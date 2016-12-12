@@ -3,10 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.actions.CruiseChecker;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,7 +18,7 @@ import java.util.TreeSet;
  * 
  * @author Karl Smith
  */
-public class RecheckCruises {
+public class RecheckDatasets {
 
 	/**
 	 * @param args
@@ -70,14 +70,14 @@ public class RecheckCruises {
 		}
 		int retVal = 0;
 		try {
-			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-			CruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+			DataFileHandler cruiseHandler = configStore.getDataFileHandler();
+			DatasetChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 
 			for ( String expo : expocodes ) {
 				// Get all the data for this cruise
-				DashboardCruiseWithData cruiseData;
+				DashboardDatasetData cruiseData;
 				try {
-					cruiseData = cruiseHandler.getCruiseDataFromFiles(expo, 0, -1);
+					cruiseData = cruiseHandler.getDatasetDataFromFiles(expo, 0, -1);
 				} catch ( Exception ex ) {
 					System.err.println("Error - " + expo + " - problems obtaining cruise data");
 					retVal = 1;

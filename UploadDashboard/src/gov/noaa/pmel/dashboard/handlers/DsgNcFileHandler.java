@@ -8,13 +8,13 @@ import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,17 +108,17 @@ public class DsgNcFileHandler {
 	 * Generates the cruise-specific full NetCDF DSG abstract file for a cruise.
 	 * Creates the parent subdirectory if it does not exist.
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise 
+	 * @param dataset
+	 * 		dataset of the cruise 
 	 * @return
 	 * 		full NetCDF DSG abstract file for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or
+	 * 		if the dataset is invalid, or
 	 * 		if problems creating the parent subdirectory
 	 */
 	public DsgNcFile getDsgNcFile(String expocode) throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Check and standardize the dataset
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		// Make sure the parent directory exists
 		File parentDir = new File(dsgFilesDir, upperExpo.substring(0,4));
 		if ( parentDir.exists() ) {
@@ -141,16 +141,16 @@ public class DsgNcFileHandler {
 	 * methods should not be used with the decimated data file; the actual decimated 
 	 * DSG file is created using {@link #decimateCruise(String)}.
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise
+	 * @param dataset
+	 * 		dataset of the cruise
 	 * @return
 	 * 		decimated NetCDF DSG abstract file for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 */
 	public DsgNcFile getDecDsgNcFile(String expocode) throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Check and standardize the dataset
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		// Make sure the parent directory exists
 		File parentDir = new File(decDsgFilesDir, upperExpo.substring(0,4));
 		if ( parentDir.exists() ) {
@@ -175,7 +175,7 @@ public class DsgNcFileHandler {
 	 * 
 	 * @param omeMData
 	 * 		metadata for the cruise
-	 * @param cruiseData
+	 * @param datasetData
 	 * 		data for the cruise
 	 * @param versionStatus
 	 * 		version number and status to assign
@@ -186,19 +186,19 @@ public class DsgNcFileHandler {
 	 * 		if there are problems with the metadata or data given, or
 	 * 		if there are problems creating or writing the full-data DSG file
 	 */
-	public void saveCruise(DashboardOmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
+	public void saveCruise(DashboardOmeMetadata omeMData, DashboardDatasetData cruiseData, 
 			String versionStatus, String qcFlag) throws IllegalArgumentException {
 		// Get the location and name for the NetCDF DSG file
-		DsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
+		DsgNcFile dsgFile = getDsgNcFile(omeMData.getDatasetId());
 
 		// Get the metadata needed for creating the DSG file
-		DsgMetadata dsgMData = omeMData.createSocatMetadata();
+		DsgMetadata dsgMData = omeMData.createDsgMetadata();
 		dsgMData.setVersion(versionStatus);
 		dsgMData.setQcFlag(qcFlag);
 
 		// Convert the cruise data strings into the appropriate type
-		ArrayList<DsgCruiseData> socatDatalist = 
-				DsgCruiseData.dataListFromDashboardCruise(knownDataFileTypes, cruiseData);
+		ArrayList<DsgData> socatDatalist = 
+				DsgData.dataListFromDashboardCruise(knownDataFileTypes, cruiseData);
 
 		// Create the NetCDF DSG file
 		try {
@@ -213,7 +213,7 @@ public class DsgNcFileHandler {
 		SocatTool tool = new SocatTool(ferretConfig);
 		ArrayList<String> scriptArgs = new ArrayList<String>(1);
 		scriptArgs.add(dsgFile.getPath());
-		tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
+		tool.init(scriptArgs, cruiseData.getDatasetId(), FerretConfig.Action.COMPUTE);
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
@@ -228,8 +228,8 @@ public class DsgNcFileHandler {
 	 * This notification is not done in this routine so that a single 
 	 * notification event can be made after multiple modifications.
 	 * 
-	 * @param expocode
-	 * 		generate the decimated-data DSG file for the dataset with this expocode
+	 * @param dataset
+	 * 		generate the decimated-data DSG file for the dataset with this dataset
 	 * @throws IllegalArgumentException
 	 * 		if there are problems reading the full-data DSG file, or
 	 * 		if there are problems creating or writing the decimated-data DSG file
@@ -258,18 +258,18 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Appropriately renames any DSG and decimated DSG files, if they exist, 
-	 * for a change in cruise expocode.  Renames the expocode in the DSG files.
+	 * for a change in cruise dataset.  Renames the dataset in the DSG files.
 	 * 
 	 * @param oldExpocode
-	 * 		standardized old expocode of the cruise
+	 * 		standardized old dataset of the cruise
 	 * @param newExpocode
-	 * 		standardized new expocode for the cruise
+	 * 		standardized new dataset for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if a DSG or decimated DSG file for the new expocode already exists, or
+	 * 		if a DSG or decimated DSG file for the new dataset already exists, or
 	 * 		if the contents of the old DSG file are invalid
 	 * @throws IOException
-	 * 		if unable to regenerate the DSG or decimated DSG file with the new expocode
-	 * 		from the data and metadata (except for expocode-related fields) in the old 
+	 * 		if unable to regenerate the DSG or decimated DSG file with the new dataset
+	 * 		from the data and metadata (except for dataset-related fields) in the old 
 	 * 		DSG file, or if unable to delete the old DSG or decimated DSG file
 	 */
 	public void renameDsgFiles(String oldExpocode, String newExpocode) 
@@ -294,9 +294,9 @@ public class DsgNcFileHandler {
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected data fields missing from the DSG file: " + missing);
 			try {
-				ArrayList<DsgCruiseData> dataVals = oldDsgFile.getDataList();
+				ArrayList<DsgData> dataVals = oldDsgFile.getDataList();
 				DsgMetadata updatedMeta = oldDsgFile.getMetadata();
-				updatedMeta.setExpocode(newExpocode);
+				updatedMeta.setDatasetId(newExpocode);
 				newDsgFile.create(updatedMeta, dataVals);
 				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 				SocatTool tool = new SocatTool(ferretConfig);
@@ -329,12 +329,12 @@ public class DsgNcFileHandler {
 	 * is not done in this routine so that a single notification event can be
 	 * made after multiple modifications.
 	 * 
-	 * @param expocode
-	 * 		delete the DSG and decimated DSG files for the dataset with this expocode
+	 * @param dataset
+	 * 		delete the DSG and decimated DSG files for the dataset with this dataset
 	 * @return
 	 * 		true if a file was deleted
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid or 
+	 * 		if the dataset is invalid or 
 	 * 		if unable to delete one of the files 
 	 */
 	public boolean deleteCruise(String expocode) throws IllegalArgumentException {
@@ -386,13 +386,13 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as characters.  Empty strings are changed to 
-	 * {@link DsgCruiseData#CHAR_MISSING_VALUE}.  For some variables, the  
+	 * {@link DsgData#CHAR_MISSING_VALUE}.  For some variables, the  
 	 * DSG file must have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
 	 * 
-	 * @param expocode
-	 * 		get the data values for the cruise with this expocode
+	 * @param dataset
+	 * 		get the data values for the cruise with this dataset
 	 * @param varName
 	 * 		name of the variable to read
 	 * @return
@@ -419,11 +419,11 @@ public class DsgNcFileHandler {
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as integers.  For some variables, the DSG file 
 	 * must have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
 	 * 
-	 * @param expocode
-	 * 		get the data values for the cruise with this expocode
+	 * @param dataset
+	 * 		get the data values for the cruise with this dataset
 	 * @param varName
 	 * 		name of the variable to read
 	 * @return
@@ -448,13 +448,13 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the full-data DSG file for the specified cruise.  The 
 	 * variable must be saved in the DSG file as doubles.  NaN and infinite 
-	 * values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  For 
+	 * values are changed to {@link DsgData#FP_MISSING_VALUE}.  For 
 	 * some variables, the DSG file must have been processed by Ferret, such 
 	 * as when saved using {@link DsgNcFileHandler#saveCruise(OmeMetadata, 
-	 * DashboardCruiseWithData, String)} for the data values to be meaningful.
+	 * DashboardDatasetData, String)} for the data values to be meaningful.
 	 * 
-	 * @param expocode
-	 * 		get the data values for the cruise with this expocode
+	 * @param dataset
+	 * 		get the data values for the cruise with this dataset
 	 * @param varName
 	 * 		name of the variable to read
 	 * @return
@@ -478,16 +478,16 @@ public class DsgNcFileHandler {
 	/**
 	 * Reads and returns the longitudes, latitudes, and times contained in the 
 	 * full-data DSG file for the specified cruise.  NaN and infinite values 
-	 * are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.
+	 * are changed to {@link DsgData#FP_MISSING_VALUE}.
 	 * 
-	 * @param expocode
-	 * 		get the data values for the cruise with this expocode
+	 * @param dataset
+	 * 		get the data values for the cruise with this dataset
 	 * @return
 	 * 		the array { lons, lats, times } from the full-data DSG file, 
 	 * 		where lons are the array of longitudes, lats are the array of latitudes, 
 	 * 		times are the array of times.
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 * @throws FileNotFoundException
 	 * 		if the full-data DSG file does not exist
 	 * @throws IOException
@@ -505,10 +505,10 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Read and returns the QC flag contained in the DSG file 
-	 * for the cruise with the indicated expocode.
+	 * for the cruise with the indicated dataset.
 	 * 
-	 * @param expocode
-	 * 		get the DSG file QC flag for the cruise with this expocode
+	 * @param dataset
+	 * 		get the DSG file QC flag for the cruise with this dataset
 	 * @return
 	 * 		the QC flag contained in the DSG file for the cruise
 	 * @throws FileNotFoundException
@@ -516,7 +516,7 @@ public class DsgNcFileHandler {
 	 * @throws IOException
 	 * 		if there is a problem opening or reading from this DSG file
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is not invalid, or
+	 * 		if the dataset is not invalid, or
 	 * 		if the DSG file for the cruise is not valid
 	 */
 	public char getQCFlag(String expocode) 
@@ -530,10 +530,10 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Assigns the QC flag given in qcEvent in the full and decimated 
-	 * DSG files for the dataset with the expocode given in qvEvent. 
+	 * DSG files for the dataset with the dataset given in qvEvent. 
 	 * 
 	 * @param qcEvent
-	 * 		get the QC flag and dataset expocode from here
+	 * 		get the QC flag and dataset dataset from here
 	 * @throws IllegalArgumentException
 	 * 		if the DSG files are not valid
 	 * @throws IOException
@@ -542,13 +542,13 @@ public class DsgNcFileHandler {
 	public void updateQCFlag(QCEvent qcEvent) 
 			throws IllegalArgumentException, IOException {
 		// Get the location and name for the NetCDF DSG file
-		String expocode = qcEvent.getExpocode();
+		String expocode = qcEvent.getDatasetId();
 		DsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
 		try {
-			dsgFile.updateQCFlag(qcEvent.getFlag());
+			dsgFile.updateQCFlag(qcEvent.getFlagValue());
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
@@ -557,7 +557,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + expocode + " does not exist");
 		try {
-			decDsgFile.updateQCFlag(qcEvent.getFlag());
+			decDsgFile.updateQCFlag(qcEvent.getFlagValue());
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
@@ -570,7 +570,7 @@ public class DsgNcFileHandler {
 	 * the missing data in WOCE event (row number, region ID, data type).
 	 * 
 	 * @param woceEvent
-	 * 		WOCE event to use; the expocode is used to identify datasets to update
+	 * 		WOCE event to use; the dataset is used to identify datasets to update
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update; can be null
 	 * @throws IllegalArgumentException
@@ -578,9 +578,9 @@ public class DsgNcFileHandler {
 	 * @throws IOException
 	 * 		if problems opening, reading from, or writing to the DSG file
 	 */
-	public void updateWoceFlags(WoceEvent woceEvent, String tempDsgFilename) 
+	public void updateWoceFlags(DataQCEvent woceEvent, String tempDsgFilename) 
 								throws IllegalArgumentException, IOException {
-		String expocode = woceEvent.getExpocode();
+		String expocode = woceEvent.getDatasetId();
 		// Assign the WOCE flags in the full-data DSG file, and get missing data
 		DsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )

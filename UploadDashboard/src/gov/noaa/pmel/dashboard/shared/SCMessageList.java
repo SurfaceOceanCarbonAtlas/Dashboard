@@ -10,23 +10,23 @@ import java.util.HashSet;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Set of sanity checker SCMessages for a cruise, 
- * along with some cruise information.
+ * Set of sanity checker SCMessages for a dataset, 
+ * along with some dataset information.
  * 
  * @author Karl Smith
  */
 public class SCMessageList extends HashSet<SCMessage> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 2963465761569124080L;
+	private static final long serialVersionUID = 2922125729137984943L;
 
 	protected String username;
-	protected String expocode;
+	protected String datasetId;
 	protected ArrayList<String> summaries;
 
 	public SCMessageList() {
 		super();
 		username = DashboardUtils.STRING_MISSING_VALUE;
-		expocode = DashboardUtils.STRING_MISSING_VALUE;
+		datasetId = DashboardUtils.STRING_MISSING_VALUE;
 		summaries = new ArrayList<String>();
 	}
 
@@ -53,23 +53,23 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; 
+	 * 		the dataset ID; 
 	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public String getExpocode() {
-		return expocode;
+	public String getDatasetId() {
+		return datasetId;
 	}
 
 	/**
-	 * @param expocode 
-	 * 		the expocode to set; 
+	 * @param dataset 
+	 * 		the dataset to set; 
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setExpocode(String expocode) {
-		if ( expocode == null )
-			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
+	public void setDatasetId(String datasetId) {
+		if ( datasetId == null )
+			this.datasetId = DashboardUtils.STRING_MISSING_VALUE;
 		else
-			this.expocode = expocode;
+			this.datasetId = datasetId;
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	 * @param summaries 
 	 * 		the summary messages to assign.  The current list of
 	 * 		summary messages is cleared, and then the contents of
-	 * 		this list, if not null, is added to the list.
+	 * 		this list, if not null, are added to the list.
 	 */
 	public void setSummaries(ArrayList<String> summaries) {
 		this.summaries.clear();
@@ -97,7 +97,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
-		result = result * prime + expocode.hashCode();
+		result = result * prime + datasetId.hashCode();
 		result = result * prime + username.hashCode();
 		result = result * prime + summaries.hashCode();
 		return result;
@@ -114,7 +114,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 			return false;
 		SCMessageList other = (SCMessageList) obj;
 
-		if ( ! expocode.equals(other.expocode) )
+		if ( ! datasetId.equals(other.datasetId) )
 			return false;
 		if ( ! username.equals(other.username) )
 			return false;
@@ -129,7 +129,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	public String toString() {
 		return "SCMessageList" +
 				"[\n    username=" + username + 
-				",\n    expocode=" + expocode + 
+				",\n    datasetId=" + datasetId + 
 				",\n    summaries=" + summaries.toString() + 
 				",\n    " + super.toString() + 
 				" \n]";

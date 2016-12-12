@@ -13,43 +13,19 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseWithData extends DashboardCruise implements Serializable, IsSerializable {
+public class DashboardDatasetData extends DashboardDataset implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -3091386913235608854L;
+	private static final long serialVersionUID = 3410692666983612359L;
 
-	protected ArrayList<String> preamble;
 	protected ArrayList<Integer> rowNums;
 	protected ArrayList<ArrayList<String>> dataValues;
 
 	/**
 	 * Creates with no cruise data
 	 */
-	public DashboardCruiseWithData() {
-		preamble = new ArrayList<String>();
+	public DashboardDatasetData() {
 		rowNums = new ArrayList<Integer>();
 		dataValues = new ArrayList<ArrayList<String>>();
-	}
-
-	/**
-	 * @return 
-	 * 		the list of metadata preamble strings;
-	 * 		may be empty, but never null.
-	 * 		The actual list in this object is returned.
-	 */
-	public ArrayList<String> getPreamble() {
-		return preamble;
-	}
-
-	/**
-	 * @param preamble 
-	 * 		the metadata preamble strings to assign.  The list in 
-	 * 		this object is cleared and all the contents of the
-	 * 		given list, if not null, are added. 
-	 */
-	public void setPreamble(ArrayList<String> preamble) {
-		this.preamble.clear();
-		if ( preamble != null )
-			this.preamble.addAll(preamble);
 	}
 
 	/**
@@ -111,7 +87,6 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
-		result = result * prime + preamble.hashCode();
 		result = result * prime + dataValues.hashCode();
 		result = result * prime + rowNums.hashCode();
 		return result;
@@ -124,13 +99,11 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 		if (obj == null)
 			return false;
 
-		if ( ! ( obj instanceof DashboardCruiseWithData ) )
+		if ( ! ( obj instanceof DashboardDatasetData ) )
 			return false;
-		DashboardCruiseWithData other = (DashboardCruiseWithData) obj;
+		DashboardDatasetData other = (DashboardDatasetData) obj;
 
 		if ( ! super.equals(other) ) 
-			return false;
-		if ( ! preamble.equals(other.preamble) ) 
 			return false;
 		if ( ! rowNums.equals(other.rowNums) )
 			return false;
@@ -143,15 +116,15 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 	@Override
 	public String toString() {
 		String repr = 
-				"DashboardCruiseWithData[\n" +
+				"DashboardDatasetData[\n" +
 				"    selected=" + Boolean.toString(selected) + ";\n" + 
 				"    version = " + version + ";\n" + 
 				"    owner=" + owner +  ";\n" + 
-				"    expocode=" + expocode +  ";\n" + 
+				"    datasetId=" + datasetId +  ";\n" + 
 				"    dataCheckStatus=" + dataCheckStatus + ";\n" + 
 				"    omeTimestamp=" + omeTimestamp + ";\n" + 
 				"    addlDocs=" + addlDocs.toString() + ";\n" + 
-				"    qcStatus=" + qcStatus + ";\n" + 
+				"    submitStatus=" + submitStatus + ";\n" + 
 				"    archiveStatus=" + archiveStatus + ";\n" + 
 				"    archiveDate=" + archiveDate + ";\n" + 
 				"    uploadFilename=" + uploadFilename + ";\n" + 
@@ -161,11 +134,8 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 				"    numWarnRows=" + Integer.toString(numWarnRows) + ";\n" + 
 				"    userColNames=" + userColNames.toString() + ";\n" + 
 				"    dataColTypes=" + dataColTypes.toString() + ";\n" + 
-				"    checkerWoceThrees = " + checkerWoceThrees.toString() + ";\n" + 
-				"    checkerWoceFours = " + checkerWoceFours.toString() + ";\n" + 
-				"    userWoceThreeRowIndices = " + userWoceThrees.toString() + ";\n" + 
-				"    userWoceFourRowIndices = " + userWoceFours.toString() + ";\n" + 
-				"    preamble = " + preamble.toString() + ";\n" + 
+				"    checkerFlags = " + checkerFlags.toString() + ";\n" + 
+				"    userFlags = " + userFlags.toString() + ";\n" + 
 				"    dataValues = [\n";
 		for (int k = 0; k < rowNums.size(); k++)
 			repr += "         " + rowNums.get(k).toString() + ": " + dataValues.get(k).toString() + ",\n";

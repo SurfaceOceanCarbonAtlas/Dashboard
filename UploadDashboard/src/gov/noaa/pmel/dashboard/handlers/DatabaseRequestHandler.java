@@ -6,7 +6,7 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -373,16 +373,16 @@ public class DatabaseRequestHandler {
 			int reviewerId = getReviewerId(catConn, 
 					qcEvent.getUsername(), qcEvent.getRealname());
 			PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" + 
-					QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
+					QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `dataset`, " +
 					"`qc_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES(?, ?, ?, ?, ?, ?, ?);");
-			addPrepStmt.setString(1, qcEvent.getFlag().toString());
+			addPrepStmt.setString(1, qcEvent.getFlagValue());
 			Date flagDate = qcEvent.getFlagDate();
 			if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
 				addPrepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
 			else
 				addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
-			addPrepStmt.setString(3, qcEvent.getExpocode());
+			addPrepStmt.setString(3, qcEvent.getDatasetId());
 			addPrepStmt.setString(4, qcEvent.getVersion());
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
@@ -394,7 +394,7 @@ public class DatabaseRequestHandler {
 
 	/**
 	 * Removed any QC events that:
-	 * (1) are for the given expocode,
+	 * (1) are for the given dataset,
 	 * (2) are for the coastal region,
 	 * (3) have new (N) or update (U) flags,
 	 * (4) have a comment starting with "Initial".
@@ -403,8 +403,8 @@ public class DatabaseRequestHandler {
 	 * mistakenly assigned coastal region in the Southern or Arctic Oceans
 	 * (which do not have coastal regions).
 	 * 
-	 * @param expocode
-	 * 		remove initial coastal QC flags for the cruise with this expocode
+	 * @param dataset
+	 * 		remove initial coastal QC flags for the cruise with this dataset
 	 * @returns 
 	 * 		the row count returned from the DELETE SQL statement
 	 * @throws SQLException
@@ -415,7 +415,7 @@ public class DatabaseRequestHandler {
 		Connection catConn = makeConnection(true);
 		try {
 			PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
-					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" + 
+					QCEVENTS_TABLE_NAME + "` WHERE `dataset` = ? AND `qc_flag` IN ('" + 
 					DashboardUtils.QC_NEW_FLAG + "','" + DashboardUtils.QC_UPDATED_FLAG + 
 					"') AND `region_id` = '" + DashboardUtils.COASTAL_REGION_ID + 
 					"' AND `qc_comment` LIKE 'Initial%'");
@@ -434,15 +434,15 @@ public class DatabaseRequestHandler {
 	 * this conflict, the {@link DashboardUtils#QC_CONFLICT_FLAG} flag is 
 	 * returned.
 	 * 
-	 * @param expocode
-	 * 		get the QC flag for the dataset with this expocode.
+	 * @param dataset
+	 * 		get the QC flag for the dataset with this dataset.
 	 * @return
 	 * 		the QC flag for the dataset; never null
 	 * @throws SQLException
 	 * 		if a problem occurs getting all QC events for the data set, or
 	 * 		if the QC flags in the dataset are corrupt.
 	 */
-	public Character getQCFlag(String expocode) throws SQLException {
+	public String getQCFlag(String expocode) throws SQLException {
 		HashMap<Character,QCEvent> regionFlags = new HashMap<Character,QCEvent>();
 		long lastUpdateTime = MIN_FLAG_SEC_TIME * 1000L;
 		Connection catConn = makeConnection(false);
@@ -450,7 +450,7 @@ public class DatabaseRequestHandler {
 			// Get all the QC events for this data set, ordered so the latest are last
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `qc_flag`, `qc_time`, `region_id` FROM `" + QCEVENTS_TABLE_NAME + 
-					"` WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
+					"` WHERE `dataset` = ? ORDER BY `qc_time` ASC;");
 			getPrepStmt.setString(1, expocode);
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
@@ -489,7 +489,7 @@ public class DatabaseRequestHandler {
 						lastUpdateTime = time;
 					}
 					QCEvent qcFlag = new QCEvent();
-					qcFlag.setFlag(flag);
+					qcFlag.setFlagValue(flag);
 					qcFlag.setFlagDate(new Date(time));
 					// last are latest, so no need to check the return value
 					regionFlags.put(regionID, qcFlag);
@@ -503,7 +503,7 @@ public class DatabaseRequestHandler {
 
 		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
 		QCEvent globalEvent = regionFlags.get(DashboardUtils.GLOBAL_REGION_ID);
-		Character globalFlag;
+		String globalFlag;
 		long globalTime;
 		if ( globalEvent == null ) {
 			// Some v1 cruises do not have global flags
@@ -511,7 +511,7 @@ public class DatabaseRequestHandler {
 			globalTime = lastUpdateTime;
 		}
 		else {
-			globalFlag = globalEvent.getFlag();
+			globalFlag = globalEvent.getFlagValue();
 			globalTime = globalEvent.getFlagDate().getTime();
 		}
 
@@ -519,7 +519,7 @@ public class DatabaseRequestHandler {
 		// (1) global flag is last, or 
 		// (2) all region flags are after global flag and match, or
 		// (3) region flags after global flag match global flag  
-		Character latestFlag = null;
+		String latestFlag = null;
 		for ( Entry<Character,QCEvent> regionEntry : regionFlags.entrySet() ) {
 			// Just compare non-global entries
 			if ( DashboardUtils.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
@@ -529,10 +529,10 @@ public class DatabaseRequestHandler {
 			long time = qcEvent.getFlagDate().getTime();
 			if  ( time - lastUpdateTime < -1000L )
 				continue;
-			Character flag;
+			String flag;
 			if ( time >  globalTime ) {
 				// last flag for this region set after the last global flag; its flag applies
-				flag = qcEvent.getFlag();
+				flag = qcEvent.getFlagValue();
 			}
 			else { 
 				// last flag for this region set before the last global flag; the global flag applies
@@ -560,8 +560,8 @@ public class DatabaseRequestHandler {
 	 * to a 'U'.  The version number used is the largest version 
 	 * number of global new and update QC flags for this dataset in the database.
 	 * 
-	 * @param expocode
-	 * 		get the version status String for the dataset with this expocode 
+	 * @param dataset
+	 * 		get the version status String for the dataset with this dataset 
 	 * @return
 	 * 		the version number status String; never null but may be empty
 	 * 		if no global new or update QC flags exist.
@@ -576,7 +576,7 @@ public class DatabaseRequestHandler {
 			// Get all the QC events for this data set, ordered so the latest are last
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `qc_version` FROM `" + QCEVENTS_TABLE_NAME + 
-					"` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.GLOBAL_REGION_ID +
+					"` WHERE `dataset` = ? AND `region_id` = '" + DashboardUtils.GLOBAL_REGION_ID +
 					"' AND `qc_flag` IN ('" + DashboardUtils.QC_NEW_FLAG + 
 					"', '" + DashboardUtils.QC_UPDATED_FLAG + "');");
 			getPrepStmt.setString(1, expocode);
@@ -622,7 +622,7 @@ public class DatabaseRequestHandler {
 	 * 
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
-	 * 		include columns with names qc_flag, qc_time, expocode, 
+	 * 		include columns with names qc_flag, qc_time, dataset, 
 	 * 		qc_version, region_id, username, realname, and qc_comment.
 	 * @returns
 	 * 		the created QC flag
@@ -636,7 +636,7 @@ public class DatabaseRequestHandler {
 			throw new SQLException("Unexpected invalid qc_id");
 		qcEvent.setId(id);
 		try {
-			qcEvent.setFlag(results.getString("qc_flag").charAt(0));
+			qcEvent.setFlagValue(results.getString("qc_flag"));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL qc_flag");
 		} catch (IndexOutOfBoundsException ex) {
@@ -645,7 +645,7 @@ public class DatabaseRequestHandler {
 		qcEvent.setFlagDate(new Date(results.getLong("qc_time") * 1000L));
 		if ( results.wasNull() )
 			qcEvent.setFlagDate(null);
-		qcEvent.setExpocode(results.getString("expocode"));
+		qcEvent.setDatasetId(results.getString("dataset"));
 		qcEvent.setVersion(results.getString("qc_version"));
 		if ( results.wasNull() )
 			qcEvent.setVersion(null);
@@ -658,8 +658,8 @@ public class DatabaseRequestHandler {
 	/**
 	 * Retrieves the current list of QC events for a dataset.
 	 * 
-	 * @param expocode
-	 * 		get the QC events for the dataset with this expocode 
+	 * @param dataset
+	 * 		get the QC events for the dataset with this dataset 
 	 * @return
 	 * 		the list of QC events for the dataset, ordered by the date
 	 * 		of the event (latest event first)
@@ -703,7 +703,7 @@ public class DatabaseRequestHandler {
 	 * 		if the reviewer cannot be found in the reviewers table, or
 	 * 		if a problem occurs adding the WOCE event
 	 */
-	public void addWoceEvent(WoceEvent woceEvent) throws SQLException {
+	public void addWoceEvent(DataQCEvent woceEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			int reviewerId = getReviewerId(catConn, 
@@ -711,16 +711,16 @@ public class DatabaseRequestHandler {
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, " +
-					"`woce_time`, `expocode`, `qc_version`, `data_name`, " + 
+					"`woce_time`, `dataset`, `qc_version`, `data_name`, " + 
 					"`reviewer_id`, `woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
-			prepStmt.setString(1, woceEvent.getWoceName());
-			prepStmt.setString(2, woceEvent.getFlag().toString());
+			prepStmt.setString(1, woceEvent.getFlagName());
+			prepStmt.setString(2, woceEvent.getFlagValue().toString());
 			Date flagDate = woceEvent.getFlagDate();
 			if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
 				prepStmt.setLong(3, Math.round(System.currentTimeMillis() / 1000.0));
 			else
 				prepStmt.setLong(3, Math.round(flagDate.getTime() / 1000.0));
-			prepStmt.setString(4, woceEvent.getExpocode());
+			prepStmt.setString(4, woceEvent.getDatasetId());
 			prepStmt.setString(5, woceEvent.getVersion());
 			prepStmt.setString(6, woceEvent.getVarName());
 			prepStmt.setInt(7, reviewerId);
@@ -786,12 +786,12 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Creates a WoceEvent without any locations 
+	 * Creates a DataQCEvent without any locations 
 	 * from the values in the current row of a ResultSet.
 	 * 
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
-	 * 		include columns with names woce_flag, woce_time, expocode, 
+	 * 		include columns with names woce_flag, woce_time, dataset, 
 	 * 		qc_version, data_name, username, realname, 
 	 * 		and woce_comment.
 	 * @returns
@@ -799,15 +799,15 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if getting values from the ResultSet throws one
 	 */
-	private WoceEvent createWoceEvent(ResultSet results) throws SQLException {
-		WoceEvent woceEvent = new WoceEvent();
+	private DataQCEvent createWoceEvent(ResultSet results) throws SQLException {
+		DataQCEvent woceEvent = new DataQCEvent();
 		Long id = results.getLong("woce_id");
 		if ( id < 1 )
 			throw new SQLException("Unexpected invalid woce_id");
 		woceEvent.setId(id);
-		woceEvent.setWoceName(results.getString("woce_name"));
+		woceEvent.setFlagName(results.getString("woce_name"));
 		try {
-			woceEvent.setFlag(results.getString("woce_flag").charAt(0));
+			woceEvent.setFlagValue(results.getString("woce_flag"));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL woce_flag");
 		} catch (IndexOutOfBoundsException ex) {
@@ -816,7 +816,7 @@ public class DatabaseRequestHandler {
 		woceEvent.setFlagDate(new Date(results.getLong("woce_time") * 1000L));
 		if ( results.wasNull() )
 			woceEvent.setFlagDate(null);
-		woceEvent.setExpocode(results.getString("expocode"));
+		woceEvent.setDatasetId(results.getString("dataset"));
 		woceEvent.setVersion(results.getString("qc_version"));
 		woceEvent.setVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
@@ -862,8 +862,8 @@ public class DatabaseRequestHandler {
 	/**
 	 * Retrieves the current list of WOCE events for a dataset.
 	 * 
-	 * @param expocode
-	 * 		get the WOCE events for the dataset with this expocode 
+	 * @param dataset
+	 * 		get the WOCE events for the dataset with this dataset 
 	 * @param latestFirst
 	 * 		order with the latest first?
 	 * @return
@@ -873,9 +873,9 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<WoceEvent> getWoceEvents(String expocode, 
+	public ArrayList<DataQCEvent> getWoceEvents(String expocode, 
 									boolean latestFirst) throws SQLException {
-		ArrayList<WoceEvent> eventsList = new ArrayList<WoceEvent>();
+		ArrayList<DataQCEvent> eventsList = new ArrayList<DataQCEvent>();
 		Connection catConn = makeConnection(false);
 		try {
 			String order;
@@ -900,7 +900,7 @@ public class DatabaseRequestHandler {
 			}
 			prepStmt = catConn.prepareStatement("SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME + 
 					"` WHERE `woce_id` = ? ORDER BY `row_num`;");
-			for (WoceEvent event : eventsList) {
+			for (DataQCEvent event : eventsList) {
 				// Directly modify the list of locations in the WOCE event
 				ArrayList<DataLocation> locations = event.getLocations();
 				prepStmt.setLong(1, event.getId());
@@ -924,8 +924,8 @@ public class DatabaseRequestHandler {
 	 * corresponding "old" WOCE flag values.  This should be called prior 
 	 * to adding WOCE events for an updated cruise.
 	 * 
-	 * @param expocode
-	 * 		reset the WOCE events for the cruise with this expocode
+	 * @param dataset
+	 * 		reset the WOCE events for the cruise with this dataset
 	 * @throws SQLException
 	 * 		if modifying the WOCE events in the database throws one
 	 */
@@ -934,7 +934,7 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
 					"UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? " +
-					"WHERE `expocode` = ? AND `woce_flag` = ?;");
+					"WHERE `dataset` = ? AND `woce_flag` = ?;");
 			modifyWocePrepStmt.setString(2, expocode);
 
 			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_GOOD.toString());
@@ -973,17 +973,17 @@ public class DatabaseRequestHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the WOCE flag in the event is not a "old" WOCE flag, or
 	 * 		if WOCE event does not match an existing WOCE flag
-	 * 		(woce_id, expocode, old woce_flag)
+	 * 		(woce_id, dataset, old woce_flag)
 	 * @throws SQLException
 	 * 		if modifying the WOCE event in the database throws one
 	 */
-	public Character restoreWoceEvent(WoceEvent woceEvent) 
+	public String restoreWoceEvent(DataQCEvent woceEvent) 
 								throws IllegalArgumentException, SQLException {
 		if ( woceEvent.getId() < 1 )
 			throw new IllegalArgumentException("Invalid ID for WOCE event");
 
-		Character newFlag;
-		Character oldFlag = woceEvent.getFlag();
+		String newFlag;
+		String oldFlag = woceEvent.getFlagValue();
 		if ( oldFlag.equals(DashboardUtils.OLD_WOCE_GOOD) ) {
 			newFlag = DashboardUtils.WOCE_GOOD;
 		}
@@ -1007,10 +1007,10 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement("UPDATE `" + 
 					WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? WHERE " +
-					"`woce_id` = ? AND `expocode` = ? AND `woce_flag` = ?;");
+					"`woce_id` = ? AND `dataset` = ? AND `woce_flag` = ?;");
 			prepStmt.setString(1, newFlag.toString());
 			prepStmt.setLong(2, woceEvent.getId());
-			prepStmt.setString(3, woceEvent.getExpocode());
+			prepStmt.setString(3, woceEvent.getDatasetId());
 			prepStmt.setString(4, oldFlag.toString());
 			if ( prepStmt.executeUpdate() != 1 ) {
 				// woce_id is a unique key, so could not be more than one
@@ -1026,15 +1026,15 @@ public class DatabaseRequestHandler {
 
 	/**
 	 * Adds rename QC and WOCE events and appropriately renames 
-	 * the expocode for flags in the database.  If the cruise has
+	 * the dataset for flags in the database.  If the cruise has
 	 * never been submitted for QC, or was already renamed, (i.e.,
 	 * has no QC events except maybe renames), returns without 
 	 * making any changes.
 	 * 
 	 * @param oldExpocode
-	 * 		standardized old expocode 
+	 * 		standardized old dataset 
 	 * @param newExpocode
-	 * 		standardized new expocode
+	 * 		standardized new dataset
 	 * @param version
 	 * 		version to associate with the rename QC and WOCE events
 	 * @param username
@@ -1051,10 +1051,10 @@ public class DatabaseRequestHandler {
 			int reviewerId = getReviewerId(catConn, username, "");
 			String renameComment = "Rename from " + oldExpocode + " to " + newExpocode;
 
-			// Update the old expocode to the new expocode in the appropriate QC events
+			// Update the old dataset to the new dataset in the appropriate QC events
 			PreparedStatement modifyQcPrepStmt = catConn.prepareStatement(
-					"UPDATE `" + QCEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
-					"WHERE `expocode` = ? AND `qc_flag` <> ?;");
+					"UPDATE `" + QCEVENTS_TABLE_NAME + "` SET `dataset` = ? " +
+					"WHERE `dataset` = ? AND `qc_flag` <> ?;");
 			modifyQcPrepStmt.setString(1, newExpocode);
 			modifyQcPrepStmt.setString(2, oldExpocode);
 			modifyQcPrepStmt.setString(3, DashboardUtils.QC_RENAMED_FLAG.toString());
@@ -1063,15 +1063,15 @@ public class DatabaseRequestHandler {
 			if ( updateCount < 0 )
 				throw new SQLException("Unexpected update count from renaming QC expocodes");
 			if ( updateCount == 0 ) {
-				// If no QC flags with the old expocode, cruise has never been submitted 
+				// If no QC flags with the old dataset, cruise has never been submitted 
 				// or was already renamed; in either case, nothing to do. 
 				return;
 			}
 
-			// Add two rename QC events; one for the old expocode and one for the new expocode
+			// Add two rename QC events; one for the old dataset and one for the new dataset
 			PreparedStatement addQcPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
-					"`expocode`, `qc_version`, `reviewer_id`, `qc_comment`) " +
+					"`dataset`, `qc_version`, `reviewer_id`, `qc_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
 			addQcPrepStmt.setString(1, DashboardUtils.QC_RENAMED_FLAG.toString());
 			addQcPrepStmt.setString(7, DashboardUtils.QC_RENAMED_FLAG.toString());
@@ -1093,19 +1093,19 @@ public class DatabaseRequestHandler {
 			addQcPrepStmt.setString(18, renameComment);
 			addQcPrepStmt.executeUpdate();
 
-			// Update the old expocode to the new expocode in the appropriate WOCE events
+			// Update the old dataset to the new dataset in the appropriate WOCE events
 			PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
-					"UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
-					"WHERE `expocode` = ? AND `woce_flag` <> ?;");
+					"UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `dataset` = ? " +
+					"WHERE `dataset` = ? AND `woce_flag` <> ?;");
 			modifyWocePrepStmt.setString(1, newExpocode);
 			modifyWocePrepStmt.setString(2, oldExpocode);
 			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_RENAME.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			// Add two rename WOCE events; one for the old expocode and one for the new expocode
+			// Add two rename WOCE events; one for the old dataset and one for the new dataset
 			PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
-					"`expocode`, `qc_version`, `reviewer_id`, `woce_comment`) " +
+					"`dataset`, `qc_version`, `reviewer_id`, `woce_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
 			addWocePrepStmt.setString(1, DashboardUtils.WOCE_RENAME_VARNAME);
 			addWocePrepStmt.setString(8, DashboardUtils.WOCE_RENAME_VARNAME);
@@ -1128,10 +1128,10 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Removes all QC and WOCE flags that have the given expocode and version.
+	 * Removes all QC and WOCE flags that have the given dataset and version.
 	 * 
-	 * @param expocode
-	 * 		expocode to use
+	 * @param dataset
+	 * 		dataset to use
 	 * @param version
 	 * 		version to use
 	 * @throws SQLException
@@ -1142,7 +1142,7 @@ public class DatabaseRequestHandler {
 		try {
 			// Remove any QC events for this cruise version
 			PreparedStatement deleteQcPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
-					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_version` = ?;");
+					QCEVENTS_TABLE_NAME + "` WHERE `dataset` = ? AND `qc_version` = ?;");
 			deleteQcPrepStmt.setString(1, expocode);
 			deleteQcPrepStmt.setString(2, socatVersion);
 			deleteQcPrepStmt.executeUpdate();

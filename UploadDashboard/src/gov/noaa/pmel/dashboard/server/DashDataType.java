@@ -236,43 +236,60 @@ public class DashDataType implements Comparable<DashDataType> {
 	}
 
 	/**
+	 * A QC flag type has a category name of {@link DashboardUtils#QUALITY_CATEGORY},
+	 * a data class name of {@link DashboardUtils#CHAR_DATA_CLASS_NAME}, and has a
+	 * variable name that starts with (case insensitive) "QC_" or "WOCE_" (or is
+	 * just "QC" or "WOCE").
+	 * 
 	 * @return
-	 * 		if this is a WOCE flag type
+	 * 		if this is a QC flag type
 	 */
-	public boolean isWoceType() {
-		return dataType.isWoceType();
+	public boolean isQCType() {
+		return dataType.isQCType();
 	}
 
 	/**
-	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * A (general) comment type has a data class name of 
+	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable 
+	 * name that contains (case insensitive) the word "COMMENT". 
 	 * 
-	 * @param woceType
-	 * 		WOCE flag type to use;
-	 * 		if null, checks if this a comment for any possible WOCE flag type. 
 	 * @return
-	 * 		if this type is a WOCE comment for the given WOCE flag type
-	 * @throws IllegalArgumentException
-	 * 		if woceType is not null and not a WOCE flag type
+	 * 		if this type is a comment for the given data type
 	 */
-	public boolean isWoceCommentFor(DataColumnType woceType) throws IllegalArgumentException {
-		return dataType.isWoceCommentFor(woceType);
+	public boolean isCommentType() {
+		return dataType.isCommentType();
 	}
 
 	/**
-	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * A comment type for another data type has a data class name of 
+	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable name 
+	 * that is (case insensitive) either: "COMMENT_" followed by the other 
+	 * data variable name, or the other data variable name followed by 
+	 * "_COMMENT". 
 	 * 
-	 * @param woceType
-	 * 		WOCE flag type to use;
-	 * 		if null, checks if this a comment for any possible WOCE flag type. 
+	 * @param dtype
+	 * 		given data type; cannot be null
 	 * @return
-	 * 		if this type is a WOCE comment for the given WOCE flag type
-	 * @throws IllegalArgumentException
-	 * 		if woceType is not null and not a WOCE flag type
+	 * 		if this type is a comment for the given data type
 	 */
-	public boolean isWoceCommentFor(DashDataType woceType) throws IllegalArgumentException {
-		if ( woceType == null )
-			return dataType.isWoceCommentFor(null);
-		return dataType.isWoceCommentFor(woceType.dataType);
+	public boolean isCommentTypeFor(DataColumnType dtype) {
+		return dataType.isCommentTypeFor(dtype);
+	}
+
+	/**
+	 * A comment type for another data type has a data class name of 
+	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable name 
+	 * that is (case insensitive) either: "COMMENT_" followed by the other 
+	 * data variable name, or the other data variable name followed by 
+	 * "_COMMENT". 
+	 * 
+	 * @param dtype
+	 * 		given data type; cannot be null
+	 * @return
+	 * 		if this type is a comment for the given data type
+	 */
+	public boolean isCommentTypeFor(DashDataType dtype) {
+		return dataType.isCommentTypeFor(dtype.dataType);
 	}
 
 	/**

@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class CruiseUploadPage extends CompositeWithUsername {
+public class DataUploadPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Upload Data Files";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -46,94 +46,59 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String MORE_HELP_TEXT = "more help...";
 
 	private static final String UPLOAD_FILE_DESCRIPTION_HTML = 
-			"<p>A data file for upload has the general format:<ul>" +
-			"<li>a line of metadata for each metadata item,</li> " +
-			"<li>a line of data column headers,</li>" +
-			"<li>a line of data column units (optional),</li>" +
-			"<li>a line of data values for each data sample</li>" +
+			"<p>A data file for upload has the general format: " +
+			"<ul style=\"list-style-type:none\">" +
+			"  <li>a header line of data column names,</li>" +
+			"  <li>an optional header line of data column units,</li>" +
+			"  <li>and for each sample, a line of data values.</li>" +
 			"</ul></p>" +
-			"<p>The expocode, vessel (ship) name, and investigators " +
-			"names must be given (vessel type is optional) in either " +
-			"the metadata lines: " +
-			"<ul style=\"list-style-type: none\">" +
-			"<li>expocode: ZZZZ20051231</li>" +
-			"<li>vessel name: Pacific Minnow</li>" +
-			"<li>PIs: Smith, K.; Doe, J.</li>" +
-			"<li>vessel type: Ship</li>" +
-			"</ul> " +
-			"or they can be in columns with appropriate names.  </p>";
+			"<p>An appropriately-named column containing the dataset " +
+			"or cruise name must be given; acceptable column names include: " +
+			"<ul style=\"list-style-type:none\">" +
+			"  <li>cruise</li>" +
+			"  <li>cruise name</li>" +
+			"  <li>cruise id</li>" +
+			"  <li>dataset</li>" +
+			"  <li>dataset name</li>" +
+			"  <li>dataset id</li>" +
+			"</ul>" +
+			"The data of each a sample will be associated with the " +
+			"dataset ID created from the name given in this column " +
+			"(keeping only letters, which are capitalized, and numbers).</p>";
+
 	private static final String MORE_HELP_HTML = 
-			"<p>" +
-			"The first few lines of a comma-separated upload datafile " +
-			"should look something like the follow.  Note that the data" +
-			"lines were truncated to make it easier to see the format" +
+			"<p>The first few lines of a comma-separated upload datafile " + 
+			"may look something like the follow.  (Note that the data " +
+			"lines were truncated to make it easier to see the format.) " +
+			"<ul style=\"list-style-type:none\">" +
+			"  <li>CruiseID, DATE_ddmmyyyy, TIME_hh:mm:ss, LAT_degN, LON_degE, ...<br /></li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:00:45, 12.638, -59.239, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:03:14, 12.633, -59.233, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:05:43, 12.628, -59.228, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:08:12, 12.622, -59.222, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:10:42, 12.617, -59.216, ...</li>" +
+			"</ul>" +
+			"The dataset ID for these samples will be <pre>ATLANTIS2001B</pre>" +
 			"</p><p>" +
-			"Expocode: 33AT20120417<br />" +
-			"Vessel Name: Atlantis<br />" +
-			"PI: Wanninkhof, R.<br />" +
-			"Vessel Type: Ship<br />" +
-			"<br />" +
-			"CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...<br />" +
-			"20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...<br />" +
-			"20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...<br />" +
-			"20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...<br />" +
-			"20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...<br />" +
-			"20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...<br />" +
-			"</p><p>" +
-			"The 12 character expocode is the " +
-			"<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
-			"for the vessel carrying the instrumentation followed by the " +
-			"numeric year, month, and day of departure.  For example, " +
-			"49P120101218 indicates a cruise on the Japanese (49) ship" +
-			" of opportunity Pyxis (P1) with the first day of the cruise " +
-			"on 18 December 2010.  " +
-			"</p><p>" +
-			"Tags for metadata items are case insensitive.  The tag is followed " +
-			"by either a colon or equals sign, which can have spaces around them.  " +
-			"Tags for the expocode include 'expocode' and 'cruise expocode'.  " +
-			"Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
-			"and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
-			"'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
-			"'PI name', and PI names'.  For datasets with multiple investigators, " +
-			"put all names on one metadata line and separate the names with semicolons.  " +
-			"Tags for the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
-			"If the vessel type is not specified, an intelligent guess is made based " +
-			"on the vessel name and/or the NODC code part of the expocode.  " +
-			"</p><p>" +
-			"Units for the columns can be given on a second column header line, " +
-			"such as the following:" +
-			"</p><p>" +
-			"Expocode = 33AT20120417<br />" +
-			"Vessel Name = Atlantis<br />" +
-			"Investigator = Wanninkhof, R.<br />" +
-			"Vessel Type = Ship<br />" +
-			"<br />" +
-			"CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...<br />" +
-			",Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...<br />" +
-			"20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...<br />" +
-			"20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...<br />" +
-			"20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...<br />" +
-			"20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...<br />" +
-			"20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...<br />" +
-			"</p>";
+			"Identification of column types from names is case insensitive " +
+			"and ignores any characters that are not letters or numbers. " +
+			"Units for the columns can either follow the column name, as above, " +
+			"or be given on a second column header line, such as the following:" +
+			"<ul style=\"list-style-type:none\">" +
+			"  <li>Cruise, Date, Time, Lat, Lon, ...<br /></li>" +
+			"  <li> , ddmmyyyy, hh:mm:ss, deg N, deg E, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:00:45, 12.638, -59.239, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:03:14, 12.633, -59.233, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:05:43, 12.628, -59.228, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:08:12, 12.622, -59.222, ...</li>" +
+			"  <li>Atlantis 20-01B, 19042012, 19:10:42, 12.617, -59.216, ...</li>" +
+			"</ul></p>";
 
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
 	private static final String COMMA_FORMAT_TEXT = "file contains comma-separated values";
-	private static final String COMMA_FORMAT_HELP = 
-			"the data file starts with lines of metadata, " +
-			"then has a line of comma-separated column headers, and finally " +
-			"a line of comma-separated data values for each data sample";
 	private static final String SEMICOLON_FORMAT_TEXT = "file contains semicolon-separated values";
-	private static final String SEMICOLON_FORMAT_HELP = 
-			"the data file starts with lines of metadata, " +
-			"then has a line of semicolon-separated column headers, and finally " +
-			"a line of semicolon-separated data values for each data sample";
 	private static final String TAB_FORMAT_TEXT = "file contains tab-separated values";
-	private static final String TAB_FORMAT_HELP =
-			"the data file starts with lines of metadata, " +
-			"then has a line of tab-separated column headers, and finally " +
-			"a line of tab-separated data values for each data sample";
 
 	private static final String ADVANCED_HTML_MSG = 
 			"Select a character set encoding for this file." +
@@ -156,113 +121,52 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String PREVIEW_TEXT = "Preview Data File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
 
-	private static final String CREATE_TEXT = "file contains new dataset(s)";
+	private static final String CREATE_TEXT = "only create new dataset(s)";
 	private static final String CREATE_HOVER_HELP = 
-			"the data uploaded must create new dataset(s) to be successful";
-	private static final String OVERWRITE_TEXT = "file replaces existing dataset(s)";
+			"the data uploaded must only create new datasets";
+
+	private static final String OVERWRITE_TEXT = "create new or replace existing dataset(s)";
 	private static final String OVERWRITE_HOVER_HELP = 
-			"the data uploaded must replace existing dataset(s) to be successful";
+			"the data uploaded will replace any existing dataset(s)";
+
+	private static final String APPEND_TEXT = "create new or append to existing dataset(s)";
+	private static final String APPEND_HOVER_HELP = 
+			"the data uploaded will be appended to any existing dataset(s)";
 
 	private static final String SUBMIT_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a data file to upload";
-	private static final String FAIL_MSG_HEADER = 
-			"<h3>";
 	private static final String UNEXPLAINED_FAIL_MSG = 
 			"<h3>Upload failed.</h3>" + 
 			"<p>Unexpectedly, no explanation of the failure was given</p>";
+	private static final String FAIL_MSG_START = 
+			"<h3>";
 	private static final String EXPLAINED_FAIL_MSG_START =
 			"<br />Upload failed.</h3>" +
 			"<p><pre>\n";
 	private static final String EXPLAINED_FAIL_MSG_END = 
 			"</pre></p>";
-	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<br />Expocode not found.</h3>" +
-			"<p>The data file needs to contain the dataset expocode in the " +
-			"lines of metadata preceding the data, or in a data column. " +
-			"</p><p>" +
-			"The expocode metadata line or column header should use the " +
-			"tag 'Expocode' or 'Cruise Expocode' (uppercase or lowercase " +
-			"does not matter).  The metadata line should look something " +
-			"like one of the following (when using the 'Expocode' tag): " +
-			"<ul style=\"list-style-type: none\">" +
-			"<li>Expocode = 49P120101218</li>" +
-			"<li>Expocode: 49P120101218</li>" +
-			"</ul>" +
-			"The 12 character expocode is the " +
-			"<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
-			"for the vessel carrying the instrumentation followed by the " +
-			"numeric year, month, and day of departure.  For example, " +
-			"49P120101218 indicates a cruise on the Japanese (49) ship" +
-			" of opportunity Pyxis (P1) with the first day of the cruise " +
-			"on 18 December 2010. " +
-			"</p><p>" +
-			"Please verify a valid expocode is given in your file.  You " +
-			"might want to click the Advanced Settings option on this " + 
-			"page and then click the Preview Data File button.  This will " +
-			"enable you to see how your file appears to this system and " +
-			"change the file encoding type if appropriate." +
-			"</p>";
-	private static final String NO_SHIPNAME_FAIL_MSG = 
-			"<br />Ship (Vessel) Name not found.</h3>" +
-			"<p>The data file needs to contain the ship or vessel name in " +
-			"the lines of metadata preceding the data, or in a data column. " +
-			"</p><p>" +
-			"The ship/vessel name metadata line or column header should use " +
-			"one of the tags 'ship', 'ship name', 'vessel', or 'vessel name' " +
-			"(uppercase or lowercase does not matter).  The metadata line " +
-			"should look something like one of the following (when using the " +
-			"'ship' tag): " +
-			"<ul style=\"list-style-type: none\">" +
-			"<li>ship = Pacific Minnow</li>" +
-			"<li>ship: Pacific Minnow</li>" +
-			"</ul>" +
-			"Please verify a ship or vessel name is given in your file.  " +
-			"You might want to click the Advanced Settings option on this " + 
-			"page and then click the Preview Data File button.  This will " +
-			"enable you to see how your file appears to this system and " +
-			"change the file encoding type if appropriate." +
-			"</p>";
-	private static final String NO_PINAMES_FAIL_MSG = 
-			"<br />Investigator Name(s) not found.</h3>" +
-			"<p>The data file needs to contain the investigator name(s) in " +
-			"the lines of metadata preceding the data, or in a data column. " +
-			"</p><p>" +
-			"The investigator name(s) metadata line or column header should use " +
-			"one of the tags 'investigator', 'investigator name', 'investigators', " +
-			"'investigator names', 'PI', 'PI name', 'PIs', or 'PI names' " +
-			"(uppercase or lowercase does not matter).  Use a semicolon ';' to " +
-			"separate different investigator names.  The metadata line should " +
-			"look something like one of the following (when using the 'PI names' tag): " +
-			"<ul style=\"list-style-type: none\">" +
-			"<li>PI names: Smith, K.; Doe, J.</li>" +
-			"<li>PI names = Smith, K.; Doe, J.</li>" +
-			"</ul>" +
-			"Please verify investigator names are given in your file.  " +
-			"You might want to click the Advanced Settings option on this " + 
-			"page and then click the Preview Data File button.  This will " +
-			"enable you to see how your file appears to this system and " +
-			"change the file encoding type if appropriate." +
-			"</p>";
-	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
-			"<br />A dataset already exists with this expocode.</h3>";
-	private static final String CANNOT_OVERWRITE_FAIL_MSG_END = 
-			"<p>Either you specified that this file should create a new " +
-			"dataset, or the existing dataset with this expocode cannot be " +
-			"overwritten.  Datasets cannot be overwritten if they have been " +
-			"submitted for QC, or if they do not belong to you.</p>";
-	private static final String FILE_DOES_NOT_EXIST_FAIL_MSG = 
-			"<br />A dataset with this expocode does not exist.</h3>" +
-			"<p>You specified that this file should update an existing " +
-			"dataset; however, no dataset exists with this expocode</p>";
+	private static final String NO_DATASET_NAME_FAIL_MSG = 
+			"<br />Dataset/Cruise name column not found.</h3>" +
+			"<p>The data file needs to contain a data column specifying " +
+			"the dataset or cruise name for each measurement.  Please " +
+			"verify that an appropriately-named column exists for the " +
+			"dataset or cruise name, and appropriate values are given for " +
+			"each sample.</p>";
+	private static final String DATASET_EXISTS_FAIL_MSG_START = 
+			"<br />A dataset exists with a given dataset ID.</h3>";
+	private static final String DATASET_EXISTS_FAIL_MSG_END = 
+			"<p>Either you specified that this data upload file should " +
+			"only create new datasets, or you do not have permission " +
+			"to modify a dataset for this data.</p>";
 
 	// Remove javascript added by the firewall
 	private static final String JAVASCRIPT_START = "<script language=\"javascript\">";
 	private static final String JAVASCRIPT_CLOSE = "</script>";
 
-	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, CruiseUploadPage> {
+	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, DataUploadPage> {
 	}
 
 	private static DashboardCruiseUploadPageUiBinder uiBinder = 
@@ -274,7 +178,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField HTML introHtml;
 	@UiField Anchor moreHelpAnchor;
 	@UiField FormPanel uploadForm;
-	@UiField HTML cruiseUpload;
+	@UiField HTML dataUpload;
 	@UiField Hidden timestampToken;
 	@UiField Hidden actionToken;
 	@UiField Hidden encodingToken;
@@ -290,6 +194,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField Button previewButton;
 	@UiField HTML previewHtml;
 	@UiField RadioButton createRadio;
+	@UiField RadioButton appendRadio;
 	@UiField RadioButton overwriteRadio;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
@@ -298,14 +203,14 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private Element uploadElement;
 
 	// Singleton instance of this page
-	private static CruiseUploadPage singleton = null;
+	private static DataUploadPage singleton = null;
 
 	/**
 	 * Creates an empty cruise upload page.  Do not call this 
 	 * constructor; instead use the showPage static method 
 	 * to show the singleton instance of this page. 
 	 */
-	CruiseUploadPage() {
+	DataUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
@@ -319,15 +224,15 @@ public class CruiseUploadPage extends CompositeWithUsername {
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
-		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
+		uploadForm.setAction(GWT.getModuleBaseURL() + "DataUploadService");
 		// Create the HTML5 multiple-file upload in the HTML <div>
-		cruiseUpload.setHTML("<input type=\"file\" name=\"cruisedata\" " +
-				"id=\"cruisedata\" style=\"width: 100%;\" multiple />");
+		dataUpload.setHTML("<input type=\"file\" name=\"datafiles\" " +
+				"id=\"datafiles\" style=\"width: 100%;\" multiple />");
 		// Get the multiple file input element within the HTML <div>
-		uploadElement = cruiseUpload.getElement();
+		uploadElement = dataUpload.getElement();
 		for (int k = 0; k < uploadElement.getChildCount(); k++) {
 			Element childElem = (Element) uploadElement.getChild(k);
-			if ( "cruisedata".equals(childElem.getId()) ) {
+			if ( "datafiles".equals(childElem.getId()) ) {
 				uploadElement = childElem;
 				break;
 			}
@@ -338,21 +243,21 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		settingsCaption.setCaptionText(SETTINGS_CAPTION_TEXT);
 
 		commaRadio.setText(COMMA_FORMAT_TEXT);
-		commaRadio.setTitle(COMMA_FORMAT_HELP);
 		semicolonRadio.setText(SEMICOLON_FORMAT_TEXT);
-		semicolonRadio.setTitle(SEMICOLON_FORMAT_HELP);
 		tabRadio.setText(TAB_FORMAT_TEXT);
-		tabRadio.setTitle(TAB_FORMAT_HELP);
 		commaRadio.setValue(true, false);
 		semicolonRadio.setValue(false, false);
 		tabRadio.setValue(false, false);
 
 		createRadio.setText(CREATE_TEXT);
 		createRadio.setTitle(CREATE_HOVER_HELP);
+		appendRadio.setText(APPEND_TEXT);
+		appendRadio.setTitle(APPEND_HOVER_HELP);
 		overwriteRadio.setText(OVERWRITE_TEXT);
 		overwriteRadio.setTitle(OVERWRITE_HOVER_HELP);
-		overwriteRadio.setValue(false, false);
 		createRadio.setValue(true, false);
+		appendRadio.setValue(false, false);
+		overwriteRadio.setValue(false, false);
 
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
@@ -373,7 +278,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	 */
 	static void showPage(String username) {
 		if ( singleton == null )
-			singleton = new CruiseUploadPage();
+			singleton = new DataUploadPage();
 		singleton.setUsername(username);
 		singleton.userInfoLabel.setText(WELCOME_INTRO + singleton.getUsername());
 		singleton.clearTokens();
@@ -381,7 +286,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.advancedPanel.setOpen(false);
 		UploadDashboard.updateCurrentPage(singleton);
-		History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
+		History.newItem(PagesEnum.UPLOAD_DATA.name(), false);
 	}
 
 	/**
@@ -391,7 +296,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -401,22 +306,22 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	/**
 	 * Assigns the values of the Hidden tokens on the page.
 	 * 
-	 * @param cruiseAction
-	 * 		value to assign to the actionToken
+	 * @param requestAction
+	 * 		action to request (value to assign to the actionToken)
 	 */
-	private void assignTokens(String cruiseAction) {
+	private void assignTokens(String requestAction) {
 		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		String encoding = KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()];
 		String format;
 		if ( commaRadio.getValue() )
-			format = DashboardUtils.CRUISE_FORMAT_COMMA;
+			format = DashboardUtils.COMMA_FORMAT_TAG;
 		else if ( semicolonRadio.getValue() )
-			format = DashboardUtils.CRUISE_FORMAT_SEMICOLON;
+			format = DashboardUtils.SEMICOLON_FORMAT_TAG;
 		else
-			format = DashboardUtils.CRUISE_FORMAT_TAB;
+			format = DashboardUtils.TAB_FORMAT_TAG;
 		
 		timestampToken.setValue(localTimestamp);
-		actionToken.setValue(cruiseAction);
+		actionToken.setValue(requestAction);
 		encodingToken.setValue(encoding);
 		formatToken.setValue(format); 
 	}
@@ -480,7 +385,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
-		assignTokens(DashboardUtils.REQUEST_PREVIEW_TAG);
+		assignTokens(DashboardUtils.PREVIEW_REQUEST_TAG);
 		uploadForm.submit();
 	}
 
@@ -492,16 +397,18 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			return;
 		}
 		if ( overwriteRadio.getValue() )
-			assignTokens(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
-		else
-			assignTokens(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
+			assignTokens(DashboardUtils.OVERWRITE_DATASETS_REQUEST_TAG);
+		else if ( appendRadio.getValue() )
+			assignTokens(DashboardUtils.APPEND_DATASETS_REQUEST_TAG);
+		else 
+			assignTokens(DashboardUtils.NEW_DATASETS_REQUEST_TAG);
 		uploadForm.submit();
 	}
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the cruise list page after updating the cruise list
-		CruiseListPage.showPage();
+		DatasetListPage.showPage();
 		// Make sure the normal cursor is shown
 		UploadDashboard.showAutoCursor();
 	}
@@ -519,7 +426,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Process the message returned from the upload of a dataset.
+	 * Process the message returned from the upload of a data file.
 	 * 
 	 * @param resultMsg
 	 * 		message returned from the upload of a dataset
@@ -536,7 +443,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		if ( splitMsgs[0].startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
 			// show partial file contents in the preview
 			String previewMsg = "<pre>\n";
-			for (int k = 0; k < splitMsgs.length; k++) {
+			for (int k = 1; k < splitMsgs.length; k++) {
 				// Some clean-up: remove the javascript that is added by the firewall
 				if ( splitMsgs[k].trim().startsWith(JAVASCRIPT_START) ) {
 					do {
@@ -555,22 +462,18 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			return;
 		}
 
-		ArrayList<String> expocodes = new ArrayList<String>();
+		ArrayList<String> cruiseIDs = new ArrayList<String>();
 		ArrayList<String> errMsgs = new ArrayList<String>();
 		for (int k = 0; k < splitMsgs.length; k++) {
 			String header = splitMsgs[k].trim();
-			if ( header.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+			if ( header.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
 				// Success
-				String expo = header.substring(
-						DashboardUtils.FILE_CREATED_HEADER_TAG.length()).trim();
-				expocodes.add(expo);
+				cruiseIDs.add(header.substring(DashboardUtils.SUCCESS_HEADER_TAG.length()).trim());
 			}
-			else if ( header.startsWith(DashboardUtils.FILE_INVALID_HEADER_TAG) ) {
+			else if ( header.startsWith(DashboardUtils.INVALID_FILE_HEADER_TAG) ) {
 				// An exception was thrown while processing the input file
-				String filename = header.substring(
-						DashboardUtils.FILE_INVALID_HEADER_TAG.length()).trim();
-				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + 
-						EXPLAINED_FAIL_MSG_START;
+				String filename = header.substring(DashboardUtils.INVALID_FILE_HEADER_TAG.length()).trim();
+				String failMsg = FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + EXPLAINED_FAIL_MSG_START;
 				for (k++; k < splitMsgs.length; k++) {
 					if ( splitMsgs[k].trim().startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) )
 						break;
@@ -578,48 +481,19 @@ public class CruiseUploadPage extends CompositeWithUsername {
 				}
 				errMsgs.add(failMsg + EXPLAINED_FAIL_MSG_END);
 			}
-			else if ( header.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
-				// No expocode was found in the file
-				String filename = header.substring(
-						DashboardUtils.NO_EXPOCODE_HEADER_TAG.length()).trim();
-				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_EXPOCODE_FAIL_MSG);
-			}
-			else if ( header.startsWith(DashboardUtils.NO_SHIPNAME_HEADER_TAG) ) {
-				// No ship name was found in the file
-				String filename = header.substring(
-						DashboardUtils.NO_SHIPNAME_HEADER_TAG.length()).trim();
-				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_SHIPNAME_FAIL_MSG);
-			}
-			else if ( header.startsWith(DashboardUtils.NO_PINAMES_HEADER_TAG) ) {
-				// No investigator name was found in the file
-				String filename = header.substring(
-						DashboardUtils.NO_PINAMES_HEADER_TAG.length()).trim();
-				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_PINAMES_FAIL_MSG);
-			}
-			else if ( header.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
-				// Cruise file exists and not permitted to overwrite; 
-				String[] info = header.substring(
-						DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim().split(" ; ", 4);
-				String failMsg = FAIL_MSG_HEADER;
+			else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
+				// Cruise file exists and not permitted to modify
+				String[] info = header.substring(DashboardUtils.DATASET_EXISTS_HEADER_TAG.length()).trim().split(" ; ", 4);
+				String failMsg = FAIL_MSG_START;
 				if ( info.length > 1 ) 
 					failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
 				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
-				failMsg += CANNOT_OVERWRITE_FAIL_MSG_START;
+				failMsg += DATASET_EXISTS_FAIL_MSG_START;
 				if ( info.length > 2 )
 					failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Owner = " + SafeHtmlUtils.htmlEscape(info[2].trim()) + "</p>";
 				if ( info.length > 3 )
-					failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;QC Status = " + SafeHtmlUtils.htmlEscape(info[3].trim()) + "</p>";
-				errMsgs.add(failMsg + CANNOT_OVERWRITE_FAIL_MSG_END); 
-			}
-			else if ( header.startsWith(DashboardUtils.NO_DATASET_HEADER_TAG) ) {
-				// cruise file does not exist and request was to overwrite
-				String[] info = header.substring(
-						DashboardUtils.NO_DATASET_HEADER_TAG.length()).trim().split(" ; ", 2);
-				String failMsg = FAIL_MSG_HEADER;
-				if ( info.length > 1 ) 
-					failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
-				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
-				errMsgs.add(failMsg + FILE_DOES_NOT_EXIST_FAIL_MSG);
+					failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Submit Status = " + SafeHtmlUtils.htmlEscape(info[3].trim()) + "</p>";
+				errMsgs.add(failMsg + DATASET_EXISTS_FAIL_MSG_END); 
 			}
 			else if ( header.startsWith(JAVASCRIPT_START) ) {
 				// ignore the added javascript from the firewall
@@ -649,11 +523,11 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		}
 
 		// Process any successes
-		if ( ! expocodes.isEmpty() ) {
-			for ( String expo : expocodes )
-				CruiseListPage.addSelectedCruise(expo);
-			CruiseListPage.resortTable();
-			DataColumnSpecsPage.showPage(getUsername(), expocodes);
+		if ( ! cruiseIDs.isEmpty() ) {
+			for ( String expo : cruiseIDs )
+				DatasetListPage.addSelectedCruise(expo);
+			DatasetListPage.resortTable();
+			DataColumnSpecsPage.showPage(getUsername(), cruiseIDs);
 		}
 	}
 

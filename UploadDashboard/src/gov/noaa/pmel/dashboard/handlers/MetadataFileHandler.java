@@ -10,7 +10,7 @@ import gov.noaa.pmel.dashboard.server.RowNumSet;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,22 +75,22 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Generates the cruise-specific metadata file for a metadata document
-	 * from the cruise expocode and the upload filename.
+	 * from the cruise dataset and the upload filename.
 	 * 
 	 * @param cruiseExpocode
-	 * 		expocode of the cruise associated with this metadata document
+	 * 		dataset of the cruise associated with this metadata document
 	 * @param uploadName
 	 * 		user's name of the uploaded metadata document 
 	 * @return
 	 * 		cruise-specific metadata file on the server
 	 * @throws IllegalArgumentException
 	 * 		if uploadName is null or ends in a slash or backslash, or 
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 */
 	public File getMetadataFile(String cruiseExpocode, String uploadName) 
 											throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
+		// Check and standardize the dataset
+		String expocode = DashboardServerUtils.checkDatasetID(cruiseExpocode);
 		// Remove any path from uploadName
 		String basename = DashboardUtils.baseName(uploadName);
 		if ( basename.isEmpty() )
@@ -104,26 +104,26 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Returns the list of metadata (including supplemental) documents associated
-	 * with the given expocode.
+	 * with the given dataset.
 	 * 
 	 * @param cruiseExpocode
-	 * 		get metadata documents for this expocode
+	 * 		get metadata documents for this dataset
 	 * @return
 	 * 		list of metadata documents; never null but may be empty
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 */
 	public ArrayList<DashboardMetadata> getMetadataFiles(String cruiseExpocode)
 											throws IllegalArgumentException {
 		ArrayList<DashboardMetadata> metadataList = new ArrayList<DashboardMetadata>();
-		// Check and standardize the expocode
-		final String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
+		// Check and standardize the dataset
+		final String expocode = DashboardServerUtils.checkDatasetID(cruiseExpocode);
 		// Get the parent directory for these metadata documents;
 		// if it does not exist, return the empty list
 		File parentDir = new File(filesDir, expocode.substring(0,4) + File.separator + expocode);
 		if ( ! parentDir.isDirectory() )
 			return metadataList;
-		// Get all the metadata info files for this expocode 
+		// Get all the metadata info files for this dataset 
 		File[] metafiles = parentDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -153,12 +153,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 	
 	 * @param username
 	 * 		name of user wanting to delete or overwrite the metadata document
-	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata document
+	 * @param dataset
+	 * 		dataset of the cruise associated with this metadata document
 	 * @param metaname
 	 * 		name of the metadata document to be deleted or overwritten
 	 * @throws IllegalArgumentException
-	 * 		if expocode or metaname are invalid, or
+	 * 		if dataset or metaname are invalid, or
 	 * 		if the user is not permitted to overwrite the metadata document
 	 */
 	private void verifyOkayToDelete(String username, String expocode, 
@@ -179,14 +179,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Not permitted to update metadata document " + 
 					oldMetadata.getFilename() + " for cruise " + 
-					oldMetadata.getExpocode() + " owned by " + oldOwner);
+					oldMetadata.getDatasetId() + " owned by " + oldOwner);
 	}
 
 	/**
 	 * Create or update a metadata document from the contents of a file upload.
 	 * 
 	 * @param cruiseExpocode
-	 * 		expocode of the cruise associated with this metadata document.
+	 * 		dataset of the cruise associated with this metadata document.
 	 * @param owner
 	 * 		owner of this metadata document.
 	 * @param uploadTimestamp
@@ -204,7 +204,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		a DashboardMetadata describing the new or updated metadata 
 	 * 		document; never null 
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if problems reading from the file upload stream,
 	 * 		if problems writing to the new metadata document, or
 	 * 		if problems committing the new metadata document to version control
@@ -247,11 +247,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		String message;
 		if ( isUpdate ) {
 			message = "Updated metadata document " + uploadFilename + 
-					  " for expocode " + cruiseExpocode + " and owner " + owner;
+					  " for dataset " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
 			message = "Added metadata document " + uploadFilename + 
-					  " for expocode " + cruiseExpocode + " and owner " + owner;
+					  " for dataset " + cruiseExpocode + " and owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -265,7 +265,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setExpocode(cruiseExpocode);
+		metadata.setDatasetId(cruiseExpocode);
 		metadata.setFilename(uploadFilename);
 		metadata.setUploadTimestamp(uploadTimestamp);
 		metadata.setOwner(owner);
@@ -274,11 +274,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Save the metadata properties
 		if ( isUpdate ) {
 			message = "Updated properties of metadata document " + uploadFilename + 
-					  " for expocode " + cruiseExpocode + " and owner " + owner;
+					  " for dataset " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
 			message = "Added properties of metadata document " + uploadFilename + 
-					  " for expocode " + cruiseExpocode + " and owner " + owner;
+					  " for dataset " + cruiseExpocode + " and owner " + owner;
 		}
 		saveMetadataInfo(metadata, message, false);
 
@@ -291,7 +291,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * are copied under appropriate names for the new cruise.
 	 * 
 	 * @param destCruiseExpo
-	 * 		expocode of the cruise to be associated with the 
+	 * 		dataset of the cruise to be associated with the 
 	 * 		copy of the metadata file
 	 * @param srcMetadata
 	 * 		metadata document to be copied
@@ -302,7 +302,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		a DashboardMetadata describing the new or updated metadata 
 	 * 		document copied from the another cruise; never null
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, 
+	 * 		if the dataset is invalid, 
 	 * 		if the metadata document to be copied does not exist,
 	 * 		if there were problems reading from the source metadata document, or 
 	 * 		if there were problems writing to the destination metadata document.
@@ -312,7 +312,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		String owner = srcMetadata.getOwner();
 		String uploadName = srcMetadata.getFilename();
 		// Get and input stream for source metadata document file
-		File srcFile = getMetadataFile(srcMetadata.getExpocode(), uploadName);
+		File srcFile = getMetadataFile(srcMetadata.getDatasetId(), uploadName);
 		DashboardMetadata mdata;
 		try {
 			FileInputStream src = new FileInputStream(srcFile);
@@ -336,8 +336,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Creates or updates a metadata document from the contents of the file at the given URL.
-	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata document
+	 * @param dataset
+	 * 		dataset of the cruise associated with this metadata document
 	 * @param owner
 	 * 		owner of this metadata document
 	 * @param version 
@@ -352,7 +352,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		a DashboardMetadata describing the new or updated metadata 
 	 * 		document; never null.
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if the URL String is invalid,
 	 * 		if problems reading the metadata from the given URL
 	 * 		if problems writing to the new metadata document, or
@@ -400,8 +400,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	/**
 	 * Create or update a dashboard metadata document from the given input stream
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata document.
+	 * @param dataset
+	 * 		dataset of the cruise associated with this metadata document.
 	 * @param owner
 	 * 		owner of this metadata document.
 	 * @param origName
@@ -420,7 +420,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		a DashboardMetadata describing the new or updated metadata 
 	 * 		document; never null.
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if problems reading the given metadata file data,
 	 * 		if problems writing to the new metadata document, or
 	 * 		if problems committing the new metadata document to version control
@@ -496,7 +496,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setExpocode(expocode);
+		metadata.setDatasetId(expocode);
 		metadata.setFilename(origName);
 		metadata.setUploadTimestamp(timestamp);
 		metadata.setOwner(owner);
@@ -526,8 +526,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * the information (properties) file for the metadata.  It will not 
 	 * be "selected".
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata
+	 * @param dataset
+	 * 		dataset of the cruise associated with this metadata
 	 * @param metaname
 	 * 		name of the metadata document
 	 * @return
@@ -535,7 +535,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		given metadata document.  If the properties file does not 
 	 * 		exist, null is returned.
 	 * @throws IllegalArgumentException
-	 * 		if expocode or metaname is invalid, or
+	 * 		if dataset or metaname is invalid, or
 	 * 		if there were problems reading from the properties file
 	 */
 	public DashboardMetadata getMetadataInfo(String expocode, String metaname) 
@@ -560,8 +560,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		// Create and assign the DashboardMetadata object to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		// Cruise expocode
-		metadata.setExpocode(expocode);
+		// Cruise dataset
+		metadata.setDatasetId(expocode);
 		// Metadata document name
 		metadata.setFilename(metaname);
 		// Upload timestamp
@@ -603,7 +603,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	public void saveMetadataInfo(DashboardMetadata metadata, String message,
 			boolean alsoCommitFile) throws IllegalArgumentException {
 		// Get full path name of the metadata file
-		File metadataFile = getMetadataFile(metadata.getExpocode(), 
+		File metadataFile = getMetadataFile(metadata.getDatasetId(), 
 											metadata.getFilename());
 		// Commit this metadata file if requested
 		if ( alsoCommitFile && (message != null) && ( ! message.trim().isEmpty() ) ) {
@@ -662,21 +662,21 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Appropriately renames any cruise metadata documents and info files 
-	 * for a change in cruise expocode.  Renames the expocode in the OME 
+	 * for a change in cruise dataset.  Renames the dataset in the OME 
 	 * metadata file if it exists.
 	 * 
 	 * @param oldExpocode
-	 * 		standardized old expocode of the cruise
+	 * 		standardized old dataset of the cruise
 	 * @param newExpocode
-	 * 		standardized new expocode for the cruise
+	 * 		standardized new dataset for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if a metadata or info file for the new expocode already exists, 
+	 * 		if a metadata or info file for the new dataset already exists, 
 	 * 		if the OME metadata exists but is invalid, or
 	 * 		if unable to rename a metadata or info file
 	 */
 	public void renameMetadataFiles(String oldExpocode, String newExpocode) 
 											throws IllegalArgumentException {
-		// Rename all the metadata documents associated with the old expocode
+		// Rename all the metadata documents associated with the old dataset
 		DashboardOmeMetadata omeMData = null;
 		for ( DashboardMetadata metaDoc : getMetadataFiles(oldExpocode) ) {
 			String uploadFilename = metaDoc.getFilename();
@@ -723,7 +723,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		if ( omeMData != null ) {
 			omeMData.changeExpocode(newExpocode);
-			saveAsOmeXmlDoc(omeMData, "Change expocode from " + 
+			saveAsOmeXmlDoc(omeMData, "Change dataset from " + 
 					oldExpocode + " to " + newExpocode);
 		}
 	}
@@ -734,12 +734,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 
 	 * @param username
 	 * 		name of the user wanting to remove the metadata document
-	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata
+	 * @param dataset
+	 * 		dataset of the cruise associated with this metadata
 	 * @param metaname
 	 * 		name of the metadata document
 	 * @throws IllegalArgumentException 
-	 * 		if expocode or metaname is invalid, 
+	 * 		if dataset or metaname is invalid, 
 	 * 		if the user is not permitted to delete the metadata document,
 	 * 		if there are problems deleting the document.
 	 */
@@ -783,12 +783,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		version control commit message; if null, the commit is not
 	 * 		performed
 	 * @throws IllegalArgumentException
-	 * 		if the expocode or uploadFilename in this object is invalid, or
+	 * 		if the dataset or uploadFilename in this object is invalid, or
 	 * 		writing the metadata document file generates one.
 	 */
 	public void saveAsOmeXmlDoc(DashboardOmeMetadata mdata, String message) 
 											throws IllegalArgumentException {
-		File mdataFile = getMetadataFile(mdata.getExpocode(), mdata.getFilename());
+		File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
 
 		// Generate the OME XML document
 		Document omeDoc = mdata.createOmeXmlDoc();
@@ -824,12 +824,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * Create the WOCE flags messages file from the WOCE flags in the database.
 	 * This file is NOT committed to version control.
 	 * 
-	 * @param expocode
+	 * @param dataset
 	 * 		create the WOCE flags messages file for this cruise
 	 * @param dbHandler
 	 * 		get the WOCE flags from the database using this handler
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 * @throws SQLException
 	 * 		if there are problems getting WOCE flags from the database
 	 */
@@ -851,16 +851,16 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + 
 					(new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
 			msgsWriter.println("WOCE Name\tWOCE Flag\tData Name\tNum Rows\tMessage\tRows");
-			ArrayList<WoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
-			for ( WoceEvent woceEvent : woceEventsList ) {
+			ArrayList<DataQCEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
+			for ( DataQCEvent woceEvent : woceEventsList ) {
 				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
-				Character woceFlag = woceEvent.getFlag();
+				Character woceFlag = woceEvent.getFlagValue();
 				if ( ! (woceFlag.equals('3') || woceFlag.equals('4')) )
 					continue;
 				rowNums.clear();
 				for ( DataLocation dloc : woceEvent.getLocations() )
 					rowNums.add(dloc.getRowNumber());
-				msgsWriter.print(woceEvent.getWoceName());
+				msgsWriter.print(woceEvent.getFlagName());
 				msgsWriter.print('\t');
 				msgsWriter.print(woceFlag);
 				msgsWriter.print('\t');

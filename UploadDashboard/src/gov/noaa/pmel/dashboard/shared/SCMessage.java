@@ -277,12 +277,10 @@ public class SCMessage implements Serializable, IsSerializable {
 			return false;
 
 		// Dashboard.closeTo returns true if both values are NaN
-		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 
-				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
-		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 
-				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		return true;
@@ -302,7 +300,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * Compare using the severity of the messages.
+	 * Compare using the severities of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */
@@ -321,7 +319,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the row number of the messages.
+	 * Compare using the row numbers of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */
@@ -340,7 +338,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the timestamp of the messages.
+	 * Compare using the timestamp strings of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */
@@ -359,7 +357,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the longitude of the messages.
+	 * Compare using the longitudes of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 * This also does not allow some "slop" for two floating
@@ -392,7 +390,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the latitude of the messages.
+	 * Compare using the latitudes of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 * This also does not allow some "slop" for two floating
@@ -424,7 +422,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the column number of the messages.
+	 * Compare using the column numbers of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */
@@ -443,7 +441,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the column name of the messages.
+	 * Compare using the column names of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */
@@ -462,7 +460,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the detailed comment of the messages.
+	 * Compare using the detailed comments of the messages.
 	 * Note that this is inconsistent with SCMessage.equals 
 	 * in that this is only examining one field of SCMessage.
 	 */

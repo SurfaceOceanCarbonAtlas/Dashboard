@@ -13,96 +13,91 @@ import java.util.TreeSet;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Represents an uploaded cruise and its current status.
+ * Represents an uploaded dataset and its current status.
  * 
  * @author Karl Smith
  */
-public class DashboardCruise implements Serializable, IsSerializable {
+public class DashboardDataset implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4004730799628292824L;
+	private static final long serialVersionUID = 5005454171404329101L;
 
 	protected boolean selected;
 	protected String version;
 	protected String owner;
-	protected String expocode;
+	protected String datasetId;
 	protected String dataCheckStatus;
 	protected String omeTimestamp;
 	protected TreeSet<String> addlDocs;
-	protected String qcStatus;
+	protected String submitStatus;
 	protected String archiveStatus;
 	protected String archiveDate;
 	protected String uploadFilename;
 	protected String uploadTimestamp;
-	protected String origDoi;
+	protected String doi;
 	protected int numDataRows;
 	protected int numErrorRows;
 	protected int numWarnRows;
 	protected ArrayList<String> userColNames;
 	// For each data column, a DataColumnType with type, unit, and missing value
 	protected ArrayList<DataColumnType> dataColTypes;
-	// Rows with checker questionable data
-	protected TreeSet<WoceType> checkerWoceThrees;
-	// Rows with checker bad data
-	protected TreeSet<WoceType> checkerWoceFours;
-	// Rows designated by the PI as questionable
-	protected TreeSet<WoceType> userWoceThrees;
-	// Rows designated by the PI as bad
-	protected TreeSet<WoceType> userWoceFours;
+	// Checker-generated QC flags without comments
+	protected TreeSet<QCFlag> checkerFlags;
+	// PI-provided QC flags without comments
+	protected TreeSet<QCFlag> userFlags;
 
-	public DashboardCruise() {
+	/**
+	 * Create an empty dashboard dataset
+	 */
+	public DashboardDataset() {
 		selected = false;
 		version = DashboardUtils.STRING_MISSING_VALUE;
 		owner = DashboardUtils.STRING_MISSING_VALUE;
-		expocode = DashboardUtils.STRING_MISSING_VALUE;
-		dataCheckStatus = DashboardUtils.STRING_MISSING_VALUE;
+		datasetId = DashboardUtils.STRING_MISSING_VALUE;
+		dataCheckStatus = DashboardUtils.CHECK_STATUS_NOT_CHECKED;
 		omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		addlDocs = new TreeSet<String>();
-		qcStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
+		submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
 		archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
 		archiveDate = DashboardUtils.STRING_MISSING_VALUE;
 		uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
 		uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
-		origDoi = DashboardUtils.STRING_MISSING_VALUE;
+		doi = DashboardUtils.STRING_MISSING_VALUE;
 		numDataRows = 0;
 		numErrorRows = 0;
 		numWarnRows = 0;
 		userColNames = new ArrayList<String>();
 		dataColTypes = new ArrayList<DataColumnType>();
-		checkerWoceThrees = new TreeSet<WoceType>();
-		checkerWoceFours = new TreeSet<WoceType>();
-		userWoceThrees = new TreeSet<WoceType>();
-		userWoceFours = new TreeSet<WoceType>();
+		checkerFlags = new TreeSet<QCFlag>();
+		userFlags = new TreeSet<QCFlag>();
 	}
 
 	/**
-	 * @param cruise
-	 * 		cruise to check
 	 * @return
-	 * 		Boolean.TRUE if the cruise is suspended, excluded, in preview, or not submitted, 
-	 * 		Boolean.FALSE if the cruise is submitted or acceptable but unpublished cruise,
-	 * 		null if the cruise is (acceptable and) published (previous version)
+	 * 		Boolean.TRUE if the dataset is suspended, excluded, or not submitted; 
+	 * 		Boolean.FALSE if the dataset is submitted or acceptable but not published;
+	 * 		null if the dataset is (acceptable and) published.
 	 */
 	public Boolean isEditable() {
-		// true for cruises that are not submitted, suspended, or excluded
-		String status = getQcStatus();
-		if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-			 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-			 status.equals(DashboardUtils.QC_STATUS_EXCLUDED)  ) 
+		// true for datasets that are not submitted, suspended, or excluded
+		String status = getSubmitStatus();
+		if ( status.equals(DashboardUtils.STATUS_NOT_SUBMITTED) || 
+			 status.equals(DashboardUtils.STATUS_SUSPENDED) ||
+			 status.equals(DashboardUtils.STATUS_EXCLUDED)  ) 
 			return Boolean.TRUE;
-		// false for submitted or acceptable unpublished cruises
+		// false for submitted or acceptable unpublished datasets
 		status = getArchiveStatus();
 		if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
 			 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
 			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) ||
 			 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) 
 			return Boolean.FALSE;
-		// null for acceptable published cruises
+		// null for acceptable published datasets
 		return null;
 	}
 
 	/**
 	 * @return
-	 * 		if the cruise is selected
+	 * 		if the dataset is selected
 	 */
 	public boolean isSelected() {
 		return selected;
@@ -110,7 +105,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @param selected
-	 * 		set if the cruise is selected
+	 * 		set if the dataset is selected
 	 */
 	public void setSelected(boolean selected) {
 		this.selected = selected;
@@ -118,7 +113,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise version; 
+	 * 		the dataset version; 
 	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVersion() {
@@ -127,7 +122,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @param version 
-	 * 		the cruise version (after trimming) to set;
+	 * 		the dataset version (after trimming) to set;
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setVersion(String version) {
@@ -139,7 +134,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the owner for this cruise; 
+	 * 		the owner for this dataset; 
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getOwner() {
@@ -148,7 +143,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @param owner 
-	 * 		the cruise owner (after trimming) to set;
+	 * 		the dataset owner (after trimming) to set;
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setOwner(String owner) {
@@ -160,29 +155,28 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; 
+	 * 		the dataset ID; 
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public String getExpocode() {
-		return expocode;
+	public String getDatasetId() {
+		return datasetId;
 	}
 
 	/**
-	 * @param cruiseExpocode 
-	 * 		the cruise expocode (after trimming and converting to upper-case) to set;
+	 * @param datasetId 
+	 * 		the dataset ID to set;
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public void setExpocode(String expocode) {
-		if ( expocode == null )
-			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
+	public void setDatasetId(String datasetId) {
+		if ( datasetId == null )
+			this.datasetId = DashboardUtils.STRING_MISSING_VALUE;
 		else
-			this.expocode = expocode.trim().toUpperCase();
+			this.datasetId = datasetId;
 	}
 
 	/**
 	 * @return 
-	 * 		the data check status; 
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+	 * 		the data check status; never null
 	 */
 	public String getDataCheckStatus() {
 		return dataCheckStatus;
@@ -191,11 +185,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param dataCheckStatus 
 	 * 		the data check status to set;
-	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+	 * 		if null, sets to {@link DashboardUtils#CHECK_STATUS_NOT_CHECKED}
 	 */
 	public void setDataCheckStatus(String dataCheckStatus) {
 		if ( dataCheckStatus == null )
-			this.dataCheckStatus = DashboardUtils.STRING_MISSING_VALUE;
+			this.dataCheckStatus = DashboardUtils.CHECK_STATUS_NOT_CHECKED;
 		else
 			this.dataCheckStatus = dataCheckStatus;
 	}
@@ -224,7 +218,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the additional document "filename; timestamp" strings 
-	 * 		associated with this cruise; never null but may be empty.  
+	 * 		associated with this dataset; never null but may be empty.  
 	 * 		The actual set of strings in this object is returned.
 	 */
 	public TreeSet<String> getAddlDocs() {
@@ -234,10 +228,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param addlDocs
 	 * 		the set of additional document "filename; timestamp" strings
-	 * 		for this cruise.  The set in this object is cleared and all 
+	 * 		for this dataset.  The set in this object is cleared and all 
 	 * 		the contents of the given set, if not null, are added. 
 	 */
-	public void setAddlDocs(TreeSet<String> addlDocs) {
+	public void setAddlDocs(Collection<String> addlDocs) {
 		this.addlDocs.clear();
 		if ( addlDocs != null )
 			this.addlDocs.addAll(addlDocs);
@@ -246,22 +240,22 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the QC submission status; 
-	 * 		never null but may be {@link #QC_STATUS_NOT_SUBMITTED} if not assigned
+	 * 		never null but may be {@link #STATUS_NOT_SUBMITTED} if not assigned
 	 */
-	public String getQcStatus() {
-		return qcStatus;
+	public String getSubmitStatus() {
+		return submitStatus;
 	}
 
 	/**
-	 * @param qcStatus 
+	 * @param submitStatus 
 	 * 		the  QC submission status (after trimming) to set;
 	 * 		if null, {@link #QC_STATUS_NOT_SUBMITTED} is assigned
 	 */
-	public void setQcStatus(String qcStatus) {
+	public void setSubmitStatus(String qcStatus) {
 		if ( qcStatus == null )
-			this.qcStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
+			this.submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
 		else
-			this.qcStatus = qcStatus.trim();
+			this.submitStatus = qcStatus.trim();
 	}
 
 	/**
@@ -353,26 +347,26 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * 		the DOI of the original data document;
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public String getOrigDoi() {
-		return origDoi;
+	public String getDoi() {
+		return doi;
 	}
 
 	/**
-	 * @param socatDoi
+	 * @param doi
 	 * 		the DOI (after trimming) of the original data document to set;
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public void setOrigDoi(String origDoi) {
-		if ( origDoi == null )
-			this.origDoi = DashboardUtils.STRING_MISSING_VALUE;
+	public void setDoi(String doi) {
+		if ( doi == null )
+			this.doi = DashboardUtils.STRING_MISSING_VALUE;
 		else
-			this.origDoi = origDoi.trim();
+			this.doi = doi.trim();
 	}
 
 	/**
 	 * @return 
 	 * 		the total number of data measurements (data rows) 
-	 * 		for the cruise
+	 * 		for the dataset
 	 */
 	public int getNumDataRows() {
 		return numDataRows;
@@ -381,7 +375,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param numDataRows 
 	 * 		the total number of data measurements (data rows) 
-	 * 		to set for the cruise 
+	 * 		to set for the dataset 
 	 */
 	public void setNumDataRows(int numDataRows) {
 		this.numDataRows = numDataRows;
@@ -422,7 +416,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return the userColNames
 	 * 		the list of data column header names as they appeared in 
-	 * 		the original user-provided data file for this cruise; 
+	 * 		the original user-provided data file for this dataset; 
 	 * 		never null but may be empty.  The actual list in this 
 	 * 		object is returned. 
 	 */
@@ -433,7 +427,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param userColNames 
 	 * 		the list of data column header names as they appeared in 
-	 * 		the original user-provided data file for this cruise.  The 
+	 * 		the original user-provided data file for this dataset.  The 
 	 * 		list in this object is cleared and all the contents of the  
 	 * 		given list, if not null, are added. 
 	 */
@@ -445,7 +439,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the list of data column types for this cruise; may be empty 
+	 * 		the list of data column types for this dataset; may be empty 
 	 * 		but never null.  The actual list in this object is returned.
 	 */
 	public ArrayList<DataColumnType> getDataColTypes() {
@@ -454,9 +448,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @param dataColTypes 
-	 * 		the list of data column types for this cruise.  The list in 
+	 * 		the list of data column types for this dataset.  The list in 
 	 * 		this object is cleared and all the contents of the given list, 
-	 * 		if not null, are added. 
+	 * 		if not null, are added. Note that this is a shallow copy; 
+	 * 		the given DataColumnType objects are reused. 
 	 */
 	public void setDataColTypes(ArrayList<DataColumnType> dataColTypes) {
 		this.dataColTypes.clear();
@@ -466,121 +461,71 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the set of WOCE-3 (questionable) flags generated by the 
-	 * 		automated data checker; may be empty but never null.
-	 * 		The actual set in this object is returned.
+	 * 		the set of automated data checker QC flags <b>without comments</b>; 
+	 * 		never null but may be empty.  The actual set in this object is returned.
 	 */
-	public TreeSet<WoceType> getCheckerWoceThrees() {
-		return checkerWoceThrees;
+	public TreeSet<QCFlag> getCheckerFlags() {
+		return checkerFlags;
 	}
 
 	/**
-	 * @param checkerWoceThrees 
-	 * 		the set of WOCE-3 (questionable) flags generated by the 
-	 * 		automated data checker to assign.  The set in this object 
-	 * 		is cleared and all the contents of the given collection, 
-	 * 		if not null, are added.  Note that this is a shallow 
-	 * 		copy; the given WoceType objects are used directly. 
+	 * @param checkerFlags 
+	 * 		the set of automated data checker QC flags <b>without comments</b> 
+	 * 		to assign.  The set in this object is cleared and all the contents 
+	 * 		of the given collection, if not null, are added.  Note that this 
+	 * 		is a shallow copy; the given QCFlag objects are reused. 
 	 */
-	public void setCheckerWoceThrees(Collection<WoceType> checkerWoceThrees) {
-		this.checkerWoceThrees.clear();
-		if ( checkerWoceThrees != null )
-			this.checkerWoceThrees.addAll(checkerWoceThrees);
-	}
-
-	/**
-	 * @return 
-	 * 		the set of WOCE-4 (bad) flags generated by the 
-	 * 		automated data checker; may be empty but never null.
-	 * 		The actual set in this object is returned.
-	 */
-	public TreeSet<WoceType> getCheckerWoceFours() {
-		return checkerWoceFours;
-	}
-
-	/**
-	 * @param checkerWoceFours 
-	 * 		the set of WOCE-3 flags generated by the automated
-	 * 		data checker to assign.  The set in this object is 
-	 * 		cleared and all the contents of the given collection, 
-	 * 		if not null, are added.  Note that this is a shallow 
-	 * 		copy; the given WoceType objects are used directly. 
-	 */
-	public void setCheckerWoceFours(Collection<WoceType> checkerWoceFours) {
-		this.checkerWoceFours.clear();
-		if ( checkerWoceFours != null )
-			this.checkerWoceFours.addAll(checkerWoceFours);
+	public void setCheckerFlags(Collection<QCFlag> checkerFlags) {
+		this.checkerFlags.clear();
+		if ( checkerFlags != null )
+			this.checkerFlags.addAll(checkerFlags);
 	}
 
 	/**
 	 * @return
-	 * 		The set of user-provided WOCE-3 (questionable) flags.  
-	 * 		The actual set in this object is returned.
+	 * 		The set of user-provided QC flags <b>without comments</b>;
+	 * 		never null but may be empty.  The actual set in this object is returned.
 	 */
-	public TreeSet<WoceType> getUserWoceThrees() {
-		return userWoceThrees;
+	public TreeSet<QCFlag> getUserFlags() {
+		return userFlags;
 	}
 
 	/**
-	 * @param userWoceThrees
-	 * 		The set user-provided WOCE-3 (questionable) flags to assign.  
-	 * 		The set in this object is cleared and all the contents 
-	 * 		of the given Collection, if not null, are added.
-	 * 		Note that this is a shallow copy; the given WoceType objects 
-	 * 		are used directly. 
+	 * @param userFlags
+	 * 		The set user-provided QC flags <b>without comments</b> to assign.  
+	 * 		The set in this object is cleared and all the contents of the given 
+	 * 		Collection, if not null, are added.  Note that this is a shallow copy; 
+	 * 		the given QCFlag objects are reused. 
 	 */
-	public void setUserWoceThrees(Collection<WoceType> userWoceThrees) {
-		this.userWoceThrees.clear();
-		if ( userWoceThrees != null )
-			this.userWoceThrees.addAll(userWoceThrees);
-	}
-
-	/**
-	 * @return 
-	 * 		The set of user-provided WOCE-4 (bad) flags.  
-	 * 		The actual set in this object is returned.
-	 */
-	public TreeSet<WoceType> getUserWoceFours() {
-		return userWoceFours;
-	}
-
-	/**
-	 * @param userWoceFours
-	 * 		The set user-provided WOCE-4 (bad) flags to assign.  
-	 * 		The set in this object is cleared and all the contents 
-	 * 		of the given collection, if not null, are added.
-	 */
-	public void setUserWoceFours(Collection<WoceType> userWoceFours) {
-		this.userWoceFours.clear();
-		if ( userWoceFours != null )
-			this.userWoceFours.addAll(userWoceFours);
+	public void setUserFlags(Collection<QCFlag> userFlags) {
+		this.userFlags.clear();
+		if ( userFlags != null )
+			this.userFlags.addAll(userFlags);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = Boolean.valueOf(selected).hashCode();
+		int result = Boolean.hashCode(selected);
 		result = result * prime + version.hashCode();
 		result = result * prime + owner.hashCode();
-		result = result * prime + expocode.hashCode();
+		result = result * prime + datasetId.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
 		result = result * prime + omeTimestamp.hashCode();
 		result = result * prime + addlDocs.hashCode();
-		result = result * prime + qcStatus.hashCode();
+		result = result * prime + submitStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + archiveDate.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
-		result = result * prime + origDoi.hashCode();
-		result = result * prime + numDataRows;
-		result = result * prime + numErrorRows;
-		result = result * prime + numWarnRows;
+		result = result * prime + doi.hashCode();
+		result = result * prime + Integer.hashCode(numDataRows);
+		result = result * prime + Integer.hashCode(numErrorRows);
+		result = result * prime + Integer.hashCode(numWarnRows);
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
-		result = result * prime + checkerWoceThrees.hashCode();
-		result = result * prime + checkerWoceFours.hashCode();
-		result = result * prime + userWoceThrees.hashCode();
-		result = result * prime + userWoceFours.hashCode();
+		result = result * prime + checkerFlags.hashCode();
+		result = result * prime + userFlags.hashCode();
 		return result;
 	}
 
@@ -591,9 +536,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof DashboardCruise) )
+		if ( ! (obj instanceof DashboardDataset) )
 			return false;
-		DashboardCruise other = (DashboardCruise) obj;
+		DashboardDataset other = (DashboardDataset) obj;
 
 		if ( selected != other.selected )
 			return false;
@@ -601,7 +546,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! owner.equals(other.owner) )
 			return false;
-		if ( ! expocode.equals(other.expocode) )
+		if ( ! datasetId.equals(other.datasetId) )
 			return false;
 		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
 			return false;
@@ -609,7 +554,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! addlDocs.equals(other.addlDocs) )
 			return false;
-		if ( ! qcStatus.equals(other.qcStatus) )
+		if ( ! submitStatus.equals(other.submitStatus) )
 			return false;
 		if ( ! archiveStatus.equals(other.archiveStatus) )
 			return false;
@@ -619,7 +564,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
 			return false;
-		if ( ! origDoi.equals(other.origDoi) )
+		if ( ! doi.equals(other.doi) )
 			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
@@ -631,178 +576,172 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! dataColTypes.equals(other.dataColTypes) )
 			return false;
-		if ( ! checkerWoceThrees.equals(other.checkerWoceThrees) ) 
+		if ( ! checkerFlags.equals(other.checkerFlags) ) 
 			return false;
-		if ( ! checkerWoceFours.equals(other.checkerWoceFours) ) 
-			return false;
-		if ( ! userWoceThrees.equals(other.userWoceThrees) ) 
-			return false;
-		if ( ! userWoceFours.equals(other.userWoceFours) ) 
+		if ( ! userFlags.equals(other.userFlags) ) 
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "DashboardCruise" +
+		return "DashboardDataset" +
 				"[ selected=" + Boolean.toString(selected) + 
-				",\n    version = " + version.toString() +
+				",\n    version = " + version +
 				",\n    owner=" + owner + 
-				",\n    expocode=" + expocode + 
+				",\n    datasetId=" + datasetId + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
 				",\n    omeTimestamp=" + omeTimestamp + 
 				",\n    addlDocs=" + addlDocs.toString() +
-				",\n    qcStatus=" + qcStatus + 
+				",\n    submitStatus=" + submitStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    archiveDate=" + archiveDate + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
-				",\n    origDoi=" + origDoi +
+				",\n    doi=" + doi +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
 				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
-				";\n    checkerWoceThrees = " + checkerWoceThrees.toString() +
-				";\n    checkerWoceFours = " + checkerWoceFours.toString() +
-				";\n    userWoceThreeRowIndices = " + userWoceThrees.toString() +
-				";\n    userWoceFourRowIndices = " + userWoceFours.toString() +
+				";\n    checkerFlags = " + checkerFlags.toString() +
+				";\n    userFlags = " + userFlags.toString() +
 				" ]";
 	}
 
 	/**
-	 * Compare using the "selected" property of cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the "selected" properties of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> selectedComparator =
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> selectedComparator =
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			Boolean s1 = c1.isSelected();
-			return s1.compareTo(c2.isSelected());
+			Boolean s1 = d1.isSelected();
+			return s1.compareTo(d2.isSelected());
 		}
 	};
 
 	/**
-	 * Compare using the owner of cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the owners of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> ownerComparator =
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> ownerComparator =
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getOwner().compareTo(c2.getOwner());
+			return d1.getOwner().compareTo(d2.getOwner());
 		}
 	};
 
 	/**
-	 * Compare using the expocode of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the IDs of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> expocodeComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> datasetIdComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getExpocode().compareTo(c2.getExpocode());
+			return d1.getDatasetId().compareTo(d2.getDatasetId());
 		}
 	};
 
 	/**
-	 * Compare using the upload timestamp of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the upload timestamp strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> timestampComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> timestampComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getUploadTimestamp().compareTo(c2.getUploadTimestamp());
+			return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
 		}
 	};
 
 	/**
-	 * Compare using the data check status of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the data check status strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> dataCheckComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> dataCheckComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getDataCheckStatus().compareTo(c2.getDataCheckStatus());
+			return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
 		}
 	};
 
 	/**
-	 * Compare using the OME metadata timestamp of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the OME metadata timestamp strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> omeTimestampComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> omeTimestampComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getOmeTimestamp().compareTo(c2.getOmeTimestamp());
+			return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
 		}
 	};
 
 	/**
 	 * Compare using the additional document "filename; timestamp" 
-	 * strings of the cruises.  Note that this is inconsistent with 
-	 * DashboardCruise.equals in that this is only examining one 
-	 * field of DashboardCruise.
+	 * strings of the datasets.  Note that this is inconsistent with 
+	 * DashboardDataset.equals in that this is only examining one 
+	 * field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> addlDocsComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> addlDocsComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			Iterator<String> iter1 = c1.getAddlDocs().iterator();
-			Iterator<String> iter2 = c2.getAddlDocs().iterator();
+			Iterator<String> iter1 = d1.getAddlDocs().iterator();
+			Iterator<String> iter2 = d2.getAddlDocs().iterator();
 			while ( iter1.hasNext() && iter2.hasNext() ) {
 				int result = iter1.next().compareTo(iter2.next());
 				if ( result != 0 )
@@ -820,78 +759,78 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the SOCAT version of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the version strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> versionComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> versionComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getVersion().compareTo(c2.getVersion());
+			return d1.getVersion().compareTo(d2.getVersion());
 		}
 	};
 
 	/**
-	 * Compare using the QC status string of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the QC status strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> qcStatusComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> qcStatusComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getQcStatus().compareTo(c2.getQcStatus());
+			return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
 		}
 	};
 
 	/**
-	 * Compare using the archive status of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the archive status strings of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> archiveStatusComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> archiveStatusComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getArchiveStatus().compareTo(c2.getArchiveStatus());
+			return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
 		}
 	};
 
 	/**
-	 * Compare using the upload filename of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the upload filenames of the datasets.
+	 * Note that this is inconsistent with DashboardDataset.equals 
+	 * in that this is only examining one field of DashboardDataset.
 	 */
-	public static Comparator<DashboardCruise> filenameComparator = 
-			new Comparator<DashboardCruise>() {
+	public static Comparator<DashboardDataset> filenameComparator = 
+			new Comparator<DashboardDataset>() {
 		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
+		public int compare(DashboardDataset d1, DashboardDataset d2) {
+			if ( d1 == d2 )
 				return 0;
-			if ( c1 == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2 == null )
+			if ( d2 == null )
 				return 1;
-			return c1.getUploadFilename().compareTo(c2.getUploadFilename());
+			return d1.getUploadFilename().compareTo(d2.getUploadFilename());
 		}
 	};
 

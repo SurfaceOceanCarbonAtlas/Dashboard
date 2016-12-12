@@ -6,14 +6,14 @@ package gov.noaa.pmel.dashboard.test.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * Unit tests for {@link gov.noaa.pmel.dashboard.shared.DataColumnType}
@@ -331,71 +331,60 @@ public class DataColumnTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#isWoceType()} and
-	 * {@link gov.noaa.pmel.dashboard.shared.DataColumnType#isWoceCommentFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#isQCType()},
+	 * {@link gov.noaa.pmel.dashboard.shared.DataColumnType#isCommentType()}.
+	 * {@link gov.noaa.pmel.dashboard.shared.DataColumnType#isCommentTypeFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
-	public void testWoceTypeWoceComment() {
+	public void testIsQCTypeIsComment() {
 		DataColumnType dtype1 = new DataColumnType("WOCE_flag", 100.0, "WOCE flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertTrue( dtype1.isWoceType() );
-		assertFalse( dtype1.isWoceCommentFor(null) );
+		assertTrue( dtype1.isQCType() );
+		assertFalse( dtype1.isCommentType() );
 
-		DataColumnType dtype2 = new DataColumnType("wOCe_of_nothing", 100.0, "WOCE flag for nothing", 
+		DataColumnType dtype2 = new DataColumnType("qc_O2", 100.0, "Oxygen Quality Flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertTrue( dtype2.isWoceType() );
+		assertTrue( dtype2.isQCType() );
 
-		DataColumnType ctype = new DataColumnType("Comment_WOCE_flag", 101.0, "comment for WOCE flag",
+		DataColumnType ctype = new DataColumnType("Comment_woce_flag", 101.0, "comment for WOCE flag",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertTrue( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(dtype2) );
+		assertTrue( ctype.isCommentType() );
+		assertTrue( ctype.isCommentTypeFor(dtype1) );
+		assertFalse( ctype.isCommentTypeFor(dtype2) );
 
-		ctype = new DataColumnType("Comment_WOCE_of_Nothing", 101.0, "Comment on WOCE flag for nothing",
+		ctype = new DataColumnType("QC_O2_comment", 101.0, "Oxygen Quality Flag Comment",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertTrue( ctype.isWoceCommentFor(dtype2) );
-		assertTrue( ctype.isWoceCommentFor(null) );
+		assertFalse( ctype.isQCType() );
+		assertTrue( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype1) );
+		assertTrue( ctype.isCommentTypeFor(dtype2) );
 
-		ctype = new DataColumnType("Comment_WOCE_of_Nothing", 101.0, "WOCE Comment invalid class name",
+		ctype = new DataColumnType("Comment_woce_flag", 101.0, "WOCE Comment invalid class name",
 				DashboardUtils.INT_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(dtype2) );
-		assertFalse( ctype.isWoceCommentFor(null) );
+		assertFalse( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype1) );
 
-		dtype2 = new DataColumnType("WOCE", 100.0, "WOCE flag invalid name (no underscore)", 
+		dtype2 = new DataColumnType("QC", 100.0, "QC flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-		assertFalse( dtype2.isWoceType() );
+		assertTrue( dtype2.isQCType() );
 
-		ctype = new DataColumnType("Comment_WOCE", 101.0, "WOCE Comment invalid name (no second underscore)",
+		ctype = new DataColumnType("Comment", 101.0, "General Comment",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(null) );
-		boolean errCaught = false;
-		try {
-			ctype.isWoceCommentFor(dtype2);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		if ( ! errCaught )
-			fail("Did not detect type passed to isWoceCommentFor was not a WOCE type");
-
-		dtype2 = new DataColumnType("tWOCE_flag", 100.0, "WOCE flag invalid name", 
-				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
-				DashboardUtils.QUALITY_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertTrue( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype2) );
 
 		dtype2 = new DataColumnType("WOCE_flag", 100.0, "WOCE flag invalid class name", 
 				DashboardUtils.INT_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertFalse( dtype2.isQCType() );
 
 		dtype2 = new DataColumnType("WOCE_flag", 100.0, "WOCE flag invalid category", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.IDENTIFIER_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertFalse( dtype2.isQCType() );
 	}
 
 	/**

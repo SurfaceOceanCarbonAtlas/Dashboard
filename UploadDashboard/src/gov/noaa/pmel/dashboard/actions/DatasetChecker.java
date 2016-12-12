@@ -7,11 +7,10 @@ import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,7 +55,7 @@ import uk.ac.uea.socat.sanitychecker.messages.MessageException;
  * 
  * @author Karl Smith
  */
-public class CruiseChecker {
+public class DatasetChecker {
 
 	/**
 	 * Indices of user-provided data columns. 
@@ -175,7 +174,7 @@ public class CruiseChecker {
 	 * @throws IOException
 	 * 		If the SanityChecker has problems with a configuration file
 	 */
-	public CruiseChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
+	public DatasetChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
 			MetadataFileHandler metaFileHandler) throws IOException {
 		try {
 			// Clear any previous configuration
@@ -193,11 +192,11 @@ public class CruiseChecker {
 		}
 		if ( checkerMsgHandler == null )
 			throw new NullPointerException(
-					"CheckerMsgHandler passed to CruiseChecker is null");
+					"CheckerMsgHandler passed to DatasetChecker is null");
 		msgHandler = checkerMsgHandler;
 		if ( metaFileHandler == null )
 			throw new NullPointerException(
-					"MetadataFileHandler passed to CruiseChecker is null");
+					"MetadataFileHandler passed to DatasetChecker is null");
 		metadataHandler = metaFileHandler;
 		lastCheckProcessedOkay = false;
 		lastCheckHadGeopositionErrors = false;
@@ -208,7 +207,7 @@ public class CruiseChecker {
 	 * messages, and assigns the data check status and the WOCE-3 and WOCE-4 
 	 * data flags from the SanityChecker output.
 	 * 
-	 * @param cruiseData
+	 * @param datasetData
 	 * 		cruise to check
 	 * @return
 	 * 		if the SanityChecker ran successfully
@@ -217,7 +216,7 @@ public class CruiseChecker {
 	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
-	public boolean checkCruise(DashboardCruiseWithData cruiseData) 
+	public boolean checkCruise(DashboardDatasetData cruiseData) 
 												throws IllegalArgumentException {
 		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
 		Output output = checkCruiseAndReturnOutput(cruiseData, colIndcs);
@@ -230,7 +229,7 @@ public class CruiseChecker {
 	 * Assigns the data check status and the WOCE-3 and WOCE-4 
 	 * data flags from the SanityChecker output.
 	 * 
-	 * @param cruiseData
+	 * @param datasetData
 	 * 		dataset to check
 	 * @param colIndcs
 	 * 		column indices for this dataset
@@ -241,9 +240,9 @@ public class CruiseChecker {
 	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
-	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData, 
+	private Output checkCruiseAndReturnOutput(DashboardDatasetData cruiseData, 
 			ColumnIndices colIndcs) throws IllegalArgumentException {
-		String expocode = cruiseData.getExpocode();
+		String expocode = cruiseData.getDatasetId();
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
@@ -289,7 +288,7 @@ public class CruiseChecker {
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 
 		// Specify the columns in this cruise data
-		Element rootElement = new Element("Expocode_" + cruiseData.getExpocode());
+		Element rootElement = new Element("Expocode_" + cruiseData.getDatasetId());
 		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
@@ -599,7 +598,7 @@ public class CruiseChecker {
 
 		// Get the OME metadata that was updated from the data
 		OmeMetadata updatedOmeMData = output.getMetadata();
-		// Set the expocode to force the assignment of other fields associated with the expocode
+		// Set the dataset to force the assignment of other fields associated with the dataset
 		updatedOmeMData.setExpocode(expocode);
 		updatedOmeMData.setDraft( ! updatedOmeMData.isAcceptable() );
 
@@ -645,7 +644,7 @@ public class CruiseChecker {
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
 		}
 
-		// Process the SanityChecker messages and assign WOCE flags in cruiseData
+		// Process the SanityChecker messages and assign WOCE flags in datasetData
 		msgHandler.processCruiseMessages(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
@@ -661,13 +660,13 @@ public class CruiseChecker {
 	 * and second data columns are appended to each data measurement (row, 
 	 * outer array) if not already present.
 	 *  
-	 * @param cruiseData
+	 * @param datasetData
 	 * 		cruise data to be standardized
 	 * @return
 	 * 		true if the SanityChecker ran successfully and 
 	 * 		data had no geoposition errors.
 	 */
-	public boolean standardizeCruiseData(DashboardCruiseWithData cruiseData) {
+	public boolean standardizeCruiseData(DashboardDatasetData cruiseData) {
 		if ( cruiseData.getNumDataRows() < 1 )
 			return false;
 
@@ -689,7 +688,7 @@ public class CruiseChecker {
 		ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
 		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
 
-		// Standardized data for generating a DsgCruiseData object must have 
+		// Standardized data for generating a DsgData object must have 
 		// separate year, month, day, hour, minute, and second columns
 		boolean hasYearColumn = ( colIndcs.yearIndex >= 0 );
 		boolean hasMonthColumn = ( colIndcs.monthIndex >= 0 );
@@ -852,7 +851,7 @@ public class CruiseChecker {
 	 * @param processedOK
 	 * 		did the SanityCheck run successfully?
 	 */
-	private void countWoceFlagsAndAssignStatus(DashboardCruise cruise, 
+	private void countWoceFlagsAndAssignStatus(DashboardDataset cruise, 
 								ColumnIndices colIndcs, Output output) {
 		lastCheckProcessedOkay = output.processedOK();
 		lastCheckHadGeopositionErrors = false;

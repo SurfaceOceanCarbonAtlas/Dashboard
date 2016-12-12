@@ -32,12 +32,15 @@ public class KnownDataTypesTest {
 	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardServerUtils.UNKNOWN.getVarName(),
 			DashboardServerUtils.OTHER.getVarName(),
-			DashboardServerUtils.EXPOCODE.getVarName(),
-			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.DATASET_ID.getVarName(),
 			DashboardServerUtils.PLATFORM_NAME.getVarName(),
+			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
 			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
 			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
-			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
+			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.LONGITUDE.getVarName(),
+			DashboardServerUtils.LATITUDE.getVarName(),
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
 			DashboardServerUtils.TIMESTAMP.getVarName(),
 			DashboardServerUtils.DATE.getVarName(),
 			DashboardServerUtils.YEAR.getVarName(),
@@ -48,18 +51,13 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
 			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
 			DashboardServerUtils.DAY_OF_YEAR.getVarName(),
-			DashboardServerUtils.SECOND_OF_DAY.getVarName(),
-			DashboardServerUtils.LONGITUDE.getVarName(),
-			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
-			DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(),
-			DashboardServerUtils.GENERIC_WOCE_COMMENT.getVarName()
+			DashboardServerUtils.SECOND_OF_DAY.getVarName()
 	));
 
 	private static final ArrayList<String> METADATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DashboardServerUtils.EXPOCODE.getVarName(),
-			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.DATASET_ID.getVarName(),
 			DashboardServerUtils.PLATFORM_NAME.getVarName(),
+			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
 			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
 			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
 			DashboardServerUtils.WESTERNMOST_LONGITUDE.getVarName(),
@@ -68,40 +66,38 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.NORTHERNMOST_LATITUDE.getVarName(),
 			DashboardServerUtils.TIME_COVERAGE_START.getVarName(),
 			DashboardServerUtils.TIME_COVERAGE_END.getVarName(),
-			DashboardServerUtils.QC_FLAG.getVarName(),
+			DashboardServerUtils.STATUS.getVarName(),
 			DashboardServerUtils.VERSION.getVarName()
 	));
 
 	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardServerUtils.SAMPLE_NUMBER.getVarName(),
+			DashboardServerUtils.LONGITUDE.getVarName(),
+			DashboardServerUtils.LATITUDE.getVarName(),
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
 			DashboardServerUtils.YEAR.getVarName(),
 			DashboardServerUtils.MONTH_OF_YEAR.getVarName(),
 			DashboardServerUtils.DAY_OF_MONTH.getVarName(),
 			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
 			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
 			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
-			DashboardServerUtils.TIME.getVarName(),
-			DashboardServerUtils.LONGITUDE.getVarName(),
-			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
-			DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName()
+			DashboardServerUtils.TIME.getVarName()
 	));
 
 	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = 
 			new TreeSet<DashDataType>( Arrays.asList(
-					DashboardServerUtils.EXPOCODE,
-					DashboardServerUtils.DATASET_NAME,
+					DashboardServerUtils.DATASET_ID,
 					DashboardServerUtils.PLATFORM_NAME,
+					DashboardServerUtils.PLATFORM_TYPE,
 					DashboardServerUtils.ORGANIZATION_NAME,
 					DashboardServerUtils.INVESTIGATOR_NAMES,
-					DashboardServerUtils.PLATFORM_TYPE,
 					DashboardServerUtils.WESTERNMOST_LONGITUDE,
 					DashboardServerUtils.EASTERNMOST_LONGITUDE,
 					DashboardServerUtils.SOUTHERNMOST_LATITUDE,
 					DashboardServerUtils.NORTHERNMOST_LATITUDE,
 					DashboardServerUtils.TIME_COVERAGE_START,
 					DashboardServerUtils.TIME_COVERAGE_END,
-					DashboardServerUtils.QC_FLAG,
+					DashboardServerUtils.STATUS,
 					DashboardServerUtils.VERSION
 					) );
 
@@ -147,19 +143,6 @@ public class KnownDataTypesTest {
 			ADDN_TYPES_VAR_NAMES[1] + " = " + ADDN_DATA_TYPES[1].toPropertyValue() + "\n" +
 			ADDN_TYPES_VAR_NAMES[2] + " = " + ADDN_DATA_TYPES[2].toPropertyValue() + "\n";
 			
-	/**
-	 * Test method for 
-	 * {@link gov.noaa.pmel.dashboard.server.DashboardServerUtils#getKeyForName(java.lang.String)}
-	 */
-	@Test
-	public void testGetKeyForName() {
-		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2_atm_dry_interp"));
-		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2 Atm Dry Interp"));
-		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2; Atm; Dry; Interp"));
-		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2, Atm, Dry, Interp"));
-		assertEquals("other", DashboardServerUtils.getKeyForName("(other)"));
-	}
-
 	/**
 	 * Test method for 
 	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForUsers()},
@@ -223,12 +206,12 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetDataColumnType() {
 		KnownDataTypes types = new KnownDataTypes();
-		DataColumnType expoType = types.getDataColumnType("EXPOCODE");
+		DataColumnType expoType = types.getDataColumnType("DATASET_ID");
 		assertNull( expoType );
 		types.addStandardTypesForUsers();
-		expoType = types.getDataColumnType("EXPOCODE");
+		expoType = types.getDataColumnType("DATASET_ID");
 		DashDataType other = new DashDataType(expoType);
-		assertEquals(DashboardServerUtils.EXPOCODE, other);
+		assertEquals(DashboardServerUtils.DATASET_ID, other);
 	}
 
 	/**

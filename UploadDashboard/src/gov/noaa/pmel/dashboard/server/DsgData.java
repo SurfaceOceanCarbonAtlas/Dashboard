@@ -3,7 +3,7 @@
 package gov.noaa.pmel.dashboard.server;
 
 
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -19,14 +19,14 @@ import java.util.TreeMap;
  * 
  * @author Karl Smith
  */
-public class DsgCruiseData {
+public class DsgData {
 
 	private TreeMap<DashDataType,Integer> intValsMap;
 	private TreeMap<DashDataType,Character> charValsMap;
 	private TreeMap<DashDataType,Double> doubleValsMap;
 
 	/**
-	 * Generates a DsgCruiseData object with the given known types.
+	 * Generates a DsgData object with the given known types.
 	 * Only the data class types 
 	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME},
 	 * 	{@link DashboardUtils#INT_DATA_CLASS_NAME}, and 
@@ -42,7 +42,7 @@ public class DsgCruiseData {
 	 * 		collection of all known types;
 	 * 		cannot be null or empty
 	 */
-	public DsgCruiseData(KnownDataTypes knownTypes) {
+	public DsgData(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
 		intValsMap = new TreeMap<DashDataType,Integer>();
@@ -56,7 +56,7 @@ public class DsgCruiseData {
 			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.isWoceType() ) {
 					// WOCE flag
-					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
+					charValsMap.put(dtype, DashboardUtils.FLAG_UNKNOWN);
 				}
 				else {
 					charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
@@ -99,7 +99,7 @@ public class DsgCruiseData {
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public DsgCruiseData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
+	public DsgData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
 			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record with the given known types
 		this(knownTypes);
@@ -184,8 +184,8 @@ public class DsgCruiseData {
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public static ArrayList<DsgCruiseData> dataListFromDashboardCruise(
-			KnownDataTypes knownTypes, DashboardCruiseWithData cruise) 
+	public static ArrayList<DsgData> dataListFromDashboardCruise(
+			KnownDataTypes knownTypes, DashboardDatasetData cruise) 
 					throws IllegalArgumentException {
 		// Get the required data from the cruise
 		ArrayList<ArrayList<String>> dataValsTable = cruise.getDataValues();
@@ -196,9 +196,9 @@ public class DsgCruiseData {
 			dataTypes.add( new DashDataType(dctype) );
 		// Create the list of DSG cruise data objects, 
 		// and populate it with data from each row of the table
-		ArrayList<DsgCruiseData> dsgDataList = new ArrayList<DsgCruiseData>(dataValsTable.size());
+		ArrayList<DsgData> dsgDataList = new ArrayList<DsgData>(dataValsTable.size());
 		for (int k = 0; k < dataValsTable.size(); k++) {
-			dsgDataList.add( new DsgCruiseData(knownTypes, dataTypes, k+1, dataValsTable.get(k)) );
+			dsgDataList.add( new DsgData(knownTypes, dataTypes, k+1, dataValsTable.get(k)) );
 		}
 		return dsgDataList;
 	}
@@ -579,9 +579,9 @@ public class DsgCruiseData {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof DsgCruiseData) )
+		if ( ! (obj instanceof DsgData) )
 			return false;
-		DsgCruiseData other = (DsgCruiseData) obj;
+		DsgData other = (DsgData) obj;
 
 		// Integer comparisons
 		if ( ! intValsMap.equals(other.intValsMap) )
@@ -633,7 +633,7 @@ public class DsgCruiseData {
 
 	@Override
 	public String toString() {
-		String repr = "DsgCruiseData[\n";
+		String repr = "DsgData[\n";
 		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )

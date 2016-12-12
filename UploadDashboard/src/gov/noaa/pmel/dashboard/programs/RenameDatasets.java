@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.actions.CruiseModifier;
+import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -15,13 +15,13 @@ import java.util.TreeMap;
 
 /**
  * Renames cruises (changes the expocodes).  All files will be moved to the
- * new locations specified by the new expocode.  If appropriate, file contents
+ * new locations specified by the new dataset.  If appropriate, file contents
  * are updated for the new expocodes.  If a cruise has been submitted for QC,
  * QC and WOCE flags are updated and rename events are added.
  * 
  * @author Karl Smith
  */
-public class RenameCruises {
+public class RenameDatasets {
 
 	/**
 	 * @param args
@@ -38,7 +38,7 @@ public class RenameCruises {
 			System.err.println("be added. ");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");
-			System.err.println("ExpocodesFile is a file of old and new expocode pairs, one pair per line");
+			System.err.println("ExpocodesFile is a file of old and new dataset pairs, one pair per line");
 			System.err.println();
 			System.exit(1);
 		}
@@ -54,7 +54,7 @@ public class RenameCruises {
 				while ( dataline != null ) {
 					String[] expoPair = dataline.split("\\s+");
 					if ( expoPair.length != 2 )
-						throw new IllegalArgumentException("not an expocode pair: '" + dataline.trim() + "'");
+						throw new IllegalArgumentException("not an dataset pair: '" + dataline.trim() + "'");
 					oldNewExpoMap.put(expoPair[0], expoPair[1]);
 					dataline = exposReader.readLine();
 				}
@@ -83,7 +83,7 @@ public class RenameCruises {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			CruiseModifier renamer = new CruiseModifier(configStore);
+			DatasetModifier renamer = new DatasetModifier(configStore);
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();

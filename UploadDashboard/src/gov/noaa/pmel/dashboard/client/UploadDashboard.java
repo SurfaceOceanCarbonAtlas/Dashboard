@@ -17,10 +17,10 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 	 * Enumerated type to specify pages for browser history.
 	 */
 	public enum PagesEnum {
-		/** History tag for CruiseListPage */
+		/** History tag for DatasetListPage */
 		SHOW_DATASETS,
-		/** History tag for CruiseUploadPage */
-		UPLOAD_DATASETS,
+		/** History tag for DataUploadPage */
+		UPLOAD_DATA,
 		/** History tag for DataColumnSpecsPage */
 		IDENTIFY_COLUMNS,
 		/** History tag for DataMessagesPage */
@@ -29,8 +29,8 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 		EDIT_METADATA,
 		/** History tag for AddlDocsManagerPage */
 		MANAGE_DOCUMENTS,
-		/** History tag for CruisePreviewPage */
-		PREVIEW_CRUISE,
+		/** History tag for DatasetPreviewPage */
+		PREVIEW_DATASET,
 		/** History tag for SubmitForQCPage */
 		SUBMIT_FOR_QC,
 		/** History tag for DashboardLogoutPage */
@@ -199,15 +199,15 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 			token = token.trim();
 		if ( (token == null) || token.isEmpty() || (currentPage == null) ) {
 			// Initial history setup; show the cruise list page
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else if ( token.equals(PagesEnum.SHOW_DATASETS.name()) ) {
 			// Cruise list page from history
-			CruiseListPage.redisplayPage(currentPage.getUsername());
+			DatasetListPage.redisplayPage(currentPage.getUsername());
 		}
-		else if ( token.equals(PagesEnum.UPLOAD_DATASETS.name()) ) {
+		else if ( token.equals(PagesEnum.UPLOAD_DATA.name()) ) {
 			// Cruise upload page from history
-			CruiseUploadPage.redisplayPage(currentPage.getUsername());
+			DataUploadPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.IDENTIFY_COLUMNS.name()) ) {
 			// Data column specs page from history
@@ -221,9 +221,9 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 			// Additional data manager page from history
 			AddlDocsManagerPage.redisplayPage(currentPage.getUsername());
 		}
-		else if ( token.equals(PagesEnum.PREVIEW_CRUISE.name()) ) {
+		else if ( token.equals(PagesEnum.PREVIEW_DATASET.name()) ) {
 			// Preview cruise page from history
-			CruisePreviewPage.redisplayPage(currentPage.getUsername());
+			DatasetPreviewPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
 			// Submit for QC page from history
@@ -235,7 +235,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 		}
 		else {
 			// Unknown page from the history; instead show the  cruise list page 
-			CruiseListPage.redisplayPage(currentPage.getUsername());
+			DatasetListPage.redisplayPage(currentPage.getUsername());
 		}
 	}
 

@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
@@ -14,9 +14,9 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -34,7 +34,7 @@ import java.util.TreeSet;
  */
 public class RegenerateDsgs {
 
-	CruiseFileHandler cruiseHandler;
+	DataFileHandler cruiseHandler;
 	DsgNcFileHandler dsgHandler;
 	MetadataFileHandler metaHandler;
 	KnownDataTypes knownMetadataTypes;
@@ -49,7 +49,7 @@ public class RegenerateDsgs {
 	 * 		configuration data to use
 	 */
 	public RegenerateDsgs(DashboardConfigStore configStore) {
-		cruiseHandler = configStore.getCruiseFileHandler();
+		cruiseHandler = configStore.getDataFileHandler();
 		dsgHandler = configStore.getDsgNcFileHandler();
 		metaHandler = configStore.getMetadataFileHandler();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
@@ -61,8 +61,8 @@ public class RegenerateDsgs {
 	/**
 	 * Regenerate the DSG files for the given dataset.
 	 * 
-	 * @param expocode
-	 * 		regenerate the DSG files the the dataset with this expocode
+	 * @param dataset
+	 * 		regenerate the DSG files the the dataset with this dataset
 	 * @param forceIt
 	 * 		if true, always regenerate the DSG files;
 	 * 		if false, regenerate the DSG files only if the metadata has changed
@@ -73,13 +73,13 @@ public class RegenerateDsgs {
 	 */
 	public boolean regenerateDsgFiles(String expocode, boolean forceIt) throws IllegalArgumentException {
 		boolean updateIt = forceIt;
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		DsgNcFile fullDataDsg;
-		ArrayList<DsgCruiseData> dataVals;
+		ArrayList<DsgData> dataVals;
 		DsgMetadata updatedMeta;
 		try {
 			// Get just the filenames from the set of addition document
-			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(upperExpo);
 
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
@@ -101,10 +101,10 @@ public class RegenerateDsgs {
 			String version = versionStatus.substring(0, versionStatus.length() - 1);
 
 			// Update (but do not commit) the cruise info version number and QC status if not correct 
-			if ( ! ( version.equals(cruise.getVersion()) && qcStatus.equals(cruise.getQcStatus()) ) ) {
+			if ( ! ( version.equals(cruise.getVersion()) && qcStatus.equals(cruise.getSubmitStatus()) ) ) {
 				cruise.setVersion(version);
-				cruise.setQcStatus(qcStatus);
-				cruiseHandler.saveCruiseInfoToFile(cruise, null);
+				cruise.setSubmitStatus(qcStatus);
+				cruiseHandler.saveDatasetInfoToFile(cruise, null);
 			}
 
 			// Get the metadata in the OME XML file
@@ -115,7 +115,7 @@ public class RegenerateDsgs {
 				omeMData.setVersion(version);
 				metaHandler.saveMetadataInfo(omeMData, null, false);
 			}
-			updatedMeta = omeMData.createSocatMetadata();
+			updatedMeta = omeMData.createDsgMetadata();
 
 			if ( ! fullDataMeta.equals(updatedMeta) )
 				updateIt = true;

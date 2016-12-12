@@ -3,13 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 
 import java.io.IOException;
@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.TimeZone;
 
 /**
- * Methods for revising dataset information, such as dataset owner and expocode.
+ * Methods for revising dataset information, such as dataset owner and dataset.
  * 
  * @author Karl Smith
  */
-public class CruiseModifier {
+public class DatasetModifier {
 
 	private static final SimpleDateFormat DATETIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	static {
@@ -38,7 +38,7 @@ public class CruiseModifier {
 	 * @param configStore
 	 * 		configuration store to use
 	 */
-	public CruiseModifier(DashboardConfigStore configStore) {
+	public DatasetModifier(DashboardConfigStore configStore) {
 		this.configStore = configStore;
 		this.restoredSocatVersion = null;
 	}
@@ -47,26 +47,26 @@ public class CruiseModifier {
 	 * Changes the owner of the data and metadata files for a dataset.
 	 * The dataset is added to the list of datasets for the new owner.
 	 * 
-	 * @param expocode
-	 * 		change the owner of the data and metadata files for the dataset with this expocode 
+	 * @param dataset
+	 * 		change the owner of the data and metadata files for the dataset with this dataset 
 	 * @param newOwner
 	 * 		change the owner of the data and metadata files to this username
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if the new owner username is not recognized,
 	 * 		if there is no data file for the indicated dataset
 	 */
 	public void changeCruiseOwner(String expocode, String newOwner) 
 									throws IllegalArgumentException {
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		if ( ! configStore.validateUser(newOwner) )
 			throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
 
-		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
+		DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(upperExpo);
 		String oldOwner = cruise.getOwner();
 		cruise.setOwner(newOwner);
-		cruiseHandler.saveCruiseInfoToFile(cruise, "Owner of " + upperExpo + 
+		cruiseHandler.saveDatasetInfoToFile(cruise, "Owner of " + upperExpo + 
 				" data file changed from " + oldOwner + " to " + newOwner);
 
 		MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
@@ -82,7 +82,7 @@ public class CruiseModifier {
 		String commitMsg = "Dataset " + upperExpo + " moved from " + oldOwner + " to " + newOwner;
 
 		// Add this cruise to the list for the new owner
-		DashboardCruiseList cruiseList = userHandler.getCruiseListing(newOwner);
+		DashboardDatasetList cruiseList = userHandler.getCruiseListing(newOwner);
 		if ( cruiseList.put(upperExpo, cruise) == null ) {
 			userHandler.saveCruiseListing(cruiseList, commitMsg);
 		}
@@ -97,18 +97,18 @@ public class CruiseModifier {
 	 * the system is likely have a corrupt mix of renamed and original-name files.
 	 * 
 	 * @param oldExpocode
-	 * 		current expocode for the cruise
+	 * 		current dataset for the cruise
 	 * @param newExpocode
-	 * 		new expocode to use for the cruise
+	 * 		new dataset to use for the cruise
 	 * @param username
 	 * 		username to associate with the rename QC and WOCE events
 	 * @throws IllegalArgumentException
 	 * 		if the username is not an admin,
-	 * 		if either expocode is invalid,
-	 * 		if cruise files for the old expocode do not exist,
-	 * 		if any files for the new expocode already exist
+	 * 		if either dataset is invalid,
+	 * 		if cruise files for the old dataset do not exist,
+	 * 		if any files for the new dataset already exist
 	 * @throws IOException
-	 * 		if updating a file with the new expocode throws one
+	 * 		if updating a file with the new dataset throws one
 	 * @throws SQLException 
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
@@ -116,15 +116,15 @@ public class CruiseModifier {
 	public void renameCruise(String oldExpocode, String newExpocode, String username) 
 						throws IllegalArgumentException, IOException, SQLException {
 		// check and standardized the expocodes
-		String oldExpo = DashboardServerUtils.checkExpocode(oldExpocode);
-		String newExpo = DashboardServerUtils.checkExpocode(newExpocode);
-		// rename the cruise data and info files; update the expocode in the data file
-		configStore.getCruiseFileHandler().renameCruiseFiles(oldExpo, newExpo);
+		String oldExpo = DashboardServerUtils.checkDatasetID(oldExpocode);
+		String newExpo = DashboardServerUtils.checkDatasetID(newExpocode);
+		// rename the cruise data and info files; update the dataset in the data file
+		configStore.getDataFileHandler().renameDatasetFiles(oldExpo, newExpo);
 		// rename the SanityChecker messages file, if it exists
 		configStore.getCheckerMsgHandler().renameMsgsFile(oldExpo, newExpo);
-		// rename metadata files; update the expocode in the OME metadata
+		// rename metadata files; update the dataset in the OME metadata
 		configStore.getMetadataFileHandler().renameMetadataFiles(oldExpo, newExpo);
-		// rename the DSG and decimated DSG files; update the expocode in these files
+		// rename the DSG and decimated DSG files; update the dataset in these files
 		configStore.getDsgNcFileHandler().renameDsgFiles(oldExpo, newExpo);
 		// generate a rename QC comment and modify expocodes for the flags
 		configStore.getDatabaseRequestHandler().renameCruiseFlags(

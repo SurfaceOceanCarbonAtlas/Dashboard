@@ -5,16 +5,15 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
-import gov.noaa.pmel.dashboard.shared.WoceFlag;
-import gov.noaa.pmel.dashboard.shared.WoceType;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -79,16 +78,16 @@ public class CheckerMessageHandler {
 
 	/**
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise
+	 * @param dataset
+	 * 		dataset of the cruise
 	 * @return
 	 * 		the cruise messages file associated with the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the cruise expocode is invalid
+	 * 		if the cruise dataset is invalid
 	 */
 	private File cruiseMsgsFile(String expocode) throws IllegalArgumentException {
-		// Check that the expocode is somewhat reasonable
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Check that the dataset is somewhat reasonable
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		// Get the name of the cruise messages file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_MSGS_FILENAME_EXTENSION);
@@ -96,14 +95,14 @@ public class CheckerMessageHandler {
 
 	/**
 	 * Appropriately renames a cruise messages file, if one exists, 
-	 * for a change in cruise expocode.
+	 * for a change in cruise dataset.
 	 * 
 	 * @param oldExpocode
-	 * 		standardized old expocode of the cruise
+	 * 		standardized old dataset of the cruise
 	 * @param newExpocode
-	 * 		standardized new expocode for the cruise
+	 * 		standardized new dataset for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if a messages file for the new expocode already exists, or
+	 * 		if a messages file for the new dataset already exists, or
 	 * 		if unable to rename the messages file
 	 */
 	public void renameMsgsFile(String oldExpocode, String newExpocode) throws IllegalArgumentException {
@@ -128,13 +127,13 @@ public class CheckerMessageHandler {
 	/**
 	 * Deletes the sanity checker messages file, if it exists, associated with a cruise.
 	 * 
-	 * @param expocode
-	 * 		delete the messages file associated with the cruise with this expocode
+	 * @param dataset
+	 * 		delete the messages file associated with the cruise with this dataset
 	 * @return
 	 * 		true if messages file exists and was deleted; 
 	 * 		false if the messages file does not exist.
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or
+	 * 		if the dataset is invalid, or
 	 * 		if the messages file exists but could not be deleted
 	 */
 	public boolean deleteMsgsFile(String expocode) throws IllegalArgumentException {
@@ -155,21 +154,21 @@ public class CheckerMessageHandler {
 	 * from the given SanityChecker output for the cruise as well as any 
 	 * user-provided WOCE flags in the cruise data.
 	 * 
-	 * @param cruiseData
+	 * @param datasetData
 	 * 		process messages for this cruise
 	 * @param output
 	 * 		SanityChecker output for this cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the dataset is invalid
 	 */
-	public void processCruiseMessages(DashboardCruiseWithData cruiseData, 
+	public void processCruiseMessages(DashboardDatasetData cruiseData, 
 			Output output) throws IllegalArgumentException {
 
 		TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
 		TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
 
 		// Get the cruise messages file to be written
-		File msgsFile = cruiseMsgsFile(cruiseData.getExpocode());
+		File msgsFile = cruiseMsgsFile(cruiseData.getDatasetId());
 		// Create the parent subdirectories if they do not exist
 		File parentFile = msgsFile.getParentFile();
 		if ( ! parentFile.exists() )
@@ -334,18 +333,18 @@ public class CheckerMessageHandler {
 
 	/**
 	 * Reads the list of messages produced by the SanityChecker from the messages 
-	 * file written by {@link #processCruiseMessages(DashboardCruiseWithData, Output)}.
+	 * file written by {@link #processCruiseMessages(DashboardDatasetData, Output)}.
 	 * 
-	 * @param expocode
-	 * 		get messages for the cruise with this expocode
+	 * @param dataset
+	 * 		get messages for the cruise with this dataset
 	 * @return
 	 * 		the sanity checker messages for the cruise;
 	 * 		never null, but may be empty if there were no sanity
 	 * 		checker messages for the cruise.
-	 * 		The expocode, but not the username, will be assigned 
+	 * 		The dataset, but not the username, will be assigned 
 	 * 		in the returned SCMessageList
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or 
+	 * 		if the dataset is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the cruise
@@ -354,7 +353,7 @@ public class CheckerMessageHandler {
 			throws IllegalArgumentException, FileNotFoundException {
 		// Create the list of messages to be returned
 		SCMessageList msgList = new SCMessageList();
-		msgList.setExpocode(expocode);
+		msgList.setDatasetId(expocode);
 		// Directly modify the summary messages in the SCMessageList
 		ArrayList<String> summaryMsgs = msgList.getSummaries();
 		// Read the cruise messages file
@@ -472,8 +471,8 @@ public class CheckerMessageHandler {
 	 * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
 	 * messages as well as PI-provided WOCE flags.
 	 * 
-	 * @param cruiseData
-	 * 		generate SocatWoceEvents for this cruise.  Uses the expocode, version,
+	 * @param datasetData
+	 * 		generate SocatWoceEvents for this cruise.  Uses the dataset, version,
 	 * 		column types, user WOCE flags, and user WOCE comments from this object.
 	 * 		SanityChecker cruise messages are read from the saved messages file for
 	 * 		this cruise, and data is read from the saved full-data DSG file for this
@@ -485,7 +484,7 @@ public class CheckerMessageHandler {
 	 * @return
 	 * 		the list of SocatWoceEvents for the cruise; never null but may be empty
 	 * @throws IllegalArgumentException
-	 * 		if the expocode in cruiseData is invalid, or 
+	 * 		if the dataset in datasetData is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the cruise, or
@@ -493,14 +492,14 @@ public class CheckerMessageHandler {
 	 * @throws IOException
 	 * 		if there is a problem opening or reading the full-data DSG file for the cruise
 	 */
-	public ArrayList<WoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
+	public ArrayList<DataQCEvent> generateWoceEvents(DashboardDatasetData cruiseData, 
 			DsgNcFileHandler dsgHandler, KnownDataTypes knownDataFileTypes) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
 		// Ordered set of all WOCE flags for this dataset
-		TreeSet<WoceFlag> woceFlagSet = new TreeSet<WoceFlag>();
+		TreeSet<QCFlag> woceFlagSet = new TreeSet<QCFlag>();
 
 		// Create the flags from the SanityChecker messages
-		String expocode = cruiseData.getExpocode();
+		String expocode = cruiseData.getDatasetId();
 		for ( SCMessage msg : getCruiseMessages(expocode) ) {
 
 			SCMsgSeverity severity = msg.getSeverity();
@@ -517,14 +516,14 @@ public class CheckerMessageHandler {
 				continue;
 
 			// TODO: get the correct WOCE flag name
-			WoceFlag info = new WoceFlag(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), null, rowNum-1);
+			QCFlag info = new QCFlag(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), null, rowNum-1);
 			if ( colNum > 0 )
 				info.setColumnIndex(colNum-1);
 
 			if ( severity.equals(SCMsgSeverity.ERROR) )
-				info.setFlag(DashboardUtils.WOCE_BAD);
+				info.setFlagValue(DashboardUtils.WOCE_BAD);
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
-				info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
+				info.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 
@@ -535,7 +534,7 @@ public class CheckerMessageHandler {
 
 			// Only add SanityChecker WOCE-4 flags; the SanityChecker marks all 
 			// questionable data regardless of whether it is of consequence.
-			if ( DashboardUtils.WOCE_BAD.equals(info.getFlag()) )
+			if ( DashboardUtils.WOCE_BAD.equals(info.getFlagValue()) )
 				woceFlagSet.add(info);
 		}
 
@@ -563,8 +562,8 @@ public class CheckerMessageHandler {
 			for ( WoceType uwoce : userWoceThrees ) {
 				String woceName = uwoce.getWoceName();
 				// Use Integer.MAX_VALUE as the column index to put these at the end
-				WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
-				info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
+				QCFlag info = new QCFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
+				info.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
 				String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
 				Integer idx = woceCommentIndex.get(woceName);
 				if ( idx != null ) {
@@ -578,8 +577,8 @@ public class CheckerMessageHandler {
 			for ( WoceType uwoce : userWoceFours ) {
 				String woceName = uwoce.getWoceName();
 				// Use Integer.MAX_VALUE as the column index to put these at the end
-				WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
-				info.setFlag(DashboardUtils.WOCE_BAD);
+				QCFlag info = new QCFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
+				info.setFlagValue(DashboardUtils.WOCE_BAD);
 				String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
 				Integer idx = woceCommentIndex.get(woceName);
 				if ( idx != null ) {
@@ -590,7 +589,7 @@ public class CheckerMessageHandler {
 			}
 		}
 
-		ArrayList<WoceEvent> woceList = new ArrayList<WoceEvent>();
+		ArrayList<DataQCEvent> woceList = new ArrayList<DataQCEvent>();
 		// If no WOCE flags, return now before we read data from the DSG file
 		if ( woceFlagSet.isEmpty() )
 			return woceList;
@@ -613,11 +612,11 @@ public class CheckerMessageHandler {
 		String lastDataVarName = null;
 		String dataVarName = null;
 		ArrayList<DataLocation> locations = null;
-		for ( WoceFlag info : woceFlagSet ) {
+		for ( QCFlag info : woceFlagSet ) {
 
 			// Check if a new WOCE event is needed
-			String woceName = info.getWoceName();
-			Character flag = info.getFlag();
+			String woceName = info.getFlagName();
+			Character flag = info.getFlagValue();
 			Integer colIdx = info.getColumnIndex();
 			String comment = info.getComment();
 			if ( ( ! woceName.equals(lastWoceName) ) ||
@@ -629,11 +628,11 @@ public class CheckerMessageHandler {
 				lastColIdx = colIdx;
 				lastComment = comment;
 
-				WoceEvent woceEvent = new WoceEvent();
-				woceEvent.setWoceName(woceName);
-				woceEvent.setExpocode(expocode);
+				DataQCEvent woceEvent = new DataQCEvent();
+				woceEvent.setFlagName(woceName);
+				woceEvent.setDatasetId(expocode);
 				woceEvent.setVersion(version);
-				woceEvent.setFlag(flag);
+				woceEvent.setFlagValue(flag);
 				woceEvent.setFlagDate(now);
 				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);

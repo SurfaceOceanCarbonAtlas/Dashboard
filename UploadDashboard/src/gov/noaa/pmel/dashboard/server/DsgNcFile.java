@@ -1,10 +1,10 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class DsgNcFile extends File {
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
 	private DsgMetadata metadata;
-	private ArrayList<DsgCruiseData> dataList;
+	private ArrayList<DsgData> dataList;
 
 	/**
 	 * See {@link java.io.File#File(java.lang.String)}
@@ -108,7 +108,7 @@ public class DsgNcFile extends File {
 
 	/**
 	 * Creates this NetCDF DSG file with the contents of the given 
-	 * DsgMetadata object and list of DsgCruiseData objects.
+	 * DsgMetadata object and list of DsgData objects.
 	 * The internal metadata and data list references are set to 
 	 * the given arguments. 
 	 * 
@@ -118,7 +118,7 @@ public class DsgNcFile extends File {
 	 * 		list of data for the cruise
 	 * @throws IllegalArgumentException
 	 * 		if either argument is null,
-	 * 		if the list of DsgCruiseData objects is empty, or
+	 * 		if the list of DsgData objects is empty, or
 	 * 		if a date/time in the data is missing or invalid
 	 * @throws IOException
 	 * 		if creating the NetCDF file throws one
@@ -127,7 +127,7 @@ public class DsgNcFile extends File {
 	 * @throws IllegalAccessException
 	 * 		if creating the NetCDF file throws one
 	 */
-	public void create(DsgMetadata mdata, ArrayList<DsgCruiseData> data) 
+	public void create(DsgMetadata mdata, ArrayList<DsgData> data) 
 			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
 		metadata = mdata;
 		dataList = data;
@@ -135,7 +135,7 @@ public class DsgNcFile extends File {
 		if ( metadata == null )
 			throw new IllegalArgumentException("DsgMetadata given to create cannot be null");
 		if ( (dataList == null) || (dataList.size() < 1) )
-			throw new IllegalArgumentException("DsgCruiseData list given to create cannot be null or empty");
+			throw new IllegalArgumentException("DsgData list given to create cannot be null or empty");
 
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
@@ -184,7 +184,7 @@ public class DsgNcFile extends File {
 				// No missing_value, _FillValue, or units for strings
 				addAttributes(ncfile, var, null, dtype.getDescription(), 
 						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
-				if ( DashboardServerUtils.EXPOCODE.typeNameEquals(dtype) ) {
+				if ( DashboardServerUtils.DATASET_ID.typeNameEquals(dtype) ) {
 					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
 				}
 			}
@@ -356,7 +356,7 @@ public class DsgNcFile extends File {
 				throw new RuntimeException("Unexpected failure to find ncfile variable '" + varName + "'");
 			ArrayDouble.D1 values = new ArrayDouble.D1(dataList.size());
 			for (int index = 0; index < dataList.size(); index++) {
-				DsgCruiseData datarow = dataList.get(index);
+				DsgData datarow = dataList.get(index);
 				Integer year = datarow.getYear();
 				if ( year == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No year is given");
@@ -490,9 +490,9 @@ public class DsgNcFile extends File {
 			int numData = var.getShape(0);
 
 			// Create the list of data values, all with default (missing) values
-			dataList = new ArrayList<DsgCruiseData>(numData);
+			dataList = new ArrayList<DsgData>(numData);
 			for (int k = 0; k < numData; k++)
-				dataList.add(new DsgCruiseData(knownTypes));
+				dataList.add(new DsgData(knownTypes));
 
 			for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
 				varName = dtype.getVarName();
@@ -544,7 +544,7 @@ public class DsgNcFile extends File {
 	 * @return
 	 * 		the internal data list reference; may be null
 	 */
-	public ArrayList<DsgCruiseData> getDataList() {
+	public ArrayList<DsgData> getDataList() {
 		return dataList;
 	}
 
@@ -554,7 +554,7 @@ public class DsgNcFile extends File {
 	 * as characters.  Empty strings are changed to a single blank character.
 	 * For some variables, this DSG file must have been processed by Ferret, 
 	 * such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
 	 * 
 	 * @param varName
@@ -599,7 +599,7 @@ public class DsgNcFile extends File {
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as integers.  For some variables, this DSG file must have been processed 
 	 * by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
 	 * 
 	 * @param varName
@@ -680,9 +680,9 @@ public class DsgNcFile extends File {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as doubles.  NaN and infinite values are changed to 
-	 * {@link DsgCruiseData#FP_MISSING_VALUE}.  For some variables, this 
+	 * {@link DsgData#FP_MISSING_VALUE}.  For some variables, this 
 	 * DSG file must have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
 	 * 
 	 * @param varName
@@ -720,7 +720,7 @@ public class DsgNcFile extends File {
 
 	/**
 	 * Reads and returns the longitudes, latitudes, and times contained in this 
-	 * DSG file.  NaN and infinite values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  
+	 * DSG file.  NaN and infinite values are changed to {@link DsgData#FP_MISSING_VALUE}.  
 	 * 
 	 * @return
 	 * 		the array { lons, lats, times } for this cruise, where
@@ -896,7 +896,7 @@ public class DsgNcFile extends File {
 	 * @throws IOException
 	 * 		if opening, reading from, or writing to the DSG file throws one
 	 */
-	public ArrayList<String> assignWoceFlags(WoceEvent woceEvent) 
+	public ArrayList<String> assignWoceFlags(DataQCEvent woceEvent) 
 								throws IllegalArgumentException, IOException {
 		ArrayList<String> issues = new ArrayList<String>();
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
@@ -938,14 +938,14 @@ public class DsgNcFile extends File {
 			}
 
 			// WOCE flags
-			varName = woceEvent.getWoceName();
+			varName = woceEvent.getFlagName();
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
 
-			char newFlag = woceEvent.getFlag();
+			char newFlag = woceEvent.getFlagValue();
 			for ( DataLocation dataloc : woceEvent.getLocations() ) {
 				int idx = dataloc.getRowNumber() - 1;
 
@@ -998,7 +998,7 @@ public class DsgNcFile extends File {
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
-	public ArrayList<DataLocation> updateWoceFlags(WoceEvent woceEvent, 
+	public ArrayList<DataLocation> updateWoceFlags(DataQCEvent woceEvent, 
 			boolean updateWoceEvent) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
@@ -1041,14 +1041,14 @@ public class DsgNcFile extends File {
 			}
 
 			// WOCE flags
-			varName = woceEvent.getWoceName();
+			varName = woceEvent.getFlagName();
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
 
-			char newFlag = woceEvent.getFlag();
+			char newFlag = woceEvent.getFlagValue();
 
 			// Identify the data points using a round-robin search 
 			// just in case there is more than one matching point

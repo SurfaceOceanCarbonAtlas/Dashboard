@@ -10,12 +10,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.junit.Test;
+
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
-
-import org.junit.Test;
+import gov.noaa.pmel.dashboard.shared.SCMessageList;
 
 /**
  * Tests of methods in {@link gov.noaa.pmel.dashboard.shared.SCMessageList}.
@@ -40,19 +40,19 @@ public class SCMessageListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#getExpocode()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#getDatasetId()} and 
+	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#setDatasetId(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetExpocode() {
+	public void testGetSetDatasetId() {
 		final String myExpocode = "XXXX20140204";
 		SCMessageList msgList = new SCMessageList();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
-		msgList.setExpocode(myExpocode);
-		assertEquals(myExpocode, msgList.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getDatasetId());
+		msgList.setDatasetId(myExpocode);
+		assertEquals(myExpocode, msgList.getDatasetId());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
-		msgList.setExpocode(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
+		msgList.setDatasetId(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getDatasetId());
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class SCMessageListTest {
 		assertEquals(0, msgList.getSummaries().size());
 		msgList.setSummaries(mySummaries);
 		assertEquals(mySummaries, msgList.getSummaries());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getDatasetId());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 		msgList.setSummaries(null);
 		assertEquals(0, msgList.getSummaries().size());
@@ -125,10 +125,10 @@ public class SCMessageListTest {
 		assertTrue( msgList.hashCode() == other.hashCode() );
 		assertTrue( msgList.equals(other) );
 
-		msgList.setExpocode(myExpocode);
+		msgList.setDatasetId(myExpocode);
 		assertFalse( msgList.hashCode() == other.hashCode() );
 		assertFalse( msgList.equals(other) );
-		other.setExpocode(myExpocode);
+		other.setDatasetId(myExpocode);
 		assertTrue( msgList.hashCode() == other.hashCode() );
 		assertTrue( msgList.equals(other) );
 

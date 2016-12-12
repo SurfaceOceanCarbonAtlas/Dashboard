@@ -10,7 +10,7 @@ import java.util.Collection;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Types of the data columns in a user-provided cruise data file.
+ * Types of the data columns in a user-provided data file.
  * Includes information about this data column type to present
  * and assign on the client side, as well as information for 
  * creating the variable in a NetCDF file on the server side.
@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8975368913536083085L;
+	private static final long serialVersionUID = 7705716003618660141L;
 
 	protected String varName;
 	protected Double sortOrder;
@@ -439,44 +439,68 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	}
 
 	/**
+	 * A QC flag type has a category name of {@link DashboardUtils#QUALITY_CATEGORY},
+	 * a data class name of {@link DashboardUtils#CHAR_DATA_CLASS_NAME}, and has a
+	 * variable name that starts with (case insensitive) "QC_" or "WOCE_" (or is 
+	 * just "QC" or "WOCE").
+	 * 
 	 * @return
-	 * 		if this is a WOCE flag type
+	 * 		if this is a QC flag type
 	 */
-	public boolean isWoceType() {
+	public boolean isQCType() {
 		if ( ! categoryName.equals(DashboardUtils.QUALITY_CATEGORY) )
 			return false;
 		if ( ! dataClassName.equals(DashboardUtils.CHAR_DATA_CLASS_NAME) )
 			return false;
-		if ( ! varName.toUpperCase().startsWith("WOCE_") )
-			return false;
-		return true;
+		String ucvarname = varName.toUpperCase();
+		if ( ucvarname.equals("QC") )
+			return true;
+		if ( ucvarname.startsWith("QC_") )
+			return true;
+		if ( ucvarname.equals("WOCE") )
+			return true;
+		if ( ucvarname.startsWith("WOCE_") )
+			return true;
+		return false;
 	}
 
 	/**
-	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * A (general) comment type has a data class name of 
+	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable 
+	 * name that contains (case insensitive) the word "COMMENT". 
 	 * 
-	 * @param woceType
-	 * 		WOCE flag type to use; 
-	 * 		if null, checks if this a comment for any possible WOCE flag type. 
 	 * @return
-	 * 		if this type is a WOCE comment for the given WOCE flag type
-	 * @throws IllegalArgumentException
-	 * 		if woceType is not null and not a WOCE flag type
+	 * 		if this type is a comment for the given data type
 	 */
-	public boolean isWoceCommentFor(DataColumnType woceType) throws IllegalArgumentException {
-		if ( woceType != null ) {
-			if ( ! woceType.isWoceType() )
-				throw new IllegalArgumentException("Argument to isWoceCommentFor is not a WOCE flag type: " + woceType.varName);
-			if ( ! varName.toUpperCase().equals("COMMENT_" + woceType.varName.toUpperCase()) )
-				return false;
-		}
-		else {
-			if ( ! varName.toUpperCase().startsWith("COMMENT_WOCE_") )
-				return false;
-		}
+	public boolean isCommentType() {
 		if ( ! dataClassName.equals(DashboardUtils.STRING_DATA_CLASS_NAME) )
 			return false;
-		return true;
+		if ( varName.toUpperCase().contains("COMMENT") )
+			return true;
+		return false;
+	}
+
+	/**
+	 * A comment type for another data type has a data class name of 
+	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable name 
+	 * that is (case insensitive) either: "COMMENT_" followed by the other 
+	 * data variable name, or the other data variable name followed by 
+	 * "_COMMENT". 
+	 * 
+	 * @param dtype
+	 * 		given data type; cannot be null
+	 * @return
+	 * 		if this type is a comment for the given data type
+	 */
+	public boolean isCommentTypeFor(DataColumnType dtype) {
+		if ( ! dataClassName.equals(DashboardUtils.STRING_DATA_CLASS_NAME) )
+			return false;
+		String ucname = dtype.varName.toUpperCase();
+		if ( varName.toUpperCase().equals("COMMENT_" + ucname) )
+			return true;
+		if ( varName.toUpperCase().equals(ucname + "_COMMENT") )
+			return true;
+		return false ;
 	}
 
 	@Override

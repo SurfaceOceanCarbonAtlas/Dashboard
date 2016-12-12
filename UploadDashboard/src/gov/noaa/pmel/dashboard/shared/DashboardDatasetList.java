@@ -9,17 +9,17 @@ import java.util.HashMap;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Represents a list of uploaded cruises for a user,
- * mapped by cruise expocode.
+ * Represents a list of uploaded datasets for a user,
+ * mapped by dataset ID.
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseList extends HashMap<String,DashboardCruise> implements Serializable, IsSerializable {
+public class DashboardDatasetList extends HashMap<String,DashboardDataset> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1395081680566539392L;
+	private static final long serialVersionUID = 6330657203729143823L;
 
 	protected String username;
-	protected String socatVersion;
+	protected String version;
 	// The following indicates whether or not the above user 
 	// has manager or admin privileges; a bit of a kludge.
 	protected boolean manager;
@@ -27,10 +27,10 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 	/**
 	 * Creates without a user or any cruises
 	 */
-	public DashboardCruiseList() {
+	public DashboardDatasetList() {
 		super();
 		username = DashboardUtils.STRING_MISSING_VALUE;
-		socatVersion = DashboardUtils.STRING_MISSING_VALUE;
+		version = DashboardUtils.STRING_MISSING_VALUE;
 		manager = false;
 	}
 
@@ -57,23 +57,23 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 
 	/**
 	 * @return 
-	 * 		the SOCAT version;
+	 * 		the data collection version;
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public String getSocatVersion() {
-		return socatVersion;
+	public String getVersion() {
+		return version;
 	}
 
 	/**
 	 * @param version 
-	 * 		the SOCAT version to set; 
+	 * 		the data collections version to set; 
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public void setSocatVersion(String socatVersion) {
-		if ( socatVersion == null )
-			this.socatVersion = DashboardUtils.STRING_MISSING_VALUE;
+	public void setVersion(String version) {
+		if ( version == null )
+			this.version = DashboardUtils.STRING_MISSING_VALUE;
 		else
-			this.socatVersion = socatVersion;
+			this.version = version;
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 	public int hashCode() {
 		final int prime = 37;
 		int result = username.hashCode();
-		result = result * prime + socatVersion.hashCode();
+		result = result * prime + version.hashCode();
 		result = result * prime + Boolean.valueOf(manager).hashCode();
 		result = result * prime + super.hashCode();
 		return result;
@@ -109,14 +109,14 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof DashboardCruiseList) )
+		if ( ! (obj instanceof DashboardDatasetList) )
 			return false;
-		DashboardCruiseList other = (DashboardCruiseList) obj;
+		DashboardDatasetList other = (DashboardDatasetList) obj;
 
 		if ( ! username.equals(other.username) )
 			return false;
 
-		if ( ! socatVersion.equals(other.socatVersion) )
+		if ( ! version.equals(other.version) )
 			return false;
 
 		if ( manager != other.manager )
@@ -130,11 +130,11 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 
 	@Override
 	public String toString() {
-		String repr = "DashboardCruiseList[ username=" + username + 
-					  ",\n    version=" + socatVersion + 
+		String repr = "DashboardDatasetList[ username=" + username + 
+					  ",\n    version=" + version + 
 					  ",\n    manager=" + Boolean.valueOf(manager).toString();
-		for ( String expocode : keySet() )
-			repr += ",\n    " + expocode + ":" + get(expocode).toString();
+		for ( String cruiseId : keySet() )
+			repr += ",\n    " + cruiseId + ":" + get(cruiseId).toString();
 		repr += " ]";
 		return repr;
 	}

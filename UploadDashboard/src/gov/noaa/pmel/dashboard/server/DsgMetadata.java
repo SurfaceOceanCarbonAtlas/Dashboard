@@ -160,28 +160,28 @@ public class DsgMetadata {
 
 	/**
 	 * @return
-	 * 		the expocode; 
+	 * 		the dataset ID; 
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
-	public String getExpocode() {
-		String value = stringValuesMap.get(DashboardServerUtils.EXPOCODE);
+	public String getDatasetId() {
+		String value = stringValuesMap.get(DashboardServerUtils.DATASET_ID);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
-	 * @param expocode 
-	 * 		the expocode to set; 
+	 * @param datasetId 
+	 * 		the dataset ID to set; 
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setExpocode(String expocode) {
+	public void setDatasetId(String datasetId) {
 		String value;
-		if ( expocode != null )
-			value = expocode;
+		if ( datasetId != null )
+			value = datasetId;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(DashboardServerUtils.EXPOCODE, value);
+		stringValuesMap.put(DashboardServerUtils.DATASET_ID, value);
 	}
 
 	/**

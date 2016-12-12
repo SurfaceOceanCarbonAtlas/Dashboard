@@ -159,91 +159,67 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceType()}, 
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceCommentFor(gov.noaa.pmel.dashboard.server.DashDataType)}, and
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceCommentFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#isQCType()}, 
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentType()}, 
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.server.DashDataType)}, and
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
-	public void testWoceTypeWoceComment() {
+	public void testIsQCTypeIsComment() {
 		DashDataType dtype1 = new DashDataType("WOCE_flag", 100.0, "WOCE flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertTrue( dtype1.isWoceType() );
-		assertFalse( dtype1.isWoceCommentFor((DashDataType) null) );
-		assertFalse( dtype1.isWoceCommentFor((DataColumnType) null) );
+		assertTrue( dtype1.isQCType() );
+		assertFalse( dtype1.isCommentType() );
 
-		DashDataType dtype2 = new DashDataType("wOCe_of_nothing", 100.0, "Unused WOCE flag", 
+		DashDataType dtype2 = new DashDataType("qc_O2", 100.0, "Oxygen Quality Flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertTrue( dtype2.isWoceType() );
+		assertTrue( dtype2.isQCType() );
 
-		DashDataType ctype = new DashDataType("Comment_WOCE_flag", 101.0, "WOCE flag comment",
+		DashDataType ctype = new DashDataType("Comment_woce_flag", 101.0, "comment for WOCE flag",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertTrue( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(dtype2) );
-		assertTrue( ctype.isWoceCommentFor(dtype1.duplicate()) );
-		assertFalse( ctype.isWoceCommentFor(dtype2.duplicate()) );
-		assertTrue( ctype.isWoceCommentFor((DashDataType) null) );
-		assertTrue( ctype.isWoceCommentFor((DataColumnType) null) );
+		assertTrue( ctype.isCommentType() );
+		assertTrue( ctype.isCommentTypeFor(dtype1) );
+		assertTrue( ctype.isCommentTypeFor(dtype1.duplicate()) );
+		assertFalse( ctype.isCommentTypeFor(dtype2) );
+		assertFalse( ctype.isCommentTypeFor(dtype2.duplicate()) );
 
-		ctype = new DashDataType("Comment_WOCE_of_Nothing", 101.0, "WOCE flag comment",
+		ctype = new DashDataType("QC_O2_comment", 101.0, "Oxygen Quality Flag Comment",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertTrue( ctype.isWoceCommentFor(dtype2) );
-		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
-		assertTrue( ctype.isWoceCommentFor(dtype2.duplicate()) );
-		assertTrue( ctype.isWoceCommentFor((DashDataType) null) );
-		assertTrue( ctype.isWoceCommentFor((DataColumnType) null) );
+		assertFalse( ctype.isQCType() );
+		assertTrue( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype1) );
+		assertFalse( ctype.isCommentTypeFor(dtype1.duplicate()) );
+		assertTrue( ctype.isCommentTypeFor(dtype2) );
+		assertTrue( ctype.isCommentTypeFor(dtype2.duplicate()) );
 
-		ctype = new DashDataType("Comment_WOCE_of_Nothing", 101.0, "WOCE flag comment",
+		ctype = new DashDataType("Comment_woce_flag", 101.0, "WOCE Comment invalid class name",
 				DashboardUtils.INT_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(dtype2) );
-		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
-		assertFalse( ctype.isWoceCommentFor(dtype2.duplicate()) );
-		assertFalse( ctype.isWoceCommentFor((DashDataType) null) );
-		assertFalse( ctype.isWoceCommentFor((DataColumnType) null) );
+		assertFalse( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype1) );
+		assertFalse( ctype.isCommentTypeFor(dtype1.duplicate()) );
 
-		dtype2 = new DashDataType("WOCE", 100.0, "WOCE flag", 
+		dtype2 = new DashDataType("QC", 100.0, "QC flag", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
-				DashboardUtils.QUALITY_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+				DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
+		assertTrue( dtype2.isQCType() );
 
-		ctype = new DashDataType("Comment_WOCE", 101.0, "WOCE flag comment",
+		ctype = new DashDataType("Comment", 101.0, "General Comment",
 				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
-		assertFalse( ctype.isWoceCommentFor(dtype1) );
-		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
-		boolean errCaught = false;
-		try {
-			ctype.isWoceCommentFor(dtype2);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		if ( ! errCaught )
-			fail("Did not detect type passed to isWoceCommentFor was not a WOCE type");
-		errCaught = false;
-		try {
-			ctype.isWoceCommentFor(dtype2.duplicate());
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		if ( ! errCaught )
-			fail("Did not detect type passed to isWoceCommentFor was not a WOCE type");
-
-		dtype2 = new DashDataType("tWOCE_flag", 100.0, "WOCE flag invalid name", 
-				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
-				DashboardUtils.QUALITY_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertTrue( ctype.isCommentType() );
+		assertFalse( ctype.isCommentTypeFor(dtype2) );
+		assertFalse( ctype.isCommentTypeFor(dtype2.duplicate()) );
 
 		dtype2 = new DashDataType("WOCE_flag", 100.0, "WOCE flag invalid class name", 
 				DashboardUtils.INT_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.QUALITY_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertFalse( dtype2.isQCType() );
 
 		dtype2 = new DashDataType("WOCE_flag", 100.0, "WOCE flag invalid category", 
 				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
 				DashboardUtils.IDENTIFIER_CATEGORY, null);
-		assertFalse( dtype2.isWoceType() );
+		assertFalse( dtype2.isQCType() );
 	}
 
 	/**

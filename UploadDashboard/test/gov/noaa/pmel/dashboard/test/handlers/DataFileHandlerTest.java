@@ -11,21 +11,21 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import org.junit.Test;
 
 /**
- * Test of {@link gov.noaa.pmel.dashboard.handlers.CruiseFileHandler}.
+ * Test of {@link gov.noaa.pmel.dashboard.handlers.DataFileHandler}.
  * Uses an existing UploadDashboard installation
  * 
  * @author Karl Smith
  *
  */
-public class CruiseFileHandlerTest {
+public class DataFileHandlerTest {
 
 	private static final String CSV_DATA = 
 			  "Expocode: 00KS20120419 , , , , , , , , , , , , , , , , , , ,\n"
@@ -65,17 +65,17 @@ public class CruiseFileHandlerTest {
 	};
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.handlers.CruiseFileHandler#assignCruiseDataFromInput(gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData, java.lang.String, java.io.BufferedReader, int, int, boolean)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.handlers.DataFileHandler#assignCruiseDataFromInput(gov.noaa.pmel.dashboard.shared.DashboardDatasetData, java.lang.String, java.io.BufferedReader, int, int, boolean)}.
 	 * @throws IOException 
 	 */
 	@Test
 	public void testAssignCruiseDataFromInput() throws IOException {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
 		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
-		CruiseFileHandler dataHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
+		DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
 		BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA)); 
-		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		dataHandler.assignCruiseDataFromInput(cruiseData, DashboardUtils.CRUISE_FORMAT_COMMA, cruiseReader, 0, -1, true);
+		DashboardDatasetData cruiseData = new DashboardDatasetData();
+		dataHandler.assignCruiseDataFromInput(cruiseData, DashboardUtils.COMMA_FORMAT_TAG, cruiseReader, 0, -1, true);
 		
 		assertEquals(META_PREAMBLE.size(), cruiseData.getPreamble().size());
 		for (int k = 0; k < META_PREAMBLE.size(); k++)

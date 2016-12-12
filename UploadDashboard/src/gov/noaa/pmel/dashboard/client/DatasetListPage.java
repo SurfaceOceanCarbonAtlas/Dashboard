@@ -4,8 +4,8 @@
 package gov.noaa.pmel.dashboard.client;
 
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
@@ -55,9 +55,9 @@ import com.google.gwt.view.client.ListDataProvider;
  * 
  * @author Karl Smith
  */
-public class CruiseListPage extends CompositeWithUsername {
+public class DatasetListPage extends CompositeWithUsername {
 
-	private static final String TITLE_TEXT = "My OA Datasets";
+	private static final String TITLE_TEXT = "My Datasets";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
@@ -170,7 +170,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String EXPOCODE_TO_SHOW_MSG = 
-			"Enter the expocode, possibly with wildcards * and ?, of the datasets " +
+			"Enter the dataset, possibly with wildcards * and ?, of the datasets " +
 			"you want to show in your list of displayed datasets";
 	private static final String SHOW_DATASET_FAIL_MSG = 
 			"Unable to show the specified datasets " +
@@ -243,7 +243,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 
-	interface CruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
+	interface CruiseListPageUiBinder extends UiBinder<Widget, DatasetListPage> {
 	}
 
 	private static CruiseListPageUiBinder uiBinder = 
@@ -267,22 +267,22 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiField Button changeOwnerButton;
 	@UiField Label secondSeparator;
 	@UiField Button deleteButton;
-	@UiField DataGrid<DashboardCruise> datasetsGrid;
+	@UiField DataGrid<DashboardDataset> datasetsGrid;
 
-	private ListDataProvider<DashboardCruise> listProvider;
+	private ListDataProvider<DashboardDataset> listProvider;
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
 	private DashboardInputPopup changeOwnerPopup;
-	private DashboardCruiseList cruiseSet;
-	private DashboardCruiseList checkSet;
+	private DashboardDatasetList cruiseSet;
+	private DashboardDatasetList checkSet;
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	// private boolean managerButtonsShown;
-	private TextColumn<DashboardCruise> timestampColumn;
-	private TextColumn<DashboardCruise> expocodeColumn;
+	private TextColumn<DashboardDataset> timestampColumn;
+	private TextColumn<DashboardDataset> expocodeColumn;
 
 	// The singleton instance of this page
-	private static CruiseListPage singleton;
+	private static DatasetListPage singleton;
 
 	/**
 	 * Creates an empty cruise list page.  Do not call this 
@@ -290,7 +290,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * to show the singleton instance of this page with the
 	 * latest cruise list from the server. 
 	 */
-	CruiseListPage() {
+	DatasetListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
@@ -298,8 +298,8 @@ public class CruiseListPage extends CompositeWithUsername {
 
 		setUsername(null);
 
-		cruiseSet = new DashboardCruiseList();
-		checkSet = new DashboardCruiseList();
+		cruiseSet = new DashboardDatasetList();
+		checkSet = new DashboardDatasetList();
 		expocodeSet = new TreeSet<String>();
 
 		titleLabel.setText(TITLE_TEXT);
@@ -350,11 +350,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	static void showPage() {
 		UploadDashboard.showWaitCursor();
 		// Request the latest cruise list
-		service.getCruiseList(new AsyncCallback<DashboardCruiseList>() {
+		service.getDatasetList(new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
+			public void onSuccess(DashboardDatasetList cruises) {
 				if ( singleton == null )
-					singleton = new CruiseListPage();
+					singleton = new DatasetListPage();
 				UploadDashboard.updateCurrentPage(singleton);
 				singleton.updateCruises(cruises);
 				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
@@ -375,7 +375,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) )
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		else
 			UploadDashboard.updateCurrentPage(singleton);
 	}
@@ -383,25 +383,25 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * Add a cruise to the selected list when the page is displayed.
 	 * This should be called just prior to calling showPage().  
-	 * If no cruise with the given expocode exists in the updated 
-	 * list of cruises, this expocode will be ignored. 
+	 * If no cruise with the given dataset exists in the updated 
+	 * list of cruises, this dataset will be ignored. 
 	 * 
-	 * @param expocode
-	 * 		select the cruise with this expocode
+	 * @param dataset
+	 * 		select the cruise with this dataset
 	 */
 	static void addSelectedCruise(String expocode) {
 		if ( singleton == null )
-			singleton = new CruiseListPage();
+			singleton = new DatasetListPage();
 		singleton.expocodeSet.add(expocode);
 	}
 
 	/**
 	 * Resorts the cruise list table first by upload timestamp 
-	 * in descending order, then by expocode in ascending order.
+	 * in descending order, then by dataset in ascending order.
 	 */
 	static void resortTable() {
 		if ( singleton == null )
-			singleton = new CruiseListPage();
+			singleton = new DatasetListPage();
 		ColumnSortList sortList = singleton.datasetsGrid.getColumnSortList();
 		sortList.push(new ColumnSortInfo(singleton.expocodeColumn, true));
 		sortList.push(new ColumnSortInfo(singleton.timestampColumn, false));
@@ -415,7 +415,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	private void updateCruises(DashboardCruiseList cruises) {
+	private void updateCruises(DashboardDatasetList cruises) {
 		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
@@ -440,13 +440,13 @@ public class CruiseListPage extends CompositeWithUsername {
 		}
 		*/
 		// Update the cruises shown by resetting the data in the data provider
-		List<DashboardCruise> cruiseList = listProvider.getList();
+		List<DashboardDataset> cruiseList = listProvider.getList();
 		cruiseList.clear();
 		if ( cruises != null ) {
 			cruiseList.addAll(cruises.values());
 		}
-		for ( DashboardCruise cruise : cruiseList ) {
-			if ( expocodeSet.contains(cruise.getExpocode()) )
+		for ( DashboardDataset cruise : cruiseList ) {
+			if ( expocodeSet.contains(cruise.getDatasetId()) )
 				cruise.setSelected(true);
 			else
 				cruise.setSelected(false);
@@ -475,13 +475,13 @@ public class CruiseListPage extends CompositeWithUsername {
 		if ( SELECTION_OPTION_LABEL.equals(option) )
 			return;
 		// Modify the cruise selection
-		List<DashboardCruise> cruiseList = listProvider.getList();
+		List<DashboardDataset> cruiseList = listProvider.getList();
 		if ( ALL_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardCruise cruise : cruiseList )
+			for ( DashboardDataset cruise : cruiseList )
 				cruise.setSelected(true);
 		}
 		else if ( EDITABLE_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardCruise cruise : cruiseList ) {
+			for ( DashboardDataset cruise : cruiseList ) {
 				if ( Boolean.TRUE.equals(cruise.isEditable()) )
 					cruise.setSelected(true);
 				else
@@ -489,7 +489,7 @@ public class CruiseListPage extends CompositeWithUsername {
 			}
 		}
 		else if ( SUBMITTED_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardCruise cruise : cruiseList ) {
+			for ( DashboardDataset cruise : cruiseList ) {
 				if ( Boolean.FALSE.equals(cruise.isEditable()) )
 					cruise.setSelected(true);
 				else
@@ -497,14 +497,14 @@ public class CruiseListPage extends CompositeWithUsername {
 			}
 		}
 		else if ( PUBLISHED_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardCruise cruise : cruiseList )
+			for ( DashboardDataset cruise : cruiseList )
 				if ( null == cruise.isEditable() )
 					cruise.setSelected(true);
 				else
 					cruise.setSelected(false);					
 		}
 		else if ( CLEAR_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardCruise cruise : cruiseList )
+			for ( DashboardDataset cruise : cruiseList )
 				cruise.setSelected(false);
 		}
 		else {
@@ -523,13 +523,13 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * 		SUBMITTED_SELECTION_OPTION, PUBLISHED_SELECTION_OPTION, CLEAR_SELECTION_OPTION
 	 * - unused at this time, thus commented out
 	private String getSelectedCruisesType() {
-		List<DashboardCruise> cruiseList = listProvider.getList();
+		List<DashboardDataset> cruiseList = listProvider.getList();
 		boolean isCleared = true;
 		boolean isAll = true;
 		Boolean isAllEditable = null;
 		Boolean isAllSubmitted = null;
 		Boolean isAllPublished = null;
-		for ( DashboardCruise cruise : cruiseList ) {
+		for ( DashboardDataset cruise : cruiseList ) {
 			Boolean editable = isEditableCruise(cruise);
 			if ( cruise.isSelected() ) {
 				isCleared = false;
@@ -603,7 +603,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		cruiseSet.clear();
 		cruiseSet.setUsername(getUsername());
 		expocodeSet.clear();
-		for ( DashboardCruise cruise : listProvider.getList() ) {
+		for ( DashboardDataset cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				if ( onlyEditable != null ) {
 					Boolean editable = cruise.isEditable();
@@ -614,7 +614,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					if ( onlyEditable && ! editable )
 						return false;
 				}
-				String expocode = cruise.getExpocode();
+				String expocode = cruise.getDatasetId();
 				cruiseSet.put(expocode, cruise);
 				expocodeSet.add(expocode);
 			}
@@ -632,7 +632,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		// Save the expocodes of the currently selected cruises
 		getSelectedCruises(null);
 		// Go to the cruise upload page
-		CruiseUploadPage.showPage(getUsername());
+		DataUploadPage.showPage(getUsername());
 	}
 
 	@UiHandler("viewDataButton")
@@ -691,7 +691,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
 		}
-		for ( DashboardCruise cruise : cruiseSet.values() ) {
+		for ( DashboardDataset cruise : cruiseSet.values() ) {
 			String status = cruise.getDataCheckStatus();
 			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ) {
 				UploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
@@ -702,7 +702,7 @@ public class CruiseListPage extends CompositeWithUsername {
 				return;				
 			}
 		}
-		CruisePreviewPage.showPage(cruiseSet);
+		DatasetPreviewPage.showPage(cruiseSet);
 		return;
 	}
 
@@ -768,12 +768,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	 */
 	private void continueDeleteCruises(Boolean deleteMetadata) {
 		UploadDashboard.showWaitCursor();
-		service.deleteCruises(getUsername(), expocodeSet, deleteMetadata, 
-				new AsyncCallback<DashboardCruiseList>() {
+		service.deleteDatasets(getUsername(), expocodeSet, deleteMetadata, 
+				new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
+			public void onSuccess(DashboardDatasetList cruises) {
 				if ( getUsername().equals(cruises.getUsername()) ) {
-					CruiseListPage.this.updateCruises(cruises);
+					DatasetListPage.this.updateCruises(cruises);
 				}
 				else {
 					UploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
@@ -796,12 +796,12 @@ public class CruiseListPage extends CompositeWithUsername {
 			UploadDashboard.showWaitCursor();
 			// Save the currently selected cruises
 			getSelectedCruises(null);
-			service.addCruisesToList(getUsername(), wildExpocode, 
-					new AsyncCallback<DashboardCruiseList>() {
+			service.addDatasetsToList(getUsername(), wildExpocode, 
+					new AsyncCallback<DashboardDatasetList>() {
 				@Override
-				public void onSuccess(DashboardCruiseList cruises) {
+				public void onSuccess(DashboardDatasetList cruises) {
 					if ( getUsername().equals(cruises.getUsername()) ) {
-						CruiseListPage.this.updateCruises(cruises);
+						DatasetListPage.this.updateCruises(cruises);
 					}
 					else {
 						UploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG + 
@@ -856,12 +856,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	 */
 	private void continueRemoveCruisesFromList() {
 		UploadDashboard.showWaitCursor();
-		service.removeCruisesFromList(getUsername(), expocodeSet, 
-				new AsyncCallback<DashboardCruiseList>() {
+		service.removeDatasetsFromList(getUsername(), expocodeSet, 
+				new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
+			public void onSuccess(DashboardDatasetList cruises) {
 				if ( getUsername().equals(cruises.getUsername()) ) {
-					CruiseListPage.this.updateCruises(cruises);
+					DatasetListPage.this.updateCruises(cruises);
 				}
 				else {
 					UploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG + 
@@ -915,12 +915,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	 */
 	private void continueChangeOwner(String newOwner) {
 		UploadDashboard.showWaitCursor();
-		service.changeCruiseOwner(getUsername(), expocodeSet, newOwner, 
-				new AsyncCallback<DashboardCruiseList>() {
+		service.changeDatasetOwner(getUsername(), expocodeSet, newOwner, 
+				new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
+			public void onSuccess(DashboardDatasetList cruises) {
 				if ( getUsername().equals(cruises.getUsername()) ) {
-					CruiseListPage.this.updateCruises(cruises);
+					DatasetListPage.this.updateCruises(cruises);
 				}
 				else {
 					UploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG + 
@@ -938,24 +938,24 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	/**
 	 * Creates the cruise data table columns.  The table will still need 
-	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
+	 * to be populated using {@link #updateCruises(DashboardDatasetList)}.
 	 */
 	private void buildCruiseListTable() {
 		Header<String> selectHeader = buildSelectionHeader();
 
 		// Create the columns for this table
-		TextColumn<DashboardCruise> rowNumColumn = buildRowNumColumn();
-		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
+		TextColumn<DashboardDataset> rowNumColumn = buildRowNumColumn();
+		Column<DashboardDataset,Boolean> selectedColumn = buildSelectedColumn();
 		expocodeColumn = buildExpocodeColumn();
 		timestampColumn = buildTimestampColumn();
-		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
-		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
-		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
-		TextColumn<DashboardCruise> versionColumn = buildVersionColumn();
-		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
-		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
-		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
-		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
+		Column<DashboardDataset,String> dataCheckColumn = buildDataCheckColumn();
+		Column<DashboardDataset,String> omeMetadataColumn = buildOmeMetadataColumn();
+		Column<DashboardDataset,String> addlDocsColumn = buildAddnDocsColumn();
+		TextColumn<DashboardDataset> versionColumn = buildVersionColumn();
+		Column<DashboardDataset,String> qcStatusColumn = buildQCStatusColumn();
+		Column<DashboardDataset,String> archiveStatusColumn = buildArchiveStatusColumn();
+		TextColumn<DashboardDataset> filenameColumn = buildFilenameColumn();
+		TextColumn<DashboardDataset> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
 		datasetsGrid.addColumn(rowNumColumn, "");
@@ -1024,7 +1024,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
 
 		// Create the data provider for this table
-		listProvider = new ListDataProvider<DashboardCruise>();
+		listProvider = new ListDataProvider<DashboardDataset>();
 		listProvider.addDataDisplay(datasetsGrid);
 
 		// Make the columns sortable
@@ -1040,28 +1040,28 @@ public class CruiseListPage extends CompositeWithUsername {
 		ownerColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
-		ListHandler<DashboardCruise> columnSortHandler = 
-				new ListHandler<DashboardCruise>(listProvider.getList());
+		ListHandler<DashboardDataset> columnSortHandler = 
+				new ListHandler<DashboardDataset>(listProvider.getList());
 		columnSortHandler.setComparator(expocodeColumn, 
-				DashboardCruise.expocodeComparator);
+				DashboardDataset.datasetIdComparator);
 		columnSortHandler.setComparator(timestampColumn, 
-				DashboardCruise.timestampComparator);
+				DashboardDataset.timestampComparator);
 		columnSortHandler.setComparator(dataCheckColumn, 
-				DashboardCruise.dataCheckComparator);
+				DashboardDataset.dataCheckComparator);
 		columnSortHandler.setComparator(omeMetadataColumn, 
-				DashboardCruise.omeTimestampComparator);
+				DashboardDataset.omeTimestampComparator);
 		columnSortHandler.setComparator(addlDocsColumn, 
-				DashboardCruise.addlDocsComparator);
+				DashboardDataset.addlDocsComparator);
 		columnSortHandler.setComparator(versionColumn, 
-				DashboardCruise.versionComparator);
+				DashboardDataset.versionComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
-				DashboardCruise.qcStatusComparator);
+				DashboardDataset.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
-				DashboardCruise.archiveStatusComparator);
+				DashboardDataset.archiveStatusComparator);
 		columnSortHandler.setComparator(filenameColumn, 
-				DashboardCruise.filenameComparator);
+				DashboardDataset.filenameComparator);
 		columnSortHandler.setComparator(ownerColumn, 
-				DashboardCruise.ownerComparator);
+				DashboardDataset.ownerComparator);
 
 		// Add the sort handler to the table, and set the default sort order
 		datasetsGrid.addColumnSortHandler(columnSortHandler);
@@ -1079,23 +1079,23 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the row number column for the table
 	 */
-	private TextColumn<DashboardCruise> buildRowNumColumn() {
-		TextColumn<DashboardCruise> rowNumColumn = new TextColumn<DashboardCruise>() {
+	private TextColumn<DashboardDataset> buildRowNumColumn() {
+		TextColumn<DashboardDataset> rowNumColumn = new TextColumn<DashboardDataset>() {
 			@Override
-			public String getValue(DashboardCruise cruise) {
-				String expocode = cruise.getExpocode();
-				List<DashboardCruise> cruiseList = listProvider.getList();
+			public String getValue(DashboardDataset cruise) {
+				String expocode = cruise.getDatasetId();
+				List<DashboardDataset> cruiseList = listProvider.getList();
 				int k = 0;
 				while ( k < cruiseList.size() ) {
 					// Only check expocodes since they should be unique
-					if ( expocode.equals(cruiseList.get(k).getExpocode()) )
+					if ( expocode.equals(cruiseList.get(k).getDatasetId()) )
 						break;
 					k++;
 				}
 				return Integer.toString(k+1);
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				String msg = getValue(cruise);
 				sb.appendHtmlConstant("<div style=\"color: " + 
@@ -1140,17 +1140,17 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the selection column for the table
 	 */
-	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
-		Column<DashboardCruise,Boolean> selectedColumn = 
-				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, true)) {
+	private Column<DashboardDataset,Boolean> buildSelectedColumn() {
+		Column<DashboardDataset,Boolean> selectedColumn = 
+				new Column<DashboardDataset,Boolean>(new CheckboxCell(true, true)) {
 			@Override
-			public Boolean getValue(DashboardCruise cruise) {
+			public Boolean getValue(DashboardDataset cruise) {
 				return cruise.isSelected();
 			}
 		};
-		selectedColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,Boolean>() {
+		selectedColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,Boolean>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, Boolean value) {
+			public void update(int index, DashboardDataset cruise, Boolean value) {
 				if ( ! value ) {
 					cruise.setSelected(false);
 				}
@@ -1163,14 +1163,14 @@ public class CruiseListPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * @return the expocode column for the table
+	 * @return the dataset column for the table
 	 */
-	private TextColumn<DashboardCruise> buildExpocodeColumn() {
-		TextColumn<DashboardCruise> expocodeColumn = 
-				new TextColumn<DashboardCruise> () {
+	private TextColumn<DashboardDataset> buildExpocodeColumn() {
+		TextColumn<DashboardDataset> expocodeColumn = 
+				new TextColumn<DashboardDataset> () {
 			@Override
-			public String getValue(DashboardCruise cruise) {
-				String expocode = cruise.getExpocode();
+			public String getValue(DashboardDataset cruise) {
+				String expocode = cruise.getDatasetId();
 				if ( expocode.isEmpty() )
 					expocode = NO_EXPOCODE_STRING;
 				return expocode;
@@ -1182,11 +1182,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the timestamp column for the table
 	 */
-	private TextColumn<DashboardCruise> buildTimestampColumn() {
-		TextColumn<DashboardCruise> timestampColumn = 
-				new TextColumn<DashboardCruise> () {
+	private TextColumn<DashboardDataset> buildTimestampColumn() {
+		TextColumn<DashboardDataset> timestampColumn = 
+				new TextColumn<DashboardDataset> () {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				String timestamp = cruise.getUploadTimestamp();
 				if ( timestamp.isEmpty() )
 					timestamp = NO_TIMESTAMP_STRING;
@@ -1199,11 +1199,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the data-check status column for the table
 	 */
-	private Column<DashboardCruise,String> buildDataCheckColumn() {
-		Column<DashboardCruise,String> dataCheckColumn = 
-				new Column<DashboardCruise,String> (new ClickableTextCell()) {
+	private Column<DashboardDataset,String> buildDataCheckColumn() {
+		Column<DashboardDataset,String> dataCheckColumn = 
+				new Column<DashboardDataset,String> (new ClickableTextCell()) {
 			@Override
-			public String getValue(DashboardCruise cruise) { 
+			public String getValue(DashboardDataset cruise) { 
 				String status = cruise.getDataCheckStatus();
 				if ( status.isEmpty() ) {
 					status = NO_DATA_CHECK_STATUS_STRING;
@@ -1221,7 +1221,7 @@ public class CruiseListPage extends CompositeWithUsername {
 				return status;
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
@@ -1249,14 +1249,14 @@ public class CruiseListPage extends CompositeWithUsername {
 				}
 			}
 		};
-		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
+			public void update(int index, DashboardDataset cruise, String value) {
 				// Save the currently selected cruises
 				getSelectedCruises(null);
 				// Open the data column specs page for this one cruise
 				ArrayList<String> expocodes = new ArrayList<String>(1);
-				expocodes.add(cruise.getExpocode());
+				expocodes.add(cruise.getDatasetId());
 				DataColumnSpecsPage.showPage(getUsername(), expocodes);
 			}
 		});
@@ -1266,33 +1266,33 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the OME metadata filename column for the table
 	 */
-	private Column<DashboardCruise,String> buildOmeMetadataColumn() {
-		Column<DashboardCruise,String> omeMetadataColumn = 
-				new Column<DashboardCruise,String> (new ClickableTextCell()) {
+	private Column<DashboardDataset,String> buildOmeMetadataColumn() {
+		Column<DashboardDataset,String> omeMetadataColumn = 
+				new Column<DashboardDataset,String> (new ClickableTextCell()) {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				String omeTimestamp = cruise.getOmeTimestamp();
 				if ( omeTimestamp.isEmpty() )
 					omeTimestamp = NO_OME_METADATA_STATUS_STRING;
 				return omeTimestamp;
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 				sb.appendEscaped(getValue(cruise));
 				sb.appendHtmlConstant("</em></u></div>");
 			}
 		};
-		omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+		omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
+			public void update(int index, DashboardDataset cruise, String value) {
 				// Save the currently selected cruises
 				getSelectedCruises(null);
 				// Show the OME metadata manager page for this one cruise
 				checkSet.clear();
 				checkSet.setUsername(getUsername());
-				checkSet.put(cruise.getExpocode(), cruise);
+				checkSet.put(cruise.getDatasetId(), cruise);
 				OmeManagerPage.showPage(checkSet);
 			}
 		});
@@ -1302,11 +1302,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the additional metadata files column for the table
 	 */
-	private Column<DashboardCruise,String> buildAddnDocsColumn() {
-		Column<DashboardCruise,String> addnDocsColumn = 
-				new Column<DashboardCruise,String>(new ClickableTextCell()) {
+	private Column<DashboardDataset,String> buildAddnDocsColumn() {
+		Column<DashboardDataset,String> addnDocsColumn = 
+				new Column<DashboardDataset,String>(new ClickableTextCell()) {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				TreeSet<String> addlDocTitles = cruise.getAddlDocs();
 				if ( addlDocTitles.size() == 0 )
 					return NO_ADDL_DOCS_STATUS_STRING;
@@ -1326,23 +1326,23 @@ public class CruiseListPage extends CompositeWithUsername {
 				return sb.toSafeHtml().asString();
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 				sb.appendHtmlConstant(getValue(cruise));
 				sb.appendHtmlConstant("</em></u></div>");
 			}
 		};
-		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
+			public void update(int index, DashboardDataset cruise, String value) {
 				// Save the currently selected cruises (in expocodeSet)
 				getSelectedCruises(null);
 				// Go to the additional docs page with just this one cruise
 				// Go to the QC page after performing the client-side checks on this one cruise
 				checkSet.clear();
 				checkSet.setUsername(getUsername());
-				checkSet.put(cruise.getExpocode(), cruise);
+				checkSet.put(cruise.getDatasetId(), cruise);
 				AddlDocsManagerPage.showPage(checkSet);
 			}
 		});
@@ -1352,11 +1352,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the version number column for the table 
 	 */
-	private TextColumn<DashboardCruise> buildVersionColumn() {
-		TextColumn<DashboardCruise> versionColumn = 
-				new TextColumn<DashboardCruise> () {
+	private TextColumn<DashboardDataset> buildVersionColumn() {
+		TextColumn<DashboardDataset> versionColumn = 
+				new TextColumn<DashboardDataset> () {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				return cruise.getVersion();
 			}
 		};
@@ -1366,18 +1366,18 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the QC submission status column for the table
 	 */
-	private Column<DashboardCruise,String> buildQCStatusColumn() {
-		Column<DashboardCruise,String> qcStatusColumn = 
-				new Column<DashboardCruise,String> (new ClickableTextCell()) {
+	private Column<DashboardDataset,String> buildQCStatusColumn() {
+		Column<DashboardDataset,String> qcStatusColumn = 
+				new Column<DashboardDataset,String> (new ClickableTextCell()) {
 			@Override
-			public String getValue(DashboardCruise cruise) {
-				String status = cruise.getQcStatus();
+			public String getValue(DashboardDataset cruise) {
+				String status = cruise.getSubmitStatus();
 				if ( status.isEmpty() )
 					status = NO_QC_STATUS_STRING;
 				return status;
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
@@ -1392,9 +1392,9 @@ public class CruiseListPage extends CompositeWithUsername {
 				}
 			}
 		};
-		qcStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+		qcStatusColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
+			public void update(int index, DashboardDataset cruise, String value) {
 				// Respond only for cruises in this version
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
@@ -1403,7 +1403,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
-					checkSet.put(cruise.getExpocode(), cruise);
+					checkSet.put(cruise.getDatasetId(), cruise);
 					checkCruisesForSubmitting();
 				}
 			}
@@ -1414,18 +1414,18 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the archive submission status column for the table
 	 */
-	private Column<DashboardCruise,String> buildArchiveStatusColumn() {
-		Column<DashboardCruise,String> archiveStatusColumn = 
-				new Column<DashboardCruise,String> (new ClickableTextCell()) {
+	private Column<DashboardDataset,String> buildArchiveStatusColumn() {
+		Column<DashboardDataset,String> archiveStatusColumn = 
+				new Column<DashboardDataset,String> (new ClickableTextCell()) {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				String status = cruise.getArchiveStatus();
 				if ( status.isEmpty() )
 					status = NO_ARCHIVE_STATUS_STRING;
 				return status;
 			}
 			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
+			public void render(Cell.Context ctx, DashboardDataset cruise, 
 													SafeHtmlBuilder sb) {
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
@@ -1440,9 +1440,9 @@ public class CruiseListPage extends CompositeWithUsername {
 				}
 			}
 		};
-		archiveStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+		archiveStatusColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
+			public void update(int index, DashboardDataset cruise, String value) {
 				// Respond only for cruises in this version
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
@@ -1451,7 +1451,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
-					checkSet.put(cruise.getExpocode(), cruise);
+					checkSet.put(cruise.getDatasetId(), cruise);
 					checkCruisesForSubmitting();
 				}
 			}
@@ -1462,11 +1462,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the filename column for the table
 	 */
-	private TextColumn<DashboardCruise> buildFilenameColumn() {
-		TextColumn<DashboardCruise> filenameColumn = 
-				new TextColumn<DashboardCruise> () {
+	private TextColumn<DashboardDataset> buildFilenameColumn() {
+		TextColumn<DashboardDataset> filenameColumn = 
+				new TextColumn<DashboardDataset> () {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardDataset cruise) {
 				String uploadFilename = cruise.getUploadFilename();
 				if ( uploadFilename.isEmpty() )
 					uploadFilename = NO_UPLOAD_FILENAME_STRING;
@@ -1479,11 +1479,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return the owner column for the table
 	 */
-	 private TextColumn<DashboardCruise> buildOwnerColumn() {
-	 	TextColumn<DashboardCruise> myOwnerColumn = 
-	 			new TextColumn<DashboardCruise> () {
+	 private TextColumn<DashboardDataset> buildOwnerColumn() {
+	 	TextColumn<DashboardDataset> myOwnerColumn = 
+	 			new TextColumn<DashboardDataset> () {
 	 		@Override
-	 		public String getValue(DashboardCruise cruise) {
+	 		public String getValue(DashboardDataset cruise) {
 	 			String owner = cruise.getOwner();
 	 			if ( owner.isEmpty() )
 	 				owner = NO_OWNER_STRING;
@@ -1501,22 +1501,22 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * Then checks the cruises given in checkSet in this instance for data 
 	 * compatibility for submitting for QC.  If the data has not been checked 
 	 * or is unacceptable, this method presents an error message and returns.  
-	 * If the data has serious issues to cause an automatic F flag, asks the 
-	 * user if the submit should be continued.  If the answer is yes, or if 
-	 * there were no serious data issues, continues submitting for QC by 
-	 * calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
+	 * If the data has many serious issues, asks the user if the submit should 
+	 * be continued.  If the answer is yes, or if there were no serious data 
+	 * issues, continues submitting for QC by calling 
+	 * {@link SubmitForQCPage#showPage(java.util.HashSet)}.
 	 */
 	private void checkCruisesForSubmitting() {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
-		for ( DashboardCruise cruise : checkSet.values() ) {
+		for ( DashboardDataset cruise : checkSet.values() ) {
 			// At this time, just check that some metadata file exists
 			// and do not worry about the contents
 			if ( cruise.getOmeTimestamp().isEmpty() &&
 				 cruise.getAddlDocs().isEmpty() ) {
 				errMsg += "<li>" + 
-						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+						SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
 				cannotSubmit = true;
 			}
 		}
@@ -1532,13 +1532,13 @@ public class CruiseListPage extends CompositeWithUsername {
 		errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
 		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
-		for ( DashboardCruise cruise : checkSet.values() ) {
+		for ( DashboardDataset cruise : checkSet.values() ) {
 			String status = cruise.getDataCheckStatus();
 			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
 				 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ||
 				 status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
 				errMsg += "<li>" + 
-						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+						 SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
 				cannotSubmit = true;
 			}
 			else if ( status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ||
@@ -1550,7 +1550,7 @@ public class CruiseListPage extends CompositeWithUsername {
 			}
 			else {
 				warnMsg += "<li>" + 
-					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+					 SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
 				willAutofail = true;
 			}
 		}

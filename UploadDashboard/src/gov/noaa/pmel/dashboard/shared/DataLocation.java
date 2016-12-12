@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * The location of a data point with a data value at that location.
- * Used for indicating locations for WOCE flag events which describes 
+ * Used for indicating locations for QC flag events which describes 
  * the data set and data column for this location and value.
  * 
  * @author Karl Smith
@@ -27,7 +27,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	protected Double dataValue;
 
 	/**
-	 * Creates an empty location with a global region ID
+	 * Creates an empty location
 	 */
 	public DataLocation() {
 		rowNumber = DashboardUtils.INT_MISSING_VALUE;

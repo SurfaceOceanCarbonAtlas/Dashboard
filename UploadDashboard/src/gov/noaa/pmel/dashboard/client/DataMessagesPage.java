@@ -105,7 +105,7 @@ public class DataMessagesPage extends CompositeWithUsername {
 
 	/**
 	 * Display this page in the RootLayoutPanel showing the
-	 * messages for cruise with the provided expocode.
+	 * messages for cruise with the provided dataset.
 	 * Adds this page to the page history.
 	 */
 	static void showPage(String username, String cruiseExpocode) {
@@ -142,7 +142,7 @@ public class DataMessagesPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -155,17 +155,17 @@ public class DataMessagesPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Update the cruise expocode and sanity checker messages with 
+	 * Update the cruise dataset and sanity checker messages with 
 	 * that given in the provided SCMessageList.
 	 * 
 	 * @param msgList
-	 * 		cruise expocode and set of messages to show 
+	 * 		cruise dataset and set of messages to show 
 	 */
 	private void updateMessages(SCMessageList msgs) {
 		// Assign the username and introduction message
 		setUsername(msgs.getUsername());
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + 
-				SafeHtmlUtils.htmlEscape(msgs.getExpocode()) + 
+				SafeHtmlUtils.htmlEscape(msgs.getDatasetId()) + 
 				INTRO_HTML_EPILOGUE);
 		// Update the table by resetting the data in the data provider
 		List<SCMessage> msgList = listProvider.getList();

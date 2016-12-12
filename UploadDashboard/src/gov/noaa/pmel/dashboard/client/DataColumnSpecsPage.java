@@ -3,16 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.WoceType;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,8 +32,18 @@ import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
+
 /**
- * Page for specifying the data column types in a DashboardCruiseWithData.
+ * Page for specifying the data column types in a DashboardDatasetData.
  * 
  * @author Karl Smith
  */
@@ -172,9 +172,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	// List of all known user data column types
 	private ArrayList<DataColumnType> knownUserTypes;
 	// Cruise associated with and updated by this page
-	private DashboardCruise cruise;
-	// List of CruiseDataColumn objects associated with the column Headers
-	private ArrayList<CruiseDataColumn> cruiseDataCols;
+	private DashboardDataset cruise;
+	// List of DatasetDataColumn objects associated with the column Headers
+	private ArrayList<DatasetDataColumn> cruiseDataCols;
 	// Asynchronous data provider for the data grid 
 	private AsyncDataProvider<ArrayList<String>> dataProvider;
 	// Dialog warning that data has never been checked or changes have not been saved
@@ -212,21 +212,21 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		cancelButton.setText(CANCEL_TEXT);
 
 		knownUserTypes = new ArrayList<DataColumnType>();
-		cruise = new DashboardCruise();
-		cruiseDataCols = new ArrayList<CruiseDataColumn>();
+		cruise = new DashboardDataset();
+		cruiseDataCols = new ArrayList<DatasetDataColumn>();
 		expocodes = new ArrayList<String>();
 
 		// Create the asynchronous data provider for the data grid
 		dataProvider = new AsyncDataProvider<ArrayList<String>>() {
 			@Override
 			protected void onRangeChanged(HasData<ArrayList<String>> display) {
-				// Ignore the call if there is no expocode assigned
-				if ( cruise.getExpocode().isEmpty() )
+				// Ignore the call if there is no dataset assigned
+				if ( cruise.getDatasetId().isEmpty() )
 					return;
 				UploadDashboard.showWaitCursor();
 				// Get the data for the cruise from the server
 				final Range range = display.getVisibleRange();
-				service.getCruiseDataWithRowNum(getUsername(), cruise.getExpocode(), 
+				service.getDataWithRowNum(getUsername(), cruise.getDatasetId(), 
 						range.getStart(), range.getLength(), 
 						new AsyncCallback<ArrayList<ArrayList<String>>>() {
 					@Override
@@ -262,7 +262,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	 * 
 	 * @param username
 	 * 		username for this page
-	 * @param expocode
+	 * @param dataset
 	 * 		show the specifications for this cruise
 	 */
 	static void showPage(String username, ArrayList<String> expocodes) {
@@ -273,16 +273,16 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
 		UploadDashboard.showWaitCursor();
-		service.getCruiseDataColumnSpecs(singleton.getUsername(), expocodes.get(0), 
-								new AsyncCallback<DashboardCruiseTypes>() {
+		service.getDataColumnSpecs(singleton.getUsername(), expocodes.get(0), 
+								new AsyncCallback<TypesDatasetDataPair>() {
 			@Override
-			public void onSuccess(DashboardCruiseTypes cruiseSpecs) {
+			public void onSuccess(TypesDatasetDataPair cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
 					UploadDashboard.updateCurrentPage(singleton);
 					singleton.knownUserTypes.clear();
 					if ( cruiseSpecs.getAllKnownTypes() != null )
 						singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
-					singleton.updateCruiseColumnSpecs(cruiseSpecs.getCruiseData());
+					singleton.updateCruiseColumnSpecs(cruiseSpecs.getDatasetData());
 					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 				}
 				else {
@@ -306,7 +306,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -323,7 +323,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	 * 		current cruise data column type specifications and
 	 * 		initial cruise data for display
 	 */
-	private void updateCruiseColumnSpecs(DashboardCruiseWithData cruiseSpecs) {
+	private void updateCruiseColumnSpecs(DashboardDatasetData cruiseSpecs) {
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		String status = cruiseSpecs.getDataCheckStatus();
@@ -359,8 +359,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			submitButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
 		}
 
-		// Clear the expocode in case the data provider gets called while clearing
-		cruise.setExpocode(null);
+		// Clear the dataset in case the data provider gets called while clearing
+		cruise.setDatasetId(null);
 
 		// Delete any existing columns and headers
 		int k = dataGrid.getColumnCount();
@@ -376,32 +376,22 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 
-		TreeSet<WoceType> woceSet = new TreeSet<WoceType>();
-		for ( WoceType chkwoce : cruiseSpecs.getCheckerWoceThrees() )
-			woceSet.add(new WoceType(null, chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
-		cruise.setCheckerWoceThrees(woceSet);
+		TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
+		for ( QCFlag chkwoce : cruiseSpecs.getCheckerFlags() )
+			woceSet.add(new QCFlag(null, chkwoce.getFlagValue(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+		cruise.setCheckerFlags(woceSet);
 
 		woceSet.clear();
-		for ( WoceType chkwoce : cruiseSpecs.getCheckerWoceFours() )
-			woceSet.add(new WoceType(null, chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
-		cruise.setCheckerWoceFours(woceSet);
+		for ( QCFlag uwoce : cruiseSpecs.getUserFlags() )
+			woceSet.add(new QCFlag(null, uwoce.getFlagValue(), null, uwoce.getRowIndex()));
+		cruise.setUserFlags(woceSet);
 
-		woceSet.clear();
-		for ( WoceType uwoce : cruiseSpecs.getUserWoceThrees() )
-			woceSet.add(new WoceType(null, null, uwoce.getRowIndex()));
-		cruise.setUserWoceThrees(woceSet);
-
-		woceSet.clear();
-		for ( WoceType uwoce : cruiseSpecs.getUserWoceFours() )
-			woceSet.add(new WoceType(null, null, uwoce.getRowIndex()));
-		cruise.setUserWoceFours(woceSet);
-
-		cruise.setQcStatus(cruiseSpecs.getQcStatus());
+		cruise.setSubmitStatus(cruiseSpecs.getSubmitStatus());
 		cruise.setArchiveStatus(cruiseSpecs.getArchiveStatus());
-		cruise.setExpocode(cruiseSpecs.getExpocode());
+		cruise.setDatasetId(cruiseSpecs.getDatasetId());
 
 		introHtml.setHTML(INTRO_HTML_PROLOGUE +  
-				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + 
+				SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + 
 				INTRO_HTML_EPILOGUE);
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
@@ -419,9 +409,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		for (k = 0; k < cruise.getDataColTypes().size(); k++) {
 			// TextColumn for displaying the data strings for this column
 			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k+1);
-			// CruiseDataColumn for creating the Header cell for this column
-			CruiseDataColumn cruiseColumn = new CruiseDataColumn(knownUserTypes, cruise, k);
-			// Maintain a reference to the CruiseDataColumn object
+			// DatasetDataColumn for creating the Header cell for this column
+			DatasetDataColumn cruiseColumn = new DatasetDataColumn(knownUserTypes, cruise, k);
+			// Maintain a reference to the DatasetDataColumn object
 			cruiseDataCols.add(cruiseColumn);
 			// Add this data column and the header to the grid
 			dataGrid.addColumn(dataColumn, cruiseColumn.getHeader());
@@ -456,7 +446,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	void logoutOnClick(ClickEvent event) {
 		// Check if any changes have been made
 		boolean hasChanged = false;
-		for ( CruiseDataColumn dataCol : cruiseDataCols ) {
+		for ( DatasetDataColumn dataCol : cruiseDataCols ) {
 			if ( dataCol.hasChanged() ) {
 				hasChanged = true;
 				break;
@@ -479,7 +469,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	void cancelOnClick(ClickEvent event) {
 		// Check if any changes have been made
 		boolean hasChanged = false;
-		for ( CruiseDataColumn dataCol : cruiseDataCols ) {
+		for ( DatasetDataColumn dataCol : cruiseDataCols ) {
 			if ( dataCol.hasChanged() ) {
 				hasChanged = true;
 				break;
@@ -503,24 +493,24 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			// No changes since last update
 			// If only one cruise, done
 			if ( expocodes.size() < 2 ) {
-				CruiseListPage.showPage();
+				DatasetListPage.showPage();
 				return;
 			}
 			// Put up the wait cursor and send the rest of the cruises through the sanity checker
 			UploadDashboard.showWaitCursor();
 			expocodes.remove(0);
-			service.updateCruiseDataColumns(getUsername(), expocodes, new AsyncCallback<Void>() {
+			service.updateDataColumns(getUsername(), expocodes, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					// Go to the list of cruises without comment; return to the normal cursor
-					CruiseListPage.showPage();
+					DatasetListPage.showPage();
 					UploadDashboard.showAutoCursor();
 					return;
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					// Go to the list of cruises without comment; return to the normal cursor
-					CruiseListPage.showPage();
+					DatasetListPage.showPage();
 					UploadDashboard.showAutoCursor();
 					return;
 				}
@@ -544,7 +534,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 					else {
 						// Return to the latest cruise listing page, which may  
 						// have been updated from previous actions on this page.
-						CruiseListPage.showPage();
+						DatasetListPage.showPage();
 					}
 				}
 				else {
@@ -562,7 +552,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 	@UiHandler("messagesButton") 
 	void showMessagesOnClick(ClickEvent event) {
-		DataMessagesPage.showPage(getUsername(), cruise.getExpocode());
+		DataMessagesPage.showPage(getUsername(), cruise.getDatasetId());
 	}
 
 	@UiHandler("submitButton")
@@ -778,10 +768,10 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.
-		service.updateCruiseDataColumnSpecs(getUsername(), cruise, 
-				new AsyncCallback<DashboardCruiseWithData>() {
+		service.updateDataColumnSpecs(getUsername(), cruise, 
+				new AsyncCallback<DashboardDatasetData>() {
 			@Override
-			public void onSuccess(DashboardCruiseWithData specs) {
+			public void onSuccess(DashboardDatasetData specs) {
 				if ( specs == null ) {
 					UploadDashboard.showMessage(SUBMIT_FAIL_MSG + 
 							" (unexpected null cruise information returned)");
@@ -844,44 +834,60 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		}
 		@Override
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
-			Integer rowIdx = ctx.getIndex();
-			WoceType cellWoce = new WoceType(null, colNum-1, rowIdx);
-			WoceType rowWoce = new WoceType(null, null, rowIdx);
 			if ( colNum == 0 ) {
 				sb.appendHtmlConstant("<div style=\"color:" + 
 						UploadDashboard.ROW_NUMBER_COLOR + ";text-align:right\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
+				return;
 			}
-			else if ( cruise.getCheckerWoceFours().contains(cellWoce) ||
-				 cruise.getCheckerWoceFours().contains(rowWoce) ) {
+			TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
+			Integer rowIdx = ctx.getIndex();
+			QCFlag woceCell = new QCFlag(null, DashboardUtils.FLAG_BAD, colNum-1, rowIdx);
+			QCFlag woceRow = new QCFlag(null, DashboardUtils.FLAG_BAD, null, rowIdx);
+			QCFlag woceCol = new QCFlag(null, DashboardUtils.FLAG_BAD, colNum-1, null);
+			if ( checkerFlags.contains(woceCell) || 
+				 checkerFlags.contains(woceRow) || 
+				 checkerFlags.contains(woceCol) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						UploadDashboard.CHECKER_ERROR_COLOR + ";font-weight:bold;\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
+				return;
 			}
-			else if ( cruise.getCheckerWoceThrees().contains(cellWoce) ||
-					  cruise.getCheckerWoceThrees().contains(rowWoce) ) {
-				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						UploadDashboard.CHECKER_WARNING_COLOR + ";font-weight:bold;\">");
-				sb.appendEscaped(getValue(obj));
-				sb.appendHtmlConstant("</div>");
-			}
-			else if ( cruise.getUserWoceFours().contains(rowWoce) ) {
+			TreeSet<QCFlag> userFlags = cruise.getUserFlags();
+			if ( userFlags.contains(woceCell) || 
+				 userFlags.contains(woceRow) || 
+				 userFlags.contains(woceCol) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						UploadDashboard.USER_ERROR_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
+				return;
 			}
-			else if ( cruise.getUserWoceThrees().contains(rowWoce) ) {
+			woceCell.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
+			woceRow.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
+			woceCol.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
+			if ( checkerFlags.contains(woceCell) || 
+				 checkerFlags.contains(woceRow) || 
+				 checkerFlags.contains(woceCol) ) {
+				sb.appendHtmlConstant("<div style=\"background-color:" + 
+						UploadDashboard.CHECKER_WARNING_COLOR + ";font-weight:bold;\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
+				return;
+			}
+			if ( userFlags.contains(woceCell) || 
+				 userFlags.contains(woceRow) || 
+				 userFlags.contains(woceCol) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						UploadDashboard.USER_WARNING_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
+				return;
 			}
-			else {
-				super.render(ctx, obj, sb);
-			}
+			// Render normally
+			super.render(ctx, obj, sb);
 		}
 	}
 

@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -27,7 +27,7 @@ import com.google.gwt.user.cellview.client.Header;
  * 
  * @author Karl Smith
  */
-public class CruiseDataColumn {
+public class DatasetDataColumn {
 
 	static final String DEFAULT_MISSING_VALUE = "(default missing values)";
 
@@ -36,16 +36,16 @@ public class CruiseDataColumn {
 	// List of "<name> [ <unit> ]" strings for all the known user data column types and selected units
 	private ArrayList<String> typeUnitStringList;
 	// Cruise associated with this instance
-	private DashboardCruise cruise;
+	private DashboardDataset cruise;
 	// Cruise data column index associated with this instance
 	private int columnIndex;
 	// Header associated with this instance
-	private Header<CruiseDataColumn> columnHeader;
+	private Header<DatasetDataColumn> columnHeader;
 	// Flag that something in the column header has hasChanged
 	private boolean hasChanged;
 
 	/**
-	 * Specifies a data column of a DashboardCruise.
+	 * Specifies a data column of a DashboardDataset.
 	 * 
 	 * @param knownUserTypes
 	 * 		list of all known data column types
@@ -54,7 +54,7 @@ public class CruiseDataColumn {
 	 * @param columnIndex
 	 * 		index of the cruise data column to associate with this instance
 	 */
-	CruiseDataColumn(ArrayList<DataColumnType> knownUserTypes, DashboardCruise cruise, int columnIndex) {
+	DatasetDataColumn(ArrayList<DataColumnType> knownUserTypes, DashboardDataset cruise, int columnIndex) {
 		knownTypeUnitList = new ArrayList<DataColumnType>(2 * knownUserTypes.size());
 		for ( DataColumnType dataType : knownUserTypes ) {
 			for (int k = 0; k < dataType.getUnits().size(); k++) {
@@ -87,7 +87,7 @@ public class CruiseDataColumn {
 	 * column type, a TextCell, and a TextInputCell, for the user to 
 	 * specify a missing value.
 	 */
-	Header<CruiseDataColumn> getHeader() {
+	Header<DatasetDataColumn> getHeader() {
 		return columnHeader;
 	}
 
@@ -102,10 +102,10 @@ public class CruiseDataColumn {
 	/**
 	 * Creates the header for this cruise data column.
 	 */
-	private Header<CruiseDataColumn> createHeader() {
+	private Header<DatasetDataColumn> createHeader() {
 
 		// Create the TextCell giving the column name given by the user
-		HasCell<CruiseDataColumn,String> userNameCell = new HasCell<CruiseDataColumn,String>() {
+		HasCell<DatasetDataColumn,String> userNameCell = new HasCell<DatasetDataColumn,String>() {
 			@Override
 			public TextCell getCell() {
 				// Return a TextCell which is rendered as a block-level element
@@ -118,17 +118,17 @@ public class CruiseDataColumn {
 				};
 			}
 			@Override
-			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
+			public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
 				return null;
 			}
 			@Override
-			public String getValue(CruiseDataColumn dataCol) {
+			public String getValue(DatasetDataColumn dataCol) {
 				return dataCol.cruise.getUserColNames().get(dataCol.columnIndex);
 			}
 		};
 
 		// Create the SelectionCell listing the known standard headers
-		HasCell<CruiseDataColumn,String> stdNameCell = new HasCell<CruiseDataColumn,String>() {
+		HasCell<DatasetDataColumn,String> stdNameCell = new HasCell<DatasetDataColumn,String>() {
 			@Override
 			public SelectionCell getCell() {
 				// Create a list of all the standard column headers with units;
@@ -142,10 +142,10 @@ public class CruiseDataColumn {
 				};
 			}
 			@Override
-			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
-				return new FieldUpdater<CruiseDataColumn,String>() {
+			public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
+				return new FieldUpdater<DatasetDataColumn,String>() {
 					@Override
-					public void update(int index, CruiseDataColumn dataCol, String value) {
+					public void update(int index, DatasetDataColumn dataCol, String value) {
 						// Note: index is the row index of the cell in a table 
 						// column where it is normally used; not of use here.
 
@@ -172,7 +172,7 @@ public class CruiseDataColumn {
 				};
 			}
 			@Override
-			public String getValue(CruiseDataColumn dataCol) {
+			public String getValue(DatasetDataColumn dataCol) {
 				// Find this column type with units
 				DataColumnType dctype = dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
 				// Ignore the missing value for this comparison
@@ -192,17 +192,17 @@ public class CruiseDataColumn {
 		};
 
 		// Create the TextInputCell allowing the user to specify the missing value
-		HasCell<CruiseDataColumn,String> missValCell = new HasCell<CruiseDataColumn,String>() {
+		HasCell<DatasetDataColumn,String> missValCell = new HasCell<DatasetDataColumn,String>() {
 			@Override
 			public TextInputCell getCell() {
 				return new TextInputCell();
 				// TODO: capture start-edit events to erase DEFAULT_MISSING_VALUE
 			}
 			@Override
-			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
-				return new FieldUpdater<CruiseDataColumn,String>() {
+			public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
+				return new FieldUpdater<DatasetDataColumn,String>() {
 					@Override
-					public void update(int index, CruiseDataColumn dataCol, String value) {
+					public void update(int index, DatasetDataColumn dataCol, String value) {
 						if ( value == null ) {
 							// ignore this callback if the value is null
 							return;
@@ -221,7 +221,7 @@ public class CruiseDataColumn {
 				};
 			}
 			@Override
-			public String getValue(CruiseDataColumn dataCol) {
+			public String getValue(DatasetDataColumn dataCol) {
 				DataColumnType dctype = dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
 				String value = dctype.getSelectedMissingValue();
 				if ( (value == null) || value.isEmpty() )
@@ -230,16 +230,16 @@ public class CruiseDataColumn {
 			}
 		};
 		// Create the CompositeCell to be used for the header				
-		CompositeCell<CruiseDataColumn> compCell = 
-			new CompositeCell<CruiseDataColumn>(
-				new ArrayList<HasCell<CruiseDataColumn,?>>(
+		CompositeCell<DatasetDataColumn> compCell = 
+			new CompositeCell<DatasetDataColumn>(
+				new ArrayList<HasCell<DatasetDataColumn,?>>(
 					Arrays.asList(userNameCell, stdNameCell, missValCell)));
 
 		// Create and return the Header
-		Header<CruiseDataColumn> headerCell = new Header<CruiseDataColumn>(compCell) {
+		Header<DatasetDataColumn> headerCell = new Header<DatasetDataColumn>(compCell) {
 			@Override
-			public CruiseDataColumn getValue() {
-				return CruiseDataColumn.this;
+			public DatasetDataColumn getValue() {
+				return DatasetDataColumn.this;
 			}
 		};
 		return headerCell;

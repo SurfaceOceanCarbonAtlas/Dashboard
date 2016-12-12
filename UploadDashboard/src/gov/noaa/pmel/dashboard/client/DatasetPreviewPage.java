@@ -4,7 +4,7 @@
 package gov.noaa.pmel.dashboard.client;
 
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class CruisePreviewPage extends CompositeWithUsername {
+public class DatasetPreviewPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Preview Dataset";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -100,7 +100,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	public static final String REC_FCO2_DELTA_IMAGE_NAME = "rec_fco2_delta";
 	public static final String REC_FCO2_SOURCES_IMAGE_NAME = "rec_fco2_sources";
 
-	interface CruisePreviewPageUiBinder extends UiBinder<Widget, CruisePreviewPage> {
+	interface CruisePreviewPageUiBinder extends UiBinder<Widget, DatasetPreviewPage> {
 	}
 
 	private static CruisePreviewPageUiBinder uiBinder = 
@@ -153,9 +153,9 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	AsyncCallback<Boolean> checkStatusCallback;
 
 	// The singleton instance of this page
-	private static CruisePreviewPage singleton;
+	private static DatasetPreviewPage singleton;
 
-	public CruisePreviewPage() {
+	public DatasetPreviewPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
@@ -269,13 +269,13 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	 * for the first cruise in the given cruiseList.  
 	 * Adds this page to the page history.
 	 */
-	static void showPage(DashboardCruiseList cruiseList) {
+	static void showPage(DashboardDatasetList cruiseList) {
 		if ( singleton == null )
-			singleton = new CruisePreviewPage();
+			singleton = new DatasetPreviewPage();
 		UploadDashboard.updateCurrentPage(singleton);
 		singleton.updatePreviewPlots(cruiseList.keySet().iterator().next(), 
 									 cruiseList.getUsername());
-		History.newItem(PagesEnum.PREVIEW_CRUISE.name(), false);
+		History.newItem(PagesEnum.PREVIEW_DATASET.name(), false);
 	}
 
 	/**
@@ -285,7 +285,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -295,7 +295,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	/**
 	 * Updates the this page with the plots for the indicated cruise.
 	 * 
-	 * @param expocode
+	 * @param dataset
 	 * 		cruises to use
 	 * @param username
 	 * 		user requesting these plots 
@@ -368,7 +368,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiHandler("dismissButton")
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page.
-		CruiseListPage.showPage();
+		DatasetListPage.showPage();
 	}
 
 }

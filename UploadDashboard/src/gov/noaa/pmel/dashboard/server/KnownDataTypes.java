@@ -52,14 +52,15 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Adds the default well-known data column types for the users
+	 * Adds the default well-known data column types for users
 	 * to select from.
 	 * 		UNKNOWN, OTHER,
-	 * 		EXPOCODE, DATASET_NAME, PLATFORM_NAME, ORGANIZATION_NAME, 
-	 * 		INVESTIGATOR_NAMES, PLATFORM_TYPE, 
-	 * 		TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
-	 * 		TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE,
-	 * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH
+	 * 		DATASET_ID, PLATFORM_NAME, PLATFORM_TYPE, 
+	 * 		ORGANIZATION_NAME, INVESTIGATOR_NAMES, 
+	 * 		DATASET_NAME, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, 
+	 * 		DAY_OF_MONTH, TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, 
+	 * 		SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, 
+	 * 		LATITUDE, SAMPLE_DEPTH
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
@@ -68,12 +69,15 @@ public class KnownDataTypes {
 	public KnownDataTypes addStandardTypesForUsers() {
 		addDataType(DashboardServerUtils.UNKNOWN);
 		addDataType(DashboardServerUtils.OTHER);
-		addDataType(DashboardServerUtils.EXPOCODE);
-		addDataType(DashboardServerUtils.DATASET_NAME);
+		addDataType(DashboardServerUtils.DATASET_ID);
 		addDataType(DashboardServerUtils.PLATFORM_NAME);
+		addDataType(DashboardServerUtils.PLATFORM_TYPE);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
-		addDataType(DashboardServerUtils.PLATFORM_TYPE);
+		addDataType(DashboardServerUtils.DATASET_NAME);
+		addDataType(DashboardServerUtils.LONGITUDE);
+		addDataType(DashboardServerUtils.LATITUDE);
+		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
 		addDataType(DashboardServerUtils.TIMESTAMP);
 		addDataType(DashboardServerUtils.DATE);
 		addDataType(DashboardServerUtils.YEAR);
@@ -85,41 +89,36 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
 		addDataType(DashboardServerUtils.DAY_OF_YEAR);
 		addDataType(DashboardServerUtils.SECOND_OF_DAY);
-		addDataType(DashboardServerUtils.LONGITUDE);
-		addDataType(DashboardServerUtils.LATITUDE);
-		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
-		addDataType(DashboardServerUtils.GENERIC_WOCE_FLAG);
-		addDataType(DashboardServerUtils.GENERIC_WOCE_COMMENT);
 		return this;
 	}
 
 	/**
-	 * Adds the default well-known metadata column types for the generating 
-	 * the NetCDF DSG files.
-	 * 		EXPOCODE, DATASET_NAME, PLATFORM_NAME, 
-	 * 		ORGANIZATION_NAME, INVESTIGATOR_NAMES, PLATFORM_TYPE, 
+	 * Adds the default well-known metadata column types for 
+	 * generating the NetCDF DSG files.
+	 * 		DATASET_ID, PLATFORM_NAME, PLATFORM_TYPE, 
+	 * 		ORGANIZATION_NAME, INVESTIGATOR_NAMES, 
 	 * 		WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, 
 	 * 		SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, 
-	 * 		TIME_COVERAGE_START, TIME_COVERAGE_END, QC_FLAG
+	 * 		TIME_COVERAGE_START, TIME_COVERAGE_END,
+	 * 		STATUS, VERSION
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
 	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForMetadataFiles() {
-		addDataType(DashboardServerUtils.EXPOCODE);
-		addDataType(DashboardServerUtils.DATASET_NAME);
+		addDataType(DashboardServerUtils.DATASET_ID);
 		addDataType(DashboardServerUtils.PLATFORM_NAME);
+		addDataType(DashboardServerUtils.PLATFORM_TYPE);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
-		addDataType(DashboardServerUtils.PLATFORM_TYPE);
 		addDataType(DashboardServerUtils.WESTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.EASTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
 		addDataType(DashboardServerUtils.NORTHERNMOST_LATITUDE);
 		addDataType(DashboardServerUtils.TIME_COVERAGE_START);
 		addDataType(DashboardServerUtils.TIME_COVERAGE_END);
-		addDataType(DashboardServerUtils.QC_FLAG);
+		addDataType(DashboardServerUtils.STATUS);
 		addDataType(DashboardServerUtils.VERSION);
 		return this;
 	}
@@ -127,9 +126,9 @@ public class KnownDataTypes {
 	/**
 	 * Adds the default well-known data column types for the generating 
 	 * the NetCDF DSG files.
-	 * 		SAMPLE_NUMBER, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, 
-	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME, LONGITUDE, LATITUDE, 
-	 * 		SAMPLE_DEPTH
+	 * 		SAMPLE_NUMBER, LONGITUDE, LATITUDE, SAMPLE_DEPTH, 
+	 * 		YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, 
+	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME 
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
@@ -137,6 +136,9 @@ public class KnownDataTypes {
 	 */
 	public KnownDataTypes addStandardTypesForDataFiles() {
 		addDataType(DashboardServerUtils.SAMPLE_NUMBER);
+		addDataType(DashboardServerUtils.LONGITUDE);
+		addDataType(DashboardServerUtils.LATITUDE);
+		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
 		addDataType(DashboardServerUtils.YEAR);
 		addDataType(DashboardServerUtils.MONTH_OF_YEAR);
 		addDataType(DashboardServerUtils.DAY_OF_MONTH);
@@ -144,10 +146,6 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
 		addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
 		addDataType(DashboardServerUtils.TIME);
-		addDataType(DashboardServerUtils.LONGITUDE);
-		addDataType(DashboardServerUtils.LATITUDE);
-		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
-		addDataType(DashboardServerUtils.GENERIC_WOCE_FLAG);
 		return this;
 	}
 

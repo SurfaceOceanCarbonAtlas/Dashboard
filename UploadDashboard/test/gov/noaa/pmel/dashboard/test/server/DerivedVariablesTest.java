@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 
 import java.util.ArrayList;
 
@@ -24,14 +24,14 @@ public class DerivedVariablesTest {
 		DsgNcFileTest fileTest = new DsgNcFileTest();
 		fileTest.testCreate();
 		DsgNcFile dsgFile = fileTest.dsgNcFile;
-		String expocode = dsgFile.getMetadata().getExpocode();
+		String expocode = dsgFile.getMetadata().getDatasetId();
 		int numData = dsgFile.getDataList().size();
 		ArrayList<Double> longitudes = new ArrayList<Double>(numData);
 		ArrayList<Double> latitudes = new ArrayList<Double>(numData);
 		ArrayList<Integer> hours = new ArrayList<Integer>(numData);
 		ArrayList<Integer> minutes = new ArrayList<Integer>(numData);
 		for (int k = 0; k < numData; k++) {
-			DsgCruiseData dataVals = dsgFile.getDataList().get(k);
+			DsgData dataVals = dsgFile.getDataList().get(k);
 			longitudes.add(dataVals.getLongitude());
 			latitudes.add(dataVals.getLatitude());
 			hours.add(dataVals.getHour());
@@ -50,10 +50,10 @@ public class DerivedVariablesTest {
 		assertEquals(0, unknownNames.size());
 		unknownNames = dsgFile.readData(DsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
+		assertEquals(expocode, dsgFile.getMetadata().getDatasetId());
 		assertEquals(numData, dsgFile.getDataList().size());
 		for (int k = 0; k < numData; k++) {
-			DsgCruiseData dataVals = dsgFile.getDataList().get(k);
+			DsgData dataVals = dsgFile.getDataList().get(k);
 			assertEquals(Integer.valueOf(k+1), dataVals.getSampleNumber());
 			assertEquals(longitudes.get(k), dataVals.getLongitude(), 1.0E-6);
 			assertEquals(latitudes.get(k), dataVals.getLatitude(), 1.0E-6);
@@ -73,9 +73,9 @@ public class DerivedVariablesTest {
 		assertEquals(0, unknownNames.size());
 		unknownNames = decDsgFile.readData(DsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
+		assertEquals(expocode, dsgFile.getMetadata().getDatasetId());
 		int lastRowNum = 0;
-		for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
+		for ( DsgData dataVals : dsgFile.getDataList() ) {
 			int thisRowNum = dataVals.getSampleNumber();
 			assertTrue( lastRowNum < thisRowNum );
 			assertTrue( thisRowNum <= numData );

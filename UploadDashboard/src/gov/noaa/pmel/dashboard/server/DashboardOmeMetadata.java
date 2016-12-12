@@ -55,7 +55,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * DashboardMetadata given. 
 	 * 
 	 * @param mdata
-	 * 		OME XML file to read.  The expocode, upload timestamp, and owner 
+	 * 		OME XML file to read.  The dataset, upload timestamp, and owner 
 	 * 		are copied from this object, and the file specified is read to 
 	 * 		populate the OmeMetadata member of this object.
 	 * @param mdataHandler
@@ -74,14 +74,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		if ( mdata == null )
 			throw new IllegalArgumentException("No metadata file given");
 
-		// Copy the expocode, uploadTimestamp, owner, and version
+		// Copy the dataset, uploadTimestamp, owner, and version
 		// from the given DashboardMetadata object
-		expocode = mdata.getExpocode();
+		datasetId = mdata.getDatasetId();
 		uploadTimestamp = mdata.getUploadTimestamp();
 		owner = mdata.getOwner();
 		version = mdata.getVersion();
 
-		File mdataFile = mdataHandler.getMetadataFile(expocode, mdata.getFilename());
+		File mdataFile = mdataHandler.getMetadataFile(datasetId, mdata.getFilename());
 		Document omeDoc;
 		try {
 			omeDoc = (new SAXBuilder()).build(mdataFile);
@@ -94,7 +94,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		// Create the OmeMetadata object associated with this instance
 		// from the OME XML contents
 		try {
-			omeMData = new OmeMetadata(expocode);
+			omeMData = new OmeMetadata(datasetId);
 			omeMData.assignFromOmeXmlDoc(omeDoc);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problem with " + mdataFile.getPath() +
@@ -105,30 +105,30 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Creates with the given expocode and timestamp, and from the contents 
+	 * Creates with the given dataset and timestamp, and from the contents 
 	 * of the given OME XML document.  The owner and version is left empty.
 	 * 
 	 * @param expo
-	 * 		expocode for this metadata
+	 * 		dataset for this metadata
 	 * @param timestamp
 	 * 		upload timestamp for this metadata
 	 * @param omeDoc
 	 * 		document containing the metadata contents
 	 * @throws IllegalArgumentException
-	 * 		if expocode is invalid, or
+	 * 		if dataset is invalid, or
 	 * 		if the contents of the metadata document are not valid
 	 */
 	public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc) 
 											throws IllegalArgumentException {
 		super();
 		filename = DashboardUtils.OME_FILENAME;
-		expocode = DashboardServerUtils.checkExpocode(expo);
+		datasetId = DashboardServerUtils.checkDatasetID(expo);
 		// Use the setter in case of null
 		setUploadTimestamp(timestamp);
 
 		// Read the document to create the OmeMetadata member of this object
 		try {
-			omeMData = new OmeMetadata(expocode);
+			omeMData = new OmeMetadata(datasetId);
 			omeMData.assignFromOmeXmlDoc(omeDoc);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems with the provided XML document:" +
@@ -139,7 +139,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Creates using the given OmeMetadata.  The expocode is obtained from the OmeMetadata.
+	 * Creates using the given OmeMetadata.  The dataset is obtained from the OmeMetadata.
 	 * 
 	 * @param omeMeta
 	 * 		the OmeMetadata contents of this metadata
@@ -153,7 +153,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	public DashboardOmeMetadata(OmeMetadata omeMeta, String timestamp, String owner, String version) {
 		super();
 		filename = DashboardUtils.OME_FILENAME;
-		expocode = DashboardServerUtils.checkExpocode(omeMeta.getExpocode());
+		datasetId = DashboardServerUtils.checkDatasetID(omeMeta.getExpocode());
 		setUploadTimestamp(timestamp);
 		setOwner(owner);
 		setVersion(version);
@@ -170,7 +170,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * @return
 	 *		created DsgMetadata object 
 	 */
-	public DsgMetadata createSocatMetadata() throws IllegalArgumentException {
+	public DsgMetadata createDsgMetadata() throws IllegalArgumentException {
 
 		// We cannot create a DsgMetadata object if there are conflicts
 		if ( isConflicted() ) {
@@ -185,7 +185,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		}
 		DsgMetadata scMData = new DsgMetadata(confStore.getKnownMetadataTypes());
 		
-		scMData.setExpocode(expocode);
+		scMData.setDatasetId(datasetId);
 		scMData.setDatasetName(omeMData.getExperimentName());
 
 		// Anglicize the platform name for NetCDF/LAS
@@ -193,15 +193,11 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		scMData.setPlatformName(anglicizeName(platformName));
 
 		// Set the platform type - could be missing
-		String platformType;
 		try {
-			platformType = omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
+			scMData.setPlatformType(omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING));
 		} catch ( Exception ex ) {
-			platformType = null;
+			scMData.setPlatformType(null);
 		}
-		if ( (platformType == null) || platformType.trim().isEmpty() )
-			platformType = DashboardServerUtils.guessPlatformType(expocode, platformName);
-		scMData.setPlatformType(platformType);
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));
@@ -265,16 +261,16 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Assigns the expocode associated with this DashboardMetadata as well
-	 * as the expocode stored in the OME information represented by this
+	 * Assigns the dataset associated with this DashboardMetadata as well
+	 * as the dataset stored in the OME information represented by this
 	 * DashboardMetadata.
 	 * 
 	 * @param newExpocode
-	 * 		new expocode to use
+	 * 		new dataset to use
 	 */
 	public void changeExpocode(String newExpocode) {
 		omeMData.setExpocode(newExpocode);
-		setExpocode(newExpocode);
+		setDatasetId(newExpocode);
 	}
 	
 	/**
@@ -310,10 +306,10 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 			// Some fields should not have been merged; reset to the values in this instance
 			// setExpcode sets
-			//   cruise ID = dataset ID = expocode, 
-			//   vessel ID = NODC code from expocode, 
-			//   cruise start date = start date from expocode
-			mergedOmeMData.setExpocode(this.expocode);
+			//   cruise ID = dataset ID = dataset, 
+			//   vessel ID = NODC code from dataset, 
+			//   cruise start date = start date from dataset
+			mergedOmeMData.setExpocode(this.datasetId);
 
 			String value = this.omeMData.getValue(OmeMetadata.END_DATE_STRING);
 			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )

@@ -3,10 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -55,7 +55,7 @@ public class AddAllMetadata {
 			System.exit(1);
 		}
 		try {
-			// Get the expocode of the cruises to update
+			// Get the dataset of the cruises to update
 			TreeSet<String> allExpocodes = new TreeSet<String>();
 			try {
 				BufferedReader expoReader = 
@@ -78,13 +78,13 @@ public class AddAllMetadata {
 				System.exit(1);
 			}
 
-			CruiseFileHandler fileHandler = configStore.getCruiseFileHandler();
+			DataFileHandler fileHandler = configStore.getDataFileHandler();
 			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 			for ( String expocode : allExpocodes ) {
 				try {
-					DashboardCruise cruise = fileHandler.getCruiseFromInfoFile(expocode);
+					DashboardDataset cruise = fileHandler.getDatasetFromInfoFile(expocode);
 					if ( cruise == null ) {
-						System.err.println("No dataset with the expocode " + expocode);
+						System.err.println("No dataset with the dataset " + expocode);
 						success = false;
 						continue;
 					}
@@ -110,7 +110,7 @@ public class AddAllMetadata {
 					}
 					// Save the updated additional documents/OME timestamp for the cruise
 					// but do not commit the change - to be done manually
-					fileHandler.saveCruiseInfoToFile(cruise, null);
+					fileHandler.saveDatasetInfoToFile(cruise, null);
 					System.err.println("Documents updated for " + expocode);
 				} catch (Exception ex) {
 					System.err.println("Problems working with " + expocode);

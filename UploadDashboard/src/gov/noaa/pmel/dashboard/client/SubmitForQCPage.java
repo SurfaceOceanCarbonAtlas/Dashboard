@@ -4,8 +4,8 @@
 package gov.noaa.pmel.dashboard.client;
 
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -219,7 +219,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	 * Display this page in the RootLayoutPanel showing the
 	 * given cruises.  Adds this page to the page history.
 	 */
-	static void showPage(DashboardCruiseList cruises) {
+	static void showPage(DashboardDatasetList cruises) {
 		if ( singleton == null )
 			singleton = new SubmitForQCPage();
 		UploadDashboard.updateCurrentPage(singleton);
@@ -234,7 +234,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -249,7 +249,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	private void updateCruises(DashboardCruiseList cruises) {
+	private void updateCruises(DashboardDatasetList cruises) {
 		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
@@ -260,8 +260,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		int numOwner = 0;
 		int numCdiac = 0;
 		TreeSet<String> cruiseIntros = new TreeSet<String>();
-		for ( DashboardCruise cruise : cruises.values() ) {
-			String expo = cruise.getExpocode();
+		for ( DashboardDataset cruise : cruises.values() ) {
+			String expo = cruise.getDatasetId();
 			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
 			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ) {
@@ -279,7 +279,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			expocodes.add(expo);
 
 			// Add this cruise to the intro list
-			String submitStatus = cruise.getQcStatus();
+			String submitStatus = cruise.getSubmitStatus();
 			String cdiacDate = cruise.getArchiveDate();
 			if ( submitStatus.isEmpty() && cdiacDate.isEmpty() ) {
 				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
@@ -401,7 +401,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the list of cruises which could have been modified by this page
-		CruiseListPage.showPage();
+		DatasetListPage.showPage();
 	}
 
 	@UiHandler("submitButton")
@@ -466,12 +466,12 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		boolean repeatSend = true;
 		// Submit the dataset
 		UploadDashboard.showWaitCursor();
-		service.submitCruiseForQC(getUsername(), expocodes, archiveStatus, 
+		service.submitDatasetsForQC(getUsername(), expocodes, archiveStatus, 
 				localTimestamp, repeatSend, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
-				CruiseListPage.showPage();
+				DatasetListPage.showPage();
 				UploadDashboard.showAutoCursor();
 			}
 			@Override
@@ -479,7 +479,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 				// Failure, so show fail message
 				// But still go back to the cruise list page since some may have succeeded
 				UploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
-				CruiseListPage.showPage();
+				DatasetListPage.showPage();
 				UploadDashboard.showAutoCursor();
 			}
 		});

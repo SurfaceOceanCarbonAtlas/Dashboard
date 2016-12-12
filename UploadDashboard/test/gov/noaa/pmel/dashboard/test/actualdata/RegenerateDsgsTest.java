@@ -10,7 +10,7 @@ import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -55,7 +55,7 @@ public class RegenerateDsgsTest {
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		DsgMetadata origMeta = fullDataDsg.getMetadata();
-		ArrayList<DsgCruiseData> origData = fullDataDsg.getDataList();
+		ArrayList<DsgData> origData = fullDataDsg.getDataList();
 
 		// Regenerate the DSG files
 		RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
@@ -66,15 +66,15 @@ public class RegenerateDsgsTest {
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		DsgMetadata updatedMeta = fullDataDsg.getMetadata();
-		ArrayList<DsgCruiseData> updatedData = fullDataDsg.getDataList();
+		ArrayList<DsgData> updatedData = fullDataDsg.getDataList();
 
 		// Test that nothing has changed
 		assertEquals(origMeta, updatedMeta);
 		assertEquals(origData.size(), updatedData.size());
 
 		for (int k = 0; k < origData.size(); k++) {
-			DsgCruiseData origVals = origData.get(k);
-			DsgCruiseData updatedVals = updatedData.get(k);
+			DsgData origVals = origData.get(k);
+			DsgData updatedVals = updatedData.get(k);
 
 			if ( ! origVals.equals(updatedVals) ) {
 				// Report all problems for the measurement, not just the first problem

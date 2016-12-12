@@ -1,15 +1,15 @@
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.actions.CruiseChecker;
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
@@ -21,8 +21,8 @@ public class PreviewPlotsHandler {
 
 	File dsgFilesDir;
 	File plotsDir;
-	CruiseFileHandler cruiseHandler;
-	CruiseChecker cruiseChecker;
+	DataFileHandler cruiseHandler;
+	DatasetChecker cruiseChecker;
 	KnownDataTypes knownMetadataTypes;
 	KnownDataTypes knownDataFileTypes;
 	FerretConfig ferretConfig;
@@ -35,7 +35,7 @@ public class PreviewPlotsHandler {
 	 * @param plotsDirName
 	 * 		directory to contain the preview plots
 	 * @param configStore
-	 * 		get the CruiseFileHandler, CruiseChecker, 
+	 * 		get the DataFileHandler, DatasetChecker, 
 	 * 		MetadataFileHandler, and FerretConfig from here
 	 */
 	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, 
@@ -46,7 +46,7 @@ public class PreviewPlotsHandler {
 		plotsDir = new File(plotsDirName);
 		if ( ! plotsDir.isDirectory() )
 			throw new IllegalArgumentException(plotsDirName + " is not a directory");
-		cruiseHandler = configStore.getCruiseFileHandler();
+		cruiseHandler = configStore.getDataFileHandler();
 		cruiseChecker = configStore.getDashboardCruiseChecker();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
@@ -57,17 +57,17 @@ public class PreviewPlotsHandler {
 	 * Generates the preview DSG files for a cruise.
 	 * Creates this directory if it does not exist.
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise 
+	 * @param dataset
+	 * 		dataset of the cruise 
 	 * @return
 	 * 		DSG files directory for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, 
+	 * 		if the dataset is invalid, 
 	 * 		if problems creating the directory
 	 */
 	public File getCruisePreviewDsgDir(String expocode) throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String expo = DashboardServerUtils.checkExpocode(expocode);
+		// Check and standardize the dataset
+		String expo = DashboardServerUtils.checkDatasetID(expocode);
 		// Make sure the DSG subdirectory exists
 		File cruiseDsgDir = new File(dsgFilesDir, expo.substring(0,4));
 		if ( cruiseDsgDir.exists() ) {
@@ -87,17 +87,17 @@ public class PreviewPlotsHandler {
 	 * Generates the preview plots directory for a cruise.
 	 * Creates this directory if it does not exist.
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise
+	 * @param dataset
+	 * 		dataset of the cruise
 	 * @return
 	 * 		preview plots directory for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or
+	 * 		if the dataset is invalid, or
 	 * 		if problems creating the directory
 	 */
 	public File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String expo = DashboardServerUtils.checkExpocode(expocode);
+		// Check and standardize the dataset
+		String expo = DashboardServerUtils.checkDatasetID(expocode);
 		// Make sure the plots subdirectory exists
 		File cruisePlotsDir = new File(plotsDir, expo.substring(0,4));
 		if ( cruisePlotsDir.exists() ) {
@@ -120,13 +120,13 @@ public class PreviewPlotsHandler {
 	 * finally Ferret is called to generate the data preview plots from the 
 	 * data in the DSG file.
 	 * 
-	 * @param expocode
-	 * 		expocode of the cruise to preview
+	 * @param dataset
+	 * 		dataset of the cruise to preview
 	 * @param timetag
 	 * 		time tag to add to the end of the names of the plots 
 	 * 		(before the filename extension)
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if there is an error reading the data or OME metadata,
 	 * 		if there is an error checking and standardizing the data,
 	 * 		if there is an error generating the preview DSG file, or
@@ -134,12 +134,12 @@ public class PreviewPlotsHandler {
 	 */
 	public void createPreviewPlots(String expocode, String timetag) 
 			throws IllegalArgumentException {
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		Logger log = Logger.getLogger("PreviewPlotsHandler");
 		log.debug("reading data for " + upperExpo);
 
 		// Get the complete original cruise data
-		DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(upperExpo, 0, -1);
+		DashboardDatasetData cruiseData = cruiseHandler.getDatasetDataFromFiles(upperExpo, 0, -1);
 
 		log.debug("standardizing data for " + upperExpo);
 
@@ -173,13 +173,13 @@ public class PreviewPlotsHandler {
 		// Do not use the metadata in the DSG file, and to avoid issues with the existing
 		// OME metadata, just use what we already know to create a DsgMetadata
 		DsgMetadata socatMData = new DsgMetadata(knownMetadataTypes);
-		socatMData.setExpocode(upperExpo);
+		socatMData.setDatasetId(upperExpo);
 		socatMData.setVersion(cruiseData.getVersion());
 		socatMData.setQcFlag(DashboardUtils.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
-		ArrayList<DsgCruiseData> socatDatalist = 
-				DsgCruiseData.dataListFromDashboardCruise(
+		ArrayList<DsgData> socatDatalist = 
+				DsgData.dataListFromDashboardCruise(
 						knownDataFileTypes, cruiseData);
 
 		// Create the preview NetCDF DSG file

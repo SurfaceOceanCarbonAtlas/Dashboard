@@ -3,13 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.actions.CruiseChecker;
-import gov.noaa.pmel.dashboard.actions.CruiseSubmitter;
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
+import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
@@ -66,8 +66,8 @@ public class DashboardConfigStore {
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
 	private static final String ARCHIVE_BUNDLES_DIR_NAME_TAG = "ArchiveBundlesDir";
-	private static final String ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG = "ArchiveBundlesEmailAddress";
-	private static final String CC_BUNDLES_EMAIL_ADDRESS_TAG = "CCBundlesEmailAddress";
+	private static final String BUNDLES_ARCHIVER_EMAIL_ADDRESS_TAG = "BundlesArchiveEmailAddress";
+	private static final String BUNDLES_FROM_EMAIL_ADDRESS_TAG = "BundlesFromEmailAddress";
 	private static final String SMTP_HOST_ADDRESS_TAG = "SMTPHostAddress";
 	private static final String SMTP_HOST_PORT_TAG = "SMTPHostPort";
 	private static final String SMTP_USERNAME_TAG = "SMTPUsername";
@@ -98,8 +98,8 @@ public class DashboardConfigStore {
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ARCHIVE_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Archive/Bundles \n" + 
-			ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
-			CC_BUNDLES_EMAIL_ADDRESS_TAG + "=support@my.group.org \n" +
+			BUNDLES_ARCHIVER_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
+			BUNDLES_FROM_EMAIL_ADDRESS_TAG + "=dashboard@my.group.org \n" +
 			SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.dashboard \n" +
 			SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
 			SMTP_USERNAME_TAG + "=username.for.smtp \n" +
@@ -134,16 +134,16 @@ public class DashboardConfigStore {
 	private String uploadVersion;
 	private String qcVersion;
 	private UserFileHandler userFileHandler;
-	private CruiseFileHandler cruiseFileHandler;
+	private DataFileHandler cruiseFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private ArchiveFilesBundler archiveFilesBundler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
-	private CruiseChecker cruiseChecker;
+	private DatasetChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
 	private PreviewPlotsHandler plotsHandler;
-	private CruiseSubmitter cruiseSubmitter;
+	private DatasetSubmitter cruiseSubmitter;
 	private OmePdfGenerator omePdfGenerator;
 	private KnownDataTypes knownUserDataTypes;
 	private KnownDataTypes knownMetadataTypes;
@@ -426,7 +426,7 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new CruiseFileHandler(propVal, svnUsername, 
+			cruiseFileHandler = new DataFileHandler(propVal, svnUsername, 
 					svnPassword, knownUserDataTypes);
 			// Put SanityChecker message files in the same directory
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
@@ -449,20 +449,20 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
-		// Read the CDIAC email address to send archival bundles
-		propVal = configProps.getProperty(ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG);
+		// Read the email address to send archival bundles
+		propVal = configProps.getProperty(BUNDLES_ARCHIVER_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + 
+			throw new IOException("Invalid " + BUNDLES_ARCHIVER_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
-		String cdiacEmailAddress = propVal.trim();
-		// Read the SOCAT email address for the from address for archival bundles
-		propVal = configProps.getProperty(CC_BUNDLES_EMAIL_ADDRESS_TAG);
+		String archiverEmailAddress = propVal.trim();
+		// Read the email address to mark as the "from:" address for archival bundles
+		propVal = configProps.getProperty(BUNDLES_FROM_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG + 
+			throw new IOException("Invalid " + BUNDLES_FROM_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
-		String socatEmailAddress = propVal.trim();
+		String fromEmailAddress = propVal.trim();
 		// Read the SMTP server information
 		propVal = configProps.getProperty(SMTP_HOST_ADDRESS_TAG);
 		if ( propVal == null )
@@ -495,12 +495,12 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, 
-					svnPassword, cdiacEmailAddress, socatEmailAddress, 
+					svnPassword, archiverEmailAddress, fromEmailAddress, 
 					smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
-			itsLogger.info("CDIAC files bundler and mailer using:");
+			itsLogger.info("Archive files bundler and mailer created using:");
 			itsLogger.info("    bundles directory: " + propVal);
-			itsLogger.info("    CDIAC email address: " + cdiacEmailAddress);
-			itsLogger.info("    SOCAT email address: " + socatEmailAddress);
+			itsLogger.info("    archiver email address: " + archiverEmailAddress);
+			itsLogger.info("    from email address: " + fromEmailAddress);
 			itsLogger.info("    SMTP host: " + smtpHostAddress);
 			itsLogger.info("    SMTP port: " + smtpHostPort);
 			itsLogger.info("    SMTP username: " + smtpUsername);
@@ -609,7 +609,7 @@ public class DashboardConfigStore {
 
 		// SanityChecker initialization from this same properties file 
 		try {
-			cruiseChecker = new CruiseChecker(configFile, checkerMsgHandler, metadataFileHandler);
+			cruiseChecker = new DatasetChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -650,8 +650,8 @@ public class DashboardConfigStore {
 		omePdfGenerator = new OmePdfGenerator(new File(configAppDir), 
 				metadataFileHandler, cruiseFileHandler);
 
-		// The CruiseSubmitter uses the various handlers just created
-		cruiseSubmitter = new CruiseSubmitter(this);
+		// The DatasetSubmitter uses the various handlers just created
+		cruiseSubmitter = new DatasetSubmitter(this);
 
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
@@ -874,7 +874,7 @@ public class DashboardConfigStore {
 	 * @return 
 	 * 		the handler for cruise data files
 	 */
-	public CruiseFileHandler getCruiseFileHandler() {
+	public DataFileHandler getDataFileHandler() {
 		return cruiseFileHandler;
 	}
 
@@ -922,7 +922,7 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the checker for cruise data and metadata
 	 */
-	public CruiseChecker getDashboardCruiseChecker() {
+	public DatasetChecker getDashboardCruiseChecker() {
 		return cruiseChecker;
 	}
 
@@ -938,7 +938,7 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the submitter for dashboard cruises
 	 */
-	public CruiseSubmitter getDashboardCruiseSubmitter() {
+	public DatasetSubmitter getDashboardCruiseSubmitter() {
 		return cruiseSubmitter;
 	}
 

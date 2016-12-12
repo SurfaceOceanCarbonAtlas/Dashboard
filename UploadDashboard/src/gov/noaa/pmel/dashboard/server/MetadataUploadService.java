@@ -4,11 +4,11 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
@@ -149,7 +149,7 @@ public class MetadataUploadService extends HttpServlet {
 		String version = configStore.getUploadVersion();
 
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 		DsgNcFileHandler dsgFileHandler = configStore.getDsgNcFileHandler();
 		OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
@@ -187,7 +187,7 @@ public class MetadataUploadService extends HttpServlet {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
 				}
 				// Update the metadata documents associated with this cruise
-				DashboardCruise cruise;
+				DashboardDataset cruise;
 				if ( isOme ) {
 					// Make sure the contents are valid OME XML
 					DashboardOmeMetadata omedata;
@@ -198,7 +198,7 @@ public class MetadataUploadService extends HttpServlet {
 						metadataHandler.removeMetadata(username, expo, metadata.getFilename());
 						throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
 					}
-					cruise = cruiseHandler.addAddlDocToCruise(expo, omedata);
+					cruise = cruiseHandler.addAddlDocTitleToDataset(expo, omedata);
 					try {
 						// This is using the PI OME XML file at this time
 						omePdfGenerator.createPiOmePdf(expo);
@@ -208,12 +208,12 @@ public class MetadataUploadService extends HttpServlet {
 					}
 				}
 				else {
-					cruise = cruiseHandler.addAddlDocToCruise(expo, metadata);
+					cruise = cruiseHandler.addAddlDocTitleToDataset(expo, metadata);
 				}
 				if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
 					QCEvent qcEvent = new QCEvent();
-					qcEvent.setExpocode(expo);
-					qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
+					qcEvent.setDatasetId(expo);
+					qcEvent.setFlagValue(DashboardUtils.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
 					qcEvent.setVersion(version);
 					qcEvent.setUsername(username);
@@ -229,11 +229,11 @@ public class MetadataUploadService extends HttpServlet {
 						dbHandler.addQCEvent(qcEvent);
 						dsgFileHandler.updateQCFlag(qcEvent);
 						// Update the dashboard status for the 'U' QC flag
-						cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
+						cruise.setSubmitStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 						// If archived, reset the archived status so the updated metadata will be archived
 						if ( cruise.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
 							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
-						cruiseHandler.saveCruiseInfoToFile(cruise, comment);
+						cruiseHandler.saveDatasetInfoToFile(cruise, comment);
 					} catch (Exception ex) {
 						// Should not fail.  
 						// If does, do not delete the file since it is okay, and ignore the failure.

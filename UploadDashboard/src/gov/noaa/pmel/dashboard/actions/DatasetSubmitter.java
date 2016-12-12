@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
@@ -13,14 +13,13 @@ import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
-import gov.noaa.pmel.dashboard.shared.WoceType;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -37,12 +36,12 @@ import org.apache.log4j.Logger;
  * 
  * @author Karl Smith
  */
-public class CruiseSubmitter {
+public class DatasetSubmitter {
 
-	CruiseFileHandler cruiseHandler;
+	DataFileHandler cruiseHandler;
 	CheckerMessageHandler msgHandler;
 	MetadataFileHandler metadataHandler;
-	CruiseChecker cruiseChecker;
+	DatasetChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
 	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler databaseHandler;
@@ -54,8 +53,8 @@ public class CruiseSubmitter {
 	 * @param configStore
 	 * 		create with the file handlers and data checker in this data store.
 	 */
-	public CruiseSubmitter(DashboardConfigStore configStore) {
-		cruiseHandler = configStore.getCruiseFileHandler();
+	public DatasetSubmitter(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getDataFileHandler();
 		msgHandler = configStore.getCheckerMsgHandler();
 		metadataHandler = configStore.getMetadataFileHandler();
 		cruiseChecker = configStore.getDashboardCruiseChecker();
@@ -92,7 +91,7 @@ public class CruiseSubmitter {
 	 * @param submitter
 	 * 		user performing this submit 
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if the dataset is invalid,
 	 * 		if the data or metadata is missing,
 	 * 		if the DSG files cannot be created, or
 	 * 		if there was a problem saving the updated dataset information
@@ -107,7 +106,7 @@ public class CruiseSubmitter {
 		ArrayList<String> errorMsgs = new ArrayList<String>();
 		for ( String expocode : cruiseExpocodes ) {
 			// Get the properties of this cruise
-			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
 			if ( cruise == null ) 
 				throw new IllegalArgumentException("Unknown dataset " + expocode);
 
@@ -117,7 +116,7 @@ public class CruiseSubmitter {
 			if ( Boolean.TRUE.equals(cruise.isEditable()) ) {
 				// QC flag to assign with this cruise
 				Character flag;
-				String qcStatus = cruise.getQcStatus();
+				String qcStatus = cruise.getSubmitStatus();
 				if ( DashboardUtils.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
 					flag = DashboardUtils.QC_NEW_FLAG;
 					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
@@ -128,8 +127,8 @@ public class CruiseSubmitter {
 				}
 
 				// Get the complete original cruise data
-				DashboardCruiseWithData cruiseData = 
-						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+				DashboardDatasetData cruiseData = 
+						cruiseHandler.getDatasetDataFromFiles(expocode, 0, -1);
 
 				/*
 				 *  Convert the cruise data into standard units.  Adds and assigns 
@@ -166,7 +165,7 @@ public class CruiseSubmitter {
 						if ( woceIdx < 0 ) {
 							woceIdx = cruiseTypes.size();
 							// Add a column for this WOCE type
-							// !! Directly modifying the lists in cruiseData !!
+							// !! Directly modifying the lists in datasetData !!
 							colNames.add(dtype.getDisplayName());
 							cruiseTypes.add(dtype.duplicate());
 							for (int k = 0; k < numRows; k++)
@@ -242,8 +241,8 @@ public class CruiseSubmitter {
 					continue;
 				}
 
-				// Update cruise info with status values from cruiseData
-				cruise.setQcStatus(qcStatus);
+				// Update cruise info with status values from datasetData
+				cruise.setSubmitStatus(qcStatus);
 				cruise.setVersion(version);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
@@ -251,13 +250,13 @@ public class CruiseSubmitter {
 
 				// Create the QCEvent for submitting the initial QC flags
 				QCEvent initQC = new QCEvent();
-				initQC.setExpocode(expocode);
+				initQC.setDatasetId(expocode);
 				initQC.setVersion(version);
 				initQC.setFlagDate(new Date());
 				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 				// Add the initial QC flag in each region only for new and updated cruises
-				initQC.setFlag(flag);
+				initQC.setFlagValue(flag);
 				if ( DashboardUtils.QC_NEW_FLAG.equals(flag) )
 					initQC.setComment("Initial QC flag for new dataset");
 				else
@@ -272,7 +271,7 @@ public class CruiseSubmitter {
 				}
 
 				// All cruises - remark on the number of data rows with error and warnings
-				initQC.setFlag(DashboardUtils.QC_COMMENT);
+				initQC.setFlagValue(DashboardUtils.QC_COMMENT);
 				initQC.setComment("Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
 						" data points with errors and " + 
@@ -288,7 +287,7 @@ public class CruiseSubmitter {
 
 				// Generate and add the WOCE flags from the SanityChecker results,
 				// as well as the user-provided WOCE flags, to the database
-				ArrayList<WoceEvent> initWoceList;
+				ArrayList<DataQCEvent> initWoceList;
 				try {
 					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler, knownDataFileTypes);
 				} catch (IOException ex) {
@@ -296,7 +295,7 @@ public class CruiseSubmitter {
 				}
 				try {
 					databaseHandler.resetWoceEvents(expocode);
-					for ( WoceEvent woceEvent : initWoceList ) {
+					for ( DataQCEvent woceEvent : initWoceList ) {
 						databaseHandler.addWoceEvent(woceEvent);
 					}
 				} catch (SQLException ex) {
@@ -325,7 +324,7 @@ public class CruiseSubmitter {
 			if ( changed ) {
 				// Commit this update of the cruise properties
 				commitMsg += " by user '" + submitter + "'";
-				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
+				cruiseHandler.saveDatasetInfoToFile(cruise, commitMsg);
 			}
 			try {
 				// Wait just a moment to let other things (mysql? svn?) catch up 
@@ -373,10 +372,10 @@ public class CruiseSubmitter {
 					continue;
 				}
 				// When successful, update the "sent to CDIAC" timestamp
-				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+				DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
 				cruise.setArchiveStatus(archiveStatus);
 				cruise.setArchiveDate(localTimestamp);
-				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
+				cruiseHandler.saveDatasetInfoToFile(cruise, commitMsg);
 			}
 		}
 

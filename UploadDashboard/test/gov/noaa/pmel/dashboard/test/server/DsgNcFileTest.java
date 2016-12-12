@@ -10,9 +10,9 @@ import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -65,7 +65,7 @@ public class DsgNcFileTest {
 
 
 	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			120.0, "QC flag", DashboardUtils.STRING_DATA_CLASS_NAME, "QC flag", null, 
+			120.0, "QC flagValue", DashboardUtils.STRING_DATA_CLASS_NAME, "QC flagValue", null, 
 			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType VERSION = new DashDataType("version", 
@@ -205,22 +205,22 @@ public class DsgNcFileTest {
 
 	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE_CO2_water", 
 			650.0, "WOCE CO2_water", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for aqueous CO2", null, 
+			"WOCE flagValue for aqueous CO2", null, 
 			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType COMMENT_WOCE_CO2_WATER = new DashDataType("comment_WOCE_CO2_water",
 			651.0, "comment WOCE CO2_water", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"comment about WOCE_CO2_water flag", null, 
+			"comment about WOCE_CO2_water flagValue", null, 
 			null, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
 			652.0, "WOCE_CO2_atm", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for atmospheric CO2", null, 
+			"WOCE flagValue for atmospheric CO2", null, 
 			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType COMMENT_WOCE_CO2_ATM = new DashDataType("comment_WOCE_CO2_atm", 
 			653.0, "comment WOCE CO2_atm", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"comment about WOCE_CO2_atm flag", null, 
+			"comment about WOCE_CO2_atm flagValue", null, 
 			null, DashboardUtils.NO_UNITS);
 
 
@@ -473,7 +473,7 @@ public class DsgNcFileTest {
 	@Test
 	public void testCreate() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				DashboardServerUtils.EXPOCODE.duplicate(),
+				DashboardServerUtils.DATASET_ID.duplicate(),
 				DashboardServerUtils.DATASET_NAME.duplicate(),
 				DashboardServerUtils.MONTH_OF_YEAR.duplicate(), 
 				DashboardServerUtils.DAY_OF_MONTH.duplicate(), 
@@ -522,8 +522,8 @@ public class DsgNcFileTest {
 			testValues.add(dataVals);
 		}
 
-		// Create the DashboardCruiseWithData from the above data
-		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
+		// Create the DashboardDatasetData from the above data
+		DashboardDatasetData cruise = new DashboardDatasetData();
 		cruise.setDataColTypes(testTypes);
 		cruise.setDataValues(testValues);
 		ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
@@ -531,13 +531,13 @@ public class DsgNcFileTest {
 			rowNums.add(k);
 		cruise.setRowNums(rowNums);
 
-		// Create the list of DsgCruiseData from the DashboardCruiseWithData
-		ArrayList<DsgCruiseData> dataList = 
-				DsgCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
+		// Create the list of DsgData from the DashboardDatasetData
+		ArrayList<DsgData> dataList = 
+				DsgData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
 		// Create the DsgMetadata for this cruise
 		DsgMetadata metadata = new DsgMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
-		metadata.setExpocode(expocode);
+		metadata.setDatasetId(expocode);
 		metadata.setDatasetName("GM0606");
 		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 		metadata.setPlatformName("Caribbean Cruiser");
@@ -556,7 +556,7 @@ public class DsgNcFileTest {
 		dsgNcFile = new DsgNcFile(parentDir, expocode + ".nc");
 		dsgNcFile.create(metadata, dataList);
 		assertTrue( dsgNcFile.exists() );
-		assertEquals(expocode, dsgNcFile.getMetadata().getExpocode());
+		assertEquals(expocode, dsgNcFile.getMetadata().getDatasetId());
 		assertEquals(dataValueStrings.length, dsgNcFile.getDataList().size());
 	}
 
@@ -567,7 +567,7 @@ public class DsgNcFileTest {
 	@Test
 	public void testBadMissingValuesFail() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				DashboardServerUtils.EXPOCODE.duplicate(),
+				DashboardServerUtils.DATASET_ID.duplicate(),
 				DashboardServerUtils.DATASET_NAME.duplicate(),
 				DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
 				DashboardServerUtils.DAY_OF_MONTH.duplicate(),
@@ -602,8 +602,8 @@ public class DsgNcFileTest {
 				testValues.add(dataVals);
 			}
 
-			// Create the DashboardCruiseWithData from the above data
-			DashboardCruiseWithData cruise = new DashboardCruiseWithData();
+			// Create the DashboardDatasetData from the above data
+			DashboardDatasetData cruise = new DashboardDatasetData();
 			cruise.setDataColTypes(testTypes);
 			cruise.setDataValues(testValues);
 			ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
@@ -611,13 +611,13 @@ public class DsgNcFileTest {
 				rowNums.add(k);
 			cruise.setRowNums(rowNums);
 
-			// Create the list of DsgCruiseData from the DashboardCruiseWithData
-			ArrayList<DsgCruiseData> dataList = 
-					DsgCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
+			// Create the list of DsgData from the DashboardDatasetData
+			ArrayList<DsgData> dataList = 
+					DsgData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
 			// Create the DsgMetadata for this cruise
 			DsgMetadata metadata = new DsgMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
-			metadata.setExpocode(expocode);
+			metadata.setDatasetId(expocode);
 			metadata.setDatasetName("GM0606");
 			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 			metadata.setPlatformName("Caribbean Cruiser");

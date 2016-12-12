@@ -15,47 +15,38 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.WoceType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 /**
- * Unit tests for methods of {@link gov.noaa.pmel.dashboard.shared.DashboardCruise}.
+ * Unit tests for methods of {@link gov.noaa.pmel.dashboard.shared.DashboardDataset}.
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseTest {
+public class DashboardDatasetTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#DashboardCruise()}.
-	 */
-	@Test
-	public void testDashboardCruise() {
-		DashboardCruise cruise = new DashboardCruise();
-		assertNotNull( cruise );
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#isSelected()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setSelected(boolean)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#isSelected()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setSelected(boolean)}.
 	 */
 	@Test
 	public void testSetIsSelected() {
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertFalse( cruise.isSelected() );
 		cruise.setSelected(true);
 		assertTrue( cruise.isSelected() );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getVersion()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setVersion(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getVersion()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setVersion(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetVersion() {
 		String myVersion = "2.5";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		cruise.setVersion(myVersion);
 		assertEquals(myVersion, cruise.getVersion());
@@ -65,13 +56,13 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getOwner()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setOwner(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getOwner()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setOwner(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetOwner() {
 		String myOwner = "SocatUser";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		cruise.setOwner(myOwner);
 		assertEquals(myOwner, cruise.getOwner() );
@@ -82,35 +73,35 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getExpocode()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getDatasetId()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setDatasetId(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetExpocode() {
 		String myExpocode = "ABCD20050728";
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode());
-		cruise.setExpocode(myExpocode);
-		assertEquals(myExpocode, cruise.getExpocode() );
+		DashboardDataset cruise = new DashboardDataset();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId());
+		cruise.setDatasetId(myExpocode);
+		assertEquals(myExpocode, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
-		cruise.setExpocode(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode());
+		cruise.setDatasetId(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getDataCheckStatus()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setDataCheckStatus(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getDataCheckStatus()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setDataCheckStatus(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetDataCheckStatus() {
 		String myDataStatus = "Acceptable";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
 		cruise.setDataCheckStatus(myDataStatus);
 		assertEquals(myDataStatus, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -119,17 +110,17 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getOmeTimestamp()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setOmeTimestamp(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getOmeTimestamp()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setOmeTimestamp(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetOmeTimestamp() {
 		String myOmeFilename = "2014-02-21 9:22";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		cruise.setOmeTimestamp(myOmeFilename);
 		assertEquals(myOmeFilename, cruise.getOmeTimestamp());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -138,8 +129,8 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getAddlDocs()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setAddlDocs(java.util.TreeSet)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getAddlDocs()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setAddlDocs(java.util.TreeSet)}.
 	 */
 	@Test
 	public void testSetGetAddlDocNames() {
@@ -147,13 +138,13 @@ public class DashboardCruiseTest {
 				"ABCD20050728.txt; 2014-02-21 9:23", 
 				"ABCD20050728_2.doc; 2014-02-21 9:24", 
 				"ABCD20050728_3.pdf; 2014-02-21 9:25"));
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getAddlDocs().size());
 		cruise.setAddlDocs(myMetaNames);
 		assertEquals(myMetaNames, cruise.getAddlDocs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -162,43 +153,43 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getQcStatus()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setQcStatus(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getSubmitStatus()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setSubmitStatus(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetQCStatus() {
 		String myQCStatus = "Submitted";
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
-		cruise.setQcStatus(myQCStatus);
-		assertEquals(myQCStatus, cruise.getQcStatus());
+		DashboardDataset cruise = new DashboardDataset();
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+		cruise.setSubmitStatus(myQCStatus);
+		assertEquals(myQCStatus, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
-		cruise.setQcStatus(null);
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		cruise.setSubmitStatus(null);
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getArchiveStatus()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setArchiveStatus(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getArchiveStatus()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setArchiveStatus(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetArchiveStatus() {
-		String myArchiveStatus = "Next SOCAT release";
-		DashboardCruise cruise = new DashboardCruise();
+		String myArchiveStatus = "Next year";
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -207,22 +198,22 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUploadFilename()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUploadFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getUploadFilename()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setUploadFilename(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetUploadFilename() {
 		String myFilename = "myUploadFilename.tsv";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		cruise.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -231,31 +222,31 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNumDataRows()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNumDataRows(int)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getNumDataRows()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setNumDataRows(int)}.
 	 */
 	@Test
 	public void testSetGetNumDataRows() {
 		int myNumDataRows = 2581;
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getNumDataRows());
 		cruise.setNumDataRows(myNumDataRows);
 		assertEquals(myNumDataRows, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getDataColTypes()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setDataColTypes(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getDataColTypes()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setDataColTypes(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetDataColTypes() {
@@ -266,18 +257,18 @@ public class DashboardCruiseTest {
 					DashboardUtils.LATITUDE,
 					DashboardUtils.SAMPLE_DEPTH
 				));
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getDataColTypes().size());
 		cruise.setDataColTypes(myDataTypes);
 		assertEquals(myDataTypes, cruise.getDataColTypes());
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -286,14 +277,14 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserColNames()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserColNames(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getUserColNames()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setUserColNames(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetUserColNames() {
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "salinity", "temp", "pres", "xco2")); 
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getUserColNames().size());
 		cruise.setUserColNames(myUserColNames);
 		assertEquals(myUserColNames, cruise.getUserColNames());
@@ -301,11 +292,11 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -314,13 +305,13 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNumErrorRows()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNumErrorRows(int)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getNumErrorRows()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setNumErrorRows(int)}.
 	 */
 	@Test
 	public void testSetGetNumErrorRows() {
 		int myNumErrorMsgs = 4;
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getNumErrorRows());
 		cruise.setNumErrorRows(myNumErrorMsgs);
 		assertEquals(myNumErrorMsgs, cruise.getNumErrorRows());
@@ -329,24 +320,24 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNumWarnRows()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNumWarnRows(int)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getNumWarnRows()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setNumWarnRows(int)}.
 	 */
 	@Test
 	public void testSetGetNumWarnRows() {
 		int myNumWarnMsgs = 14;
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(0, cruise.getNumWarnRows());
 		cruise.setNumWarnRows(myNumWarnMsgs);
 		assertEquals(myNumWarnMsgs, cruise.getNumWarnRows());
@@ -356,31 +347,31 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getCheckerWoceThrees()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setCheckerWoceThrees(java.util.Collection)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getCheckerFlags()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setCheckerFlags(java.util.Collection)}.
 	 */
 	@Test
-	public void testSetGetCheckerWoceThrees() {
-		TreeSet<WoceType> myWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 5, 2), 
-				new WoceType("WOCE_CO2_water", 8, 12),
-				new WoceType("WOCE_CO2_water", 3, 22)
+	public void testSetGetCheckerFlags() {
+		TreeSet<QCFlag> checkerFlags = new TreeSet<QCFlag>(Arrays.asList(
+				new QCFlag("WOCE_CO2_water", '3', 5, 2), 
+				new QCFlag("WOCE_CO2_water", '3', 8, 12),
+				new QCFlag("WOCE_CO2_water", '4', 3, 22)
 		));
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
-		cruise.setCheckerWoceThrees(myWoceThrees);
-		assertEquals(myWoceThrees, cruise.getCheckerWoceThrees());
+		DashboardDataset cruise = new DashboardDataset();
+		assertEquals(0, cruise.getCheckerFlags().size());
+		cruise.setCheckerFlags(checkerFlags);
+		assertEquals(checkerFlags, cruise.getCheckerFlags());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -388,34 +379,34 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
-		cruise.setCheckerWoceThrees(null);
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
+		cruise.setCheckerFlags(null);
+		assertEquals(0, cruise.getCheckerFlags().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getCheckerWoceFours()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setCheckerWoceFours(java.util.Collection)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getUserFlags()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setUserFlags(java.util.Collection)}.
 	 */
 	@Test
-	public void testSetGetCheckerWoceFours() {
-		TreeSet<WoceType> myWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 7, 5),
-				new WoceType("WOCE_CO2_water", 3, 15),
-				new WoceType("WOCE_CO2_water", 3, 25)
+	public void testSetGetUserFlags() {
+		TreeSet<QCFlag> userFlags = new TreeSet<QCFlag>(Arrays.asList(
+				new QCFlag("WOCE_CO2_water", '4', 4, 31),
+				new QCFlag("WOCE_CO2_water", '3', 5, 35),
+				new QCFlag("WOCE_CO2_atm", '3', 12, 35)
 		));
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		cruise.setCheckerWoceFours(myWoceFours);
-		assertEquals(myWoceFours, cruise.getCheckerWoceFours());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
+		DashboardDataset cruise = new DashboardDataset();
+		assertEquals(0, cruise.getUserFlags().size());
+		cruise.setUserFlags(userFlags);
+		assertEquals(userFlags, cruise.getUserFlags());
+		assertEquals(0, cruise.getCheckerFlags().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -423,106 +414,31 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
-		cruise.setCheckerWoceFours(null);
-		assertEquals(0, cruise.getCheckerWoceFours().size());
+		cruise.setUserFlags(null);
+		assertEquals(0, cruise.getUserFlags().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceThrees()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceThrees(java.util.Collection)}.
-	 */
-	@Test
-	public void testSetGetUserWoceThrees() {
-		TreeSet<WoceType> userWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 4, 31),
-				new WoceType("WOCE_CO2_water", 5, 35),
-				new WoceType("WOCE_CO2_atm", 12, 35)
-		));
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		cruise.setUserWoceThrees(userWoceThrees);
-		assertEquals(userWoceThrees, cruise.getUserWoceThrees());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
-		assertEquals(0, cruise.getNumWarnRows());
-		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getUserColNames().size());
-		assertEquals(0, cruise.getDataColTypes().size());
-		assertEquals(0, cruise.getNumDataRows());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
-		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
-		assertFalse( cruise.isSelected() );
-		cruise.setUserWoceThrees(null);
-		assertEquals(0, cruise.getUserWoceThrees().size());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceFours()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceFours(java.util.Collection)}.
-	 */
-	@Test
-	public void testSetGetUserWoceFours() {
-		TreeSet<WoceType> userWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 13, 43),
-				new WoceType("WOCE_CO2_atm", 13, 44),
-				new WoceType("WOCE_CO2_water", 8, 45) 
-		));
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getUserWoceFours().size());
-		cruise.setUserWoceFours(userWoceFours);
-		assertEquals(userWoceFours, cruise.getUserWoceFours());
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
-		assertEquals(0, cruise.getNumWarnRows());
-		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getUserColNames().size());
-		assertEquals(0, cruise.getDataColTypes().size());
-		assertEquals(0, cruise.getNumDataRows());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
-		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
-		assertFalse( cruise.isSelected() );
-		cruise.setUserWoceFours(null);
-		assertEquals(0, cruise.getUserWoceFours().size());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUploadTimestamp()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUploadTimestamp(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getUploadTimestamp()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setUploadTimestamp(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetUploadTimestamp() {
 		String uploadTimestamp = "2015-10-20 13:14:15";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 		cruise.setUploadTimestamp(uploadTimestamp);
 		assertEquals(uploadTimestamp, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFours().size());
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
+		assertEquals(0, cruise.getUserFlags().size());
+		assertEquals(0, cruise.getCheckerFlags().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -530,11 +446,11 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -543,21 +459,19 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getOrigDOI()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setOrigDOI(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getOrigDOI()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setOrigDOI(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetOrigDOI() {
 		String origDOI = "ORIGDOI12345";
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
-		cruise.setOrigDoi(origDOI);
-		assertEquals(origDOI, cruise.getOrigDoi());
+		DashboardDataset cruise = new DashboardDataset();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDoi());
+		cruise.setDoi(origDOI);
+		assertEquals(origDOI, cruise.getDoi());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFours().size());
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
+		assertEquals(0, cruise.getUserFlags().size());
+		assertEquals(0, cruise.getCheckerFlags().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -565,35 +479,33 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
-		cruise.setOrigDoi(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
+		cruise.setDoi(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDoi());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getArchiveDate()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setArchiveDate(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#getArchiveDate()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setArchiveDate(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetArchiveDate() {
 		String myArchiveDate = "15-JAN-2016 13:30-5:00";
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getArchiveDate());
 		cruise.setArchiveDate(myArchiveDate);
 		assertEquals(myArchiveDate, cruise.getArchiveDate());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDoi());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFours().size());
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
+		assertEquals(0, cruise.getUserFlags().size());
+		assertEquals(0, cruise.getCheckerFlags().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -601,11 +513,11 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
 		assertFalse( cruise.isSelected() );
@@ -614,8 +526,8 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#hashCode()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#hashCode()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {
@@ -646,31 +558,21 @@ public class DashboardCruiseTest {
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "depth")); 
-		TreeSet<WoceType> myWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 5, 2), 
-				new WoceType("WOCE_CO2_water", 8, 12),
-				new WoceType("WOCE_CO2_water", 3, 22)
+		TreeSet<QCFlag> checkerFlags = new TreeSet<QCFlag>(Arrays.asList(
+				new QCFlag("WOCE_CO2_water", '3', 5, 2), 
+				new QCFlag("WOCE_CO2_water", '4', 8, 12),
+				new QCFlag("WOCE_CO2_water", '3', 3, 22)
 		));
-		TreeSet<WoceType> myWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 7, 5),
-				new WoceType("WOCE_CO2_water", 3, 15),
-				new WoceType("WOCE_CO2_water", 3, 25)
-		));
-		TreeSet<WoceType> userWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 4, 31),
-				new WoceType("WOCE_CO2_water", 5, 35),
-				new WoceType("WOCE_CO2_atm", 12, 35)
-		));
-		TreeSet<WoceType> userWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType("WOCE_CO2_water", 13, 43),
-				new WoceType("WOCE_CO2_atm", 13, 44),
-				new WoceType("WOCE_CO2_water", 8, 45) 
+		TreeSet<QCFlag> userFlags = new TreeSet<QCFlag>(Arrays.asList(
+				new QCFlag("WOCE_CO2_water", '4', 4, 31),
+				new QCFlag("WOCE_CO2_water", '3', 5, 35),
+				new QCFlag("WOCE_CO2_atm", '3', 12, 35)
 		));
 
-		DashboardCruise firstCruise = new DashboardCruise();
+		DashboardDataset firstCruise = new DashboardDataset();
 		assertFalse( firstCruise.equals(null) );
 		assertFalse( firstCruise.equals(myDataStatus) );
-		DashboardCruise secondCruise = new DashboardCruise();
+		DashboardDataset secondCruise = new DashboardDataset();
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -695,10 +597,10 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setExpocode(myExpocode);
+		firstCruise.setDatasetId(myExpocode);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setExpocode(myExpocode);
+		secondCruise.setDatasetId(myExpocode);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -723,10 +625,10 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setQcStatus(myQCStatus);
+		firstCruise.setSubmitStatus(myQCStatus);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setQcStatus(myQCStatus);
+		secondCruise.setSubmitStatus(myQCStatus);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -779,31 +681,17 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setCheckerWoceThrees(myWoceThrees);
+		firstCruise.setCheckerFlags(checkerFlags);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setCheckerWoceThrees(myWoceThrees);
+		secondCruise.setCheckerFlags(checkerFlags);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setCheckerWoceFours(myWoceFours);
+		firstCruise.setUserFlags(userFlags);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setCheckerWoceFours(myWoceFours);
-		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-		assertEquals(firstCruise, secondCruise);
-
-		firstCruise.setUserWoceThrees(userWoceThrees);
-		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
-		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setUserWoceThrees(userWoceThrees);
-		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-		assertEquals(firstCruise, secondCruise);
-
-		firstCruise.setUserWoceFours(userWoceFours);
-		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
-		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setUserWoceFours(userWoceFours);
+		secondCruise.setUserFlags(userFlags);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -814,10 +702,10 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setOrigDoi(myOrigDOI);
+		firstCruise.setDoi(myOrigDOI);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setOrigDoi(myOrigDOI);
+		secondCruise.setDoi(myOrigDOI);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -830,63 +718,47 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#isSelected()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setSelected(boolean)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#isSelected()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDataset#setSelected(boolean)}.
 	 */
 	@Test
 	public void testSetIsEditable() {
-		DashboardCruise cruise = new DashboardCruise();
+		DashboardDataset cruise = new DashboardDataset();
 		assertTrue( cruise.isEditable() );
 
 
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_NOT_SUBMITTED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_EXCLUDED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_EXCLUDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUSPENDED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_A);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_ACCEPTED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_B);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_CONFLICT);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_C);
-		assertNotNull( cruise.isEditable() );
-		assertFalse( cruise.isEditable() );
-
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_D);
-		assertNotNull( cruise.isEditable() );
-		assertFalse( cruise.isEditable() );
-
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_E);
-		assertNotNull( cruise.isEditable() );
-		assertFalse( cruise.isEditable() );
-
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_CONFLICT);
-		assertNotNull( cruise.isEditable() );
-		assertFalse( cruise.isEditable() );
-
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_RENAMED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_RENAMED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
 
-		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
+		cruise.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
 
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );

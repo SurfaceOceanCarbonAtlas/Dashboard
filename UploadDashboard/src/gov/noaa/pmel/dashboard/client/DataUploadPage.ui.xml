@@ -15,11 +15,11 @@
 			<g:Anchor addStyleNames="{style.morehelpanchor}" ui:field="moreHelpAnchor" />
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
-					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />
+					<g:HTML addStyleNames="{style.uploadfile}" ui:field="dataUpload" />
 					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
-					<g:Hidden name="cruiseaction" ui:field="actionToken" />
-					<g:Hidden name="cruiseencoding" ui:field="encodingToken" />
-					<g:Hidden name="cruiseformat" ui:field="formatToken" />
+					<g:Hidden name="dataaction" ui:field="actionToken" />
+					<g:Hidden name="dataencoding" ui:field="encodingToken" />
+					<g:Hidden name="dataformat" ui:field="formatToken" />
 				</g:FlowPanel>
 			</g:FormPanel>
 			<g:CaptionPanel addStyleNames="{style.settingscaptionpanel}" ui:field="settingsCaption">
@@ -35,6 +35,8 @@
 					<g:FlowPanel addStyleNames="{style.settingsradiopanel}">
 						<g:RadioButton addStyleNames="{style.settingsradiobutton}"
 								name="actionRadioGroup" ui:field="createRadio" />
+						<g:RadioButton addStyleNames="{style.settingsradiobutton}"
+								name="actionRadioGroup" ui:field="appendRadio" />
 						<g:RadioButton addStyleNames="{style.settingsradiobutton}"
 								name="actionRadioGroup" ui:field="overwriteRadio" />
 					</g:FlowPanel>

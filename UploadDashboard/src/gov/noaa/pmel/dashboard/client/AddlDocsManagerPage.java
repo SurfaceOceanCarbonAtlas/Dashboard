@@ -4,8 +4,8 @@
 package gov.noaa.pmel.dashboard.client;
 
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
@@ -47,7 +47,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
 /**
- * Page for managing supplemental documents for a cruise.  
+ * Page for managing supplemental documents for a dataset.  
  *  
  * @author Karl Smith
  */
@@ -142,7 +142,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	@UiField Button dismissButton;
 
 	private ListDataProvider<DashboardMetadata> listProvider;
-	private HashSet<DashboardCruise> cruiseSet;
+	private HashSet<DashboardDataset> cruiseSet;
 	private TreeSet<String> expocodes;
 	private DashboardAskPopup askOverwritePopup;
 
@@ -162,7 +162,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		buildMetadataListTable();
 
 		setUsername(null);
-		cruiseSet = new HashSet<DashboardCruise>();
+		cruiseSet = new HashSet<DashboardDataset>();
 		expocodes = new TreeSet<String>();
 		askOverwritePopup = null;
 
@@ -190,7 +190,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 * @param cruiseList
 	 * 		cruises to use 
 	 */
-	static void showPage(DashboardCruiseList cruiseList) {
+	static void showPage(DashboardDatasetList cruiseList) {
 		if ( singleton == null )
 			singleton = new AddlDocsManagerPage();
 		UploadDashboard.updateCurrentPage(singleton);
@@ -205,7 +205,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	static void redisplayPage(String username) {
 		if ( (username == null) || username.isEmpty() || 
 			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
-			CruiseListPage.showPage();
+			DatasetListPage.showPage();
 		}
 		else {
 			UploadDashboard.updateCurrentPage(singleton);
@@ -219,7 +219,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 * @param cruiseSet
 	 * 		set of cruises to use 
 	 */
-	private void updateAddlDocs(DashboardCruiseList cruises) {
+	private void updateAddlDocs(DashboardDatasetList cruises) {
 		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
@@ -244,11 +244,11 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		// Update the metadata shown by resetting the data in the data provider
 		List<DashboardMetadata> addlDocsList = listProvider.getList();
 		addlDocsList.clear();
-		for ( DashboardCruise cruz : cruiseSet ) {
+		for ( DashboardDataset cruz : cruiseSet ) {
 			for ( String docTitle : cruz.getAddlDocs() ) {
 				String[] nameDate = DashboardMetadata.splitAddlDocsTitle(docTitle);
 				DashboardMetadata mdata = new DashboardMetadata();
-				mdata.setExpocode(cruz.getExpocode());
+				mdata.setDatasetId(cruz.getDatasetId());
 				mdata.setFilename(nameDate[0]);
 				mdata.setUploadTimestamp(nameDate[1]);
 				addlDocsList.add(mdata);
@@ -288,7 +288,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	@UiHandler("dismissButton")
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page.
-		CruiseListPage.showPage();
+		DatasetListPage.showPage();
 	}
 
 	@UiHandler("uploadButton") 
@@ -310,14 +310,14 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		// Check for any overwrites that will happen
 		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
 		boolean willOverwrite = false;
-		for ( DashboardCruise cruz : cruiseSet ) {
+		for ( DashboardDataset cruz : cruiseSet ) {
 			for ( String addlDocTitle : cruz.getAddlDocs() ) {
 				String[] nameTime = DashboardMetadata.splitAddlDocsTitle(addlDocTitle);
 				if ( uploadFilename.equals(nameTime[0]) ) {
 					message += "<li>" + SafeHtmlUtils.htmlEscape(nameTime[0]) + 
 							"<br />&nbsp;&nbsp;(uploaded " + SafeHtmlUtils.htmlEscape(nameTime[1]) + 
 							")<br />&nbsp;&nbsp;for dataset " + 
-							SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</li>";
+							SafeHtmlUtils.htmlEscape(cruz.getDatasetId()) + "</li>";
 					willOverwrite = true;
 				}
 			}
@@ -364,10 +364,10 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		processResultMsg(event.getResults());
 		// Contact the server to obtain the latest set 
 		// of supplemental documents for the current cruises
-		service.getUpdatedCruises(getUsername(), expocodes, 
-				new AsyncCallback<DashboardCruiseList>() {
+		service.getUpdatedDatasets(getUsername(), expocodes, 
+				new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruiseList) {
+			public void onSuccess(DashboardDatasetList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
 				UploadDashboard.showAutoCursor();
@@ -392,7 +392,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 			return;
 		}
 		resultMsg = resultMsg.trim();
-		if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+		if ( resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
 			// Do not show any messages on success;
 			// depend on the updated list of documents to show success
 			;
@@ -458,7 +458,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		columnSortHandler.setComparator(expocodeColumn, 
 				DashboardMetadata.expocodeComparator);
 
-		// Add the sort handler to the table, and sort by filename, then expocode by default
+		// Add the sort handler to the table, and sort by filename, then dataset by default
 		addlDocsGrid.addColumnSortHandler(columnSortHandler);
 		addlDocsGrid.getColumnSortList().push(expocodeColumn);
 		addlDocsGrid.getColumnSortList().push(filenameColumn);
@@ -508,7 +508,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 						new TextColumn<DashboardMetadata> () {
 			@Override
 			public String getValue(DashboardMetadata mdata) {
-				return mdata.getExpocode();
+				return mdata.getDatasetId();
 			}
 		};
 		return expocodeColumn;
@@ -530,7 +530,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 			public void update(int index, DashboardMetadata mdata, String value) {
 				// Show the document name and have the user confirm the delete 
 				final String deleteFilename = mdata.getFilename();
-				final String deleteExpocode = mdata.getExpocode();
+				final String deleteExpocode = mdata.getDatasetId();
 				String message = DELETE_DOC_HTML_PROLOGUE + 
 						SafeHtmlUtils.htmlEscape(deleteFilename) + 
 						"<br />&nbsp;&nbsp;(uploaded " + 
@@ -564,15 +564,15 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 * @param deleteFilename
 	 * 		upload name of the document to delete
 	 * @param deleteExpocode
-	 * 		delete the document from the cruise with this expocode
+	 * 		delete the document from the cruise with this dataset
 	 */
 	private void continueDelete(String deleteFilename, String deleteExpocode) {
 		// Send the request to the server
 		UploadDashboard.showWaitCursor();
 		service.deleteAddlDoc(getUsername(), deleteFilename, deleteExpocode, 
-				expocodes, new AsyncCallback<DashboardCruiseList>() {
+				expocodes, new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardCruiseList cruiseList) {
+			public void onSuccess(DashboardDatasetList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
 				UploadDashboard.showAutoCursor();

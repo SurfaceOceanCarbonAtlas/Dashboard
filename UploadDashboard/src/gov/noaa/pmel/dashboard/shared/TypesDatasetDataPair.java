@@ -10,20 +10,20 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * A simple pair of a list of known data column types 
- * and a DashboardCruiseWithData
+ * and a DashboardDatasetData
  *  
  * @author Karl Smith
  */
-public class DashboardCruiseTypes implements Serializable, IsSerializable {
+public class TypesDatasetDataPair implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8578550732667367014L;
+	private static final long serialVersionUID = -3743012223467969206L;
 
 	protected ArrayList<DataColumnType> allKnownTypes;
-	protected DashboardCruiseWithData cruiseData;
+	protected DashboardDatasetData datasetData;
 
-	public DashboardCruiseTypes() {
+	public TypesDatasetDataPair() {
 		allKnownTypes = null;
-		cruiseData = null;
+		datasetData = null;
 	}
 
 	/**
@@ -46,20 +46,20 @@ public class DashboardCruiseTypes implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the dashboard cruise with data;
+	 * 		the dashboard dataset with data;
 	 * 		the actual list in this instance (not a copy) is returned
 	 */
-	public DashboardCruiseWithData getCruiseData() {
-		return cruiseData;
+	public DashboardDatasetData getDatasetData() {
+		return datasetData;
 	}
 
 	/**
-	 * @param cruiseData 
-	 * 		the dashboard cruise with data to set;
-	 * 		the given dashboard cruise with data (not a copy) is assigned to this instance
+	 * @param datasetData 
+	 * 		the dashboard dataset with data to set;
+	 * 		the given dashboard dataset with data (not a copy) is assigned to this instance
 	 */
-	public void setCruiseData(DashboardCruiseWithData cruiseData) {
-		this.cruiseData = cruiseData;
+	public void setDatasetData(DashboardDatasetData cruiseData) {
+		this.datasetData = cruiseData;
 	}
 
 	@Override
@@ -69,8 +69,8 @@ public class DashboardCruiseTypes implements Serializable, IsSerializable {
 		if ( allKnownTypes != null )
 			result += allKnownTypes.hashCode();
 		result *= prime;
-		if ( cruiseData != null )
-			result += cruiseData.hashCode();
+		if ( datasetData != null )
+			result += datasetData.hashCode();
 		return result;
 	}
 
@@ -79,9 +79,9 @@ public class DashboardCruiseTypes implements Serializable, IsSerializable {
 		if ( this == obj )
 			return true;
 
-		if ( ! (obj instanceof DashboardCruiseTypes) )
+		if ( ! (obj instanceof TypesDatasetDataPair) )
 			return false;
-		DashboardCruiseTypes other = (DashboardCruiseTypes) obj;
+		TypesDatasetDataPair other = (TypesDatasetDataPair) obj;
 
 		if ( allKnownTypes == null ) {
 			if ( other.allKnownTypes != null ) {
@@ -92,12 +92,12 @@ public class DashboardCruiseTypes implements Serializable, IsSerializable {
 			return false;
 		}
 
-		if ( cruiseData == null ) {
-			if ( other.cruiseData != null ) {
+		if ( datasetData == null ) {
+			if ( other.datasetData != null ) {
 				return false;
 			}
 		} 
-		else if ( ! cruiseData.equals(other.cruiseData) ) {
+		else if ( ! datasetData.equals(other.datasetData) ) {
 			return false;
 		}
 
@@ -106,9 +106,9 @@ public class DashboardCruiseTypes implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "DashboardCruiseTypes[\n" +
+		return "TypesDatasetDataPair[\n" +
 				"allKnownTypes=" + allKnownTypes.toString() + ",\n" +
-				"cruiseData=" + cruiseData.toString() + "\n" +
+				"datasetData=" + datasetData.toString() + "\n" +
 				"]";
 	}
 	

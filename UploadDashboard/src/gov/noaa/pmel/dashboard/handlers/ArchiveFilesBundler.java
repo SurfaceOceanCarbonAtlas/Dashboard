@@ -114,17 +114,17 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * The bundle virtual File for the given dataset.
 	 * Creates the parent subdirectory, if it does not already exist, for this File.
 	 * 
-	 * @param expocode
-	 * 		return the virtual File for the dataset with this expocode
+	 * @param dataset
+	 * 		return the virtual File for the dataset with this dataset
 	 * @return
 	 * 		the bundle virtual File
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or
+	 * 		if the dataset is invalid, or
 	 * 		if unable to generate the parent subdirectory if it does not already exist
 	 */
 	public File getBundleFile(String expocode) throws IllegalArgumentException {
-		// Check and standardize the expocode
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Check and standardize the dataset
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		// Create 
 		File parentFile = new File(filesDir, upperExpo.substring(0,4));
 		if ( ! parentFile.isDirectory() ) {
@@ -146,8 +146,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * associated with this instance for archival.  This bundle 
 	 * is also committed to version control using the given message. 
 	 * 
-	 * @param expocode
-	 * 		create the bundle for the cruise with this expocode
+	 * @param dataset
+	 * 		create the bundle for the cruise with this dataset
 	 * @param message
 	 * 		version control commit message for the bundle file; 
 	 * 		if null or empty, the bundle file is not committed 
@@ -160,7 +160,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * @return
 	 * 		an message indicating what was sent and to whom
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is not valid, or
+	 * 		if the dataset is not valid, or
 	 * 		if there is a problem sending the archival request email
 	 * @throws IOException
 	 * 		if unable to read the default DashboardConfigStore, 
@@ -176,11 +176,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			throw new IllegalArgumentException("no user name");
 		if ( (userEmail == null) || userEmail.isEmpty() )
 			throw new IllegalArgumentException("no user email address");
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
 		// Get the original data file for this dataset
-		File origDataFile = configStore.getCruiseFileHandler().cruiseDataFile(upperExpo);
+		File origDataFile = configStore.getDataFileHandler().datasetDataFile(upperExpo);
 		if ( ! origDataFile.exists() )
 			throw new IOException("No original data file for " + upperExpo);
 
@@ -188,8 +188,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 		ArrayList<File> addlDocs = new ArrayList<File>();
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo) ) {
-			// Exclude the (expocode)/OME.xml document at this time;
-			// do include the (expocode)/PI_OME.xml 
+			// Exclude the (dataset)/OME.xml document at this time;
+			// do include the (dataset)/PI_OME.xml 
 			String filename = mdata.getFilename();
 			if ( ! filename.equals(DashboardUtils.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(upperExpo, filename));
