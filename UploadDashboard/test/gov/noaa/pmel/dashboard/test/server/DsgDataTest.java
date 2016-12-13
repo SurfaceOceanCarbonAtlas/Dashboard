@@ -429,31 +429,6 @@ public class DsgDataTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSampleDepth());
 	}
 
-	static final Character WOCE_FLAG = 'K';
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getGenericWoceFlag()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setGenericWoceFlag(java.lang.Character)}.
-	 */
-	@Test
-	public void testGetSetGenericWoceFlag() {
-		DsgData data = new DsgData(KNOWN_DATA_TYPES);
-		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, data.getGenericWoceFlag());
-		data.setGenericWoceFlag(WOCE_FLAG);
-		assertEquals(WOCE_FLAG, data.getGenericWoceFlag());
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSampleDepth());
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getLatitude());
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getLongitude());
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSecond());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMinute());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getHour());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
-		data.setGenericWoceFlag(null);
-		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, data.getGenericWoceFlag());
-	}
-
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#hashCode()} 
 	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#equals(java.lang.Object)}.
@@ -539,14 +514,6 @@ public class DsgDataTest {
 		assertTrue( data.hashCode() == other.hashCode() );
 		assertFalse( data.equals(other) );
 		other.setSampleDepth(SAMPLE_DEPTH);
-		assertTrue( data.hashCode() == other.hashCode() );
-		assertTrue( data.equals(other) );
-
-		// hashCode and equals ignores WOCE flags, as long as the type is present in both
-		data.setGenericWoceFlag(WOCE_FLAG);
-		assertTrue( data.hashCode() == other.hashCode() );
-		assertTrue( data.equals(other) );
-		other.setGenericWoceFlag(WOCE_FLAG);
 		assertTrue( data.hashCode() == other.hashCode() );
 		assertTrue( data.equals(other) );
 	}

@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -381,7 +382,7 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		if there was an error committing the updated cruise listing 
 	 * 			to version control
 	 */
-	public DashboardDatasetList addCruisesToListing(ArrayList<String> expocodeList, 
+	public DashboardDatasetList addCruisesToListing(Collection<String> expocodeList, 
 							String username) throws IllegalArgumentException {
 		String cleanUsername = DashboardUtils.cleanUsername(username);
 		if ( cleanUsername.isEmpty() )

@@ -357,7 +357,7 @@ public class DataFileHandler extends VersionedFileHandler {
 					}
 					
 					// Assign the data column types from the column names (including customizations for this user)
-					DashboardDatasetData fakeDataset = new DashboardDatasetData();
+					DashboardDataset fakeDataset = new DashboardDataset();
 					fakeDataset.setOwner(owner);
 					fakeDataset.setUserColNames(columnNames);
 					DashboardConfigStore configStore;

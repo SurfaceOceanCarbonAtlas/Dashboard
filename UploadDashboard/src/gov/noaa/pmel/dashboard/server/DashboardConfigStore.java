@@ -134,7 +134,7 @@ public class DashboardConfigStore {
 	private String uploadVersion;
 	private String qcVersion;
 	private UserFileHandler userFileHandler;
-	private DataFileHandler cruiseFileHandler;
+	private DataFileHandler dataFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private ArchiveFilesBundler archiveFilesBundler;
@@ -426,7 +426,7 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new DataFileHandler(propVal, svnUsername, 
+			dataFileHandler = new DataFileHandler(propVal, svnUsername, 
 					svnPassword, knownUserDataTypes);
 			// Put SanityChecker message files in the same directory
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
@@ -648,7 +648,7 @@ public class DashboardConfigStore {
 
 		// Create the OME XML to PDF generator
 		omePdfGenerator = new OmePdfGenerator(new File(configAppDir), 
-				metadataFileHandler, cruiseFileHandler);
+				metadataFileHandler, dataFileHandler);
 
 		// The DatasetSubmitter uses the various handlers just created
 		cruiseSubmitter = new DatasetSubmitter(this);
@@ -738,7 +738,7 @@ public class DashboardConfigStore {
 	private void stopMonitors() {
 		// Shutdown all the VersionsedFileHandlers
 		userFileHandler.shutdown();
-		cruiseFileHandler.shutdown();
+		dataFileHandler.shutdown();
 		metadataFileHandler.shutdown();
 		archiveFilesBundler.shutdown();
 		// Stop the configuration watcher
@@ -875,7 +875,7 @@ public class DashboardConfigStore {
 	 * 		the handler for cruise data files
 	 */
 	public DataFileHandler getDataFileHandler() {
-		return cruiseFileHandler;
+		return dataFileHandler;
 	}
 
 	/**

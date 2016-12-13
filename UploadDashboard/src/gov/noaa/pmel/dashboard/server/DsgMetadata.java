@@ -9,14 +9,15 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
- * Class for working with metadata values of interest from SOCAT,
- * including those derived from cruise data.
+ * Class for working with metadata values of interest,
+ * including those derived from dataset data.
  * 
  * @author Karl Smith
  */
 public class DsgMetadata {
 
 	// Maps of variable names to values
+	TreeMap<DashDataType,Character> charValuesMap;
 	TreeMap<DashDataType,String> stringValuesMap;
 	TreeMap<DashDataType,Double> doubleValuesMap;
 	TreeMap<DashDataType,Date> dateValuesMap;
@@ -24,12 +25,14 @@ public class DsgMetadata {
 	/**
 	 * Generates a DsgMetadata object with the given known types.
 	 * Only the data class types 
+	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME}, 
 	 * 	{@link DashboardUtils#STRING_DATA_CLASS_NAME}, 
 	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}, and
 	 * 	{@link DashboardUtils#DATE_DATA_CLASS_NAME}
 	 * are accepted at this time.
 	 * Sets the values to the default values:
-	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
+	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other 
+	 * 		{@link DashboardUtils#CHAR_DATA_CLASS_NAME} values, 
 	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other 
 	 * 		{@link DashboardUtils#STRING_DATA_CLASS_NAME} values, 
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for 
@@ -44,19 +47,17 @@ public class DsgMetadata {
 	public DsgMetadata(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
+		charValuesMap = new TreeMap<DashDataType,Character>();
 		stringValuesMap = new TreeMap<DashDataType,String>();
 		doubleValuesMap = new TreeMap<DashDataType,Double>();
 		dateValuesMap = new TreeMap<DashDataType,Date>();
 
 		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				if ( dtype.typeNameEquals(DashboardServerUtils.QC_FLAG) ) {
-					// Single blank character for QC_FLAG
-					stringValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE.toString());
-				}
-				else {
-					stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
-				}
+			if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				charValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+			}
+			else if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
 			}
 			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
@@ -69,6 +70,35 @@ public class DsgMetadata {
 						dtype.getDataClassName() + "' associated with type '" + dtype.getVarName() + "'");
 			}
 		}
+	}
+
+	/**
+	 * @return
+	 * 		the map of variable names and values for character variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public TreeMap<DashDataType,Character> getCharVariables() {
+		return charValuesMap;
+	}
+
+	/**
+	 * Updates the given character type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setCharVariableValue(DashDataType dtype, Character value) throws IllegalArgumentException {
+		if ( ! charValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata character variable " + dtype.getVarName());
+		if ( value == null )
+			charValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+		else
+			charValuesMap.put(dtype, value);
 	}
 
 	/**
@@ -354,32 +384,6 @@ public class DsgMetadata {
 
 	/**
 	 * @return
-	 * 		the QC flag;
-	 * 		never null but could be {@link DashboardUtils#CHAR_MISSING_VALUE}.toString() if not assigned
-	 */
-	public String getQcFlag() {
-		String value = stringValuesMap.get(DashboardServerUtils.QC_FLAG);
-		if ( value == null )
-			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
-		return value;
-	}
-
-	/**
-	 * @param qcFlag 
-	 * 		the QC flag to set; 
-	 * 		if null, a string with a single blank character is assigned
-	 */
-	public void setQcFlag(String qcFlag) {
-		String value;
-		if ( qcFlag != null )
-			value = qcFlag;
-		else
-			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
-		stringValuesMap.put(DashboardServerUtils.QC_FLAG, value);
-	}
-
-	/**
-	 * @return
 	 * 		the west-most longitude for the cruise;
 	 * 		never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
@@ -552,11 +556,14 @@ public class DsgMetadata {
 
 	@Override 
 	public int hashCode() {
-		// Do not consider floating-point fields since they do not 
-		// have to be exactly the same for equals to return true.
 		final int prime = 37;
-		int result = stringValuesMap.hashCode();
+		int result = charValuesMap.hashCode();
+		result = result * prime + stringValuesMap.hashCode();
 		result = result * prime + dateValuesMap.hashCode();
+		// Consider only the keys of the floating-point fields set
+		// since floating point values do not have to be exactly 
+		// the same for equals to return true. 
+		result = result * prime + doubleValuesMap.keySet().hashCode();
 		return result;
 	}
 
@@ -575,6 +582,10 @@ public class DsgMetadata {
 		if ( ! dateValuesMap.equals(other.dateValuesMap) )
 			return false;
 
+		// Character comparisons
+		if ( ! charValuesMap.equals(other.charValuesMap) )
+			return false;
+
 		// String comparisons
 		if ( ! stringValuesMap.equals(other.stringValuesMap) )
 			return false;
@@ -582,6 +593,7 @@ public class DsgMetadata {
 		// Floating-point comparisons - values don't have to be exactly the same
 		if ( ! doubleValuesMap.keySet().equals(other.doubleValuesMap.keySet()) )
 			return false;
+
 		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() ) {
 			DashDataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
@@ -603,6 +615,8 @@ public class DsgMetadata {
 	@Override
 	public String toString() {
 		String repr = "DsgMetadata[\n";
+		for ( Entry<DashDataType,Character> entry : charValuesMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
 		for ( Entry<DashDataType,String> entry : stringValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
 		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() )

@@ -14,8 +14,8 @@ import java.util.TreeMap;
 
 /**
  * Class for working with data values of interest, both PI-provided
- * values and computed values, from a SOCAT cruise data measurement.
- * Note that WOCE flags are ignored in the hashCode and equals methods.
+ * values and computed values, from a data measurement.
+ * Note that QC flags are ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
@@ -33,7 +33,6 @@ public class DsgData {
 	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}
 	 * are accepted at this time.
 	 * Sets the values to the default values:
-	 * 	{@link DashboardUtils#WOCE_NOT_CHECKED} for WOCE flags (starts with "WOCE_"),
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link DashboardUtils#CHAR_DATA_CLASS_NAME} values.
 	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link DashboardUtils#INT_DATA_CLASS_NAME} values, and
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values
@@ -54,13 +53,7 @@ public class DsgData {
 				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
 			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				if ( dtype.isWoceType() ) {
-					// WOCE flag
-					charValsMap.put(dtype, DashboardUtils.FLAG_UNKNOWN);
-				}
-				else {
-					charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
-				}
+				charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
 			}
 			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
@@ -161,7 +154,7 @@ public class DsgData {
 
 	/**
 	 * Creates a list of these data objects from the values and data column
-	 * types given in a dashboard cruise with data.  This assumes the data
+	 * types given in a dataset with data.  This assumes the data
 	 * is in the standard units for each type, and the missing value is
 	 * "NaN", and empty string, or null.
 	 * 
@@ -173,8 +166,8 @@ public class DsgData {
 	 * 
 	 * @param knownTypes
 	 * 		list of known data types
-	 * @param cruise
-	 * 		dashboard cruise with data
+	 * @param datasetData
+	 * 		dataset with data to use
 	 * @return
 	 * 		list of these data objects
 	 * @throws IllegalArgumentException
@@ -185,11 +178,11 @@ public class DsgData {
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
 	public static ArrayList<DsgData> dataListFromDashboardCruise(
-			KnownDataTypes knownTypes, DashboardDatasetData cruise) 
+			KnownDataTypes knownTypes, DashboardDatasetData datasetData) 
 					throws IllegalArgumentException {
 		// Get the required data from the cruise
-		ArrayList<ArrayList<String>> dataValsTable = cruise.getDataValues();
-		ArrayList<DataColumnType> dataColTypes = cruise.getDataColTypes();
+		ArrayList<ArrayList<String>> dataValsTable = datasetData.getDataValues();
+		ArrayList<DataColumnType> dataColTypes = datasetData.getDataColTypes();
 		// Create the list of DashDataType objects - assumes data already standardized
 		ArrayList<DashDataType> dataTypes = new ArrayList<DashDataType>(dataColTypes.size());
 		for ( DataColumnType dctype : dataColTypes )
@@ -530,43 +523,19 @@ public class DsgData {
 		doubleValsMap.put(DashboardServerUtils.SAMPLE_DEPTH, value);
 	}
 
-	/**
-	 * @return
-	 * 		the generic WOCE flag;
-	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned.
-	 */
-	public Character getGenericWoceFlag() {
-		Character value = charValsMap.get(DashboardServerUtils.GENERIC_WOCE_FLAG);
-		if ( value == null )
-			value = DashboardUtils.WOCE_NOT_CHECKED;
-		return value;
-	}
-
-	/**
-	 * @param genericWoceFlag
-	 * 		the generic WOCE flag to set;
-	 * 		if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned.
-	 */
-	public void setGenericWoceFlag(Character genericWoceFlag) {
-		Character value = genericWoceFlag;
-		if ( value == null )
-			value = DashboardUtils.WOCE_NOT_CHECKED;
-		charValsMap.put(DashboardServerUtils.GENERIC_WOCE_FLAG, value);
-	}
-
 	@Override 
 	public int hashCode() {
 		final int prime = 37;
 		int result = intValsMap.hashCode();
 		// Ignore WOCE flag differences.
-		TreeMap<DashDataType,Character> nonWoceCharValsMap = 
+		TreeMap<DashDataType,Character> nonQCCharValsMap = 
 				new TreeMap<DashDataType,Character>();
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
-			if ( ! entry.getKey().isWoceType() ) {
-				nonWoceCharValsMap.put(entry.getKey(), entry.getValue());
+			if ( ! entry.getKey().isQCType() ) {
+				nonQCCharValsMap.put(entry.getKey(), entry.getValue());
 			}
 		}
-		result = result * prime + nonWoceCharValsMap.hashCode();
+		result = result * prime + nonQCCharValsMap.hashCode();
 		// Do not use floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
 		return result;
@@ -592,7 +561,7 @@ public class DsgData {
 			return false;
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
 			DashDataType dtype = entry.getKey();
-			if ( ! dtype.isWoceType() ) {
+			if ( ! dtype.isQCType() ) {
 				if ( ! entry.getValue().equals(other.charValsMap.get(dtype)) )
 					return false;
 			}

@@ -84,7 +84,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload omeUpload;
 	@UiField Hidden timestampToken;
-	@UiField Hidden expocodesToken;
+	@UiField Hidden datasetIdsToken;
 	@UiField Hidden omeToken;
 	@UiField Button uploadButton;
 	@UiField Button cancelButton;
@@ -173,7 +173,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	 */
 	private void clearTokens() {
 		timestampToken.setValue("");
-		expocodesToken.setValue("");
+		datasetIdsToken.setValue("");
 		omeToken.setValue("");
 	}
 
@@ -183,7 +183,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private void assignTokens() {
 		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		timestampToken.setValue(localTimestamp);
-		expocodesToken.setValue("[ \"" + cruise.getDatasetId() + "\" ]");
+		datasetIdsToken.setValue("[ \"" + cruise.getDatasetId() + "\" ]");
 		omeToken.setValue("true");
 	}
 

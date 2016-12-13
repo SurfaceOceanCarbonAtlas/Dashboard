@@ -6,16 +6,18 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.server.DashDataType;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Unit test for methods in gov.noaa.pmel.dashboard.shared.DsgMetadata.
@@ -26,13 +28,22 @@ import org.junit.Test;
  */
 public class DsgMetadataTest {
 
+	public static final DashDataType QC_FLAG_TYPE = new DashDataType("qc_flag", 
+			120.0, "QC flag", DashboardUtils.CHAR_DATA_CLASS_NAME, "QC flag", null, 
+			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
+	public static final Properties ADDN_TYPES_PROPERTIES;
+	static {
+		ADDN_TYPES_PROPERTIES = new Properties();
+		ADDN_TYPES_PROPERTIES.setProperty(QC_FLAG_TYPE.getVarName(), QC_FLAG_TYPE.toPropertyValue());
+	}
+
+	static final Character QC_FLAG_VALUE = 'C';
 	static final String EXPOCODE = "XXXX20140113";
 	static final String CRUISE_NAME = "My Cruise";
 	static final String PLATFORM_NAME = "My Vessel";
 	static final String ORGANIZATION_NAME = "PMEL/NOAA";
 	static final String INVESTIGATOR_NAMES = "Smith, K. : Doe, J.";
 	static final String PLATFORM_TYPE = "Battleship";
-	static final String QC_FLAG = "C";
 	static final Double WESTMOST_LONGITUDE = -160.0;
 	static final Double EASTMOST_LONGITUDE = -135.0;
 	static final Double SOUTHMOST_LATITUDE = 15.0;
@@ -42,12 +53,37 @@ public class DsgMetadataTest {
 	static final String VERSION_STATUS = "2.5N";
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getCharVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setCharVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Character)}.
+	 */
+	@Test
+	public void testGetSetCharVariableValue() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
+		mdata.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		TreeMap<DashDataType,Character> charMap = mdata.getCharVariables();
+		assertEquals(QC_FLAG_VALUE, charMap.get(QC_FLAG_TYPE));
+		mdata.setCharVariableValue(QC_FLAG_TYPE, null);
+		charMap = mdata.getCharVariables();
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(QC_FLAG_TYPE));
+		boolean errCaught = false;
+		try {
+			mdata.setCharVariableValue(DashboardServerUtils.DATASET_ID, QC_FLAG_VALUE);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
+
+		/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getStringVariables()}
 	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetStringVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setStringVariableValue(DashboardServerUtils.DATASET_ID, EXPOCODE);
 		TreeMap<DashDataType,String> stringMap = mdata.getStringVariables();
@@ -71,6 +107,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetDoubleVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		Double value = Double.valueOf(EASTMOST_LONGITUDE);
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
@@ -95,6 +132,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetDateVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, BEGIN_TIME);
 		TreeMap<DashDataType,Date> dateMap = mdata.getDateVariables();
@@ -118,6 +156,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetExpocode() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
 		mdata.setDatasetId(EXPOCODE);
@@ -133,6 +172,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetDatasetName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		mdata.setDatasetName(CRUISE_NAME);
@@ -149,6 +189,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetPlatformName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		mdata.setPlatformName(PLATFORM_NAME);
@@ -166,6 +207,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetOrganization() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
 		mdata.setOrganizationName(ORGANIZATION_NAME);
@@ -184,6 +226,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetInvestigatorNames() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		mdata.setInvestigatorNames(INVESTIGATOR_NAMES);
@@ -203,6 +246,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetPlatformType() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		mdata.setPlatformType(PLATFORM_TYPE);
@@ -217,33 +261,13 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getQcFlag()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setQcFlag(java.lang.Character)}.
-	 */
-	@Test
-	public void testGetSetQCFlag() {
-		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE.toString(), mdata.getQcFlag());
-		mdata.setQcFlag(QC_FLAG);
-		assertEquals(QC_FLAG, mdata.getQcFlag());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-		mdata.setQcFlag(null);
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE.toString(), mdata.getQcFlag());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getWestmostLongitude()}
 	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
@@ -265,6 +289,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetEastmostLongitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		mdata.setEastmostLongitude(EASTMOST_LONGITUDE);
@@ -287,6 +312,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetSouthmostLatitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		mdata.setSouthmostLatitude(SOUTHMOST_LATITUDE);
@@ -310,6 +336,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetNorthmostLatitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		mdata.setNorthmostLatitude(NORTHMOST_LATITUDE);
@@ -334,6 +361,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testSetBeginTime() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
@@ -359,6 +387,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetEndTime() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
@@ -385,6 +414,7 @@ public class DsgMetadataTest {
 	@Test
 	public void testGetSetVersion() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
 		mdata.setVersion(VERSION_STATUS);
@@ -412,12 +442,20 @@ public class DsgMetadataTest {
 	@Test
 	public void testHashCodeEqualsObject() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertFalse( mdata.equals(null) );
 		assertFalse( mdata.equals(EXPOCODE) );
 
 		DsgMetadata other = new DsgMetadata(knownTypes);
+		assertEquals(mdata.hashCode(), other.hashCode());
+		assertTrue( mdata.equals(other) );
+
+		mdata.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		assertFalse( mdata.hashCode() == other.hashCode());
+		assertFalse( mdata.equals(other) );
+		other.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

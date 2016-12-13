@@ -1,18 +1,15 @@
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.DataQCEvent;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
@@ -27,12 +24,13 @@ import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
+
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 
 public class DsgNcFile extends File {
 
-	private static final long serialVersionUID = 8291908351201533511L;
+	private static final long serialVersionUID = -3134631558638142701L;
 
 	private static final String DSG_VERSION = "DsgNcFile 2.0";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -152,6 +150,11 @@ public class DsgNcFile extends File {
 			trajStringDims.add(traj);
 			trajStringDims.add(stringlen);
 
+			Dimension charlen = ncfile.addDimension(null, "char_length", 1);
+			List<Dimension> trajCharDims = new ArrayList<Dimension>();
+			trajCharDims.add(traj);
+			trajCharDims.add(charlen);
+
 			List<Dimension> trajDims = new ArrayList<Dimension>();
 			trajDims.add(traj);
 
@@ -159,7 +162,6 @@ public class DsgNcFile extends File {
 			List<Dimension> dataDims = new ArrayList<Dimension>();
 			dataDims.add(obslen);
 
-			Dimension charlen = ncfile.addDimension(null, "char_length", 1);
 			List<Dimension> charDataDims = new ArrayList<Dimension>();
 			charDataDims.add(obslen);
 			charDataDims.add(charlen);
@@ -187,6 +189,15 @@ public class DsgNcFile extends File {
 				if ( DashboardServerUtils.DATASET_ID.typeNameEquals(dtype) ) {
 					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
 				}
+			}
+
+			for (  DashDataType dtype : metadata.getCharVariables().keySet() ) {
+				// Metadata characters
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.CHAR, trajCharDims);
+				// No missing_value, _FillValue, or units for characters
+				addAttributes(ncfile, var, null, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
 			}
 
 			for (  DashDataType dtype : metadata.getDoubleVariables().keySet() ) {
@@ -266,6 +277,20 @@ public class DsgNcFile extends File {
 					dvalue = "";
 				ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
 				mvar.setString(0, dvalue);
+				ncfile.write(var, mvar);
+			}
+
+			for (  Entry<DashDataType,Character> entry : metadata.getCharVariables().entrySet() ) {
+				// Metadata characters
+				varName = entry.getKey().getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				Character dvalue = entry.getValue();
+				if ( dvalue == null )
+					dvalue = ' ';
+				ArrayChar.D2 mvar = new ArrayChar.D2(1, 1);
+				mvar.setString(0, dvalue.toString());
 				ncfile.write(var, mvar);
 			}
 
@@ -421,13 +446,6 @@ public class DsgNcFile extends File {
 				String varName = dtype.getVarName();
 				Variable var = ncfile.findVariable(varName);
 				if ( var == null ) {
-					// A couple of name modifications
-					if ( "platform_name".equals(varName) )
-						var = ncfile.findVariable("vessel_name");
-					else if ( "platform_type".equals(varName) )
-						var = ncfile.findVariable("vessel_type");
-				}
-				if ( var == null ) {
 					namesNotFound.add(varName);
 					continue;
 				}
@@ -435,6 +453,16 @@ public class DsgNcFile extends File {
 				if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
 					metadata.setStringVariableValue(dtype, mvar.getString(0));
+				}
+				else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dataClassName) ) {
+					ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
+					String strval = mvar.getString(0);
+					Character charval;
+					if ( strval.length() > 0 )
+						charval = strval.charAt(0);
+					else
+						charval = ' ';
+					metadata.setCharVariableValue(dtype, charval);
 				}
 				else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayDouble.D1 mvar = (ArrayDouble.D1) var.read();
@@ -633,50 +661,6 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * Writes the given array of characters as the values 
-	 * for the given character data variable.
-	 * 
-	 * @param varName
-	 * 		character data variable name
-	 * @param values
-	 * 		character values to assign
-	 * @throws IOException
-	 * 		if reading from or writing to the file throws one
-	 * @throws IllegalArgumentException
-	 * 		if the variable name or number of provided values
-	 * 		is invalid
-	 */
-	public void writeCharVarDataValues(String varName, char[] values) 
-								throws IOException, IllegalArgumentException {
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
-		try {
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			if ( var.getShape(1) != 1 ) 
-				throw new IllegalArgumentException("Variable '" + varName + 
-						"' is not a single-character array variable in " + getName());
-			int numVals = var.getShape(0);
-			if ( numVals != values.length )
-				throw new IllegalArgumentException("Inconstistent number of variables for '" + 
-						varName + "' (" + Integer.toString(numVals) + 
-						") and provided data (" + Integer.toString(values.length) + ")");
-			ArrayChar.D2 dvar = new ArrayChar.D2(numVals, 1);
-			for (int k = 0; k < numVals; k++) {
-				dvar.set(k, 0, values[k]);
-			}
-			try {
-				ncfile.write(var, dvar);
-			} catch (InvalidRangeException ex) {
-				throw new IllegalArgumentException(ex);
-			}
-		} finally {
-			ncfile.close();
-		}
-	}
-
-	/**
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as doubles.  NaN and infinite values are changed to 
@@ -719,76 +703,6 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * Reads and returns the longitudes, latitudes, and times contained in this 
-	 * DSG file.  NaN and infinite values are changed to {@link DsgData#FP_MISSING_VALUE}.  
-	 * 
-	 * @return
-	 * 		the array { lons, lats, times } for this cruise, where
-	 * 		lons are the array of longitudes, lats are the array of latitudes, 
-	 * 		times are the array of times.
-	 * @throws IOException
-	 * 		if problems opening or reading from this DSG file, or 
-	 * 		if any of the data arrays are not given in this DSG file
-	 */
-	public double[][] readLonLatTimeDataValues() throws IOException {
-		double[] lons;
-		double[] lats;
-		double[] times;
-
-		NetcdfFile ncfile = NetcdfFile.open(getPath());
-		try {
-			Variable lonVar = ncfile.findVariable(DashboardServerUtils.LONGITUDE.getVarName());
-			if ( lonVar == null )
-				throw new IOException("Unable to find longitudes in " + getName());
-			int numVals = lonVar.getShape(0);
-
-			Variable latVar = ncfile.findVariable(DashboardServerUtils.LATITUDE.getVarName());
-			if ( latVar == null )
-				throw new IOException("Unable to find latitudes in " + getName());
-			if ( latVar.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of latitudes in " + getName());
-
-			Variable timeVar = ncfile.findVariable(DashboardServerUtils.TIME.getVarName());
-			if ( timeVar == null )
-				throw new IOException("Unable to find times in " + getName());
-			if ( timeVar.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of time values in " + getName());
-
-			lons = new double[numVals];
-			lats = new double[numVals];
-			times = new double[numVals];
-
-			ArrayDouble.D1 dvar = (ArrayDouble.D1) lonVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				lons[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) latVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				lats[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) timeVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				times[k] = value;
-			}
-		} finally {
-			ncfile.close();
-		}
-
-		return new double[][] { lons, lats, times }; 
-	}
-
-	/**
 	 * Updates the string recorded for the given variable in this DSG file.
 	 * 
 	 * @param varName
@@ -825,347 +739,47 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * @return
-	 * 		the QC flag contained in this DSG file
-	 * @throws IllegalArgumentException
-	 * 		if this DSG file is not valid
-	 * @throws IOException
-	 * 		if opening or reading from the DSG file throws one
-	 */
-	public char getQCFlag() throws IllegalArgumentException, IOException {
-		char flag;
-		NetcdfFile ncfile = NetcdfFile.open(getPath());
-		try {
-			String varName = DashboardServerUtils.QC_FLAG.getVarName();
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayChar.D2 flagArray = (ArrayChar.D2) var.read();
-			flag = flagArray.get(0, 0);
-		} finally {
-			ncfile.close();
-		}
-		return flag;
-	}
-
-	/**
-	 * Updates this DSG file with the given QC flag.
+	 * Writes the given array of characters as the values 
+	 * for the given character data variable.
 	 * 
-	 * @param qcFlag
-	 * 		the QC flag to assign
-	 * @throws IllegalArgumentException
-	 * 		if this DSG file is not valid
+	 * @param varName
+	 * 		character data variable name
+	 * @param values
+	 * 		character values to assign
 	 * @throws IOException
-	 * 		if opening or writing to the DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the updated QC flag to the DSG file throws one 
+	 * 		if reading from or writing to the file throws one
+	 * @throws IllegalArgumentException
+	 * 		if the variable name or number of provided values
+	 * 		is invalid
 	 */
-	public void updateQCFlag(Character qcFlag)
-			throws IllegalArgumentException, IOException, InvalidRangeException {
+	public void writeCharVarDataValues(String varName, char[] values) 
+								throws IOException, IllegalArgumentException {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
-			String varName = DashboardServerUtils.QC_FLAG.getVarName();
 			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
-			flagArray.setString(0, qcFlag.toString());
-			ncfile.write(var, flagArray);
-		} finally {
-			ncfile.close();
-		}
-	}
-
-	/**
-	 * Assigns the given complete WOCE flags in this DSG file.  In particular, 
-	 * the row numbers in the WOCE flag locations are used to identify the row 
-	 * for the WOCE flag; however, the latitude, longitude, and timestamp in 
-	 * these WOCE flag locations are checked that they match those in this DSG 
-	 * file.  The data values, if given, is also checked that they roughly match 
-	 * those in this DSG file.  If there is a mismatch in any of these values, 
-	 * a message is added to the list returned.
-	 * 
-	 * @param woceEvent
-	 * 		WOCE flags to set
-	 * @return
-	 * 		list of data mismatch messages; never null but may be empty
-	 * @throws IllegalArgumentException
-	 * 		if the DSG file or the WOCE flags are not valid
-	 * @throws IOException
-	 * 		if opening, reading from, or writing to the DSG file throws one
-	 */
-	public ArrayList<String> assignWoceFlags(DataQCEvent woceEvent) 
-								throws IllegalArgumentException, IOException {
-		ArrayList<String> issues = new ArrayList<String>();
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
-		try {
-
-			String varName = DashboardServerUtils.LONGITUDE.getVarName();
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
-
-			varName = DashboardServerUtils.LATITUDE.getVarName();
-			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
-			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
-
-			varName = DashboardServerUtils.TIME.getVarName();
-			var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" +
-						varName + "' in " + getName());
-			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
-
-			String dataname = woceEvent.getVarName();
-			ArrayDouble.D1 datavalues;
-			if ( dataname.isEmpty() || DashboardServerUtils.GEOPOSITION.getVarName().equals(dataname) ) {
-				// WOCE based on longitude/latitude/time
-				datavalues = null;
+			if ( var.getShape(1) != 1 ) 
+				throw new IllegalArgumentException("Variable '" + varName + 
+						"' is not a single-character array variable in " + getName());
+			int numVals = var.getShape(0);
+			if ( numVals != values.length )
+				throw new IllegalArgumentException("Inconstistent number of variables for '" + 
+						varName + "' (" + Integer.toString(numVals) + 
+						") and provided data (" + Integer.toString(values.length) + ")");
+			ArrayChar.D2 dvar = new ArrayChar.D2(numVals, 1);
+			for (int k = 0; k < numVals; k++) {
+				dvar.set(k, 0, values[k]);
 			}
-			else {
-				var = ncfile.findVariable(dataname);
-				if ( var == null )
-					throw new IllegalArgumentException("Unable to find variable '" + 
-							dataname + "' in " + getName());
-				datavalues = (ArrayDouble.D1) var.read(); 
-			}
-
-			// WOCE flags
-			varName = woceEvent.getFlagName();
-			Variable wocevar = ncfile.findVariable(varName);
-			if ( wocevar == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
-
-			char newFlag = woceEvent.getFlagValue();
-			for ( DataLocation dataloc : woceEvent.getLocations() ) {
-				int idx = dataloc.getRowNumber() - 1;
-
-				// Check the values are close (data value roughly close)
-				if ( dataMatches(dataloc, longitudes, latitudes, times, 
-									datavalues, idx, 0.006, 0.01) ) {
-					wocevalues.set(idx, 0, newFlag);
-				}
-				else {
-					DataLocation dsgLoc = new DataLocation();
-					dsgLoc.setRowNumber(idx + 1);
-					dsgLoc.setLongitude(longitudes.get(idx));
-					dsgLoc.setLatitude(latitudes.get(idx));
-					dsgLoc.setDataDate(new Date(Math.round(times.get(idx) * 1000.0)));
-					if ( datavalues != null )
-						dsgLoc.setDataValue(datavalues.get(idx));
-					issues.add("Values for the DSG row (first) different from WOCE " +
-							"flag location (second): \n    " + dsgLoc.toString() + 
-							"\n    " + dataloc.toString());
-				}
-			}
-
-			// Save the updated WOCE flags to the DSG file
 			try {
-				ncfile.write(wocevar, wocevalues);
+				ncfile.write(var, dvar);
 			} catch (InvalidRangeException ex) {
-				throw new IOException(ex);
+				throw new IllegalArgumentException(ex);
 			}
 		} finally {
 			ncfile.close();
 		}
-		return issues;
-	}
-
-	/**
-	 * Updates this DSG file with the given WOCE flags.  Optionally will 
-	 * also update the row number in the WOCE flags from the data in this DSG file. 
-	 * 
-	 * @param woceEvent
-	 * 		WOCE flags to set
-	 * @param updateWoceEvent
-	 * 		if true, update the WOCE flags from data in this DSG file
-	 * @return
-	 * 		list of the WOCEEvent data locations not found 
-	 * 		in this DSG file; never null but may be empty
-	 * @throws IllegalArgumentException
-	 * 		if the DSG file or the WOCE flags are not valid
-	 * @throws IOException
-	 * 		if opening, reading from, or writing to the DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the update WOCE flags to the DSG file throws one 
-	 */
-	public ArrayList<DataLocation> updateWoceFlags(DataQCEvent woceEvent, 
-			boolean updateWoceEvent) 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
-		ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
-		try {
-
-			String varName = DashboardServerUtils.LONGITUDE.getVarName();
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
-
-			varName = DashboardServerUtils.LATITUDE.getVarName();
-			var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
-
-			varName = DashboardServerUtils.TIME.getVarName();
-			var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" +
-						varName + "' in " + getName());
-			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
-
-			String dataname = woceEvent.getVarName();
-			ArrayDouble.D1 datavalues;
-			if ( DashboardServerUtils.GEOPOSITION.getVarName().equals(dataname) ) {
-				// WOCE based on longitude/latitude/time
-				datavalues = null;
-			}
-			else {
-				var = ncfile.findVariable(dataname);
-				if ( var == null )
-					throw new IllegalArgumentException("Unable to find variable '" + 
-							dataname + "' in " + getName());
-				datavalues = (ArrayDouble.D1) var.read(); 
-			}
-
-			// WOCE flags
-			varName = woceEvent.getFlagName();
-			Variable wocevar = ncfile.findVariable(varName);
-			if ( wocevar == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
-
-			char newFlag = woceEvent.getFlagValue();
-
-			// Identify the data points using a round-robin search 
-			// just in case there is more than one matching point
-			int startIdx = 0;
-			int arraySize = (int) times.getSize();
-			HashSet<Integer> assignedRowIndices = new HashSet<Integer>(); 
-			for ( DataLocation dataloc : woceEvent.getLocations() ) {
-				boolean valueFound = false;
-				int idx;
-				for (idx = startIdx; idx < arraySize; idx++) {
-					if ( dataMatches(dataloc, longitudes, latitudes, times, 
-							datavalues, idx, 1.0E-5, 1.0E-5) ) {
-						if ( assignedRowIndices.add(idx) ) {
-							valueFound = true;
-							break;
-						}
-					}
-				}
-				if ( idx >= arraySize ) {
-					for (idx = 0; idx < startIdx; idx++) {
-						if ( dataMatches(dataloc, longitudes, latitudes, times, 
-								datavalues, idx, 1.0E-5, 1.0E-5) ) {
-							if ( assignedRowIndices.add(idx) ) {
-								valueFound = true;
-								break;
-							}
-						}
-					}
-				}
-				if ( valueFound ) {
-					wocevalues.set(idx, 0, newFlag);
-					if ( updateWoceEvent ) {
-						dataloc.setRowNumber(idx + 1);
-					}
-					// Start the next search from the next data point
-					startIdx = idx + 1;
-				}
-				else {
-					unidentified.add(dataloc);
-				}
-			}
-
-			// Save the updated WOCE flags to the DSG file
-			ncfile.write(wocevar, wocevalues);
-		} finally {
-			ncfile.close();
-		}
-		return unidentified;
-	}
-
-	/**
-	 * Compares the data location information given in a DataLocation with the
-	 * longitude, latitude, time, and (if applicable) data value at a given 
-	 * index into arrays of these values.
-	 * 
-	 * @param dataloc
-	 * 		data location to compare
-	 * @param longitudes
-	 * 		array of longitudes to use
-	 * @param latitudes
-	 * 		array of latitudes to use
-	 * @param times
-	 * 		array of times (seconds since 1970-01-01 00:00:00) to use
-	 * @param datavalues
-	 * 		if not null, array of data values to use
-	 * @param idx
-	 * 		index into the arrays of the values to compare
-	 * @param dataRelTol
-	 * 		relative tolerance for (only) the data value;
-	 * 		see {@link DashboardUtils#closeTo(Double, Double, double, double)}
-	 * @param dataAbsTol
-	 * 		absolute tolerance for (only) the data value
-	 * 		see {@link DashboardUtils#closeTo(Double, Double, double, double)}
-	 * @return
-	 * 		true if the data locations match
-	 */
-	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
-			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, 
-			int idx, double dataRelTol, double dataAbsTol) {
-
-		Double arrLongitude = longitudes.get(idx);
-		Double arrLatitude = latitudes.get(idx);
-		Double arrTime = times.get(idx);
-		Double arrValue;
-		if ( datavalues != null )
-			arrValue = datavalues.get(idx);
-		else
-			arrValue = Double.NaN;
-
-		Double datLongitude = dataloc.getLongitude();
-		Double datLatitude = dataloc.getLatitude();
-		Double datTime = dataloc.getDataDate().getTime() / 1000.0;
-		Double datValue = dataloc.getDataValue(); 
-
-		// Check if longitude is within 0.001 degrees of each other
-		if ( ! DashboardUtils.longitudeCloseTo(datLongitude, arrLongitude, 0.0, 0.001) ) {
-			return false;
-		}
-
-		// Check if latitude is within 0.0001 degrees of each other
-		if ( ! DashboardUtils.closeTo(datLatitude, arrLatitude, 0.0, 0.0001) ) {
-			return false;
-		}
-
-		// Check if times are within a second of each other
-		if ( ! DashboardUtils.closeTo(datTime, arrTime, 0.0, 1.0) ) {
-			return false;
-		}
-
-		// If given, check if data values are close to each other
-		if ( datavalues != null ) {
-			if ( ! DashboardUtils.closeTo(datValue, arrValue, dataRelTol, dataAbsTol) ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 }

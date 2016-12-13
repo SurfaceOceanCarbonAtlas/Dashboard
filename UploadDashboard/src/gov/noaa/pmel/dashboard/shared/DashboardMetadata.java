@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4886304668606517767L;
+	private static final long serialVersionUID = 4800004152004279471L;
 
 	/**
 	 * Separator between the filename and the upload timestamp 
@@ -324,7 +324,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 * Note that this is inconsistent with DashboardMetadata.equals 
 	 * in that this is only examining one field of DashboardMetadata.
 	 */
-	public static Comparator<DashboardMetadata> expocodeComparator =
+	public static Comparator<DashboardMetadata> datasetIdComparator =
 			new Comparator<DashboardMetadata>() {
 		@Override
 		public int compare(DashboardMetadata m1, DashboardMetadata m2) {

@@ -52,6 +52,16 @@ public class DashboardUtils {
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 	public static final String GEOPOSITION_ERRORS_MSG = "(lat/lon/time errors!)";
 
+	// Status strings - datasets that can be modified
+	public static final String STATUS_NOT_SUBMITTED = "";
+	public static final String STATUS_SUSPENDED = "Suspended";
+	public static final String STATUS_EXCLUDED = "Excluded";
+	// Status strings - datasets that cannot be modified
+	public static final String STATUS_SUBMITTED = "Submitted";
+	public static final String STATUS_ACCEPTED = "Accepted";
+	public static final String STATUS_CONFLICT = "Conflict";
+	public static final String STATUS_RENAMED = "Renamed";
+
 	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_NEXT_RELEASE = "With next release";
@@ -129,31 +139,21 @@ public class DashboardUtils {
 	 */
 	public static final String PI_OME_PDF_FILENAME = "PI_OME.pdf";
 
-	// Status strings - datasets that can be modified
-	public static final String STATUS_NOT_SUBMITTED = "";
-	public static final String STATUS_SUSPENDED = "Suspended";
-	public static final String STATUS_EXCLUDED = "Excluded";
-	// Status strings - datasets that cannot be modified
-	public static final String STATUS_SUBMITTED = "Submitted";
-	public static final String STATUS_ACCEPTED = "Accepted";
-	public static final String STATUS_CONFLICT = "Conflict";
-	public static final String STATUS_RENAMED = "Renamed";
-
 	public static final String PI_QC_COMMENT_START = "PI provided QC flag of ";
 
 	// flags for QC/WOCE events of current datasets
 	public static final Character FLAG_GOOD = '1';
-	public static final Character FLAG_UNKNOWN = '2';
+	public static final Character FLAG_NOT_CHECKED = '2';
 	public static final Character FLAG_QUESTIONABLE = '3';
 	public static final Character FLAG_BAD = '4';
 	public static final Character FLAG_NO_DATA = '9';
 
 	// flags for QC/WOCE events of datasets that has been updated
 	public static final Character OLD_FLAG_GOOD = 'G';
-	public static final Character OLD_FLAG_UNKNOWN = 'U';
+	public static final Character OLD_FLAG_NOT_CHECKED = 'U';
 	public static final Character OLD_FLAG_QUESTIONABLE = 'Q';
 	public static final Character OLD_FLAG_BAD = 'B';
-	public static final Character OLD_FLAG_NO_DATA = 'M';
+	public static final Character OLD_FLAG_NO_DATA = 'N';
 
 	// flag and variable name for dataset rename events
 	public static final Character FLAG_RENAME = 'R';

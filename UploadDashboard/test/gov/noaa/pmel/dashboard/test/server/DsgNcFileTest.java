@@ -64,10 +64,6 @@ public class DsgNcFileTest {
 			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
 
 
-	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			120.0, "QC flagValue", DashboardUtils.STRING_DATA_CLASS_NAME, "QC flagValue", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-
 	public static final DashDataType VERSION = new DashDataType("version", 
 			200.0, "version", DashboardUtils.STRING_DATA_CLASS_NAME, 
 			"version number with status", null, 

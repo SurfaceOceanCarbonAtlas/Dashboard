@@ -32,7 +32,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -6561611158540029135L;
+	private static final long serialVersionUID = 6970740109331521539L;
 
 	/**
 	 * String separating each PI listed in scienceGroup, each organization 
@@ -236,14 +236,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			scMData.setEndTime(null);
 		}
 
-		StringBuffer scienceGroup = new StringBuffer();
+		StringBuffer piNames = new StringBuffer();
 		for ( String investigator : omeMData.getInvestigators() ) {
-			if ( scienceGroup.length() > 0 )
-				scienceGroup.append(NAMES_SEPARATOR);
+			if ( piNames.length() > 0 )
+				piNames.append(NAMES_SEPARATOR);
 			// Anglicize investigator names for NetCDF/LAS
-			scienceGroup.append(anglicizeName(investigator));
+			piNames.append(anglicizeName(investigator));
 		}
-		scMData.setInvestigatorNames(scienceGroup.toString());
+		scMData.setInvestigatorNames(piNames.toString());
 
 		HashSet<String> usedOrganizations = new HashSet<String>();
 		StringBuffer orgGroup = new StringBuffer();
@@ -465,7 +465,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		the name given by the PI for this dataset; 
 	 * 		never null but may be empty
 	 */
-	public String getCruiseName() {
+	public String getDatasetName() {
 		String cruiseName = omeMData.getExperimentName();
 		if ( cruiseName == null )
 			return "";
@@ -489,13 +489,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		the semicolon-separated list of PI names for this dataset; 
 	 * 		never null but may be empty
 	 */
-	public String getScienceGroup() {
-		ArrayList<String> scienceGroup = omeMData.getInvestigators();
-		if ( scienceGroup == null )
+	public String getPINames() {
+		ArrayList<String> investigators = omeMData.getInvestigators();
+		if ( investigators == null )
 			return "";
 		String piNames = "";
 		boolean isFirst = true;
-		for ( String name : scienceGroup ) {
+		for ( String name : investigators ) {
 			if ( isFirst )
 				isFirst = false;
 			else
@@ -510,7 +510,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		the original reference(s) for this dataset; 
 	 * 		never null but may be empty
 	 */
-	public String getOrigDataRef() {
+	public String getDatasetRefs() {
 		String dataSetRefs;
 		try {
 			dataSetRefs = omeMData.getValue(OmeMetadata.DATA_SET_REFS_STRING);
