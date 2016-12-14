@@ -1,23 +1,6 @@
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!OAPCalculate	!
-!load the mat file from "SOCAT_make_mat_file	!
-!and recalulates fco2!
-!The calculations follows DOE	
-!DOE is not clear whether atmosperic or equilibrator pressure should be
-!used for pCO2 to fCO2 conversion. Here I have used equilibrator pressure.
-!The difference is on the order of 1/100 uatm. 
-!Also, it was not always possible to use equilibrator xCO2 as delta factor
-!in fCO2 expression, instead the starting point for each recalculation was
-!used, again the effect is very negligible. 
-!
-!Are Olsen, Aug 2008.
-! Converted to Ferret .jnl script Ansley Manke 10/2013
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! OAPCalculate.jnl
 
-
-! Here is the file to read and append to.
-! Contains the metadata variables, global attributes, and incoming variables.
-! Where we recompute some of the incoming variables and append them to the file,
+! We recompute some of the incoming variables and append them to the file,
 ! the values in the file are replaced. 
 !
 !  Argument is a file name; the single-cruise dsg file from the data entry
@@ -25,16 +8,7 @@
 
 define symbol cruise_filename "($1)"
 
-!!!!!!
-! This step to be removed; for testing I copy the file and add data to that.
-
-!!!!!!define symbol infile ($1)
-!!!!!!sp cp ($infile) ($infile).new.nc
-!!!!!!define symbol cruise_filename ($infile).new.nc
-!!!!!
-
 set mem/siz=300 ! for sampling from etopo2
-
 
 use "($cruise_filename)"
 define symbol keep_history = `..History`
@@ -51,29 +25,6 @@ let second = missing(sec_in, 0)
 
 define symbol outtype=`longitude,return=dtype`
 
-
-! Set variables with ncep_slp, woaSss, etopoDepth, d2l, region_id
-GO SOCAT3_NCEP_slp
-
-GO SOCAT3_WOA_salinity
-
-!!!!!!!!!CALCULATIONS!!!!!!!!!!!!!!!!!!!!!!!!!
-
-!kelvin temperatures
-LET temp_k = temp+273.15
-LET Temperature_equi_k = Temperature_equi+273.15
-!pH2Os
-LET pH2O=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*LN(temp_k/100) -0.000544*sal))
-LET pH2O_woa=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*LN(temp_k/100) -0.000544*woaSss))
-
-LET pH2O_eq=1013.25*(exp(24.4543-67.4509*(100/Temperature_equi_k) \
--4.8489*LN(Temperature_equi_k/100) -0.000544*sal))
-LET pH2O_eq_woa=1013.25*(exp(24.4543-67.4509*(100/Temperature_equi_k) \
--4.8489*LN(Temperature_equi_k/100)-0.000544*woaSss))
-!pressure, IF equilibrator pressure not given, use atmospheric pressure + 3
-LET press = IF Pressure_equi THEN Pressure_equi ELSE Pressure_atm+3
-!NCEP pressure + 3, for calculations
-LET ncep_slp_eq=ncep_slp+3 
 !ship speed	-speed to next observation
 ! sw_dist script from matlab_sw_dist.m 
 ! given lat, lon, and units (km or nm), computes dist and phaseangle
@@ -86,201 +37,11 @@ LET deltatt =24*datenum[i=@ddf]
 LET deltaTime = IF i[gx=deltatt] LT npts THEN deltatt ELSE deltatt[i=@fnr]
 LET speed = dist_filled/deltaTime !knots
 
-!!!!!!!!!!!!!fCO2 CALCULATIONS!!!!!!!!!!!!
-
-!1. from xCO2_water_sst_wet_ppm
-!not used
-
-!2. from xCO2_water_equi_temp_wet_ppm
-!not used
-
- 
-!3. from xCO2_water_sst_dry_ppm!!!!!!!!!!!!
-
-!a. Reported pressures and salt
-LET pCO2_temp_a=xCO2_water_sst_dry_ppm*((press-ph2o)/1013.25)
-
-LET fCO2_insitu_from_xCO2_water_sst_dry_ppm=pCO2_temp_a*exp((press/1013.25)*((-1636.75+(12.0408*temp_k) \
--(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-xCO2_water_sst_dry_ppm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))
-
-!b. Reported pressures and WOA salt
-LET pCO2_temp_b=xCO2_water_sst_dry_ppm*((press-pH2O_woa)/1013.25)
-
-LET fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa=pCO2_temp_b*exp((press/1013.25)*((-1636.75+(12.0408*temp_k) \
- -(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-xCO2_water_sst_dry_ppm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))
-
-!c. NCEP pressures & reported salt 
-LET pCO2_temp_c=xCO2_water_sst_dry_ppm*((ncep_slp_eq-pH2O)/1013.25)
-
-LET fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep=pCO2_temp_c*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*temp_k) \
- -(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-xCO2_water_sst_dry_ppm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))
-
-!d. NCEP pressures & WOA salt
-LET pCO2_temp_d=xCO2_water_sst_dry_ppm*((ncep_slp_eq-pH2O_woa)/1013.25)
-
-LET fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa=pCO2_temp_d*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*temp_k) \
- -(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-xCO2_water_sst_dry_ppm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))
-
-
-
-!4. from xCO2_water_equi_temp_dry_ppm!!!!!!!!!!!!!!!!!!!!
-
-!a. Reported pressures and salt 
-LET pCO2_temp_e=xCO2_water_equi_temp_dry_ppm*((press-pH2O_eq)/1013.25)
-
-LET fco2_temp_a=pCO2_temp_e*exp((press/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-xCO2_water_equi_temp_dry_ppm/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))
-  
-LET fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm=fco2_temp_a*exp(0.0423*(temp-Temperature_equi))
-
-
-!b.Reported pressures & WOA salt
-LET pCO2_temp_f=xCO2_water_equi_temp_dry_ppm*((press-pH2O_eq_woa)/1013.25)
-  
-LET fco2_temp_b=pCO2_temp_f*exp((press/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-xCO2_water_equi_temp_dry_ppm/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))
-  
-LET fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa=fco2_temp_b*exp(0.0423*(temp-Temperature_equi))
-
-	
-!c. NCEP pressures and reported salt
-LET pCO2_temp_g=xCO2_water_equi_temp_dry_ppm*((ncep_slp_eq-pH2O_eq)/1013.25)
-
-   	LET fco2_temp_c=pCO2_temp_g*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-xCO2_water_equi_temp_dry_ppm/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))
-  
-LET fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep=fco2_temp_c*exp(0.0423*(temp-Temperature_equi))
-
-  
-!d. NCEP pressures and WOA salt 
-LET pCO2_temp_h=xCO2_water_equi_temp_dry_ppm*((ncep_slp_eq-pH2O_eq_woa)/1013.25)
-
-LET fco2_temp_d=pCO2_temp_h*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-xCO2_water_equi_temp_dry_ppm/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))
-  
-LET fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa=fco2_temp_d*exp(0.0423*(temp-Temperature_equi))
-
-
-!5. from fCO2_water_sst_100humidity_uatm!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!these are fCO2 insitu
-LET fCO2_insitu_from_fCO2_water_sst_100humidty_uatm=fCO2_water_sst_100humidity_uatm
-
-
-!6. from fCO2_water_corr_25_uatm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!not used.
-
-!7. from fCO2_water_corr_to_20!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!not used.
-
-!8. from fCO2_water_equi_uatm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!convert to SST
-LET fCO2_insitu_from_fCO2_water_equi_uatm=fCO2_water_equi_uatm*exp(0.0423*(temp-Temperature_equi))
-
-
-!9. from pCO2_water_sst_100humidity_uatm!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!convert to fCO2 in situ
-
-!a. Reported pressures
-LET fCO2_from_pCO2_water_sst_100humidity_uatm=pCO2_water_sst_100humidity_uatm*exp((press/1013.25)*((-1636.75+(12.0408*temp_k) \
- -(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-pCO2_water_sst_100humidity_uatm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))	!DOE handboook
-
-!b.NCEP pressures 
-LET fCO2_from_pCO2_water_sst_100humidity_uatm_ncep=pCO2_water_sst_100humidity_uatm*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*temp_k) \
- -(0.0327957*temp_k^2)+(0.0000316528*temp_k^3)+2*(1-pCO2_water_sst_100humidity_uatm/1e6)^2*(57.7-0.118*temp_k))/(82.057*temp_k)))	!DOE handboook
-
-
-!10. from pCO2_water_equi_temp!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-!a. Reported pressures
-LET fco2_temp_e=pCO2_water_equi_temp*exp((press/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-pCO2_water_equi_temp/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))	!DOE handboook
-
-  
-LET fCO2_from_pCO2_water_water_equi_temp=fco2_temp_e*exp(0.0423*(temp-Temperature_equi))
-
-!b. NCEP pressures
-LET fco2_temp_f=pCO2_water_equi_temp*exp((ncep_slp_eq/1013.25)*((-1636.75+(12.0408*Temperature_equi_k) \
- -(0.0327957*Temperature_equi_k^2)+(0.0000316528*Temperature_equi_k^3)+2*(1-pCO2_water_equi_temp/1e6)^2*(57.7-0.118*Temperature_equi_k))/(82.057*Temperature_equi_k)))	!DOE handboook
-
-LET fCO2_from_pCO2_water_water_equi_temp_ncep=fco2_temp_f*exp(0.0423*(temp-Temperature_equi))
-
-
-
-!11. from pCO2_theta_SW_corrected_to_sst!!!!!!!!!!!!!!!!!!!!!!!!!
-!not used
-
-
-!select recommended fCO2
-
-LET var14 = fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
-LET var13 = fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-LET var12 = fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-LET var11 = fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-LET var10 = fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-LET var9 = fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
-LET var8 = fCO2_from_pCO2_water_sst_100humidity_uatm_ncep 
-LET var7 = fCO2_from_pCO2_water_water_equi_temp_ncep 
-LET var6 = fCO2_insitu_from_fCO2_water_sst_100humidty_uatm 
-LET var5 = fCO2_insitu_from_fCO2_water_equi_uatm 
-LET var4 = fCO2_from_pCO2_water_sst_100humidity_uatm 
-LET var3 = fCO2_from_pCO2_water_water_equi_temp 
-LET var2 = fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-LET var1 = fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-
-LET vara = IF var1 THEN var1 ELSE var2; load vara
-LET varb = IF vara THEN vara ELSE var3; load varb
-LET varc = IF varb THEN varb ELSE var4; load varc
-LET vard = IF varc THEN varc ELSE var5; load vard
-LET vare = IF vard THEN vard ELSE var6; load vare
-LET varf = IF vare THEN vare ELSE var7; load varf
-LET varg = IF varf THEN varf ELSE var8; load varg
-LET varh = IF varg THEN varg ELSE var9; load varh
-LET vari = IF varh THEN varh ELSE var10; load vari
-LET varj = IF vari THEN vari ELSE var11; load varj
-LET vark = IF varj THEN varj ELSE var12; load vark
-LET varl = IF vark THEN vark ELSE var13; load varl
-LET fco2_rec = IF varl THEN varl ELSE var14; load fco2_rec
-
-! which source was used in each instance?
-
-LET src14 = IF var14 THEN 14
-LET src13 = IF var13 THEN 13
-LET src12 = IF var12 THEN 12
-LET src11 = IF var11 THEN 11
-LET src10 = IF var10 THEN 10
-LET src9 = IF var9 THEN  9
-LET src8 = IF var8 THEN  8
-LET src7 = IF var7 THEN  7
-LET src6 = IF var6 THEN  6
-LET src5 = IF var5 THEN  5
-LET src4 = IF var4 THEN  4
-LET src3 = IF var3 THEN  3
-LET src2 = IF var2 THEN  2
-LET src1 = IF var1 THEN  1
-
-LET srca = IF src1 THEN src1 ELSE src2
-LET srcb = IF srca THEN srca ELSE src3
-LET srcc = IF srcb THEN srcb ELSE src4
-LET srcd = IF srcc THEN srcc ELSE src5
-LET srce = IF srcd THEN srcd ELSE src6
-LET srcf = IF srce THEN srce ELSE src7
-LET srcg = IF srcf THEN srcf ELSE src8
-LET srch = IF srcg THEN srcg ELSE src9
-LET srci = IF srch THEN srch ELSE src10
-LET srcj = IF srci THEN srci ELSE src11
-LET srck = IF srcj THEN srcj ELSE src12
-LET srcl = IF srck THEN srck ELSE src13
-LET/bad=999 fco2_src = IF srcl THEN srcl ELSE src14
-
 ! More variables to add: etopoDepth, d2l, region_id, gvCO2
 
 GO SOCAT3_ETOPO2_depth
 
 GO SOCAT3_dist2land
-
-GO SOCAT3_region_id
-
-GO SOCAT3_gvco2
 
 !!!!!!!Save output
 cancel mode upcase
@@ -292,37 +53,6 @@ cancel mode upcase
 ! making it an essential part of the DSG file
 
 GO nobs_deci_full
-
-! fCO2 recomputed
-let/title="fCO2 Recommended"/units="uatm" fCO2_recommended = fco2_rec
-set var/outtype=($outtype) fCO2_recommended
-define attribute/output fCO2_recommended.ioos_category = "CO2"
-
-! fCO2 Source
-let/title="fCO2 Source Type"/bad=-1 fCO2_source = fco2_src
-set var/outtype=int fCO2_source
-define attribute/output fCO2_source.ioos_category = "Identifier"
-
-! Delta temperature
-let/title="Equilibrator Temp - SST"/units="`temp,return=units`" delta_temp = temperature_equi - temp
-set var/outtype=($outtype) delta_temp
-
-! Pressure from NCEP
-let/title="Surface Air Pressure from NCEP"/units="hPa" pressure_ncep_slp = ncep_slp
-set var/outtype=($outtype) pressure_ncep_slp
-define attribute/output pressure_ncep_slp.ioos_category = "Pressure"
-define attribute/output pressure_ncep_slp.standard_name = "surface_air_pressure"
-
-! Salinity from WOA 2005
-let/title="Sea Water Salinity from WOA5"/units="PSU" woa_sss = woaSss
-set var/outtype=($outtype) woa_sss
-define attribute/output woa_sss.ioos_category = "Salinity"
-define attribute/output woa_sss.standard_name = "sea_water_salinity"
-
-! GlobalView Marine Carbon
-let/title="GlobalView CO2"/unit="micromol per mol" gvCO2 = gvCO2_sampled
-set var/outtype=($outtype) gvCO2
-define attribute/output gvCO2.ioos_category = "CO2"
 
 ! Lon in 0-360
 let/title="longitude"/units="degrees_east" lon360 = IF longitude LT 0 THEN longitude+360 else longitude
@@ -372,58 +102,13 @@ let/title="Day of Year"/units=days day_of_year = tax_jday(day_and_year, ttday) +
 set var/outtype=($outtype) day_of_year
 define attribute/output day_of_year.ioos_category = "Time"
 
-! Region ID
-let/title="Region ID" region_id = regionid[gx=year@asn]
-define attribute/output region_id.ioos_category = "Identifier"
-define attribute/output region_id.history = "added to ($cruise_filename)"
-
 ! month of year
 LET charmonths = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 let datamonths = samplei(charmonths, month)
 let/title="month of year" tmonth = datamonths[gx=latitude@asn]
 define attribute/output tmonth.history = "added to ($cruise_filename)"
 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-set var/outtype=($outtype)/title="fCO2 from pCO2_water_equi_temp, Pressure_equi, sal"  fCO2_from_pCO2_water_water_equi_temp 
-set var/outtype=($outtype)/title="fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm
-set var/outtype=($outtype)/title="fCO2 from fCO2_water_equi_tem, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_equi_uatm 
-set var/outtype=($outtype)/title="fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm
-set var/outtype=($outtype)/title="fCO2 from pCO2_water_equi_temp, ncepSlp, sal"  fCO2_from_pCO2_water_water_equi_temp_ncep  
-set var/outtype=($outtype)/title="fCO2 from pCO2_water_sst_100humidity_uatm, ncepSlp, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
-
-
 ! Save to the input files; variables will overwrite the nominal values already there
-
-save/keep/quiet/append/file="($cruise_filename)" woa_sss
-save/keep/quiet/append/file="($cruise_filename)" pressure_ncep_slp
-
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_equi_uatm 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp_ncep  
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa
-
-save/keep/quiet/append/file="($cruise_filename)" fCO2_recommended
-save/keep/quiet/append/file="($cruise_filename)" fCO2_source
-save/keep/quiet/append/file="($cruise_filename)" gvCO2
-
-save/keep/quiet/append/file="($cruise_filename)" delta_temp
 
 save/keep/quiet/append/file="($cruise_filename)" lon360 
 save/keep/quiet/append/file="($cruise_filename)" etopo2
@@ -433,8 +118,6 @@ save/keep/quiet/append/file="($cruise_filename)" day_of_year
 save/keep/quiet/append/file="($cruise_filename)" tmonth
 
 save/keep/quiet/append/file="($cruise_filename)" calc_speed
-save/keep/quiet/append/file="($cruise_filename)" region_id
-
 
 let edit_global = NCO_ATTR("($cruise_filename)","global","History","c","o","($keep_history)")
 load edit_global

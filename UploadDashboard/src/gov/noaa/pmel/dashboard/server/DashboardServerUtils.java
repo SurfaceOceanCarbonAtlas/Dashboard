@@ -19,6 +19,22 @@ public class DashboardServerUtils {
 	/** Maximum length for a valid dataset ID */
 	public static final int MAX_DATASET_ID_LENGTH = 128;
 
+	/** Sanity Checker "username" for flags */
+	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
+
+	/** Sanity Checker "realname" for flags */
+	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
+
+	// flags for QC/WOCE events of datasets that has been updated
+	public static final Character OLD_FLAG_NO_INFO = 'U';
+	public static final Character OLD_FLAG_ACCEPTABLE = 'G';
+	public static final Character OLD_WOCE_QUESTIONABLE = 'Q';
+	public static final Character OLD_WOCE_BAD = 'B';
+
+	// flag and variable name for dataset rename events
+	public static final Character FLAG_RENAME = 'R';
+	public static final String RENAME_VARNAME = "Rename";
+
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */

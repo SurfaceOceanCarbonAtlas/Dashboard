@@ -645,7 +645,7 @@ public class DatasetChecker {
 		}
 
 		// Process the SanityChecker messages and assign WOCE flags in datasetData
-		msgHandler.processCruiseMessages(cruiseData, output);
+		msgHandler.processCheckerMessages(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status

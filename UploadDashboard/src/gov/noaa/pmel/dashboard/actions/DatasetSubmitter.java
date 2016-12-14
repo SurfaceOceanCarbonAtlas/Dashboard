@@ -12,6 +12,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
@@ -231,7 +232,7 @@ public class DatasetSubmitter {
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
 					logger.debug("Generating the full-data DSG file for " + expocode);
-					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
+					dsgNcHandler.saveDataset(omeMData, cruiseData, socatVersionStatus, flag.toString());
 
 					// Generate the decimated-data DSG file from the full-data DSG file
 					logger.debug("Generating the decimated-data DSG file for " + expocode);
@@ -247,61 +248,6 @@ public class DatasetSubmitter {
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
-
-				// Create the QCEvent for submitting the initial QC flags
-				QCEvent initQC = new QCEvent();
-				initQC.setDatasetId(expocode);
-				initQC.setVersion(version);
-				initQC.setFlagDate(new Date());
-				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				// Add the initial QC flag in each region only for new and updated cruises
-				initQC.setFlagValue(flag);
-				if ( DashboardUtils.QC_NEW_FLAG.equals(flag) )
-					initQC.setComment("Initial QC flag for new dataset");
-				else
-					initQC.setComment("Initial QC flag for updated dataset");
-
-				// Add the initial QC flag
-				try {
-					databaseHandler.addQCEvent(initQC);
-				} catch (SQLException ex) {
-					throw new IllegalArgumentException(
-							"Unable to add an initial QC flag:\n    " + ex.getMessage());
-				}
-
-				// All cruises - remark on the number of data rows with error and warnings
-				initQC.setFlagValue(DashboardUtils.QC_COMMENT);
-				initQC.setComment("Automated data check found " + 
-						Integer.toString(cruiseData.getNumErrorRows()) + 
-						" data points with errors and " + 
-						Integer.toString(cruiseData.getNumWarnRows()) + 
-						" data points with warnings.");
-				try {
-					databaseHandler.addQCEvent(initQC);
-				} catch (SQLException ex) {
-					throw new IllegalArgumentException("Unable to add an initial " +
-							"QC comment with the number of error and warnings:\n    " + 
-							ex.getMessage());
-				}
-
-				// Generate and add the WOCE flags from the SanityChecker results,
-				// as well as the user-provided WOCE flags, to the database
-				ArrayList<DataQCEvent> initWoceList;
-				try {
-					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler, knownDataFileTypes);
-				} catch (IOException ex) {
-					throw new IllegalArgumentException(ex);
-				}
-				try {
-					databaseHandler.resetWoceEvents(expocode);
-					for ( DataQCEvent woceEvent : initWoceList ) {
-						databaseHandler.addWoceEvent(woceEvent);
-					}
-				} catch (SQLException ex) {
-					throw new IllegalArgumentException("Unable to add a WOCE flag "
-							+ "with the data checking results:\n    " + ex.getMessage());
-				}
 
 				// Set up to save changes to version control
 				changed = true;

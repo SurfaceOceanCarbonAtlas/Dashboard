@@ -449,7 +449,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Get the list of saved sanity checker Message objects for this cruise
 		SCMessageList scMsgList;
 		try {
-			scMsgList = configStore.getCheckerMsgHandler().getCruiseMessages(expocode);
+			scMsgList = configStore.getCheckerMsgHandler().getCheckerMessages(expocode);
 		} catch (FileNotFoundException ex) {
 			throw new IllegalArgumentException("The sanity checker has never been run on cruise " + expocode);
 		}

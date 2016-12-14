@@ -109,11 +109,6 @@ public class DashboardUtils {
 	 */
 	public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
 
-	/** Sanity Checker "username" for flags */
-	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
-	/** Sanity Checker "realname" for flags */
-	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
-
 	/**
 	 * The "upload filename" for all OME metadata files.
 	 */
@@ -139,25 +134,14 @@ public class DashboardUtils {
 	 */
 	public static final String PI_OME_PDF_FILENAME = "PI_OME.pdf";
 
-	public static final String PI_QC_COMMENT_START = "PI provided QC flag of ";
-
-	// flags for QC/WOCE events of current datasets
-	public static final Character FLAG_GOOD = '1';
-	public static final Character FLAG_NOT_CHECKED = '2';
-	public static final Character FLAG_QUESTIONABLE = '3';
-	public static final Character FLAG_BAD = '4';
-	public static final Character FLAG_NO_DATA = '9';
-
-	// flags for QC/WOCE events of datasets that has been updated
-	public static final Character OLD_FLAG_GOOD = 'G';
-	public static final Character OLD_FLAG_NOT_CHECKED = 'U';
-	public static final Character OLD_FLAG_QUESTIONABLE = 'Q';
-	public static final Character OLD_FLAG_BAD = 'B';
-	public static final Character OLD_FLAG_NO_DATA = 'N';
-
-	// flag and variable name for dataset rename events
-	public static final Character FLAG_RENAME = 'R';
-	public static final String RENAME_VARNAME = "Rename";
+	/** General-purpose flag value for no information avaiable at this time */
+	public static final Character FLAG_NO_INFO = '1';
+	/** General-purpose flag value for acceptable data */
+	public static final Character FLAG_ACCEPTABLE = '2';
+	/** WOCE-type flag value for questionable data */
+	public static final Character WOCE_QUESTIONABLE = '3';
+	/** WOCE-type flag value for bad data */
+	public static final Character WOCE_BAD = '4';
 
 	// Supported data class names
 	public static final String CHAR_DATA_CLASS_NAME = "Character";

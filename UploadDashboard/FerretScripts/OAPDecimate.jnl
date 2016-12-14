@@ -1,5 +1,4 @@
-! ddsg_socat3.jnl
-! ACM 5/16/2014
+! OAPDecimate.jnl
 
 ! Compute and apply sampling for a single-trajectory dsg file
 ! using piecewise linear interpolation
@@ -9,15 +8,6 @@
 ! files. This allows us to create the decimated dsg file
 ! with the exact same names as in the input files.
 !
-! THIS WAS REMOVED at R18201: 8/19/2014
-! WOCE flags are not used in the decimated datasets, as they may change in the
-! full data. Keep them in the file for a consistent set of variables, but mark 
-! them with the unused flag "M".
-
-! 7/2016, change to missing-value when inheriting attributes.
-! 10/2016 Changes to just handle all the variables present in the files 
-!         instead of fixed lists of variables. All metadata variables on the 
-!         traj axis are saved as-is, variables on the obs axis are decimated.
 
 ! arguments: 
 !  input_file single dsg file
@@ -32,7 +22,7 @@ DEFINE SYMBOL outfile = ($2)
 
 DEFINE SYMBOL tol_lon = 1
 DEFINE SYMBOL tol_lat = 1
-DEFINE SYMBOL tol_var = 4
+DEFINE SYMBOL tol_var = 10
 
 LET tol1 = ($tol_lon)
 LET tol2 = ($tol_lat)
@@ -62,8 +52,8 @@ ELSE
    DEFINE SYMBOL lonvar = lon360
 ENDIF
 
-LET sample_vars = {"($lonvar)", "latitude", "fCO2_recommended"}
-LET sample_pts= piecewise3(($lonvar), latitude, fCO2_recommended, `control`, `tol1`, `tol2`, `tol3`)
+LET sample_vars = {"($lonvar)", "latitude", "sample_depth"}
+LET sample_pts= piecewise3(($lonvar), latitude, sample_depth, `control`, `tol1`, `tol2`, `tol3`)
 LOAD sample_pts
 
 DEFINE SYMBOL output_filename = ($outfile)
@@ -102,7 +92,7 @@ DEFINE SYMBOL num_obs_sampled = `nsample`
 
 ! write a global attribute with the decimation parameters.
 DEFINE ATT/QUIET/OUTPUT ..decimation =  \
-"`nobs_full` original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+"`nobs_full` original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), sample_depth ($tol_var) ($comment)" 
 
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
 
@@ -132,9 +122,9 @@ SAVE/QUIET/FILE="($outfile)"/APPEND/OUTTYPE=int nobs_deci
 
 SET VAR/NAME=($lonvar)_in ($lonvar)
 SET VAR/NAME=latitude_in latitude
-SET VAR/NAME=fCO2_recommended_in fCO2_recommended
+SET VAR/NAME=sample_depth_in sample_depth
 
-LET sample_pts= PIECEWISE3(($lonvar)_in, latitude_in, fCO2_recommended_in, `control`, `tol1`, `tol2`, `tol3`)
+LET sample_pts= PIECEWISE3(($lonvar)_in, latitude_in, sample_depth_in, `control`, `tol1`, `tol2`, `tol3`)
 
 LET/BAD=`($lonvar)_in,RETURN=bad,PREC=9` ($lonvar) = SAMPLE_FAST_I(($lonvar)_in, samplevar)
 SET ATT/LIKE=($lonvar)_in ($lonvar)
@@ -146,19 +136,19 @@ SET ATT/LIKE=latitude_in latitude
 SET ATT/OUTPUT=all latitude
 SAVE/QUIET/APPEND/FILE="($outfile)" latitude
 
-LET/BAD=`fCO2_recommended_in,RETURN=bad,PREC=9` fCO2_recommended = SAMPLE_FAST_I(fCO2_recommended_in, samplevar)
-SET ATT/LIKE=fCO2_recommended_in fCO2_recommended
-SET ATT/OUTPUT=all fCO2_recommended
-SAVE/QUIET/APPEND/FILE="($outfile)" fCO2_recommended
+LET/BAD=`sample_depth_in,RETURN=bad,PREC=9` sample_depth = SAMPLE_FAST_I(sample_depth_in, samplevar)
+SET ATT/LIKE=sample_depth_in sample_depth
+SET ATT/OUTPUT=all sample_depth
+SAVE/QUIET/APPEND/FILE="($outfile)" sample_depth
 
 ! Restore the original definitions
 
-cancel var ($lonvar), latitude, fCO2_recommended
+cancel var ($lonvar), latitude, sample_depth
 SET VAR/NAME=($lonvar) ($lonvar)_in
 SET VAR/NAME=latitude latitude_in
-SET VAR/NAME=fCO2_recommended fCO2_recommended_in
+SET VAR/NAME=sample_depth sample_depth_in
 
-LET sample_pts= piecewise3(($lonvar), latitude, fCO2_recommended, `control`, `tol1`, `tol2`, `tol3`)
+LET sample_pts= piecewise3(($lonvar), latitude, sample_depth, `control`, `tol1`, `tol2`, `tol3`)
 
 
 ! Numeric variables that are on the obs axis

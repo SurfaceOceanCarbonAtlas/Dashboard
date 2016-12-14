@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -40,11 +41,6 @@ public class DataFileHandlerTest {
 			+ "AOML_Atlantis,20-01B,110.79736,19042012,19:08:12,12.622,-59.222,393.455,-999,395.32,1009.1,1012.21,27.57,27.4981,35.13,375.5,379.69,-4.19,2,\n"
 			+ " , , , , , , , , , , , , , , , , , , , \n";
 
-	private static final ArrayList<String> META_PREAMBLE = new ArrayList<String>(Arrays.asList(new String[] {
-		"Expocode: 00KS20120419",
-		"Ship: Atlantis",
-		"PI: Wanninkhof, R.",
-		"" }) );
 	private static final ArrayList<String> HEADERS = new ArrayList<String>(Arrays.asList(new String[] {
 		"Group_Ship", "Cruise ID", "JD_GMT", "DATE_UTC__ddmmyyyy", "TIME_UTC_hh:mm:ss", "LAT_dec_degree", "LONG_dec_degree", "xCO2_EQU_ppm", "xCO2_ATM_ppm", "xCO2_ATM_interpolated_ppm", "PRES_EQU_hPa", "PRES_ATM@SSP_hPa", "TEMP_EQU_C", "SST_C", "SAL_permil", "fCO2_SW@SST_uatm", "fCO2_ATM_interpolated_uatm", "dfCO2_uatm", "WOCE_QC_FLAG", "QC_SUBFLAG"
 	}) );
@@ -73,13 +69,16 @@ public class DataFileHandlerTest {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
 		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
 		DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
+		String owner = "me";
+		String filename = "somefile.csv";
+		String timestamp = "2016-12-13 16:11 +8";
 		BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA)); 
-		DashboardDatasetData cruiseData = new DashboardDatasetData();
-		dataHandler.assignCruiseDataFromInput(cruiseData, DashboardUtils.COMMA_FORMAT_TAG, cruiseReader, 0, -1, true);
+		TreeMap<String,DashboardDatasetData> datasetsMap = 
+				dataHandler.createDatasetsFromInput(cruiseReader, 
+						DashboardUtils.COMMA_FORMAT_TAG, owner, filename, timestamp);
+		assertEquals(1, datasetsMap.size());
+		DashboardDatasetData cruiseData = datasetsMap.firstEntry().getValue();
 		
-		assertEquals(META_PREAMBLE.size(), cruiseData.getPreamble().size());
-		for (int k = 0; k < META_PREAMBLE.size(); k++)
-			assertEquals(META_PREAMBLE.get(k), cruiseData.getPreamble().get(k));
 		assertEquals(HEADERS.size(), cruiseData.getUserColNames().size());
 		for (int k = 0; k < HEADERS.size(); k++)
 			assertEquals(HEADERS.get(k), cruiseData.getUserColNames().get(k));

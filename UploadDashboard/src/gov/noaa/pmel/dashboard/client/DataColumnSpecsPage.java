@@ -843,9 +843,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			}
 			TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
 			Integer rowIdx = ctx.getIndex();
-			QCFlag woceCell = new QCFlag(null, DashboardUtils.FLAG_BAD, colNum-1, rowIdx);
-			QCFlag woceRow = new QCFlag(null, DashboardUtils.FLAG_BAD, null, rowIdx);
-			QCFlag woceCol = new QCFlag(null, DashboardUtils.FLAG_BAD, colNum-1, null);
+			QCFlag woceCell = new QCFlag(null, DashboardUtils.WOCE_BAD, colNum-1, rowIdx);
+			QCFlag woceRow = new QCFlag(null, DashboardUtils.WOCE_BAD, null, rowIdx);
+			QCFlag woceCol = new QCFlag(null, DashboardUtils.WOCE_BAD, colNum-1, null);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {
@@ -865,9 +865,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				sb.appendHtmlConstant("</div>");
 				return;
 			}
-			woceCell.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
-			woceRow.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
-			woceCol.setFlagValue(DashboardUtils.FLAG_QUESTIONABLE);
+			woceCell.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
+			woceRow.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
+			woceCol.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {
