@@ -15,10 +15,21 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable  {
 
-	private static final long serialVersionUID = -6067723330021217964L;
+	private static final long serialVersionUID = 1802598804328743505L;
+
+	/**
+	 * WOCE-like enumerated type indicating the severity of a QC flag value
+	 */
+	public enum Severity implements Serializable, IsSerializable {
+		UNASSIGNED,
+		ACCEPTABLE,
+		QUESTIONABLE,
+		BAD
+	}
 
 	protected String flagName;
 	protected Character flagValue;
+	protected Severity severity;
 	protected Integer columnIndex;
 	protected Integer rowIndex;
 	protected String comment;
@@ -34,6 +45,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	public QCFlag() {
 		flagName = DashboardUtils.STRING_MISSING_VALUE;
 		flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+		severity = Severity.UNASSIGNED;
 		columnIndex = DashboardUtils.INT_MISSING_VALUE;
 		rowIndex = DashboardUtils.INT_MISSING_VALUE;
 		comment = DashboardUtils.STRING_MISSING_VALUE;
@@ -42,12 +54,15 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	/**
 	 * Create with given flag name, flag value, column index, and row index 
 	 * as described by {@link #setFlagName(String)}, {@link #setFlagValue(String)}, 
-	 * {@link #setColumnIndex(Integer)}, and {@link #setRowIndex(Integer)}.
+	 * {@link #setSeverity(QCFlag.Severity)}, {@link #setColumnIndex(Integer)}, 
+	 * and {@link #setRowIndex(Integer)}.  
 	 * The comment is set to {@link DashboardUtils#STRING_MISSING_VALUE}.
 	 */
-	public QCFlag(String flagName, Character flagValue, Integer columnIndex, Integer rowIndex) {
+	public QCFlag(String flagName, Character flagValue, Severity severity, 
+			Integer columnIndex, Integer rowIndex) {
 		setFlagName(flagName);
 		setFlagValue(flagValue);
+		setSeverity(severity);
 		setColumnIndex(columnIndex);
 		setRowIndex(rowIndex);
 		comment = DashboardUtils.STRING_MISSING_VALUE;
@@ -93,6 +108,27 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 			this.flagValue = flagValue;
 		else
 			this.flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+	}
+
+	/**
+	 * @return 
+	 * 		the severity of the QC flag;
+	 * 		never null but may be {@link QCFlag.Severity#UNASSIGNED} if not assigned
+	 */
+	public Severity getSeverity() {
+		return severity;
+	}
+
+	/**
+	 * @param severity 
+	 * 		the severity to set for this QC flag value;
+	 * 		if null, {@link QCFlag.Severity#UNASSIGNED} will be assigned
+	 */
+	public void setSeverity(Severity severity) {
+		if ( severity != null )
+			this.severity = severity;
+		else
+			this.severity = Severity.UNASSIGNED;
 	}
 
 	/**
@@ -166,6 +202,11 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 		result = this.flagValue.compareTo(other.flagValue);
 		if ( result != 0 )
 			return result;
+		// Presumably a flag name and value directly corresponds 
+		// to a severity, but go ahead and check it
+		result = this.severity.compareTo(other.severity);
+		if ( result != 0 )
+			return result;
 		result = this.columnIndex.compareTo(other.columnIndex);
 		if ( result != 0 )
 			return result;
@@ -184,6 +225,9 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 		int result = comment.hashCode();
 		result = prime * result + flagName.hashCode();
 		result = prime * result + flagValue.hashCode();
+		// Presumably a flag name and value directly corresponds 
+		// to a severity, but go ahead and include it
+		result = prime * result + severity.hashCode();
 		result = prime * result + rowIndex.hashCode();
 		result = prime * result + columnIndex.hashCode();
 		return result;
@@ -205,6 +249,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 			return false;
 		if ( ! flagValue.equals(other.flagValue) )
 			return false;
+		// Presumably a flag name and value directly corresponds 
+		// to a severity, but go ahead and include it
+		if ( ! severity.equals(other.severity) )
+			return false;
 		if ( ! flagName.equals(other.flagName) )
 			return false;
 		if ( ! comment.equals(other.comment) )
@@ -217,6 +265,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 		return "QCFlag[" +
 			   "flagName=" + flagName + ", " +
 			   "flagValue='" + flagValue.toString() + "', " +
+			   "severity=" + severity.toString() + 
 			   "columnIndex=" + columnIndex.toString() + ", " +
 			   "rowIndex=" + rowIndex.toString() + 
 			   "comment=\"" + comment + "\", " +

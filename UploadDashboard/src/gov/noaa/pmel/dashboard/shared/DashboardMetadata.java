@@ -201,7 +201,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the SOCAT version; 
+	 * 		the version; 
 	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVersion() {
@@ -210,7 +210,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param version 
-	 * 		the SOCAT version to set; 
+	 * 		the version to set; 
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVersion(String version) {

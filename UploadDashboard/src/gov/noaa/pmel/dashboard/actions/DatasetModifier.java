@@ -56,7 +56,7 @@ public class DatasetModifier {
 	 * 		if the new owner username is not recognized,
 	 * 		if there is no data file for the indicated dataset
 	 */
-	public void changeCruiseOwner(String expocode, String newOwner) 
+	public void changeDatasetOwner(String expocode, String newOwner) 
 									throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
 		if ( ! configStore.validateUser(newOwner) )
@@ -82,9 +82,9 @@ public class DatasetModifier {
 		String commitMsg = "Dataset " + upperExpo + " moved from " + oldOwner + " to " + newOwner;
 
 		// Add this cruise to the list for the new owner
-		DashboardDatasetList cruiseList = userHandler.getCruiseListing(newOwner);
+		DashboardDatasetList cruiseList = userHandler.getDatasetListing(newOwner);
 		if ( cruiseList.put(upperExpo, cruise) == null ) {
-			userHandler.saveCruiseListing(cruiseList, commitMsg);
+			userHandler.saveDatasetListing(cruiseList, commitMsg);
 		}
 
 		// Rely on update-on-read to remove the cruise from the list of the old owner 
@@ -113,7 +113,7 @@ public class DatasetModifier {
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameCruise(String oldExpocode, String newExpocode, String username) 
+	public void renameDataset(String oldExpocode, String newExpocode, String username) 
 						throws IllegalArgumentException, IOException, SQLException {
 		// check and standardized the expocodes
 		String oldExpo = DashboardServerUtils.checkDatasetID(oldExpocode);
@@ -124,12 +124,8 @@ public class DatasetModifier {
 		configStore.getCheckerMsgHandler().renameMsgsFile(oldExpo, newExpo);
 		// rename metadata files; update the dataset in the OME metadata
 		configStore.getMetadataFileHandler().renameMetadataFiles(oldExpo, newExpo);
-		// rename the DSG and decimated DSG files; update the dataset in these files
+		// rename the DSG and decimated DSG files; update the dataset ID in these files
 		configStore.getDsgNcFileHandler().renameDsgFiles(oldExpo, newExpo);
-		// generate a rename QC comment and modify expocodes for the flags
-		configStore.getDatabaseRequestHandler().renameCruiseFlags(
-				oldExpo, newExpo, configStore.getUploadVersion(), username);
-		// TODO: rename the WOCE messages file, if it exists
 	}
 
 }

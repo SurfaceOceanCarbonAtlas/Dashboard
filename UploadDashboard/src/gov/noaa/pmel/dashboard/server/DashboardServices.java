@@ -107,7 +107,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Get the dashboard data store and current username
 		if ( ! validateRequest(null) ) 
 			throw new IllegalArgumentException("Invalid user request");
-		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
+		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getDatasetListing(username);
 		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
@@ -130,7 +130,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Return the current list of cruises, which should 
 		// detect the missing cruises and update itself
-		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
+		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getDatasetListing(username);
 		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
@@ -144,7 +144,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Add the cruises to the user's list and return the updated list
 		DashboardDatasetList cruiseList = configStore.getUserFileHandler()
-				.addCruisesToListing(wildExpocode, username);
+				.addDatasetsToListing(wildExpocode, username);
 		Logger.getLogger("DashboardServices").info("added cruises " + wildExpocode + " for " + username);
 		return cruiseList;
 	}
@@ -158,7 +158,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Remove the cruises from the user's list and return the updated list
 		DashboardDatasetList cruiseList = configStore.getUserFileHandler()
-				.removeCruisesFromListing(expocodeSet, username);
+				.removeDatasetsFromListing(expocodeSet, username);
 		Logger.getLogger("DashboardServices").info("removed cruises " + expocodeSet.toString() + " for " + username);
 		return cruiseList;
 	}
@@ -188,11 +188,11 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		DatasetModifier modifier = new DatasetModifier(configStore);
 		Logger itsLogger = Logger.getLogger("DashboardServices");
 		for ( String expocode : expocodeSet ) {
-			modifier.changeCruiseOwner(expocode, newUsername);
+			modifier.changeDatasetOwner(expocode, newUsername);
 			itsLogger.info("changed owner of " + expocode + " to " + newUsername);
 		}
 		// Return the updated list of cruises for this user
-		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getCruiseListing(pageUsername);
+		DashboardDatasetList cruiseList = configStore.getUserFileHandler().getDatasetListing(pageUsername);
 		return cruiseList;
 	}
 
@@ -207,7 +207,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
 		DashboardDatasetList cruiseList = new DashboardDatasetList();
 		cruiseList.setUsername(username);
-		cruiseList.setVersion(configStore.getUploadVersion());
 		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : expocodeSet ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getDatasetFromInfoFile(cruiseExpocode));
@@ -254,7 +253,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 						" is not associated with dataset " + expocode);
 		}
 		// Delete this OME metadata or additional documents file on the server
-		mdataHandler.removeMetadata(username, expocode, deleteFilename);
+		mdataHandler.deleteMetadata(username, expocode, deleteFilename);
 
 		Logger.getLogger("DashboardServices").info("deleted metadata " + deleteFilename + 
 				" from " + expocode + " for " + username);
@@ -266,7 +265,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Create the set of updated cruise information to return
 		DashboardDatasetList cruiseList = new DashboardDatasetList();
 		cruiseList.setUsername(username);
-		cruiseList.setVersion(configStore.getUploadVersion());
 		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getDatasetFromInfoFile(cruiseExpocode));
@@ -367,7 +365,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		configStore.getDashboardCruiseChecker().checkCruise(cruiseData);
+		configStore.getDashboardDatasetChecker().checkDataset(cruiseData);
 
 		// Save and commit the updated cruise columns
 		configStore.getDataFileHandler().saveDatasetInfoToFile(cruiseData, 
@@ -406,7 +404,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
 		UserFileHandler userHandler = configStore.getUserFileHandler();
-		DatasetChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+		DatasetChecker cruiseChecker = configStore.getDashboardDatasetChecker();
 		Logger dataSpecsLogger = Logger.getLogger("DashboardServices");
 
 		for ( String expocode : cruiseExpocodes ) {
@@ -425,7 +423,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			
 				// Run the SanityCheck on the updated cruise.  Saves the SanityChecker messages,
 				// and assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-				cruiseChecker.checkCruise(cruiseData);
+				cruiseChecker.checkDataset(cruiseData);
 
 				// Save and commit the updated cruise information
 				cruiseHandler.saveDatasetInfoToFile(cruiseData, "Data status and WOCE flags for " + expocode + 
@@ -472,7 +470,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardUtils.OME_FILENAME);
 			DashboardOmeMetadata updatedOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
 			// Reset the dataset and related fields to that for activeExpocode 
-			updatedOmeMData.changeExpocode(activeExpocode);
+			updatedOmeMData.changeDatasetID(activeExpocode);
 			// Read the OME XML contents currently saved for activeExpocode
 			mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardUtils.OME_FILENAME);
 			DashboardOmeMetadata origOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
@@ -512,7 +510,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Submit the cruises for QC and possibly send to CDIAC
-		configStore.getDashboardCruiseSubmitter().submitCruises(cruiseExpocodes, 
+		configStore.getDashboardDatasetSubmitter().submitDatasets(cruiseExpocodes, 
 				archiveStatus, localTimestamp, repeatSend, username);
 		Logger.getLogger("DashboardServices").info("cruises " + cruiseExpocodes.toString() + 
 				" submitted by " + username);

@@ -129,11 +129,11 @@ public class MetadataUploadService extends HttpServlet {
 			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}
-		// Extract the cruise expocodes from the expocodes string
-		TreeSet<String> cruiseExpocodes = new TreeSet<String>(); 
+		// Extract the set of dataset ID from the datasetIds String
+		TreeSet<String> idSet = new TreeSet<String>(); 
 		try {
-			cruiseExpocodes.addAll(DashboardUtils.decodeStringArrayList(datasetIds));
-			if ( cruiseExpocodes.size() < 1 )
+			idSet.addAll(DashboardUtils.decodeStringArrayList(datasetIds));
+			if ( idSet.size() < 1 )
 				throw new IllegalArgumentException();
 		} catch ( IllegalArgumentException ex ) {
 			metadataItem.delete();
@@ -169,15 +169,15 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		DashboardMetadata metadata = null;
-		for ( String expo : cruiseExpocodes ) {
+		for ( String id : idSet ) {
 			try {
 				// Save the metadata document for this cruise
 				if ( metadata == null ) {
-					metadata = metadataHandler.saveMetadataFileItem(expo, 
+					metadata = metadataHandler.saveMetadataFileItem(id, 
 							username, uploadTimestamp, uploadFilename, version, metadataItem);
 				}
 				else {
-					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
+					metadata = metadataHandler.copyMetadataFile(id, metadata, true);
 				}
 				// Update the metadata documents associated with this cruise
 				if ( isOme ) {
@@ -187,20 +187,20 @@ public class MetadataUploadService extends HttpServlet {
 						omedata = new DashboardOmeMetadata(metadata, metadataHandler);
 					} catch ( IllegalArgumentException ex ) {
 						// Problems with the file - delete it
-						metadataHandler.removeMetadata(username, expo, metadata.getFilename());
+						metadataHandler.deleteMetadata(username, id, metadata.getFilename());
 						throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
 					}
-					cruiseHandler.addAddlDocTitleToDataset(expo, omedata);
+					cruiseHandler.addAddlDocTitleToDataset(id, omedata);
 					try {
 						// This is using the PI OME XML file at this time
-						omePdfGenerator.createPiOmePdf(expo);
+						omePdfGenerator.createPiOmePdf(id);
 					} catch ( Exception ex ) {
 						throw new IllegalArgumentException(
 								"Unable to create the PDF from the OME XML: " + ex.getMessage());
 					}
 				}
 				else {
-					cruiseHandler.addAddlDocTitleToDataset(expo, metadata);
+					cruiseHandler.addAddlDocTitleToDataset(id, metadata);
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();

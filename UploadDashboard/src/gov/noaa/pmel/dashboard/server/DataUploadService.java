@@ -367,7 +367,7 @@ public class DataUploadService extends HttpServlet {
 
 		// Update the list of cruises for the user
 		try {
-			configStore.getUserFileHandler().addCruisesToListing(successes, username);
+			configStore.getUserFileHandler().addDatasetsToListing(successes, username);
 		} catch (IllegalArgumentException ex) {
 			sendErrMsg(response, "Unexpected error updating list of datasets \n" + ex.getMessage());
 			return;

@@ -40,6 +40,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 
 /**
@@ -378,12 +379,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 		TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
 		for ( QCFlag chkwoce : cruiseSpecs.getCheckerFlags() )
-			woceSet.add(new QCFlag(null, chkwoce.getFlagValue(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+			woceSet.add(new QCFlag(null, null, chkwoce.getSeverity(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
 		cruise.setCheckerFlags(woceSet);
 
 		woceSet.clear();
 		for ( QCFlag uwoce : cruiseSpecs.getUserFlags() )
-			woceSet.add(new QCFlag(null, uwoce.getFlagValue(), null, uwoce.getRowIndex()));
+			woceSet.add(new QCFlag(null, null, uwoce.getSeverity(), null, uwoce.getRowIndex()));
 		cruise.setUserFlags(woceSet);
 
 		cruise.setSubmitStatus(cruiseSpecs.getSubmitStatus());
@@ -843,9 +844,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			}
 			TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
 			Integer rowIdx = ctx.getIndex();
-			QCFlag woceCell = new QCFlag(null, DashboardUtils.WOCE_BAD, colNum-1, rowIdx);
-			QCFlag woceRow = new QCFlag(null, DashboardUtils.WOCE_BAD, null, rowIdx);
-			QCFlag woceCol = new QCFlag(null, DashboardUtils.WOCE_BAD, colNum-1, null);
+			QCFlag woceCell = new QCFlag(null, null, Severity.BAD, colNum-1, rowIdx);
+			QCFlag woceRow = new QCFlag(null, null, Severity.BAD, null, rowIdx);
+			QCFlag woceCol = new QCFlag(null, null, Severity.BAD, colNum-1, null);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {
@@ -865,9 +866,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				sb.appendHtmlConstant("</div>");
 				return;
 			}
-			woceCell.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
-			woceRow.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
-			woceCol.setFlagValue(DashboardUtils.WOCE_QUESTIONABLE);
+			woceCell.setSeverity(Severity.QUESTIONABLE);
+			woceRow.setSeverity(Severity.QUESTIONABLE);
+			woceCol.setSeverity(Severity.QUESTIONABLE);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {

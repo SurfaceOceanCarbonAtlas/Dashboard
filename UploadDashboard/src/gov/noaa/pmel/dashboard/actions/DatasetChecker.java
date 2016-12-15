@@ -11,6 +11,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,14 +53,14 @@ import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 
 /**
- * Class for working with the SanityChecker 
+ * Class for working with the automated data checker 
  * 
  * @author Karl Smith
  */
 public class DatasetChecker {
 
 	/**
-	 * Indices of user-provided data columns. 
+	 * Indices of data columns types of interest.
 	 */
 	private class ColumnIndices {
 		int timestampIndex = -1;
@@ -78,18 +80,16 @@ public class DatasetChecker {
 	}
 
 	/**
-	 * Creates and returns a ColumnIndices assigned with the indices
-	 * of the given data column types.
+	 * Returns a ColumnIndices assigned with the indices
+	 * of the data column types of interest in the given list.
 	 * 
 	 * @param columnTypes
 	 * 		data column types to use
 	 * @return
-	 * 		assigned data column indices
+	 * 		ColumnIndices with indices of data column types of interest
 	 */
 	private ColumnIndices getColumnIndices(ArrayList<DataColumnType> columnTypes) {
-		// Save indices of data columns for assigning WOCE flags 
 		ColumnIndices colIndcs = new ColumnIndices();
-
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
 			if ( DashboardServerUtils.TIMESTAMP.typeNameEquals(colType) )
@@ -114,7 +114,6 @@ public class DatasetChecker {
 				colIndcs.dayOfYearIndex = k;
 			else if ( DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(colType) )
 				colIndcs.secondOfDayIndex = k;
-
 			else if ( DashboardServerUtils.LONGITUDE.typeNameEquals(colType) )
 				colIndcs.longitudeIndex = k;
 			else if ( DashboardServerUtils.LATITUDE.typeNameEquals(colType) )
@@ -125,6 +124,10 @@ public class DatasetChecker {
 		return colIndcs;
 	}
 
+	/**
+	 * Enumerated type indicating the source column type(s) for determining 
+	 * the date and time of sample measurements.
+	 */
 	private enum DateTimeType {
 		DATETIME_TIMESTAMP,
 		DATETIME_DATE_TIME,
@@ -135,21 +138,23 @@ public class DatasetChecker {
 	}
 
 	/**
-	 * Data units used by the sanity checker where they do not match
-	 * those already specified for the type.
+	 * Data units used by the automated checker which are different  
+	 * but equivalent to those already specified for the type.
 	 */
-	private static final HashMap<String,ArrayList<String>> CHECKER_DATA_UNITS = 
-			new HashMap<String,ArrayList<String>>();
+	private static final HashMap<String,ArrayList<String>> CHECKER_DATA_UNITS ;
 	static {
+		// Checker timestamp units only specify the format of the date
 		final ArrayList<String> checkerTimestampDateUnits = 
 				new ArrayList<String>(DashboardUtils.TIMESTAMP_UNITS.size());
 		for ( String fmt : DashboardUtils.TIMESTAMP_UNITS ) 
 			checkerTimestampDateUnits.add(fmt.split(" ", 2)[0]);
+		// Longitude and latitude units are prefixed with "decimal_"
 		final ArrayList<String> checkerLongitudeUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees_east", "decimal_degrees_west"));
 		final ArrayList<String> checkerLatitudeUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees_north", "decimal_degrees_south"));
-
+		// Create the map of renamed units
+		CHECKER_DATA_UNITS = new HashMap<String,ArrayList<String>>();
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.TIMESTAMP.getVarName(), checkerTimestampDateUnits);
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.LONGITUDE.getVarName(), checkerLongitudeUnits);
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.LATITUDE.getVarName(), checkerLatitudeUnits);
@@ -161,18 +166,18 @@ public class DatasetChecker {
 	private boolean lastCheckHadGeopositionErrors;
 
 	/**
-	 * Initializes the SanityChecker using the configuration files names
-	 * in the given properties files.
+	 * Initializes the automated data checker using the configuration files 
+	 * named in the given properties files.
 	 * 
 	 * @param configFile
 	 * 		properties file giving the names of the configuration files 
-	 * 		for each SanityChecker component
+	 * 		for each automated data checker component
 	 * @param checkerMsgHandler
-	 * 		handler for SanityChecker messages
+	 * 		handler for automated data checker messages
 	 * @param metaFileHandler
 	 * 		handler for dashboard OME metadata files
 	 * @throws IOException
-	 * 		If the SanityChecker has problems with a configuration file
+	 * 		if the automated data checker has problems with a configuration file
 	 */
 	public DatasetChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
 			MetadataFileHandler metaFileHandler) throws IOException {
@@ -183,75 +188,69 @@ public class DatasetChecker {
 			ColumnConversionConfig.destroy();
 			MetadataConfig.destroy();
 			BaseConfig.destroy();
-			// Initialize the SanityChecker from the configuration file
+			// Initialize the automated data checker from the configuration file
 			SanityChecker.initConfig(configFile.getAbsolutePath());
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid SanityChecker configuration" + 
-					" values specified in " + configFile.getPath() + 
-					"\n    " + ex.getMessage());
+			throw new IOException("Invalid automated data checker configuration values specified in " + 
+					configFile.getPath() + "\n    " + ex.getMessage());
 		}
 		if ( checkerMsgHandler == null )
-			throw new NullPointerException(
-					"CheckerMsgHandler passed to DatasetChecker is null");
+			throw new NullPointerException("CheckerMsgHandler passed to DatasetChecker is null");
 		msgHandler = checkerMsgHandler;
 		if ( metaFileHandler == null )
-			throw new NullPointerException(
-					"MetadataFileHandler passed to DatasetChecker is null");
+			throw new NullPointerException("MetadataFileHandler passed to DatasetChecker is null");
 		metadataHandler = metaFileHandler;
 		lastCheckProcessedOkay = false;
 		lastCheckHadGeopositionErrors = false;
 	}
 
 	/**
-	 * Runs the SanityChecker on the given cruise.  Saves the SanityChecker
-	 * messages, and assigns the data check status and the WOCE-3 and WOCE-4 
-	 * data flags from the SanityChecker output.
+	 * Runs the automated data checker on the given dataset.  Saves the data check
+	 * messages, sets the data check status, and assigned the data checker flags 
+	 * from the results.
 	 * 
-	 * @param datasetData
-	 * 		cruise to check
+	 * @param dataset
+	 * 		dataset to check
 	 * @return
-	 * 		if the SanityChecker ran successfully
+	 * 		if the automcated data checker ran successfully
 	 * @throws IllegalArgumentException
 	 * 		if a data column type is unknown, 
 	 * 		if an existing OME XML file is corrupt, or
-	 * 		if the sanity checker throws an exception
+	 * 		if the automated data checker throws an exception
 	 */
-	public boolean checkCruise(DashboardDatasetData cruiseData) 
-												throws IllegalArgumentException {
-		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
-		Output output = checkCruiseAndReturnOutput(cruiseData, colIndcs);
+	public boolean checkDataset(DashboardDatasetData dataset) throws IllegalArgumentException {
+		ColumnIndices colIndcs = getColumnIndices(dataset.getDataColTypes());
+		Output output = checkDatasetAndReturnOutput(dataset, colIndcs);
 		return output.processedOK();
 	}
 
 	/**
-	 * Runs the SanityChecker on the given cruise.  
-	 * Saves the SanityChecker messages to the messages file.
-	 * Assigns the data check status and the WOCE-3 and WOCE-4 
-	 * data flags from the SanityChecker output.
+	 * Runs the automated data checker on the given dataset.  Saves the data check
+	 * messages, sets the data check status, and assigned the data checker flags 
+	 * from the results.
 	 * 
-	 * @param datasetData
+	 * @param dataset
 	 * 		dataset to check
 	 * @param colIndcs
-	 * 		column indices for this dataset
+	 * 		column indices of interest for this dataset
 	 * @return
-	 * 		the returned Output from {@link SanityChecker#process()}
+	 * 		the returned output from the automated data checker
 	 * @throws IllegalArgumentException
 	 * 		if a data column type is unknown, 
 	 * 		if an existing OME XML file is corrupt, or
-	 * 		if the sanity checker throws an exception
+	 * 		if the automated data checker throws an exception
 	 */
-	private Output checkCruiseAndReturnOutput(DashboardDatasetData cruiseData, 
+	private Output checkDatasetAndReturnOutput(DashboardDatasetData dataset, 
 			ColumnIndices colIndcs) throws IllegalArgumentException {
-		String expocode = cruiseData.getDatasetId();
+		String datasetId = dataset.getDatasetId();
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
 		try {
 			convConfig = ColumnConversionConfig.getInstance();
 		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Unexpected ColumnConversionConfig exception: " + 
-							ex.getMessage());
+			throw new IllegalArgumentException("Unexpected ColumnConversionConfig exception: " + 
+					ex.getMessage());
 		}
 
 		// Specify the default date format used in this cruise
@@ -285,31 +284,29 @@ public class DatasetChecker {
 					"measurement is not completely specified in a way known " +
 					"to the automated data checker");
 
-		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
+		ArrayList<DataColumnType> columnTypes = dataset.getDataColTypes();
 
 		// Specify the columns in this cruise data
-		Element rootElement = new Element("Expocode_" + cruiseData.getDatasetId());
+		Element rootElement = new Element("Expocode_" + dataset.getDatasetId());
 		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
 			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(colType) ) {
 				// Might happen in multiple file upload
-				throw new IllegalArgumentException(
-						"Data type not defined for column " + Integer.toString(k+1) + 
-						": " + cruiseData.getUserColNames().get(k));
+				throw new IllegalArgumentException("Data type not defined for column " + 
+						Integer.toString(k+1) + ": " + dataset.getUserColNames().get(k));
 			}
 			else if ( DashboardServerUtils.OTHER.typeNameEquals(colType) ||
-					  colType.isWoceCommentFor(null) ) {
+					  colType.isCommentType() ) {
 				// Unchecked data 
 				;
 			}
 			// DATETIME_TIMESTAMP
 			else if ( DashboardServerUtils.TIMESTAMP.typeNameEquals(colType) && 
-					DateTimeType.DATETIME_TIMESTAMP.equals(timeSpec) ) {
+					  DateTimeType.DATETIME_TIMESTAMP.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.SINGLE_DATE_TIME_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 				int idx = colType.getSelectedUnitIndex();
 				dateFormat = CHECKER_DATA_UNITS.get(colType.getVarName()).get(idx);
@@ -318,9 +315,8 @@ public class DatasetChecker {
 			else if ( DashboardServerUtils.DATE.typeNameEquals(colType) && 
 					  DateTimeType.DATETIME_DATE_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.DATE_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 				int idx = colType.getSelectedUnitIndex();
 				dateFormat = colType.getUnits().get(idx);
@@ -328,26 +324,23 @@ public class DatasetChecker {
 			else if ( DashboardServerUtils.TIME_OF_DAY.typeNameEquals(colType) && 
 					  DateTimeType.DATETIME_DATE_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.TIME_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[1] = userElement;
 			}
 			// DATETIME_YEAR_DAY_SEC
 			else if ( DashboardServerUtils.YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_DAY_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YDS_YEAR_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 			}
 			else if ( DashboardServerUtils.DAY_OF_YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_DAY_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YDS_DAY_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.JAN_FIRST_INDEX_ELEMENT);
@@ -364,26 +357,23 @@ public class DatasetChecker {
 			else if ( DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_DAY_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YDS_SECOND_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[2] = userElement;
 			}
 			// DATETIME_YEAR_DECIMAL_DAY
 			else if ( DashboardServerUtils.YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_DECIMAL_DAY.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YDJD_YEAR_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 			}
 			else if ( DashboardServerUtils.DAY_OF_YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_DECIMAL_DAY.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YDJD_DECIMAL_JDATE_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT);
@@ -401,82 +391,72 @@ public class DatasetChecker {
 			else if ( DashboardServerUtils.YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YEAR_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 			}
 			else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.MONTH_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[1] = userElement;
 			}
 			else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.DAY_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[2] = userElement;
 			}
 			else if ( DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.HOUR_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[3] = userElement;
 			}
 			else if ( DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.MINUTE_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[4] = userElement;
 			}
 			else if ( DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.SECOND_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[5] = userElement;
 			}
 			// DATETIME_YEAR_MON_DAY_TIME
 			else if ( DashboardServerUtils.YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YMDT_YEAR_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 			}
 			else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YMDT_MONTH_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[1] = userElement;
 			}
 			else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(colType) &&
 					  DateTimeType.DATETIME_YEAR_MON_DAY_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YMDT_DAY_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[2] = userElement;
 			}
 			else if ( DashboardServerUtils.TIME_OF_DAY.typeNameEquals(colType) && 
 					  DateTimeType.DATETIME_YEAR_MON_DAY_TIME.equals(timeSpec) ) {
 				Element userElement = new Element(ColumnSpec.YMDT_TIME_ELEMENT);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
+				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[3] = userElement;
 			}
 			// Not involved with date/time specification
@@ -489,7 +469,7 @@ public class DatasetChecker {
 				String chkUnit;
 				if ( checkerUnits == null ) {
 					chkUnit = colType.getUnits().get(idx);
-					// Some hacks to avoid specific SOCAT types; ideally the sanity checker 
+					// Some hacks to avoid specific SOCAT types; ideally the automated data checker 
 					// should be reconfigured to accept the units used
 					if ( "PSU".equals(chkUnit) ) {
 						// salinity
@@ -515,7 +495,7 @@ public class DatasetChecker {
 				// Element specifying the index and user name of the column
 				Element userElement = new Element(ColumnSpec.INPUT_COLUMN_ELEMENT_NAME);
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
-				userElement.setText(cruiseData.getUserColNames().get(k));
+				userElement.setText(dataset.getUserColNames().get(k));
 				// Standard column name for the checker
 				Element columnElement = new Element(ColumnSpec.SOCAT_COLUMN_ELEMENT); 
 				columnElement.setAttribute(ColumnSpec.SOCAT_COLUMN_NAME_ATTRIBUTE, colType.getVarName());
@@ -545,24 +525,22 @@ public class DatasetChecker {
 		Document cruiseDoc = new Document(rootElement);
 
 		// Create the column specifications object for the sanity checker
-		Logger logger = Logger.getLogger("Sanity Checker - " + expocode);
+		Logger logger = Logger.getLogger("Sanity Checker - " + datasetId);
 		if ( Level.DEBUG.isGreaterOrEqual(logger.getEffectiveLevel()) ) {
 			logger.debug("cruise columns specifications document:\n" + 
-					(new XMLOutputter(Format.getPrettyFormat()))
-					.outputString(cruiseDoc));
+					(new XMLOutputter(Format.getPrettyFormat())).outputString(cruiseDoc));
 		}
 		ColumnSpec colSpec;
 		try {
-			colSpec = new ColumnSpec(new File(expocode), cruiseDoc, convConfig, logger);
+			colSpec = new ColumnSpec(new File(datasetId), cruiseDoc, convConfig, logger);
 		} catch (InvalidColumnSpecException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected ColumnSpec exception: " + ex.getMessage());
+			throw new IllegalArgumentException("Unexpected ColumnSpec exception: " + ex.getMessage());
 		};
 
 		// Get the OME metadata for this cruise
 		Document oldOmeDoc;
 		OmeMetadata oldOmeMData;
-		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
+		File omeFile = metadataHandler.getMetadataFile(datasetId, DashboardUtils.OME_FILENAME);
 		if ( omeFile.exists() ) {
 			try {
 				oldOmeDoc = (new SAXBuilder()).build(omeFile);
@@ -570,7 +548,7 @@ public class DatasetChecker {
 				throw new IllegalArgumentException("Problems reading the OME XML " + 
 						omeFile.getName() + "\n    " + ex.getMessage());
 			}
-			oldOmeMData = new OmeMetadata(expocode);
+			oldOmeMData = new OmeMetadata(datasetId);
 			try {
 				oldOmeMData.assignFromOmeXmlDoc(oldOmeDoc);
 			} catch (BadEntryNameException | InvalidConflictException ex) {
@@ -580,17 +558,16 @@ public class DatasetChecker {
 		}
 		else {
 			oldOmeDoc = null;
-			oldOmeMData = new OmeMetadata(expocode);
+			oldOmeMData = new OmeMetadata(datasetId);
 		}
 
 		// Create the SanityChecker for this cruise
 		SanityChecker checker;
 		try {
-			checker = new SanityChecker(expocode, oldOmeMData, colSpec, 
-										cruiseData.getDataValues(), dateFormat);
+			checker = new SanityChecker(datasetId, oldOmeMData, colSpec, 
+										dataset.getDataValues(), dateFormat);
 		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Sanity Checker Exception: " + ex.getMessage());
+			throw new IllegalArgumentException("automated data checker exception: " + ex.getMessage());
 		}
 
 		// Run the SanityChecker on this data and get the results
@@ -598,8 +575,8 @@ public class DatasetChecker {
 
 		// Get the OME metadata that was updated from the data
 		OmeMetadata updatedOmeMData = output.getMetadata();
-		// Set the dataset to force the assignment of other fields associated with the dataset
-		updatedOmeMData.setExpocode(expocode);
+		// Set the dataset ID to force the assignment of other fields associated with the dataset
+		updatedOmeMData.setExpocode(datasetId);
 		updatedOmeMData.setDraft( ! updatedOmeMData.isAcceptable() );
 
 		// Check if this OME metadata has any changes
@@ -637,45 +614,45 @@ public class DatasetChecker {
 			// Save the updated OME metadata
 			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z").print(new DateTime());
 			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(updatedOmeMData, 
-					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
+					timestamp, dataset.getOwner(), dataset.getVersion());
 
 			String message = "Update of OME metadata from cruise checker";
 			metadataHandler.saveMetadataInfo(dashOmeMData, message, false);
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
 		}
 
-		// Process the SanityChecker messages and assign WOCE flags in datasetData
-		msgHandler.processCheckerMessages(cruiseData, output);
+		// Create/update the messages file and the data checker flags
+		msgHandler.processCheckerMessages(dataset, output);
 
-		// Count the rows of data with errors and only warnings, check if there 
-		// were lon/lat/date/time problems and assign the data check status
-		countWoceFlagsAndAssignStatus(cruiseData, colIndcs, output);
+		// Count the rows of data with errors and with only warnings, check if there 
+		// were lon/lat/depth/time problems and assign the data check status
+		countWoceFlagsAndAssignStatus(dataset, colIndcs, output);
 
 		return output;
 	}
 
 	/**
-	 * Sanity-checks and standardizes the units in the data values, stored 
-	 * as strings, in the given cruise.  The year, month, day, hour, minute, 
-	 * and second data columns are appended to each data measurement (row, 
-	 * outer array) if not already present.
+	 * Checks and standardizes the units in the data values, stored as strings, 
+	 * in the given dataset.  The year, month, day, hour, minute, and second 
+	 * data columns are appended to each data measurement (row, outer array) 
+	 * if not already present.
 	 *  
-	 * @param datasetData
-	 * 		cruise data to be standardized
+	 * @param dataset
+	 * 		dataset whose data is to be standardized
 	 * @return
-	 * 		true if the SanityChecker ran successfully and 
-	 * 		data had no geoposition errors.
+	 * 		true if the automated data checker ran successfully and 
+	 * 		data had no lon/lat/depth/time errors.
 	 */
-	public boolean standardizeCruiseData(DashboardDatasetData cruiseData) {
-		if ( cruiseData.getNumDataRows() < 1 )
+	public boolean standardizeDatasetData(DashboardDatasetData dataset) {
+		if ( dataset.getNumDataRows() < 1 )
 			return false;
 
-		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
+		ColumnIndices colIndcs = getColumnIndices(dataset.getDataColTypes());
 
-		// Run the SanityChecker to get the standardized data
+		// Run the automated data checker to get the standardized data
 		Output output;
 		try {
-			output = checkCruiseAndReturnOutput(cruiseData, colIndcs);
+			output = checkDatasetAndReturnOutput(dataset, colIndcs);
 		} catch (IllegalArgumentException ex) {
 			lastCheckProcessedOkay = false;
 			return false;
@@ -685,8 +662,8 @@ public class DatasetChecker {
 		List<SocatDataRecord> stdRowVals = output.getRecords();
 
 		// Directly modify the lists in the cruise data object
-		ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
-		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
+		ArrayList<DataColumnType> dataColTypes = dataset.getDataColTypes();
+		ArrayList<ArrayList<String>> dataVals = dataset.getDataValues();
 
 		// Standardized data for generating a DsgData object must have 
 		// separate year, month, day, hour, minute, and second columns
@@ -699,7 +676,7 @@ public class DatasetChecker {
 
 		// Add any missing time columns.
 		// !! Directly modify the lists in the cruise data object !!
-		ArrayList<String> userColNames = cruiseData.getUserColNames();
+		ArrayList<String> userColNames = dataset.getUserColNames();
 		if ( ! hasYearColumn ) {
 			DataColumnType dctype = DashboardServerUtils.YEAR.duplicate();
 			dctype.setSelectedMissingValue(Integer.toString(DashboardUtils.INT_MISSING_VALUE));
@@ -755,7 +732,7 @@ public class DatasetChecker {
 			Integer minute;
 			Double second;
 			try {
-				// Verify the longitude, latitude, and time are given
+				// Verify the longitude, latitude, depth, and time are given
 				longitude = stdVals.getLongitude();
 				latitude = stdVals.getLatitude();
 				if ( longitude.isNaN() || latitude.isNaN() )
@@ -830,6 +807,18 @@ public class DatasetChecker {
 						throw new IllegalArgumentException("Checker data column not found for " + 
 								chkName + " (column type " + colType + ")");
 					String value = stdCol.getValue();
+					if ( DashboardServerUtils.SAMPLE_DEPTH.typeNameEquals(colType) ) {
+						// Sample depth not a special column for the automated data checker,
+						// but a valid value must be given for this dashboard.
+						try {
+							Double depth = Double.parseDouble(value);
+							if ( depth.isNaN() || depth.isInfinite() )
+								throw new IllegalArgumentException();
+						} catch (Exception ex) {
+							lastCheckHadGeopositionErrors = true;
+							return false;
+						}
+					}
 					rowData.set(k, value);
 				}
 				k++;
@@ -844,55 +833,64 @@ public class DatasetChecker {
 	 * warnings.  Sets lastCheckProcessedOkay and lastCheckHadGeopostionErrors.
 	 * Assigns the data check status.
 	 * 
-	 * @param cruise
-	 * 		cruise to use
+	 * @param dataset
+	 * 		dataset to use
 	 * @param colIndcs
 	 * 		data column indices for the cruise
 	 * @param processedOK
 	 * 		did the SanityCheck run successfully?
 	 */
-	private void countWoceFlagsAndAssignStatus(DashboardDataset cruise, 
+	private void countWoceFlagsAndAssignStatus(DashboardDataset dataset, 
 								ColumnIndices colIndcs, Output output) {
 		lastCheckProcessedOkay = output.processedOK();
 		lastCheckHadGeopositionErrors = false;
 
-		// Get the indices of data rows the PI marked as bad in some WOCE flag.
+		// Get the indices of data rows the PI marked as bad.
 		HashSet<Integer> userErrRows = new HashSet<Integer>();
-		for ( WoceType wtype : cruise.getUserWoceFours() ) {
-			userErrRows.add(wtype.getRowIndex());
+		for ( QCFlag wtype : dataset.getUserFlags() ) {
+			if ( Severity.BAD.equals(wtype.getSeverity()) )
+				userErrRows.add(wtype.getRowIndex());
 		}
-		// Get the indices of data rows the PI marked as questionable is
-		// some WOCE flag, but did not mark as bad in any WOCE flag.
+		// Get the indices of data rows the PI marked as questionable 
+		// in some QC flag, but did not mark as bad in any QC flag.
 		HashSet<Integer> userWarnRows = new HashSet<Integer>();
-		for ( WoceType wtype : cruise.getUserWoceThrees() ) {
-			Integer rowIdx = wtype.getRowIndex();
-			if ( ! userErrRows.contains(rowIdx) )
-				userWarnRows.add(rowIdx);
+		for ( QCFlag wtype : dataset.getUserFlags() ) {
+			if ( Severity.QUESTIONABLE.equals(wtype.getSeverity()) ) {
+				Integer rowIdx = wtype.getRowIndex();
+				if ( ! userErrRows.contains(rowIdx) )
+					userWarnRows.add(rowIdx);
+			}
 		}
-		// Get the indices of data rows the SanityChecker found having 
-		// errors but not marked as bad by the PI.
+		// Get the indices of data rows the automated data checker 
+		// found having errors but not marked as bad by the PI.
 		HashSet<Integer> errRows = new HashSet<Integer>();
-		for ( WoceType wtype : cruise.getCheckerWoceFours() ) {
-			Integer rowIdx = wtype.getRowIndex();
-			if ( ! userErrRows.contains(rowIdx) )
-				errRows.add(rowIdx);
+		for ( QCFlag wtype : dataset.getCheckerFlags() ) {
+			if ( Severity.BAD.equals(wtype.getSeverity()) ) {
+				Integer rowIdx = wtype.getRowIndex();
+				if ( ! userErrRows.contains(rowIdx) )
+					errRows.add(rowIdx);
+			}
 		}
-		// Get the indices of data rows the SanityChecker found having  
+		// Get the indices of data rows the automated data checker found having 
 		// only warnings but not marked as bad or questionable by the PI.
 		HashSet<Integer> warnRows = new HashSet<Integer>();
-		for ( WoceType wtype : cruise.getCheckerWoceThrees() ) {
-			Integer rowIdx = wtype.getRowIndex();
-			if ( ! ( userErrRows.contains(rowIdx) ||
-					 userWarnRows.contains(rowIdx) ||
-					 errRows.contains(rowIdx) ) )
-				warnRows.add(rowIdx);
+		for ( QCFlag wtype : dataset.getCheckerFlags() ) {
+			if ( Severity.QUESTIONABLE.equals(wtype.getSeverity()) ) {
+				Integer rowIdx = wtype.getRowIndex();
+				if ( ! ( userErrRows.contains(rowIdx) ||
+						 userWarnRows.contains(rowIdx) ||
+						 errRows.contains(rowIdx) ) )
+					warnRows.add(rowIdx);
+			}
 		}
-		// Get the indices of data column that the SanityChecker found errors 
-		// in rows not marked as bad by the PI
+		// Get the indices of data column that the automated data checker 
+		// found errors in rows not marked as bad by the PI
 		HashSet<Integer> errCols = new HashSet<Integer>();
-		for ( WoceType wtype : cruise.getCheckerWoceFours() ) {
-			if ( ! userErrRows.contains(wtype.getRowIndex()) )
-				errCols.add(wtype.getColumnIndex());
+		for ( QCFlag wtype : dataset.getCheckerFlags() ) {
+			if ( Severity.BAD.equals(wtype.getSeverity()) ) {
+				if ( ! userErrRows.contains(wtype.getRowIndex()) )
+					errCols.add(wtype.getColumnIndex());
+			}
 		}
 
 		if ( (colIndcs.longitudeIndex < 0) || errCols.contains(colIndcs.longitudeIndex) ||
@@ -913,7 +911,7 @@ public class DatasetChecker {
 		}
 		if ( ! lastCheckHadGeopositionErrors ) {
 			// Date/time errors may not be associated with any column
-			// so check the sanity checker messages
+			// so check the automated data checker messages
 			try {
 				for ( Message msg : output.getMessages().getMessages() ) {
 					String colName = msg.getColumnName();
@@ -931,27 +929,27 @@ public class DatasetChecker {
 		int numErrorRows = errRows.size();
 		int numWarnRows = warnRows.size();
 
-		cruise.setNumErrorRows(numErrorRows);
-		cruise.setNumWarnRows(numWarnRows);
+		dataset.setNumErrorRows(numErrorRows);
+		dataset.setNumWarnRows(numWarnRows);
 
 		// Assign the data-check status message using the results of the sanity check
 		if ( ! lastCheckProcessedOkay ) {
-			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 		else if ( lastCheckHadGeopositionErrors ) {
-			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
 					Integer.toString(numErrorRows) + " errors " + DashboardUtils.GEOPOSITION_ERRORS_MSG);
 		}
 		else if ( numErrorRows > 0 ) {
-			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
 					Integer.toString(numErrorRows) + " errors");
 		}
 		else if ( numWarnRows > 0 ) {
-			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
+			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
 					Integer.toString(numWarnRows) + " warnings");
 		}
 		else {
-			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
+			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 		}
 	}
 

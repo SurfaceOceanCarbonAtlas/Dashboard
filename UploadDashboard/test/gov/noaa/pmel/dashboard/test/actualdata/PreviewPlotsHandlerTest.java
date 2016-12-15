@@ -29,8 +29,8 @@ public class PreviewPlotsHandlerTest {
 		final String timetag = "testing";
 		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		PreviewPlotsHandler plotsHandler = configStore.getPreviewPlotsHandler();
-		File dsgFilesDir = plotsHandler.getCruisePreviewDsgDir(EXPOCODE);
-		File plotsDir = plotsHandler.getCruisePreviewPlotsDir(EXPOCODE);
+		File dsgFilesDir = plotsHandler.getDatasetPreviewDsgDir(EXPOCODE);
+		File plotsDir = plotsHandler.getDatasetPreviewPlotsDir(EXPOCODE);
 
 		plotsHandler.createPreviewPlots(EXPOCODE, timetag);
 

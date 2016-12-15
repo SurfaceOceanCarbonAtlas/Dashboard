@@ -261,16 +261,16 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Assigns the dataset associated with this DashboardMetadata as well
-	 * as the dataset stored in the OME information represented by this
-	 * DashboardMetadata.
+	 * Assigns the dataset ID associated with this DashboardMetadata as 
+	 * well as the dataset ID stored in the OME information represented 
+	 * by this DashboardMetadata.
 	 * 
-	 * @param newExpocode
-	 * 		new dataset to use
+	 * @param newId
+	 * 		new dataset ID to use
 	 */
-	public void changeExpocode(String newExpocode) {
-		omeMData.setExpocode(newExpocode);
-		setDatasetId(newExpocode);
+	public void changeDatasetID(String newId) {
+		omeMData.setExpocode(newId);
+		setDatasetId(newId);
 	}
 	
 	/**

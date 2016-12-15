@@ -13,54 +13,52 @@ import java.io.IOException;
 import java.util.TreeSet;
 
 /**
- * Generates the original data file bundles for the specified expocodes 
- * without e-mailing them out.  Intended for archival on release of SOCAT.
+ * Generates the original data file bundles for the specified dataset IDs 
+ * without e-mailing them out.  Intended for archival on release.
  * 
  * @author Karl Smith
  */
 public class GenerateOrigFileBundles {
 
 	/**
-	 * Generates the original data file bundles for the specified expocodes.
+	 * Generates the original data file bundles for the specified dataset IDs.
 	 * These bundles are added to the version control bundles directory, 
 	 * but not e-mailed to anyone.
 	 * 
 	 * @param args
-	 * 		ExpocodesFile
+	 * 		IDsFile
 	 * 
-	 * where ExpocodesFile is a file of expocodes for generating original data file bundles.
+	 * where IDsFile is a file of IDs of datasets to generating original data file bundles for.
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {
-			System.err.println("Arguments:  ExpocodesFile");
+			System.err.println("Arguments:  IDsFile");
 			System.err.println();
-			System.err.println("Generates original data file bundles for the expocodes ");
-			System.err.println("specified in ExpocodesFile.  These file bundles are added ");
-			System.err.println("to version control bundles directory, but not emailed to ");
-			System.err.println("anyone.  The default dashboard configuration is used for ");
-			System.err.println("this process. ");
+			System.err.println("Generates original data file bundles for the dataset IDs specified ");
+			System.err.println("in IDsFile.  These file bundles are added to the version control ");
+			System.err.println("bundles directory, but are not emailed to anyone.  The default ");
+			System.err.println("dashboard configuration is used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}
-		String exposFilename = args[0];
+		String idsFilename = args[0];
 
-		TreeSet<String> expocodes = new TreeSet<String>();
+		TreeSet<String> idsSet = new TreeSet<String>();
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(exposFilename));
+			BufferedReader reader = new BufferedReader(new FileReader(idsFilename));
 			try {
 				String dataline = reader.readLine();
 				while ( dataline != null ) {
-					dataline = dataline.trim().toUpperCase();
-					if ( ! dataline.isEmpty() )
-						expocodes.add(dataline);
+					dataline = dataline.trim();
+					if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+						idsSet.add(dataline);
 					dataline = reader.readLine();
 				}
 			} finally {
 				reader.close();
 			}
 		} catch (Exception ex) {
-			System.err.println("Problems reading the file of expocodes '" + 
-					exposFilename + "': " + ex.getMessage());
+			System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
@@ -69,25 +67,26 @@ public class GenerateOrigFileBundles {
 		try {
 			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
-			System.err.println("Problems obtaining the default dashboard " +
-					"configuration: " + ex.getMessage());
+			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
 		boolean success = true;
 		try {
+
 			ArchiveFilesBundler filesBundler = configStore.getArchiveFilesBundler();
-			for ( String expo : expocodes ) {
-				String commitMsg = "Automated generation of the original data files bundle for " + expo;
+			for ( String datasetId : idsSet ) {
+				String commitMsg = "Automated generation of the original data files bundle for " + datasetId;
 				try {
-					String resultMsg = filesBundler.sendOrigFilesBundle(expo, commitMsg, 
+					String resultMsg = filesBundler.sendOrigFilesBundle(datasetId, commitMsg, 
 							DashboardServerUtils.NOMAIL_USER_REAL_NAME, DashboardServerUtils.NOMAIL_USER_EMAIL);
-					System.out.println(expo + " : " + resultMsg); 
+					System.out.println(datasetId + " : " + resultMsg); 
 				} catch ( IllegalArgumentException | IOException ex ) {
-					System.out.println(expo + " : " + "failed - " + ex.getMessage());
+					System.out.println(datasetId + " : " + "failed - " + ex.getMessage());
 					success = false;
 				}
 			}
+
 		} finally {
 			DashboardConfigStore.shutdown();
 		}

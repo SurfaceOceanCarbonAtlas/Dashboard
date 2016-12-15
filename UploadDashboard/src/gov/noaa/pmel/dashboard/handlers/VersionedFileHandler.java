@@ -127,7 +127,7 @@ public class VersionedFileHandler {
 						if ( (parent != null) && (message != null) ) {
 							try {
 								/*
-								 * TODO: still having issues with the loack still being present
+								 * TODO: still having issues with the lock still being present
 								 * when committing and adding files to be committed
 								 * 
 								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed

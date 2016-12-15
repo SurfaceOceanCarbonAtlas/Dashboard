@@ -14,10 +14,9 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
- * Renames cruises (changes the expocodes).  All files will be moved to the
- * new locations specified by the new dataset.  If appropriate, file contents
- * are updated for the new expocodes.  If a cruise has been submitted for QC,
- * QC and WOCE flags are updated and rename events are added.
+ * Renames datasets (changes the dataset IDs).  All files will be moved to the
+ * new locations specified by the new ID.  If appropriate, file contents
+ * are updated for the new Ids.
  * 
  * @author Karl Smith
  */
@@ -26,45 +25,45 @@ public class RenameDatasets {
 	/**
 	 * @param args
 	 * 		Username - name of the dashboard admin user requesting this update.
-	 * 		ExpocodesFile - file of old and new expocodes (one pair per line) for the cruises
+	 * 		IDsFile - file of old and new IDs (one pair per line) for the datasets
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 2 ) {
-			System.err.println("Arguments:  Username  ExpocodesFile");
+			System.err.println("Arguments:  Username  IDsFile");
 			System.err.println();
-			System.err.println("Renames cruise (changes the expocodes).  All files will be moved, ");
-			System.err.println("and updated if appropriate.  If the cruise had been submitted for ");
-			System.err.println("QC, the QC and WOCE flags will be updated and rename events will ");
-			System.err.println("be added. ");
+			System.err.println("Renames datasets (changes the IDs).  All files will be moved, ");
+			System.err.println("and updated if appropriate.");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");
-			System.err.println("ExpocodesFile is a file of old and new dataset pairs, one pair per line");
+			System.err.println("IDsFile is a file of old and new IDs, one pair per line for the datasets.");
 			System.err.println();
 			System.exit(1);
 		}
 
 		String username = args[0];
-		File exposFile = new File(args[1]);
+		File idsFile = new File(args[1]);
 
-		TreeMap<String,String> oldNewExpoMap = new TreeMap<String,String>();
+		TreeMap<String,String> oldNewIdsMap = new TreeMap<String,String>();
 		try {
-			BufferedReader exposReader = new BufferedReader(new FileReader(exposFile));
+			BufferedReader idsReader = new BufferedReader(new FileReader(idsFile));
 			try {
-				String dataline = exposReader.readLine();
+				String dataline = idsReader.readLine();
 				while ( dataline != null ) {
+					if ( dataline.isEmpty() || dataline.startsWith("#") )
+						continue;
 					String[] expoPair = dataline.split("\\s+");
 					if ( expoPair.length != 2 )
-						throw new IllegalArgumentException("not an dataset pair: '" + dataline.trim() + "'");
-					oldNewExpoMap.put(expoPair[0], expoPair[1]);
-					dataline = exposReader.readLine();
+						throw new IllegalArgumentException("not a pair of IDs: '" + dataline.trim() + "'");
+					oldNewIdsMap.put(expoPair[0], expoPair[1]);
+					dataline = idsReader.readLine();
 				}
 			} finally {
-				exposReader.close();
+				idsReader.close();
 			}
-			if ( oldNewExpoMap.isEmpty() )
+			if ( oldNewIdsMap.isEmpty() )
 				throw new IOException("file is empty");
 		} catch (Exception ex) {
-			System.err.println("Problems reading the old and new expocodes from " + exposFile.getPath());
+			System.err.println("Problems reading the old and new dataset IDs from " + idsFile.getPath());
 			System.exit(1);
 		}
 
@@ -73,30 +72,32 @@ public class RenameDatasets {
 		try {
 			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
-			System.err.println("Problems reading the default dashboard " +
-					"configuration file: " + ex.getMessage());
+			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
 		try {
+
 			if ( ! configStore.isAdmin(username) ) {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
 			DatasetModifier renamer = new DatasetModifier(configStore);
-			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
-				String oldExpocode = expoEntry.getKey();
-				String newExpocode = expoEntry.getValue();
+			for ( Entry<String, String> idsEntry: oldNewIdsMap.entrySet() ) {
+				String oldId = idsEntry.getKey();
+				String newId = idsEntry.getValue();
 				try {
-					renamer.renameCruise(oldExpocode, newExpocode, username);
+					renamer.renameDataset(oldId, newId, username);
 				} catch (Exception ex) {
-					System.err.println("Error renaming " + oldExpocode + " to " + newExpocode);
+					System.err.println("Error renaming " + oldId + " to " + newId);
 					ex.printStackTrace();
 				}
 			}
+
 		} finally {
 			DashboardConfigStore.shutdown();
 		}
+
 		System.exit(0);
 	}
 

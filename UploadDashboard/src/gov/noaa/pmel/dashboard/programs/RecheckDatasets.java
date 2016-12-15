@@ -13,8 +13,7 @@ import java.io.FileReader;
 import java.util.TreeSet;
 
 /**
- * Rechecks cruises with the SanityChecker and regenerates the SanityChecker messages files.
- * Does not make any changes to the WOCE flags in the database.
+ * Rechecks datasets with the automated data checker and regenerates the messages files.
  * 
  * @author Karl Smith
  */
@@ -22,39 +21,36 @@ public class RecheckDatasets {
 
 	/**
 	 * @param args
-	 * 		ExpocodesFile - a file containing expocodes of the cruises to recheck
+	 * 		IDsFile - a file containing IDs of the datasets to recheck
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {
-			System.err.println("Arguments:  ExpocodesFile");
+			System.err.println("Arguments:  IDsFile");
 			System.err.println();
-			System.err.println("ExpocodesFile");
-			System.err.println("    is a file containing expocodes, one per line, to recheck with the ");
-			System.err.println("    SanityChecker and regenerate the SanityChecker messages files, but ");
-			System.err.println("    does not make any changes to the WOCE flags in the database. ");
+			System.err.println("IDsFile");
+			System.err.println("    is a file containing dataset IDs, one per line, to recheck with the ");
+			System.err.println("    automated data checker and regenerate the messages files.");
 			System.err.println();
 			System.exit(1);
 		}
-		String exposFilename = args[0];
+		String idsFilename = args[0];
 
-		TreeSet<String> expocodes = new TreeSet<String>();
+		TreeSet<String> idsSet = new TreeSet<String>();
 		try {
-			BufferedReader reader = 
-					new BufferedReader(new FileReader(exposFilename));
+			BufferedReader idsReader = new BufferedReader(new FileReader(idsFilename));
 			try {
-				String dataline = reader.readLine();
+				String dataline = idsReader.readLine();
 				while ( dataline != null ) {
-					dataline = dataline.trim().toUpperCase();
-					if ( ! dataline.isEmpty() )
-						expocodes.add(dataline);
-					dataline = reader.readLine();
+					dataline = dataline.trim();
+					if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+						idsSet.add(dataline);
+					dataline = idsReader.readLine();
 				}
 			} finally {
-				reader.close();
+				idsReader.close();
 			}
 		} catch (Exception ex) {
-			System.err.println("Problems reading the file of expocodes '" + 
-					exposFilename + "': " + ex.getMessage());
+			System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
@@ -63,35 +59,36 @@ public class RecheckDatasets {
 		try {
 			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
-			System.err.println("Problems obtaining the default dashboard " +
-					"configuration: " + ex.getMessage());
+			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
 		int retVal = 0;
 		try {
-			DataFileHandler cruiseHandler = configStore.getDataFileHandler();
-			DatasetChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 
-			for ( String expo : expocodes ) {
-				// Get all the data for this cruise
-				DashboardDatasetData cruiseData;
+			DataFileHandler dataHandler = configStore.getDataFileHandler();
+			DatasetChecker dataChecker = configStore.getDashboardDatasetChecker();
+
+			for ( String datasetId : idsSet ) {
+				// Get all the data for this dataset
+				DashboardDatasetData dataset;
 				try {
-					cruiseData = cruiseHandler.getDatasetDataFromFiles(expo, 0, -1);
+					dataset = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
 				} catch ( Exception ex ) {
-					System.err.println("Error - " + expo + " - problems obtaining cruise data");
+					System.err.println("Error - " + datasetId + " - problems obtaining dataset data");
 					retVal = 1;
 					continue;
 				}
-				// Check the cruise as if this was to be submitted.
-				// This will regenerate the SanityChecker messages file.
-				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
-					System.err.println("Error - " + expo + " - problems standardizing cruise data");
+				// Check the dataset as if this was to be submitted.
+				// This will regenerate the automated data checker messages file.
+				if ( ! dataChecker.standardizeDatasetData(dataset) ) {
+					System.err.println("Error - " + datasetId + " - problems standardizing dataset data");
 					retVal = 1;
 					continue;
 				}
-				System.err.println("Success - " + expo);
+				System.err.println("Success - " + datasetId);
 			}
+
 		} finally {
 			DashboardConfigStore.shutdown();
 		}

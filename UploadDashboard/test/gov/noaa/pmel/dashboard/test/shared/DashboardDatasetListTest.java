@@ -35,23 +35,6 @@ public class DashboardDatasetListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDatasetList#getVersion()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDatasetList#setVersion(java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetSocatVersion() {
-		String mySocatVersion = "4";
-		DashboardDatasetList cruiseList = new DashboardDatasetList();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getVersion());
-		cruiseList.setVersion(mySocatVersion);
-		assertEquals(mySocatVersion, cruiseList.getVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
-		assertEquals(0, cruiseList.size());
-		cruiseList.setVersion(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getVersion());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardDatasetList#isManager()}
 	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardDatasetList#setManager(boolean)}.
 	 */
@@ -61,7 +44,6 @@ public class DashboardDatasetListTest {
 		assertFalse( cruiseList.isManager());
 		cruiseList.setManager(true);
 		assertTrue( cruiseList.isManager());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
 		assertEquals(0, cruiseList.size());
 	}
@@ -73,7 +55,6 @@ public class DashboardDatasetListTest {
 	@Test
 	public void testHashCodeEquals() {
 		String myUsername = "SocatUser";
-		String mySocatVersion = "4";
 		String myExpocode = "ABCD20050728";
 		DashboardDataset cruise = new DashboardDataset();
 		cruise.setOwner(myUsername);
@@ -96,13 +77,6 @@ public class DashboardDatasetListTest {
 		assertFalse( firstList.hashCode() == secondList.hashCode() );
 		assertFalse( firstList.equals(secondList) );
 		secondList.setUsername(myUsername);
-		assertTrue( firstList.hashCode() == secondList.hashCode() );
-		assertTrue( firstList.equals(secondList) );
-
-		firstList.setVersion(mySocatVersion);
-		assertFalse( firstList.hashCode() == secondList.hashCode() );
-		assertFalse( firstList.equals(secondList) );
-		secondList.setVersion(mySocatVersion);
 		assertTrue( firstList.hashCode() == secondList.hashCode() );
 		assertTrue( firstList.equals(secondList) );
 

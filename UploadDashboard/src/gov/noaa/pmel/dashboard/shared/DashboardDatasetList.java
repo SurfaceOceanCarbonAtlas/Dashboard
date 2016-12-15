@@ -16,10 +16,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardDatasetList extends HashMap<String,DashboardDataset> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6330657203729143823L;
+	private static final long serialVersionUID = 8265872123615522516L;
 
 	protected String username;
-	protected String version;
 	// The following indicates whether or not the above user 
 	// has manager or admin privileges; a bit of a kludge.
 	protected boolean manager;
@@ -30,7 +29,6 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 	public DashboardDatasetList() {
 		super();
 		username = DashboardUtils.STRING_MISSING_VALUE;
-		version = DashboardUtils.STRING_MISSING_VALUE;
 		manager = false;
 	}
 
@@ -57,27 +55,6 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 
 	/**
 	 * @return 
-	 * 		the data collection version;
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getVersion() {
-		return version;
-	}
-
-	/**
-	 * @param version 
-	 * 		the data collections version to set; 
-	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public void setVersion(String version) {
-		if ( version == null )
-			this.version = DashboardUtils.STRING_MISSING_VALUE;
-		else
-			this.version = version;
-	}
-
-	/**
-	 * @return 
 	 * 		if this user is a manager/admin
 	 */
 	public boolean isManager() {
@@ -96,7 +73,6 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 	public int hashCode() {
 		final int prime = 37;
 		int result = username.hashCode();
-		result = result * prime + version.hashCode();
 		result = result * prime + Boolean.valueOf(manager).hashCode();
 		result = result * prime + super.hashCode();
 		return result;
@@ -116,9 +92,6 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 		if ( ! username.equals(other.username) )
 			return false;
 
-		if ( ! version.equals(other.version) )
-			return false;
-
 		if ( manager != other.manager )
 			return false;
 
@@ -131,7 +104,6 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 	@Override
 	public String toString() {
 		String repr = "DashboardDatasetList[ username=" + username + 
-					  ",\n    version=" + version + 
 					  ",\n    manager=" + Boolean.valueOf(manager).toString();
 		for ( String cruiseId : keySet() )
 			repr += ",\n    " + cruiseId + ":" + get(cruiseId).toString();

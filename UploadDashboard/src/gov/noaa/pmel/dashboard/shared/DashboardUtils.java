@@ -11,6 +11,8 @@ import java.util.TreeSet;
 
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
 /**
  * Static dashboard utility functions and constants
  * for use on both the client and server side.
@@ -584,9 +586,8 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Encodes a set of QCFlag objects suitable for decoding 
-	 * with {@link #decodeQCFlagSet(String)}.  The comments
-	 * in the QCFlag objects are ignored.
+	 * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}. 
+	 * The comments in the QCFlag objects are ignored.
 	 * 
 	 * @param qcSet
 	 * 		set of QCFlag values to encode
@@ -607,6 +608,8 @@ public class DashboardUtils {
 			sb.append(", ");
 			sb.append(flag.getColumnIndex().toString());
 			sb.append(", \"");
+			sb.append(flag.getSeverity().toString());
+			sb.append("\", \"");
 			sb.append(flag.getFlagValue());
 			sb.append("\", \"");
 			sb.append(flag.getFlagName());
@@ -617,8 +620,7 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Decodes an encoded QCFlag set produced by 
-	 * {@link #encodeQCFlagSet(java.util.TreeSet)}, 
+	 * Decodes an encoded QCFlag set produced by {@link #encodeQCFlagSet(java.util.TreeSet)}, 
 	 * into a TreeSet of QCFlags. 
 	 * 
 	 * @param qcFlagSetStr
@@ -627,7 +629,7 @@ public class DashboardUtils {
 	 * 		the decoded TreeSet ofQCFlag objects; never null, but may
 	 * 		be empty (if the encoded set does not specify any QCFlag objects)
 	 * @throws IllegalArgumentException
-	 * 		if woceSetStr does not start with '[', does not end with ']', 
+	 * 		if qcFlagSetStr does not start with '[', does not end with ']', 
 	 * 		or contains an invalid encoded QCFlag.
 	 */
 	public static TreeSet<QCFlag> decodeQCFlagSet(String qcFlagSetStr) {
@@ -646,29 +648,42 @@ public class DashboardUtils {
 								  .split("\\]\\s*,\\s*\\[", -1);
 		TreeSet<QCFlag> flagSet = new TreeSet<QCFlag>();
 		for ( String encFlag : pieces ) {
-			String[] flagParts = encFlag.split(",", 4);
+			String[] flagParts = encFlag.split(",", 5);
 			try {
-				if ( flagParts.length != 4 )
+				if ( flagParts.length != 5 )
 					throw new IllegalArgumentException("incomplete QCFlag description");
+
 				Integer rowIndex = Integer.parseInt(flagParts[0].trim());
+
 				Integer colIndex = Integer.parseInt(flagParts[1].trim());
+
 				firstIndex = flagParts[2].indexOf("\"");
 				lastIndex = flagParts[2].lastIndexOf("\"");
 				if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
 					 ( ! flagParts[2].substring(0, firstIndex).trim().isEmpty() ) ||
 					 ( ! flagParts[2].substring(lastIndex+1).trim().isEmpty() ) )
-					throw new IllegalArgumentException("flag value not enclosed in double quotes");
-				String flagValue = flagParts[2].substring(firstIndex+1, lastIndex);
-				if ( flagValue.length() != 1 )
-					throw new IllegalArgumentException("flag value is not a single character");
+					throw new IllegalArgumentException("severity not enclosed in double quotes");
+				Severity severity = Severity.valueOf(flagParts[2].substring(firstIndex+1, lastIndex));
+
 				firstIndex = flagParts[3].indexOf("\"");
 				lastIndex = flagParts[3].lastIndexOf("\"");
 				if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
 					 ( ! flagParts[3].substring(0, firstIndex).trim().isEmpty() ) ||
 					 ( ! flagParts[3].substring(lastIndex+1).trim().isEmpty() ) )
+					throw new IllegalArgumentException("flag value not enclosed in double quotes");
+				String flagValue = flagParts[3].substring(firstIndex+1, lastIndex);
+				if ( flagValue.length() != 1 )
+					throw new IllegalArgumentException("flag value is not a single character");
+
+				firstIndex = flagParts[4].indexOf("\"");
+				lastIndex = flagParts[4].lastIndexOf("\"");
+				if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
+					 ( ! flagParts[4].substring(0, firstIndex).trim().isEmpty() ) ||
+					 ( ! flagParts[4].substring(lastIndex+1).trim().isEmpty() ) )
 					throw new IllegalArgumentException("flag name not enclosed in double quotes");
-				String flagName = flagParts[3].substring(firstIndex+1, lastIndex);
-				flagSet.add(new QCFlag(flagName, flagValue.charAt(0), colIndex, rowIndex));
+				String flagName = flagParts[4].substring(firstIndex+1, lastIndex);
+
+				flagSet.add(new QCFlag(flagName, flagValue.charAt(0), severity, colIndex, rowIndex));
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " + ex.getMessage(), ex);
 			}

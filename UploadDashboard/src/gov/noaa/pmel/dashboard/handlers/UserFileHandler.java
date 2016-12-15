@@ -124,201 +124,188 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Gets the list of cruises for a user
+	 * Gets the list of datasets for a user
 	 * 
 	 * @param username
 	 * 		get cruises for this user
 	 * @return
-	 * 		the list of cruises for the user; will not be null 
+	 * 		the list of datasets for the user; will not be null, 
 	 * 		but may be empty (including if there is no saved listing)
 	 * @throws IllegalArgumentException
-	 * 		if username was invalid, if there was a problem
-	 * 		reading an existing cruise listing, or 
-	 * 		if there was an error committing the updated 
-	 * 		cruise listing to version control
+	 * 		if username is invalid, 
+	 * 		if there was a problem reading an existing dataset listing, or 
+	 * 		if there was an error committing the updated dataset listing to version control
 	 */
-	public DashboardDatasetList getCruiseListing(String username) 
+	public DashboardDatasetList getDatasetListing(String username) 
 										throws IllegalArgumentException {
-		// Get the name of the cruise list file for this user
+		// Get the name of the dataset list file for this user
 		String cleanUsername = DashboardUtils.cleanUsername(username);
 		if ( cleanUsername.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
-		File userDataFile = new File(filesDir, 
-				cleanUsername + USER_CRUISE_LIST_NAME_EXTENSION);
+		File userDataFile = new File(filesDir, cleanUsername + USER_CRUISE_LIST_NAME_EXTENSION);
 		boolean needsCommit = false;
 		String commitMessage = "";
 		// Read the cruise expocodes from the cruise list file
-		HashSet<String> expocodeSet = new HashSet<String>();
+		HashSet<String> dataIdsSet = new HashSet<String>();
 		try {
-			BufferedReader expoReader = new BufferedReader(
-										new FileReader(userDataFile));
+			BufferedReader idsReader = new BufferedReader(new FileReader(userDataFile));
 			try {
-				String expocode = expoReader.readLine();
-				while ( expocode != null ) {
-					expocodeSet.add(expocode);
-					expocode = expoReader.readLine();
+				String datasetId = idsReader.readLine();
+				while ( datasetId != null ) {
+					dataIdsSet.add(datasetId);
+					datasetId = idsReader.readLine();
 				}
 			} finally {
-				expoReader.close();
+				idsReader.close();
 			}
 		} catch ( FileNotFoundException ex ) {
 			// Return a valid cruise listing with no cruises
 			needsCommit = true;
-			commitMessage = "add new cruise listing for " + cleanUsername + "; ";
+			commitMessage = "add new dataset listing for " + cleanUsername + "; ";
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
-			throw new IllegalArgumentException(
-					"Problems reading the cruise listing from " + 
-					userDataFile.getPath() + ": " + ex.getMessage());
+			throw new IllegalArgumentException("Problems reading the dataset listing for " + 
+					cleanUsername + ": " + ex.getMessage());
 		}
 		// Get the cruise file handler
 		DashboardConfigStore configStore;
 		try {
 			configStore = DashboardConfigStore.get(false);
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException("Unexpected failure to get settings");
+			throw new IllegalArgumentException("Unexpected failure to get dashboard settings");
 		}
-		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
-		// Create the cruise list (map) for these cruises
-		DashboardDatasetList cruiseList = new DashboardDatasetList();
-		cruiseList.setUsername(cleanUsername);
-		cruiseList.setVersion(configStore.getUploadVersion());
-		for ( String expocode : expocodeSet ) {
+		DataFileHandler dataHandler = configStore.getDataFileHandler();
+		// Create the dataset list (map) for these cruises
+		DashboardDatasetList datasetList = new DashboardDatasetList();
+		datasetList.setUsername(cleanUsername);
+		for ( String datasetId : dataIdsSet ) {
 			// Create the DashboardDataset from the info file
-			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
-			if ( cruise == null ) {
-				// Cruise no longer exists - remove this dataset from the saved list
+			DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
+			if ( dataset == null ) {
+				// Dataset no longer exists - remove this ID from the saved list
 				needsCommit = true;
-				commitMessage += "remove non-existant dataset " + expocode + "; ";
+				commitMessage += "remove non-existant dataset " + datasetId + "; ";
 			}
 			else {
-				String owner = cruise.getOwner();
+				String owner = dataset.getOwner();
 				if ( ! configStore.userManagesOver(cleanUsername, owner) ) {
-					// No longer authorized to view - remove this dataset from the saved list
+					// No longer authorized to view - remove this ID from the saved list
 					needsCommit = true;
-					commitMessage += "remove unauthorized dataset " + expocode + "; ";
+					commitMessage += "remove unauthorized dataset " + datasetId + "; ";
 				}
 				else {
-					cruiseList.put(expocode, cruise);
+					datasetList.put(datasetId, dataset);
 				}
 			}
 		}
 		if ( needsCommit )
-			saveCruiseListing(cruiseList, commitMessage);
+			saveDatasetListing(datasetList, commitMessage);
 		// Determine whether or not this user is a manager/admin 
-		cruiseList.setManager(configStore.isManager(cleanUsername));
+		datasetList.setManager(configStore.isManager(cleanUsername));
 		// Return the listing of cruises
-		return cruiseList;
+		return datasetList;
 	}
 
 	/**
-	 * Saves the list of cruises for a user
+	 * Saves the list of datasets for a user
 	 * 
-	 * @param cruiseList
-	 * 		listing of cruises to be saved
+	 * @param datasetList
+	 * 		listing of datasets to be saved
 	 * @param message
 	 * 		version control commit message; 
 	 * 		if null or blank, the commit will not be performed 
 	 * @throws IllegalArgumentException
-	 * 		if the cruise listing was invalid, if there was 
-	 * 		a problem saving the cruise listing, or if there 
-	 * 		was an error committing the updated file to 
-	 * 		version control
+	 * 		if the dataset listing was invalid, 
+	 * 		if there was a problem saving the cruise listing, or 
+	 * 		if there was an error committing the updated file to version control
 	 */
-	public void saveCruiseListing(DashboardDatasetList cruiseList, 
+	public void saveDatasetListing(DashboardDatasetList datasetList, 
 						String message) throws IllegalArgumentException {
-		String username = cruiseList.getUsername();
-		// Get the name of the cruise list file for this user
+		// Get the name of the dataset list file for this user
+		String username = datasetList.getUsername();
 		if ( (username == null) || username.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
-		File userDataFile = new File(filesDir, 
-				username + USER_CRUISE_LIST_NAME_EXTENSION);
-		// Write the expocodes of the cruises in the listing to the file
+		File userDataFile = new File(filesDir, username + USER_CRUISE_LIST_NAME_EXTENSION);
+		// Write the IDs of the datasets in the listing to the file
 		try {
-			PrintWriter expoWriter = new PrintWriter(userDataFile);
+			PrintWriter idsWriter = new PrintWriter(userDataFile);
 			try {
-				for ( String expocode : cruiseList.keySet() )
-					expoWriter.println(expocode);
+				for ( String datasetId : datasetList.keySet() )
+					idsWriter.println(datasetId);
 			} finally {
-				expoWriter.close();
+				idsWriter.close();
 			}
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Problems saving the cruise listing " + 
-					userDataFile.getPath() + ": " + ex.getMessage());
+			throw new IllegalArgumentException("Problems saving the dataset listing for " + 
+					username + ": " + ex.getMessage());
 		}
 		if ( (message == null) || message.trim().isEmpty() )
 			return;
-		// Commit the update to this list of cruise expocodes
+		// Commit the update to this list of dataset IDs
 		try {
 			commitVersion(userDataFile, message);
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Problems committing the updated cruise listing: " + 
-					ex.getMessage());
+			throw new IllegalArgumentException("Problems committing the updated dataset listing for " + 
+					username + ": " + ex.getMessage());
 		}
 	}
 
 	/**
-	 * Removes an entry from a user's list of cruises, and
-	 * saves the resulting list of cruises.
+	 * Removes an entry from a user's list of datasets, and
+	 * saves the resulting list of datasets.
 	 * 
-	 * @param expocodeSet
-	 * 		expocodes of cruises to remove from the list
+	 * @param idsSet
+	 * 		IDs of datasets to remove from the list
 	 * @param username
-	 * 		user whose cruise list is to be updated
+	 * 		user whose dataset list is to be updated
 	 * @return
-	 * 		updated list of cruises for user
+	 * 		updated list of datasets for user
 	 * @throws IllegalArgumentException
-	 * 		if username is invalid, if there was a  
-	 * 		problem saving the updated cruise listing, or
-	 * 		if there was an error committing the updated 
-	 * 		cruise listing to version control
+	 * 		if username is invalid, 
+	 * 		if there was a problem saving the updated dataset listing, or
+	 * 		if there was an error committing the updated dataset listing to version control
 	 */
-	public DashboardDatasetList removeCruisesFromListing(
-							TreeSet<String> expocodeSet, String username) 
-										throws IllegalArgumentException {
+	public DashboardDatasetList removeDatasetsFromListing(TreeSet<String> idsSet, 
+			String username) throws IllegalArgumentException {
 		String cleanUsername = DashboardUtils.cleanUsername(username);
 		if ( cleanUsername.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
-		DashboardDatasetList cruiseList = getCruiseListing(cleanUsername);
+		DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
 		boolean changeMade = false;
-		String commitMessage = 
-				"cruises removed from the listing for " + cleanUsername + ": ";
-		for ( String expocode : expocodeSet ) {
-			if ( cruiseList.containsKey(expocode) ) {
-				cruiseList.remove(expocode);
+		String commitMessage = "datasets removed from the listing for " + cleanUsername + ": ";
+		for ( String datasetId : idsSet ) {
+			if ( datasetList.containsKey(datasetId) ) {
+				datasetList.remove(datasetId);
 				changeMade = true;
-				commitMessage += expocode + "; ";
+				commitMessage += datasetId + "; ";
 			}
 		}
 		if ( changeMade ) {
 			// Save the updated cruise listing
-			saveCruiseListing(cruiseList, commitMessage);
+			saveDatasetListing(datasetList, commitMessage);
 		}
-		return cruiseList;
+		return datasetList;
 	}
 
 	/**
-	 * Adds matching entries to a user's list of cruises, and saves the resulting 
-	 * list of cruises.  Only cruises that are modifiable by the use (owned by
-	 * the user or owned by someone the user manages) are added. 
+	 * Adds matching entries to a user's list of datasets, and saves the 
+	 * resulting list of datasets.  Only datasets that are owned by the 
+	 * user, or owned by someone the user manages, are added. 
 	 * 
-	 * @param wildExpocode
-	 * 		dataset, possibly with wildcards * and ?, to add
+	 * @param wildDatasetId
+	 * 		dataset ID, possibly with wildcards * and ?, to add
 	 * @param username
-	 * 		user whose cruise list is to be updated
+	 * 		user whose dataset list is to be updated
 	 * @return
-	 * 		updated list of cruises for the user
+	 * 		updated list of datasets for the user
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid, 
-	 * 		if wildExpocode is invalid,
-	 * 		if the cruise information file does not exist, 
-	 * 		if there was a problem saving the updated cruise listing, or 
-	 * 		if there was an error committing the updated cruise listing 
-	 * 			to version control
+	 * 		if the dataset ID is invalid,
+	 * 		if the dataset information file does not exist, 
+	 * 		if there was a problem saving the updated dateset listing, or 
+	 * 		if there was an error committing the updated dataset listing to version control
 	 */
-	public DashboardDatasetList addCruisesToListing(String wildExpocode, 
+	public DashboardDatasetList addDatasetsToListing(String wildDatasetId, 
 						String username) throws IllegalArgumentException {
 		String cleanUsername = DashboardUtils.cleanUsername(username);
 		if ( cleanUsername.isEmpty() )
@@ -327,142 +314,139 @@ public class UserFileHandler extends VersionedFileHandler {
 		try {
 			configStore = DashboardConfigStore.get(false);
 		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the default dashboard config store");
+			throw new IllegalArgumentException("Unexpected failure to get the default dashboard settings");
 		}
-		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
-		HashSet<String> matchExpocodes = cruiseHandler.getMatchingDatasetIds(wildExpocode);
-		if ( matchExpocodes.size() == 0 ) 
-			throw new IllegalArgumentException(
-					"No datasets with an dataset matching " + wildExpocode);
-		DashboardDatasetList cruiseList = getCruiseListing(cleanUsername);
-		String commitMsg = "Added cruise(s) ";
+		DataFileHandler dataHandler = configStore.getDataFileHandler();
+		HashSet<String> matchingIds = dataHandler.getMatchingDatasetIds(wildDatasetId);
+		if ( matchingIds.size() == 0 ) 
+			throw new IllegalArgumentException("No datasets with an ID matching " + wildDatasetId);
+		DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
+		String commitMsg = "Added dataset(s) ";
 		boolean needsCommit = false;
 		boolean viewableFound = false;
-		for ( String expocode : matchExpocodes ) {
-			// Create a cruise entry for this data
-			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
-			if ( cruise == null ) 
+		for ( String datasetId : matchingIds ) {
+			// Create a dataset entry for this data
+			DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
+			if ( dataset == null ) 
 				throw new IllegalArgumentException("Unexpected error: dataset " +
-						expocode + " does not exist");
-			if ( configStore.userManagesOver(cleanUsername, cruise.getOwner()) ) {
-				// Add or replace this cruise entry in the cruise list
-				// Only the expocodes (keys) are saved in the cruise list
+						datasetId + " does not exist");
+			if ( configStore.userManagesOver(cleanUsername, dataset.getOwner()) ) {
+				// Add or replace this dataset entry in the dataset list
 				viewableFound = true;
-				if ( cruiseList.put(expocode, cruise) == null ) {
-					commitMsg += expocode + ", ";
+				if ( datasetList.put(datasetId, dataset) == null ) {
+					// Only the IDs are saved to the dataset listing file
+					commitMsg += datasetId + ", ";
 					needsCommit = true;
 				}
 			}
 		}
 		if ( ! viewableFound )
-			throw new IllegalArgumentException(
-					"No datasets with an dataset matching " + wildExpocode + 
+			throw new IllegalArgumentException("No datasets with an ID matching " + wildDatasetId + 
 					" that can be viewed by " + cleanUsername);
 		if ( needsCommit )
-			saveCruiseListing(cruiseList, commitMsg + " to the listing for " + cleanUsername);
-		return cruiseList;
+			saveDatasetListing(datasetList, commitMsg + " to the listing for " + cleanUsername);
+		return datasetList;
 	}
 
 	/**
-	 * Adds an entries to a user's list of cruises, and saves the resulting 
-	 * list of cruises.
+	 * Adds entries to a user's list of datasets, and saves the resulting 
+	 * list of datasets.  This does not check dataset ownership.
 	 * 
-	 * @param expocodeList
-	 * 		list of cruise expocodes to add to the list
+	 * @param idsSet
+	 * 		list of IDs of datasets to add to the list
 	 * @param username
-	 * 		user whose cruise list is to be updated
+	 * 		user whose dataset list is to be updated
 	 * @return
-	 * 		updated list of cruises for user
+	 * 		updated list of datasets for user
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid, 
 	 * 		if any of the expocodes are invalid,
 	 * 		if the cruise information file does not exist, 
 	 * 		if there was a problem saving the updated cruise listing, or 
-	 * 		if there was an error committing the updated cruise listing 
-	 * 			to version control
+	 * 		if there was an error committing the updated cruise listing to version control
 	 */
-	public DashboardDatasetList addCruisesToListing(Collection<String> expocodeList, 
+	public DashboardDatasetList addDatasetsToListing(Collection<String> idsSet, 
 							String username) throws IllegalArgumentException {
 		String cleanUsername = DashboardUtils.cleanUsername(username);
 		if ( cleanUsername.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
-		DataFileHandler cruiseHandler;
+		DataFileHandler dataHandler;
 		try {
-			cruiseHandler = DashboardConfigStore.get(false).getDataFileHandler();
+			dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
 		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the cruise file handler");
+			throw new IllegalArgumentException("Unexpected failure to get the cruise file handler");
 		}
-		DashboardDatasetList cruiseList = getCruiseListing(cleanUsername);
-		String commitMsg = "Added cruises ";
-		// Create a cruise entry for this data
-		for ( String expocode : expocodeList) {
-			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
-			if ( cruise == null ) 
-				throw new IllegalArgumentException(
-						"cruise " + expocode + " does not exist");
-			// Add or replace this cruise entry in the cruise list
-			// Only the expocodes (keys) are saved in the cruise list
-			cruiseList.put(expocode, cruise);
-			commitMsg += expocode + ", ";
+		DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
+		String commitMsg = "Added dataset(s) ";
+		boolean needsCommit = false;
+		for ( String datasetId : idsSet) {
+			// Create a dataset entry for this data
+			DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
+			if ( dataset == null ) 
+				throw new IllegalArgumentException("dataset " + datasetId + " does not exist");
+			// Add or replace this dataset entry in the dataset list
+			if ( datasetList.put(datasetId, dataset) == null ) {
+				// Only the IDs are saved to the dataset listing file
+				commitMsg += datasetId + ", ";
+				needsCommit = true;
+			}
 		}
-		commitMsg += " to the listing for " + cleanUsername;
-		saveCruiseListing(cruiseList, commitMsg);
-		return cruiseList;
+		if ( needsCommit ) {
+			commitMsg += " to the listing for " + cleanUsername;
+			saveDatasetListing(datasetList, commitMsg);
+		}
+		return datasetList;
 	}
 
 	/**
-	 * Assigns the data column types, units, and missing values for a cruise 
+	 * Assigns the data column types, units, and missing values for a dataset 
 	 * from the user-provided data column names using the mappings of column 
-	 * names to types, units, and missing values associated with the cruise 
+	 * names to types, units, and missing values associated with the dataset 
 	 * owner. 
 	 *  
-	 * @param cruise
-	 * 		cruise whose data column types, units, and missing values are to 
-	 * 		be assigned
+	 * @param dataset
+	 * 		dataset whose data column types, units, and missing values 
+	 * 		are to be assigned
 	 * @throws IllegalArgumentException
 	 * 		if the data column names to types, units, and missing values
-	 * 		properties file for the cruise owner, if it exists, is invalid.
+	 * 		properties file for the dataset owner, if the file exists, 
+	 * 		is invalid.
 	 */
-	public void assignDataColumnTypes(DashboardDataset cruise) 
-											throws IllegalArgumentException {
+	public void assignDataColumnTypes(DashboardDataset dataset) throws IllegalArgumentException {
 		// Copy the default maps of data column names to types and units
 		HashMap<String,DataColumnType> userColNamesToTypes = 
 				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
 		// Add the user-customized map of column names to types
-		File propsFile = new File(filesDir, 
-				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
+		File propsFile = new File(filesDir, dataset.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
 		if ( propsFile.exists() ) 
 			addDataColumnNames(userColNamesToTypes, propsFile);
-		// Directly assign the lists contained in the cruise
-		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
-		colTypes.clear();
+		ArrayList<String> userColNames = dataset.getUserColNames();
+		ArrayList<DataColumnType> colTypes = new ArrayList<DataColumnType>(userColNames.size());
 		// Go through the column names to assign these lists
-		for ( String colName : cruise.getUserColNames() ) {
-			// Convert the column name to the key
+		for ( String colName : userColNames ) {
 			String key = DashboardServerUtils.getKeyForName(colName);
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
 				thisColType = DashboardUtils.UNKNOWN;
 			colTypes.add(thisColType);
 		}
+		dataset.setDataColTypes(colTypes);
 	}
 
 	/**
 	 * Updates and saves the data column names to types for a user from 
 	 * the currently assigned column names, types, units, and missing values 
-	 * given in a cruise.
+	 * given in a dataset.
 	 * 
-	 * @param cruise
-	 * 		update the data column names to types from this cruise
+	 * @param dataset
+	 * 		update the data column names to types from this dataset
 	 * @param username
 	 * 		update data column names to types for this user
 	 * @throws IllegalArgumentException
 	 * 		if the data column names to types file is invalid (if it exists), or 
 	 * 		if unable to save or commit the updated version of this file 
 	 */
-	public void updateUserDataColumnTypes(DashboardDataset cruise, String username) 
+	public void updateUserDataColumnTypes(DashboardDataset dataset, String username) 
 											throws IllegalArgumentException {
 		// Copy the default maps of data column names to types and units
 		HashMap<String,DataColumnType> userColNamesToTypes = 
@@ -471,12 +455,11 @@ public class UserFileHandler extends VersionedFileHandler {
 		File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
 		if ( propsFile.exists() ) 
 			addDataColumnNames(userColNamesToTypes, propsFile);
-		// Add mappings of data columns names to types, units, 
-		// and missing values from this cruise
-		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
+		// Add mappings of data columns names to types, units, and missing values from this dataset
+		ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
 		boolean changed = false;
 		int k = 0;
-		for ( String colName : cruise.getUserColNames() ) {
+		for ( String colName : dataset.getUserColNames() ) {
 			String key = DashboardServerUtils.getKeyForName(colName);
 			DataColumnType thisColType = colTypes.get(k);
 			DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
@@ -514,21 +497,16 @@ public class UserFileHandler extends VersionedFileHandler {
 				propsWriter.close();
 			}
 		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Problems saving the data column names to types, units, " +
-					"and missing values file for " + username + "\n" + 
-					ex.getMessage());
+			throw new IllegalArgumentException("Problems saving the data column names to types, units, " +
+					"and missing values file for " + username + "\n" + ex.getMessage());
 		}
 		// Commit the update version of this file
 		try {
-			commitVersion(propsFile, 
-					"Data column names to types, units, and missing values " +
-					"properties file for " + username);
+			commitVersion(propsFile, "Updated data column names to types, units, and missing values for " + 
+					username);
 		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Problems committing the data column names to types, units, " +
-					"and missing values file for " + username + "\n" + 
-					ex.getMessage());
+			throw new IllegalArgumentException("Problems committing the data column names to types for " + 
+					username + "\n" + ex.getMessage());
 		}
 	}
 

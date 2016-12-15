@@ -3,26 +3,25 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.TreeSet;
+
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DsgData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.TreeSet;
 
 /**
  * Regenerates the full-data DSG files with the current data values 
@@ -34,7 +33,7 @@ import java.util.TreeSet;
  */
 public class RegenerateDsgs {
 
-	DataFileHandler cruiseHandler;
+	DataFileHandler dataHandler;
 	DsgNcFileHandler dsgHandler;
 	MetadataFileHandler metaHandler;
 	KnownDataTypes knownMetadataTypes;
@@ -49,7 +48,7 @@ public class RegenerateDsgs {
 	 * 		configuration data to use
 	 */
 	public RegenerateDsgs(DashboardConfigStore configStore) {
-		cruiseHandler = configStore.getDataFileHandler();
+		dataHandler = configStore.getDataFileHandler();
 		dsgHandler = configStore.getDsgNcFileHandler();
 		metaHandler = configStore.getMetadataFileHandler();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
@@ -61,8 +60,8 @@ public class RegenerateDsgs {
 	/**
 	 * Regenerate the DSG files for the given dataset.
 	 * 
-	 * @param dataset
-	 * 		regenerate the DSG files the the dataset with this dataset
+	 * @param datasetId
+	 * 		regenerate the DSG files the the dataset with this ID
 	 * @param forceIt
 	 * 		if true, always regenerate the DSG files;
 	 * 		if false, regenerate the DSG files only if the metadata has changed
@@ -71,18 +70,16 @@ public class RegenerateDsgs {
 	 * @throws IllegalArgumentException
 	 * 		if there was a problem regenerating the DSG files
 	 */
-	public boolean regenerateDsgFiles(String expocode, boolean forceIt) throws IllegalArgumentException {
+	public boolean regenerateDsgFiles(String datasetId, boolean forceIt) throws IllegalArgumentException {
 		boolean updateIt = forceIt;
-		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
+		String stdId = DashboardServerUtils.checkDatasetID(datasetId);
 		DsgNcFile fullDataDsg;
 		ArrayList<DsgData> dataVals;
+
 		DsgMetadata updatedMeta;
 		try {
-			// Get just the filenames from the set of addition document
-			DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(upperExpo);
-
 			// Read the current metadata in the full-data DSG file
-			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
+			fullDataDsg = dsgHandler.getDsgNcFile(stdId);
 			ArrayList<String> missing = fullDataDsg.readMetadata(knownMetadataTypes);
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected metadata fields missing from the DSG file: " + missing);
@@ -92,61 +89,41 @@ public class RegenerateDsgs {
 			DsgMetadata fullDataMeta = fullDataDsg.getMetadata();
 			dataVals = fullDataDsg.getDataList();
 
-			// Get the QC flag and SOCAT version from the database
-			Character qcFlag = dbHandler.getQCFlag(upperExpo);
-			String qcStatus = DashboardUtils.FLAG_STATUS_MAP.get(qcFlag);
-			String versionStatus = dbHandler.getVersionStatus(upperExpo);
-			if ( versionStatus.isEmpty() )
-				throw new IllegalArgumentException("Unable to get the version and status from the database");
-			String version = versionStatus.substring(0, versionStatus.length() - 1);
-
-			// Update (but do not commit) the cruise info version number and QC status if not correct 
-			if ( ! ( version.equals(cruise.getVersion()) && qcStatus.equals(cruise.getSubmitStatus()) ) ) {
-				cruise.setVersion(version);
-				cruise.setSubmitStatus(qcStatus);
-				cruiseHandler.saveDatasetInfoToFile(cruise, null);
-			}
-
 			// Get the metadata in the OME XML file
 			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-					metaHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metaHandler);
-			// Update (but do not commit) the metadata info if not correct
-			if ( ! version.equals(omeMData.getVersion()) ) {
-				omeMData.setVersion(version);
-				metaHandler.saveMetadataInfo(omeMData, null, false);
-			}
+					metaHandler.getMetadataInfo(stdId, DashboardUtils.OME_FILENAME), metaHandler);
 			updatedMeta = omeMData.createDsgMetadata();
 
 			if ( ! fullDataMeta.equals(updatedMeta) )
 				updateIt = true;
 		} catch (Exception ex) {
-			throw new IllegalArgumentException("Problems reading the dataset " + upperExpo + ": " + ex.getMessage());
+			throw new IllegalArgumentException("Problems reading the dataset " + stdId + ": " + ex.getMessage());
 		}
 
 		if ( updateIt ) {
 			try {
 				// Regenerate the DSG file with the updated metadata
 				fullDataDsg.create(updatedMeta, dataVals);
-				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
+				// Call Ferret to add data variables
 				SocatTool tool = new SocatTool(ferretConfig);
 				ArrayList<String> scriptArgs = new ArrayList<String>(1);
 				scriptArgs.add(fullDataDsg.getPath());
-				tool.init(scriptArgs, upperExpo, FerretConfig.Action.COMPUTE);
+				tool.init(scriptArgs, stdId, FerretConfig.Action.COMPUTE);
 				tool.run();
 				if ( tool.hasError() )
-					throw new IllegalArgumentException("Failure in adding computed variables: " + 
-							tool.getErrorMessage());
+					throw new IllegalArgumentException("Failure in adding computed variables for " + 
+							stdId + ": " + tool.getErrorMessage());
 
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " + 
-							upperExpo + ": " + ex.getMessage());
+							stdId + ": " + ex.getMessage());
 			}
 			try {
 				// Regenerate the decimated-data DSG file 
-				dsgHandler.decimateCruise(upperExpo);
+				dsgHandler.decimateCruise(stdId);
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Problems regenerating the decimated-data DSG files for " + 
-							upperExpo + ": " + ex.getMessage());
+							stdId + ": " + ex.getMessage());
 			}
 		}
 		return updateIt;		
@@ -161,11 +138,11 @@ public class RegenerateDsgs {
 
 	/**
 	 * @param args
-	 * 		ExpocodesFile - update DSG files of these cruises
+	 * 		IDsFile - update DSG files of the datasets with these IDs
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 2 ) {
-			System.err.println("Arguments:  ExpocodesFile  Always");
+			System.err.println("Arguments:  IDsFile  Always");
 			System.err.println();
 			System.err.println("Regenerates the full-data DSG files with the current data values ");
 			System.err.println("in the DSG files but with the current metadata values in the OME "); 
@@ -177,29 +154,28 @@ public class RegenerateDsgs {
 			System.exit(1);
 		}
 
-		String expocodesFilename = args[0];
+		String idsFilename = args[0];
 		boolean always = false;
 		if ( "T".equals(args[1]) || "True".equals(args[1]) )
 			always = true;
 
-		// Get the expocodes of the datasets to update
-		TreeSet<String> allExpocodes = new TreeSet<String>();
+		// Get the IDs of the datasets to update
+		TreeSet<String> idsSet = new TreeSet<String>();
 		try {
-			BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
+			BufferedReader idsReader = new BufferedReader(new FileReader(idsFilename));
 			try {
-				String dataline = expoReader.readLine();
+				String dataline = idsReader.readLine();
 				while ( dataline != null ) {
 					dataline = dataline.trim();
 					if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-						allExpocodes.add(dataline);
-					dataline = expoReader.readLine();
+						idsSet.add(dataline);
+					dataline = idsReader.readLine();
 				}
 			} finally {
-				expoReader.close();
+				idsReader.close();
 			}
 		} catch (Exception ex) {
-			System.err.println("Error getting expocodes from " + 
-					expocodesFilename + ": " + ex.getMessage());
+			System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
@@ -219,10 +195,10 @@ public class RegenerateDsgs {
 		boolean success = true;
 		try {
 			// update each of the datasets
-			for ( String expocode : allExpocodes ) {
+			for ( String datasetId : idsSet ) {
 				try {
-					if ( regenerator.regenerateDsgFiles(expocode, always) ) {
-						System.err.println("Regenerated the DSG files for " + expocode);
+					if ( regenerator.regenerateDsgFiles(datasetId, always) ) {
+						System.err.println("Regenerated the DSG files for " + datasetId);
 						changed = true;
 					}
 				} catch (Exception ex) {

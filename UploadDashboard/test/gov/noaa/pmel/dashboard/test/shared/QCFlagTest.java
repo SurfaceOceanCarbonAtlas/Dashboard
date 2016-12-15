@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * Unit tests for methods of {@link gov.noaa.pmel.dashboard.shared.QCFlag}
@@ -21,6 +22,7 @@ public class QCFlagTest {
 
 	private static final String MY_FLAG_NAME = "WOCE_CO2_atm";
 	private static final Character MY_FLAG_VALUE = '3';
+	private static final Severity MY_SEVERITY = Severity.QUESTIONABLE;
 	private static final Integer MY_COLUMN_INDEX = 5;
 	private static final Integer MY_ROW_INDEX = 15;
 	private static final String MY_COMMENT = "my comment";
@@ -55,6 +57,22 @@ public class QCFlagTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getSeverity()} and
+	 * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setSeverity(gov.noaa.pmel.dashboard.shared.QCFlag.Severity)}.
+	 */
+	@Test
+	public void testGetSetSeverity() {
+		QCFlag flag = new QCFlag();
+		assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+		flag.setSeverity(MY_SEVERITY);
+		assertEquals(MY_SEVERITY, flag.getSeverity());
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
+		flag.setSeverity(null);
+		assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getColumnIndex()} and
 	 * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setColumnIndex(java.lang.Integer)}.
 	 */
@@ -64,6 +82,7 @@ public class QCFlagTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
 		flag.setColumnIndex(MY_COLUMN_INDEX);
 		assertEquals(MY_COLUMN_INDEX, flag.getColumnIndex());
+		assertEquals(Severity.UNASSIGNED, flag.getSeverity());
 		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
 		flag.setColumnIndex(null);
@@ -81,6 +100,7 @@ public class QCFlagTest {
 		flag.setRowIndex(MY_ROW_INDEX);
 		assertEquals(MY_ROW_INDEX, flag.getRowIndex());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
+		assertEquals(Severity.UNASSIGNED, flag.getSeverity());
 		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
 		flag.setRowIndex(null);
@@ -99,6 +119,7 @@ public class QCFlagTest {
 		assertEquals(MY_COMMENT, flag.getComment());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getRowIndex());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
+		assertEquals(Severity.UNASSIGNED, flag.getSeverity());
 		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
 		flag.setComment(null);
@@ -107,13 +128,15 @@ public class QCFlagTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#QCFlag(
-	 * java.lang.String, java.lang.Character, java.lang.Integer, java.lang.Integer)}.
+	 * java.lang.String, java.lang.Character, gov.noaa.pmel.dashboard.shared.QCFlag.Severity, 
+	 * java.lang.Integer, java.lang.Integer)}.
 	 */
 	@Test
 	public void testWoceFlagStringIntegerInteger() {
-		QCFlag flag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_COLUMN_INDEX, MY_ROW_INDEX);
+		QCFlag flag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
 		assertEquals(MY_FLAG_NAME, flag.getFlagName());
 		assertEquals(MY_FLAG_VALUE, flag.getFlagValue());
+		assertEquals(MY_SEVERITY, flag.getSeverity());
 		assertEquals(MY_COLUMN_INDEX, flag.getColumnIndex());
 		assertEquals(MY_ROW_INDEX, flag.getRowIndex());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getComment());
@@ -147,6 +170,13 @@ public class QCFlagTest {
 		assertTrue( first.hashCode() == second.hashCode() );
 		assertTrue( first.equals(second) );
 
+		first.setSeverity(MY_SEVERITY);
+		assertFalse( first.hashCode() == second.hashCode() );
+		assertFalse( first.equals(second) );
+		second.setSeverity(MY_SEVERITY);
+		assertTrue( first.hashCode() == second.hashCode() );
+		assertTrue( first.equals(second) );
+
 		first.setColumnIndex(MY_COLUMN_INDEX);
 		assertFalse( first.hashCode() == second.hashCode() );
 		assertFalse( first.equals(second) );
@@ -174,10 +204,10 @@ public class QCFlagTest {
 	 */
 	@Test
 	public void testCompareTo() {
-		QCFlag first = new QCFlag("WOCE_CO2_atm", '3', 5, 25);
+		QCFlag first = new QCFlag("WOCE_CO2_atm", '3', Severity.QUESTIONABLE, 5, 25);
 		first.setComment("BBBB");
 
-		QCFlag second = new QCFlag("WOCE_CO2_water", '2', 4, 15);
+		QCFlag second = new QCFlag("WOCE_CO2_water", '2', Severity.ACCEPTABLE, 4, 15);
 		second.setComment("AAAA");
 		assertTrue( first.compareTo(second) < 0 );
 		assertTrue( second.compareTo(first) > 0 );
@@ -190,6 +220,13 @@ public class QCFlagTest {
 		assertTrue( second.compareTo(first) > 0 );
 
 		second.setFlagValue('3');
+		assertTrue( first.compareTo(second) > 0 );
+		assertTrue( second.compareTo(first) < 0 );
+		second.setSeverity(Severity.BAD);
+		assertTrue( first.compareTo(second) < 0 );
+		assertTrue( second.compareTo(first) > 0 );
+
+		second.setSeverity(Severity.QUESTIONABLE);
 		assertTrue( first.compareTo(second) > 0 );
 		assertTrue( second.compareTo(first) < 0 );
 		second.setColumnIndex(6);

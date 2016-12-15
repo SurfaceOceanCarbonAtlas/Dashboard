@@ -140,10 +140,10 @@ public class DashboardConfigStore {
 	private ArchiveFilesBundler archiveFilesBundler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
-	private DatasetChecker cruiseChecker;
+	private DatasetChecker datasetChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
 	private PreviewPlotsHandler plotsHandler;
-	private DatasetSubmitter cruiseSubmitter;
+	private DatasetSubmitter datasetSubmitter;
 	private OmePdfGenerator omePdfGenerator;
 	private KnownDataTypes knownUserDataTypes;
 	private KnownDataTypes knownMetadataTypes;
@@ -609,7 +609,7 @@ public class DashboardConfigStore {
 
 		// SanityChecker initialization from this same properties file 
 		try {
-			cruiseChecker = new DatasetChecker(configFile, checkerMsgHandler, metadataFileHandler);
+			datasetChecker = new DatasetChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -651,7 +651,7 @@ public class DashboardConfigStore {
 				metadataFileHandler, dataFileHandler);
 
 		// The DatasetSubmitter uses the various handlers just created
-		cruiseSubmitter = new DatasetSubmitter(this);
+		datasetSubmitter = new DatasetSubmitter(this);
 
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
@@ -920,10 +920,10 @@ public class DashboardConfigStore {
 
 	/**
 	 * @return
-	 * 		the checker for cruise data and metadata
+	 * 		the checker for dataset data and metadata
 	 */
-	public DatasetChecker getDashboardCruiseChecker() {
-		return cruiseChecker;
+	public DatasetChecker getDashboardDatasetChecker() {
+		return datasetChecker;
 	}
 
 	/**
@@ -936,15 +936,15 @@ public class DashboardConfigStore {
 
 	/**
 	 * @return
-	 * 		the submitter for dashboard cruises
+	 * 		the submitter for dashboard datasets
 	 */
-	public DatasetSubmitter getDashboardCruiseSubmitter() {
-		return cruiseSubmitter;
+	public DatasetSubmitter getDashboardDatasetSubmitter() {
+		return datasetSubmitter;
 	}
 
 	/**
 	 * @return
-	 * 		the files bundler for "send to CDIAC" datasets
+	 * 		the files bundler for archiving datasets
 	 */
 	public ArchiveFilesBundler getArchiveFilesBundler() {
 		return archiveFilesBundler;

@@ -23,6 +23,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
@@ -269,18 +270,18 @@ public class CheckerMessageHandler {
 						if ( msg.isError() ) {
 							QCFlag flag;
 							if ( colNum > 0 )
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, colNum-1, rowNum-1);
+								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, Severity.BAD, colNum-1, rowNum-1);
 							else
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, null, rowNum-1);
+								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, Severity.BAD, null, rowNum-1);
 							woceFlags.add(flag);
 						}
 						else if ( msg.isWarning() ) {
 							QCFlag flag;
 							if ( colNum > 0 ) {
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, colNum-1, rowNum-1);
+								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, Severity.QUESTIONABLE, colNum-1, rowNum-1);
 							}
 							else {
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, null, rowNum-1);
+								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, Severity.QUESTIONABLE, null, rowNum-1);
 							}
 							woceFlags.add(flag);
 						}
@@ -298,7 +299,10 @@ public class CheckerMessageHandler {
 		}
 
 		// Assign any user-provided QC flags.
-		// This assumes QC flags indicating problems have flag values that are integers 3-9
+		// TODO: get severity from user-provided specification of the type
+		// This assumes QC flags indicating problems have flag values that are integers 3-9.
+		// If "WOCE" (case insensive) is in the data type description, 3 is QUESTIONABLE 
+		// and 4-9 are BAD; otherwise 3-9 are all BAD.
 		ArrayList<DataColumnType> columnTypes = dataset.getDataColTypes();
 		TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
 		for (int k = 0; k < columnTypes.size(); k++) {
@@ -314,15 +318,23 @@ public class CheckerMessageHandler {
 					break;
 				}
 			}
+			Severity severityOfThree = Severity.BAD;
+			if ( colType.getDescription().toUpperCase().contains("WOCE") )
+				severityOfThree = Severity.QUESTIONABLE;
 			for (int rowIdx = 0; rowIdx < dataset.getNumDataRows(); rowIdx++) {
 				try {
 					int value = Integer.parseInt(dataset.getDataValues().get(rowIdx).get(k));
 					if ( (value >= 3) && (value <= 9) ) {
+						Severity severity;
+						if ( value == 3 )
+							severity = severityOfThree;
+						else
+							severity = Severity.BAD;
 						QCFlag flag;
 						if ( colIdx >= 0 )
-							flag = new QCFlag(colType.getVarName(), Integer.toString(value).charAt(0), colIdx, rowIdx);
+							flag = new QCFlag(colType.getVarName(), Integer.toString(value).charAt(0), severity, colIdx, rowIdx);
 						else
-							flag = new QCFlag(colType.getVarName(), Integer.toString(value).charAt(0), null, rowIdx);
+							flag = new QCFlag(colType.getVarName(), Integer.toString(value).charAt(0), severity, null, rowIdx);
 						qcFlags.add(flag);
 					}
 				} catch (NumberFormatException ex) {

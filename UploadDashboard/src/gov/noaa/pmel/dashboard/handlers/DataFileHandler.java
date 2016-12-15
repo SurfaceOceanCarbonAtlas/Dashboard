@@ -954,13 +954,13 @@ public class DataFileHandler extends VersionedFileHandler {
 			// Delete the metadata and additional documents associated with this cruise
 			MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 			try {
-				metadataHandler.removeMetadata(username, datasetId, DashboardUtils.OME_FILENAME);
+				metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.OME_FILENAME);
 			} catch (Exception ex) {
 				// Ignore - may not exist
 				;
 			}
 			try {
-				metadataHandler.removeMetadata(username, datasetId, DashboardUtils.PI_OME_FILENAME);
+				metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.PI_OME_FILENAME);
 			} catch (Exception ex) {
 				// Ignore - may not exist
 				;
@@ -968,7 +968,7 @@ public class DataFileHandler extends VersionedFileHandler {
 			for ( String mdataTitle : dataset.getAddlDocs() ) {
 				String filename = DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0];
 				try {
-					metadataHandler.removeMetadata(username, datasetId, filename);
+					metadataHandler.deleteMetadata(username, datasetId, filename);
 				} catch (Exception ex) {
 					// Ignore
 					;
