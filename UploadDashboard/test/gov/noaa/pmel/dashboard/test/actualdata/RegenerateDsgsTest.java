@@ -5,14 +5,6 @@ package gov.noaa.pmel.dashboard.test.actualdata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
-import gov.noaa.pmel.dashboard.server.DashDataType;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DsgData;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +12,15 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
+import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DsgData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Tests of method in {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs}

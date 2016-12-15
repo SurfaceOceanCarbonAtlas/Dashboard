@@ -1,7 +1,5 @@
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -13,6 +11,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 
 /**

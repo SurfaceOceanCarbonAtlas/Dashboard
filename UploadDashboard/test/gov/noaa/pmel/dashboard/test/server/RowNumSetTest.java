@@ -3,10 +3,11 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.*;
-import gov.noaa.pmel.dashboard.server.RowNumSet;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.server.RowNumSet;
 
 /**
  * Unit tests for RowNumSet

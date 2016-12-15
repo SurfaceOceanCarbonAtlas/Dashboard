@@ -3,11 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +24,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Bundles files for sending out to be archived.

@@ -3,11 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
@@ -26,6 +21,11 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
+
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
 /**
  * Page showing various plots of cruise data.

@@ -107,6 +107,11 @@ public class DashboardServerUtils {
 	 */
 	public static final DashDataType SECOND_OF_DAY = new DashDataType(DashboardUtils.SECOND_OF_DAY);
 
+	/**
+	 * WOCE flag from the automated data checker.
+	 */
+	public static final DashDataType WOCE_AUTOCHECK = new DashDataType(DashboardUtils.WOCE_AUTOCHECK);
+
 	/** 
 	 * Value of userRealName to use to skip sending the email request in 
 	 * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)} 

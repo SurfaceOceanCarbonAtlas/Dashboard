@@ -27,6 +27,7 @@ import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
+
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
@@ -198,6 +199,7 @@ public class CheckerMessageHandler {
 
 				// WOCE-type QC flags to assign from the automated data check
 				TreeSet<QCFlag> woceFlags = new TreeSet<QCFlag>();
+				String woceFlagName = DashboardUtils.WOCE_AUTOCHECK.getVarName();
 
 				for ( Message msg : output.getMessages().getMessages() ) {
 					int rowNum = msg.getLineNumber();
@@ -270,18 +272,22 @@ public class CheckerMessageHandler {
 						if ( msg.isError() ) {
 							QCFlag flag;
 							if ( colNum > 0 )
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, Severity.BAD, colNum-1, rowNum-1);
+								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_BAD, 
+										Severity.BAD, colNum-1, rowNum-1);
 							else
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_BAD, Severity.BAD, null, rowNum-1);
+								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_BAD, 
+										Severity.BAD, null, rowNum-1);
 							woceFlags.add(flag);
 						}
 						else if ( msg.isWarning() ) {
 							QCFlag flag;
 							if ( colNum > 0 ) {
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, Severity.QUESTIONABLE, colNum-1, rowNum-1);
+								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_QUESTIONABLE, 
+										Severity.QUESTIONABLE, colNum-1, rowNum-1);
 							}
 							else {
-								flag = new QCFlag("WOCE", DashboardUtils.WOCE_QUESTIONABLE, Severity.QUESTIONABLE, null, rowNum-1);
+								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_QUESTIONABLE, 
+										Severity.QUESTIONABLE, null, rowNum-1);
 							}
 							woceFlags.add(flag);
 						}

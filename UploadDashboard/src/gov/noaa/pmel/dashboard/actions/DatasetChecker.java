@@ -3,17 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
-import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +23,17 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+
+import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import uk.ac.uea.socat.omemetadata.BadEntryNameException;
 import uk.ac.uea.socat.omemetadata.InvalidConflictException;

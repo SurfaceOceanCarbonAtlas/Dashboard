@@ -3,11 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
@@ -28,6 +23,11 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
+
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * @author Karl Smith

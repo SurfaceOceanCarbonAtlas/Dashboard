@@ -3,10 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,6 +15,10 @@ import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.Header;
+
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * Class for creating a CompositeCell Header for a cruise data column.

@@ -3,12 +3,12 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TreeSet;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * Known data types that can be extended as needed.
@@ -128,7 +128,7 @@ public class KnownDataTypes {
 	 * the NetCDF DSG files.
 	 * 		SAMPLE_NUMBER, LONGITUDE, LATITUDE, SAMPLE_DEPTH, 
 	 * 		YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, 
-	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME 
+	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME, WOCE_AUTOCHECK 
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
@@ -146,6 +146,7 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
 		addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
 		addDataType(DashboardServerUtils.TIME);
+		addDataType(DashboardServerUtils.WOCE_AUTOCHECK);
 		return this;
 	}
 

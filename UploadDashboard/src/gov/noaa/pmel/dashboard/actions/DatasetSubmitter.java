@@ -3,6 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+
+import org.apache.log4j.Logger;
+
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -12,28 +19,13 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-import gov.noaa.pmel.dashboard.shared.DataQCEvent;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 /**
  * Submits a dataset.  At this time this just means creating the 
@@ -116,11 +108,11 @@ public class DatasetSubmitter {
 			String commitMsg = "Dataset " + datasetId;
 
 			if ( Boolean.TRUE.equals(dataset.isEditable()) ) {
-				// Get the complete original cruise data
+				// Get the complete dataset data
 				DashboardDatasetData datasetData = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
 
 				/*
-				 *  Convert the cruise data into standard units.  Adds and assigns 
+				 *  Convert the data into standard units.  Adds and assigns 
 				 *  year, month, day, hour, minute, and seconds columns if not present.
 				 */
 				if ( ! datasetChecker.standardizeDatasetData(datasetData) ) {
@@ -136,48 +128,20 @@ public class DatasetSubmitter {
 					continue;
 				}
 
-				// Make sure a column exists for the automated data checker WOCE flags
-				int numRows = datasetData.getNumDataRows();
-				ArrayList<String> colNames = datasetData.getUserColNames();
-				ArrayList<DataColumnType> cruiseTypes = datasetData.getDataColTypes();
-				ArrayList<ArrayList<String>> dataVals = datasetData.getDataValues();
-				HashMap<String,Integer> woceTypeIndices = new HashMap<String,Integer>();
-				for ( DashDataType dtype : knownDataFileTypes.getKnownTypesSet() ) {
-					if ( dtype.isWoceType() ) {
-						Integer woceIdx = -1;
-						for (int k = 0; k < cruiseTypes.size(); k++) {
-							if ( dtype.typeNameEquals(cruiseTypes.get(k)) ) {
-								woceIdx = k;
-								break;
-							}
-						}
-						if ( woceIdx < 0 ) {
-							woceIdx = cruiseTypes.size();
-							// Add a column for this WOCE type
-							// !! Directly modifying the lists in datasetData !!
-							colNames.add(dtype.getDisplayName());
-							cruiseTypes.add(dtype.duplicate());
-							for (int k = 0; k < numRows; k++)
-								dataVals.get(k).add(DashboardUtils.WOCE_NOT_CHECKED.toString());
-						}
-						woceTypeIndices.put(dtype.getVarName(), woceIdx);
-					}
-				}
-
-				// Add automated data checker flags
+				// Add and assign a column for the automated data checker flags
 				for ( QCFlag wtype : dataset.getCheckerFlags() ) {
-					Integer colIdx = woceTypeIndices.get(wtype.getWoceName());
+					Integer colIdx = woceTypeIndices.get(wtype.getFlagName());
 					if ( colIdx == null )
-						throw new RuntimeException("Unexpected unknown WOCE name: " + wtype.getWoceName());
+						throw new RuntimeException("Unexpected unknown WOCE name: " + wtype.getFlagName());
 					Integer rowIdx = wtype.getRowIndex();
 					if ( (rowIdx < 0) || (rowIdx >= numRows) )
 						throw new RuntimeException("Unexpected WOCE row index: " + rowIdx.toString());
 					dataVals.get(rowIdx).set(colIdx, DashboardUtils.WOCE_BAD.toString());
 				}
-				// PI-provided WOCE flags are already in the data (that is where they came from)
+				// PI-provided QC flags are already in the data (that is where they came from)
 
 				try {
-					// Get the OME metadata for this cruise
+					// Get the OME metadata for this dataset
 					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
 					if ( ! version.equals(omeInfo.getVersion()) ) {
 						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " + 
@@ -185,8 +149,7 @@ public class DatasetSubmitter {
 					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
-					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
-					// possibly modified and WOCEd cruise data
+					// Generate the NetCDF DSG file, enhanced by Ferret
 					logger.debug("Generating the full-data DSG file for " + datasetId);
 					dsgHandler.saveDataset(omeMData, datasetData, version);
 
@@ -198,7 +161,7 @@ public class DatasetSubmitter {
 					continue;
 				}
 
-				// Update cruise info with status values from datasetData
+				// Update dataset info with status values from the dataset data object
 				dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
 				dataset.setVersion(version);
 				dataset.setDataCheckStatus(datasetData.getDataCheckStatus());
@@ -213,7 +176,7 @@ public class DatasetSubmitter {
 
 			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) && 
 				 ( repeatSend || dataset.getArchiveDate().isEmpty() ) ) {
-				// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
+				// Queue the request to send (or re-send) the data and metadata for archival
 				archiveIds.add(datasetId);
 			}
 			else if ( ! archiveStatus.equals(dataset.getArchiveStatus()) ) {
@@ -224,7 +187,7 @@ public class DatasetSubmitter {
 			}
 
 			if ( changed ) {
-				// Commit this update of the cruise properties
+				// Commit this update of the dataset properties
 				commitMsg += " by user '" + submitter + "'";
 				dataHandler.saveDatasetInfoToFile(dataset, commitMsg);
 			}
@@ -239,11 +202,11 @@ public class DatasetSubmitter {
 			}
 		}
 
-		// notify ERDDAP of new/updated cruises
+		// notify ERDDAP of new/updated dataset
 		if ( ! ingestIds.isEmpty() )
 			dsgHandler.flagErddap(true, true);
 
-		// Send original cruise data to CDIAC where user requested immediate archival
+		// Send dataset data and metadata for archival where user requested immediate archival
 		if ( ! archiveIds.isEmpty() ) {
 			String userRealName;
 			try {
@@ -263,25 +226,25 @@ public class DatasetSubmitter {
 			if ( (userEmail == null) || userEmail.isEmpty() )
 				throw new IllegalArgumentException("Unknown e-mail address for user " + submitter);
 
-			for ( String expocode : archiveIds ) {
-				String commitMsg = "Immediate archival of dataset " + expocode + " requested by " + 
+			for ( String datasetId : archiveIds ) {
+				String commitMsg = "Immediate archival of dataset " + datasetId + " requested by " + 
 						userRealName + " (" + userEmail + ") at " + timestamp;
 				try {
-					filesBundler.sendOrigFilesBundle(expocode, commitMsg, userRealName, userEmail);
+					filesBundler.sendOrigFilesBundle(datasetId, commitMsg, userRealName, userEmail);
 				} catch (Exception ex) {
 					errorMsgs.add("Failed to submit request for immediate archival of " + 
-							expocode + ": " + ex.getMessage());
+							datasetId + ": " + ex.getMessage());
 					continue;
 				}
-				// When successful, update the "sent to CDIAC" timestamp
-				DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(expocode);
+				// When successful, update the archived timestamp
+				DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(datasetId);
 				cruise.setArchiveStatus(archiveStatus);
 				cruise.setArchiveDate(timestamp);
 				dataHandler.saveDatasetInfoToFile(cruise, commitMsg);
 			}
 		}
 
-		// If any cruise submit errors, return the error messages
+		// If any dataset submit had errors, return the error messages
 		// TODO: do this in a return message, not an IllegalArgumentException
 		if ( errorMsgs.size() > 0 ) {
 			StringBuilder sb = new StringBuilder();

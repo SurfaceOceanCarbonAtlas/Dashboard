@@ -3,15 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.actions.DatasetModifier;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import gov.noaa.pmel.dashboard.actions.DatasetModifier;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 /**
  * Renames datasets (changes the dataset IDs).  All files will be moved to the

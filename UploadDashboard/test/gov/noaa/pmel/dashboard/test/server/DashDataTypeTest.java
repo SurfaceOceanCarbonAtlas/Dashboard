@@ -3,15 +3,18 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.*;
-import gov.noaa.pmel.dashboard.server.DashDataType;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * Tests for {@link gov.noaa.pmel.dashboard.server.DashDataType}

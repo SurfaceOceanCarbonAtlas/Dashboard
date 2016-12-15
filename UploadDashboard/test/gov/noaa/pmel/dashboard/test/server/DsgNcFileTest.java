@@ -6,15 +6,6 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
-import gov.noaa.pmel.dashboard.server.DashDataType;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DsgData;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -23,6 +14,16 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DsgData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * @author Karl Smith

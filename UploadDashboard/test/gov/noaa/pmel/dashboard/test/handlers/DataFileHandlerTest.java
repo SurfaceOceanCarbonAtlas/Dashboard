@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.test.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 
+import org.junit.Test;
+
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import org.junit.Test;
 
 /**
  * Test of {@link gov.noaa.pmel.dashboard.handlers.DataFileHandler}.

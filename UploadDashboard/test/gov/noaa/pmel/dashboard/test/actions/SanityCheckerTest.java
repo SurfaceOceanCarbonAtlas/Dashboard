@@ -6,8 +6,6 @@ package gov.noaa.pmel.dashboard.test.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.test.server.DsgNcFileTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -19,6 +17,9 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.test.server.DsgNcFileTest;
 
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;

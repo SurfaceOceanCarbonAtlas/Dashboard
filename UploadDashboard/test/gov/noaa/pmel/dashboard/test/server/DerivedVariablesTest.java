@@ -3,15 +3,16 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.ferret.FerretConfig;
-import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DsgData;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.dashboard.ferret.SocatTool;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DsgData;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
 
 public class DerivedVariablesTest {
 

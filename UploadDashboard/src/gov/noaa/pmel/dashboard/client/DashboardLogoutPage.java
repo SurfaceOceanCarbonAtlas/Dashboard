@@ -3,10 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -16,6 +12,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
+
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
 /**
  * Logout page with a button to go back to the login again

@@ -3,10 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,6 +14,10 @@ import java.util.TimeZone;
 
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
+
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 

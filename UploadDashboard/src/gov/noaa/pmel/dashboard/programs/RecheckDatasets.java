@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.TreeSet;
+
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.TreeSet;
 
 /**
  * Rechecks datasets with the automated data checker and regenerates the messages files.

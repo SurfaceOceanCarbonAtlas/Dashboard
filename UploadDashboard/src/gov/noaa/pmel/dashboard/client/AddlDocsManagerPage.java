@@ -3,14 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,6 +37,14 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Page for managing supplemental documents for a dataset.  

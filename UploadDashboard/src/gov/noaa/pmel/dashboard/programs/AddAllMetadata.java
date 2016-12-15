@@ -3,16 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.TreeSet;
+
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.TreeSet;
 
 /**
  * Updates the metadata and additional documents for datasets 

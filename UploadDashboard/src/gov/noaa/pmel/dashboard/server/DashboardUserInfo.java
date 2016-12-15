@@ -3,9 +3,9 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.util.HashSet;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * User authentication and privileges

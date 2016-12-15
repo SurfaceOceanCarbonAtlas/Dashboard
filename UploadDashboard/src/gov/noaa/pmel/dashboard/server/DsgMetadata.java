@@ -2,11 +2,11 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Class for working with metadata values of interest,
