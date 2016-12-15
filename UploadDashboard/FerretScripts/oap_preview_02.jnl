@@ -1,7 +1,6 @@
+! Latitude, Longitude vs time
 
-! Latitude, Longitude vs time and sample number
-
-go preview_setup ($infile_dsg) 2
+go oap_preview_setup ($infile_dsg) 2
 
 let/title=Latitude lat = reshape(latitude, tt)
 let/title=Longitude lon = reshape(longitude, tt)
@@ -31,15 +30,12 @@ plot($linestyle)($style2)/axes=1,1,0,1/title=" "/set lon
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
 
-
-! Label at the top with the Expocode and count
-DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+! Label at the top with the dataset ID and count
+DEFINE SYMBOL lab_top = Dataset `dataset_id`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
-
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Latitude and Longitude vs time  `nobs` locations
 
-
 ! Make the color key
-Go keybox ($style1) Latitude ($style2) Longitude
+GO oap_keybox ($style1) Latitude ($style2) Longitude
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

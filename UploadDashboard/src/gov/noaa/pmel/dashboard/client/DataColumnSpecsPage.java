@@ -172,7 +172,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private DashboardAskPopup defaultSecondsPopup;
 	// List of all known user data column types
 	private ArrayList<DataColumnType> knownUserTypes;
-	// Cruise associated with and updated by this page
+	// Dataset associated with and updated by this page
 	private DashboardDataset cruise;
 	// List of DatasetDataColumn objects associated with the column Headers
 	private ArrayList<DatasetDataColumn> cruiseDataCols;
@@ -283,7 +283,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 					singleton.knownUserTypes.clear();
 					if ( cruiseSpecs.getAllKnownTypes() != null )
 						singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
-					singleton.updateCruiseColumnSpecs(cruiseSpecs.getDatasetData());
+					singleton.updateDatasetColumnSpecs(cruiseSpecs.getDatasetData());
 					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 				}
 				else {
@@ -324,7 +324,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	 * 		current cruise data column type specifications and
 	 * 		initial cruise data for display
 	 */
-	private void updateCruiseColumnSpecs(DashboardDatasetData cruiseSpecs) {
+	private void updateDatasetColumnSpecs(DashboardDatasetData cruiseSpecs) {
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		String status = cruiseSpecs.getDataCheckStatus();
@@ -369,7 +369,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			k--;
 			dataGrid.removeColumn(k);
 		}
-		// Clear the list of CruiseDataColumns
+		// Clear the list of DatasetDataColumns
 		cruiseDataCols.clear();
 
 		// Assign the new cruise information needed by this page
@@ -395,7 +395,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + 
 				INTRO_HTML_EPILOGUE);
 
-		// Rebuild the data grid using the provided CruiseDataColumnSpecs
+		// Rebuild the data grid using the provided DatasetDataColumnSpecs
 		if ( cruise.getDataColTypes().size() < 4 )
 			throw new IllegalArgumentException(
 					"Unexpected small number of data columns: " + 
@@ -423,7 +423,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		}
 		// Set the minimum table width
 		dataGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
-		// Update the data provider with the data in the CruiseDataColumnSpecs
+		// Update the data provider with the data in the DatasetDataColumnSpecs
 		dataProvider.updateRowCount(cruise.getNumDataRows(), true);
 		// Just insert the row numbers into each data row (modifying cruiseSpecs)
 		ArrayList<ArrayList<String>> dataWithRowNums = cruiseSpecs.getDataValues();
@@ -780,7 +780,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 					UploadDashboard.showAutoCursor();
 					return;
 				}
-				updateCruiseColumnSpecs(specs);
+				updateDatasetColumnSpecs(specs);
 				String status = specs.getDataCheckStatus();
 				if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
 					 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {

@@ -164,7 +164,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiField Button cancelButton;
 
 	private HashSet<String> expocodes;
-	private boolean hasSentCruise;
+	private boolean hasSentDataset;
 	private DashboardInfoPopup delayArchivePopup;
 	private DashboardInfoPopup cdiacInfoPopup;
 	private DashboardInfoPopup ownerArchivePopup;
@@ -184,7 +184,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 		setUsername(null);
 		expocodes = new HashSet<String>();
-		hasSentCruise = false;
+		hasSentDataset = false;
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -223,7 +223,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		if ( singleton == null )
 			singleton = new SubmitForQCPage();
 		UploadDashboard.updateCurrentPage(singleton);
-		singleton.updateCruises(cruises);
+		singleton.updateDatasets(cruises);
 		History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
 	}
 
@@ -249,13 +249,13 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	private void updateCruises(DashboardDatasetList cruises) {
+	private void updateDatasets(DashboardDatasetList cruises) {
 		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		expocodes.clear();
-		hasSentCruise = false;
+		hasSentDataset = false;
 		int numDelay = 0;
 		int numOwner = 0;
 		int numCdiac = 0;
@@ -291,13 +291,13 @@ public class SubmitForQCPage extends CompositeWithUsername {
 						submitStatus + CRUISE_INFO_EPILOGUE + "</li>");								
 			}
 			else if ( submitStatus.isEmpty() ) {
-				hasSentCruise = true;
+				hasSentDataset = true;
 				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
 						CRUISE_INFO_PROLOGUE + ARCHIVE_STATUS_INTRO +
 						cdiacDate + CRUISE_INFO_EPILOGUE + "</li>");								
 			}
 			else {
-				hasSentCruise = true;
+				hasSentDataset = true;
 				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
 						CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
 						submitStatus + "; " + ARCHIVE_STATUS_INTRO +
@@ -314,16 +314,16 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		introHtml.setHTML(introMsg);
 
 		// Check the appropriate radio button
-		int numCruises = cruises.size();
-		if ( numDelay == numCruises ) {
+		int numDatasets = cruises.size();
+		if ( numDelay == numDatasets ) {
 			// All "with next release", so keep that setting
 			delayRadio.setValue(true, true);
 		}
-		else if ( numCdiac == numCruises ) {
+		else if ( numCdiac == numDatasets ) {
 			// All "sent to CDIAC", so keep that setting
 			cdiacRadio.setValue(true, true);
 		}
-		else if ( numOwner == numCruises ) {
+		else if ( numOwner == numDatasets ) {
 			// All "owner will archive", so keep that setting
 			ownerRadio.setValue(true, true);
 		}
@@ -349,7 +349,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiHandler({"delayRadio","ownerRadio"})
 	void radioOnClick(ClickEvent event) {
 		// If there is a cruise sent to CDIAC, warn if another selection is made
-		if ( hasSentCruise ) {
+		if ( hasSentDataset ) {
 			UploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
 		}
 	}
@@ -410,7 +410,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			UploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
 			return;
 		}
-		if ( hasSentCruise && cdiacRadio.getValue() ) {
+		if ( hasSentDataset && cdiacRadio.getValue() ) {
 			// Asking to submit to CDIAC now, but has a cruise already sent
 			if ( resubmitAskPopup == null ) {
 				resubmitAskPopup = new DashboardAskPopup(YES_RESEND_TEXT, 

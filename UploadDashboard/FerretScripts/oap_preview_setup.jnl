@@ -1,4 +1,4 @@
-! Setup for preview plots
+! Setup for OA preview plots
 ! Open the dataset, define the output file name
 ! Make definitions used by all the scripts
 
@@ -8,24 +8,19 @@ can view
 use "$1"
 
 ! Define the plot file name
-DEFINE SYMBOL expocode_str = `expocode`
+DEFINE SYMBOL datasetid_str = `dataset_id`
 DEFINE SYMBOL nplt = $2
 IF `($nplt) LT 10` then DEFINE SYMBOL nplt = 0($nplt)
 
-DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($expocode_str)_($nplt).png
+DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($datasetid_str)_($nplt).gif
 
 ! Redefine the GIF-image file name, which prevents name clashes when there
 ! are multiple sessions.
-
 DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
 SET GIFFILE "($gifplot_name)"
 
 ! Further setup, done once for all the outputs
 IF ($preview_setup_done"0|*>1") THEN exit/script
-
-SET VAR/TITLE="WOCE flag for water CO_2" WOCE_CO2_water
-SET VAR/TITLE="fCO_2 recommended" fCO2_recommended
-
 
 ! reset the green pen to a darker green...
 ppl color,3,0,80,0    
@@ -39,21 +34,15 @@ DEFINE SYMBOL land_palette = gray_light
 ! Reset color 6 to light gray - line underlay on map, marking woce-4 points
 ppl color,6,70,70,70 ! gray
 
-
 ! set up the color palette for WOCE flags
 DEFINE SYMBOL woce_palette = woce2
-
-
 
 can mode logo
 
 ppl txlsze,0.08
 ppl axlsze,0.08,0.08
 
-
 LET nobs = `latitude[i=@ngd]`
-LET nfnoc = `fCO2_recommended[i=@ngd]`
-
 
 ! Define time axis
 ! If we cannot define the time axis, exit
@@ -70,43 +59,9 @@ LET monthsecs = 30*24*60*60
 !IF `ttn-tt1 GT monthsecs` THEN DEFINE SYMBOL taxis_setting = PPL txtype,MON,DMY
 
 ! Define numeric variable on the time axis with the WOCE flags
-SET VAR/NAME=WOCE_CO2_water_in WOCE_CO2_water
-LET WOCE_CO2_water_x = STRFLOAT(WOCE_CO2_water_in)
-LET WOCE_CO2_water = RESHAPE(WOCE_CO2_water_x, tt)
-
-
-
-LET var_sources = {\
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"fCO2_water_equi_uatm", \
-"fCO2_water_sst_100humidity_uatm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm"}
-
-LET source_labels = {\
-"xCO_2^s^w(teq) dry", \
-"xCO_2^s^w(sst) dry", \
-"pCO_2^s^w(teq)", \
-"pCO_2^s^w(sst)", \
-"fCO_2^s^w(teq)", \
-"fCO_2^s^w(sst)", \
-"pCO_2^s^w(teq) ncep", \
-"pCO_2^s^w(sst) ncep", \
-"xCO_2^s^w(teq) dry woa", \
-"xCO_2^s^w(sst) dry woa", \
-"xCO_2^s^w(teq) dry ncep", \
-"xCO_2^s^w(sst) dry ncep", \
-"xCO_2^s^w(teq) dry ncep_woa", \
-"xCO_2^s^w(sst) dry ncep_woa"}
+SET VAR/NAME=WOCE_autocheck_in WOCE_autocheck
+LET WOCE_autocheck_x = STRFLOAT(WOCE_autocheck_in)
+LET WOCE_autocheck = RESHAPE(WOCE_autocheck_x, tt)
 
 define view/x=0:1/y=0:1 full0
 define view/x=0:1/y=0:1 full1
@@ -114,7 +69,6 @@ define view/x=0:1/y=0:1 full2
 define view/x=0:1/y=0:1 full3
 
 cancel mode nodata_label
-
 
 ! polygon plot style 
 DEFINE SYMBOL ppstyle = /SYMBOL=17/siz=0.06

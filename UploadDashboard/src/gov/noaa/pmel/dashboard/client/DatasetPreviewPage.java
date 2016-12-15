@@ -52,18 +52,6 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 	private static final String LAT_VS_LON_TAB_TEXT = "lat vs lon";
 	private static final String LAT_LON_TAB_TEXT = "lat, lon";
 	private static final String SAMPLE_VS_TIME_TAB_TEXT = "sample num vs time";
-	private static final String TIME_SERIES_TAB_TEXT = "time series";
-	private static final String PRESSURES_TAB_TEXT = "pressures";
-	private static final String TEMPERATURES_TAB_TEXT = "temperatures";
-	private static final String SALINITIES_TAB_TEXT = "salinities";
-	private static final String XCO2S_TAB_TEXT = "xCO<sub>2</sub>s";
-	private static final String DT_XCO2_FCO2_TAB_TEXT = "dT, xCO<sub>2</sub>, fCO<sub>2</sub>";
-	private static final String REC_FCO2_VS_TIME_TAB_TEXT = "rec fCO<sub>2</sub> vs time";
-	private static final String REC_FCO2_VS_SST_TAB_TEXT = "rec fCO<sub>2</sub> vs SST";
-	private static final String REC_FCO2_VS_SAL_TAB_TEXT = "rec fCO<sub>2</sub> vs sal";
-	private static final String REPORT_REC_FCO2_TAB_TEXT = "given &amp; rec fCO<sub>2</sub>";
-	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> - src CO<sub>2</sub>";
-	private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
 	private static final String REFRESH_HELP_ADDENDUM = 
 			" -- if plots to not show after awhile, try pressing the '" + REFRESH_TEXT + "' button given below this image.";
@@ -71,40 +59,16 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
 	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time";
-	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
-	private static final String PRESSURES_ALT_TEXT = "pressures versus time";
-	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
-	private static final String SALINITIES_ALT_TEXT = "salinities versus time";
-	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time";
-	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time";
-	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
-	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
-	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
-	private static final String REPORT_REC_FCO2_ALT_TEXT = "reported and recommended fCO2";
-	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported source CO2";
-	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2";
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
 	public static final String SAMPLE_VS_TIME_IMAGE_NAME = "sample_vs_time";
-	public static final String TIME_SERIES_IMAGE_NAME = "time_series";
-	public static final String PRESSURES_IMAGE_NAME = "pressures";
-	public static final String TEMPERATURES_IMAGE_NAME = "temperatures";
-	public static final String SALINITIES_IMAGE_NAME = "salinities";
-	public static final String XCO2S_IMAGE_NAME = "xco2s";
-	public static final String DT_XCO2_FCO2_IMAGE_NAME = "delta_temp_xco2_fco2";
-	public static final String REC_FCO2_VS_TIME_IMAGE_NAME = "rec_fco2_vs_time";
-	public static final String REC_FCO2_VS_SST_IMAGE_NAME = "rec_fco2_vs_sst";
-	public static final String REC_FCO2_VS_SAL_IMAGE_NAME = "rec_fco2_vs_sal";
-	public static final String REPORT_REC_FCO2_IMAGE_NAME = "report_rec_fco2";
-	public static final String REC_FCO2_DELTA_IMAGE_NAME = "rec_fco2_delta";
-	public static final String REC_FCO2_SOURCES_IMAGE_NAME = "rec_fco2_sources";
 
-	interface CruisePreviewPageUiBinder extends UiBinder<Widget, DatasetPreviewPage> {
+	interface DatasetPreviewPageUiBinder extends UiBinder<Widget, DatasetPreviewPage> {
 	}
 
-	private static CruisePreviewPageUiBinder uiBinder = 
-			GWT.create(CruisePreviewPageUiBinder.class);
+	private static DatasetPreviewPageUiBinder uiBinder = 
+			GWT.create(DatasetPreviewPageUiBinder.class);
 
 	private static DashboardServicesInterfaceAsync service = 
 			GWT.create(DashboardServicesInterface.class);
@@ -119,34 +83,10 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 	@UiField HTML latVsLonHtml;
 	@UiField HTML latLonHtml;
 	@UiField HTML sampleVsTimeHtml;
-	@UiField HTML timeSeriesHtml;
-	@UiField HTML pressuresHtml;
-	@UiField HTML temperaturesHtml;
-	@UiField HTML salinitiesHtml;
-	@UiField HTML xco2sHtml;
-	@UiField HTML dtXco2Fco2Html;
-	@UiField HTML recFco2VsTimeHtml;
-	@UiField HTML recFco2VsSstHtml;
-	@UiField HTML recFco2VsSalHtml;
-	@UiField HTML reportRecFco2Html;
-	@UiField HTML recFco2DeltaHtml;
-	@UiField HTML recFco2SourcesHtml;
 
 	@UiField Image latVsLonImage;
 	@UiField Image latLonImage;
 	@UiField Image sampleVsTimeImage;
-	@UiField Image timeSeriesImage;
-	@UiField Image pressuresImage;
-	@UiField Image temperaturesImage;
-	@UiField Image salinitiesImage;
-	@UiField Image xco2sImage;
-	@UiField Image dtXco2Fco2Image;
-	@UiField Image recFco2VsTimeImage;
-	@UiField Image recFco2VsSstImage;
-	@UiField Image recFco2VsSalImage;
-	@UiField Image reportRecFco2Image;
-	@UiField Image recFco2DeltaImage;
-	@UiField Image recFco2SourcesImage;
 
 	String expocode;
 	String timetag;
@@ -199,69 +139,21 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 		latVsLonHtml.setHTML(LAT_VS_LON_TAB_TEXT);
 		latLonHtml.setHTML(LAT_LON_TAB_TEXT);
 		sampleVsTimeHtml.setHTML(SAMPLE_VS_TIME_TAB_TEXT);
-		timeSeriesHtml.setHTML(TIME_SERIES_TAB_TEXT);
-		pressuresHtml.setHTML(PRESSURES_TAB_TEXT);
-		temperaturesHtml.setHTML(TEMPERATURES_TAB_TEXT);
-		salinitiesHtml.setHTML(SALINITIES_TAB_TEXT);
-		xco2sHtml.setHTML(XCO2S_TAB_TEXT);
-		dtXco2Fco2Html.setHTML(DT_XCO2_FCO2_TAB_TEXT);
-		recFco2VsTimeHtml.setHTML(REC_FCO2_VS_TIME_TAB_TEXT);
-		recFco2VsSstHtml.setHTML(REC_FCO2_VS_SST_TAB_TEXT);
-		recFco2VsSalHtml.setHTML(REC_FCO2_VS_SAL_TAB_TEXT);
-		reportRecFco2Html.setHTML(REPORT_REC_FCO2_TAB_TEXT);
-		recFco2DeltaHtml.setHTML(REC_FCO2_DELTA_TAB_TEXT);
-		recFco2SourcesHtml.setHTML(REC_FCO2_SOURCES_TAB_TEXT);
 
 		// Set hover helps for the tabs
 		latVsLonHtml.setTitle(LAT_VS_LON_ALT_TEXT);
 		latLonHtml.setTitle(LAT_LON_ALT_TEXT);
 		sampleVsTimeHtml.setTitle(SAMPLE_VS_TIME_ALT_TEXT);
-		timeSeriesHtml.setTitle(TIME_SERIES_ALT_TEXT);
-		pressuresHtml.setTitle(PRESSURES_ALT_TEXT);
-		temperaturesHtml.setTitle(TEMPERATURES_ALT_TEXT);
-		salinitiesHtml.setTitle(SALINITIES_ALT_TEXT);
-		xco2sHtml.setTitle(XCO2S_ALT_TEXT);
-		dtXco2Fco2Html.setTitle(DT_XCO2_FCO2_ALT_TEXT);
-		recFco2VsTimeHtml.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
-		recFco2VsSstHtml.setTitle(REC_CO2_VS_SST_ALT_TEXT);
-		recFco2VsSalHtml.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
-		reportRecFco2Html.setTitle(REPORT_REC_FCO2_ALT_TEXT);
-		recFco2DeltaHtml.setTitle(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2SourcesHtml.setTitle(REC_FCO2_SOURCES_ALT_TEXT);
 
 		// Set text alternative for the images
 		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT + REFRESH_HELP_ADDENDUM);
 		latLonImage.setAltText(LAT_LON_ALT_TEXT + REFRESH_HELP_ADDENDUM);
 		sampleVsTimeImage.setAltText(SAMPLE_VS_TIME_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		timeSeriesImage.setAltText(TIME_SERIES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		pressuresImage.setAltText(PRESSURES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		temperaturesImage.setAltText(TEMPERATURES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		salinitiesImage.setAltText(SALINITIES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		xco2sImage.setAltText(XCO2S_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		dtXco2Fco2Image.setAltText(DT_XCO2_FCO2_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		recFco2VsTimeImage.setAltText(REC_FCO2_VS_TIME_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		reportRecFco2Image.setAltText(REPORT_REC_FCO2_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		recFco2DeltaImage.setAltText(REC_FCO2_DELTA_ALT_TEXT + REFRESH_HELP_ADDENDUM);
-		recFco2SourcesImage.setAltText(REC_FCO2_SOURCES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
 
 		// Set hover helps for the images
 		latVsLonImage.setTitle(LAT_VS_LON_ALT_TEXT);
 		latLonImage.setTitle(LAT_LON_ALT_TEXT);
 		sampleVsTimeImage.setTitle(SAMPLE_VS_TIME_ALT_TEXT);
-		timeSeriesImage.setTitle(TIME_SERIES_ALT_TEXT);
-		pressuresImage.setTitle(PRESSURES_ALT_TEXT);
-		temperaturesImage.setTitle(TEMPERATURES_ALT_TEXT);
-		salinitiesImage.setTitle(SALINITIES_ALT_TEXT);
-		xco2sImage.setTitle(XCO2S_ALT_TEXT);
-		dtXco2Fco2Image.setTitle(DT_XCO2_FCO2_ALT_TEXT);
-		recFco2VsTimeImage.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
-		recFco2VsSstImage.setTitle(REC_CO2_VS_SST_ALT_TEXT);
-		recFco2VsSalImage.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
-		reportRecFco2Image.setTitle(REPORT_REC_FCO2_ALT_TEXT);
-		recFco2DeltaImage.setTitle(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2SourcesImage.setTitle(REC_FCO2_SOURCES_ALT_TEXT);
 	}
 
 	/**
@@ -340,18 +232,6 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 		latVsLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_VS_LON_IMAGE_NAME + imageSuffix));
 		latLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_LON_IMAGE_NAME + imageSuffix));
 		sampleVsTimeImage.setUrl(UriUtils.fromString(imagePrefix + SAMPLE_VS_TIME_IMAGE_NAME + imageSuffix));
-		timeSeriesImage.setUrl(UriUtils.fromString(imagePrefix + TIME_SERIES_IMAGE_NAME + imageSuffix));
-		pressuresImage.setUrl(UriUtils.fromString(imagePrefix + PRESSURES_IMAGE_NAME + imageSuffix));
-		temperaturesImage.setUrl(UriUtils.fromString(imagePrefix + TEMPERATURES_IMAGE_NAME + imageSuffix));
-		salinitiesImage.setUrl(UriUtils.fromString(imagePrefix + SALINITIES_IMAGE_NAME + imageSuffix));
-		xco2sImage.setUrl(UriUtils.fromString(imagePrefix + XCO2S_IMAGE_NAME + imageSuffix));
-		dtXco2Fco2Image.setUrl(UriUtils.fromString(imagePrefix + DT_XCO2_FCO2_IMAGE_NAME + imageSuffix));
-		recFco2VsTimeImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_TIME_IMAGE_NAME + imageSuffix));
-		recFco2VsSstImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SST_IMAGE_NAME + imageSuffix));
-		recFco2VsSalImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SAL_IMAGE_NAME + imageSuffix));
-		reportRecFco2Image.setUrl(UriUtils.fromString(imagePrefix + REPORT_REC_FCO2_IMAGE_NAME + imageSuffix));
-		recFco2DeltaImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_DELTA_IMAGE_NAME + imageSuffix));
-		recFco2SourcesImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_SOURCES_IMAGE_NAME + imageSuffix));
 	}
 
 	@UiHandler("refreshButton")

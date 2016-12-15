@@ -1,4 +1,4 @@
-! preview_xy_range
+! oap_preview_xy_range
 !  Version of LAS_is_range, called by preview map script. Handles
 !  x and y; does not handle time 
 !

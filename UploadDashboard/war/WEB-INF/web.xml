@@ -20,12 +20,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.dashboard.server.CruiseUploadService</servlet-class>
+		<servlet-name>DashboardDataUploadServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.dashboard.server.DataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<url-pattern>/OAPUploadDashboard/CruiseUploadService</url-pattern>
+		<servlet-name>DashboardDataUploadServlet</servlet-name>
+		<url-pattern>/OAPUploadDashboard/DataUploadService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

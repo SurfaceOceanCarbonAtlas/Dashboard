@@ -38,7 +38,7 @@ public class SanityCheckerTest {
 	static {
 		String home = System.getenv("HOME");
 		CONFIG_FILENAME = home + "/content/OAPUploadDashboard/config/OAPUploadDashboard.properties";
-		LOG4J_PROPERTIES_FILENAME = home + "/content/OAPßUploadDashboard/config/log4j.properties";
+		LOG4J_PROPERTIES_FILENAME = home + "/content/OAPUploadDashboard/config/log4j.properties";
 	}
 
 	@Test
@@ -233,7 +233,9 @@ public class SanityCheckerTest {
 				colSpec, questionableCruiseData, "YYYY-MM-DD");
 		output = checker.process();
 		assertTrue( output.processedOK() );
-		assertTrue( output.hasWarnings() );
+		// At this time OAP only checking lon/lat/depth/time so questionable CO2 values not detected
+		// assertTrue( output.hasWarnings() );
+		assertFalse( output.hasWarnings() );
 		assertFalse( output.hasErrors() );
 		assertEquals( 342.039, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
 		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );

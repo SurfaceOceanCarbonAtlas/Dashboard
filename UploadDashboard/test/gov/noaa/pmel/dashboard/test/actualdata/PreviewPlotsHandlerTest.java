@@ -43,19 +43,7 @@ public class PreviewPlotsHandlerTest {
 		for ( String imgName : new String[] {
 				DatasetPreviewPage.LAT_VS_LON_IMAGE_NAME,
 				DatasetPreviewPage.LAT_LON_IMAGE_NAME,
-				DatasetPreviewPage.SAMPLE_VS_TIME_IMAGE_NAME,
-				DatasetPreviewPage.TIME_SERIES_IMAGE_NAME,
-				DatasetPreviewPage.PRESSURES_IMAGE_NAME,
-				DatasetPreviewPage.TEMPERATURES_IMAGE_NAME,
-				DatasetPreviewPage.SALINITIES_IMAGE_NAME,
-				DatasetPreviewPage.XCO2S_IMAGE_NAME,
-				DatasetPreviewPage.DT_XCO2_FCO2_IMAGE_NAME,
-				DatasetPreviewPage.REC_FCO2_VS_TIME_IMAGE_NAME,
-				DatasetPreviewPage.REC_FCO2_VS_SST_IMAGE_NAME,
-				DatasetPreviewPage.REC_FCO2_VS_SAL_IMAGE_NAME,
-				DatasetPreviewPage.REPORT_REC_FCO2_IMAGE_NAME,
-				DatasetPreviewPage.REC_FCO2_DELTA_IMAGE_NAME,
-				DatasetPreviewPage.REC_FCO2_SOURCES_IMAGE_NAME } ) {
+				DatasetPreviewPage.SAMPLE_VS_TIME_IMAGE_NAME } ) {
 			plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".gif");
 			assertTrue( "Plot for " + imgName + " does not exist", plotFile.exists() );
 			plotFile.delete();

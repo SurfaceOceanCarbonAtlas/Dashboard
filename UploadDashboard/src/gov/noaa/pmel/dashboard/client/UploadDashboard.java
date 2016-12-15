@@ -202,11 +202,11 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 			DatasetListPage.showPage();
 		}
 		else if ( token.equals(PagesEnum.SHOW_DATASETS.name()) ) {
-			// Cruise list page from history
+			// Dataset list page from history
 			DatasetListPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.UPLOAD_DATA.name()) ) {
-			// Cruise upload page from history
+			// Dataset upload page from history
 			DataUploadPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.IDENTIFY_COLUMNS.name()) ) {

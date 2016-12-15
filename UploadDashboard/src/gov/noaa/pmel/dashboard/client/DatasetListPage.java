@@ -169,8 +169,8 @@ public class DatasetListPage extends CompositeWithUsername {
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
-	private static final String EXPOCODE_TO_SHOW_MSG = 
-			"Enter the dataset, possibly with wildcards * and ?, of the datasets " +
+	private static final String DATASETS_TO_SHOW_MSG = 
+			"Enter the ID, possibly with wildcards * and ?, of the dataset(s) " +
 			"you want to show in your list of displayed datasets";
 	private static final String SHOW_DATASET_FAIL_MSG = 
 			"Unable to show the specified datasets " +
@@ -220,7 +220,7 @@ public class DatasetListPage extends CompositeWithUsername {
 	private static final String CLEAR_SELECTION_OPTION = "None";
 
 	// Column header strings
-	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
+	private static final String DATASET_ID_COLUMN_NAME = "Dataset ID";
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
 	private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
@@ -233,7 +233,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = "(no uploaded datasets)";
-	private static final String NO_EXPOCODE_STRING = "(unknown)";
+	private static final String NO_DATASET_ID_STRING = "(unknown)";
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
 	private static final String NO_DATA_CHECK_STATUS_STRING = "Not checked";
 	private static final String NO_OME_METADATA_STATUS_STRING = "(no metadata)";
@@ -243,11 +243,11 @@ public class DatasetListPage extends CompositeWithUsername {
 	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 
-	interface CruiseListPageUiBinder extends UiBinder<Widget, DatasetListPage> {
+	interface DatasetListPageUiBinder extends UiBinder<Widget, DatasetListPage> {
 	}
 
-	private static CruiseListPageUiBinder uiBinder = 
-			GWT.create(CruiseListPageUiBinder.class);
+	private static DatasetListPageUiBinder uiBinder = 
+			GWT.create(DatasetListPageUiBinder.class);
 
 	private static DashboardServicesInterfaceAsync service = 
 			GWT.create(DashboardServicesInterface.class);
@@ -273,9 +273,9 @@ public class DatasetListPage extends CompositeWithUsername {
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
 	private DashboardInputPopup changeOwnerPopup;
-	private DashboardDatasetList cruiseSet;
+	private DashboardDatasetList datasetsSet;
 	private DashboardDatasetList checkSet;
-	private TreeSet<String> expocodeSet;
+	private TreeSet<String> datasetIdsSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	// private boolean managerButtonsShown;
 	private TextColumn<DashboardDataset> timestampColumn;
@@ -285,22 +285,22 @@ public class DatasetListPage extends CompositeWithUsername {
 	private static DatasetListPage singleton;
 
 	/**
-	 * Creates an empty cruise list page.  Do not call this 
+	 * Creates an empty dataset list page.  Do not call this 
 	 * constructor; instead use the showPage static method 
 	 * to show the singleton instance of this page with the
-	 * latest cruise list from the server. 
+	 * latest dataset list from the server. 
 	 */
 	DatasetListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		buildCruiseListTable();
+		buildDatasetListTable();
 
 		setUsername(null);
 
-		cruiseSet = new DashboardDatasetList();
+		datasetsSet = new DashboardDatasetList();
 		checkSet = new DashboardDatasetList();
-		expocodeSet = new TreeSet<String>();
+		datasetIdsSet = new TreeSet<String>();
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -343,7 +343,7 @@ public class DatasetListPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Display the cruise list page in the RootLayoutPanel 
+	 * Display the dataset list page in the RootLayoutPanel 
 	 * with the latest information from the server.
 	 * Adds this page to the page history.
 	 */
@@ -356,7 +356,7 @@ public class DatasetListPage extends CompositeWithUsername {
 				if ( singleton == null )
 					singleton = new DatasetListPage();
 				UploadDashboard.updateCurrentPage(singleton);
-				singleton.updateCruises(cruises);
+				singleton.updateDatasets(cruises);
 				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
 				UploadDashboard.showAutoCursor();
 			}
@@ -381,18 +381,18 @@ public class DatasetListPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Add a cruise to the selected list when the page is displayed.
+	 * Add a dataset to the selected list when the page is displayed.
 	 * This should be called just prior to calling showPage().  
-	 * If no cruise with the given dataset exists in the updated 
-	 * list of cruises, this dataset will be ignored. 
+	 * If no dataset with the given ID exists in the updated 
+	 * list of datasets, this ID will be ignored. 
 	 * 
 	 * @param dataset
 	 * 		select the cruise with this dataset
 	 */
-	static void addSelectedCruise(String expocode) {
+	static void addSelectedDataset(String datasetId) {
 		if ( singleton == null )
 			singleton = new DatasetListPage();
-		singleton.expocodeSet.add(expocode);
+		singleton.datasetIdsSet.add(datasetId);
 	}
 
 	/**
@@ -409,57 +409,37 @@ public class DatasetListPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Updates the cruise list page with the current username and 
-	 * with the cruises given in the argument.
+	 * Updates the dataset list page with the current username and 
+	 * with the datasets given in the argument.
 	 * 
-	 * @param cruises
-	 * 		cruises to display
+	 * @param newList
+	 * 		datasets to display
 	 */
-	private void updateCruises(DashboardDatasetList cruises) {
+	private void updateDatasets(DashboardDatasetList newList) {
 		// Update the username
-		setUsername(cruises.getUsername());
+		setUsername(newList.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
-		/*
-		if ( cruises.isManager() ) {
-			if ( ! managerButtonsShown ) {
-				// Add manager-specific buttons
-				firstSeparator.setVisible(true);
-				showDatasetButton.setVisible(true);
-				hideDatasetButton.setVisible(true);
-				managerButtonsShown = true;
-			}
-		}
-		else {
-			if ( managerButtonsShown ) {
-				// Remove manager-specific buttons
-				firstSeparator.setVisible(false);
-				showDatasetButton.setVisible(false);
-				hideDatasetButton.setVisible(false);
-				managerButtonsShown = false;
-			}
-		}
-		*/
 		// Update the cruises shown by resetting the data in the data provider
-		List<DashboardDataset> cruiseList = listProvider.getList();
-		cruiseList.clear();
-		if ( cruises != null ) {
-			cruiseList.addAll(cruises.values());
+		List<DashboardDataset> providerList = listProvider.getList();
+		providerList.clear();
+		if ( newList != null ) {
+			providerList.addAll(newList.values());
 		}
-		for ( DashboardDataset cruise : cruiseList ) {
-			if ( expocodeSet.contains(cruise.getDatasetId()) )
-				cruise.setSelected(true);
+		for ( DashboardDataset dataset : providerList ) {
+			if ( datasetIdsSet.contains(dataset.getDatasetId()) )
+				dataset.setSelected(true);
 			else
-				cruise.setSelected(false);
+				dataset.setSelected(false);
 		}
-		datasetsGrid.setRowCount(cruiseList.size());
-		datasetsGrid.setVisibleRange(0, cruiseList.size());
+		datasetsGrid.setRowCount(providerList.size());
+		datasetsGrid.setVisibleRange(0, providerList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
 	}
 
 	/**
-	 * Selects cruises of the given type in the cruise list, supplementing the currently
-	 * selected cruises, or clears all selected cruises.
+	 * Selects dataset of the given type in the dataset list, supplementing the currently
+	 * selected datasets, or clears all selected datasets.
 	 * 
 	 * @param option
 	 * 		string indicating the cruise types to select;  one of: <br />
@@ -470,48 +450,48 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * 		PUBLISHED_SELECTION_OPTION - selects published cruises; or <br />
 	 * 		CLEAR_SELECTION_OPTION - clears all selected cruises.
 	 */
-	private void setCruiseSelection(String option) {
+	private void setDatasetSelection(String option) {
 		// Do nothing is SELECTION_OPTION_LABEL is given
 		if ( SELECTION_OPTION_LABEL.equals(option) )
 			return;
-		// Modify the cruise selection
-		List<DashboardDataset> cruiseList = listProvider.getList();
+		// Modify the dataset selection
+		List<DashboardDataset> providerList = listProvider.getList();
 		if ( ALL_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardDataset cruise : cruiseList )
-				cruise.setSelected(true);
+			for ( DashboardDataset dataset : providerList )
+				dataset.setSelected(true);
 		}
 		else if ( EDITABLE_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardDataset cruise : cruiseList ) {
-				if ( Boolean.TRUE.equals(cruise.isEditable()) )
-					cruise.setSelected(true);
+			for ( DashboardDataset dataset : providerList ) {
+				if ( Boolean.TRUE.equals(dataset.isEditable()) )
+					dataset.setSelected(true);
 				else
-					cruise.setSelected(false);
+					dataset.setSelected(false);
 			}
 		}
 		else if ( SUBMITTED_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardDataset cruise : cruiseList ) {
-				if ( Boolean.FALSE.equals(cruise.isEditable()) )
-					cruise.setSelected(true);
+			for ( DashboardDataset dataset : providerList ) {
+				if ( Boolean.FALSE.equals(dataset.isEditable()) )
+					dataset.setSelected(true);
 				else
-					cruise.setSelected(false);					
+					dataset.setSelected(false);					
 			}
 		}
 		else if ( PUBLISHED_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardDataset cruise : cruiseList )
-				if ( null == cruise.isEditable() )
-					cruise.setSelected(true);
+			for ( DashboardDataset dataset : providerList )
+				if ( null == dataset.isEditable() )
+					dataset.setSelected(true);
 				else
-					cruise.setSelected(false);					
+					dataset.setSelected(false);					
 		}
 		else if ( CLEAR_SELECTION_OPTION.equals(option) ) {
-			for ( DashboardDataset cruise : cruiseList )
-				cruise.setSelected(false);
+			for ( DashboardDataset dataset : providerList )
+				dataset.setSelected(false);
 		}
 		else {
-			throw new RuntimeException("Unexpected option given the setCruiseSelection: " + option);
+			throw new RuntimeException("Unexpected option given the setDatasetSelection: " + option);
 		}
-		datasetsGrid.setRowCount(cruiseList.size());
-		datasetsGrid.setVisibleRange(0, cruiseList.size());
+		datasetsGrid.setRowCount(providerList.size());
+		datasetsGrid.setVisibleRange(0, providerList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
 	}
@@ -522,7 +502,7 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * 		one of SELECTION_OPTION_LABEL, ALL_SELECTION_OPTION, EDITABLE_SELECTION_OPTION, 
 	 * 		SUBMITTED_SELECTION_OPTION, PUBLISHED_SELECTION_OPTION, CLEAR_SELECTION_OPTION
 	 * - unused at this time, thus commented out
-	private String getSelectedCruisesType() {
+	private String getSelectedDatasetsType() {
 		List<DashboardDataset> cruiseList = listProvider.getList();
 		boolean isCleared = true;
 		boolean isAll = true;
@@ -530,7 +510,7 @@ public class DatasetListPage extends CompositeWithUsername {
 		Boolean isAllSubmitted = null;
 		Boolean isAllPublished = null;
 		for ( DashboardDataset cruise : cruiseList ) {
-			Boolean editable = isEditableCruise(cruise);
+			Boolean editable = isEditableDataset(cruise);
 			if ( cruise.isSelected() ) {
 				isCleared = false;
 				if ( null == editable ) {
@@ -589,8 +569,8 @@ public class DatasetListPage extends CompositeWithUsername {
 	*/
 
 	/**
-	 * Assigns cruiseSet with the selected cruises, and 
-	 * expocodeSet with the expocodes of these cruises. 
+	 * Assigns datasetsSet with the selected cruises, and 
+	 * datasetIdsSet with the expocodes of these cruises. 
 	 *  
 	 * @param onlyEditable
 	 * 		if true, fails if a submitted or published cruise is selected;
@@ -599,14 +579,14 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruises(Boolean onlyEditable) {
-		cruiseSet.clear();
-		cruiseSet.setUsername(getUsername());
-		expocodeSet.clear();
-		for ( DashboardDataset cruise : listProvider.getList() ) {
-			if ( cruise.isSelected() ) {
+	private boolean getSelectedDatasets(Boolean onlyEditable) {
+		datasetsSet.clear();
+		datasetsSet.setUsername(getUsername());
+		datasetIdsSet.clear();
+		for ( DashboardDataset dataset : listProvider.getList() ) {
+			if ( dataset.isSelected() ) {
 				if ( onlyEditable != null ) {
-					Boolean editable = cruise.isEditable();
+					Boolean editable = dataset.isEditable();
 					// check if from a previous version
 					if ( editable == null )
 						return false;
@@ -614,9 +594,9 @@ public class DatasetListPage extends CompositeWithUsername {
 					if ( onlyEditable && ! editable )
 						return false;
 				}
-				String expocode = cruise.getDatasetId();
-				cruiseSet.put(expocode, cruise);
-				expocodeSet.add(expocode);
+				String expocode = dataset.getDatasetId();
+				datasetsSet.put(expocode, dataset);
+				datasetIdsSet.add(expocode);
 			}
 		}
 		return true;
@@ -628,71 +608,71 @@ public class DatasetListPage extends CompositeWithUsername {
 	}
 
 	@UiHandler("uploadButton")
-	void uploadCruiseOnClick(ClickEvent event) {
-		// Save the expocodes of the currently selected cruises
-		getSelectedCruises(null);
-		// Go to the cruise upload page
+	void uploadDatasetOnClick(ClickEvent event) {
+		// Save the IDs of the currently selected datasets
+		getSelectedDatasets(null);
+		// Go to the dataset upload page
 		DataUploadPage.showPage(getUsername());
 	}
 
 	@UiHandler("viewDataButton")
 	void dataCheckOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(true) ) {
+		if ( ! getSelectedDatasets(true) ) {
 			UploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
-		if ( expocodeSet.size() < 1 ) {
+		if ( datasetIdsSet.size() < 1 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
-		DataColumnSpecsPage.showPage(getUsername(), new ArrayList<String>(expocodeSet));
+		DataColumnSpecsPage.showPage(getUsername(), new ArrayList<String>(datasetIdsSet));
 	}
 
 	@UiHandler("omeMetadataButton")
 	void omeOnClick(ClickEvent event) {
-		getSelectedCruises(null);
-		if ( cruiseSet.size() < 1 ) {
+		getSelectedDatasets(null);
+		if ( datasetsSet.size() < 1 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		// Until the OME is in place, only accept one cruise
-		if ( cruiseSet.size() > 1 ) {
+		if ( datasetsSet.size() > 1 ) {
 			UploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
-		OmeManagerPage.showPage(cruiseSet);
+		OmeManagerPage.showPage(datasetsSet);
 	}
 
 	@UiHandler("addlDocsButton")
 	void addlDocsOnClick(ClickEvent event) {
-		getSelectedCruises(null);
-		if ( cruiseSet.size() < 1 ) {
+		getSelectedDatasets(null);
+		if ( datasetsSet.size() < 1 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
-		AddlDocsManagerPage.showPage(cruiseSet);
+		AddlDocsManagerPage.showPage(datasetsSet);
 	}
 
 	@UiHandler("reviewButton")
 	void reviewOnClick(ClickEvent event) {
-		getSelectedCruises(null);
-		if ( cruiseSet.size() < 1 ) {
+		getSelectedDatasets(null);
+		if ( datasetsSet.size() < 1 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
 		}
-		if ( cruiseSet.size() > 1 ) {
+		if ( datasetsSet.size() > 1 ) {
 			UploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
 		}
-		for ( DashboardDataset cruise : cruiseSet.values() ) {
-			String status = cruise.getDataCheckStatus();
+		for ( DashboardDataset dataset : datasetsSet.values() ) {
+			String status = dataset.getDataCheckStatus();
 			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ) {
 				UploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
 				return;
@@ -702,44 +682,44 @@ public class DatasetListPage extends CompositeWithUsername {
 				return;				
 			}
 		}
-		DatasetPreviewPage.showPage(cruiseSet);
+		DatasetPreviewPage.showPage(datasetsSet);
 		return;
 	}
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(false) ) {
+		if ( ! getSelectedDatasets(false) ) {
 			UploadDashboard.showMessage(
 					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
-		if ( cruiseSet.size() == 0 ) {
+		if ( datasetsSet.size() == 0 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
 		checkSet.clear();
-		checkSet.putAll(cruiseSet);
+		checkSet.putAll(datasetsSet);
 		checkSet.setUsername(getUsername());
-		checkCruisesForSubmitting();
+		checkDatasetsForSubmitting();
 	}
 
 	@UiHandler("deleteButton")
-	void deleteCruiseOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(true) ) {
+	void deleteDatasetOnClick(ClickEvent event) {
+		if ( ! getSelectedDatasets(true) ) {
 			UploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
-		if ( expocodeSet.size() == 0 ) {
+		if ( datasetIdsSet.size() == 0 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
 		// Confirm cruises to be deleted
 		String message = DELETE_DATASET_HTML_PROLOGUE;
-		for ( String expocode : expocodeSet )
-			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+		for ( String datasetId : datasetIdsSet )
+			message += "<li>" + SafeHtmlUtils.htmlEscape(datasetId) + "</li>";
 		message += DELETE_DATASET_HTML_EPILOGUE;
 		if ( askDeletePopup == null ) {
 			askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT, 
@@ -749,7 +729,7 @@ public class DatasetListPage extends CompositeWithUsername {
 					// Only proceed only if yes button was selected
 					if ( okay ) {
 						// never delete the metadata or supplemental documents
-						continueDeleteCruises(false);
+						continueDeleteDatasets(false);
 					}
 				}
 				@Override
@@ -766,14 +746,14 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * Makes the request to delete the currently selected cruises,
 	 * and processes the results.
 	 */
-	private void continueDeleteCruises(Boolean deleteMetadata) {
+	private void continueDeleteDatasets(Boolean deleteMetadata) {
 		UploadDashboard.showWaitCursor();
-		service.deleteDatasets(getUsername(), expocodeSet, deleteMetadata, 
+		service.deleteDatasets(getUsername(), datasetIdsSet, deleteMetadata, 
 				new AsyncCallback<DashboardDatasetList>() {
 			@Override
-			public void onSuccess(DashboardDatasetList cruises) {
-				if ( getUsername().equals(cruises.getUsername()) ) {
-					DatasetListPage.this.updateCruises(cruises);
+			public void onSuccess(DashboardDatasetList datasetList) {
+				if ( getUsername().equals(datasetList.getUsername()) ) {
+					DatasetListPage.this.updateDatasets(datasetList);
 				}
 				else {
 					UploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
@@ -791,17 +771,17 @@ public class DatasetListPage extends CompositeWithUsername {
 
 	@UiHandler("showDatasetButton")
 	void addToListOnClick(ClickEvent event) {
-		String wildExpocode = Window.prompt(EXPOCODE_TO_SHOW_MSG, "");
-		if ( (wildExpocode != null) && ! wildExpocode.trim().isEmpty() ) {
+		String wildDatasetId = Window.prompt(DATASETS_TO_SHOW_MSG, "");
+		if ( (wildDatasetId != null) && ! wildDatasetId.trim().isEmpty() ) {
 			UploadDashboard.showWaitCursor();
 			// Save the currently selected cruises
-			getSelectedCruises(null);
-			service.addDatasetsToList(getUsername(), wildExpocode, 
+			getSelectedDatasets(null);
+			service.addDatasetsToList(getUsername(), wildDatasetId, 
 					new AsyncCallback<DashboardDatasetList>() {
 				@Override
 				public void onSuccess(DashboardDatasetList cruises) {
 					if ( getUsername().equals(cruises.getUsername()) ) {
-						DatasetListPage.this.updateCruises(cruises);
+						DatasetListPage.this.updateDatasets(cruises);
 					}
 					else {
 						UploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG + 
@@ -820,15 +800,15 @@ public class DatasetListPage extends CompositeWithUsername {
 
 	@UiHandler("hideDatasetButton")
 	void removeFromListOnClick(ClickEvent event) {
-		getSelectedCruises(null);
-		if ( expocodeSet.size() == 0 ) {
+		getSelectedDatasets(null);
+		if ( datasetIdsSet.size() == 0 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_HIDE_ERR_END);
 			return;
 		}
 		// Confirm cruises to be removed
 		String message = HIDE_DATASET_HTML_PROLOGUE;
-		for ( String expocode : expocodeSet )
+		for ( String expocode : datasetIdsSet )
 			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
 		message += HIDE_DATASET_HTML_EPILOGUE;
 		if ( askRemovePopup == null ) {
@@ -838,7 +818,7 @@ public class DatasetListPage extends CompositeWithUsername {
 				public void onSuccess(Boolean result) {
 					// Only proceed if yes; ignore if no or null
 					if ( result == true )
-						continueRemoveCruisesFromList();
+						continueRemoveDatasetsFromList();
 				}
 				@Override
 				public void onFailure(Throwable ex) {
@@ -854,14 +834,14 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * Makes the request to remove cruises from a user's list,
 	 * and processes the results.
 	 */
-	private void continueRemoveCruisesFromList() {
+	private void continueRemoveDatasetsFromList() {
 		UploadDashboard.showWaitCursor();
-		service.removeDatasetsFromList(getUsername(), expocodeSet, 
+		service.removeDatasetsFromList(getUsername(), datasetIdsSet, 
 				new AsyncCallback<DashboardDatasetList>() {
 			@Override
 			public void onSuccess(DashboardDatasetList cruises) {
 				if ( getUsername().equals(cruises.getUsername()) ) {
-					DatasetListPage.this.updateCruises(cruises);
+					DatasetListPage.this.updateDatasets(cruises);
 				}
 				else {
 					UploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG + 
@@ -879,15 +859,15 @@ public class DatasetListPage extends CompositeWithUsername {
 
 	@UiHandler("changeOwnerButton")
 	void changeOwnerOnClick(ClickEvent event) {
-		getSelectedCruises(null);
-		if ( expocodeSet.size() == 0 ) {
+		getSelectedDatasets(null);
+		if ( datasetIdsSet.size() == 0 ) {
 			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_CHANGE_OWNER_ERR_END);
 			return;
 		}
 		// Confirm cruises to be removed
 		String message = CHANGE_OWNER_HTML_PROLOGUE;
-		for ( String expocode : expocodeSet )
+		for ( String expocode : datasetIdsSet )
 			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
 		message += CHANGE_OWNER_HTML_EPILOGUE;
 		if ( changeOwnerPopup == null ) {
@@ -915,12 +895,12 @@ public class DatasetListPage extends CompositeWithUsername {
 	 */
 	private void continueChangeOwner(String newOwner) {
 		UploadDashboard.showWaitCursor();
-		service.changeDatasetOwner(getUsername(), expocodeSet, newOwner, 
+		service.changeDatasetOwner(getUsername(), datasetIdsSet, newOwner, 
 				new AsyncCallback<DashboardDatasetList>() {
 			@Override
 			public void onSuccess(DashboardDatasetList cruises) {
 				if ( getUsername().equals(cruises.getUsername()) ) {
-					DatasetListPage.this.updateCruises(cruises);
+					DatasetListPage.this.updateDatasets(cruises);
 				}
 				else {
 					UploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG + 
@@ -938,15 +918,15 @@ public class DatasetListPage extends CompositeWithUsername {
 
 	/**
 	 * Creates the cruise data table columns.  The table will still need 
-	 * to be populated using {@link #updateCruises(DashboardDatasetList)}.
+	 * to be populated using {@link #updateDatasets(DashboardDatasetList)}.
 	 */
-	private void buildCruiseListTable() {
+	private void buildDatasetListTable() {
 		Header<String> selectHeader = buildSelectionHeader();
 
 		// Create the columns for this table
 		TextColumn<DashboardDataset> rowNumColumn = buildRowNumColumn();
 		Column<DashboardDataset,Boolean> selectedColumn = buildSelectedColumn();
-		expocodeColumn = buildExpocodeColumn();
+		expocodeColumn = buildDatasetIdColumn();
 		timestampColumn = buildTimestampColumn();
 		Column<DashboardDataset,String> dataCheckColumn = buildDataCheckColumn();
 		Column<DashboardDataset,String> omeMetadataColumn = buildOmeMetadataColumn();
@@ -961,7 +941,7 @@ public class DatasetListPage extends CompositeWithUsername {
 		datasetsGrid.addColumn(rowNumColumn, "");
 		datasetsGrid.addColumn(selectedColumn, selectHeader);
 		datasetsGrid.addColumn(expocodeColumn, 
-				SafeHtmlUtils.fromSafeConstant(EXPOCODE_COLUMN_NAME));
+				SafeHtmlUtils.fromSafeConstant(DATASET_ID_COLUMN_NAME));
 		datasetsGrid.addColumn(timestampColumn, 
 				SafeHtmlUtils.fromSafeConstant(TIMESTAMP_COLUMN_NAME));
 		datasetsGrid.addColumn(dataCheckColumn, 
@@ -1131,7 +1111,7 @@ public class DatasetListPage extends CompositeWithUsername {
 			public void update(String option) {
 				if ( option == null )
 					return;
-				setCruiseSelection(option);
+				setDatasetSelection(option);
 			}
 		});
 		return selectHeader;
@@ -1165,14 +1145,14 @@ public class DatasetListPage extends CompositeWithUsername {
 	/**
 	 * @return the dataset column for the table
 	 */
-	private TextColumn<DashboardDataset> buildExpocodeColumn() {
+	private TextColumn<DashboardDataset> buildDatasetIdColumn() {
 		TextColumn<DashboardDataset> expocodeColumn = 
 				new TextColumn<DashboardDataset> () {
 			@Override
 			public String getValue(DashboardDataset cruise) {
 				String expocode = cruise.getDatasetId();
 				if ( expocode.isEmpty() )
-					expocode = NO_EXPOCODE_STRING;
+					expocode = NO_DATASET_ID_STRING;
 				return expocode;
 			}
 		};
@@ -1253,7 +1233,7 @@ public class DatasetListPage extends CompositeWithUsername {
 			@Override
 			public void update(int index, DashboardDataset cruise, String value) {
 				// Save the currently selected cruises
-				getSelectedCruises(null);
+				getSelectedDatasets(null);
 				// Open the data column specs page for this one cruise
 				ArrayList<String> expocodes = new ArrayList<String>(1);
 				expocodes.add(cruise.getDatasetId());
@@ -1288,7 +1268,7 @@ public class DatasetListPage extends CompositeWithUsername {
 			@Override
 			public void update(int index, DashboardDataset cruise, String value) {
 				// Save the currently selected cruises
-				getSelectedCruises(null);
+				getSelectedDatasets(null);
 				// Show the OME metadata manager page for this one cruise
 				checkSet.clear();
 				checkSet.setUsername(getUsername());
@@ -1336,8 +1316,8 @@ public class DatasetListPage extends CompositeWithUsername {
 		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
 			@Override
 			public void update(int index, DashboardDataset cruise, String value) {
-				// Save the currently selected cruises (in expocodeSet)
-				getSelectedCruises(null);
+				// Save the currently selected cruises (in datasetIdsSet)
+				getSelectedDatasets(null);
 				// Go to the additional docs page with just this one cruise
 				// Go to the QC page after performing the client-side checks on this one cruise
 				checkSet.clear();
@@ -1398,13 +1378,13 @@ public class DatasetListPage extends CompositeWithUsername {
 				// Respond only for cruises in this version
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
-					// Save the currently selected cruises (in expocodeSet)
-					getSelectedCruises(null);
+					// Save the currently selected cruises (in datasetIdsSet)
+					getSelectedDatasets(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
 					checkSet.put(cruise.getDatasetId(), cruise);
-					checkCruisesForSubmitting();
+					checkDatasetsForSubmitting();
 				}
 			}
 		});
@@ -1446,13 +1426,13 @@ public class DatasetListPage extends CompositeWithUsername {
 				// Respond only for cruises in this version
 				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
-					// Save the currently selected cruises (in expocodeSet)
-					getSelectedCruises(null);
+					// Save the currently selected cruises (in datasetIdsSet)
+					getSelectedDatasets(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
 					checkSet.put(cruise.getDatasetId(), cruise);
-					checkCruisesForSubmitting();
+					checkDatasetsForSubmitting();
 				}
 			}
 		});
@@ -1506,7 +1486,7 @@ public class DatasetListPage extends CompositeWithUsername {
 	 * issues, continues submitting for QC by calling 
 	 * {@link SubmitForQCPage#showPage(java.util.HashSet)}.
 	 */
-	private void checkCruisesForSubmitting() {
+	private void checkDatasetsForSubmitting() {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;

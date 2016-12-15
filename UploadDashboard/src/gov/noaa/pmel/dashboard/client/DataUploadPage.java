@@ -166,11 +166,11 @@ public class DataUploadPage extends CompositeWithUsername {
 	private static final String JAVASCRIPT_START = "<script language=\"javascript\">";
 	private static final String JAVASCRIPT_CLOSE = "</script>";
 
-	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, DataUploadPage> {
+	interface DashboardDatasetUploadPageUiBinder extends UiBinder<Widget, DataUploadPage> {
 	}
 
-	private static DashboardCruiseUploadPageUiBinder uiBinder = 
-			GWT.create(DashboardCruiseUploadPageUiBinder.class);
+	private static DashboardDatasetUploadPageUiBinder uiBinder = 
+			GWT.create(DashboardDatasetUploadPageUiBinder.class);
 
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
@@ -482,7 +482,7 @@ public class DataUploadPage extends CompositeWithUsername {
 				errMsgs.add(failMsg + EXPLAINED_FAIL_MSG_END);
 			}
 			else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
-				// Cruise file exists and not permitted to modify
+				// Dataset file exists and not permitted to modify
 				String[] info = header.substring(DashboardUtils.DATASET_EXISTS_HEADER_TAG.length()).trim().split(" ; ", 4);
 				String failMsg = FAIL_MSG_START;
 				if ( info.length > 1 ) 
@@ -525,7 +525,7 @@ public class DataUploadPage extends CompositeWithUsername {
 		// Process any successes
 		if ( ! cruiseIDs.isEmpty() ) {
 			for ( String expo : cruiseIDs )
-				DatasetListPage.addSelectedCruise(expo);
+				DatasetListPage.addSelectedDataset(expo);
 			DatasetListPage.resortTable();
 			DataColumnSpecsPage.showPage(getUsername(), cruiseIDs);
 		}

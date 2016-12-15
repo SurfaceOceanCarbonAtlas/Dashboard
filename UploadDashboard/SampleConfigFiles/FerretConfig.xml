@@ -47,7 +47,7 @@
         </variable>
         <variable>
             <name>FER_GO</name>
-            <value>SocatFerretScripts</value>
+            <value>OAP/scripts</value>
             <value>Ferret/go</value>
             <value>Ferret/examples</value>
             <value>Ferret/contrib</value>

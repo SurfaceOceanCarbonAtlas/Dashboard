@@ -1,17 +1,16 @@
 ! Map with trajectory track
 
-GO preview_setup ($infile_dsg) 1
+GO oap_preview_setup ($infile_dsg) 1
 
 SET VIEW full
 !GO margins 1,0.7,0.7,0.7
 
-GO preview_map
+GO oap_preview_map
 
-! Label at the top with the Expocode and count
-DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+! Label at the top with the dataset ID and count
+DEFINE SYMBOL lab_top = Dataset `dataset_id`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
-
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
-  Map Locations  `nobs` locations Colored by WOCE flag for water CO_2
+  Map Locations  `nobs` locations colored by checker WOCE flag
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

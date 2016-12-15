@@ -35,9 +35,9 @@ public class DatasetDataColumn {
 	private ArrayList<DataColumnType> knownTypeUnitList;
 	// List of "<name> [ <unit> ]" strings for all the known user data column types and selected units
 	private ArrayList<String> typeUnitStringList;
-	// Cruise associated with this instance
+	// Dataset associated with this instance
 	private DashboardDataset cruise;
-	// Cruise data column index associated with this instance
+	// Dataset data column index associated with this instance
 	private int columnIndex;
 	// Header associated with this instance
 	private Header<DatasetDataColumn> columnHeader;

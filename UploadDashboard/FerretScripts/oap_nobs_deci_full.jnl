@@ -1,4 +1,4 @@
-
+! oap_nobs_deci_full
 ! Add the variables nobs_full and nobs_deci.  For full- resolution original data 
 ! these the same value as each other and as num_obs. Both are needed so set of 
 ! variables is identical to what is in the decimated versions.

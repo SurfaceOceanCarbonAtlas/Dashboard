@@ -34,7 +34,8 @@ public class DatasetModifier {
 	String restoredSocatVersion;
 
 	/**
-	 * Modifies information about datasets or restores previous versions of data or WOCE flags for datasets.
+	 * Modifies information about datasets. 
+	 * 
 	 * @param configStore
 	 * 		configuration store to use
 	 */
@@ -47,7 +48,7 @@ public class DatasetModifier {
 	 * Changes the owner of the data and metadata files for a dataset.
 	 * The dataset is added to the list of datasets for the new owner.
 	 * 
-	 * @param dataset
+	 * @param datasetId
 	 * 		change the owner of the data and metadata files for the dataset with this dataset 
 	 * @param newOwner
 	 * 		change the owner of the data and metadata files to this username
@@ -56,35 +57,35 @@ public class DatasetModifier {
 	 * 		if the new owner username is not recognized,
 	 * 		if there is no data file for the indicated dataset
 	 */
-	public void changeDatasetOwner(String expocode, String newOwner) 
+	public void changeDatasetOwner(String datasetId, String newOwner) 
 									throws IllegalArgumentException {
-		String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
+		String stdId = DashboardServerUtils.checkDatasetID(datasetId);
 		if ( ! configStore.validateUser(newOwner) )
 			throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
 
-		DataFileHandler cruiseHandler = configStore.getDataFileHandler();
-		DashboardDataset cruise = cruiseHandler.getDatasetFromInfoFile(upperExpo);
-		String oldOwner = cruise.getOwner();
-		cruise.setOwner(newOwner);
-		cruiseHandler.saveDatasetInfoToFile(cruise, "Owner of " + upperExpo + 
+		DataFileHandler dataHandler = configStore.getDataFileHandler();
+		DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(stdId);
+		String oldOwner = dataset.getOwner();
+		dataset.setOwner(newOwner);
+		dataHandler.saveDatasetInfoToFile(dataset, "Owner of " + stdId + 
 				" data file changed from " + oldOwner + " to " + newOwner);
 
 		MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
-		ArrayList<DashboardMetadata> metaList = metaHandler.getMetadataFiles(upperExpo);
+		ArrayList<DashboardMetadata> metaList = metaHandler.getMetadataFiles(stdId);
 		for ( DashboardMetadata mdata : metaList ) {
 			String oldMetaOwner = mdata.getOwner();
 			mdata.setOwner(newOwner);
-			metaHandler.saveMetadataInfo(mdata, "Owner of " + upperExpo + 
+			metaHandler.saveMetadataInfo(mdata, "Owner of " + stdId + 
 					" metadata file changed from " + oldMetaOwner + " to " + newOwner, false);
 		}
 
 		UserFileHandler userHandler = configStore.getUserFileHandler();
-		String commitMsg = "Dataset " + upperExpo + " moved from " + oldOwner + " to " + newOwner;
+		String commitMsg = "Dataset " + stdId + " moved from " + oldOwner + " to " + newOwner;
 
-		// Add this cruise to the list for the new owner
-		DashboardDatasetList cruiseList = userHandler.getDatasetListing(newOwner);
-		if ( cruiseList.put(upperExpo, cruise) == null ) {
-			userHandler.saveDatasetListing(cruiseList, commitMsg);
+		// Add this dataset to the list for the new owner
+		DashboardDatasetList datasetList = userHandler.getDatasetListing(newOwner);
+		if ( datasetList.put(stdId, dataset) == null ) {
+			userHandler.saveDatasetListing(datasetList, commitMsg);
 		}
 
 		// Rely on update-on-read to remove the cruise from the list of the old owner 
@@ -92,40 +93,39 @@ public class DatasetModifier {
 	}
 
 	/**
-	 * Appropriately renames dashboard cruise files, as well as SOCAT files and 
-	 * database flags if the cruise has been submitted.  If an exception is thrown,
+	 * Appropriately renames dashboard dataset files.  If an exception is thrown,
 	 * the system is likely have a corrupt mix of renamed and original-name files.
 	 * 
-	 * @param oldExpocode
-	 * 		current dataset for the cruise
-	 * @param newExpocode
-	 * 		new dataset to use for the cruise
+	 * @param oldId
+	 * 		current ID for the dataset
+	 * @param newId
+	 * 		new ID to use for the dataset
 	 * @param username
-	 * 		username to associate with the rename QC and WOCE events
+	 * 		user requesting this rename
 	 * @throws IllegalArgumentException
 	 * 		if the username is not an admin,
-	 * 		if either dataset is invalid,
-	 * 		if cruise files for the old dataset do not exist,
-	 * 		if any files for the new dataset already exist
+	 * 		if either dataset ID is invalid,
+	 * 		if files for the old dataset ID do not exist,
+	 * 		if any files for the new dataset ID already exist
 	 * @throws IOException
-	 * 		if updating a file with the new dataset throws one
+	 * 		if updating a file with the new ID throws one
 	 * @throws SQLException 
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameDataset(String oldExpocode, String newExpocode, String username) 
+	public void renameDataset(String oldId, String newId, String username) 
 						throws IllegalArgumentException, IOException, SQLException {
-		// check and standardized the expocodes
-		String oldExpo = DashboardServerUtils.checkDatasetID(oldExpocode);
-		String newExpo = DashboardServerUtils.checkDatasetID(newExpocode);
-		// rename the cruise data and info files; update the dataset in the data file
-		configStore.getDataFileHandler().renameDatasetFiles(oldExpo, newExpo);
-		// rename the SanityChecker messages file, if it exists
-		configStore.getCheckerMsgHandler().renameMsgsFile(oldExpo, newExpo);
-		// rename metadata files; update the dataset in the OME metadata
-		configStore.getMetadataFileHandler().renameMetadataFiles(oldExpo, newExpo);
-		// rename the DSG and decimated DSG files; update the dataset ID in these files
-		configStore.getDsgNcFileHandler().renameDsgFiles(oldExpo, newExpo);
+		// check and standardized the dataset IDs
+		String oldStdId = DashboardServerUtils.checkDatasetID(oldId);
+		String newStdId = DashboardServerUtils.checkDatasetID(newId);
+		// rename the dataset data and info files, updating the dataset ID
+		configStore.getDataFileHandler().renameDatasetFiles(oldStdId, newStdId);
+		// rename the automated data checker messages file, if it exists
+		configStore.getCheckerMsgHandler().renameMsgsFile(oldStdId, newStdId);
+		// rename metadata files, updating the dataset ID
+		configStore.getMetadataFileHandler().renameMetadataFiles(oldStdId, newStdId);
+		// rename the DSG and decimated DSG files, updating the dataset ID
+		configStore.getDsgNcFileHandler().renameDsgFiles(oldStdId, newStdId);
 	}
 
 }

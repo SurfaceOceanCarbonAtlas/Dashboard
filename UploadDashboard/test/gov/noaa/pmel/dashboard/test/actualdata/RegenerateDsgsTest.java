@@ -31,7 +31,7 @@ public class RegenerateDsgsTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs#regenerateDsgFiles(java.lang.String, boolean)}.
-	 * Uses the full-data DSG file in an existing Dashboard installaltion.
+	 * Uses the full-data DSG file in an existing dashboard installation.
 	 */
 	@Test
 	public void testRegenerateDsgFiles() throws IllegalArgumentException, IOException {

@@ -126,7 +126,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	static void showPage(DashboardDatasetList cruises) {
 		if ( singleton == null )
 			singleton = new OmeManagerPage();
-		singleton.updateCruise(cruises);
+		singleton.updateDataset(cruises);
 		UploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 	}
@@ -151,7 +151,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	 * @param cruises
 	 * 		associate the uploaded OME metadata to the cruise in this set of cruises
 	 */
-	private void updateCruise(DashboardDatasetList cruises) {
+	private void updateDataset(DashboardDatasetList cruises) {
 		// Update the current username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());

@@ -506,7 +506,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = Boolean.hashCode(selected);
+		int result = Boolean.valueOf(selected).hashCode();
 		result = result * prime + version.hashCode();
 		result = result * prime + owner.hashCode();
 		result = result * prime + datasetId.hashCode();

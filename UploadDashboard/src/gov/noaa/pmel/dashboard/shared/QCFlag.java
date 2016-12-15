@@ -133,7 +133,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
 	/**
 	 * @return 
-	 * 		the index of the row for this QC flag;
+	 * 		the index of the column for this QC flag;
 	 * 		never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getColumnIndex() {

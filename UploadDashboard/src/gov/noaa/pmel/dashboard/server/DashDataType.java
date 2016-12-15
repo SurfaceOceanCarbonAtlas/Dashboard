@@ -471,7 +471,7 @@ public class DashDataType implements Comparable<DashDataType> {
 	public String toString() {
 		return "DashDataType[ " +
 				"varName=\"" + dataType.getVarName() + "\", " +
-				"sortOrder=" + dataType.getSortOrder().toString() +
+				"sortOrder=" + dataType.getSortOrder().toString() + ", " +
 				"displayName=\"" + dataType.getDisplayName() + "\", " +
 				"dataClassName=\"" + dataType.getDataClassName() + "\", " +
 				"description=\"" + dataType.getDescription() + "\", " +

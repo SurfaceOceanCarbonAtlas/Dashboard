@@ -82,25 +82,66 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
 			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
 			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
-			DashboardServerUtils.TIME.getVarName()
+			DashboardServerUtils.TIME.getVarName(),
+			DashboardServerUtils.WOCE_AUTOCHECK.getVarName()
 	));
 
-	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = 
-			new TreeSet<DashDataType>( Arrays.asList(
-					DashboardServerUtils.DATASET_ID,
-					DashboardServerUtils.PLATFORM_NAME,
-					DashboardServerUtils.PLATFORM_TYPE,
-					DashboardServerUtils.ORGANIZATION_NAME,
-					DashboardServerUtils.INVESTIGATOR_NAMES,
-					DashboardServerUtils.WESTERNMOST_LONGITUDE,
-					DashboardServerUtils.EASTERNMOST_LONGITUDE,
-					DashboardServerUtils.SOUTHERNMOST_LATITUDE,
-					DashboardServerUtils.NORTHERNMOST_LATITUDE,
-					DashboardServerUtils.TIME_COVERAGE_START,
-					DashboardServerUtils.TIME_COVERAGE_END,
-					DashboardServerUtils.STATUS,
-					DashboardServerUtils.VERSION
-					) );
+	private static final TreeSet<DashDataType> USERS_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+			DashboardServerUtils.UNKNOWN,
+			DashboardServerUtils.OTHER,
+			DashboardServerUtils.DATASET_ID,
+			DashboardServerUtils.PLATFORM_NAME,
+			DashboardServerUtils.PLATFORM_TYPE,
+			DashboardServerUtils.ORGANIZATION_NAME,
+			DashboardServerUtils.INVESTIGATOR_NAMES,
+			DashboardServerUtils.DATASET_NAME,
+			DashboardServerUtils.LONGITUDE,
+			DashboardServerUtils.LATITUDE,
+			DashboardServerUtils.SAMPLE_DEPTH,
+			DashboardServerUtils.TIMESTAMP,
+			DashboardServerUtils.DATE,
+			DashboardServerUtils.YEAR,
+			DashboardServerUtils.MONTH_OF_YEAR,
+			DashboardServerUtils.DAY_OF_MONTH,
+			DashboardServerUtils.TIME_OF_DAY,
+			DashboardServerUtils.HOUR_OF_DAY,
+			DashboardServerUtils.MINUTE_OF_HOUR,
+			DashboardServerUtils.SECOND_OF_MINUTE,
+			DashboardServerUtils.DAY_OF_YEAR,
+			DashboardServerUtils.SECOND_OF_DAY
+	));
+
+	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+			DashboardServerUtils.DATASET_ID,
+			DashboardServerUtils.PLATFORM_NAME,
+			DashboardServerUtils.PLATFORM_TYPE,
+			DashboardServerUtils.ORGANIZATION_NAME,
+			DashboardServerUtils.INVESTIGATOR_NAMES,
+			DashboardServerUtils.WESTERNMOST_LONGITUDE,
+			DashboardServerUtils.EASTERNMOST_LONGITUDE,
+			DashboardServerUtils.SOUTHERNMOST_LATITUDE,
+			DashboardServerUtils.NORTHERNMOST_LATITUDE,
+			DashboardServerUtils.TIME_COVERAGE_START,
+			DashboardServerUtils.TIME_COVERAGE_END,
+			DashboardServerUtils.STATUS,
+			DashboardServerUtils.VERSION
+	));
+
+	private static final TreeSet<DashDataType> DATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+			DashboardServerUtils.SAMPLE_NUMBER,
+			DashboardServerUtils.LONGITUDE,
+			DashboardServerUtils.LATITUDE,
+			DashboardServerUtils.SAMPLE_DEPTH,
+			DashboardServerUtils.YEAR,
+			DashboardServerUtils.MONTH_OF_YEAR,
+			DashboardServerUtils.DAY_OF_MONTH,
+			DashboardServerUtils.HOUR_OF_DAY,
+			DashboardServerUtils.MINUTE_OF_HOUR,
+			DashboardServerUtils.SECOND_OF_MINUTE,
+			DashboardServerUtils.TIME,
+			DashboardServerUtils.WOCE_AUTOCHECK
+	));
+
 
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };
@@ -197,8 +238,12 @@ public class KnownDataTypesTest {
 	 */
 	@Test
 	public void testGetKnownTypesSet() {
-		KnownDataTypes types = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		KnownDataTypes types = new KnownDataTypes().addStandardTypesForUsers();
+		assertEquals(USERS_TYPES_SET, types.getKnownTypesSet());
+		types = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		assertEquals(METADATA_FILES_TYPES_SET, types.getKnownTypesSet());
+		types = new KnownDataTypes().addStandardTypesForDataFiles();
+		assertEquals(DATA_FILES_TYPES_SET, types.getKnownTypesSet());
 	}
 
 	/**

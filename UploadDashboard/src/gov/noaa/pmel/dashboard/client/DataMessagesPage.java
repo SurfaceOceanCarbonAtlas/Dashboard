@@ -104,13 +104,17 @@ public class DataMessagesPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Display this page in the RootLayoutPanel showing the
-	 * messages for cruise with the provided dataset.
-	 * Adds this page to the page history.
+	 * Display this page in the RootLayoutPanel showing the messages 
+	 * for the specified dataset.  Adds this page to the page history.
+	 * 
+	 * @param username
+	 * 		user requesting the page
+	 * @param datasetId
+	 * 		ID of the dataset to use
 	 */
-	static void showPage(String username, String cruiseExpocode) {
+	static void showPage(String username, String datasetId) {
 		UploadDashboard.showWaitCursor();
-		service.getDataMessages(username, cruiseExpocode, new AsyncCallback<SCMessageList>() {
+		service.getDataMessages(username, datasetId, new AsyncCallback<SCMessageList>() {
 			@Override
 			public void onSuccess(SCMessageList msgList) {
 				if ( msgList == null ) {
@@ -155,7 +159,7 @@ public class DataMessagesPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Update the cruise dataset and sanity checker messages with 
+	 * Update the automated data checker messages with 
 	 * that given in the provided SCMessageList.
 	 * 
 	 * @param msgList

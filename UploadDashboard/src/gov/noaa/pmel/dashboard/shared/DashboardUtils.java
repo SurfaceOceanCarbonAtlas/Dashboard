@@ -298,7 +298,7 @@ public class DashboardUtils {
 	 * User-provided name for the dataset (user type data)
 	 */
 	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
-			500.0, "dataset", STRING_DATA_CLASS_NAME, "dataset name", null, 
+			500.0, "dataset name", STRING_DATA_CLASS_NAME, "dataset name", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
 

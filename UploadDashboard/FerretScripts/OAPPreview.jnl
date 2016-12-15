@@ -6,7 +6,7 @@ DEFINE SYMBOL result_time_tag = ($3%.%)
 
 
 
-GO preview_setup ($infile_dsg) 1
+GO oap_preview_setup ($infile_dsg) 1
 
 IF ($fer_last_error"0|*>1") THEN
    say/append/outfile=run_all_errors.list "($infile_dsg)"
@@ -15,20 +15,16 @@ IF ($fer_last_error"0|*>1") THEN
    exit/script
 ENDIF
 
-GO preview_01
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_lat_vs_lon_($result_time_tag).gif
+GO oap_preview_01
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($datasetid_str)_lat_vs_lon_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
-GO preview_02
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_lat_lon_($result_time_tag).gif
+GO oap_preview_02
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($datasetid_str)_lat_lon_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
-GO preview_11  ! now the same as preview_color.jnl
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_time_series_($result_time_tag).gif
-SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
-
-GO preview_14
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_sample_vs_time_($result_time_tag).gif
+GO oap_preview_03
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($datasetid_str)_sample_vs_time_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
 cancel data/all; cancel variable/all; cancel symbol/all

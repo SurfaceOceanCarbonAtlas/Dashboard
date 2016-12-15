@@ -5,8 +5,8 @@ package gov.noaa.pmel.dashboard.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -16,7 +16,6 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
@@ -24,7 +23,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 /**
@@ -129,15 +127,21 @@ public class DatasetSubmitter {
 				}
 
 				// Add and assign a column for the automated data checker flags
+				int numRows = datasetData.getNumDataRows();
+				ArrayList<String> flagVals = new ArrayList<String>(numRows);
+				// For the automated data checker flag values, default to acceptable
+				for (int k = 0; k < numRows; k++)
+					flagVals.add(DashboardUtils.FLAG_ACCEPTABLE.toString());
 				for ( QCFlag wtype : dataset.getCheckerFlags() ) {
-					Integer colIdx = woceTypeIndices.get(wtype.getFlagName());
-					if ( colIdx == null )
-						throw new RuntimeException("Unexpected unknown WOCE name: " + wtype.getFlagName());
 					Integer rowIdx = wtype.getRowIndex();
 					if ( (rowIdx < 0) || (rowIdx >= numRows) )
-						throw new RuntimeException("Unexpected WOCE row index: " + rowIdx.toString());
-					dataVals.get(rowIdx).set(colIdx, DashboardUtils.WOCE_BAD.toString());
+						throw new RuntimeException("Unexpected automated data checker WOCE row index: " + rowIdx.toString());
+					flagVals.set(rowIdx, wtype.getFlagValue().toString());
 				}
+				// Directly modify the lists in the dataset
+				datasetData.getUserColNames().add("WOCE_autocheck");
+				datasetData.getDataColTypes().add(DashboardUtils.WOCE_AUTOCHECK);
+				datasetData.getDataValues().add(flagVals);
 				// PI-provided QC flags are already in the data (that is where they came from)
 
 				try {
@@ -167,6 +171,18 @@ public class DatasetSubmitter {
 				dataset.setDataCheckStatus(datasetData.getDataCheckStatus());
 				dataset.setNumErrorRows(datasetData.getNumErrorRows());
 				dataset.setNumWarnRows(datasetData.getNumWarnRows());
+				dataset.setUserFlags(datasetData.getUserFlags());
+				// Update the data checker QC flags, making sure the column index is valid
+				int numCols = dataset.getUserColNames().size();
+				TreeSet<QCFlag> flagsSet = datasetData.getCheckerFlags();
+				for ( QCFlag flag : flagsSet ) {
+					Integer colIdx = flag.getColumnIndex();
+					// If not in range, either is INT_MISSING_VALUE or one of the added time columns
+					// so keep the flag but set the column index to INT_MISSING_VALUE
+					if ( (colIdx < 0) || (colIdx >= numCols) )
+						flag.setColumnIndex(DashboardUtils.INT_MISSING_VALUE);
+				}
+				dataset.setCheckerFlags(flagsSet);
 
 				// Set up to save changes to version control
 				changed = true;

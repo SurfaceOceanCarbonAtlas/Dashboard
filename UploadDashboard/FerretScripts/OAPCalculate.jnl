@@ -28,7 +28,7 @@ define symbol outtype=`longitude,return=dtype`
 !ship speed	-speed to next observation
 ! sw_dist script from matlab_sw_dist.m 
 ! given lat, lon, and units (km or nm), computes dist and phaseangle
-GO sw_dist longitude latitude 'nm'
+GO oap_sw_dist longitude latitude 'nm'
 LET npts = `year[i=@ngd]`
 let dist_filled = if i[gx=year] LT npts THEN dist ELSE dist[i=@fnr]
 
@@ -37,11 +37,11 @@ LET deltatt =24*datenum[i=@ddf]
 LET deltaTime = IF i[gx=deltatt] LT npts THEN deltatt ELSE deltatt[i=@fnr]
 LET speed = dist_filled/deltaTime !knots
 
-! More variables to add: etopoDepth, d2l, region_id, gvCO2
+! More variables to add: etopoDepth, d2l
 
-GO SOCAT3_ETOPO2_depth
+GO oap_etopo2_depth
 
-GO SOCAT3_dist2land
+GO oap_dist2land
 
 !!!!!!!Save output
 cancel mode upcase
@@ -52,7 +52,7 @@ cancel mode upcase
 ! Note that num_obs is the "count variable" with the sample_dimension attribute
 ! making it an essential part of the DSG file
 
-GO nobs_deci_full
+GO oap_nobs_deci_full
 
 ! Lon in 0-360
 let/title="longitude"/units="degrees_east" lon360 = IF longitude LT 0 THEN longitude+360 else longitude
