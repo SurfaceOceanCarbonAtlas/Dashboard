@@ -236,14 +236,37 @@ public class DashboardUtils {
 			1.0, "other", null, null, null, null, NO_UNITS);
 
 
-
 	/**
-	 * Unique identifier for the dataset (metadata)
+	 * Unique identifier for the dataset 
+	 * (metadata derived from user data column for the dataset name)
 	 */
 	public static final DataColumnType DATASET_ID = new DataColumnType("dataset_id", 
-			100.0, "dataset ID", STRING_DATA_CLASS_NAME, "dataset ID", null, 
+			50.0, "dataset ID", STRING_DATA_CLASS_NAME, "dataset ID", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
-	
+
+	/**
+	 * Consecutive numbering of the samples after merging and ordering
+	 */
+	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number", 
+			51.0, "sample num", INT_DATA_CLASS_NAME, "sample number", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
+
+	/**
+	 * Completely specified time (seconds since 1970-01-01T00:00:00Z) 
+	 * used in file data.  Computed value; not a user type
+	 */
+	public static final DataColumnType TIME = new DataColumnType("time", 
+			52.0, "time", DOUBLE_DATA_CLASS_NAME, "time", "time", 
+			TIME_CATEGORY, TIME_UNITS);
+
+
+	/**
+	 * User-provided name of the cruise/dataset
+	 */
+	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
+			100.0, "cruise/dataset name", STRING_DATA_CLASS_NAME, "dataset name", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
+
 	public static final DataColumnType PLATFORM_NAME = new DataColumnType("platform_name", 
 			101.0, "platform name", STRING_DATA_CLASS_NAME, "platform name", "platform_name",
 			PLATFORM_CATEGORY, NO_UNITS);
@@ -259,7 +282,6 @@ public class DashboardUtils {
 	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators", 
 			104.0, "PI names", STRING_DATA_CLASS_NAME, "investigators", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
-
 
 	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min", 
 			110.0, "westmost lon", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
@@ -295,15 +317,11 @@ public class DashboardUtils {
 
 
 	/**
-	 * User-provided name for the dataset (user type data)
+	 * User-provided unique ID for a sample in a dataset (user data type only). 
+	 * Used when merging files of different data types measured for a sample.
 	 */
-	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
-			500.0, "dataset name", STRING_DATA_CLASS_NAME, "dataset name", null, 
-			IDENTIFIER_CATEGORY, NO_UNITS);
-
-
-	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number", 
-			501.0, "sample num", INT_DATA_CLASS_NAME, "sample number", null, 
+	public static final DataColumnType SAMPLE_ID = new DataColumnType("sample_id",
+			501.0, "sample ID", STRING_DATA_CLASS_NAME, "sample ID", null,
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType LONGITUDE = new DataColumnType("longitude", 
@@ -317,14 +335,6 @@ public class DashboardUtils {
 	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", 
 			504.0, "sample depth", DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", 
 			BATHYMETRY_CATEGORY, DEPTH_UNITS);
-
-	/**
-	 * Completely specified time (seconds since 1970-01-01T00:00:00Z) 
-	 * used in file data.  Computed value; not a user type
-	 */
-	public static final DataColumnType TIME = new DataColumnType("time", 
-			505.0, "time", DOUBLE_DATA_CLASS_NAME, "time", "time", 
-			TIME_CATEGORY, TIME_UNITS);
 
 	/**
 	 * Date and time of the measurement

@@ -33,12 +33,12 @@ public class KnownDataTypesTest {
 	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardServerUtils.UNKNOWN.getVarName(),
 			DashboardServerUtils.OTHER.getVarName(),
-			DashboardServerUtils.DATASET_ID.getVarName(),
+			DashboardServerUtils.DATASET_NAME.getVarName(),
 			DashboardServerUtils.PLATFORM_NAME.getVarName(),
 			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
 			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
 			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
-			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.SAMPLE_ID.getVarName(),
 			DashboardServerUtils.LONGITUDE.getVarName(),
 			DashboardServerUtils.LATITUDE.getVarName(),
 			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
@@ -57,6 +57,7 @@ public class KnownDataTypesTest {
 
 	private static final ArrayList<String> METADATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardServerUtils.DATASET_ID.getVarName(),
+			DashboardServerUtils.DATASET_NAME.getVarName(),
 			DashboardServerUtils.PLATFORM_NAME.getVarName(),
 			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
 			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
@@ -73,6 +74,7 @@ public class KnownDataTypesTest {
 
 	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardServerUtils.SAMPLE_NUMBER.getVarName(),
+			DashboardServerUtils.TIME.getVarName(),
 			DashboardServerUtils.LONGITUDE.getVarName(),
 			DashboardServerUtils.LATITUDE.getVarName(),
 			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
@@ -82,19 +84,18 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
 			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
 			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
-			DashboardServerUtils.TIME.getVarName(),
 			DashboardServerUtils.WOCE_AUTOCHECK.getVarName()
 	));
 
 	private static final TreeSet<DashDataType> USERS_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
 			DashboardServerUtils.UNKNOWN,
 			DashboardServerUtils.OTHER,
-			DashboardServerUtils.DATASET_ID,
+			DashboardServerUtils.DATASET_NAME,
 			DashboardServerUtils.PLATFORM_NAME,
 			DashboardServerUtils.PLATFORM_TYPE,
 			DashboardServerUtils.ORGANIZATION_NAME,
 			DashboardServerUtils.INVESTIGATOR_NAMES,
-			DashboardServerUtils.DATASET_NAME,
+			DashboardServerUtils.SAMPLE_ID,
 			DashboardServerUtils.LONGITUDE,
 			DashboardServerUtils.LATITUDE,
 			DashboardServerUtils.SAMPLE_DEPTH,
@@ -113,6 +114,7 @@ public class KnownDataTypesTest {
 
 	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
 			DashboardServerUtils.DATASET_ID,
+			DashboardServerUtils.DATASET_NAME,
 			DashboardServerUtils.PLATFORM_NAME,
 			DashboardServerUtils.PLATFORM_TYPE,
 			DashboardServerUtils.ORGANIZATION_NAME,
@@ -129,6 +131,7 @@ public class KnownDataTypesTest {
 
 	private static final TreeSet<DashDataType> DATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
 			DashboardServerUtils.SAMPLE_NUMBER,
+			DashboardServerUtils.TIME,
 			DashboardServerUtils.LONGITUDE,
 			DashboardServerUtils.LATITUDE,
 			DashboardServerUtils.SAMPLE_DEPTH,
@@ -138,7 +141,6 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.HOUR_OF_DAY,
 			DashboardServerUtils.MINUTE_OF_HOUR,
 			DashboardServerUtils.SECOND_OF_MINUTE,
-			DashboardServerUtils.TIME,
 			DashboardServerUtils.WOCE_AUTOCHECK
 	));
 
@@ -252,12 +254,12 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetDataColumnType() {
 		KnownDataTypes types = new KnownDataTypes();
-		DataColumnType expoType = types.getDataColumnType("DATASET_ID");
-		assertNull( expoType );
+		DataColumnType nameType = types.getDataColumnType("DATASET_NAME");
+		assertNull( nameType );
 		types.addStandardTypesForUsers();
-		expoType = types.getDataColumnType("DATASET_ID");
-		DashDataType other = new DashDataType(expoType);
-		assertEquals(DashboardServerUtils.DATASET_ID, other);
+		nameType = types.getDataColumnType("DATASET_NAME");
+		DashDataType other = new DashDataType(nameType);
+		assertEquals(DashboardServerUtils.DATASET_NAME, other);
 	}
 
 	/**

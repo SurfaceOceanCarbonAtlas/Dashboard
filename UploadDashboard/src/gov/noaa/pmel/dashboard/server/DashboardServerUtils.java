@@ -49,9 +49,26 @@ public class DashboardServerUtils {
 	public static final DashDataType OTHER = new DashDataType(DashboardUtils.OTHER);
 
 	/**
-	 * Unique identifier for the dataset. (metadata)
+	 * Unique identifier for the dataset 
+	 * (metadata derived from user data column for the dataset name)
 	 */
 	public static final DashDataType DATASET_ID = new DashDataType(DashboardUtils.DATASET_ID);
+
+	/**
+	 * Consecutive numbering of the samples after merging and ordering.
+	 */
+	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
+
+	/**
+	 * Completely specified time (seconds since 1970-01-01T00:00:00Z) of a sample.
+	 * Computed value; not a user type
+	 */
+	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
+
+	/**
+	 * User-provided name for the dataset
+	 */
+	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
 
 	public static final DashDataType PLATFORM_NAME = new DashDataType(DashboardUtils.PLATFORM_NAME);
 	public static final DashDataType PLATFORM_TYPE = new DashDataType(DashboardUtils.PLATFORM_TYPE);
@@ -67,15 +84,14 @@ public class DashboardServerUtils {
 	public static final DashDataType VERSION = new DashDataType(DashboardUtils.VERSION);
 
 	/**
-	 * User-provided name for the dataset (user data type)
+	 * User-provided unique ID for a sample in a dataset (user data type only). 
+	 * Used when merging files of different data types measured for a sample.
 	 */
-	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
+	public static final DashDataType SAMPLE_ID = new DashDataType(DashboardUtils.SAMPLE_ID);
 
-	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
 	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
 	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
 	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
-	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
 
 	/**
 	 * Date and time or the measurement
