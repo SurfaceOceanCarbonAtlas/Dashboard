@@ -26,11 +26,17 @@ public class CheckerUtils {
 		defaultsSet.add("-999");
 		defaultsSet.add("-999.");
 		defaultsSet.add("-999.0");
+		defaultsSet.add("-999.00");
+		defaultsSet.add("-999.000");
 		defaultsSet.add("-999.9");
+		defaultsSet.add("-999.99");
+		defaultsSet.add("-999.999");
 		defaultsSet.add("-9999");
 		defaultsSet.add("-9999.");
 		defaultsSet.add("-9999.0");
+		defaultsSet.add("-9999.00");
 		defaultsSet.add("-9999.9");
+		defaultsSet.add("-9999.99");
 		DEFAULT_MISSING_VALUE_STRINGS = Collections.unmodifiableSet(defaultsSet);
 	}
 
