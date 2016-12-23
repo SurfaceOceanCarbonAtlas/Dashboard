@@ -1,19 +1,21 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.standardize;
 
 import java.util.ArrayList;
 
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
- * An 2-D array of objects corresponding to the standardized values in a dataset.
+ * A 2-D array of objects corresponding to the standardized values in a dataset.
  * 
  * @author Karl Smith
  */
 public class StdDataArray {
+	private Boolean[] standardized;
 	private Object[][] stdObjects;
 	private int numSamples;
 	private int numDataCols;
@@ -41,6 +43,9 @@ public class StdDataArray {
 		for (int j = 0; j < numSamples; j++)
 			for (int k = 0; k < numDataCols; k++)
 				stdObjects[j][k] = null;
+		standardized = new Boolean[numDataCols];
+		for (int k = 0; k < numDataCols; k++)
+			standardized[k] = null;
 	}
 
 	public StdDataArray(ArrayList<ArrayList<String>> dataVals, 
@@ -51,54 +56,78 @@ public class StdDataArray {
 				throw new IllegalArgumentException("Inconsistent number of data columns (" + 
 						dataVals.get(j).size() + " instead of " + numDataCols + 
 						") in sample values");
+		boolean needsAnotherPass = false;
 		for (int k = 0; k < numDataCols; k++) {
 			DataColumnType colType = dataTypes.get(k);
 			String dataClassName = colType.getDataClassName();
-			String fromUnits = colType.getUnits().get(colType.getSelectedUnitIndex());
-			if ( DashboardUtils.STRING_MISSING_VALUE.equals(fromUnits) )
-				fromUnits = null;
-			String toUnits = colType.getUnits().get(0);
-			if ( DashboardUtils.STRING_MISSING_VALUE.equals(toUnits) )
-				toUnits = null;
-			String missVal = colType.getSelectedMissingValue();
-			if ( DashboardUtils.STRING_MISSING_VALUE.equals(missVal) )
-				missVal = null;
-			if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dataClassName) ) {
-				for (int j = 0; j < numSamples; j++) {
-					stdObjects[j][k] = getStringValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
+			// Standardize any values that do not require other data values
+			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(colType) ||
+				 DashboardServerUtils.OTHER.typeNameEquals(colType) ) {
+				standardized[k] = null;
+			}
+			else if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dataClassName) ) {
+				try {
+					StringStandardizer stdizer = new StringStandardizer(colType);
+					for (int j = 0; j < numSamples; j++)
+						stdObjects[j][k] = stdizer.getStandardValue(dataVals.get(j).get(k));
+					standardized[k] = true;
+				} catch ( NotStandardizedException ex ) {
+					standardized[k] = false;
+					needsAnotherPass = true;
 				}
 			}
 			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dataClassName) ) {
-				for (int j = 0; j < numSamples; j++) {
-					stdObjects[j][k] = getCharacterValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
+				try {
+					CharStandardizer stdizer = new CharStandardizer(colType);
+					for (int j = 0; j < numSamples; j++)
+						stdObjects[j][k] = stdizer.getStandardValue(dataVals.get(j).get(k));
+					standardized[k] = true;
+				} catch ( NotStandardizedException ex ) {
+					standardized[k] = false;
+					needsAnotherPass = true;
 				}
 			}
 			else if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dataClassName) ) {
-				for (int j = 0; j < numSamples; j++) {
-					stdObjects[j][k] = getIntegerValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
+				try {
+					IntStandardizer stdizer = new IntStandardizer(colType);
+					for (int j = 0; j < numSamples; j++)
+						stdObjects[j][k] = stdizer.getStandardValue(dataVals.get(j).get(k));
+					standardized[k] = true;
+				} catch ( NotStandardizedException ex ) {
+					standardized[k] = false;
+					needsAnotherPass = true;
 				}
 			}
 			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
-				if ( DashboardServerUtils.LONGITUDE.typeNameEquals(colType) ) {
-					for (int j = 0; j < numSamples; j++) {
-						stdObjects[j][k] = getLongitudeValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
-					}
+				try {
+					DoubleStandardizer stdizer = new DoubleStandardizer(colType);
+					for (int j = 0; j < numSamples; j++)
+						stdObjects[j][k] = stdizer.getStandardValue(dataVals.get(j).get(k));
+					standardized[k] = true;
+				} catch ( NotStandardizedException ex ) {
+					standardized[k] = false;
+					needsAnotherPass = true;
 				}
-				else if ( DashboardServerUtils.LATITUDE.typeNameEquals(colType) ) {
-					for (int j = 0; j < numSamples; j++) {
-						stdObjects[j][k] = getLatitudeValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
-					}
-				}
-				else {
-					for (int j = 0; j < numSamples; j++) {
-						stdObjects[j][k] = getDoubleValue(dataVals.get(j).get(k), fromUnits, toUnits, missVal);
-					}
+			}
+			else if ( DashboardUtils.DATE_DATA_CLASS_NAME.equals(dataClassName) ) {
+				try {
+					DateStandardizer stdizer = new DateStandardizer(colType);
+					for (int j = 0; j < numSamples; j++)
+						stdObjects[j][k] = stdizer.getStandardValue(dataVals.get(j).get(k));
+					standardized[k] = true;
+				} catch ( NotStandardizedException ex ) {
+					standardized[k] = false;
+					needsAnotherPass = true;
 				}
 			}
 			else {
 				throw new IllegalArgumentException("Unknown data class name of " + dataClassName);
 			}
- 		}
+		}
+		if ( needsAnotherPass ) {
+			// TODO:
+			throw new IllegalArgumentException("Second pass standardization not yet implemented");
+		}
 	}
 
 	/**
@@ -110,41 +139,23 @@ public class StdDataArray {
 	 * @param columnIdx
 	 * 		index of the data column
 	 * @return
-	 * 		standard value object
+	 * 		standard value object; null is returned for "missing value"
 	 * @throws IndexOutOfBoundsException
 	 * 		if either the sample index of the value index is invalid
+	 * @throws NotStandardizedException 
+	 * 		if the value cannot be standardized (due to column type), or 
+	 * 		if the value has not been standardized
 	 */
-	public Object getStdVal(int sampleIdx, int columnIdx) throws IndexOutOfBoundsException {
+	public Object getStdVal(int sampleIdx, int columnIdx) throws IndexOutOfBoundsException, NotStandardizedException {
 		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
 			throw new IndexOutOfBoundsException("sample index is invalid " + sampleIdx);
 		if ( (columnIdx < 0) || (columnIdx >= numDataCols) )
 			throw new IndexOutOfBoundsException("data column index is invalid " + columnIdx);
+		if ( standardized[columnIdx] == null )
+			throw new NotStandardizedException("value cannot be standardized");
+		if ( ! standardized[columnIdx] )
+			throw new NotStandardizedException("value has not been standardized");
 		return stdObjects[sampleIdx][columnIdx];
-	}
-
-	/**
-	 * Assign the standard value object for the specified value (column index)
-	 * of the specified sample (row index).
-	 * 
-	 * @param sampleIdx
-	 * 		index of the sample (row)
-	 * @param columnIdx
-	 * 		index of the data column
-	 * @param stdValue
-	 * 		standard value object to assign
-	 * @return
-	 * 		previous standard value object at that location
-	 * @throws IndexOutOfBoundsException
-	 * 		if either the sample index of the value index is invalid
-	 */
-	public Object setStdVal(int sampleIdx, int columnIdx, Object stdValue) throws IndexOutOfBoundsException {
-		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
-			throw new IndexOutOfBoundsException("sample index is invalid " + sampleIdx);
-		if ( (columnIdx < 0) || (columnIdx >= numDataCols) )
-			throw new IndexOutOfBoundsException("data column index is invalid " + columnIdx);
-		Object oldStdVal = stdObjects[sampleIdx][columnIdx];
-		stdObjects[sampleIdx][columnIdx] = stdValue;
-		return oldStdVal;
 	}
 
 	@Override
