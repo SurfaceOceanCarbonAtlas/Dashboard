@@ -236,7 +236,7 @@ public interface DashboardServicesInterface extends RemoteService {
 	 * 		if the dataset ID is invalid, or
 	 * 		if the SanityChecker has never been run on this cruise.
 	 */
-	SCMessageList getDataMessages(String username, String datasetId) 
+	ADCMessageList getDataMessages(String username, String datasetId) 
 			throws IllegalArgumentException;
 
 	/**

@@ -227,7 +227,7 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		the callback to make with list of sanity checker data messages
 	 */
 	void getDataMessages(String username, String datasetId,
-			AsyncCallback<SCMessageList> callback);
+			AsyncCallback<ADCMessageList> callback);
 
 	/**
 	 * Client-side interface for getting the absolute path 

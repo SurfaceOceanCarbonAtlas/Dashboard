@@ -15,7 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SCMessageList extends HashSet<SCMessage> implements Serializable, IsSerializable {
+public class ADCMessageList extends HashSet<ADCMessage> implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = 2922125729137984943L;
 
@@ -23,7 +23,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	protected String datasetId;
 	protected ArrayList<String> summaries;
 
-	public SCMessageList() {
+	public ADCMessageList() {
 		super();
 		username = DashboardUtils.STRING_MISSING_VALUE;
 		datasetId = DashboardUtils.STRING_MISSING_VALUE;
@@ -110,9 +110,9 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SCMessageList) )
+		if ( ! (obj instanceof ADCMessageList) )
 			return false;
-		SCMessageList other = (SCMessageList) obj;
+		ADCMessageList other = (ADCMessageList) obj;
 
 		if ( ! datasetId.equals(other.datasetId) )
 			return false;
@@ -127,7 +127,7 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 
 	@Override
 	public String toString() {
-		return "SCMessageList" +
+		return "ADCMessageList" +
 				"[\n    username=" + username + 
 				",\n    datasetId=" + datasetId + 
 				",\n    summaries=" + summaries.toString() + 

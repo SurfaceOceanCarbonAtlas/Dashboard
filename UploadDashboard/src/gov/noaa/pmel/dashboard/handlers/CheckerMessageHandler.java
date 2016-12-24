@@ -24,9 +24,9 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-import gov.noaa.pmel.dashboard.shared.SCMessage;
-import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -361,19 +361,19 @@ public class CheckerMessageHandler {
 	 * 		the automated data checker messages for the dataset;
 	 * 		never null, but may be empty if there were no messages.
 	 * 		The datasetId, but not the username, will be assigned 
-	 * 		in the returned SCMessageList
+	 * 		in the returned ADCMessageList
 	 * @throws IllegalArgumentException
 	 * 		if the dataset ID is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the dateset
 	 */
-	public SCMessageList getCheckerMessages(String datasetId) 
+	public ADCMessageList getCheckerMessages(String datasetId) 
 			throws IllegalArgumentException, FileNotFoundException {
 		// Create the list of messages to be returned
-		SCMessageList msgList = new SCMessageList();
+		ADCMessageList msgList = new ADCMessageList();
 		msgList.setDatasetId(datasetId);
-		// Directly modify the summary messages in the SCMessageList
+		// Directly modify the summary messages in the ADCMessageList
 		ArrayList<String> summaryMsgs = msgList.getSummaries();
 		// Read the cruise messages file
 		File msgsFile = messagesFile(datasetId);
@@ -400,7 +400,7 @@ public class CheckerMessageHandler {
 							msgProps.setProperty(keyValue[0], keyValue[1]);
 						}
 
-						SCMessage msg = new SCMessage();
+						ADCMessage msg = new ADCMessage();
 
 						String propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
 						try {

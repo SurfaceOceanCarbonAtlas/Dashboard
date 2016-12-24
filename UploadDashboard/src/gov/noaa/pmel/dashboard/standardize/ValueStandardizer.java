@@ -30,8 +30,6 @@ public abstract class ValueStandardizer {
 	protected static final Double[] DEFAULT_MISSING_VALUE_NUMBERS_ARRAY = 
 			new Double[] {-999.0, -999.9, -999.99, -999.999,
 					-9999.0, -9999.9, -9999.99, -99999.0, -99999.9};
-	protected static final double REL_TOL = 0.0;
-	protected static final double ABS_TOL = 1.0E-6;
 
 	protected DashDataType dataType;
 	protected String fromUnit;
@@ -92,15 +90,19 @@ public abstract class ValueStandardizer {
 				return true;
 			try {
 				Double value = Double.valueOf(trimVal);
-				for ( Double mvdbl : DEFAULT_MISSING_VALUE_NUMBERS_ARRAY )
-					if ( DashboardUtils.closeTo(value, mvdbl, REL_TOL, ABS_TOL) )
+				for ( Double mvdbl : DEFAULT_MISSING_VALUE_NUMBERS_ARRAY ) {
+					if ( DashboardUtils.closeTo(value, mvdbl, 
+							DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 						return true;
+					}
+				}
 			} catch ( Exception ex ) {
 				// not numeric
 			}
 		}
-		else if ( missVal.equalsIgnoreCase(trimVal) )
+		else if ( missVal.equalsIgnoreCase(trimVal) ) {
 			return true;
+		}
 		return false;
 	}
 

@@ -28,7 +28,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 
 /**
@@ -437,14 +437,14 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 	}
 
 	@Override
-	public SCMessageList getDataMessages(String pageUsername, 
+	public ADCMessageList getDataMessages(String pageUsername, 
 			String datasetId) throws IllegalArgumentException {
 		// Get the dashboard data store and current username, and validate that username
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Get the list of saved automated data checker messages for this dataset
-		SCMessageList scMsgList;
+		ADCMessageList scMsgList;
 		try {
 			scMsgList = configStore.getCheckerMsgHandler().getCheckerMessages(datasetId);
 		} catch (FileNotFoundException ex) {

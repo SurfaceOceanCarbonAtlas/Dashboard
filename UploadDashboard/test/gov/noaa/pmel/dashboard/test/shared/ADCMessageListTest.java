@@ -13,25 +13,25 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.SCMessage;
-import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 
 /**
- * Tests of methods in {@link gov.noaa.pmel.dashboard.shared.SCMessageList}.
+ * Tests of methods in {@link gov.noaa.pmel.dashboard.shared.ADCMessageList}.
  * 
  * @author Karl Smith
  */
-public class SCMessageListTest {
+public class ADCMessageListTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#getUsername()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#setUsername(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getUsername()} and 
+	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setUsername(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetUsername() {
 		final String myUsername = "SocatUser";
-		SCMessageList msgList = new SCMessageList();
+		ADCMessageList msgList = new ADCMessageList();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 		msgList.setUsername(myUsername);
 		assertEquals(myUsername, msgList.getUsername());
@@ -40,13 +40,13 @@ public class SCMessageListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#getDatasetId()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#setDatasetId(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getDatasetId()} and 
+	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setDatasetId(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetDatasetId() {
 		final String myExpocode = "XXXX20140204";
-		SCMessageList msgList = new SCMessageList();
+		ADCMessageList msgList = new ADCMessageList();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getDatasetId());
 		msgList.setDatasetId(myExpocode);
 		assertEquals(myExpocode, msgList.getDatasetId());
@@ -56,8 +56,8 @@ public class SCMessageListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#getSummaries()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#setSummaries(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getSummaries()} and 
+	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setSummaries(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testGetSetSummaries() {
@@ -65,7 +65,7 @@ public class SCMessageListTest {
 				"3 errors of type: P_equ unreasonably large", 
 				"5 errors of type: calculated ship speed unreasonably large",
 				"20 warnings of type: P_equ unusually large"));
-		SCMessageList msgList = new SCMessageList();
+		ADCMessageList msgList = new ADCMessageList();
 		assertEquals(0, msgList.getSummaries().size());
 		msgList.setSummaries(mySummaries);
 		assertEquals(mySummaries, msgList.getSummaries());
@@ -76,8 +76,8 @@ public class SCMessageListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessageList#hashCode()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.SCMessageList#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#hashCode()} and 
+	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {
@@ -93,7 +93,7 @@ public class SCMessageListTest {
 		final String myColName = "P_atm";
 		final String myExplanation = "value exceeds the upper limit of questionable values";
 
-		SCMessage myMsg = new SCMessage();
+		ADCMessage myMsg = new ADCMessage();
 		myMsg.setSeverity(mySeverity);
 		myMsg.setRowNumber(myRowNum);
 		myMsg.setColNumber(myColNum);
@@ -101,7 +101,7 @@ public class SCMessageListTest {
 		myMsg.setGeneralComment(myExplanation);
 		myMsg.setDetailedComment(myExplanation);
 
-		SCMessage otherMsg = new SCMessage();
+		ADCMessage otherMsg = new ADCMessage();
 		otherMsg.setSeverity(mySeverity);
 		otherMsg.setRowNumber(myRowNum);
 		otherMsg.setColNumber(myColNum);
@@ -110,11 +110,11 @@ public class SCMessageListTest {
 		otherMsg.setDetailedComment(myExplanation);
 		assertEquals(myMsg, otherMsg);
 
-		SCMessageList msgList = new SCMessageList();
+		ADCMessageList msgList = new ADCMessageList();
 		assertFalse( msgList.equals(null) );
 		assertFalse( msgList.equals(myExpocode) );
 
-		SCMessageList other = new SCMessageList();
+		ADCMessageList other = new ADCMessageList();
 		assertTrue( msgList.hashCode() == other.hashCode() );
 		assertTrue( msgList.equals(other) );
 
