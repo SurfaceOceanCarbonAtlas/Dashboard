@@ -1,12 +1,13 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.datatype;
 
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 

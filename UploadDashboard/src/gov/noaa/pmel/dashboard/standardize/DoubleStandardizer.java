@@ -121,7 +121,7 @@ public class DoubleStandardizer extends ValueStandardizer {
 	public Double getStandardValue(String strVal) 
 			throws IllegalArgumentException, IllegalStateException {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("null string given to standardize");
 		if ( isMissingValue(strVal) )
 			return null;
 		Double value;

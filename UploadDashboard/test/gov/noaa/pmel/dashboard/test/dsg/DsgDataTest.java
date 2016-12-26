@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,10 +15,10 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DsgData;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -130,9 +130,9 @@ public class DsgDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#DsgData(gov.noaa.pmel.dashboard.server.KnownDataTypes, 
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#DsgData(gov.noaa.pmel.dashboard.datatype.KnownDataTypes, 
 	 * java.util.List, java.util.List)}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#dataListFromDashboardCruise(gov.noaa.pmel.dashboard.server.KnownDataTypes, 
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#dataListFromDashboardCruise(gov.noaa.pmel.dashboard.datatype.KnownDataTypes, 
 	 * gov.noaa.pmel.dashboard.shared.DashboardDatasetData)}.
 	 */
 	@Test
@@ -167,8 +167,8 @@ public class DsgDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getIntegerVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setIntegerVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getIntegerVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setIntegerVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetIntegerVariableValue() {
@@ -190,8 +190,8 @@ public class DsgDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getCharacterVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setCharacterVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Character)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getCharacterVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setCharacterVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Character)}.
 	 */
 	@Test
 	public void testGetSetCharacterVariableValue() {
@@ -213,8 +213,8 @@ public class DsgDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getDoubleVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getDoubleVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setDoubleVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDoubleVariableValue() {
@@ -237,8 +237,8 @@ public class DsgDataTest {
 
 	static final Integer SAMPLE_NUMBER = 123;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getSampleNumber()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setSampleNumber(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getSampleNumber()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setSampleNumber(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetSampleNumber() {
@@ -252,8 +252,8 @@ public class DsgDataTest {
 
 	static final Integer YEAR = 2014;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getYear()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setYear(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getYear()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setYear(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetYear() {
@@ -268,8 +268,8 @@ public class DsgDataTest {
 
 	static final Integer MONTH = 1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getMonth()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setMonth(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getMonth()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setMonth(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMonth() {
@@ -285,8 +285,8 @@ public class DsgDataTest {
 
 	static final Integer DAY = 13;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getDay()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setDay(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getDay()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setDay(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetDay() {
@@ -303,8 +303,8 @@ public class DsgDataTest {
 
 	static final Integer HOUR = 19;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getHour()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setHour(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getHour()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setHour(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetHour() {
@@ -322,8 +322,8 @@ public class DsgDataTest {
 
 	static final Integer MINUTE = 35;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getMinute()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setMinute(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getMinute()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setMinute(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMinute() {
@@ -342,8 +342,8 @@ public class DsgDataTest {
 
 	static final Double SECOND = 18.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getSecond()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setSecond(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getSecond()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setSecond(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSecond() {
@@ -363,8 +363,8 @@ public class DsgDataTest {
 
 	static final Double LONGITUDE = -125.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getLongitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getLongitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLongitude() {
@@ -385,8 +385,8 @@ public class DsgDataTest {
 
 	static final Double LATITUDE = 46.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getLatitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getLatitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLatitude() {
@@ -408,8 +408,8 @@ public class DsgDataTest {
 
 	static final Double SAMPLE_DEPTH = 5.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#getSampleDepth()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#setSampleDepth(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#getSampleDepth()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#setSampleDepth(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSampleDepth() {
@@ -431,8 +431,8 @@ public class DsgDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgData#hashCode()} 
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgData#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgData#hashCode()} 
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgData#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {

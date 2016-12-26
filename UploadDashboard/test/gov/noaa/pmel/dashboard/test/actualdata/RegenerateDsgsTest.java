@@ -13,13 +13,13 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.dsg.DsgData;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
-import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DsgData;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,10 +13,10 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
@@ -53,8 +53,8 @@ public class DsgMetadataTest {
 	static final String VERSION_STATUS = "2.5N";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getCharVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setCharVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Character)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getCharVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setCharVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Character)}.
 	 */
 	@Test
 	public void testGetSetCharVariableValue() {
@@ -77,8 +77,8 @@ public class DsgMetadataTest {
 	}
 
 		/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getStringVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getStringVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetStringVariableValue() {
@@ -101,8 +101,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDoubleVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDoubleVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDoubleVariableValue() {
@@ -126,8 +126,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDateVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDateVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetDateVariableValue() {
@@ -150,8 +150,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDatasetId()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDatasetId(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDatasetId()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDatasetId(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetExpocode() {
@@ -166,8 +166,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDatasetName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDatasetName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDatasetName()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDatasetName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetDatasetName() {
@@ -183,8 +183,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getPlatformName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setPlatformName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getPlatformName()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setPlatformName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetPlatformName() {
@@ -201,8 +201,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getOrganizationName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setOrganizationName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getOrganizationName()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setOrganizationName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetOrganization() {
@@ -220,8 +220,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getInvestigatorNames()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setInvestigatorNames(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getInvestigatorNames()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setInvestigatorNames(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetInvestigatorNames() {
@@ -240,8 +240,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getPlatformType()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setPlatformType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getPlatformType()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setPlatformType(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetPlatformType() {
@@ -261,8 +261,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getWestmostLongitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setWestmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getWestmostLongitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
@@ -283,8 +283,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getEastmostLongitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setEastmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getEastmostLongitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setEastmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetEastmostLongitude() {
@@ -306,8 +306,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getSouthmostLatitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setSouthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getSouthmostLatitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setSouthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSouthmostLatitude() {
@@ -330,8 +330,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getNorthmostLatitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setNorthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getNorthmostLatitude()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setNorthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNorthmostLatitude() {
@@ -355,8 +355,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getBeginTime()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setBeginTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getBeginTime()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setBeginTime(java.util.Date)}.
 	 */
 	@Test
 	public void testSetBeginTime() {
@@ -381,8 +381,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getEndTime()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setEndTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getEndTime()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setEndTime(java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetEndTime() {
@@ -408,8 +408,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVersion()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVersion(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getVersion()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setVersion(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetVersion() {
@@ -436,8 +436,8 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#hashCode()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#hashCode()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {

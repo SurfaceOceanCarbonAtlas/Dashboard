@@ -12,52 +12,46 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 /**
  * Types of the data columns in a user-provided data file.
  * Includes information about this data column type to present
- * and assign on the client side, as well as information for 
- * creating the variable in a NetCDF file on the server side.
+ * and assign on the client side.
  * 
  * @author Karl Smith
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7705716003618660141L;
+	private static final long serialVersionUID = -7521282556925954886L;
 
 	protected String varName;
 	protected Double sortOrder;
 	protected String displayName;
-	protected String dataClassName;
 	protected String description;
-	protected String standardName;
-	protected String categoryName;
 	protected ArrayList<String> units;
 	protected Integer selectedUnitIndex;
 	protected String selectedMissingValue;
 
 	/**
 	 * Create an empty data column type; 
+	 * all strings are set to {@link DashboardUtils#STRING_MISSING_VALUE},
 	 * the sort order is set to {@link DashboardUtils#FP_MISSING_VALUE},
 	 * the units list is a copy of {@link DashboardUtils#NO_UNITS}, 
-	 * the index of the selected unit is zero, 
-	 * and all remaining String values are set to 
-	 * {@link DashboardUtils#STRING_MISSING_VALUE},
+	 * the index of the selected unit is zero. 
+	 * 
 	 */
 	public DataColumnType() {
 		varName = DashboardUtils.STRING_MISSING_VALUE;
 		sortOrder = DashboardUtils.FP_MISSING_VALUE;
 		displayName = DashboardUtils.STRING_MISSING_VALUE;
-		dataClassName = DashboardUtils.STRING_MISSING_VALUE;
 		description = DashboardUtils.STRING_MISSING_VALUE;
-		standardName = DashboardUtils.STRING_MISSING_VALUE;
-		categoryName = DashboardUtils.STRING_MISSING_VALUE;
 		units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 		selectedUnitIndex = Integer.valueOf(0);
 		selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
-	 * Create a data column type with the given values.  The index 
-	 * of the selected unit is zero and the selected missing value 
-	 * is {@link DashboardUtils#STRING_MISSING_VALUE}
-	 * (interpreted as default missing values).
+	 * Create a data column type with the given values.  A new ArrayList
+	 * of units is created from the given collection of units.  The index 
+	 * of the selected unit is zero and the selected missing value is set 
+	 * to {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as 
+	 * default missing values).
 	 * 
 	 * @param varName
 	 * 		name for a variable of this type; 
@@ -69,31 +63,19 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * @param displayName
 	 * 		displayed name for this types;
 	 * 		if null or blank, varName is used
-	 * @param dataClassName
-	 * 		name of the class for a variable of this type
-	 * 		(e.g., Character, Double, Integer, String);
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param description
 	 * 		description of a variable of this type;
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 * @param standardName
-	 * 		standard name for a variable of this type
-	 * 		(can be the same as that of other data column types);
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 * @param categoryName
-	 * 		category name for a variable of this type;
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param units
-	 * 		unit strings associated with this type (copied);
-	 * 		if null or empty, {@link DashboardUtils#NO_UNITS} is used (copied)
+	 * 		unit strings associated with this type;
+	 * 		if null or empty, {@link DashboardUtils#NO_UNITS} is used
 	 * @throws IllegalArgumentException
 	 * 		if the variable name is null or blank
 	 */
 	public DataColumnType(String varName, Double sortOrder, String displayName, 
-			String dataClassName, String description, String standardName, 
-			String categoryName, Collection<String> units) throws IllegalArgumentException {
+			String description, Collection<String> units) throws IllegalArgumentException {
 		if ( (varName == null) || varName.trim().isEmpty() )
-			throw new IllegalArgumentException("variable name is null or blank");
+			throw new IllegalArgumentException("data type variable name is invalid");
 		this.varName = varName;
 		if ( (sortOrder == null) || sortOrder.isNaN() || sortOrder.isInfinite() )
 			this.sortOrder = DashboardUtils.FP_MISSING_VALUE;
@@ -103,22 +85,10 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			this.displayName = varName;
 		else
 			this.displayName = displayName;
-		if ( dataClassName != null )
-			this.dataClassName = dataClassName;
-		else
-			this.dataClassName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( description != null )
 			this.description = description;
 		else
 			this.description = DashboardUtils.STRING_MISSING_VALUE;
-		if ( standardName != null )
-			this.standardName = standardName;
-		else
-			this.standardName = DashboardUtils.STRING_MISSING_VALUE;
-		if ( categoryName != null )
-			this.categoryName = categoryName;
-		else
-			this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( (units != null) && (units.size() > 0) ) {
 			this.units = new ArrayList<String>(units);
 		}
@@ -200,29 +170,6 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
 	/**
 	 * @return 
-	 * 		the data class name for this data column type
-	 * 		(e.g., Character, Double, Integer, String);
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getDataClassName() {
-		return dataClassName;
-	}
-
-	/**
-	 * @param dataClassName 
-	 * 		the data class name to set for this data column type
-	 * 		(e.g., Character, Double, Integer, String);
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 */
-	public void setDataClassName(String dataClassName) {
-		if ( dataClassName != null )
-			this.dataClassName = dataClassName;
-		else
-			this.dataClassName = DashboardUtils.STRING_MISSING_VALUE;
-	}
-
-	/**
-	 * @return 
 	 * 		description of a variable of this type;
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
@@ -240,48 +187,6 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			this.description = description;
 		else
 			this.description = DashboardUtils.STRING_MISSING_VALUE;
-	}
-
-	/**
-	 * @return 
-	 * 		standard name of a variable of this type;
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getStandardName() {
-		return standardName;
-	}
-
-	/**
-	 * @param standardName 
-	 * 		standard name of a variable of this type to set;
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 */
-	public void setStandardName(String standardName) {
-		if ( standardName != null )
-			this.standardName = standardName;
-		else
-			this.standardName = DashboardUtils.STRING_MISSING_VALUE;
-	}
-
-	/**
-	 * @return
-	 * 		category name of a variable of this type;
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getCategoryName() {
-		return categoryName;
-	}
-
-	/**
-	 * @param categoryName 
-	 * 		category name of a variable of this type;
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 */
-	public void setCategoryName(String categoryName) {
-		if ( categoryName != null )
-			this.categoryName = categoryName;
-		else
-			this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
@@ -335,7 +240,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
 	/**
 	 * Assigns the selected unit using the given unit name.
-	 * Name comparisons are case-insensitively.
+	 * Name comparisons are case-insensitive.
 	 * 
 	 * @param unitName
 	 * 		name of the selected unit
@@ -387,17 +292,15 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * 		made of any mutable data (namely, the list of units).
 	 */
 	public DataColumnType duplicate() {
-		DataColumnType dup = new DataColumnType(varName, sortOrder, displayName, 
-				dataClassName, description, standardName, categoryName, units);
+		DataColumnType dup = new DataColumnType(varName, sortOrder, displayName, description, units);
 		dup.selectedUnitIndex = selectedUnitIndex;
 		dup.selectedMissingValue = selectedMissingValue;
 		return dup;
 	}
 
 	/**
-	 * Checks if the variable or displayed name of this data column type 
-	 * is equal, ignoring case and non-alphanumeric characters, 
-	 * to the given name.
+	 * Checks if the variable or displayed name of this data column type is equal, 
+	 * ignoring case and non-alphanumeric characters, to the given name.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
@@ -438,71 +341,6 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		return false;
 	}
 
-	/**
-	 * A QC flag type has a category name of {@link DashboardUtils#QUALITY_CATEGORY},
-	 * a data class name of {@link DashboardUtils#CHAR_DATA_CLASS_NAME}, and has a
-	 * variable name that starts with (case insensitive) "QC_" or "WOCE_" (or is 
-	 * just "QC" or "WOCE").
-	 * 
-	 * @return
-	 * 		if this is a QC flag type
-	 */
-	public boolean isQCType() {
-		if ( ! categoryName.equals(DashboardUtils.QUALITY_CATEGORY) )
-			return false;
-		if ( ! dataClassName.equals(DashboardUtils.CHAR_DATA_CLASS_NAME) )
-			return false;
-		String ucvarname = varName.toUpperCase();
-		if ( ucvarname.equals("QC") )
-			return true;
-		if ( ucvarname.startsWith("QC_") )
-			return true;
-		if ( ucvarname.equals("WOCE") )
-			return true;
-		if ( ucvarname.startsWith("WOCE_") )
-			return true;
-		return false;
-	}
-
-	/**
-	 * A (general) comment type has a data class name of 
-	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable 
-	 * name that contains (case insensitive) the word "COMMENT". 
-	 * 
-	 * @return
-	 * 		if this type is a comment for the given data type
-	 */
-	public boolean isCommentType() {
-		if ( ! dataClassName.equals(DashboardUtils.STRING_DATA_CLASS_NAME) )
-			return false;
-		if ( varName.toUpperCase().contains("COMMENT") )
-			return true;
-		return false;
-	}
-
-	/**
-	 * A comment type for another data type has a data class name of 
-	 * {@link DashboardUtils#STRING_DATA_CLASS_NAME} and a variable name 
-	 * that is (case insensitive) either: "COMMENT_" followed by the other 
-	 * data variable name, or the other data variable name followed by 
-	 * "_COMMENT". 
-	 * 
-	 * @param dtype
-	 * 		given data type; cannot be null
-	 * @return
-	 * 		if this type is a comment for the given data type
-	 */
-	public boolean isCommentTypeFor(DataColumnType dtype) {
-		if ( ! dataClassName.equals(DashboardUtils.STRING_DATA_CLASS_NAME) )
-			return false;
-		String ucname = dtype.varName.toUpperCase();
-		if ( varName.toUpperCase().equals("COMMENT_" + ucname) )
-			return true;
-		if ( varName.toUpperCase().equals(ucname + "_COMMENT") )
-			return true;
-		return false ;
-	}
-
 	@Override
 	public int compareTo(DataColumnType other) {
 		int result;
@@ -515,16 +353,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		result = displayName.compareTo(other.displayName);
 		if ( result != 0 )
 			return result;
-		result = dataClassName.compareTo(other.dataClassName);
-		if ( result != 0 )
-			return result;
 		result = description.compareTo(other.description);
-		if ( result != 0 )
-			return result;
-		result = standardName.compareTo(other.standardName);
-		if ( result != 0 )
-			return result;
-		result = categoryName.compareTo(other.categoryName);
 		if ( result != 0 )
 			return result;
 		result = selectedMissingValue.compareTo(other.selectedMissingValue);
@@ -550,10 +379,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		final int prime = 37;
 		int result = varName.hashCode();
 		result = result * prime + displayName.hashCode();
-		result = result * prime + dataClassName.hashCode();
 		result = result * prime + description.hashCode();
-		result = result * prime + standardName.hashCode();
-		result = result * prime + categoryName.hashCode();
 		result = result * prime + selectedUnitIndex.hashCode();
 		result = result * prime + selectedMissingValue.hashCode();
 		result = result * prime + units.hashCode();
@@ -575,13 +401,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			return false;
 		if ( ! displayName.equals(other.displayName) )
 			return false;
-		if ( ! dataClassName.equals(other.dataClassName) )
-			return false;
 		if ( ! description.equals(other.description) )
-			return false;
-		if ( ! standardName.equals(other.standardName) )
-			return false;
-		if ( ! categoryName.equals(other.categoryName) )
 			return false;
 		if ( ! selectedUnitIndex.equals(other.selectedUnitIndex) )
 			return false;
@@ -602,10 +422,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 				"varName=\"" + varName + "\", " +
 				"sortOrder=" + sortOrder.toString() + ", " +
 				"displayName=\"" + displayName + "\", " +
-				"dataClassName=\"" + dataClassName + "\", " +
 				"description=\"" + description + "\", " +
-				"standardName=\"" + standardName + "\", " +
-				"categoryName=\"" + categoryName + "\", " +
 				"units=" + units.toString() + ", " +
 				"selectedUnitIndex=" + selectedUnitIndex.toString() + ", " +
 				"selectedMissingValue=\"" + selectedMissingValue + "\" ]";

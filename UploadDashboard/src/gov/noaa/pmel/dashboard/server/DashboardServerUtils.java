@@ -5,6 +5,10 @@ package gov.noaa.pmel.dashboard.server;
 
 import java.util.regex.Pattern;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -35,10 +39,25 @@ public class DashboardServerUtils {
 	public static final Character FLAG_RENAME = 'R';
 	public static final String RENAME_VARNAME = "Rename";
 
+	// Some suggested categories
+	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
+	public static final String CO2_CATEGORY = "CO2";
+	public static final String IDENTIFIER_CATEGORY = "Identifier";
+	public static final String LOCATION_CATEGORY = "Location";
+	public static final String PLATFORM_CATEGORY = "Platform";
+	public static final String PRESSURE_CATEGORY = "Pressure";
+	public static final String QUALITY_CATEGORY = "Quality";
+	public static final String SALINITY_CATEGORY = "Salinity";
+	public static final String TEMPERATURE_CATEGORY = "Temperature";
+	public static final String TIME_CATEGORY = "Time";
+	public static final String WATER_VAPOR_CATEGORY = "Water Vapor";
+	public static final String WIND_CATEGORY = "Wind";
+
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
-	public static final DashDataType UNKNOWN = new DashDataType(DashboardUtils.UNKNOWN);
+	public static final StringDashDataType UNKNOWN = new StringDashDataType(DashboardUtils.UNKNOWN, 
+			null, null, null, null, null, null);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -46,42 +65,60 @@ public class DashboardServerUtils {
 	 * be part of the metadata, but the values are not validated or used. 
 	 * Multiple columns may have this type.
 	 */
-	public static final DashDataType OTHER = new DashDataType(DashboardUtils.OTHER);
+	public static final StringDashDataType OTHER = new StringDashDataType(DashboardUtils.OTHER, 
+			null, null, null, null, null, null);
 
 	/**
 	 * Unique identifier for the dataset 
 	 * (metadata derived from user data column for the dataset name)
 	 */
-	public static final DashDataType DATASET_ID = new DashDataType(DashboardUtils.DATASET_ID);
+	public static final StringDashDataType DATASET_ID = new StringDashDataType(DashboardUtils.DATASET_ID, 
+			null, null, null, null, null, null);
 
 	/**
 	 * Consecutive numbering of the samples after merging and ordering.
 	 */
-	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
+	public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType(DashboardUtils.SAMPLE_NUMBER, 
+			null, null, "1", null, null, null);
 
 	/**
 	 * Completely specified time (seconds since 1970-01-01T00:00:00Z) of a sample.
 	 * Computed value; not a user type
 	 */
-	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
+	public static final DoubleDashDataType TIME = new DoubleDashDataType(DashboardUtils.TIME, 
+			"time", TIME_CATEGORY, null, null, null, null);
 
 	/**
 	 * User-provided name for the dataset
 	 */
-	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
+	public static final StringDashDataType DATASET_NAME = new StringDashDataType(DashboardUtils.DATASET_NAME, 
+			"dataset_name", IDENTIFIER_CATEGORY, null, null, null, null);
 
-	public static final DashDataType PLATFORM_NAME = new DashDataType(DashboardUtils.PLATFORM_NAME);
-	public static final DashDataType PLATFORM_TYPE = new DashDataType(DashboardUtils.PLATFORM_TYPE);
-	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
-	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
-	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
-	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
-	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
-	public static final DashDataType NORTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.NORTHERNMOST_LATITUDE);
-	public static final DashDataType TIME_COVERAGE_START = new DashDataType(DashboardUtils.TIME_COVERAGE_START);
-	public static final DashDataType TIME_COVERAGE_END = new DashDataType(DashboardUtils.TIME_COVERAGE_END);
-	public static final DashDataType STATUS = new DashDataType(DashboardUtils.STATUS);
-	public static final DashDataType VERSION = new DashDataType(DashboardUtils.VERSION);
+	public static final StringDashDataType PLATFORM_NAME = new StringDashDataType(DashboardUtils.PLATFORM_NAME, 
+			"platform_name", IDENTIFIER_CATEGORY, null, null, null, null);
+	public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType(DashboardUtils.PLATFORM_TYPE, 
+			"platform_name", IDENTIFIER_CATEGORY, null, null, null, null);
+			
+	public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType(DashboardUtils.ORGANIZATION_NAME, 
+			"organization", IDENTIFIER_CATEGORY, null, null, null, null);
+	public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType(DashboardUtils.INVESTIGATOR_NAMES, 
+			"investigators", IDENTIFIER_CATEGORY, null, null, null, null);
+	public static final LonLatDashDataType WESTERNMOST_LONGITUDE = new LonLatDashDataType(DashboardUtils.WESTERNMOST_LONGITUDE, 
+			"geospatial_lon_min", LOCATION_CATEGORY, null, null, null, null);
+	public static final LonLatDashDataType EASTERNMOST_LONGITUDE = new LonLatDashDataType(DashboardUtils.EASTERNMOST_LONGITUDE, 
+			"geospatial_lon_max", LOCATION_CATEGORY, null, null, null, null);
+	public static final LonLatDashDataType SOUTHERNMOST_LATITUDE = new LonLatDashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE, 
+			"geospatial_lat_min", LOCATION_CATEGORY, null, null, null, null);
+	public static final LonLatDashDataType NORTHERNMOST_LATITUDE = new LonLatDashDataType(DashboardUtils.NORTHERNMOST_LATITUDE, 
+			"geospatial_lat_max", LOCATION_CATEGORY, null, null, null, null);
+	public static final TimeDashDataType TIME_COVERAGE_START = new TimeDashDataType(DashboardUtils.TIME_COVERAGE_START, 
+			"time_coverage_start", LOCATION_CATEGORY, null, null, null, null);
+	public static final TimeDashDataType TIME_COVERAGE_END = new TimeDashDataType(DashboardUtils.TIME_COVERAGE_END, 
+			"time_coverage_end", LOCATION_CATEGORY, null, null, null, null);
+	public static final StringDashDataType STATUS = new StringDashDataType(DashboardUtils.STATUS, 
+			"status", IDENTIFIER_CATEGORY, null, null, null, null);
+	public static final StringDashDataType VERSION = new StringDashDataType(DashboardUtils.VERSION, 
+			"cersion", IDENTIFIER_CATEGORY, null, null, null, null);
 
 	/**
 	 * User-provided unique ID for a sample in a dataset (user data type only). 

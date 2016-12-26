@@ -49,7 +49,7 @@ public class StringStandardizer extends ValueStandardizer {
 	@Override
 	public String getStandardValue(String strVal) throws IllegalArgumentException {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("null string given to standardize");
 		String standardVal = strVal.trim();
 		if ( isMissingValue(standardVal) )
 			return null;

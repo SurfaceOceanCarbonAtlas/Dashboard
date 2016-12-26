@@ -46,13 +46,13 @@ public class CharStandardizer extends ValueStandardizer {
 	 * 		If the given string representation is a single whitespace character that
 	 * 		is not interpreted as a missing value, then that character is returned.
 	 * @throws IllegalArgumentException
-	 * 		if null is given, or
+	 * 		if the string is null, or 
 	 * 		if the string represents neither a missing value nor a single character
 	 */
 	@Override
 	public Character getStandardValue(String strVal) throws IllegalArgumentException {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("null string given to standardize");
 		String standardVal = strVal.trim();
 		if ( isMissingValue(standardVal) )
 			return null;

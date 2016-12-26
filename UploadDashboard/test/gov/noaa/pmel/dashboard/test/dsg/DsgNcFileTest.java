@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,12 +15,12 @@ import java.util.Properties;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgData;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DsgData;
-import gov.noaa.pmel.dashboard.server.DsgMetadata;
-import gov.noaa.pmel.dashboard.server.DsgNcFile;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -465,7 +465,7 @@ public class DsgNcFileTest {
 
 	/**
 	 * Test method for successfully creating a DSG file using 
-	 * {@link gov.noaa.pmel.dashboard.server.DsgNcFile#create}.
+	 * {@link gov.noaa.pmel.dashboard.dsg.DsgNcFile#create}.
 	 */
 	@Test
 	public void testCreate() throws Exception {
@@ -559,7 +559,7 @@ public class DsgNcFileTest {
 
     /**
 	 * Test method for checking expected failures to a DSG file using 
-	 * {@link gov.noaa.pmel.dashboard.server.DsgNcFile#create}.
+	 * {@link gov.noaa.pmel.dashboard.dsg.DsgNcFile#create}.
 	 */
 	@Test
 	public void testBadMissingValuesFail() throws Exception {

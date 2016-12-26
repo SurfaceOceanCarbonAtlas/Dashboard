@@ -6,7 +6,7 @@ package gov.noaa.pmel.dashboard.standardize;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -54,6 +54,8 @@ public abstract class ValueStandardizer {
 	 * 		standardized) is needed
 	 */
 	protected ValueStandardizer(DataColumnType dtype) {
+		if ( dtype == null )
+			throw new IllegalArgumentException("null data column type given");
 		dataType = new DashDataType(dtype);
 		fromUnit = dtype.getUnits().get(dtype.getSelectedUnitIndex());
 		if ( DashboardUtils.STRING_MISSING_VALUE.equals(fromUnit) )
@@ -77,13 +79,13 @@ public abstract class ValueStandardizer {
 	 * {@link #DEFAULT_MISSING_VALUE_NUMBERS_ARRAY}.
 	 * 
 	 * @param strVal
-	 * 		string representation to check; cannot be null
+	 * 		string representation to check
 	 * @return
 	 * 		if this string represents a missing value
-	 * @throws IllegalArgumentException
+	 * @throws NullPointerException
 	 * 		if the given string is null
 	 */
-	protected boolean isMissingValue(String strVal) {
+	protected boolean isMissingValue(String strVal) throws NullPointerException {
 		String trimVal = strVal.trim();
 		if ( missVal == null ) {
 			if ( DEFAULT_MISSING_VALUE_LCSTRINGS_SET.contains(trimVal.toLowerCase()) )
@@ -117,9 +119,10 @@ public abstract class ValueStandardizer {
 	 * @return
 	 * 		null if the string representation matches a missing value for this type;
 	 * 		otherwise, the standard value object for this string value and type 
+	 * @throws NullPointerException
+	 * 		if the given string is null
 	 * @throws IllegalArgumentException
-	 * 		if the given string representation is null, or
-	 * 		if the string cannot be interpreted as the required data type.
+	 * 		if the given string cannot be interpreted as the required data type.
 	 * @throws IllegalStateException
 	 * 		if unit-conversion of the value cannot be performed
 	 */

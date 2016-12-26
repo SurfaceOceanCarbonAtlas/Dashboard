@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.datatype;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,12 +12,12 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
- * Tests for {@link gov.noaa.pmel.dashboard.server.DashDataType}
+ * Tests for {@link gov.noaa.pmel.dashboard.datatype.DashDataType}
  * 
  * @author Karl Smith
  */
@@ -33,17 +33,17 @@ public class DashDataTypeTest {
 	private static final ArrayList<String> UNITS = new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(java.lang.String, 
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#DataType(java.lang.String, 
 	 * java.lang.Double, java.lang.String, java.lang.String, java.lang.String, java.lang.String, 
 	 * java.util.Collection)} as well as
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getVarName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getSortOrder()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDisplayName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDataClassName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDescription()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getStandardName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getCategoryName()}, and
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getUnits()}.
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getVarName()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getSortOrder()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getDisplayName()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getDataClassName()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getDescription()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getStandardName()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getCategoryName()}, and
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#getUnits()}.
 	 */
 	@Test
 	public void testDashDataType() {
@@ -61,9 +61,9 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(java.lang.String)}
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)},
-	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.server.DashDataType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#typeNameEquals(java.lang.String)}
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)},
+	 * and {@link gov.noaa.pmel.dashboard.datatype.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.datatype.DashDataType)}.
 	 */
 	@Test
 	public void testTypeNameEquals() {
@@ -148,7 +148,7 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#duplicate()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#duplicate()}.
 	 */
 	@Test
 	public void testDuplicate() {
@@ -162,10 +162,10 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#isQCType()}, 
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentType()}, 
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.server.DashDataType)}, and
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#isQCType()}, 
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#isCommentType()}, 
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.datatype.DashDataType)}, and
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#isCommentTypeFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
 	public void testIsQCTypeIsComment() {
@@ -226,8 +226,8 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#toPropertyValue()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#fromPropertyValue(java.lang.String,java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#toPropertyValue()}
+	 * and {@link gov.noaa.pmel.dashboard.datatype.DashDataType#fromPropertyValue(java.lang.String,java.lang.String)}.
 	 */
 	@Test
 	public void testToFromPropertyValue() {
@@ -274,10 +274,10 @@ public class DashDataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#hashCode()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#equals(java.lang.Object)}
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.DashDataType#hashCode()}
+	 * and {@link gov.noaa.pmel.dashboard.datatype.DashDataType#equals(java.lang.Object)}
 	 * as well as 
-	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(gov.noaa.pmel.dashboard.shared.DataColumnType)},
+	 * {@link gov.noaa.pmel.dashboard.datatype.DashDataType#DataType(gov.noaa.pmel.dashboard.shared.DataColumnType)},
 	 */
 	@Test
 	public void testHashCodeEquals() {

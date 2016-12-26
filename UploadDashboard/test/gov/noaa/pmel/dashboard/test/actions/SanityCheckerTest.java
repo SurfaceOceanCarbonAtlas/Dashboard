@@ -19,8 +19,7 @@ import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.test.server.DsgNcFileTest;
-
+import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.datatype;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,14 +18,14 @@ import java.util.TreeSet;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
- * Unit tests for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes}.
+ * Unit tests for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes}.
  * @author Karl Smith
  */
 public class KnownDataTypesTest {
@@ -189,9 +189,9 @@ public class KnownDataTypesTest {
 			
 	/**
 	 * Test method for 
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForUsers()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#isEmpty()}, and
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
+	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#addStandardTypesForUsers()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#isEmpty()}, and
+	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
 	public void testAddStandardTypesForClient() {
@@ -206,8 +206,8 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForMetadataFiles()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#addStandardTypesForMetadataFiles()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
 	public void testAddStandardTypesForMetadataFiles() {
@@ -221,8 +221,8 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForDataFiles()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#addStandardTypesForDataFiles()},
+	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
 	public void testAddStandardTypesForDataFiles() {
@@ -236,7 +236,7 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesSet()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getKnownTypesSet()}.
 	 */
 	@Test
 	public void testGetKnownTypesSet() {
@@ -249,7 +249,7 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getDataColumnType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getDataColumnType(java.lang.String)}.
 	 */
 	@Test
 	public void testGetDataColumnType() {
@@ -263,7 +263,7 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesSet()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getKnownTypesSet()}.
 	 */
 	@Test
 	public void testGetKnownTypesList() {
@@ -276,7 +276,7 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addTypesFromProperties(java.util.Properties)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#addTypesFromProperties(java.util.Properties)}.
 	 */
 	@Test
 	public void testAddTypesFromProperties() throws IOException {

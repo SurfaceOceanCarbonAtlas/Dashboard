@@ -1,6 +1,6 @@
 /**
  */
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.dsg;
 
 
 import java.util.ArrayList;
@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
