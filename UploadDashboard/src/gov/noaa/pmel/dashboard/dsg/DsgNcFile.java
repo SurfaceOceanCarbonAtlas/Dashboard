@@ -33,8 +33,6 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class DsgNcFile extends File {
 
-	private static final long serialVersionUID = -3134631558638142701L;
-
 	private static final String DSG_VERSION = "DsgNcFile 2.0";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */

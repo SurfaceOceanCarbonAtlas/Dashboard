@@ -161,7 +161,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * @return
 	 * 		the simple class name of the data that this data column type provides.
 	 */
-	protected abstract String getDataClassName();
+	public abstract String getDataClassName();
 
 	/**
 	 * @param strRepr
@@ -171,7 +171,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * @throws IllegalArgumentException
 	 * 		if the string representation cannot be interpreted
 	 */
-	protected abstract T dataValueOf(String strRepr) throws IllegalArgumentException;
+	public abstract T dataValueOf(String strRepr) throws IllegalArgumentException;
 
 	/**
 	 * Verifies that the values minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal,

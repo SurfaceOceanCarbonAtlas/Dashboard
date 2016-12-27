@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
@@ -29,6 +31,15 @@ public class DashboardServerUtils {
 	/** Sanity Checker "realname" for flags */
 	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
 
+	/** General-purpose flag value for no information available at this time */
+	public static final Character FLAG_NO_INFO = '1';
+	/** General-purpose flag value for acceptable data */
+	public static final Character FLAG_ACCEPTABLE = '2';
+	/** WOCE-type flag value for questionable data */
+	public static final Character WOCE_QUESTIONABLE = '3';
+	/** WOCE-type flag value for bad data */
+	public static final Character WOCE_BAD = '4';
+
 	// flags for QC/WOCE events of datasets that has been updated
 	public static final Character OLD_FLAG_NO_INFO = 'U';
 	public static final Character OLD_FLAG_ACCEPTABLE = 'G';
@@ -39,6 +50,12 @@ public class DashboardServerUtils {
 	public static final Character FLAG_RENAME = 'R';
 	public static final String RENAME_VARNAME = "Rename";
 
+	/** 
+	 * GEOPOSITION_VARNAME is a marker used in automated data checking
+	 * to indicate an severe error in the combination of lon/lat/depth/time. 
+	 */
+	public static final String GEOPOSITION_VARNAME = "geoposition";
+
 	// Some suggested categories
 	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
 	public static final String IDENTIFIER_CATEGORY = "Identifier";
@@ -46,6 +63,10 @@ public class DashboardServerUtils {
 	public static final String PLATFORM_CATEGORY = "Platform";
 	public static final String QUALITY_CATEGORY = "Quality";
 	public static final String TIME_CATEGORY = "Time";
+
+	/** Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z") */
+	public static final ArrayList<String> TIME_UNITS = 
+			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
@@ -66,21 +87,24 @@ public class DashboardServerUtils {
 	 * Unique identifier for the dataset 
 	 * (metadata derived from user data column for the dataset name)
 	 */
-	public static final StringDashDataType DATASET_ID = new StringDashDataType(DashboardUtils.DATASET_ID, 
+	public static final StringDashDataType DATASET_ID = new StringDashDataType("dataset_id", 
+			50.0, "dataset ID", "unique ID for this dataset", DashboardUtils.NO_UNITS, 
 			null, IDENTIFIER_CATEGORY, null, null, null, null);
 
 	/**
 	 * Consecutive numbering of the samples after merging and ordering.
 	 */
-	public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType(DashboardUtils.SAMPLE_NUMBER, 
-			null, IDENTIFIER_CATEGORY, "1", null, null, null);
+	public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType("sample_number", 
+			51.0, "sample num", "sample number", DashboardUtils.NO_UNITS, null, 
+			IDENTIFIER_CATEGORY, "1", null, null, null);
 
 	/**
-	 * Completely specified time (seconds since 1970-01-01T00:00:00Z) of a sample.
-	 * Computed value; not a user type
+	 * Completely specified sampling time (seconds since 1970-01-01T00:00:00Z) 
+	 * used in file data; computed value.
 	 */
-	public static final DoubleDashDataType TIME = new DoubleDashDataType(DashboardUtils.TIME, 
-			"time", TIME_CATEGORY, null, null, null, null);
+	public static final DoubleDashDataType TIME = new DoubleDashDataType("time", 
+			52.0, "time", "sample time", TIME_UNITS, "time", 
+			TIME_CATEGORY, null, null, null, null);
 
 	/**
 	 * User-provided name for the dataset
@@ -97,22 +121,29 @@ public class DashboardServerUtils {
 	public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType(DashboardUtils.INVESTIGATOR_NAMES, 
 			"investigators", IDENTIFIER_CATEGORY, null, null, null, null);
 
-	public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType(DashboardUtils.WESTERNMOST_LONGITUDE, 
+	public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_min", 
+			110.0, "westmost lon", "westernmost longitude", DashboardUtils.LONGITUDE_UNITS, 
 			"geospatial_lon_min", LOCATION_CATEGORY, "-540.0", "-180.0", "360.0", "540.0");
-	public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType(DashboardUtils.EASTERNMOST_LONGITUDE, 
+	public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max", 
+			111.0, "eastmost lon", "easternmost longitude", DashboardUtils.LONGITUDE_UNITS, 
 			"geospatial_lon_max", LOCATION_CATEGORY, "-540.0", "-180.0", "360.0", "540.0");
-	public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE, 
+	public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min", 
+			112.0, "southmost lat", "southernmost latitude", DashboardUtils.LATITUDE_UNITS, 
 			"geospatial_lat_min", LOCATION_CATEGORY, "-90.0", null, null, "90.0");
-	public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType(DashboardUtils.NORTHERNMOST_LATITUDE, 
+	public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max", 
+			113.0, "northmost lat", "northernmost latitude", DashboardUtils.LATITUDE_UNITS, 
 			"geospatial_lat_max", LOCATION_CATEGORY, "-90.0", null, null, "90.0");
-	public static final StringDashDataType TIME_COVERAGE_START = new StringDashDataType(DashboardUtils.TIME_COVERAGE_START, 
+	public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start", 
+			114.0, "start time", "starting time", TIME_UNITS, 
 			"time_coverage_start", LOCATION_CATEGORY, null, null, null, null);
-	public static final StringDashDataType TIME_COVERAGE_END = new StringDashDataType(DashboardUtils.TIME_COVERAGE_END, 
+	public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_converage_end", 
+			115.0, "end time", "ending time", TIME_UNITS, 
 			"time_coverage_end", LOCATION_CATEGORY, null, null, null, null);
-	public static final StringDashDataType STATUS = new StringDashDataType(DashboardUtils.STATUS, 
+	public static final StringDashDataType STATUS = new StringDashDataType("status",
+			120.0, "status", "status", DashboardUtils.NO_UNITS, 
 			null, IDENTIFIER_CATEGORY, null, null, null, null);
-	public static final StringDashDataType VERSION = new StringDashDataType(DashboardUtils.VERSION, 
-			null, IDENTIFIER_CATEGORY, null, null, null, null);
+	public static final StringDashDataType VERSION = new StringDashDataType("version",
+			121.0, "version", "version", DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null, null, null, null);
 
 	/**
 	 * User-provided unique ID for a sample in a dataset (user data type only). 
@@ -172,7 +203,8 @@ public class DashboardServerUtils {
 	/**
 	 * WOCE flag from the automated data checker.
 	 */
-	public static final CharDashDataType WOCE_AUTOCHECK = new CharDashDataType(DashboardUtils.WOCE_AUTOCHECK, 
+	public static final CharDashDataType WOCE_AUTOCHECK = new CharDashDataType("WOCE_autocheck",
+			500.0, "WOCE autocheck", "WOCE flag from automated data checking", DashboardUtils.NO_UNITS, 
 			"WOCE_flag", QUALITY_CATEGORY, "1", "2", "4", "9");
 
 	/** 

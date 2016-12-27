@@ -2,12 +2,15 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
-import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -20,88 +23,51 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 public class DsgMetadata {
 
 	// Maps of variable names to values
-	TreeMap<DashDataType,Character> charValuesMap;
-	TreeMap<DashDataType,String> stringValuesMap;
-	TreeMap<DashDataType,Double> doubleValuesMap;
-	TreeMap<DashDataType,Date> dateValuesMap;
+	TreeMap<StringDashDataType,String> stringValuesMap;
+	TreeMap<CharDashDataType,Character> charValuesMap;
+	TreeMap<IntDashDataType,Integer> intValuesMap;
+	TreeMap<DoubleDashDataType,Double> doubleValuesMap;
 
 	/**
-	 * Generates a DsgMetadata object with the given known types.
-	 * Only the data class types 
-	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME}, 
-	 * 	{@link DashboardUtils#STRING_DATA_CLASS_NAME}, 
-	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}, and
-	 * 	{@link DashboardUtils#DATE_DATA_CLASS_NAME}
-	 * are accepted at this time.
-	 * Sets the values to the default values:
-	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other 
-	 * 		{@link DashboardUtils#CHAR_DATA_CLASS_NAME} values, 
-	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other 
-	 * 		{@link DashboardUtils#STRING_DATA_CLASS_NAME} values, 
-	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for 
-	 * 		{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values, and
-	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for 
-	 * 		{@link DashboardUtils#DATE_DATA_CLASS_NAME} values.
+	 * Generates a DsgMetata object with the given known types.  Only the 
+	 * data types {@link CharDashDataType}, {@link StringDashDataType}, 
+	 * {@link IntDashDataType}, and {@link DoubleDashDataType} are accepted 
+	 * at this time.  Sets the values to the default values for each type: 
+	 * {@link DashboardUtils#STRING_MISSING_VALUE} for {@link StringDashDataType}, 
+	 * {@link DashboardUtils#CHAR_MISSING_VALUE} for {@link CharDashDataType}, 
+	 * {@link DashboardUtils#INT_MISSING_VALUE} for {@link IntDashDataType}, and 
+	 * {@link DashboardUtils#FP_MISSING_VALUE} for {@link DoubleDashDataType}.
 	 * 
 	 * @param knownTypes
-	 * 		all known data types;
-	 * 		cannot be null or empty
+	 * 		collection of all known metadata types; cannot be null or empty
 	 */
 	public DsgMetadata(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
-			throw new IllegalArgumentException("known data types cannot be null or empty");
-		charValuesMap = new TreeMap<DashDataType,Character>();
-		stringValuesMap = new TreeMap<DashDataType,String>();
-		doubleValuesMap = new TreeMap<DashDataType,Double>();
-		dateValuesMap = new TreeMap<DashDataType,Date>();
+			throw new IllegalArgumentException("known metadata types cannot be null or empty");
+		stringValuesMap = new TreeMap<StringDashDataType,String>();
+		charValuesMap = new TreeMap<CharDashDataType,Character>();
+		intValuesMap = new TreeMap<IntDashDataType,Integer>();
+		doubleValuesMap = new TreeMap<DoubleDashDataType,Double>();
 
-		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				charValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+		for ( DashDataType<?> dtype : knownTypes.getKnownTypesSet() ) {
+			if ( dtype instanceof StringDashDataType ) {
+				stringValuesMap.put((StringDashDataType) dtype, DashboardUtils.STRING_MISSING_VALUE);
 			}
-			else if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
+			else if ( dtype instanceof CharDashDataType ) {
+				charValuesMap.put((CharDashDataType) dtype, DashboardUtils.CHAR_MISSING_VALUE);
 			}
-			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+			else if ( dtype instanceof IntDashDataType ) {
+				intValuesMap.put((IntDashDataType) dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
-			else if ( DashboardUtils.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				dateValuesMap.put(dtype, DashboardUtils.DATE_MISSING_VALUE);
+			else if ( dtype instanceof DoubleDashDataType ) {
+				doubleValuesMap.put((DoubleDashDataType) dtype, DashboardUtils.FP_MISSING_VALUE);
 			}
 			else {
-				throw new IllegalArgumentException("Unknown data class name '" + 
-						dtype.getDataClassName() + "' associated with type '" + dtype.getVarName() + "'");
+				throw new IllegalArgumentException("Unknown metadata class name \"" + 
+						dtype.getDataClassName() + "\" associated with type \"" + 
+						dtype.getVarName() + "\"");
 			}
 		}
-	}
-
-	/**
-	 * @return
-	 * 		the map of variable names and values for character variables;
-	 * 		the actual map in this instance is returned.
-	 */
-	public TreeMap<DashDataType,Character> getCharVariables() {
-		return charValuesMap;
-	}
-
-	/**
-	 * Updates the given character type variable with the given value.
-	 * 
-	 * @param dtype
-	 * 		the data type of the value
-	 * @param value
-	 * 		the value to assign; 
-	 * 		if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
-	 * @throws IllegalArgumentException
-	 * 		if the data type variable is not a known data type in this metadata
-	 */
-	public void setCharVariableValue(DashDataType dtype, Character value) throws IllegalArgumentException {
-		if ( ! charValuesMap.containsKey(dtype) )
-			throw new IllegalArgumentException("Unknown metadata character variable " + dtype.getVarName());
-		if ( value == null )
-			charValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
-		else
-			charValuesMap.put(dtype, value);
 	}
 
 	/**
@@ -109,7 +75,7 @@ public class DsgMetadata {
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public TreeMap<DashDataType,String> getStringVariables() {
+	public TreeMap<StringDashDataType,String> getStringVariables() {
 		return stringValuesMap;
 	}
 
@@ -124,7 +90,7 @@ public class DsgMetadata {
 	 * @throws IllegalArgumentException
 	 * 		if the data type variable is not a known data type in this metadata
 	 */
-	public void setStringVariableValue(DashDataType dtype, String value) throws IllegalArgumentException {
+	public void setStringVariableValue(StringDashDataType dtype, String value) throws IllegalArgumentException {
 		if ( ! stringValuesMap.containsKey(dtype) )
 			throw new IllegalArgumentException("Unknown metadata string variable " + dtype.getVarName());
 		if ( value == null )
@@ -135,10 +101,70 @@ public class DsgMetadata {
 
 	/**
 	 * @return
+	 * 		the map of variable names and values for character variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public TreeMap<CharDashDataType,Character> getCharVariables() {
+		return charValuesMap;
+	}
+
+	/**
+	 * Updates the given character type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setCharVariableValue(CharDashDataType dtype, Character value) 
+											throws IllegalArgumentException {
+		if ( ! charValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata character variable " + dtype.getVarName());
+		if ( value == null )
+			charValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+		else
+			charValuesMap.put(dtype, value);
+	}
+
+	/**
+	 * @return
+	 * 		the map of variable names and values for integer variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public TreeMap<IntDashDataType,Integer> getIntVariables() {
+		return intValuesMap;
+	}
+
+	/**
+	 * Updates the given integer type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setIntVariableValue(IntDashDataType dtype, Integer value) 
+											throws IllegalArgumentException {
+		if ( ! intValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata integer variable " + dtype.getVarName());
+		if ( value == null )
+			intValuesMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+		else
+			intValuesMap.put(dtype, value);
+	}
+
+	/**
+	 * @return
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public TreeMap<DashDataType,Double> getDoubleVariables() {
+	public TreeMap<DoubleDashDataType,Double> getDoubleVariables() {
 		return doubleValuesMap;
 	}
 
@@ -153,42 +179,13 @@ public class DsgMetadata {
 	 * @throws IllegalArgumentException
 	 * 		if the data type variable is not a known data type in this metadata
 	 */
-	public void setDoubleVariableValue(DashDataType dtype, Double value) throws IllegalArgumentException {
+	public void setDoubleVariableValue(DoubleDashDataType dtype, Double value) throws IllegalArgumentException {
 		if ( ! doubleValuesMap.containsKey(dtype) )
 			throw new IllegalArgumentException("Unknown metadata double variable " + dtype.getVarName());
 		if ( (value == null) || value.isNaN() || value.isInfinite() )
 			doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
 		else
 			doubleValuesMap.put(dtype, value);
-	}
-
-	/**
-	 * @return
-	 * 		the map of variable names and values for Date variables;
-	 * 		the actual map in this instance is returned.
-	 */
-	public TreeMap<DashDataType,Date> getDateVariables() {
-		return dateValuesMap;
-	}
-
-	/**
-	 * Updates the given Date type variable with the given value.
-	 * 
-	 * @param dtype
-	 * 		the data type of the value
-	 * @param value
-	 * 		the value to assign; 
-	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
-	 * @throws IllegalArgumentException
-	 * 		if the data type variable is not a known data type in this metadata
-	 */
-	public void setDateVariableValue(DashDataType dtype, Date value) throws IllegalArgumentException {
-		if ( ! dateValuesMap.containsKey(dtype) )
-			throw new IllegalArgumentException("Unknown metadata Date variable " + dtype.getVarName());
-		if ( value == null )
-			dateValuesMap.put(dtype, DashboardUtils.DATE_MISSING_VALUE);
-		else
-			dateValuesMap.put(dtype, value);
 	}
 
 	/**
@@ -348,12 +345,6 @@ public class DsgMetadata {
 	}
 
 	/**
-	 * Get the version status - the version number followed by an 'N', 
-	 * indicating the dataset is new in this version, or a 'U', 
-	 * indicating the dataset is an update from a previous 
-	 * version.  Updates within a version do NOT change an 'N' 
-	 * to a 'U'.
-	 * 
 	 * @return
 	 * 		the version associated with this instance; 
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
@@ -366,12 +357,6 @@ public class DsgMetadata {
 	}
 
 	/**
-	 * Set the version status - the version number followed by an 'N', 
-	 * indicating the dataset is new in this version, or a 'U', 
-	 * indicating the dataset is an update from a previous 
-	 * version.  Updates within a version do NOT change an 'N' 
-	 * to a 'U'.
-	 * 
 	 * @param version 
 	 * 		the version to set; 
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
@@ -491,54 +476,54 @@ public class DsgMetadata {
 
 	/**
 	 * @return
-	 * 		the beginning time for the cruise;
-	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
+	 * 		the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned.
 	 */
-	public Date getBeginTime() {
-		Date value = dateValuesMap.get(DashboardServerUtils.TIME_COVERAGE_START);
+	public Double getBeginTime() {
+		Double value = doubleValuesMap.get(DashboardServerUtils.TIME_COVERAGE_START);
 		if ( value == null )
-			value = DashboardUtils.DATE_MISSING_VALUE;
+			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param beginTime 
-	 * 		the beginning time for the cruise to set;
-	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
+	 * 		the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setBeginTime(Date beginTime) {
-		Date value;
+	public void setBeginTime(Double beginTime) {
+		Double value;
 		if ( beginTime != null )
 			value = beginTime;
 		else
-			value = DashboardUtils.DATE_MISSING_VALUE;
-		dateValuesMap.put(DashboardServerUtils.TIME_COVERAGE_START, value);
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(DashboardServerUtils.TIME_COVERAGE_START, value);
 	}
 
 	/**
 	 * @return
-	 * 		the ending time for the cruise;
-	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
+	 * 		the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned.
 	 */
-	public Date getEndTime() {
-		Date value = dateValuesMap.get(DashboardServerUtils.TIME_COVERAGE_END);
+	public Double getEndTime() {
+		Double value = doubleValuesMap.get(DashboardServerUtils.TIME_COVERAGE_END);
 		if ( value == null )
-			value = DashboardUtils.DATE_MISSING_VALUE;
+			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param endTime 
-	 * 		the ending time for the cruise to set;
-	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
+	 * 		the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setEndTime(Date endTime) {
-		Date value;
+	public void setEndTime(Double endTime) {
+		Double value;
 		if ( endTime != null )
 			value = endTime;
 		else
-			value = DashboardUtils.DATE_MISSING_VALUE;
-		dateValuesMap.put(DashboardServerUtils.TIME_COVERAGE_END, value);
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(DashboardServerUtils.TIME_COVERAGE_END, value);
 	}
 
 	/**
@@ -560,9 +545,9 @@ public class DsgMetadata {
 	@Override 
 	public int hashCode() {
 		final int prime = 37;
-		int result = charValuesMap.hashCode();
-		result = result * prime + stringValuesMap.hashCode();
-		result = result * prime + dateValuesMap.hashCode();
+		int result = stringValuesMap.hashCode();
+		result = result * prime + charValuesMap.hashCode();
+		result = result * prime + intValuesMap.hashCode();
 		// Consider only the keys of the floating-point fields set
 		// since floating point values do not have to be exactly 
 		// the same for equals to return true. 
@@ -581,24 +566,24 @@ public class DsgMetadata {
 			return false;
 		DsgMetadata other = (DsgMetadata) obj;
 
-		// Date comparisons
-		if ( ! dateValuesMap.equals(other.dateValuesMap) )
+		// String comparisons
+		if ( ! stringValuesMap.equals(other.stringValuesMap) )
 			return false;
 
 		// Character comparisons
 		if ( ! charValuesMap.equals(other.charValuesMap) )
 			return false;
 
-		// String comparisons
-		if ( ! stringValuesMap.equals(other.stringValuesMap) )
+		// Integer comparisons
+		if ( ! intValuesMap.equals(other.intValuesMap) )
 			return false;
 
 		// Floating-point comparisons - values don't have to be exactly the same
 		if ( ! doubleValuesMap.keySet().equals(other.doubleValuesMap.keySet()) )
 			return false;
 
-		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() ) {
-			DashDataType dtype = entry.getKey();
+		for ( Entry<DoubleDashDataType,Double> entry : doubleValuesMap.entrySet() ) {
+			DoubleDashDataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
 			Double otherval = other.doubleValuesMap.get(dtype);
 			if ( dtype.getVarName().toUpperCase().contains("LONGITUDE") ) {
@@ -618,13 +603,13 @@ public class DsgMetadata {
 	@Override
 	public String toString() {
 		String repr = "DsgMetadata[\n";
-		for ( Entry<DashDataType,Character> entry : charValuesMap.entrySet() )
+		for ( Entry<StringDashDataType,String> entry : stringValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
-		for ( Entry<DashDataType,String> entry : stringValuesMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
-		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() )
+		for ( Entry<CharDashDataType,Character> entry : charValuesMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=\'" + entry.getValue().toString() + "\'\n";
+		for ( Entry<IntDashDataType,Integer> entry : intValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
-		for ( Entry<DashDataType,Date> entry : dateValuesMap.entrySet() )
+		for ( Entry<DoubleDashDataType,Double> entry : doubleValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		repr += "]";
 		return repr;

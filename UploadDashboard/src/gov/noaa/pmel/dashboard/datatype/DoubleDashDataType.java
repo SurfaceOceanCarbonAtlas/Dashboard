@@ -9,7 +9,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
- * Data column types that provides Integer data.
+ * Data column types that provides Double data.
  * 
  * @author Karl Smith
  */

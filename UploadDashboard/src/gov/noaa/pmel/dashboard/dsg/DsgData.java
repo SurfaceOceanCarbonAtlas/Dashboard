@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
@@ -24,46 +27,43 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class DsgData {
 
-	private TreeMap<DashDataType,Integer> intValsMap;
-	private TreeMap<DashDataType,Character> charValsMap;
-	private TreeMap<DashDataType,Double> doubleValsMap;
+	private TreeMap<IntDashDataType,Integer> intValsMap;
+	private TreeMap<CharDashDataType,Character> charValsMap;
+	private TreeMap<DoubleDashDataType,Double> doubleValsMap;
 
 	/**
-	 * Generates a DsgData object with the given known types.
-	 * Only the data class types 
-	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME},
-	 * 	{@link DashboardUtils#INT_DATA_CLASS_NAME}, and 
-	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}
-	 * are accepted at this time.
-	 * Sets the values to the default values:
-	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link DashboardUtils#CHAR_DATA_CLASS_NAME} values.
-	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link DashboardUtils#INT_DATA_CLASS_NAME} values, and
-	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values
+	 * Generates a DsgData object with the given known types.  Only the 
+	 * data types {@link CharDashDataType}, {@link IntDashDataType}, and 
+	 * {@link DoubleDashDataType} are accepted at this time.  Sets the 
+	 * values to the default values for each type: 
+	 * {@link DashboardUtils#CHAR_MISSING_VALUE} for {@link CharDashDataType}, 
+	 * {@link DashboardUtils#INT_MISSING_VALUE} for {@link IntDashDataType}, and 
+	 * {@link DashboardUtils#FP_MISSING_VALUE} for {@link DoubleDashDataType}.
 	 * 
 	 * @param knownTypes
-	 * 		collection of all known types;
-	 * 		cannot be null or empty
+	 * 		collection of all known file data types; cannot be null or empty
 	 */
 	public DsgData(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
-			throw new IllegalArgumentException("known data types cannot be null or empty");
-		intValsMap = new TreeMap<DashDataType,Integer>();
-		charValsMap = new TreeMap<DashDataType,Character>();
-		doubleValsMap = new TreeMap<DashDataType,Double>();
+			throw new IllegalArgumentException("known file data types cannot be null or empty");
+		charValsMap = new TreeMap<CharDashDataType,Character>();
+		intValsMap = new TreeMap<IntDashDataType,Integer>();
+		doubleValsMap = new TreeMap<DoubleDashDataType,Double>();
 
-		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+		for ( DashDataType<?> dtype : knownTypes.getKnownTypesSet() ) {
+			if ( dtype instanceof CharDashDataType ) {
+				charValsMap.put((CharDashDataType) dtype, DashboardUtils.CHAR_MISSING_VALUE);
 			}
-			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+			else if ( dtype instanceof IntDashDataType ) {
+				intValsMap.put((IntDashDataType) dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
-			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+			else if ( dtype instanceof DoubleDashDataType ) {
+				doubleValsMap.put((DoubleDashDataType) dtype, DashboardUtils.FP_MISSING_VALUE);
 			}
 			else {
-				throw new IllegalArgumentException("Unknown data class name '" + 
-						dtype.getDataClassName() + "' associated with type '" + dtype.getVarName() + "'");
+				throw new IllegalArgumentException("Unknown file data class name \"" + 
+						dtype.getDataClassName() + "\" associated with type \"" + 
+						dtype.getVarName() + "\"");
 			}
 		}
 	}
@@ -71,7 +71,7 @@ public class DsgData {
 	/**
 	 * Creates from a list of data column types and corresponding data strings.
 	 * This assumes the data in the strings are in the standard units for each
-	 * type, and the missing value is "NaN", an empty string, or null.
+	 * type, and missing values are null.
 	 * 
 	 * An exception is thrown if a data column with type 
 	 * {@link DashboardServerUtils#UNKNOWN} is encountered; otherwise data columns

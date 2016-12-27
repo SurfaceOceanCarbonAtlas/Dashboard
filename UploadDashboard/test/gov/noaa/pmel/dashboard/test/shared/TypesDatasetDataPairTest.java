@@ -30,7 +30,7 @@ public class TypesDatasetDataPairTest {
 	@Test
 	public void testGetSetAllKnownTypes() {
 		ArrayList<DataColumnType> knownTypes = new ArrayList<DataColumnType>(5);
-		knownTypes.add(DashboardUtils.DATASET_ID);
+		knownTypes.add(DashboardUtils.DATASET_NAME);
 		knownTypes.add(DashboardUtils.LONGITUDE);
 		knownTypes.add(DashboardUtils.LATITUDE);
 		knownTypes.add(DashboardUtils.SAMPLE_DEPTH);
@@ -70,7 +70,7 @@ public class TypesDatasetDataPairTest {
 	@Test
 	public void testHashCodeEquals() {
 		ArrayList<DataColumnType> knownTypes = new ArrayList<DataColumnType>(5);
-		knownTypes.add(DashboardUtils.DATASET_ID);
+		knownTypes.add(DashboardUtils.DATASET_NAME);
 		knownTypes.add(DashboardUtils.LONGITUDE);
 		knownTypes.add(DashboardUtils.LATITUDE);
 		knownTypes.add(DashboardUtils.SAMPLE_DEPTH);
