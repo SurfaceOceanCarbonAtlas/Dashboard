@@ -285,11 +285,11 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		KnownDataTypes knownUserTypes = configStore.getKnownUserDataTypes();
 		if ( knownUserTypes == null )
 			throw new IllegalArgumentException("unexpected missing list of all known data column types");
-		TreeSet<DashDataType> knownTypesSet = knownUserTypes.getKnownTypesSet();
+		TreeSet<DashDataType<?>> knownTypesSet = knownUserTypes.getKnownTypesSet();
 		if ( knownTypesSet.isEmpty() )
 			throw new IllegalArgumentException("unexpected empty list of all known data column types");
 		ArrayList<DataColumnType> knownTypesList = new ArrayList<DataColumnType>(knownTypesSet.size());
-		for ( DashDataType dtype : knownTypesSet )
+		for ( DashDataType<?> dtype : knownTypesSet )
 			knownTypesList.add(dtype.duplicate());
 
 		// Get the cruise with the first maximum-needed number of rows

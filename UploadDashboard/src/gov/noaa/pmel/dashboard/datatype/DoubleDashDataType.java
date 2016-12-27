@@ -178,4 +178,9 @@ public class DoubleDashDataType extends DashDataType<Double> {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return "Double" + super.toString();
+	}
+
 }

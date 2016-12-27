@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -111,10 +112,11 @@ public class UserFileHandler extends VersionedFileHandler {
 						propVal + "\" for key \"" + colName + "\" given in " +
 						propFile.getPath());
 
-			DataColumnType dctype = userTypes.getDataColumnType(vals[0]);
-			if ( dctype == null )
+			DashDataType<?> dtype = userTypes.getDataType(vals[0]);
+			if ( dtype == null )
 				throw new IllegalArgumentException("Unknown data type \"" + 
 						vals[0] + "\" for tag \"" + colName + "\"");
+			DataColumnType dctype = dtype.duplicate();
 			if ( ! dctype.setSelectedUnit(vals[1]) )
 				throw new IllegalArgumentException("Unknown data unit \"" + vals[1] + 
 						"\" for data type \"" + vals[0] + "\"");

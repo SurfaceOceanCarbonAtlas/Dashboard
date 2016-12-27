@@ -23,8 +23,8 @@ public class ADCMessage implements Serializable, IsSerializable {
 	 */
 	public enum SCMsgSeverity implements Serializable, IsSerializable {
 		UNKNOWN,
-		ERROR,
 		WARNING,
+		ERROR
 	}
 
 	protected SCMsgSeverity severity;

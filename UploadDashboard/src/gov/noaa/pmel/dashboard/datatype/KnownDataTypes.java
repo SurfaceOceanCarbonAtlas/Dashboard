@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.TreeSet;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
@@ -19,14 +18,19 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class KnownDataTypes {
 
-	private HashMap<String,DashDataType> knownTypes;
+	/**
+	 * Map whose keys are both variable name keys and display name keys 
+	 * (see {@link DashboardServerUtils#getKeyForName(String)} for a
+	 * data type.
+	 */
+	private HashMap<String,DashDataType<?>> knownTypes;
 
 	/**
 	 * Creates with no well-know data types.
 	 */
 	public KnownDataTypes() {
 		// Give extra capacity for added types
-		knownTypes = new HashMap<String,DashDataType>(96);
+		knownTypes = new HashMap<String,DashDataType<?>>(64);
 	}
 
 	/**
@@ -39,9 +43,9 @@ public class KnownDataTypes {
 	 * @throws IllegalArgumentException
 	 * 		if the data type already is a known type
 	 */
-	private void addDataType(DashDataType dtype) throws IllegalArgumentException {
+	private void addDataType(DashDataType<?> dtype) throws IllegalArgumentException {
 		String varKey = DashboardServerUtils.getKeyForName(dtype.getVarName());
-		DashDataType oldVal = knownTypes.put(varKey, dtype);
+		DashDataType<?> oldVal = knownTypes.put(varKey, dtype);
 		if ( oldVal != null )
 			throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
 		String displayKey = DashboardServerUtils.getKeyForName(dtype.getDisplayName());
@@ -179,11 +183,11 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Determines if a given data type name exists in the list
-	 * of known data types.
+	 * Determines if a given data type variable or display name 
+	 * exists in the list of known data types.
 	 * 
 	 * @param typeName
-	 * 		search for a data type with this name 
+	 * 		search for a data type with this variable or display name 
 	 * @return
 	 * 		if the given data type name is known
 	 */
@@ -192,30 +196,41 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Returns a new data column type based on the data type with a type
-	 * matching the given type name. 
-	 * The selected unit will be zero and the select missing value will be 
-	 * {@link DashboardUtils#STRING_MISSING_VALUE} (default missing values).
+	 * Returns a new data type matching the variable or display name.
 	 * 
-	 * @param varName
-	 * 		type name to find
+	 * @param typeName
+	 * 		variable or display name to find
 	 * @return
-	 * 		data column type matching the given type name, or
+	 * 		data type matching the given type name, or
 	 * 		null if the name does not match that of a known type
 	 */
-	public DataColumnType getDataColumnType(String typeName) {
-		DashDataType dtype = knownTypes.get(DashboardServerUtils.getKeyForName(typeName));
+	public DashDataType<?> getDataType(String typeName) {
+		return knownTypes.get(DashboardServerUtils.getKeyForName(typeName));
+	}
+
+	/**
+	 * Returns a new data type matching the variable or display name 
+	 * of the given data column type. 
+	 * 
+	 * @param dctype
+	 * 		data column type to use
+	 * @return
+	 * 		data type matching the name in the given data column type, or
+	 * 		null if the name does not match that of a known type
+	 */
+	public DashDataType<?> getDataType(DataColumnType dctype) {
+		DashDataType<?> dtype = getDataType(dctype.getVarName());
 		if ( dtype == null )
-			return null;
-		return dtype.duplicate();
+			dtype = getDataType(dctype.getDisplayName());
+		return dtype;
 	}
 
 	/**
 	 * @return
 	 * 		the sorted current set of known data types.
 	 */
-	public TreeSet<DashDataType> getKnownTypesSet() {
-		return new TreeSet<DashDataType>(knownTypes.values());
+	public TreeSet<DashDataType<?>> getKnownTypesSet() {
+		return new TreeSet<DashDataType<?>>(knownTypes.values());
 	}
 
 	/**
@@ -230,7 +245,7 @@ public class KnownDataTypes {
 	public String toString() {
 		String strval = "KnownDataTypes[\n";
 		// Do not show the keys, only the unique data types
-		for ( DashDataType dtype : getKnownTypesSet() )
+		for ( DashDataType<?> dtype : getKnownTypesSet() )
 			strval += "    " + dtype.toString() + "\n";
 		strval += "]";
 		return strval;

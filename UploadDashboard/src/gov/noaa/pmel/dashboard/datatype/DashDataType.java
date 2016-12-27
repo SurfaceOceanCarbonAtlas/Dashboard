@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -24,19 +25,24 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  * 
  * @author Karl Smith
  */
-public abstract class DashDataType<T extends Comparable<T>> implements Comparable<DashDataType<T>> {
+public abstract class DashDataType<T extends Comparable<T>> implements Comparable<DashDataType<?>> {
 
-	protected static final String DATA_CLASS_NAME_TAG = "data_class";
-	protected static final String SORT_ORDER_TAG = "sort_order";
-	protected static final String DISPLAY_NAME_TAG = "display_name";
-	protected static final String DESCRIPTION_TAG = "description";
-	protected static final String STANDARD_NAME_TAG = "standard_name";
-	protected static final String CATEGORY_NAME_TAG = "category_name";
-	protected static final String UNITS_TAG = "units";
-	protected static final String MIN_QUESTIONABLE_VALUE_TAG = "min_question_value";
-	protected static final String MIN_ACCEPTABLE_VALUE_TAG = "min_accept_value";
-	protected static final String MAX_ACCEPTABLE_VALUE_TAG = "max_accept_value";
-	protected static final String MAX_QUESTIONABLE_VALUE_TAG = "max_question_value";
+	public static final String UNREASONABLY_SMALL_MSG = " is less than the reasonable limit of ";
+	public static final String QUESTIONABLY_SMALL_MSG = " is less than the acceptable limit of ";
+	public static final String QUESTIONABLY_LARGE_MSG = " is more than the acceptable limit of ";
+	public static final String UNREASONABLY_LARGE_MSG = " is more than the reasonable limit of ";
+
+	public static final String DATA_CLASS_NAME_TAG = "data_class";
+	public static final String SORT_ORDER_TAG = "sort_order";
+	public static final String DISPLAY_NAME_TAG = "display_name";
+	public static final String DESCRIPTION_TAG = "description";
+	public static final String STANDARD_NAME_TAG = "standard_name";
+	public static final String CATEGORY_NAME_TAG = "category_name";
+	public static final String UNITS_TAG = "units";
+	public static final String MIN_QUESTIONABLE_VALUE_TAG = "min_question_value";
+	public static final String MIN_ACCEPTABLE_VALUE_TAG = "min_accept_value";
+	public static final String MAX_ACCEPTABLE_VALUE_TAG = "max_accept_value";
+	public static final String MAX_QUESTIONABLE_VALUE_TAG = "max_question_value";
 
 	protected String varName;
 	protected Double sortOrder;
@@ -197,6 +203,63 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	}
 
 	/**
+	 * Perform bounds checking on the given standard value of this data type.
+	 * 
+	 * @param stdVal
+	 * 		standard value to check
+	 * @return
+	 * 		null if the given value is null (missing) or within the acceptable range;
+	 * 		otherwise, an message giving the severity and describing the problem 
+	 * 		(both general comment and detailed comments are assigned).
+	 */
+	public ADCMessage boundsCheckStandardValue(T stdVal) {
+		// If the value is missing, make no comment
+		if ( stdVal == null )
+			return null;
+		// Check if unreasonable small
+		if ( (minQuestionVal != null) && (minQuestionVal.compareTo(stdVal) > 0) ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(ADCMessage.SCMsgSeverity.ERROR);
+			msg.setGeneralComment(displayName + 
+					UNREASONABLY_SMALL_MSG + minQuestionVal.toString());
+			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
+					UNREASONABLY_SMALL_MSG + minQuestionVal.toString());
+			return msg;
+		}
+		// Check if unreasonably large
+		if ( (maxQuestionVal != null) && (maxQuestionVal.compareTo(stdVal) < 0) ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(ADCMessage.SCMsgSeverity.ERROR);
+			msg.setGeneralComment(displayName + 
+					UNREASONABLY_LARGE_MSG + maxQuestionVal.toString());
+			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
+					UNREASONABLY_LARGE_MSG + maxQuestionVal.toString());
+			return msg;
+		}
+		// Check if questionably small
+		if ( (minAcceptVal != null) && (minAcceptVal.compareTo(stdVal) > 0) ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(ADCMessage.SCMsgSeverity.WARNING);
+			msg.setGeneralComment(displayName + 
+					QUESTIONABLY_SMALL_MSG + minAcceptVal.toString());
+			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
+					QUESTIONABLY_SMALL_MSG + minAcceptVal.toString());
+			return msg;
+		}
+		// Check if questionably large
+		if ( (maxAcceptVal != null) && (maxAcceptVal.compareTo(stdVal) < 0) ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(ADCMessage.SCMsgSeverity.WARNING);
+			msg.setGeneralComment(displayName + 
+					QUESTIONABLY_LARGE_MSG + maxAcceptVal.toString());
+			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
+					QUESTIONABLY_LARGE_MSG + maxAcceptVal.toString());
+			return msg;
+		}
+		return null;
+	}
+
+	/**
 	 * @return 
 	 * 		the variable name for this data type; never null or blank
 	 */
@@ -351,20 +414,27 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public int compareTo(DashDataType<T> other) {
+	public int compareTo(DashDataType<?> other) {
+		// This first check should be all that is needed
 		int result = sortOrder.compareTo(other.sortOrder);
 		if ( result != 0 )
 			return result;
+
+		// But to be complete....
 		result = displayName.compareTo(other.displayName);
 		if ( result != 0 )
 			return result;
 		result = varName.compareTo(other.varName);
 		if ( result != 0 )
 			return result;
+
+		// This check should ensures the cast of the limits will succeed
 		result = getDataClassName().compareTo(other.getDataClassName());
 		if ( result != 0 )
 			return result;
+
 		result = description.compareTo(other.description);
 		if ( result != 0 )
 			return result;
@@ -392,7 +462,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			return 1;
 		}
 		else {
-			result = minQuestionVal.compareTo(other.minQuestionVal);
+			result = minQuestionVal.compareTo((T) other.minQuestionVal);
 			if ( result != 0 )
 				return result;
 		}
@@ -405,7 +475,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			return 1;
 		}
 		else {
-			result = minAcceptVal.compareTo(other.minAcceptVal);
+			result = minAcceptVal.compareTo((T) other.minAcceptVal);
 			if ( result != 0 )
 				return result;
 		}
@@ -418,7 +488,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			return 1;
 		}
 		else {
-			result = maxAcceptVal.compareTo(other.maxAcceptVal);
+			result = maxAcceptVal.compareTo((T) other.maxAcceptVal);
 			if ( result != 0 )
 				return result;
 		}
@@ -431,7 +501,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			return 1;
 		}
 		else {
-			result = maxQuestionVal.compareTo(other.maxQuestionVal);
+			result = maxQuestionVal.compareTo((T) other.maxQuestionVal);
 			if ( result != 0 )
 				return result;
 		}
@@ -439,12 +509,28 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		return 0;
 	}
 
+	@Override
+	public String toString() {
+		return "DashDataType[varName=" + varName + 
+				", sortOrder=" + sortOrder.toString() + 
+				", displayName=" + displayName + 
+				", description=" + description + 
+				", units=" + units + 
+				", standardName=" + standardName + 
+				", categoryName=" + categoryName + 
+				", minQuestionVal=" + minQuestionVal + 
+				", minAcceptVal=" + minAcceptVal + 
+				", maxAcceptVal=" + maxAcceptVal + 
+				", maxQuestionVal=" + maxQuestionVal + 
+				"]";
+	}
+
 	/**
 	 * Checks if the variable or displayed name of this data type is equal, 
 	 * ignoring case and non-alphanumeric characters, to the given name.
 	 * 
-	 * @param other
-	 * 		data type to compare to
+	 * @param name
+	 * 		name to use
 	 * @return
 	 * 		whether the type names match
 	 */
@@ -613,11 +699,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		if ( minQuestionVal != null )
 			jsonObj.addProperty(MIN_QUESTIONABLE_VALUE_TAG, minQuestionVal.toString());
 		if ( minAcceptVal != null )
-			jsonObj.addProperty(MIN_QUESTIONABLE_VALUE_TAG, minAcceptVal.toString());
+			jsonObj.addProperty(MIN_ACCEPTABLE_VALUE_TAG, minAcceptVal.toString());
 		if ( maxAcceptVal != null )
-			jsonObj.addProperty(MIN_QUESTIONABLE_VALUE_TAG, maxAcceptVal.toString());
+			jsonObj.addProperty(MAX_ACCEPTABLE_VALUE_TAG, maxAcceptVal.toString());
 		if ( maxQuestionVal != null )
-			jsonObj.addProperty(MIN_QUESTIONABLE_VALUE_TAG, maxQuestionVal.toString());
+			jsonObj.addProperty(MAX_QUESTIONABLE_VALUE_TAG, maxQuestionVal.toString());
 		return jsonObj.toString();
 	}
 

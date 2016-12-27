@@ -170,4 +170,8 @@ public class StringDashDataType extends DashDataType<String> {
 		return strVal.trim();
 	}
 
+	@Override
+	public String toString() {
+		return "String" + super.toString();
+	}
 }

@@ -178,4 +178,9 @@ public class IntDashDataType extends DashDataType<Integer> {
 		return value;
 	}
 
+	@Override
+	public String toString() {
+		return "Int" + super.toString();
+	}
+
 }

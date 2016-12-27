@@ -18,6 +18,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -304,6 +307,8 @@ public class CheckerMessageHandler {
 			msgsWriter.close();
 		}
 
+		DashboardConfigStore configStore = DashboardConfigStore.get(false);
+		KnownDataTypes userKnownTypes = configStore.getKnownUserDataTypes();
 		// Assign any user-provided QC flags.
 		// TODO: get severity from user-provided specification of the type
 		// This assumes QC flags indicating problems have flag values that are integers 3-9.
@@ -313,13 +318,13 @@ public class CheckerMessageHandler {
 		TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			// Look for QC columns
-			DataColumnType colType = columnTypes.get(k);
+			DashDataType<?> colType = userKnownTypes.getDashDataType(columnTypes.get(k));
 			if ( ! colType.isQCType() )
 				continue;
 			// Check for another column associated with this QC column
 			int colIdx = -1;
 			for (int j = 0; j < columnTypes.size(); j++) {
-				if ( colType.isCommentTypeFor(columnTypes.get(j)) ) {
+				if ( colType.isCommentTypeFor(userKnownTypes.getDashDataType(columnTypes.get(j))) ) {
 					colIdx = j;
 					break;
 				}

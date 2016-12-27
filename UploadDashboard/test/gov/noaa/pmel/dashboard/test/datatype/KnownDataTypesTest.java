@@ -19,7 +19,10 @@ import java.util.TreeSet;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -30,64 +33,7 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class KnownDataTypesTest {
 
-	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DashboardServerUtils.UNKNOWN.getVarName(),
-			DashboardServerUtils.OTHER.getVarName(),
-			DashboardServerUtils.DATASET_NAME.getVarName(),
-			DashboardServerUtils.PLATFORM_NAME.getVarName(),
-			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
-			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
-			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
-			DashboardServerUtils.SAMPLE_ID.getVarName(),
-			DashboardServerUtils.LONGITUDE.getVarName(),
-			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
-			DashboardServerUtils.TIMESTAMP.getVarName(),
-			DashboardServerUtils.DATE.getVarName(),
-			DashboardServerUtils.YEAR.getVarName(),
-			DashboardServerUtils.MONTH_OF_YEAR.getVarName(),
-			DashboardServerUtils.DAY_OF_MONTH.getVarName(),
-			DashboardServerUtils.TIME_OF_DAY.getVarName(),
-			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
-			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
-			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
-			DashboardServerUtils.DAY_OF_YEAR.getVarName(),
-			DashboardServerUtils.SECOND_OF_DAY.getVarName()
-	));
-
-	private static final ArrayList<String> METADATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DashboardServerUtils.DATASET_ID.getVarName(),
-			DashboardServerUtils.DATASET_NAME.getVarName(),
-			DashboardServerUtils.PLATFORM_NAME.getVarName(),
-			DashboardServerUtils.PLATFORM_TYPE.getVarName(),
-			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
-			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
-			DashboardServerUtils.WESTERNMOST_LONGITUDE.getVarName(),
-			DashboardServerUtils.EASTERNMOST_LONGITUDE.getVarName(),
-			DashboardServerUtils.SOUTHERNMOST_LATITUDE.getVarName(),
-			DashboardServerUtils.NORTHERNMOST_LATITUDE.getVarName(),
-			DashboardServerUtils.TIME_COVERAGE_START.getVarName(),
-			DashboardServerUtils.TIME_COVERAGE_END.getVarName(),
-			DashboardServerUtils.STATUS.getVarName(),
-			DashboardServerUtils.VERSION.getVarName()
-	));
-
-	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DashboardServerUtils.SAMPLE_NUMBER.getVarName(),
-			DashboardServerUtils.TIME.getVarName(),
-			DashboardServerUtils.LONGITUDE.getVarName(),
-			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
-			DashboardServerUtils.YEAR.getVarName(),
-			DashboardServerUtils.MONTH_OF_YEAR.getVarName(),
-			DashboardServerUtils.DAY_OF_MONTH.getVarName(),
-			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
-			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
-			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
-			DashboardServerUtils.WOCE_AUTOCHECK.getVarName()
-	));
-
-	private static final TreeSet<DashDataType> USERS_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+	private static final TreeSet<DashDataType<?>> USERS_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
 			DashboardServerUtils.UNKNOWN,
 			DashboardServerUtils.OTHER,
 			DashboardServerUtils.DATASET_NAME,
@@ -112,7 +58,7 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.SECOND_OF_DAY
 	));
 
-	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+	private static final TreeSet<DashDataType<?>> METADATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
 			DashboardServerUtils.DATASET_ID,
 			DashboardServerUtils.DATASET_NAME,
 			DashboardServerUtils.PLATFORM_NAME,
@@ -129,7 +75,7 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.VERSION
 	));
 
-	private static final TreeSet<DashDataType> DATA_FILES_TYPES_SET = new TreeSet<DashDataType>(Arrays.asList(
+	private static final TreeSet<DashDataType<?>> DATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
 			DashboardServerUtils.SAMPLE_NUMBER,
 			DashboardServerUtils.TIME,
 			DashboardServerUtils.LONGITUDE,
@@ -144,49 +90,64 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.WOCE_AUTOCHECK
 	));
 
+	private static final HashSet<String> USERS_VARNAMES;
+	private static final HashSet<String> METADATA_FILES_VARNAMES;
+	private static final HashSet<String> DATA_FILES_VARNAMES;
+	static {
+		USERS_VARNAMES = new HashSet<String>(USERS_TYPES.size());
+		for ( DashDataType<?> dtype : USERS_TYPES )
+			USERS_VARNAMES.add(dtype.getVarName());
+		METADATA_FILES_VARNAMES = new HashSet<String>(METADATA_FILES_TYPES.size());
+		for ( DashDataType<?> dtype : METADATA_FILES_TYPES )
+			METADATA_FILES_VARNAMES.add(dtype.getVarName());
+		DATA_FILES_VARNAMES = new HashSet<String>(DATA_FILES_TYPES.size());
+		for ( DashDataType<?> dtype : DATA_FILES_TYPES )
+			DATA_FILES_VARNAMES.add(dtype.getVarName());
+	}
 
+	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
+			Double.class.getSimpleName(), 
+			Integer.class.getSimpleName(), 
+			String.class.getSimpleName() };
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
-		"xCO2_atm_dry_interp", "rank", "socat_doi" };
+			"xCO2_atm_dry_interp", "rank", "socat_doi" };
 	static final Double[] ADDN_TYPES_SORT_ORDERS = new Double[] {
-		34.0, 56.0, 78.0
+			34.0, 56.0, 78.0
 	};
 	static final String[] ADDN_TYPES_DISPLAY_NAMES = new String[] {
-		"xCO2 atm dry", "ranking", "SOCAT DOI" };
-	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
-		DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-		DashboardUtils.INT_DATA_CLASS_NAME, 
-		DashboardUtils.STRING_DATA_CLASS_NAME };
+			"xCO2 atm dry", "ranking", "SOCAT DOI" };
 	static final String[] ADDN_TYPES_DESCRIPTIONS = new String[] { 
-		"mole fraction CO2 in sea level air", 
-		"personal ranking", 
-		"DOI of SOCAT-enhanced datafile" };
+			"mole fraction CO2 in sea level air", 
+			"personal ranking", 
+	"DOI of SOCAT-enhanced datafile" };
 	static final String[] ADDN_TYPES_STANDARD_NAMES = new String[] { 
-		"xCO2_atm", "", "DOI" };
+			"xCO2_atm", "", "DOI" };
 	static final String[] ADDN_TYPES_CATEGORY_NAMES = new String[] { 
-		"CO2", "", "Identifier" };
+			"CO2", "", "Identifier" };
 
 	static final ArrayList<String> MOL_FRACTION_UNITS = 
 			new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
-	static final DashDataType[] ADDN_DATA_TYPES = new DashDataType[] {
-		new DashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_SORT_ORDERS[0], 
-				ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
-				ADDN_TYPES_DESCRIPTIONS[0], ADDN_TYPES_STANDARD_NAMES[0], 
-				ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
-		new DashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_SORT_ORDERS[0], 
-				ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
-				ADDN_TYPES_DESCRIPTIONS[1], null, null, null),
-		new DashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_SORT_ORDERS[0], 
-				ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
-				ADDN_TYPES_DESCRIPTIONS[2], ADDN_TYPES_STANDARD_NAMES[2], 
-				ADDN_TYPES_CATEGORY_NAMES[2], null)
+	static final DashDataType<?>[] ADDN_DATA_TYPES = new DashDataType<?>[] {
+		new DoubleDashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_SORT_ORDERS[0], 
+				ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_DESCRIPTIONS[0], 
+				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[0], 
+				ADDN_TYPES_CATEGORY_NAMES[0], null, null, null, null),
+		new IntDashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_SORT_ORDERS[1], 
+				ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_DESCRIPTIONS[1], 
+				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[1], 
+				ADDN_TYPES_CATEGORY_NAMES[1], null, null, null, null),
+		new StringDashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_SORT_ORDERS[2], 
+				ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_DESCRIPTIONS[2], 
+				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[2], 
+				ADDN_TYPES_CATEGORY_NAMES[2], null, null, null, null),
 	};
 
 	static final String ADDN_TYPES_PROPERTIES_STRING = 
 			ADDN_TYPES_VAR_NAMES[0] + " = " + ADDN_DATA_TYPES[0].toPropertyValue() + "\n" +
 			ADDN_TYPES_VAR_NAMES[1] + " = " + ADDN_DATA_TYPES[1].toPropertyValue() + "\n" +
 			ADDN_TYPES_VAR_NAMES[2] + " = " + ADDN_DATA_TYPES[2].toPropertyValue() + "\n";
-			
+
 	/**
 	 * Test method for 
 	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#addStandardTypesForUsers()},
@@ -194,7 +155,7 @@ public class KnownDataTypesTest {
 	 * {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
-	public void testAddStandardTypesForClient() {
+	public void testAddStandardTypesForUsers() {
 		KnownDataTypes types = new KnownDataTypes();
 		assertTrue( types.isEmpty() );
 		KnownDataTypes other = types.addStandardTypesForUsers();
@@ -241,25 +202,29 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetKnownTypesSet() {
 		KnownDataTypes types = new KnownDataTypes().addStandardTypesForUsers();
-		assertEquals(USERS_TYPES_SET, types.getKnownTypesSet());
+		assertEquals(USERS_TYPES, types.getKnownTypesSet());
 		types = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		assertEquals(METADATA_FILES_TYPES_SET, types.getKnownTypesSet());
+		assertEquals(METADATA_FILES_TYPES, types.getKnownTypesSet());
 		types = new KnownDataTypes().addStandardTypesForDataFiles();
-		assertEquals(DATA_FILES_TYPES_SET, types.getKnownTypesSet());
+		assertEquals(DATA_FILES_TYPES, types.getKnownTypesSet());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getDataColumnType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getDataType(java.lang.String)}
+	 * and {@link gov.noaa.pmel.dashboard.datatype.KnownDataTypes#getDataType(gov.noaa.pmel.dashboard.shared.DataColumnType)}
 	 */
 	@Test
-	public void testGetDataColumnType() {
+	public void testGetDataType() {
 		KnownDataTypes types = new KnownDataTypes();
-		DataColumnType nameType = types.getDataColumnType("DATASET_NAME");
-		assertNull( nameType );
+		assertNull( types.getDataType("DATASET_NAME") );
 		types.addStandardTypesForUsers();
-		nameType = types.getDataColumnType("DATASET_NAME");
-		DashDataType other = new DashDataType(nameType);
-		assertEquals(DashboardServerUtils.DATASET_NAME, other);
+		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType("DATASET_NAME"));
+		DataColumnType dctype = new DataColumnType("dataset_name", 5.0, "cruise name", 
+				"cruise/dataset name", DashboardUtils.NO_UNITS);
+		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
+		dctype = new DataColumnType("cruise_name", 5.0, "dataset name", 
+				"cruise/dataset name", DashboardUtils.NO_UNITS);
+		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
 	}
 
 	/**
@@ -268,11 +233,11 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetKnownTypesList() {
 		KnownDataTypes types = new KnownDataTypes();
-		TreeSet<DashDataType> knownSet = types.getKnownTypesSet();
+		TreeSet<DashDataType<?>> knownSet = types.getKnownTypesSet();
 		assertEquals(0, knownSet.size());
 		types.addStandardTypesForMetadataFiles();
 		knownSet = types.getKnownTypesSet();
-		assertEquals(METADATA_FILES_TYPES_SET, knownSet);
+		assertEquals(METADATA_FILES_TYPES, knownSet);
 	}
 
 	/**
@@ -290,7 +255,7 @@ public class KnownDataTypesTest {
 		assertTrue( clientTypes == other );
 		assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.getKnownTypesSet().size());
 		for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
-			assertEquals(ADDN_DATA_TYPES[k].duplicate(), clientTypes.getDataColumnType(ADDN_TYPES_VAR_NAMES[k]));
+			assertEquals(ADDN_DATA_TYPES[k], clientTypes.getDataType(ADDN_TYPES_VAR_NAMES[k]));
 		}
 	}
 

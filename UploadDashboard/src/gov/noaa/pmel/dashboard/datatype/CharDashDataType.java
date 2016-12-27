@@ -175,4 +175,9 @@ public class CharDashDataType extends DashDataType<Character> {
 		throw new IllegalArgumentException("invalid character value \"" + strVal + "\"");		
 	}
 
+	@Override
+	public String toString() {
+		return "Char" + super.toString();
+	}
+
 }

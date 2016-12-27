@@ -336,8 +336,8 @@ public class DashboardConfigStore {
 		}
 		if ( itsLogger.isInfoEnabled() ) {
 			itsLogger.info("Known user-provided data types: ");
-			TreeSet<DashDataType> knownTypes = knownUserDataTypes.getKnownTypesSet();
-			for ( DashDataType dtype : knownTypes )
+			TreeSet<DashDataType<?>> knownTypes = knownUserDataTypes.getKnownTypesSet();
+			for ( DashDataType<?> dtype : knownTypes )
 				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
 		}
 
@@ -363,8 +363,8 @@ public class DashboardConfigStore {
 		}
 		if ( itsLogger.isInfoEnabled() ) {
 			itsLogger.info("Known file metadata types: ");
-			TreeSet<DashDataType> knownTypes = knownMetadataTypes.getKnownTypesSet();
-			for ( DashDataType dtype : knownTypes )
+			TreeSet<DashDataType<?>> knownTypes = knownMetadataTypes.getKnownTypesSet();
+			for ( DashDataType<?> dtype : knownTypes )
 				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
 		}
 
@@ -390,8 +390,8 @@ public class DashboardConfigStore {
 		}
 		if ( itsLogger.isInfoEnabled() ) {
 			itsLogger.info("Known file data types: ");
-			TreeSet<DashDataType> knownTypes = knownDataFileTypes.getKnownTypesSet();
-			for ( DashDataType dtype : knownTypes )
+			TreeSet<DashDataType<?>> knownTypes = knownDataFileTypes.getKnownTypesSet();
+			for ( DashDataType<?> dtype : knownTypes )
 				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
 		}
 
