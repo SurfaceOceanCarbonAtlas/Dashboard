@@ -24,6 +24,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.tmatesoft.svn.core.SVNException;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
@@ -1154,9 +1155,10 @@ public class DataFileHandler extends VersionedFileHandler {
 		// Assign the data column types 
 		ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(numCols);
 		for (int k = 0; k < numCols; k++) {
-			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
-			if ( dctype == null )
+			DashDataType<?> dataType = userTypes.getDataType(colTypeNames.get(k));
+			if ( dataType == null )
 				throw new IllegalArgumentException("unknown data type \"" + colTypeNames.get(k) + "\"");
+			DataColumnType dctype = dataType.duplicate();
 			if ( ! dctype.setSelectedUnit(colTypeUnits.get(k)) )
 				throw new IllegalArgumentException("unknown unit \"" + colTypeUnits.get(k) + 
 						"\" for data type \"" + dctype.getVarName() + "\"");

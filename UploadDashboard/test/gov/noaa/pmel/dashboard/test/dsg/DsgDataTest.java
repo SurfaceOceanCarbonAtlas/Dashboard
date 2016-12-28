@@ -152,7 +152,6 @@ public class DsgDataTest {
 		cruise.setRowNums(rowNums);
 		ArrayList<DsgData> dataList = DsgData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
 		for (int k = 0; k < dataList.size(); k++) {
-			rowNums.add(k+1);
 			DsgData dataRow = dataList.get(k);
 			TreeMap<DoubleDashDataType,Double> doubleValues = dataRow.getDoubleVariables();
 			assertEquals(EXPECTED_YEARS.get(k), dataRow.getYear());

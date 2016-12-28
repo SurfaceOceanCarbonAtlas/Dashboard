@@ -114,19 +114,13 @@ public class DsgData {
 			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dtype) )
 				throw new IllegalArgumentException("Data column number " + 
 						Integer.toString(k+1) + " has type UNKNOWN");
-			// Skip over missing values since the empty data record
+			// Skip over other types and missing values since the empty data record
 			// is initialized with the missing value for data type
+			if ( ! knownTypes.containsTypeName(dtype.getVarName()) )
+				continue;
 			String value = dataValues.get(k);
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
-			// Check if this data type is in the known list
-			DashDataType<?> stdType = knownTypes.getDataType(dtype.getVarName());
-			if ( stdType == null )
-				continue;
-			if ( ! stdType.getDataClassName().equals(dtype.getDataClassName()) )
-				throw new IllegalArgumentException("Data column type " + dtype.getVarName() + 
-						" has data class " + dtype.getDataClassName() + 
-						" instead of " + stdType.getDataClassName());
 			// Assign the value
 			if ( dtype instanceof IntDashDataType ) {
 				try {
@@ -188,8 +182,16 @@ public class DsgData {
 		ArrayList<DataColumnType> dataColTypes = datasetData.getDataColTypes();
 		// Create the list of DashDataType objects - assumes data already standardized
 		ArrayList<DashDataType<?>> dataTypes = new ArrayList<DashDataType<?>>(dataColTypes.size());
-		for ( DataColumnType dctype : dataColTypes )
-			dataTypes.add( knownTypes.getDataType(dctype) );
+		for ( DataColumnType dctype : dataColTypes ) {
+			DashDataType<?> dtype = knownTypes.getDataType(dctype);
+			if ( dtype == null ) {
+				if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dctype) )
+					throw new IllegalArgumentException("data type for a column is the unknown type");
+				// An acceptable but unknown type - mark it as "other" for these purposes
+				dtype = DashboardServerUtils.OTHER;				
+			}
+			dataTypes.add(dtype);
+		}
 		// Create the list of DSG cruise data objects, 
 		// and populate it with data from each row of the table
 		ArrayList<DsgData> dsgDataList = new ArrayList<DsgData>(dataValsTable.size());

@@ -202,7 +202,7 @@ public class CheckerMessageHandler {
 
 				// WOCE-type QC flags to assign from the automated data check
 				TreeSet<QCFlag> woceFlags = new TreeSet<QCFlag>();
-				String woceFlagName = DashboardUtils.WOCE_AUTOCHECK.getVarName();
+				String woceFlagName = DashboardServerUtils.WOCE_AUTOCHECK.getVarName();
 
 				for ( Message msg : output.getMessages().getMessages() ) {
 					int rowNum = msg.getLineNumber();
@@ -275,21 +275,21 @@ public class CheckerMessageHandler {
 						if ( msg.isError() ) {
 							QCFlag flag;
 							if ( colNum > 0 )
-								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_BAD, 
+								flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD, 
 										Severity.BAD, colNum-1, rowNum-1);
 							else
-								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_BAD, 
+								flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD, 
 										Severity.BAD, null, rowNum-1);
 							woceFlags.add(flag);
 						}
 						else if ( msg.isWarning() ) {
 							QCFlag flag;
 							if ( colNum > 0 ) {
-								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_QUESTIONABLE, 
+								flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE, 
 										Severity.QUESTIONABLE, colNum-1, rowNum-1);
 							}
 							else {
-								flag = new QCFlag(woceFlagName, DashboardUtils.WOCE_QUESTIONABLE, 
+								flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE, 
 										Severity.QUESTIONABLE, null, rowNum-1);
 							}
 							woceFlags.add(flag);
@@ -307,8 +307,14 @@ public class CheckerMessageHandler {
 			msgsWriter.close();
 		}
 
-		DashboardConfigStore configStore = DashboardConfigStore.get(false);
-		KnownDataTypes userKnownTypes = configStore.getKnownUserDataTypes();
+		KnownDataTypes userKnownTypes;
+		try {
+			DashboardConfigStore configStore = DashboardConfigStore.get(false);
+			userKnownTypes = configStore.getKnownUserDataTypes();
+		} catch ( Exception ex ) {
+			throw  new IllegalArgumentException("Unexpected error retrieving the dashboard configuration");
+		}
+
 		// Assign any user-provided QC flags.
 		// TODO: get severity from user-provided specification of the type
 		// This assumes QC flags indicating problems have flag values that are integers 3-9.
@@ -318,13 +324,13 @@ public class CheckerMessageHandler {
 		TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			// Look for QC columns
-			DashDataType<?> colType = userKnownTypes.getDashDataType(columnTypes.get(k));
+			DashDataType<?> colType = userKnownTypes.getDataType(columnTypes.get(k));
 			if ( ! colType.isQCType() )
 				continue;
 			// Check for another column associated with this QC column
 			int colIdx = -1;
 			for (int j = 0; j < columnTypes.size(); j++) {
-				if ( colType.isCommentTypeFor(userKnownTypes.getDashDataType(columnTypes.get(j))) ) {
+				if ( colType.isCommentTypeFor(userKnownTypes.getDataType(columnTypes.get(j))) ) {
 					colIdx = j;
 					break;
 				}

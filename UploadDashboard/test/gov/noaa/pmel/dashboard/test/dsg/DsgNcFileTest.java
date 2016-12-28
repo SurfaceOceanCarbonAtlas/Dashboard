@@ -54,7 +54,7 @@ public class DsgNcFileTest {
 	public static final DoubleDashDataType PATM = new DoubleDashDataType("Pressure_atm", 
 			703.0, "P_atm", "sea-level air pressure", 
 			PRESSURE_UNITS, "air_pressure_at_sea_level", 
-			PRESSURE_CATEGORY, "8000.0", "9000.0", "11000.0", "1200.0");
+			PRESSURE_CATEGORY, "8000.0", "9000.0", "11000.0", "12000.0");
 
 	public static final DoubleDashDataType XCO2_WATER_SST_DRY = new DoubleDashDataType("xCO2_water_sst_dry_ppm", 
 			704.0, "xCO2_water_SST_dry", "water xCO2 dry using sst", 

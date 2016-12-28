@@ -13,7 +13,9 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
@@ -80,13 +82,13 @@ public class RegenerateDsgsTest {
 			if ( ! origVals.equals(updatedVals) ) {
 				// Report all problems for the measurement, not just the first problem
 
-				TreeMap<DashDataType,Integer> origIntVals = origVals.getIntegerVariables();
-				TreeMap<DashDataType,Integer> updatedIntVals = updatedVals.getIntegerVariables();
+				TreeMap<IntDashDataType,Integer> origIntVals = origVals.getIntegerVariables();
+				TreeMap<IntDashDataType,Integer> updatedIntVals = updatedVals.getIntegerVariables();
 				if ( origIntVals.size() != updatedIntVals.size() )
 					System.err.println("Number of integer values: expected = " + 
 							origIntVals.size() + "; found = " + updatedIntVals.size() );
-				for ( Entry<DashDataType,Integer> entry : origIntVals.entrySet() ) {
-					DashDataType key = entry.getKey();
+				for ( Entry<IntDashDataType,Integer> entry : origIntVals.entrySet() ) {
+					IntDashDataType key = entry.getKey();
 					Integer original = entry.getValue();
 					Integer updated = updatedIntVals.get(key);
 					if ( ! original.equals(updated) )
@@ -94,13 +96,13 @@ public class RegenerateDsgsTest {
 								original + "; found = " + updated );
 				}
 
-				TreeMap<DashDataType,Character> origCharVals = origVals.getCharacterVariables();
-				TreeMap<DashDataType,Character> updatedCharVals = updatedVals.getCharacterVariables();
+				TreeMap<CharDashDataType,Character> origCharVals = origVals.getCharacterVariables();
+				TreeMap<CharDashDataType,Character> updatedCharVals = updatedVals.getCharacterVariables();
 				if ( origCharVals.size() != updatedCharVals.size() )
 					System.err.println("Number of character values: expected = " + 
 							origCharVals.size() + "; found = " + updatedCharVals.size() );
-				for ( Entry<DashDataType,Character> entry : origCharVals.entrySet() ) {
-					DashDataType key = entry.getKey();
+				for ( Entry<CharDashDataType,Character> entry : origCharVals.entrySet() ) {
+					CharDashDataType key = entry.getKey();
 					Character original = entry.getValue();
 					Character updated = updatedCharVals.get(key);
 					if ( ! original.equals(updated) )
@@ -108,13 +110,13 @@ public class RegenerateDsgsTest {
 								original + "; found = " + updated );
 				}
 
-				TreeMap<DashDataType,Double> origDoubleVals = origVals.getDoubleVariables();
-				TreeMap<DashDataType,Double> updatedDoubleVals = updatedVals.getDoubleVariables();
+				TreeMap<DoubleDashDataType,Double> origDoubleVals = origVals.getDoubleVariables();
+				TreeMap<DoubleDashDataType,Double> updatedDoubleVals = updatedVals.getDoubleVariables();
 				if ( origDoubleVals.size() != updatedDoubleVals.size() )
 					System.err.println("Number of character values: expected = " + 
 							origDoubleVals.size() + "; found = " + updatedDoubleVals.size() );
-				for ( Entry<DashDataType,Double> entry : origDoubleVals.entrySet() ) {
-					DashDataType key = entry.getKey();
+				for ( Entry<DoubleDashDataType,Double> entry : origDoubleVals.entrySet() ) {
+					DoubleDashDataType key = entry.getKey();
 					Double original = entry.getValue();
 					Double updated = updatedDoubleVals.get(key);
 					if ( ! DashboardUtils.closeTo(original, updated, 

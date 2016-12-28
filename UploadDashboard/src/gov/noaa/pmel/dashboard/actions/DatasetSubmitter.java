@@ -19,6 +19,7 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -131,7 +132,7 @@ public class DatasetSubmitter {
 				ArrayList<String> flagVals = new ArrayList<String>(numRows);
 				// For the automated data checker flag values, default to acceptable
 				for (int k = 0; k < numRows; k++)
-					flagVals.add(DashboardUtils.FLAG_ACCEPTABLE.toString());
+					flagVals.add(DashboardServerUtils.FLAG_ACCEPTABLE.toString());
 				for ( QCFlag wtype : dataset.getCheckerFlags() ) {
 					Integer rowIdx = wtype.getRowIndex();
 					if ( (rowIdx < 0) || (rowIdx >= numRows) )
@@ -140,7 +141,7 @@ public class DatasetSubmitter {
 				}
 				// Directly modify the lists in the dataset
 				datasetData.getUserColNames().add("WOCE_autocheck");
-				datasetData.getDataColTypes().add(DashboardUtils.WOCE_AUTOCHECK);
+				datasetData.getDataColTypes().add(DashboardServerUtils.WOCE_AUTOCHECK.duplicate());
 				datasetData.getDataValues().add(flagVals);
 				// PI-provided QC flags are already in the data (that is where they came from)
 

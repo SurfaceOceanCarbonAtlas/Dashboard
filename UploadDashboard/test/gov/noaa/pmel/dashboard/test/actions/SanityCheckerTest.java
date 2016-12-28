@@ -18,6 +18,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
@@ -32,6 +33,27 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
  * @author Karl Smith
  */
 public class SanityCheckerTest {
+
+	public static final DoubleDashDataType TEQU = new DoubleDashDataType("Temperature_equi", 
+			310.0, "T_equ", "equilibrator chamber temperature", DsgNcFileTest.TEMPERATURE_UNITS, 
+			null, DsgNcFileTest.TEMPERATURE_CATEGORY, "-10.0", "-5.0", "40.0", "50.0");
+
+	public static final DoubleDashDataType PEQU = new DoubleDashDataType("Pressure_equi", 
+			320.0, "P_equ", "equilibrator chamber pressure", DsgNcFileTest.PRESSURE_UNITS, 
+			null, DsgNcFileTest.PRESSURE_CATEGORY, "800.0", "900.0", "1100.0", "1200.0");
+
+	public static final DoubleDashDataType XCO2_WATER_TEQU_DRY = new DoubleDashDataType("xCO2_water_equi_temp_dry_ppm", 
+			330.0, "xCO2_water_Tequ_dry", "water xCO2 dry using equi temp", DsgNcFileTest.XCO2_UNITS, 
+			"mole_fraction_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
+
+	public static final DoubleDashDataType FCO2_WATER_SST_WET =  new DoubleDashDataType("fCO2_water_sst_100humidity_uatm", 
+			340.0, "fCO2_water_SST_wet", "water fCO2 wet using sst", DsgNcFileTest.PCO2_UNITS, 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
+
+	public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm", 
+			350.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", DsgNcFileTest.PCO2_UNITS, 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
+
 	private static final String CONFIG_FILENAME;
 	private static final String LOG4J_PROPERTIES_FILENAME;
 	static {
@@ -67,7 +89,7 @@ public class SanityCheckerTest {
 						"<input_column index=\"14\">SST [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + DsgNcFileTest.TEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + TEQU.getVarName() + "\">" +
 						"<input_column index=\"15\">Tequ [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
@@ -75,15 +97,15 @@ public class SanityCheckerTest {
 						"<input_column index=\"16\">PPPP [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + DsgNcFileTest.PEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + PEQU.getVarName() + "\">" +
 						"<input_column index=\"17\">Pequ [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + DsgNcFileTest.XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
+					"<socat_column name=\"" + XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
 						"<input_column index=\"23\">xCO2_water_Tequ_dry [umol/mol]</input_column>" +
 						"<input_units>ppm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + DsgNcFileTest.FCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + FCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"28\">fCO2_water_SST_wet [uatm]</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
@@ -274,7 +296,7 @@ public class SanityCheckerTest {
 						"<input_column index=\"7\">" + DashboardServerUtils.LONGITUDE.getVarName() + "</input_column>" +
 						"<input_units>decimal_degrees_east</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + DsgNcFileTest.PCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + PCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"8\">CO2</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +

@@ -24,8 +24,13 @@ import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -286,11 +291,20 @@ public class DatasetChecker {
 
 		ArrayList<DataColumnType> columnTypes = dataset.getDataColTypes();
 
+		KnownDataTypes knownUserTypes;
+		try {
+			DashboardConfigStore configStore = DashboardConfigStore.get(false);
+			knownUserTypes = configStore.getKnownUserDataTypes();
+		} catch (IOException ex) {
+			throw  new IllegalArgumentException("Unexpected error retrieving the dashboard configuration");
+		}
+
 		// Specify the columns in this cruise data
 		Element rootElement = new Element("Expocode_" + dataset.getDatasetId());
 		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
-			DataColumnType colType = columnTypes.get(k);
+			DataColumnType dctype = columnTypes.get(k);
+			DashDataType<?> colType = knownUserTypes.getDataType(dctype);
 			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(colType) ) {
 				// Might happen in multiple file upload
 				throw new IllegalArgumentException("Data type not defined for column " + 
@@ -308,7 +322,7 @@ public class DatasetChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
 				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
-				int idx = colType.getSelectedUnitIndex();
+				int idx = dctype.getSelectedUnitIndex();
 				dateFormat = CHECKER_DATA_UNITS.get(colType.getVarName()).get(idx);
 			}
 			// DATETIME_DATA_TIME
@@ -318,8 +332,8 @@ public class DatasetChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
 				userElement.setText(dataset.getUserColNames().get(k));
 				timestampElements[0] = userElement;
-				int idx = colType.getSelectedUnitIndex();
-				dateFormat = colType.getUnits().get(idx);
+				int idx = dctype.getSelectedUnitIndex();
+				dateFormat = dctype.getUnits().get(idx);
 			}
 			else if ( DashboardServerUtils.TIME_OF_DAY.typeNameEquals(colType) && 
 					  DateTimeType.DATETIME_DATE_TIME.equals(timeSpec) ) {
@@ -344,7 +358,7 @@ public class DatasetChecker {
 				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.JAN_FIRST_INDEX_ELEMENT);
-				String units = colType.getUnits().get(colType.getSelectedUnitIndex());
+				String units = dctype.getUnits().get(dctype.getSelectedUnitIndex());
 				if ( "Jan1=1.0".equals(units) )
 					userElement.setText("1");
 				else if ( "Jan1=0.0".equals(units) )
@@ -377,7 +391,7 @@ public class DatasetChecker {
 				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT);
-				String units = colType.getUnits().get(colType.getSelectedUnitIndex());
+				String units = dctype.getUnits().get(dctype.getSelectedUnitIndex());
 				if ( "Jan1=1.0".equals(units) )
 					userElement.setText("1");
 				else if ( "Jan1=0.0".equals(units) )
@@ -463,12 +477,12 @@ public class DatasetChecker {
 			else {
 				// Element specifying the units of the column
 				Element unitsElement = new Element(ColumnSpec.INPUT_UNITS_ELEMENT_NAME);
-				int idx = colType.getSelectedUnitIndex();
+				int idx = dctype.getSelectedUnitIndex();
 				// See if there are alternate unit strings for the checker for this data type
 				ArrayList<String> checkerUnits = CHECKER_DATA_UNITS.get(colType.getVarName());
 				String chkUnit;
 				if ( checkerUnits == null ) {
-					chkUnit = colType.getUnits().get(idx);
+					chkUnit = dctype.getUnits().get(idx);
 					// Some hacks to avoid specific SOCAT types; ideally the automated data checker 
 					// should be reconfigured to accept the units used
 					if ( "PSU".equals(chkUnit) ) {
@@ -503,7 +517,7 @@ public class DatasetChecker {
 				columnElement.addContent(userElement);
 				columnElement.addContent(unitsElement);
 				// Add the missing value if specified
-				String missValue = colType.getSelectedMissingValue();
+				String missValue = dctype.getSelectedMissingValue();
 				if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(missValue) ) {
 					Element missValElement = new Element(ColumnSpec.MISSING_VALUE_ELEMENT_NAME);
 					missValElement.setText(missValue);
@@ -767,6 +781,19 @@ public class DatasetChecker {
 				rowData.add(second.toString());
 		}
 
+		KnownDataTypes knownUserTypes;
+		try {
+			DashboardConfigStore configStore = DashboardConfigStore.get(false);
+			knownUserTypes = configStore.getKnownUserDataTypes();
+		} catch (IOException ex) {
+			throw  new IllegalArgumentException("Unexpected error retrieving the dashboard configuration");
+		}
+		ArrayList<DashDataType<?>> dataTypes = new ArrayList<DashDataType<?>>(dataVals.size());
+		for ( DataColumnType colType : dataColTypes ) {
+			DashDataType<?> dtype = knownUserTypes.getDataType(colType);
+			dataTypes.add(dtype);
+		}
+
 		// Go through each row, converting data as needed
 		stdRowIter = stdRowVals.iterator();
 		for ( ArrayList<String> rowData : dataVals ) {
@@ -779,8 +806,9 @@ public class DatasetChecker {
 			}
 			int k = 0;
 			for ( DataColumnType colType : dataColTypes ) {
-				if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(colType.getDataClassName()) ||
-					 DashboardUtils.CHAR_DATA_CLASS_NAME.equals(colType.getDataClassName()) ||
+				DashDataType<?> dtype = dataTypes.get(k);
+				if ( ( dtype instanceof StringDashDataType ) ||
+					 ( dtype instanceof CharDashDataType ) ||
 					 DashboardServerUtils.OTHER.typeNameEquals(colType) ||
 					 DashboardServerUtils.TIMESTAMP.typeNameEquals(colType) ||   // just in case it changes away from String 
 					 DashboardServerUtils.DATE.typeNameEquals(colType) ||   // just in case it changes away from String
