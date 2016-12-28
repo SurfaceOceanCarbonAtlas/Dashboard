@@ -15,7 +15,9 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -30,6 +32,10 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class DsgDataTest {
 
+	public static final CharDashDataType WOCE_FCO2_WATER = new CharDashDataType("woce_fco2_water", 
+			401.0, "WOCE fCO2 water", "WOCE flag for aqueous fCO2", DashboardUtils.NO_UNITS, "WOCE_flag",
+			DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null);
+	
 	static final KnownDataTypes KNOWN_DATA_TYPES;
 	static {
 		KNOWN_DATA_TYPES = new KnownDataTypes();
@@ -47,8 +53,8 @@ public class DsgDataTest {
 				DsgNcFileTest.PATM.toPropertyValue());
 		addnTypeProps.setProperty(DsgNcFileTest.SHIP_SPEED.getVarName(), 
 				DsgNcFileTest.SHIP_SPEED.toPropertyValue());
-		addnTypeProps.setProperty(DsgNcFileTest.WOCE_CO2_WATER.getVarName(), 
-				DsgNcFileTest.WOCE_CO2_WATER.toPropertyValue());
+		addnTypeProps.setProperty(WOCE_FCO2_WATER.getVarName(), 
+				WOCE_FCO2_WATER.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
 	}
 
@@ -148,7 +154,7 @@ public class DsgDataTest {
 		for (int k = 0; k < dataList.size(); k++) {
 			rowNums.add(k+1);
 			DsgData dataRow = dataList.get(k);
-			TreeMap<DashDataType,Double> doubleValues = dataRow.getDoubleVariables();
+			TreeMap<DoubleDashDataType,Double> doubleValues = dataRow.getDoubleVariables();
 			assertEquals(EXPECTED_YEARS.get(k), dataRow.getYear());
 			assertEquals(EXPECTED_MONTHS.get(k), dataRow.getMonth());
 			assertEquals(EXPECTED_DAYS.get(k), dataRow.getDay());
@@ -175,18 +181,11 @@ public class DsgDataTest {
 		DsgData data = new DsgData(KNOWN_DATA_TYPES);
 		Integer value = 123;
 		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, value);
-		TreeMap<DashDataType,Integer> intMap = data.getIntegerVariables();
+		TreeMap<IntDashDataType,Integer> intMap = data.getIntegerVariables();
 		assertEquals(value, intMap.get(DashboardServerUtils.SAMPLE_NUMBER));
 		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, null);
 		intMap = data.getIntegerVariables();
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, intMap.get(DashboardServerUtils.SAMPLE_NUMBER));
-		boolean errCaught = false;
-		try {
-			data.setIntegerVariableValue(DashboardServerUtils.TIME, value);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
 	}
 
 	/**
@@ -197,19 +196,12 @@ public class DsgDataTest {
 	public void testGetSetCharacterVariableValue() {
 		DsgData data = new DsgData(KNOWN_DATA_TYPES);
 		Character value = 'K';
-		data.setCharacterVariableValue(DsgNcFileTest.WOCE_CO2_WATER, value);
-		TreeMap<DashDataType,Character> charMap = data.getCharacterVariables();
-		assertEquals(value, charMap.get(DsgNcFileTest.WOCE_CO2_WATER));
-		data.setCharacterVariableValue(DsgNcFileTest.WOCE_CO2_WATER, null);
+		data.setCharacterVariableValue(WOCE_FCO2_WATER, value);
+		TreeMap<CharDashDataType,Character> charMap = data.getCharacterVariables();
+		assertEquals(value, charMap.get(WOCE_FCO2_WATER));
+		data.setCharacterVariableValue(WOCE_FCO2_WATER, null);
 		charMap = data.getCharacterVariables();
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(DsgNcFileTest.WOCE_CO2_WATER));
-		boolean errCaught = false;
-		try {
-			data.setCharacterVariableValue(DashboardServerUtils.TIME, value);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(WOCE_FCO2_WATER));
 	}
 
 	/**
@@ -221,18 +213,11 @@ public class DsgDataTest {
 		DsgData data = new DsgData(KNOWN_DATA_TYPES);
 		Double value = (new Date()).getTime() / 1000.0;
 		data.setDoubleVariableValue(DashboardServerUtils.TIME, value);
-		TreeMap<DashDataType,Double> doubleMap = data.getDoubleVariables();
+		TreeMap<DoubleDashDataType,Double> doubleMap = data.getDoubleVariables();
 		assertEquals(value, doubleMap.get(DashboardServerUtils.TIME));
 		data.setDoubleVariableValue(DashboardServerUtils.TIME, null);
 		doubleMap = data.getDoubleVariables();
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(DashboardServerUtils.TIME));
-		boolean errCaught = false;
-		try {
-			data.setDoubleVariableValue(DashboardServerUtils.SAMPLE_NUMBER, value);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
 	}
 
 	static final Integer SAMPLE_NUMBER = 123;

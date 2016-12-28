@@ -27,8 +27,8 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class DsgData {
 
-	private TreeMap<IntDashDataType,Integer> intValsMap;
 	private TreeMap<CharDashDataType,Character> charValsMap;
+	private TreeMap<IntDashDataType,Integer> intValsMap;
 	private TreeMap<DoubleDashDataType,Double> doubleValsMap;
 
 	/**
@@ -95,7 +95,7 @@ public class DsgData {
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public DsgData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
+	public DsgData(KnownDataTypes knownTypes, List<DashDataType<?>> columnTypes, 
 			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record with the given known types
 		this(knownTypes);
@@ -110,7 +110,7 @@ public class DsgData {
 			intValsMap.put(DashboardServerUtils.SAMPLE_NUMBER, Integer.valueOf(sampleNum));
 		for (int k = 0; k < numColumns; k++) {
 			// Make sure the data type is valid
-			DashDataType dtype = columnTypes.get(k);
+			DashDataType<?> dtype = columnTypes.get(k);
 			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dtype) )
 				throw new IllegalArgumentException("Data column number " + 
 						Integer.toString(k+1) + " has type UNKNOWN");
@@ -120,7 +120,7 @@ public class DsgData {
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
 			// Check if this data type is in the known list
-			DataColumnType stdType = knownTypes.getDataColumnType(dtype.getVarName());
+			DashDataType<?> stdType = knownTypes.getDataType(dtype.getVarName());
 			if ( stdType == null )
 				continue;
 			if ( ! stdType.getDataClassName().equals(dtype.getDataClassName()) )
@@ -128,22 +128,22 @@ public class DsgData {
 						" has data class " + dtype.getDataClassName() + 
 						" instead of " + stdType.getDataClassName());
 			// Assign the value
-			if ( intValsMap.containsKey(dtype) ) {
+			if ( dtype instanceof IntDashDataType ) {
 				try {
-					intValsMap.put(dtype, Integer.parseInt(value));
+					intValsMap.put((IntDashDataType) dtype, Integer.parseInt(value));
 				} catch ( Exception ex ) {
 					throw new IllegalArgumentException("Unable to parse '" + 
 							value + "' as an Integer: " + ex.getMessage());
 				}
 			}
-			else if ( charValsMap.containsKey(dtype) ) {
+			else if ( dtype instanceof CharDashDataType ) {
 				if ( value.length() != 1 )
 					throw new IllegalArgumentException("More than one character in '" + value + "'");
-				charValsMap.put(dtype, value.charAt(0));
+				charValsMap.put((CharDashDataType) dtype, value.charAt(0));
 			}
-			else if ( doubleValsMap.containsKey(dtype) ) {
+			else if ( dtype instanceof DoubleDashDataType ) {
 				try {
-					doubleValsMap.put(dtype, Double.parseDouble(value));
+					doubleValsMap.put((DoubleDashDataType) dtype, Double.parseDouble(value));
 				} catch ( Exception ex ) {
 					throw new IllegalArgumentException("Unable to parse '" + 
 							value + "' as a Double: " + ex.getMessage());
@@ -187,9 +187,9 @@ public class DsgData {
 		ArrayList<ArrayList<String>> dataValsTable = datasetData.getDataValues();
 		ArrayList<DataColumnType> dataColTypes = datasetData.getDataColTypes();
 		// Create the list of DashDataType objects - assumes data already standardized
-		ArrayList<DashDataType> dataTypes = new ArrayList<DashDataType>(dataColTypes.size());
+		ArrayList<DashDataType<?>> dataTypes = new ArrayList<DashDataType<?>>(dataColTypes.size());
 		for ( DataColumnType dctype : dataColTypes )
-			dataTypes.add( new DashDataType(dctype) );
+			dataTypes.add( knownTypes.getDataType(dctype) );
 		// Create the list of DSG cruise data objects, 
 		// and populate it with data from each row of the table
 		ArrayList<DsgData> dsgDataList = new ArrayList<DsgData>(dataValsTable.size());
@@ -204,7 +204,7 @@ public class DsgData {
 	 * 		the map of variable names and values for Integer variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public TreeMap<DashDataType,Integer> getIntegerVariables() {
+	public TreeMap<IntDashDataType,Integer> getIntegerVariables() {
 		return intValsMap;
 	}
 
@@ -219,7 +219,7 @@ public class DsgData {
 	 * @throws IllegalArgumentException
 	 * 		if the data type variable is not a known data type in this data
 	 */
-	public void setIntegerVariableValue(DashDataType dtype, Integer value) throws IllegalArgumentException {
+	public void setIntegerVariableValue(IntDashDataType dtype, Integer value) throws IllegalArgumentException {
 		if ( ! intValsMap.containsKey(dtype) )
 			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
 		if ( value == null )
@@ -233,7 +233,7 @@ public class DsgData {
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public TreeMap<DashDataType,Character> getCharacterVariables() {
+	public TreeMap<CharDashDataType,Character> getCharacterVariables() {
 		return charValsMap;
 	}
 
@@ -248,7 +248,7 @@ public class DsgData {
 	 * @throws IllegalArgumentException
 	 * 		if the data type variable is not a known data type in this data
 	 */
-	public void setCharacterVariableValue(DashDataType dtype, Character value) throws IllegalArgumentException {
+	public void setCharacterVariableValue(CharDashDataType dtype, Character value) throws IllegalArgumentException {
 		if ( ! charValsMap.containsKey(dtype) )
 			throw new IllegalArgumentException("Unknown data character variable " + dtype.getVarName());
 		if ( value == null )
@@ -262,7 +262,7 @@ public class DsgData {
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public TreeMap<DashDataType,Double> getDoubleVariables() {
+	public TreeMap<DoubleDashDataType,Double> getDoubleVariables() {
 		return doubleValsMap;
 	}
 
@@ -277,7 +277,7 @@ public class DsgData {
 	 * @throws IllegalArgumentException
 	 * 		if the data type variable is not a known data type in this data
 	 */
-	public void setDoubleVariableValue(DashDataType dtype, Double value) throws IllegalArgumentException {
+	public void setDoubleVariableValue(DoubleDashDataType dtype, Double value) throws IllegalArgumentException {
 		if ( ! doubleValsMap.containsKey(dtype) )
 			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
 		if ( (value == null) || value.isNaN() || value.isInfinite() )
@@ -531,9 +531,9 @@ public class DsgData {
 		final int prime = 37;
 		int result = intValsMap.hashCode();
 		// Ignore WOCE flag differences.
-		TreeMap<DashDataType,Character> nonQCCharValsMap = 
-				new TreeMap<DashDataType,Character>();
-		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
+		TreeMap<CharDashDataType,Character> nonQCCharValsMap = 
+				new TreeMap<CharDashDataType,Character>();
+		for ( Entry<CharDashDataType,Character> entry : charValsMap.entrySet() ) {
 			if ( ! entry.getKey().isQCType() ) {
 				nonQCCharValsMap.put(entry.getKey(), entry.getValue());
 			}
@@ -562,8 +562,8 @@ public class DsgData {
 		// Character comparisons - ignore WOCE flag differences
 		if ( ! charValsMap.keySet().equals(other.charValsMap.keySet()) )
 			return false;
-		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
-			DashDataType dtype = entry.getKey();
+		for ( Entry<CharDashDataType,Character> entry : charValsMap.entrySet() ) {
+			CharDashDataType dtype = entry.getKey();
 			if ( ! dtype.isQCType() ) {
 				if ( ! entry.getValue().equals(other.charValsMap.get(dtype)) )
 					return false;
@@ -573,8 +573,8 @@ public class DsgData {
 		// Floating-point comparisons - values don't have to be exactly the same
 		if ( ! doubleValsMap.keySet().equals(other.doubleValsMap.keySet()) )
 			return false;
-		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() ) {
-			DashDataType dtype = entry.getKey();
+		for ( Entry<DoubleDashDataType,Double> entry : doubleValsMap.entrySet() ) {
+			DoubleDashDataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
 			Double otherval = other.doubleValsMap.get(dtype);
 
@@ -606,11 +606,11 @@ public class DsgData {
 	@Override
 	public String toString() {
 		String repr = "DsgData[\n";
-		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
+		for ( Entry<IntDashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
-		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )
+		for ( Entry<CharDashDataType,Character> entry : charValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "='" + entry.getValue().toString() + "'\n";
-		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() )
+		for ( Entry<DoubleDashDataType,Double> entry : doubleValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		repr += "]";
 		return repr;

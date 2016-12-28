@@ -13,8 +13,11 @@ import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -28,16 +31,21 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  */
 public class DsgMetadataTest {
 
-	public static final DashDataType QC_FLAG_TYPE = new DashDataType("qc_flag", 
-			120.0, "QC flag", DashboardUtils.CHAR_DATA_CLASS_NAME, "QC flag", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
+	public static final CharDashDataType QC_FLAG_TYPE = new CharDashDataType("qc_flag", 
+			200.0, "QC flag", "QC flag", DashboardUtils.NO_UNITS, "QC", 
+			DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null);
+	public static final IntDashDataType SERIAL_NUMBER = new IntDashDataType("serial_number",
+			201.0, "Serial Number", "cruise serial number", DashboardUtils.NO_UNITS, null,
+			DashboardServerUtils.IDENTIFIER_CATEGORY, null, null, null, null);
 	public static final Properties ADDN_TYPES_PROPERTIES;
 	static {
 		ADDN_TYPES_PROPERTIES = new Properties();
 		ADDN_TYPES_PROPERTIES.setProperty(QC_FLAG_TYPE.getVarName(), QC_FLAG_TYPE.toPropertyValue());
+		ADDN_TYPES_PROPERTIES.setProperty(SERIAL_NUMBER.getVarName(), SERIAL_NUMBER.toPropertyValue());
 	}
 
 	static final Character QC_FLAG_VALUE = 'C';
+	static final Integer CRUISE_SERIAL_NUM = 123456789;
 	static final String EXPOCODE = "XXXX20140113";
 	static final String CRUISE_NAME = "My Cruise";
 	static final String PLATFORM_NAME = "My Vessel";
@@ -48,8 +56,8 @@ public class DsgMetadataTest {
 	static final Double EASTMOST_LONGITUDE = -135.0;
 	static final Double SOUTHMOST_LATITUDE = 15.0;
 	static final Double NORTHMOST_LATITUDE = 50.0;
-	static final Date BEGIN_TIME = new Date();
-	static final Date END_TIME = new Date(BEGIN_TIME.getTime() + 1000000L);
+	static final Double BEGIN_TIME = new Date().getTime() / 1000.0;
+	static final Double END_TIME = BEGIN_TIME + 1000.0;
 	static final String VERSION_STATUS = "2.5N";
 
 	/**
@@ -62,21 +70,14 @@ public class DsgMetadataTest {
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
-		TreeMap<DashDataType,Character> charMap = mdata.getCharVariables();
+		TreeMap<CharDashDataType,Character> charMap = mdata.getCharVariables();
 		assertEquals(QC_FLAG_VALUE, charMap.get(QC_FLAG_TYPE));
 		mdata.setCharVariableValue(QC_FLAG_TYPE, null);
 		charMap = mdata.getCharVariables();
 		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(QC_FLAG_TYPE));
-		boolean errCaught = false;
-		try {
-			mdata.setCharVariableValue(DashboardServerUtils.DATASET_ID, QC_FLAG_VALUE);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
 	}
 
-		/**
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getStringVariables()}
 	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.String)}.
 	 */
@@ -86,18 +87,28 @@ public class DsgMetadataTest {
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setStringVariableValue(DashboardServerUtils.DATASET_ID, EXPOCODE);
-		TreeMap<DashDataType,String> stringMap = mdata.getStringVariables();
+		TreeMap<StringDashDataType,String> stringMap = mdata.getStringVariables();
 		assertEquals(EXPOCODE, stringMap.get(DashboardServerUtils.DATASET_ID));
 		mdata.setStringVariableValue(DashboardServerUtils.DATASET_ID, null);
 		stringMap = mdata.getStringVariables();
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, stringMap.get(DashboardServerUtils.DATASET_ID));
-		boolean errCaught = false;
-		try {
-			mdata.setStringVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, EXPOCODE);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getIntVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setIntVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Integer)}.
+	 */
+	@Test
+	public void testGetSetIntVariableValue() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
+		mdata.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
+		TreeMap<IntDashDataType,Integer> dateMap = mdata.getIntVariables();
+		assertEquals(CRUISE_SERIAL_NUM, dateMap.get(SERIAL_NUMBER));
+		mdata.setIntVariableValue(SERIAL_NUMBER, null);
+		dateMap = mdata.getIntVariables();
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, dateMap.get(SERIAL_NUMBER));
 	}
 
 	/**
@@ -111,42 +122,11 @@ public class DsgMetadataTest {
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		Double value = Double.valueOf(EASTMOST_LONGITUDE);
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
-		TreeMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
+		TreeMap<DoubleDashDataType,Double> doubleMap = mdata.getDoubleVariables();
 		assertEquals(value, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, null);
 		doubleMap = mdata.getDoubleVariables();
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
-		boolean errCaught = false;
-		try {
-			mdata.setDoubleVariableValue(DashboardServerUtils.DATASET_ID, value);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDateVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.util.Date)}.
-	 */
-	@Test
-	public void testGetSetDateVariableValue() {
-		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
-		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, BEGIN_TIME);
-		TreeMap<DashDataType,Date> dateMap = mdata.getDateVariables();
-		assertEquals(BEGIN_TIME, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
-		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, null);
-		dateMap = mdata.getDateVariables();
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
-		boolean errCaught = false;
-		try {
-			mdata.setDateVariableValue(DashboardServerUtils.DATASET_ID, BEGIN_TIME);
-		} catch ( IllegalArgumentException ex ) {
-			errCaught = true;
-		}
-		assertTrue( errCaught );
 	}
 
 	/**
@@ -154,7 +134,7 @@ public class DsgMetadataTest {
 	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDatasetId(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetExpocode() {
+	public void testGetSetDatasetId() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
@@ -363,7 +343,7 @@ public class DsgMetadataTest {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
 		assertEquals(BEGIN_TIME, mdata.getBeginTime());
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
@@ -377,7 +357,7 @@ public class DsgMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
 		mdata.setBeginTime(null);
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
 	}
 
 	/**
@@ -389,10 +369,10 @@ public class DsgMetadataTest {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
@@ -404,7 +384,7 @@ public class DsgMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
 		mdata.setEndTime(null);
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
 	}
 
 	/**
@@ -419,8 +399,8 @@ public class DsgMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
 		mdata.setVersion(VERSION_STATUS);
 		assertEquals(VERSION_STATUS, mdata.getVersion());
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
@@ -456,6 +436,13 @@ public class DsgMetadataTest {
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
 		other.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		assertEquals(mdata.hashCode(), other.hashCode());
+		assertTrue( mdata.equals(other) );
+
+		mdata.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
+		assertFalse( mdata.hashCode() == other.hashCode());
+		assertFalse( mdata.equals(other) );
+		other.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
@@ -533,15 +520,17 @@ public class DsgMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
+		// hashCode ignores floating point values
 		mdata.setBeginTime(BEGIN_TIME);
-		assertFalse( mdata.hashCode() == other.hashCode());
+		assertTrue( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
 		other.setBeginTime(BEGIN_TIME);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
+		// hashCode ignores floating point values
 		mdata.setEndTime(END_TIME);
-		assertFalse( mdata.hashCode() == other.hashCode());
+		assertTrue( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
 		other.setEndTime(END_TIME);
 		assertEquals(mdata.hashCode(), other.hashCode());

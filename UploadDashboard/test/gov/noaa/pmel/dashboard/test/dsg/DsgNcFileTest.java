@@ -174,8 +174,8 @@ public class DsgNcFileTest {
 		metadata.setWestmostLongitude(-92.77);
 		metadata.setEastmostLongitude(-92.74);
 		SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
-		metadata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
-		metadata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
+		metadata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC").getTime() / 1000.0);
+		metadata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC").getTime() / 1000.0);
 
 		File parentDir = new File("/var/tmp/junit");
 		if ( ! parentDir.exists() )
@@ -254,8 +254,8 @@ public class DsgNcFileTest {
 			metadata.setWestmostLongitude(-92.77);
 			metadata.setEastmostLongitude(-92.74);
 			SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
-			metadata.setBeginTime(dateFmt.parse("2006-02-28 23:48 UTC"));
-			metadata.setEndTime(dateFmt.parse("2006-03-01 23:50 UTC"));
+			metadata.setBeginTime(dateFmt.parse("2006-02-28 23:48 UTC").getTime() / 1000.0);
+			metadata.setEndTime(dateFmt.parse("2006-03-01 23:50 UTC").getTime() / 1000.0);
 
 			File parentDir = new File("/var/tmp/oap");
 			if ( ! parentDir.exists() )
