@@ -79,32 +79,32 @@ public class StringDashDataType extends DashDataType<String> {
 			try {
 				minQuestionVal = dataValueOf(minQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum questionable value: \"" + 
+						minQuestionStrVal + "\"");
 			}
 		}
 		if ( minAcceptStrVal != null ) {
 			try {
 				minAcceptVal = dataValueOf(minAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum acceptable value: \"" + 
+						minAcceptStrVal + "\"");
 			}
 		}
 		if ( maxAcceptStrVal != null ) {
 			try {
 				maxAcceptVal = dataValueOf(maxAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum acceptable value: \"" + 
+						maxAcceptStrVal + "\"");
 			}
 		}
 		if ( maxQuestionStrVal != null ) {
 			try {
 				maxQuestionVal = dataValueOf(maxQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum questionable value: \"" + 
+						maxQuestionStrVal + "\"");
 			}
 		}
 		validateLimits();
@@ -166,12 +166,32 @@ public class StringDashDataType extends DashDataType<String> {
 	@Override
 	public String dataValueOf(String strVal) {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("no value given");
 		return strVal.trim();
+	}
+
+	@Override
+	public ValueConverter<String> getStandardizer(String inputUnit, String missingValue, 
+			StdDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+
+		if ( (inputUnit != null) || ! DashboardUtils.STRING_MISSING_VALUE.equals(units.get(0)) )
+			throw new IllegalArgumentException("unit conversion of characters not supported");
+
+		ValueConverter<String> stdConverter = new ValueConverter<String>(null, null, missingValue) {
+			@Override
+			public String convertValueOf(String valueString) {
+				if ( isMissingValue(valueString, true) )
+					return null;
+				return dataValueOf(valueString);
+			}
+		};
+
+		return stdConverter;
 	}
 
 	@Override
 	public String toString() {
 		return "String" + super.toString();
 	}
+
 }

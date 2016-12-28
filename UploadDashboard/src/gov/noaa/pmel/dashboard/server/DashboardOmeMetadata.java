@@ -227,12 +227,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		SimpleDateFormat dateParser = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 		dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
 		try {
-			scMData.setBeginTime(dateParser.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00"));
+			scMData.setBeginTime(dateParser.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00").getTime() / 1000.0);
 		} catch (ParseException ex) {
 			scMData.setBeginTime(null);
 		}
 		try {
-			scMData.setEndTime(dateParser.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59"));
+			scMData.setEndTime(dateParser.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59").getTime() / 1000.0);
 		} catch (ParseException ex) {
 			scMData.setEndTime(null);
 		}

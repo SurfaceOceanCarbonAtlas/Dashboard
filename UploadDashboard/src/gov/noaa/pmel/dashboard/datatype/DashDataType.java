@@ -165,13 +165,44 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
 	/**
 	 * @param strRepr
-	 * 		string representation of a value of the data type class
+	 * 		string representation of the value to return
 	 * @return
 	 * 		value represented by the string
 	 * @throws IllegalArgumentException
 	 * 		if the string representation cannot be interpreted
 	 */
 	public abstract T dataValueOf(String strRepr) throws IllegalArgumentException;
+
+	/**
+	 * Returns a value converter to interpreting string representations to data 
+	 * values of this type.  This converter use the given missing value string
+	 * to interpret missing values.  If required, values should also be converted
+	 * to the standard unit (the first unit in the units array) for this data type.
+	 * 
+	 * @param inputUnit
+	 * 		unit/format of the input data string values.  If null, the value is
+	 * 		unitless, and in this case the standard value should also be unitless 
+	 * 		(empty string).  The value returned, if the string does not represent
+	 * 		a missing value, should just be the value returned by 
+	 * 		{@link #dataValueOf(String)}.
+	 * @param missingValue
+	 * 		missing value for this converter; if null, standard missing values 
+	 * 		are to be used
+	 * @param stdArray
+	 * 		the standardized data that has been converted so far.  This is provided 
+	 * 		for data conversions that require standardized data from other data 
+	 * 		columns.
+	 * @return
+	 * 		a value converter, using the given missing value string, for converting 
+	 * 		the data value strings in the given units to data values in standard units
+	 * @throws IllegalArgumentException
+	 * 		if there is no converter for performing this conversion
+	 * @throws IllegalStateException
+	 * 		if the converter depends on other data that has not yet been standardized
+	 */
+	public abstract ValueConverter<T> getStandardizer(String inputUnit, 
+			String missingValue, StdDataArray stdArray) 
+					throws IllegalArgumentException, IllegalStateException;
 
 	/**
 	 * Verifies that the values minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal,
@@ -323,19 +354,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	public int hashCode() {
 		final int prime = 37;
 		int result = 0;
-		result = prime * result + sortOrder.hashCode();
-		result = prime * result + displayName.hashCode();
-		result = prime * result + varName.hashCode();
-		result = prime * result + getDataClassName().hashCode();
-		result = prime * result + description.hashCode();
-		result = prime * result + standardName.hashCode();
-		result = prime * result + categoryName.hashCode();
 
-		result = prime * result + Integer.hashCode(units.size());
-		for ( String val : units )
-			result = prime * result + val.hashCode();
-
-		result *= prime;
+		// Most significant items last (in case there is overflow)
 		if ( minQuestionVal != null)
 			result += minQuestionVal.hashCode();
 
@@ -350,6 +370,18 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		result *= prime;
 		if ( maxQuestionVal != null)
 			result += maxQuestionVal.hashCode();
+
+		for ( String val : units )
+			result = prime * result + val.hashCode();
+		result = prime * result + Integer.hashCode(units.size());
+
+		result = prime * result + categoryName.hashCode();
+		result = prime * result + standardName.hashCode();
+		result = prime * result + description.hashCode();
+		result = prime * result + getDataClassName().hashCode();
+		result = prime * result + varName.hashCode();
+		result = prime * result + displayName.hashCode();
+		result = prime * result + sortOrder.hashCode();
 
 		return result;
 	}

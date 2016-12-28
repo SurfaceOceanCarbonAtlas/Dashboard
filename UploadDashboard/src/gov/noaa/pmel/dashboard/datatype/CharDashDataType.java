@@ -79,32 +79,32 @@ public class CharDashDataType extends DashDataType<Character> {
 			try {
 				minQuestionVal = dataValueOf(minQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum questionable value: \"" + 
+						minQuestionStrVal + "\"");
 			}
 		}
 		if ( minAcceptStrVal != null ) {
 			try {
 				minAcceptVal = dataValueOf(minAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum acceptable value: \"" + 
+						minAcceptStrVal + "\"");
 			}
 		}
 		if ( maxAcceptStrVal != null ) {
 			try {
 				maxAcceptVal = dataValueOf(maxAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum acceptable value: \"" + 
+						maxAcceptStrVal + "\"");
 			}
 		}
 		if ( maxQuestionStrVal != null ) {
 			try {
 				maxQuestionVal = dataValueOf(maxQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum questionable value: \"" + 
+						maxQuestionStrVal + "\"");
 			}
 		}
 		validateLimits();
@@ -166,13 +166,32 @@ public class CharDashDataType extends DashDataType<Character> {
 	@Override
 	public Character dataValueOf(String strVal) {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("no value given");
 		String trimVal = strVal.trim();
 		if ( trimVal.isEmpty() && (strVal.length() == 1) )
 			return strVal.charAt(0);
 		if ( trimVal.length() == 1 )
 			return trimVal.charAt(0);
-		throw new IllegalArgumentException("invalid character value \"" + strVal + "\"");		
+		throw new IllegalArgumentException("not a character value");		
+	}
+
+	@Override
+	public ValueConverter<Character> getStandardizer(String inputUnit, String missingValue, 
+			StdDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+
+		if ( (inputUnit != null) || ! DashboardUtils.STRING_MISSING_VALUE.equals(units.get(0)) )
+			throw new IllegalArgumentException("unit conversion of characters not supported");
+
+		ValueConverter<Character> stdConverter = new ValueConverter<Character>(null, null, missingValue) {
+			@Override
+			public Character convertValueOf(String valueString) {
+				if ( isMissingValue(valueString, true) )
+					return null;
+				return dataValueOf(valueString);
+			}
+		};
+
+		return stdConverter;
 	}
 
 	@Override

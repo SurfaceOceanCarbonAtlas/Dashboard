@@ -16,15 +16,20 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class ADCMessage implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1388700190317730653L;
+	private static final long serialVersionUID = -4524821044077234564L;
 
 	/**
 	 * Enumerated type for the severity of the issue in the message
 	 */
 	public enum SCMsgSeverity implements Serializable, IsSerializable {
+		/** unassigned or just a comment */
 		UNKNOWN,
+		/** warning, WOCE-3 */
 		WARNING,
-		ERROR
+		/** error, WOCE-4, that could remain */
+		ERROR,
+		/** critical error must be corrected */
+		CRITICAL
 	}
 
 	protected SCMsgSeverity severity;

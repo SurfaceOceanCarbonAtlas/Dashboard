@@ -79,32 +79,32 @@ public class DoubleDashDataType extends DashDataType<Double> {
 			try {
 				minQuestionVal = dataValueOf(minQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum questionable value: \"" + 
+						minQuestionStrVal + "\"");
 			}
 		}
 		if ( minAcceptStrVal != null ) {
 			try {
 				minAcceptVal = dataValueOf(minAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum acceptable value: \"" + 
+						minAcceptStrVal + "\"");
 			}
 		}
 		if ( maxAcceptStrVal != null ) {
 			try {
 				maxAcceptVal = dataValueOf(maxAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum acceptable value: \"" + 
+						maxAcceptStrVal + "\"");
 			}
 		}
 		if ( maxQuestionStrVal != null ) {
 			try {
 				maxQuestionVal = dataValueOf(maxQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum questionable value: \"" + 
+						maxQuestionStrVal + "\"");
 			}
 		}
 		validateLimits();
@@ -166,16 +166,28 @@ public class DoubleDashDataType extends DashDataType<Double> {
 	@Override
 	public Double dataValueOf(String strVal) {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("no value given");
 		String trimVal = strVal.trim();
 		Double value;
 		try {
 			value = Double.valueOf(trimVal);
 		} catch ( NumberFormatException ex ) {
-			throw new IllegalArgumentException("invalid floating-point value \"" + 
-					trimVal + "\": " + ex.getMessage());	
+			throw new IllegalArgumentException("not a floating-point value");	
 		}
 		return value;
+	}
+
+	@Override
+	public ValueConverter<Double> getStandardizer(String inputUnit, String missingValue, 
+			StdDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+		String outputUnit = units.get(0);
+		if ( DashboardUtils.STRING_MISSING_VALUE.equals(outputUnit) )
+			outputUnit = null;
+
+		// TODO: catch IllegalArgumentExceptions and use other converters (that need to be written)
+		ValueConverter<Double> stdConverter = new LinearConverter(inputUnit, outputUnit, missingValue);
+		
+		return stdConverter;
 	}
 
 	@Override

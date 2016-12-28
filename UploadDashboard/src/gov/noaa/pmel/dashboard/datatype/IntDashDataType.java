@@ -79,32 +79,32 @@ public class IntDashDataType extends DashDataType<Integer> {
 			try {
 				minQuestionVal = dataValueOf(minQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum questionable value: \"" + 
+						minQuestionStrVal + "\"");
 			}
 		}
 		if ( minAcceptStrVal != null ) {
 			try {
 				minAcceptVal = dataValueOf(minAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid minimum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid minimum acceptable value: \"" + 
+						minAcceptStrVal + "\"");
 			}
 		}
 		if ( maxAcceptStrVal != null ) {
 			try {
 				maxAcceptVal = dataValueOf(maxAcceptStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum acceptable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum acceptable value: \"" + 
+						maxAcceptStrVal + "\"");
 			}
 		}
 		if ( maxQuestionStrVal != null ) {
 			try {
 				maxQuestionVal = dataValueOf(maxQuestionStrVal);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IllegalArgumentException("invalid maximum questionable value: " + 
-						ex.getMessage(), ex);
+				throw new IllegalArgumentException("invalid maximum questionable value: \"" + 
+						maxQuestionStrVal + "\"");
 			}
 		}
 		validateLimits();
@@ -166,16 +166,38 @@ public class IntDashDataType extends DashDataType<Integer> {
 	@Override
 	public Integer dataValueOf(String strVal) {
 		if ( strVal == null )
-			throw new IllegalArgumentException("null string given");
+			throw new IllegalArgumentException("no value given");
 		String trimVal = strVal.trim();
 		Integer value;
 		try {
 			value = Integer.valueOf(trimVal);
 		} catch ( NumberFormatException ex ) {
-			throw new IllegalArgumentException("invalid decimal integer value \"" + 
-					trimVal + "\": " + ex.getMessage());	
+			throw new IllegalArgumentException("not an integer value");	
 		}
 		return value;
+	}
+
+	@Override
+	public ValueConverter<Integer> getStandardizer(String inputUnit, String missingValue, StdDataArray stdArray)
+			throws IllegalArgumentException, IllegalStateException {
+		String stdUnit = units.get(0);
+		if ( DashboardUtils.STRING_MISSING_VALUE.equals(stdUnit) )
+			stdUnit = null;
+		if ( ( (inputUnit == null) && (stdUnit != null) ) ||
+			 ( (inputUnit != null) && ( ! inputUnit.equals(stdUnit) ) ) )
+			throw new IllegalArgumentException("unit conversion of integers not supported");
+
+		ValueConverter<Integer> stdConverter = new ValueConverter<Integer>(null, null, missingValue) {
+			@Override
+			public Integer convertValueOf(String valueString) 
+					throws IllegalArgumentException, IllegalStateException {
+				if ( isMissingValue(valueString, true) )
+					return null;
+				return dataValueOf(valueString);
+			}
+		};
+
+		return stdConverter;
 	}
 
 	@Override
