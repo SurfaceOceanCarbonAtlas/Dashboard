@@ -160,13 +160,17 @@ public class StdDataArray {
 							try {
 								stdObjects[j][k] = stdizer.convertValueOf(strDataVals[j][k]);
 							} catch ( IllegalArgumentException ex ) {
+								stdObjects[j][k] = null;
 								ADCMessage msg = new ADCMessage();
 								msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
 								msg.setRowNumber(j+1);
 								msg.setColNumber(k+1);
 								msg.setColName(userColNames[k]);
 								msg.setGeneralComment(ex.getMessage());
-								msg.setDetailedComment(ex.getMessage() + ": \"" + strDataVals[j][k] + "\"");
+								if ( strDataVals[j][k] == null )
+									msg.setDetailedComment(ex.getMessage());
+								else
+									msg.setDetailedComment(ex.getMessage() + ": \"" + strDataVals[j][k] + "\"");
 								msgList.add(msg);
 							}
 						}
@@ -199,7 +203,8 @@ public class StdDataArray {
 	 * @param columnIdx
 	 * 		index of the data column
 	 * @return
-	 * 		standard value object; null is returned for "missing value"
+	 * 		standard value object; null is returned for "missing value" or
+	 * 		values that could not be interpreted
 	 * @throws IndexOutOfBoundsException
 	 * 		if either the sample index or the column index is invalid
 	 * @throws IllegalArgumentException 

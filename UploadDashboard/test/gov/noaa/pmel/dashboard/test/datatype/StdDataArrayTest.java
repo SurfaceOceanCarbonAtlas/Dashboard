@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.test.datatype;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.StdDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
 
@@ -27,6 +30,9 @@ import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
  * @author Karl Smith
  */
 public class StdDataArrayTest {
+
+	static final String NO_VALUE_ERRMSG = "no value given";
+	static final String INVALID_FP_VALUE_ERRMSG = "not a valid floating-point value";
 
 	static final KnownDataTypes KNOWN_USER_TYPES;
 
@@ -82,9 +88,9 @@ public class StdDataArrayTest {
 			Arrays.asList("Expocode,Cruise,Month,Day,Year,Hour,Minute,Latitude,Longitude,SST,Salinity,xCO2_water_SST,pCO2_water_Teq,P_atm,Speed".split(","))
 	);
 	static final ArrayList<ArrayList<String>> DATA_VALUE_STRINGS = new ArrayList<ArrayList<String>>(Arrays.asList(
-			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3".split(","))), 
-			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3".split(","))), 
-			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2".split(","))),  
+			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,9009.281,-999,extra".split(","))), 
+			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298".split(","))), 
+			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,garbage ".split(","))),  
 			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,51,29.0517,-92.7592,28.99,33.44,399.7,382.7,1009.302,0.3".split(","))), 
 			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,52,29.0516,-92.7592,28.9,33.39,397.9,381,1009.29,0.3".split(","))), 
 			new ArrayList<String>(Arrays.asList("31B520060606,GM0606,6,10,2006,23,53,29.0516,-92.7593,28.93,33.38,397.1,380.3,1009.283,0.3".split(","))), 
@@ -129,7 +135,43 @@ public class StdDataArrayTest {
 	@Test
 	public void testStandardizeData() {
 		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		stdData.standardizeData(DATA_VALUE_STRINGS);
+		Integer numDataCols = DATA_COLUMN_TYPES.size();
+
+		// Errors in data: first row has too many values (one message), 
+		// second row does not have enough values (two messages; one for the row, one for the value),
+		// third row has value that cannot be interpreted (one messages)
+		// Not the excessive large pressure in the first row should NOT generate an error at this time
+		ArrayList<ADCMessage> msgList = stdData.standardizeData(DATA_VALUE_STRINGS);
+		assertEquals(4, msgList.size());
+
+		ADCMessage msg = msgList.get(0);
+		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Integer.valueOf(1), msg.getRowNumber());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
+		assertEquals(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
+		assertTrue( msg.getDetailedComment().contains(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
+
+		msg = msgList.get(1);
+		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Integer.valueOf(2), msg.getRowNumber());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
+		assertEquals(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
+		assertTrue( msg.getDetailedComment().contains(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
+
+		msg = msgList.get(2);
+		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Integer.valueOf(2), msg.getRowNumber());
+		assertEquals(Integer.valueOf(numDataCols), msg.getColNumber());
+		assertEquals(NO_VALUE_ERRMSG, msg.getGeneralComment());
+		assertEquals(NO_VALUE_ERRMSG, msg.getDetailedComment());
+
+		msg = msgList.get(3);
+		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Integer.valueOf(3), msg.getRowNumber());
+		assertEquals(Integer.valueOf(numDataCols), msg.getColNumber());
+		assertEquals(INVALID_FP_VALUE_ERRMSG, msg.getGeneralComment());
+		assertTrue( msg.getDetailedComment().contains(INVALID_FP_VALUE_ERRMSG) );
+
 		int numRows = DATA_VALUE_STRINGS.size();
 		// First two columns are Strings
 		for (int k = 0; k < 2; k++) {
@@ -138,20 +180,33 @@ public class StdDataArrayTest {
 				assertEquals(DATA_VALUE_STRINGS.get(j).get(k), value);
 			}
 		}
-		// Next five are Integer
+		// Next five columns are Integer
 		for (int k = 2; k < 7; k++) {
 			for (int j = 0; j < numRows; j++) {
 				Integer value = (Integer) stdData.getStdVal(j, k);
 				assertEquals(Integer.valueOf(DATA_VALUE_STRINGS.get(j).get(k)), value);
 			}
 		}
-		// Rest are Double
-		for (int k = 7; k < DATA_COLUMN_TYPES.size(); k++) {
+		// Rest of the columns are Double
+		for (int k = 7; k < numDataCols-1; k++) {
 			for (int j = 0; j < numRows; j++) {
 				Double value = (Double) stdData.getStdVal(j, k);
 				assertEquals(Double.valueOf(DATA_VALUE_STRINGS.get(j).get(k)), value, 1.0E-6);
 			}
 		}
+		// Check the invalid values
+		assertNull( stdData.getStdVal(0,numDataCols-1) );
+		assertNull( stdData.getStdVal(1,numDataCols-1) );
+		assertNull( stdData.getStdVal(2,numDataCols-1) );
+		for (int j = 3; j < numRows; j++) {
+			Double value = (Double) stdData.getStdVal(j, numDataCols-1);
+			assertEquals(Double.valueOf(DATA_VALUE_STRINGS.get(j).get(numDataCols-1)), value, 1.0E-6);
+		}
+
+		ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
+				DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()) );
+		msgList = stdData.standardizeData(subset);
+		assertTrue( msgList.isEmpty() );
 	}
 
 	/**
@@ -177,7 +232,7 @@ public class StdDataArrayTest {
 		assertTrue( stdData.equals(other) );
 
 		ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
-				DATA_VALUE_STRINGS.subList(0, DATA_VALUE_STRINGS.size() - 1) );
+				DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()) );
 		other.standardizeData(subset);
 		assertFalse( stdData.hashCode() == other.hashCode() );
 		assertFalse( stdData.equals(other) );
