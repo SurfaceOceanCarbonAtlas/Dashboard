@@ -54,14 +54,20 @@ public class StdDataArray {
 		if ( (dataColumnTypes == null) || dataColumnTypes.isEmpty() )
 			throw new IllegalArgumentException("no data column types given");
 		numDataCols = dataColumnTypes.size();
+		if ( userColumnNames.size() != numDataCols )
+			throw new IllegalArgumentException("Different number of data column names (" + 
+					userColumnNames.size() + ") and types (" +  numDataCols + ")");
+		userColNames = new String[numDataCols];
 		dataTypes = new DashDataType<?>[numDataCols];
 		userUnits = new String[numDataCols];
 		userMissVals = new String[numDataCols];
 		for (int k = 0; k < numDataCols; k++) {
+			userColNames[k] = userColumnNames.get(k);
 			DataColumnType dataColType = dataColumnTypes.get(k);
 			dataTypes[k] = knownTypes.getDataType(dataColType);
 			if ( dataTypes[k] == null )
-				throw new IllegalArgumentException("unknown data column type: " + dataColType.getDisplayName());
+				throw new IllegalArgumentException("unknown data column type: " + 
+						dataColType.getDisplayName());
 			userUnits[k] = dataColType.getUnits().get(dataColType.getSelectedUnitIndex());
 			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
 				userUnits[k] = null;
@@ -217,13 +223,7 @@ public class StdDataArray {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = numDataCols;
-		result = prime * result + numSamples;
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( standardized[k] != null )
-				result += standardized[k].hashCode();
-		}
+		int result = 0;
 		for (int j = 0; j < numSamples; j++) {
 			for (int k = 0; k < numDataCols; k++) {
 				result *= prime;
@@ -231,6 +231,33 @@ public class StdDataArray {
 					result += stdObjects[j][k].hashCode(); 
 			}
 		}
+		for (int k = 0; k < numDataCols; k++) {
+			result *= prime;
+			if ( standardized[k] != null )
+				result += standardized[k].hashCode();
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			result *= prime;
+			if ( userMissVals[k] != null )
+				result += userMissVals[k].hashCode();
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			result *= prime;
+			if ( userUnits[k] != null )
+				result += userUnits[k].hashCode();
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			result *= prime;
+			if ( dataTypes[k] != null )
+				result += dataTypes[k].hashCode();
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			result *= prime;
+			if ( userColNames[k] != null )
+				result += userColNames[k].hashCode();
+		}
+		result = prime * result + numDataCols;
+		result = prime * result + numSamples;
 		return result;
 	}
 
@@ -246,11 +273,51 @@ public class StdDataArray {
 			return false;
 		}
 		StdDataArray other = (StdDataArray) obj;
+		if (numSamples != other.numSamples) {
+			return false;
+		}
 		if (numDataCols != other.numDataCols) {
 			return false;
 		}
-		if (numSamples != other.numSamples) {
-			return false;
+		for (int k = 0; k < numDataCols; k++) {
+			if ( userColNames[k] == null ) {
+				if ( other.userColNames[k] != null )
+					return false;
+			}
+			else {
+				if ( ! userColNames[k].equals(other.userColNames[k]) )
+					return false;
+			}
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			if ( dataTypes[k] == null ) {
+				if ( other.dataTypes[k] != null )
+					return false;
+			}
+			else {
+				if ( ! dataTypes[k].equals(other.dataTypes[k]) )
+					return false;
+			}
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			if ( userUnits[k] == null ) {
+				if ( other.userUnits[k] != null )
+					return false;
+			}
+			else {
+				if ( ! userUnits[k].equals(other.userUnits[k]) )
+					return false;
+			}
+		}
+		for (int k = 0; k < numDataCols; k++) {
+			if ( userMissVals[k] == null ) {
+				if ( other.userMissVals[k] != null )
+					return false;
+			}
+			else {
+				if ( ! userMissVals[k].equals(other.userMissVals[k]) )
+					return false;
+			}
 		}
 		for (int k = 0; k < numDataCols; k++) {
 			if ( standardized[k] == null ) {
@@ -280,13 +347,17 @@ public class StdDataArray {
 	@Override
 	public String toString() {
 		String repr = "StdDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols;
-		repr += "\n  standardized=["; 
-		for (int k = 0; k < numDataCols; k++) {
-			if ( k > 0 )
-				repr += ", ";
-			repr += String.valueOf(standardized[k]);
-		}
-		repr += "]\n  stdObjects=";
+		List<String> namesList = Arrays.asList(userColNames);
+		repr += "\n  userColNames=" + namesList.toString(); 
+		List<DashDataType<?>> typesList = Arrays.asList(dataTypes);
+		repr += "\n  userColTypes=" + typesList.toString(); 
+		namesList = Arrays.asList(userUnits);
+		repr += "\n  userUnits=" + namesList.toString();
+		namesList = Arrays.asList(userMissVals);
+		repr += "\n  userMissVals=" + namesList.toString();
+		List<Boolean> boolList = Arrays.asList(standardized);
+		repr += "\n  standardized=" + boolList.toString();
+		repr += "\n  stdObjects=[";
 		for (int j = 0; j < numSamples; j++) {
 			if ( j > 0 )
 				repr += ",";
