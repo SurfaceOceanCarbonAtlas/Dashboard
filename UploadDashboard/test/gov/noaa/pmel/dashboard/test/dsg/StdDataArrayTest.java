@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.datatype;
+package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,22 +10,23 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
 
 /**
- * Unit tests for methods in {@link gov.noaa.pmel.dashboard.datatype.StdDataArray}
+ * Unit tests for methods in {@link gov.noaa.pmel.dashboard.dsg.StdDataArray}
  * 
  * @author Karl Smith
  */
@@ -116,21 +117,24 @@ public class StdDataArrayTest {
 	));
 	
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.StdDataArray#getDataTypes()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumDataCols()} and
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getDataTypes()} 
 	 */
 	@Test
 	public void testGetDataTypes() {
 		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		int numColumns = stdData.getNumDataCols();
+		assertEquals(DATA_COLUMN_TYPES.size(), numColumns);
 		List<DashDataType<?>> dataTypes = stdData.getDataTypes();
-		int numColumns = DATA_COLUMN_TYPES.size();
 		assertEquals(numColumns, dataTypes.size());
 		for (int k = 0; k < numColumns; k++)
 			assertEquals(DATA_COLUMN_DASH_TYPES.get(k), dataTypes.get(k));
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.StdDataArray#standardizeData(java.util.ArrayList)}
-	 * and {@link gov.noaa.pmel.dashboard.datatype.StdDataArray#getStdVal(int, int)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#standardizeData(java.util.ArrayList)},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumSamples()}, and
+	 * and {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getStdVal(int, int)}.
 	 */
 	@Test
 	public void testStandardizeData() {
@@ -142,6 +146,7 @@ public class StdDataArrayTest {
 		// third row has value that cannot be interpreted (one messages)
 		// Not the excessive large pressure in the first row should NOT generate an error at this time
 		ArrayList<ADCMessage> msgList = stdData.standardizeData(DATA_VALUE_STRINGS);
+		assertEquals(DATA_VALUE_STRINGS.size(), stdData.getNumSamples());
 		assertEquals(4, msgList.size());
 
 		ADCMessage msg = msgList.get(0);
@@ -161,14 +166,14 @@ public class StdDataArrayTest {
 		msg = msgList.get(2);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(2), msg.getRowNumber());
-		assertEquals(Integer.valueOf(numDataCols), msg.getColNumber());
+		assertEquals(numDataCols, msg.getColNumber());
 		assertEquals(NO_VALUE_ERRMSG, msg.getGeneralComment());
 		assertEquals(NO_VALUE_ERRMSG, msg.getDetailedComment());
 
 		msg = msgList.get(3);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(3), msg.getRowNumber());
-		assertEquals(Integer.valueOf(numDataCols), msg.getColNumber());
+		assertEquals(numDataCols, msg.getColNumber());
 		assertEquals(INVALID_FP_VALUE_ERRMSG, msg.getGeneralComment());
 		assertTrue( msg.getDetailedComment().contains(INVALID_FP_VALUE_ERRMSG) );
 
@@ -210,8 +215,56 @@ public class StdDataArrayTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.datatype.StdDataArray#hashCode()} and
-	 * {@link gov.noaa.pmel.dashboard.datatype.StdDataArray#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getSampleLongitudes()},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getSampleLatitudes()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getSampleDepths()}, and 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getSampleTimes()}.
+	 */
+	@Test
+	public void testGetSampleLonLatDepthTime() {
+		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		stdData.standardizeData(DATA_VALUE_STRINGS);
+		int numSamples = stdData.getNumSamples();
+
+		Double[] latitudes = new Double[numSamples];
+		Double[] longitudes = new Double[numSamples];
+		for (int j = 0; j < numSamples; j++) {
+			ArrayList<String> dataRow = DATA_VALUE_STRINGS.get(j);
+			latitudes[j] = Double.valueOf(dataRow.get(7));
+			longitudes[j] = Double.valueOf(dataRow.get(8));
+		}
+		Double[] sampleLongitudes = stdData.getSampleLongitudes();
+		Double[] sampleLatitudes = stdData.getSampleLatitudes();
+		for (int j = 0; j < numSamples; j++)
+			assertEquals(longitudes[j], sampleLongitudes[j], 1.0E-6);
+		for (int j = 0; j < numSamples; j++)
+			assertEquals(latitudes[j], sampleLatitudes[j], 1.0E-6);
+
+		boolean caught = false;
+		try {
+			stdData.getSampleDepths();
+		} catch ( IllegalStateException ex ) {
+			caught = true;
+		}
+		assertTrue( caught );
+
+		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		cal.clear();
+		// in Calendar, month number is zero-based
+		cal.set(2006,5,10,23,48,0);
+		Double[] times = new Double[numSamples];
+		times[0] = cal.getTimeInMillis() / 1000.0;
+		// data times are each a minute apart; no second given
+		for (int j = 1; j < numSamples; j++)
+			times[j] = times[0] + j * 60.0;
+		Double[] sampleTimes = stdData.getSampleTimes();
+		for (int j = 0; j < numSamples; j++)
+			assertEquals(times[j], sampleTimes[j], 1.0E-6);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hashCode()} and
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {

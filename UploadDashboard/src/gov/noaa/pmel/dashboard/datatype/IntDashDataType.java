@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.datatype;
 
 import java.util.Collection;
 
+import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
