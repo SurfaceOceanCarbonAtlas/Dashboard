@@ -37,13 +37,10 @@ public class DsgNcFile extends File {
 	private static final long serialVersionUID = 8793930730574156281L;
 
 	private static final String DSG_VERSION = "DsgNcFile 2.0";
-	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
-	/** 1970-01-01 00:00:00 */
-	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
 	private DsgMetadata metadata;
-	private ArrayList<DsgData> dataList;
+	private StdDataArray stddata;
 
 	/**
 	 * See {@link java.io.File#File(java.lang.String)}
@@ -52,7 +49,7 @@ public class DsgNcFile extends File {
 	public DsgNcFile(String filename) {
 		super(filename);
 		metadata = null;
-		dataList = null;
+		stddata = null;
 	}
 
 	/**
@@ -62,7 +59,7 @@ public class DsgNcFile extends File {
 	public DsgNcFile(File parent, String child) {
 		super(parent, child);
 		metadata = null;
-		dataList = null;
+		stddata = null;
 	}
 
 	/**
@@ -109,19 +106,37 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * Creates this NetCDF DSG file with the contents of the given 
-	 * DsgMetadata object and list of DsgData objects.
-	 * The internal metadata and data list references are set to 
-	 * the given arguments. 
+	 * Creates this NetCDF DSG file with the metadata given in mdata and the 
+	 * standardized data in userStdData for those data column types that are 
+	 * found in dataFileTypes.  The internal DsgMetadata reference is updated 
+	 * to the given DsgMetadata object, and the internal StdDataArray reference 
+	 * is updated to a new StdDataArray object created from the known data file 
+	 * columns in the given StdDataArray object.  The internal StdDataArray
+	 * object will also have the following columns added if not already present:
+	 * <ul>
+	 *   <li>{@link DashboardServerUtils#YEAR}</li>
+	 *   <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
+	 *   <li>{@link DashboardServerUtils#DAY_OF_MONTH}</li>
+	 *   <li>{@link DashboardServerUtils#HOUR_OF_DAY}</li>
+	 *   <li>{@link DashboardServerUtils#MINUTE_OF_HOUR}</li>
+	 *   <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
+	 *   <li>{@link DashboardServerUtils#TIME}</li>
+	 *  </ul>
+	 * TIME is always added and computed since it is not a user-provided type.
+	 * If the time to the seconds is not provided, the seconds values are all 
+	 * set to zero and the added SECOND_OF_MINUTE data will all be zero.
 	 * 
-	 * @param mdata
-	 * 		metadata for the cruise
-	 * @param data
-	 * 		list of data for the cruise
+	 * @param metadata
+	 * 		metadata for the dataset
+	 * @param userStdData
+	 * 		standardized user-provided data
+	 * @param dataFileTypes
+	 * 		known data types for data files
 	 * @throws IllegalArgumentException
-	 * 		if either argument is null,
-	 * 		if the list of DsgData objects is empty, or
-	 * 		if a date/time in the data is missing or invalid
+	 * 		if any argument is null,
+	 * 		if any of the data types is {@link DashboardServerUtils#UNKNOWN}
+	 * 		if any sample longitude, latitude, sample depth is missing,
+	 * 		if any sample time cannot be computed
 	 * @throws IOException
 	 * 		if creating the NetCDF file throws one
 	 * @throws InvalidRangeException
@@ -129,15 +144,40 @@ public class DsgNcFile extends File {
 	 * @throws IllegalAccessException
 	 * 		if creating the NetCDF file throws one
 	 */
-	public void create(DsgMetadata mdata, ArrayList<DsgData> data) 
+	public void create(DsgMetadata metadata, StdDataArray userStdData, KnownDataTypes dataFileTypes) 
 			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
-		metadata = mdata;
-		dataList = data;
+		this.metadata = metadata;
+		this.stddata = userStdData;
 
 		if ( metadata == null )
-			throw new IllegalArgumentException("DsgMetadata given to create cannot be null");
-		if ( (dataList == null) || (dataList.size() < 1) )
-			throw new IllegalArgumentException("DsgData list given to create cannot be null or empty");
+			throw new IllegalArgumentException("no metadata given");
+		if ( userStdData == null )
+			throw new IllegalArgumentException("no data given");
+		int numSamples = stddata.getNumSamples();
+		int numColumns = stddata.getNumDataCols();
+		if ( (numSamples <= 0) || (numColumns <= 0) )
+			throw new IllegalArgumentException("no data values given");
+		List<DashDataType<?>> dataTypes = stddata.getDataTypes();
+		// Check that sample longitude, latitude, depth, and time are all valid; 
+		// keep the time values for adding
+		Double[] timeVals;
+		try {
+			for ( Double value : userStdData.getSampleLongitudes() )
+				if ( value == null )
+					throw new IllegalArgumentException("a longitude value is missing");
+			for ( Double value : userStdData.getSampleLatitudes() )
+				if ( value == null )
+					throw new IllegalArgumentException("a latitude value is missing");
+			for ( Double value : userStdData.getSampleDepths() )
+				if ( value == null )
+					throw new IllegalArgumentException("a sample depth value is missing");
+			timeVals = userStdData.getSampleTimes();
+			for ( Double value : timeVals )
+				if ( value == null )
+					throw new IllegalArgumentException("a sample date/time value is missing");
+		} catch ( IllegalStateException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
 
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
@@ -162,7 +202,7 @@ public class DsgNcFile extends File {
 			List<Dimension> trajDims = new ArrayList<Dimension>();
 			trajDims.add(traj);
 
-			Dimension obslen = ncfile.addDimension(null, "obs", dataList.size());
+			Dimension obslen = ncfile.addDimension(null, "obs", numSamples);
 			List<Dimension> dataDims = new ArrayList<Dimension>();
 			dataDims.add(obslen);
 
