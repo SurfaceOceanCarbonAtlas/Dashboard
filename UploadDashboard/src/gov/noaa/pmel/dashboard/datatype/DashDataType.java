@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -202,7 +202,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * 		if the converter depends on other data that has not yet been standardized
 	 */
 	public abstract ValueConverter<T> getStandardizer(String inputUnit, 
-			String missingValue, StdDataArray stdArray) 
+			String missingValue, StdUserDataArray stdArray) 
 					throws IllegalArgumentException, IllegalStateException;
 
 	/**

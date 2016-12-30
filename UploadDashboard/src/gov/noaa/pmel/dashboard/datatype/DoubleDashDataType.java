@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.datatype;
 
 import java.util.Collection;
 
-import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -180,7 +180,7 @@ public class DoubleDashDataType extends DashDataType<Double> {
 
 	@Override
 	public ValueConverter<Double> getStandardizer(String inputUnit, String missingValue, 
-			StdDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+			StdUserDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
 		String outputUnit = units.get(0);
 		if ( DashboardUtils.STRING_MISSING_VALUE.equals(outputUnit) )
 			outputUnit = null;

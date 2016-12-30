@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.datatype;
 
 import java.util.Collection;
 
-import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -178,7 +178,7 @@ public class CharDashDataType extends DashDataType<Character> {
 
 	@Override
 	public ValueConverter<Character> getStandardizer(String inputUnit, String missingValue, 
-			StdDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+			StdUserDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
 
 		if ( (inputUnit != null) || ! DashboardUtils.STRING_MISSING_VALUE.equals(units.get(0)) )
 			throw new IllegalArgumentException("unit conversion of characters not supported");

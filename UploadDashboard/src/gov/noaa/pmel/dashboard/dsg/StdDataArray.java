@@ -3,19 +3,18 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.ValueConverter;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 
@@ -27,64 +26,158 @@ import ucar.nc2.time.CalendarDate;
  */
 public class StdDataArray {
 
-	public static final String INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG = 
-			"inconstistent number of data values";
-
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
-	private int numSamples;
-	private int numDataCols;
-	private String[] userColNames;
-	private DashDataType<?>[] dataTypes;
-	private String[] userUnits;
-	private String[] userMissVals;
-	private Boolean[] standardized;
-	private Object[][] stdObjects;
-	private int longitudeIndex;
-	private int latitudeIndex;
-	private int sampleDepthIndex;
-	private int timestampIndex;
-	private int dateIndex;
-	private int yearIndex;
-	private int monthOfYearIndex;
-	private int dayOfMonthIndex;
-	private int timeOfDayIndex;
-	private int hourOfDayIndex;
-	private int minuteOfHourIndex;
-	private int secondOfMinuteIndex;
-	private int dayOfYearIndex;
-	private int secondOfDayIndex;
+	protected int numSamples;
+	protected int numDataCols;
+	protected DashDataType<?>[] dataTypes;
+	protected Object[][] stdObjects;
+	protected int longitudeIndex;
+	protected int latitudeIndex;
+	protected int sampleDepthIndex;
+	protected int timestampIndex;
+	protected int dateIndex;
+	protected int yearIndex;
+	protected int monthOfYearIndex;
+	protected int dayOfMonthIndex;
+	protected int timeOfDayIndex;
+	protected int hourOfDayIndex;
+	protected int minuteOfHourIndex;
+	protected int secondOfMinuteIndex;
+	protected int dayOfYearIndex;
+	protected int secondOfDayIndex;
 
 	/**
-	 * Create and assign the 1-D arrays of data column information (type, input unit, input 
-	 * missing value) from the given data column descriptions.  The 2-D array of standard
-	 * data objects is not created until {@link #standardizeData(ArrayList)} is called.
+	 * Create and assign the 1-D arrays of data column types from the given data 
+	 * column descriptions.  The 2-D array of standard data objects is not created.
 	 * 
-	 * @param userColumnNames
-	 * 		user's name for the data columns
 	 * @param dataColumnTypes
-	 * 		description of the data columns in each sample
+	 * 		user's description of the data columns in each sample
 	 * @param knownTypes
-	 * 		all known data types that a user may provide
+	 * 		all known user data types
 	 * @throws IllegalArgumentException
-	 * 		if the specified number of samples is not positive,
-	 * 		if dataColumnTypes is empty, or
-	 * 		if a data column descriptions is not a known data type
+	 * 		if there are no user data column descriptions, 
+	 * 		if there are no known user data types, 
+	 * 		if a data column description is not a known user data type
 	 */
-	public StdDataArray(ArrayList<String> userColumnNames, ArrayList<DataColumnType> dataColumnTypes, 
+	protected StdDataArray(List<DataColumnType> dataColumnTypes, 
 			KnownDataTypes knownTypes) throws IllegalArgumentException {
 		if ( (dataColumnTypes == null) || dataColumnTypes.isEmpty() )
 			throw new IllegalArgumentException("no data column types given");
+		if ( (knownTypes == null) || knownTypes.isEmpty() )
+			throw new IllegalArgumentException("no known user data types given");
 		numDataCols = dataColumnTypes.size();
-		if ( userColumnNames.size() != numDataCols )
-			throw new IllegalArgumentException("Different number of data column names (" + 
-					userColumnNames.size() + ") and types (" +  numDataCols + ")");
-		userColNames = new String[numDataCols];
+		numSamples = 0;
+
 		dataTypes = new DashDataType<?>[numDataCols];
-		userUnits = new String[numDataCols];
-		userMissVals = new String[numDataCols];
+		stdObjects = null;
+
+		for (int k = 0; k < numDataCols; k++) {
+			DataColumnType dataColType = dataColumnTypes.get(k);
+			dataTypes[k] = knownTypes.getDataType(dataColType);
+			if ( dataTypes[k] == null )
+				throw new IllegalArgumentException("unknown data column type: " + 
+						dataColType.getDisplayName());
+		}
+
+		assignColumnIndicesOfInterest();
+	}
+
+	/**
+	 * Create with the given data file data types for each column and the given 
+	 * standardized data objects for each data column value (second index) in each 
+	 * sample (first index).  The data types given must be known subclasses of 
+	 * DashDataType valid for data files: {@link CharDashDataType}, 
+	 * {@link IntDashDataType}, or {@link DoubleDashDataType}.
+	 * 
+	 * @param dataColumnTypes
+	 * 		types for the data columns in each sample
+	 * @param stdDataValues
+	 * 		standard values; the value at stdDataValues[j][k] is the appropriate
+	 * 		object for the value of the k-th data column in the j-th sample.
+	 * 		Missing values correspond to null objects.
+	 * @throws IllegalArgumentException
+	 * 		if not data column types are given, 
+	 * 		if a data column type is not a known subclass type,
+	 * 		if no data values are given,
+	 * 		if the number of data columns in the array of data values does 
+	 * 			not match the number of data column types, or
+	 * 		if a data value object is not an appropriate object 
+	 * 			for the data column type
+	 */
+	public StdDataArray(List<DashDataType<?>> dataColumnTypes, 
+			Object[][] stdDataValues) throws IllegalArgumentException {
+		if ( (dataColumnTypes == null) || (dataColumnTypes.isEmpty()) )
+			throw new IllegalArgumentException("no data column types given");
+		numDataCols = dataColumnTypes.size();
+		if ( (stdDataValues == null) || (stdDataValues.length == 0) )
+			throw new IllegalArgumentException("no standardized data values given");
+		numSamples = stdDataValues.length;
+		if ( stdDataValues[0].length != numDataCols )
+			throw new IllegalArgumentException("Different number of data column values (" + 
+					stdDataValues[0].length + ") and types (" +  numDataCols + ")");
+
+		dataTypes = new DashDataType<?>[numDataCols];
+		stdObjects = new Object[numSamples][numDataCols];
+
+		for (int k = 0; k < numDataCols; k++) {
+			DashDataType<?> dtype = dataColumnTypes.get(k);
+			if ( dtype == null )
+				throw new IllegalArgumentException(
+						"no data type for column number" + Integer.toString(k+1));
+			dataTypes[k] = dtype;
+
+			// Catch invalid data column types and invalid data objects 
+			// while assigning the standard data values
+			if ( dtype instanceof CharDashDataType ) {
+				for (int j = 0; j < numSamples; j++) {
+					try {
+						stdObjects[j][k] = (Character) stdDataValues[j][k];
+					} catch ( Exception ex ) {
+						throw new IllegalArgumentException("standard data object for sample number " + 
+								Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+								" is invalid: " + ex.getMessage());
+					}
+				}
+			}
+			else if ( dtype instanceof IntDashDataType ) {
+				for (int j = 0; j < numSamples; j++) {
+					try {
+						stdObjects[j][k] = (Integer) stdDataValues[j][k];
+					} catch ( Exception ex ) {
+						throw new IllegalArgumentException("standard data object for sample number " + 
+								Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+								" is invalid: " + ex.getMessage());
+					}
+				}
+			}
+			else if ( dtype instanceof DoubleDashDataType ) {
+				for (int j = 0; j < numSamples; j++) {
+					try {
+						stdObjects[j][k] = (Double) stdDataValues[j][k];
+					} catch ( Exception ex ) {
+						throw new IllegalArgumentException("standard data object for sample number " + 
+								Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+								" is invalid: " + ex.getMessage());
+					}
+				}
+			}
+			else {
+				throw new IllegalArgumentException("unknown data class type for " + 
+						dtype.getDisplayName() + " (" + dtype.getDataClassName() + ")");
+			}
+		}
+
+		assignColumnIndicesOfInterest();
+	}
+
+	/**
+	 * Assigns the data column indices of interest (longitude, latitude, sample 
+	 * depth, and various time types) from the assigned types of the data columns.
+	 */
+	private void assignColumnIndicesOfInterest() {
 		longitudeIndex = DashboardUtils.INT_MISSING_VALUE;
 		latitudeIndex = DashboardUtils.INT_MISSING_VALUE;
 		sampleDepthIndex = DashboardUtils.INT_MISSING_VALUE;
@@ -100,13 +193,6 @@ public class StdDataArray {
 		dayOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
 		secondOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
 		for (int k = 0; k < numDataCols; k++) {
-			userColNames[k] = userColumnNames.get(k);
-			DataColumnType dataColType = dataColumnTypes.get(k);
-			dataTypes[k] = knownTypes.getDataType(dataColType);
-			if ( dataTypes[k] == null )
-				throw new IllegalArgumentException("unknown data column type: " + 
-						dataColType.getDisplayName());
-
 			if ( DashboardServerUtils.LONGITUDE.typeNameEquals(dataTypes[k]) )
 				longitudeIndex = k;
 			else if ( DashboardServerUtils.LATITUDE.typeNameEquals(dataTypes[k]) )
@@ -135,125 +221,8 @@ public class StdDataArray {
 				dayOfYearIndex = k;
 			else if ( DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(dataTypes[k]) )
 				secondOfDayIndex = k;
-				
-			userUnits[k] = dataColType.getUnits().get(dataColType.getSelectedUnitIndex());
-			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
-				userUnits[k] = null;
-			userMissVals[k] = dataColType.getSelectedMissingValue();
-			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userMissVals[k]) )
-				userMissVals[k] = null;
 		}
-		standardized = new Boolean[numDataCols];
-		for (int k = 0; k < numDataCols; k++)
-			standardized[k] = null;
-		numSamples = 0;
-		stdObjects = null;
 	}
-
-	/**
-	 * Create and assign the 2-D array of standard objects by interpreting the 
-	 * list of lists of strings representations of these objects using data column 
-	 * information provided in the constructor.  The list of lists of strings is 
-	 * arranged such that each inner list gives each data column value for a 
-	 * particular sample, and the outer list iterates through each sample.  
-	 * <br /><br />
-	 * Any data columns types matching {@link DashboardServerUtils#UNKNOWN} or 
-	 * {@link DashboardServerUtils#OTHER} are ignored; {@link #getStdVal(int, int)} 
-	 * will throw an IllegalArgumentException if a standard value is requested 
-	 * from such a data column.
-	 * <br /><br />
-	 * No bounds checking of standardized data values is performed.
-	 * 
-	 * @param dataVals
-	 * 		a list of list of data value strings where dataVals.get(j).get(k) is 
-	 * 		the value of the k-th data column for the j-th sample.
-	 * @return
-	 * 		a list of automated data check messages describing problems (critical 
-	 * 		errors) encountered when standardizing the data; never null but may 
-	 * 		be empty.
-	 * @throws IllegalArgumentException
-	 * 		if there are no data samples (outer list is empty),
-	 * 		if a required unit conversion is not supported, or
-	 * 		if a standardizer for a given data type is not known
-	 */
-	public ArrayList<ADCMessage> standardizeData(ArrayList<ArrayList<String>> dataVals) 
-													throws IllegalArgumentException {
-		// Create the 2-D array 
-		if ( dataVals.isEmpty() )
-			throw new IllegalArgumentException("no data values given");
-		numSamples = dataVals.size();
-		stdObjects = new Object[numSamples][numDataCols];
-		ArrayList<ADCMessage> msgList = new ArrayList<ADCMessage>();
-		// Create a 2-D array of these Strings for efficiency
-		String[][] strDataVals = new String[numSamples][numDataCols];
-		for (int j = 0; j < numSamples; j++) {
-			ArrayList<String> rowVals = dataVals.get(j);
-			if ( rowVals.size() != numDataCols ) {
-				// Generate a general message for this row - in case too long
-				ADCMessage msg = new ADCMessage();
-				msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
-				msg.setRowNumber(j+1);
-				msg.setGeneralComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG);
-				msg.setDetailedComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG + "; " + 
-						numDataCols + " expected but " + rowVals.size() + " found");
-				msgList.add(msg);
-				// Continue on, assuming the missing values are at the end
-			}
-			for (int k = 0; k < numDataCols; k++) {
-				try {
-					strDataVals[j][k] = rowVals.get(k);
-				} catch ( IndexOutOfBoundsException ex ) {
-					// Setting it to null will generate a "no value given" message
-					strDataVals[j][k] = null;
-				}
-			}
-		}
-		// Standardize data columns that do not require values from other data columns
-		boolean needsAnotherPass;
-		do {
-			needsAnotherPass = false;
-			for (int k = 0; k < numDataCols; k++) {
-				DashDataType<?> colType = dataTypes[k];
-				if ( DashboardServerUtils.UNKNOWN.typeNameEquals(colType) ||
-						DashboardServerUtils.OTHER.typeNameEquals(colType) ) {
-					for (int j = 0; j < numSamples; j++) {
-						stdObjects[j][k] = null;
-					}
-					standardized[k] = null;
-				}
-				else {
-					try {
-						ValueConverter<?> stdizer = colType.getStandardizer(userUnits[k], userMissVals[k], this);
-						for (int j = 0; j < numSamples; j++) {
-							try {
-								stdObjects[j][k] = stdizer.convertValueOf(strDataVals[j][k]);
-							} catch ( IllegalArgumentException ex ) {
-								stdObjects[j][k] = null;
-								ADCMessage msg = new ADCMessage();
-								msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
-								msg.setRowNumber(j+1);
-								msg.setColNumber(k+1);
-								msg.setColName(userColNames[k]);
-								msg.setGeneralComment(ex.getMessage());
-								if ( strDataVals[j][k] == null )
-									msg.setDetailedComment(ex.getMessage());
-								else
-									msg.setDetailedComment(ex.getMessage() + ": \"" + strDataVals[j][k] + "\"");
-								msgList.add(msg);
-							}
-						}
-						standardized[k] = true;
-					} catch ( IllegalStateException ex ) {
-						standardized[k] = false;
-						needsAnotherPass = true;
-					}
-				}
-			}
-		} while ( needsAnotherPass );
-
-		return msgList;
-	}
-
 
 	/**
 	 * @return 
@@ -272,6 +241,24 @@ public class StdDataArray {
 	}
 
 	/**
+	 * Determines is this data column is an appropriate index.  This version 
+	 * of the method just checks that the value is in the appropriate range.
+	 * Subclasses should override this method if further validation is required.
+	 * 
+	 * @param idx
+	 * 		index to test
+	 * @return
+	 * 		if the index is valid
+	 */
+	protected boolean isUsableIndex(int idx) {
+		if ( idx < 0 )
+			return false;
+		if ( idx >= numDataCols )
+			return false;
+		return true;
+	}
+
+	/**
 	 * @return
 	 * 		an array containing the standardized longitudes; 
 	 * 		missing values are null
@@ -279,10 +266,8 @@ public class StdDataArray {
 	 * 		if there are no standardized longitudes
 	 */
 	public Double[] getSampleLongitudes() throws IllegalStateException {
-		if ( (longitudeIndex < 0) || (longitudeIndex >= numDataCols) )
-			throw new IllegalStateException("no longitude data column");
-		if ( ! Boolean.TRUE.equals(standardized[longitudeIndex]) )
-			throw new IllegalStateException("longitude data was not standardized");
+		if ( ! isUsableIndex(longitudeIndex) )
+			throw new IllegalStateException("no valid longitude data column");
 		Double[] sampleLongitudes = new Double[numSamples];
 		for (int j = 0; j < numSamples; j++)
 			sampleLongitudes[j] = (Double) stdObjects[j][longitudeIndex];
@@ -297,10 +282,8 @@ public class StdDataArray {
 	 * 		if there are no standardized latitudes
 	 */
 	public Double[] getSampleLatitudes() throws IllegalStateException {
-		if ( (latitudeIndex < 0) || (latitudeIndex >= numDataCols) )
-			throw new IllegalStateException("no latitude data column");
-		if ( ! Boolean.TRUE.equals(standardized[latitudeIndex]) )
-			throw new IllegalStateException("latitude data was not standardized");
+		if ( ! isUsableIndex(latitudeIndex) )
+			throw new IllegalStateException("no valid latitude data column");
 		Double[] sampleLatitudes = new Double[numSamples];
 		for (int j = 0; j < numSamples; j++)
 			sampleLatitudes[j] = (Double) stdObjects[j][latitudeIndex];
@@ -315,30 +298,12 @@ public class StdDataArray {
 	 * 		if there are no standardized sample depths
 	 */
 	public Double[] getSampleDepths() throws IllegalStateException {
-		if ( (sampleDepthIndex < 0) || (sampleDepthIndex >= numDataCols) )
-			throw new IllegalStateException("no sample depth data column");
-		if ( ! Boolean.TRUE.equals(standardized[sampleDepthIndex]) )
-			throw new IllegalStateException("sample depth data was not standardized");
+		if ( ! isUsableIndex(sampleDepthIndex) )
+			throw new IllegalStateException("no valid sample depth data column");
 		Double[] sampleDepths = new Double[numSamples];
 		for (int j = 0; j < numSamples; j++)
 			sampleDepths[j] = (Double) stdObjects[j][sampleDepthIndex];
 		return sampleDepths;
-	}
-
-	/**
-	 * @param idx
-	 * 		index to test
-	 * @return
-	 * 		if the index is valid the corresponding data column has been standardized
-	 */
-	private boolean isUsableIndex(int idx) {
-		if ( idx < 0 )
-			return false;
-		if ( idx >= numDataCols )
-			return false;
-		if ( ! Boolean.TRUE.equals(standardized[idx]) )
-			return false;
-		return true;
 	}
 
 	/**
@@ -584,36 +549,20 @@ public class StdDataArray {
 	 * 		standard value object; null is returned for "missing value" or
 	 * 		values that could not be interpreted
 	 * @throws IndexOutOfBoundsException
-	 * 		if either the sample index or the column index is invalid
-	 * @throws IllegalArgumentException 
-	 * 		if the value cannot be standardized
-	 * @throws IllegalStateException 
-	 * 		if the value has not been standardized
+	 * 		if the sample index or the data column index is invalid
 	 */
-	public Object getStdVal(int sampleIdx, int columnIdx) 
-			throws IndexOutOfBoundsException, IllegalArgumentException, IllegalStateException {
+	public Object getStdVal(int sampleIdx, int columnIdx) throws IndexOutOfBoundsException{
 		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
 			throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
 		if ( (columnIdx < 0) || (columnIdx >= numDataCols) )
 			throw new IndexOutOfBoundsException("data column index is invalid: " + columnIdx);
-		if ( standardized[columnIdx] == null )
-			throw new IllegalArgumentException("value cannot be standardized");
-		if ( ! standardized[columnIdx] )
-			throw new IllegalStateException("value has not been standardized");
 		return stdObjects[sampleIdx][columnIdx];
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = 0;
-		for (int j = 0; j < numSamples; j++) {
-			for (int k = 0; k < numDataCols; k++) {
-				result *= prime;
-				if ( stdObjects[j][k] != null )
-					result += stdObjects[j][k].hashCode(); 
-			}
-		}
+		int result = Arrays.deepHashCode(stdObjects);
 		result = prime * result + secondOfDayIndex;
 		result = prime * result + dayOfYearIndex;
 		result = prime * result + secondOfMinuteIndex;
@@ -628,31 +577,7 @@ public class StdDataArray {
 		result = prime * result + sampleDepthIndex;
 		result = prime * result + latitudeIndex;
 		result = prime * result + longitudeIndex;
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( standardized[k] != null )
-				result += standardized[k].hashCode();
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( userMissVals[k] != null )
-				result += userMissVals[k].hashCode();
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( userUnits[k] != null )
-				result += userUnits[k].hashCode();
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( dataTypes[k] != null )
-				result += dataTypes[k].hashCode();
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			result *= prime;
-			if ( userColNames[k] != null )
-				result += userColNames[k].hashCode();
-		}
+		result = prime * result + Arrays.hashCode(dataTypes);
 		result = prime * result + numDataCols;
 		result = prime * result + numSamples;
 		return result;
@@ -660,22 +585,19 @@ public class StdDataArray {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if ( this == obj )
 			return true;
-		}
-		if (obj == null) {
+		if ( obj == null )
 			return false;
-		}
-		if ( ! (obj instanceof StdDataArray) ) {
+
+		if ( ! ( obj instanceof StdDataArray ) )
 			return false;
-		}
 		StdDataArray other = (StdDataArray) obj;
-		if ( numSamples != other.numSamples ) {
+
+		if ( numDataCols != other.numDataCols )
 			return false;
-		}
-		if ( numDataCols != other.numDataCols ) {
+		if ( numSamples != other.numSamples )
 			return false;
-		}
 
 		if ( longitudeIndex != other.longitudeIndex )
 			return false;
@@ -706,113 +628,40 @@ public class StdDataArray {
 		if ( secondOfDayIndex != other.secondOfDayIndex )
 			return false;
 
-		for (int k = 0; k < numDataCols; k++) {
-			if ( userColNames[k] == null ) {
-				if ( other.userColNames[k] != null )
-					return false;
-			}
-			else {
-				if ( ! userColNames[k].equals(other.userColNames[k]) )
-					return false;
-			}
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			if ( userUnits[k] == null ) {
-				if ( other.userUnits[k] != null )
-					return false;
-			}
-			else {
-				if ( ! userUnits[k].equals(other.userUnits[k]) )
-					return false;
-			}
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			if ( userMissVals[k] == null ) {
-				if ( other.userMissVals[k] != null )
-					return false;
-			}
-			else {
-				if ( ! userMissVals[k].equals(other.userMissVals[k]) )
-					return false;
-			}
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			if ( standardized[k] == null ) {
-				if ( other.standardized[k] != null )
-					return false;
-			}
-			else {
-				if ( ! standardized[k].equals(other.standardized[k]) )
-					return false;
-			}
-		}
-		for (int k = 0; k < numDataCols; k++) {
-			if ( dataTypes[k] == null ) {
-				if ( other.dataTypes[k] != null )
-					return false;
-			}
-			else {
-				if ( ! dataTypes[k].equals(other.dataTypes[k]) )
-					return false;
-			}
-		}
-		for (int j = 0; j < numSamples; j++) {
-			for (int k = 0; k < numDataCols; k++) {
-				if ( stdObjects[j][k] == null ) {
-					if ( other.stdObjects[j][k] != null )
-						return false;
-				}
-				else {
-					if ( ! stdObjects[j][k].equals(other.stdObjects[j][k]) )
-						return false;
-				}
-			}
-		}
+		if ( ! Arrays.equals(dataTypes, other.dataTypes) )
+			return false;
+
+		if ( ! Arrays.deepEquals(stdObjects, other.stdObjects) )
+			return false;
+
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		String repr = "StdDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols;
-		List<String> namesList = Arrays.asList(userColNames);
-		repr += "\n  userColNames=" + namesList.toString(); 
-		List<DashDataType<?>> typesList = Arrays.asList(dataTypes);
-		repr += "\n  userColTypes=" + typesList.toString(); 
-		namesList = Arrays.asList(userUnits);
-		repr += "\n  userUnits=" + namesList.toString();
-		namesList = Arrays.asList(userMissVals);
-		repr += "\n  userMissVals=" + namesList.toString();
-		List<Boolean> boolList = Arrays.asList(standardized);
-
-		repr += "\n  longitudeIndex=" + longitudeIndex;
-		repr += ",  latitudeIndex=" + latitudeIndex;
-		repr += ",  sampleDepthIndex=" + sampleDepthIndex;
-		repr += ",  timestampIndex=" + timestampIndex;
-		repr += ",  dateIndex=" + dateIndex;
-		repr += ",  yearIndex=" + yearIndex;
-		repr += ",  monthOfYearIndex=" + monthOfYearIndex;
-		repr += ",  dayOfMonthIndex=" + dayOfMonthIndex;
-		repr += ",  timeOfDayIndex=" + timeOfDayIndex;
-		repr += ",  hourOfDayIndex=" + hourOfDayIndex;
-		repr += ",  minuteOfHourIndex=" + minuteOfHourIndex;
-		repr += ",  secondOfMinuteIndex=" + secondOfMinuteIndex;
-		repr += ",  dayOfYearIndex=" + dayOfYearIndex;
-		repr += ",  secondOfDayIndex=" + secondOfDayIndex;
-		
-		repr += "\n  standardized=" + boolList.toString();
-		repr += "\n  stdObjects=[";
+		repr += ",\n  longitudeIndex=" + longitudeIndex;
+		repr += ", latitudeIndex=" + latitudeIndex;
+		repr += ", sampleDepthIndex=" + sampleDepthIndex;
+		repr += ", timestampIndex=" + timestampIndex;
+		repr += ", dateIndex=" + dateIndex;
+		repr += ", yearIndex=" + yearIndex;
+		repr += ", monthOfYearIndex=" + monthOfYearIndex;
+		repr += ", dayOfMonthIndex=" + dayOfMonthIndex;
+		repr += ", timeOfDayIndex=" + timeOfDayIndex;
+		repr += ", hourOfDayIndex=" + hourOfDayIndex;
+		repr += ", minuteOfHourIndex=" + minuteOfHourIndex;
+		repr += ", secondOfMinuteIndex=" + secondOfMinuteIndex;
+		repr += ", dayOfYearIndex=" + dayOfYearIndex;
+		repr += ", secondOfDayIndex=" + secondOfDayIndex;
+		repr += ",\n  dataTypes=" + Arrays.toString(dataTypes);
+		repr += ",\n  stdObjects=[";
 		for (int j = 0; j < numSamples; j++) {
 			if ( j > 0 )
 				repr += ",";
-			repr += "\n    [ ";
-			for (int k = 0; k < numDataCols; k++) {
-				if ( k > 0 )
-					repr += ", ";
-				repr += String.valueOf(stdObjects[j][k]);
-			}
-			repr += " ]";
+			repr += "\n    " + Arrays.toString(stdObjects[j]);
 		}
-		repr += "\n]";
+		repr += "\n  ]\n]";
 		return repr;
 	}
 

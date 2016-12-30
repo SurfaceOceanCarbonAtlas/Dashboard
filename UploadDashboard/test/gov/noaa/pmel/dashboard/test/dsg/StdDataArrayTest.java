@@ -19,14 +19,15 @@ import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
- * Unit tests for methods in {@link gov.noaa.pmel.dashboard.dsg.StdDataArray}
+ * Unit tests for methods in {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray}
+ * and {@link gov.noaa.pmel.dashboard.dsg.StdDataArray}
  * 
  * @author Karl Smith
  */
@@ -122,7 +123,7 @@ public class StdDataArrayTest {
 	 */
 	@Test
 	public void testGetDataTypes() {
-		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
 		int numColumns = stdData.getNumDataCols();
 		assertEquals(DATA_COLUMN_TYPES.size(), numColumns);
 		List<DashDataType<?>> dataTypes = stdData.getDataTypes();
@@ -132,13 +133,13 @@ public class StdDataArrayTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#standardizeData(java.util.ArrayList)},
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#standardizeData(java.util.ArrayList)},
 	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumSamples()}, and
-	 * and {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getStdVal(int, int)}.
+	 * and {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#getStdVal(int, int)}.
 	 */
 	@Test
 	public void testStandardizeData() {
-		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
 		Integer numDataCols = DATA_COLUMN_TYPES.size();
 
 		// Errors in data: first row has too many values (one message), 
@@ -153,15 +154,15 @@ public class StdDataArrayTest {
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(1), msg.getRowNumber());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
-		assertEquals(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
-		assertTrue( msg.getDetailedComment().contains(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
+		assertEquals(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
+		assertTrue( msg.getDetailedComment().contains(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
 
 		msg = msgList.get(1);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(2), msg.getRowNumber());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
-		assertEquals(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
-		assertTrue( msg.getDetailedComment().contains(StdDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
+		assertEquals(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
+		assertTrue( msg.getDetailedComment().contains(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
 
 		msg = msgList.get(2);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
@@ -222,7 +223,7 @@ public class StdDataArrayTest {
 	 */
 	@Test
 	public void testGetSampleLonLatDepthTime() {
-		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
 		stdData.standardizeData(DATA_VALUE_STRINGS);
 		int numSamples = stdData.getNumSamples();
 
@@ -263,16 +264,16 @@ public class StdDataArrayTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hashCode()} and
-	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#hashCode()} and
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		StdDataArray stdData = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
 		assertFalse( stdData.equals(null) );
 		assertFalse( stdData.equals(USER_COLUMN_NAMES) );
 
-		StdDataArray other = new StdDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		StdUserDataArray other = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
 		assertTrue( stdData.hashCode() == other.hashCode() );
 		assertTrue( stdData.equals(other) );
 
