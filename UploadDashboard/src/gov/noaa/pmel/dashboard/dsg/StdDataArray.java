@@ -5,11 +5,8 @@ package gov.noaa.pmel.dashboard.dsg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -18,6 +15,9 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+
+import ucar.nc2.time.Calendar;
+import ucar.nc2.time.CalendarDate;
 
 /**
  * A 2-D array of objects corresponding to the standardized values in a dataset, 
@@ -29,6 +29,10 @@ public class StdDataArray {
 
 	public static final String INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG = 
 			"inconstistent number of data values";
+
+	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
+	/** 1970-01-01 00:00:00 */
+	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
 	private int numSamples;
 	private int numDataCols;
@@ -365,7 +369,6 @@ public class StdDataArray {
 	 */
 	public Double[] getSampleTimes() throws IllegalStateException {
 		Double[] sampleTimes = new Double[numSamples];
-		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
 		if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) && 
 			 isUsableIndex(dayOfMonthIndex) && isUsableIndex(hourOfDayIndex) && 
@@ -373,14 +376,13 @@ public class StdDataArray {
 			// Get time using just year, month, day, hour, and minute; set second to zero
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
 					int month = ((Integer) stdObjects[j][monthOfYearIndex]).intValue();
 					int day = ((Integer) stdObjects[j][dayOfMonthIndex]).intValue();
 					int hour = ((Integer) stdObjects[j][hourOfDayIndex]).intValue();
 					int min = ((Integer) stdObjects[j][minuteOfHourIndex]).intValue();
-					cal.set(year,  month-1, day, hour, min, 0);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -405,7 +407,6 @@ public class StdDataArray {
 			// Standard format of time string is HH:mm:ss.SSS
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
 					int month = ((Integer) stdObjects[j][monthOfYearIndex]).intValue();
 					int day = ((Integer) stdObjects[j][dayOfMonthIndex]).intValue();
@@ -414,8 +415,8 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					cal.set(year,  month-1, day, hour, min, 0);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 
 					if ( hms.length == 3 ) {
 						double sec = Double.parseDouble(hms[2]);
@@ -431,19 +432,16 @@ public class StdDataArray {
 			// Use year, day of year (presumably an integer), and second of day
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
-					cal.set(Calendar.YEAR, year);
 					double dayOfYear = ((Double) stdObjects[j][yearIndex]).doubleValue();
 					int intDayOfYear = (int) dayOfYear;
-					cal.set(Calendar.DAY_OF_YEAR, intDayOfYear);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.withDoy(BASE_CALENDAR, year, intDayOfYear, 0, 0, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 
 					// add the fractional day in case the day of year is not an integer value
 					sampleTimes[j] += (dayOfYear - (double) intDayOfYear) * 24.0 * 60.0 * 60.0;
 					// add the seconds of day
-					double secondOfDay = ((Double) stdObjects[j][secondOfDayIndex]).doubleValue();
-					sampleTimes[j] += secondOfDay;
+					sampleTimes[j] = ((Double) stdObjects[j][secondOfDayIndex]).doubleValue();
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -454,7 +452,6 @@ public class StdDataArray {
 			// Standard format of the timestamp is yyyy-MM-dd HH:mm:sss.SSS
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					String[] dateTime = ((String) stdObjects[j][timestampIndex]).split(" ");
 					if ( dateTime.length != 2 )
 						throw new Exception();
@@ -469,8 +466,8 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					cal.set(year,  month-1, day, hour, min, 0);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 
 					if ( hms.length == 3 ) {
 						double sec = Double.parseDouble(hms[2]);
@@ -487,7 +484,6 @@ public class StdDataArray {
 			// Standard format of time string is HH:mm:ss.SSS
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					String[] ymd = ((String) stdObjects[j][dateIndex]).split("-");
 					if ( ymd.length != 3 )
 						throw new Exception();
@@ -499,8 +495,8 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					cal.set(year,  month-1, day, hour, min, 0);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 
 					if ( hms.length == 3 ) {
 						double sec = Double.parseDouble(hms[2]);
@@ -517,7 +513,6 @@ public class StdDataArray {
 			// Standard format of the date is yyyy-MM-dd
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					String[] ymd = ((String) stdObjects[j][dateIndex]).split("-");
 					if ( ymd.length != 3 )
 						throw new Exception();
@@ -526,8 +521,8 @@ public class StdDataArray {
 					int day = Integer.parseInt(ymd[2]);
 					int hour = ((Integer) stdObjects[j][hourOfDayIndex]).intValue();
 					int min = ((Integer) stdObjects[j][minuteOfHourIndex]).intValue();
-					cal.set(year,  month-1, day, hour, min, 0);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -550,13 +545,11 @@ public class StdDataArray {
 			// Use year and day of year (presumably floating-point)
 			for (int j = 0; j < numSamples; j++) {
 				try {
-					cal.clear();
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
-					cal.set(Calendar.YEAR, year);
 					double dayOfYear = ((Double) stdObjects[j][yearIndex]).doubleValue();
 					int intDayOfYear = (int) dayOfYear;
-					cal.set(Calendar.DAY_OF_YEAR, intDayOfYear);
-					sampleTimes[j] = cal.getTimeInMillis() / 1000.0;
+					CalendarDate date = CalendarDate.withDoy(BASE_CALENDAR, year, intDayOfYear, 0, 0, 0);
+					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 
 					// add the fractional day
 					sampleTimes[j] += (dayOfYear - (double) intDayOfYear) * 24.0 * 60.0 * 60.0;
