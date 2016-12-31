@@ -34,8 +34,6 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class DsgNcFile extends File {
 
-	private static final long serialVersionUID = 8793930730574156281L;
-
 	private static final String DSG_VERSION = "DsgNcFile 2.0";
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
@@ -109,9 +107,9 @@ public class DsgNcFile extends File {
 	 * Creates this NetCDF DSG file with the metadata given in mdata and the 
 	 * standardized data in userStdData for those data column types that are 
 	 * found in dataFileTypes.  The internal DsgMetadata reference is updated 
-	 * to the given DsgMetadata object, and the internal StdDataArray reference 
-	 * is updated to a new StdDataArray object created from the known data file 
-	 * columns in the given StdDataArray object.  The internal StdDataArray
+	 * to the given DsgMetadata object, and the internal StdUserDataArray reference 
+	 * is updated to a new StdUserDataArray object created from the known data file 
+	 * columns in the given StdUserDataArray object.  The internal StdUserDataArray
 	 * object will also have the following columns added if not already present:
 	 * <ul>
 	 *   <li>{@link DashboardServerUtils#YEAR}</li>
@@ -144,7 +142,7 @@ public class DsgNcFile extends File {
 	 * @throws IllegalAccessException
 	 * 		if creating the NetCDF file throws one
 	 */
-	public void create(DsgMetadata metadata, StdDataArray userStdData, KnownDataTypes dataFileTypes) 
+	public void create(DsgMetadata metadata, StdUserDataArray userStdData, KnownDataTypes dataFileTypes) 
 			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
 		this.metadata = metadata;
 		this.stddata = userStdData;
