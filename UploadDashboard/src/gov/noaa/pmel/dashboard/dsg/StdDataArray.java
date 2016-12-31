@@ -531,6 +531,54 @@ public class StdDataArray {
 
 	/**
 	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#YEAR} data column
+	 */
+	public boolean hasYear() {
+		return isUsableIndex(yearIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#MONTH_OF_YEAR} data column
+	 */
+	public boolean hasMonthOfYear() {
+		return isUsableIndex(monthOfYearIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#DAY_OF_MONTH} data column
+	 */
+	public boolean hasDayOfMonth() {
+		return isUsableIndex(dayOfMonthIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#HOUR_OF_DAY} data column
+	 */
+	public boolean hasHourOfDay() {
+		return isUsableIndex(hourOfDayIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#MINUTE_OF_HOUR} data column
+	 */
+	public boolean hasMinuteOfHour() {
+		return isUsableIndex(minuteOfHourIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#SECOND_OF_MINUTE} data column
+	 */
+	public boolean hasSecondOfMinute() {
+		return isUsableIndex(secondOfMinuteIndex);
+	}
+
+	/**
+	 * @return
 	 * 		an unmodifiable list of types for the data columns.
 	 */
 	public List<DashDataType<?>> getDataTypes() {

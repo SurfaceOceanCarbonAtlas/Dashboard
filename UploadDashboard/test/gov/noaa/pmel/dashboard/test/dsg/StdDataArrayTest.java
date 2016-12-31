@@ -251,7 +251,7 @@ public class StdDataArrayTest {
 
 		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 		cal.clear();
-		// in Calendar, month number is zero-based
+		// in java.util.Calendar, month number is zero-based
 		cal.set(2006,5,10,23,48,0);
 		Double[] times = new Double[numSamples];
 		times[0] = cal.getTimeInMillis() / 1000.0;
@@ -261,6 +261,35 @@ public class StdDataArrayTest {
 		Double[] sampleTimes = stdData.getSampleTimes();
 		for (int j = 0; j < numSamples; j++)
 			assertEquals(times[j], sampleTimes[j], 1.0E-6);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasYear()},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasMonthOfYear()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasDayOfMonth()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasHourOfDay()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasMinuteOfHour()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasSecondOfMinute()}.
+	 */
+	@Test
+	public void testHasYearMonthDayHourMinuteSecond() {
+		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		// For StdUserDataArray, all columns invalid until data values are given
+		assertFalse( stdData.hasYear() );
+		assertFalse( stdData.hasMonthOfYear() );
+		assertFalse( stdData.hasDayOfMonth() );
+		assertFalse( stdData.hasHourOfDay() );
+		assertFalse( stdData.hasMinuteOfHour() );
+		assertFalse( stdData.hasSecondOfMinute() );
+
+		stdData.standardizeData(DATA_VALUE_STRINGS);
+		// No seconds given in the data
+		assertTrue( stdData.hasYear() );
+		assertTrue( stdData.hasMonthOfYear() );
+		assertTrue( stdData.hasDayOfMonth() );
+		assertTrue( stdData.hasHourOfDay() );
+		assertTrue( stdData.hasMinuteOfHour() );
+		assertFalse( stdData.hasSecondOfMinute() );
 	}
 
 	/**
