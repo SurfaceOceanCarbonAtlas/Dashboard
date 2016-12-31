@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
@@ -14,10 +15,9 @@ import java.util.TreeMap;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
-import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -61,72 +61,41 @@ public class DsgMetadataTest {
 	static final String VERSION_STATUS = "2.5N";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getCharVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setCharVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Character)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getValuesMap()}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Object)}.
 	 */
 	@Test
 	public void testGetSetCharVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		mdata.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
-		TreeMap<CharDashDataType,Character> charMap = mdata.getCharVariables();
-		assertEquals(QC_FLAG_VALUE, charMap.get(QC_FLAG_TYPE));
-		mdata.setCharVariableValue(QC_FLAG_TYPE, null);
-		charMap = mdata.getCharVariables();
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(QC_FLAG_TYPE));
-	}
+		mdata.setValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		TreeMap<DashDataType<?>,Object> valuesMap = mdata.getValuesMap();
+		assertEquals(QC_FLAG_VALUE, valuesMap.get(QC_FLAG_TYPE));
+		mdata.setValue(QC_FLAG_TYPE, null);
+		valuesMap = mdata.getValuesMap();
+		assertNull( valuesMap.get(QC_FLAG_TYPE) );
 
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getStringVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetStringVariableValue() {
-		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
-		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		mdata.setStringVariableValue(DashboardServerUtils.DATASET_ID, EXPOCODE);
-		TreeMap<StringDashDataType,String> stringMap = mdata.getStringVariables();
-		assertEquals(EXPOCODE, stringMap.get(DashboardServerUtils.DATASET_ID));
-		mdata.setStringVariableValue(DashboardServerUtils.DATASET_ID, null);
-		stringMap = mdata.getStringVariables();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, stringMap.get(DashboardServerUtils.DATASET_ID));
-	}
+		mdata.setValue(DashboardServerUtils.DATASET_ID, EXPOCODE);
+		valuesMap = mdata.getValuesMap();
+		assertEquals(EXPOCODE, valuesMap.get(DashboardServerUtils.DATASET_ID));
+		mdata.setValue(DashboardServerUtils.DATASET_ID, null);
+		valuesMap = mdata.getValuesMap();
+		assertNull( valuesMap.get(DashboardServerUtils.DATASET_ID) );
 
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getIntVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setIntVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Integer)}.
-	 */
-	@Test
-	public void testGetSetIntVariableValue() {
-		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
-		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		mdata.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
-		TreeMap<IntDashDataType,Integer> dateMap = mdata.getIntVariables();
-		assertEquals(CRUISE_SERIAL_NUM, dateMap.get(SERIAL_NUMBER));
-		mdata.setIntVariableValue(SERIAL_NUMBER, null);
-		dateMap = mdata.getIntVariables();
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, dateMap.get(SERIAL_NUMBER));
-	}
+		mdata.setValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
+		valuesMap = mdata.getValuesMap();
+		assertEquals(CRUISE_SERIAL_NUM, valuesMap.get(SERIAL_NUMBER));
+		mdata.setValue(SERIAL_NUMBER, null);
+		valuesMap = mdata.getValuesMap();
+		assertNull( valuesMap.get(SERIAL_NUMBER) );
 
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#getDoubleVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.dsg.DsgMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.datatype.DashDataType,java.lang.Double)}.
-	 */
-	@Test
-	public void testGetSetDoubleVariableValue() {
-		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		knownTypes.addTypesFromProperties(ADDN_TYPES_PROPERTIES);
-		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		Double value = Double.valueOf(EASTMOST_LONGITUDE);
-		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
-		TreeMap<DoubleDashDataType,Double> doubleMap = mdata.getDoubleVariables();
-		assertEquals(value, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
-		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, null);
-		doubleMap = mdata.getDoubleVariables();
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
+		mdata.setValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, EASTMOST_LONGITUDE);
+		valuesMap = mdata.getValuesMap();
+		assertEquals(EASTMOST_LONGITUDE, valuesMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
+		mdata.setValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, null);
+		valuesMap = mdata.getValuesMap();
+		assertNull( valuesMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE) );
 	}
 
 	/**
@@ -432,17 +401,17 @@ public class DsgMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		mdata.setValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setCharVariableValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
+		other.setValue(QC_FLAG_TYPE, QC_FLAG_VALUE);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
+		mdata.setValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setIntVariableValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
+		other.setValue(SERIAL_NUMBER, CRUISE_SERIAL_NUM);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
