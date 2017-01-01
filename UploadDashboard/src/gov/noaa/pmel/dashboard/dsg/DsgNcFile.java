@@ -226,7 +226,8 @@ public class DsgNcFile extends File {
 				}
 			}
 
-			for ( DashDataType<?> dtype : metadata.valuesMap.keySet() ) {
+			List<DashDataType<?>> dataTypes = stddata.getDataTypes();
+			for ( DashDataType<?> dtype : dataTypes ) {
 				varName = dtype.getVarName();
 				if ( dtype instanceof CharDashDataType ) {
 					// Data Characters
@@ -318,7 +319,6 @@ public class DsgNcFile extends File {
 				}
 			}
 
-			List<DashDataType<?>> dataTypes = stddata.getDataTypes();
 			for (int k = 0; k < stddata.getNumDataCols(); k++) {
 				DashDataType<?> dtype = dataTypes.get(k);
 				varName = dtype.getVarName();
