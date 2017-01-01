@@ -3,9 +3,12 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -15,8 +18,6 @@ import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import ucar.nc2.time.Calendar;
-import ucar.nc2.time.CalendarDate;
 
 /**
  * A 2-D array of objects corresponding to the standardized values in a dataset, 
@@ -25,10 +26,6 @@ import ucar.nc2.time.CalendarDate;
  * @author Karl Smith
  */
 public class StdDataArray {
-
-	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
-	/** 1970-01-01 00:00:00 */
-	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
 	protected int numSamples;
 	protected int numDataCols;
@@ -174,6 +171,184 @@ public class StdDataArray {
 	}
 
 	/**
+	 * Creates with the standardized data file types and values in the given 
+	 * user standard data array.  The methods {@link #getSampleLongitudes()}, 
+	 * {@link #getSampleLatitudes()}, {@link #getSampleDepths()}, and 
+	 * {@link #getSampleTimes()} on the standardized user data must succeed 
+	 * and return arrays with no null (missing) values.  No data column can be 
+	 * the type {@link DashboardServerUtils#UNKNOWN}.  Only those data columns 
+	 * matching one of the given known data files types is copied from the 
+	 * standardized user data.  The following data columns will be added and 
+	 * assigned if not already present:
+	 * <ul>
+	 *   <li>{@link DashboardServerUtils#YEAR}</li>
+	 *   <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
+	 *   <li>{@link DashboardServerUtils#DAY_OF_MONTH}</li>
+	 *   <li>{@link DashboardServerUtils#HOUR_OF_DAY}</li>
+	 *   <li>{@link DashboardServerUtils#MINUTE_OF_HOUR}</li>
+	 *   <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
+	 *   <li>{@link DashboardServerUtils#TIME}</li>
+	 * </ul>
+	 * (TIME should always added and assigned since it is not a user provided type.)
+	 * If the time to the seconds is not provided, the seconds values are all 
+	 * set to zero and the added SECOND_OF_MINUTE column added will be all zeros.
+	 * 
+	 * @param userStdData
+	 * 		standardized user data values
+	 * @param dataFileTypes
+	 * 		known data file column types
+	 * @throws IllegalArgumentException
+	 * 		if no standard user data values are given,
+	 * 		if any of the user data types is {@link DashboardServerUtils#UNKNOWN}
+	 * 		if any sample longitude, latitude, sample depth is missing, or
+	 * 		if any sample time cannot be computed.
+	 */
+	public StdDataArray(StdUserDataArray userStdData, KnownDataTypes dataFileTypes) throws IllegalArgumentException {
+		// StdUserDataArray has to have data columns, but could be missing the data values
+		numSamples = userStdData.getNumSamples();
+		if ( numSamples <= 0 )
+			throw new IllegalArgumentException("no data values given");
+		int numUserColumns = userStdData.getNumDataCols();
+
+		// Check that sample longitude, latitude, depth, and time are present and all valid; 
+		// hang onto the time values for adding to this standardized data
+		Double[] timeVals;
+		try {
+			for ( Double value : userStdData.getSampleLongitudes() )
+				if ( value == null )
+					throw new IllegalArgumentException("a longitude value is missing");
+			for ( Double value : userStdData.getSampleLatitudes() )
+				if ( value == null )
+					throw new IllegalArgumentException("a latitude value is missing");
+			for ( Double value : userStdData.getSampleDepths() )
+				if ( value == null )
+					throw new IllegalArgumentException("a sample depth value is missing");
+			timeVals = userStdData.getSampleTimes();
+			for ( Double value : timeVals )
+				if ( value == null )
+					throw new IllegalArgumentException("a sample date/time value is missing");
+		} catch ( IllegalStateException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		// Get the list of data file types present in the standardized user data
+		ArrayList<DashDataType<?>> userDataTypes = new ArrayList<DashDataType<?>>(numUserColumns + 7);
+		ArrayList<Integer> userColIndices = new ArrayList<Integer>(numUserColumns + 7);
+		List <DashDataType<?>> userTypes = userStdData.getDataTypes();
+		for (int k = 0; k < numUserColumns; k++) {
+			DashDataType<?> dtype = userTypes.get(k);
+			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dtype) )
+				throw new IllegalArgumentException("user column number " + Integer.toString(k+1) + 
+						" is type " + DashboardServerUtils.UNKNOWN.getDisplayName());
+			if ( userStdData.isUsableIndex(k) && dataFileTypes.containsTypeName(dtype.getVarName()) ) {
+				// OTHER and metadata column types are not added
+				userColIndices.add(k);
+				userDataTypes.add(dtype);
+			}
+		}
+		// Add required data columns if not present
+		if ( ! userStdData.hasYear() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.YEAR);
+		}
+		if ( ! userStdData.hasMonthOfYear() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.MONTH_OF_YEAR);
+		}
+		if ( ! userStdData.hasDayOfMonth() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.DAY_OF_MONTH);
+		}
+		if ( ! userStdData.hasHourOfDay() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.HOUR_OF_DAY);
+		}
+		if ( ! userStdData.hasMinuteOfHour() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.MINUTE_OF_HOUR);
+		}
+		if ( ! userStdData.hasSecondOfMinute() ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.SECOND_OF_MINUTE);
+		}
+		if ( ! userDataTypes.contains(DashboardServerUtils.TIME) ) {
+			userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
+			userDataTypes.add(DashboardServerUtils.TIME);
+		}
+
+		numDataCols = userDataTypes.size();
+		dataTypes = new DashDataType<?>[numDataCols];
+		stdObjects = new Object[numSamples][numDataCols];
+		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		for (int k = 0; k < numDataCols; k++) {
+			dataTypes[k] = userDataTypes.get(k);
+			int userIdx = userColIndices.get(k);
+			if ( DashboardUtils.INT_MISSING_VALUE.equals(userIdx) ) {
+				if ( DashboardServerUtils.YEAR.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.YEAR) );
+					}
+				}
+				else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MONTH) - GregorianCalendar.JANUARY + 1 );
+					}
+				}
+				else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.DAY_OF_MONTH) );
+					}
+				}
+				else if ( DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.HOUR_OF_DAY) );
+					}
+				}
+				else if ( DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MINUTE) );
+					}
+				}
+				else if ( DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						cal.clear();
+						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
+						Double second = ( 1000.0 * cal.get(GregorianCalendar.SECOND) + 
+											cal.get(GregorianCalendar.MILLISECOND) ) / 1000.0;
+						stdObjects[j][k] = second;
+					}
+				}
+				else if ( DashboardServerUtils.TIME.typeNameEquals(dataTypes[k]) ) {
+					for (int j = 0; j < numSamples; j++) {
+						stdObjects[j][k] = timeVals[j];
+					}
+				}
+				else {
+					throw new IllegalArgumentException("Unexpected error: unknown data column type with missing index");
+				}
+			}
+			else {
+				for (int j = 0; j < numSamples; j++) {
+					// Because isValidIndex was true, this should not throw any exceptions
+					stdObjects[j][k] = userStdData.getStdVal(j, userIdx);
+				}
+			}
+		}
+
+		assignColumnIndicesOfInterest();
+	}
+
+	/**
 	 * Assigns the data column indices of interest (longitude, latitude, sample 
 	 * depth, and various time types) from the assigned types of the data columns.
 	 */
@@ -250,7 +425,7 @@ public class StdDataArray {
 	 * @return
 	 * 		if the index is valid
 	 */
-	protected boolean isUsableIndex(int idx) {
+	public boolean isUsableIndex(int idx) {
 		if ( idx < 0 )
 			return false;
 		if ( idx >= numDataCols )
@@ -333,12 +508,14 @@ public class StdDataArray {
 	 * 		if specification of the sample date and time is incomplete
 	 */
 	public Double[] getSampleTimes() throws IllegalStateException {
+		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 		Double[] sampleTimes = new Double[numSamples];
 
 		if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) && 
 			 isUsableIndex(dayOfMonthIndex) && isUsableIndex(hourOfDayIndex) && 
 			 isUsableIndex(minuteOfHourIndex) ) {
-			// Get time using just year, month, day, hour, and minute; set second to zero
+			// Get time using year, month, day, hour, minute, and (if available) second
+			boolean hasSec = isUsableIndex(secondOfMinuteIndex);
 			for (int j = 0; j < numSamples; j++) {
 				try {
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
@@ -346,23 +523,26 @@ public class StdDataArray {
 					int day = ((Integer) stdObjects[j][dayOfMonthIndex]).intValue();
 					int hour = ((Integer) stdObjects[j][hourOfDayIndex]).intValue();
 					int min = ((Integer) stdObjects[j][minuteOfHourIndex]).intValue();
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-				} catch ( Exception ex ) {
-					sampleTimes[j] = null;
-				}
-			}
-			// If available, add the seconds
-			if ( isUsableIndex(secondOfMinuteIndex) ) {
-				for (int j = 0; j < numSamples; j++) {
-					if ( sampleTimes[j] != null ) {
+					int sec = 0;
+					int millisec = 0;
+					if ( hasSec ) {
 						try {
-							double sec = ((Double) stdObjects[j][secondOfMinuteIndex]).doubleValue();
-							sampleTimes[j] += sec;
+							Double value = (Double) stdObjects[j][secondOfMinuteIndex];
+							sec = value.intValue();
+							value -= sec;
+							value *= 1000.0;
+							millisec = value.intValue();
 						} catch ( Exception ex ) {
-							// If a secondOfMinute value is missing, just leave as zero
+							sec = 0;
+							millisec = 0;
 						}
 					}
+					cal.clear();
+					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+				} catch ( Exception ex ) {
+					sampleTimes[j] = null;
 				}
 			}
 		}
@@ -380,13 +560,22 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-
-					if ( hms.length == 3 ) {
-						double sec = Double.parseDouble(hms[2]);
-						sampleTimes[j] += sec;
+					int sec;
+					int millisec;
+					try {
+						Double value = Double.parseDouble(hms[2]);
+						sec = value.intValue();
+						value -= sec;
+						value *= 1000.0;
+						millisec = value.intValue();
+					} catch ( Exception ex ) {
+						sec = 0;
+						millisec = 0;
 					}
+					cal.clear();
+					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -394,19 +583,34 @@ public class StdDataArray {
 		}
 		else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) && 
 				  isUsableIndex(secondOfDayIndex) ) {
-			// Use year, day of year (presumably an integer), and second of day
+			// Use year, day of year (an integer), and second of day
 			for (int j = 0; j < numSamples; j++) {
 				try {
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
-					double dayOfYear = ((Double) stdObjects[j][yearIndex]).doubleValue();
-					int intDayOfYear = (int) dayOfYear;
-					CalendarDate date = CalendarDate.withDoy(BASE_CALENDAR, year, intDayOfYear, 0, 0, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-
-					// add the fractional day in case the day of year is not an integer value
-					sampleTimes[j] += (dayOfYear - (double) intDayOfYear) * 24.0 * 60.0 * 60.0;
-					// add the seconds of day
-					sampleTimes[j] = ((Double) stdObjects[j][secondOfDayIndex]).doubleValue();
+					Double value = (Double) stdObjects[j][dayOfYearIndex];
+					int dayOfYear = value.intValue();
+					if ( Math.abs(value - dayOfYear) > DashboardUtils.MAX_ABSOLUTE_ERROR )
+						throw new Exception();
+					value = ((Double) stdObjects[j][secondOfDayIndex]).doubleValue();
+					value /= 3600.0;
+					int hour = value.intValue();
+					value -= hour;
+					value *= 60.0;
+					int minute = value.intValue();
+					value -= minute;
+					value *= 60.0;
+					int sec = value.intValue();
+					value -= sec;
+					value *= 1000.0;
+					int millisec = value.intValue();
+					cal.clear();
+					cal.set(GregorianCalendar.YEAR, year);
+					cal.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
+					cal.set(GregorianCalendar.HOUR_OF_DAY, hour);
+					cal.set(GregorianCalendar.MINUTE, minute);
+					cal.set(GregorianCalendar.SECOND, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -431,13 +635,22 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-
-					if ( hms.length == 3 ) {
-						double sec = Double.parseDouble(hms[2]);
-						sampleTimes[j] += sec;
+					int sec;
+					int millisec;
+					try {
+						Double value = Double.parseDouble(hms[2]);
+						sec = value.intValue();
+						value -= sec;
+						value *= 1000.0;
+						millisec = value.intValue();
+					} catch ( Exception ex ) {
+						sec = 0;
+						millisec = 0;
 					}
+					cal.clear();
+					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -460,13 +673,22 @@ public class StdDataArray {
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-
-					if ( hms.length == 3 ) {
-						double sec = Double.parseDouble(hms[2]);
-						sampleTimes[j] += sec;
+					int sec;
+					int millisec;
+					try {
+						Double value = Double.parseDouble(hms[2]);
+						sec = value.intValue();
+						value -= sec;
+						value *= 1000.0;
+						millisec = value.intValue();
+					} catch ( Exception ex ) {
+						sec = 0;
+						millisec = 0;
 					}
+					cal.clear();
+					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
@@ -474,8 +696,9 @@ public class StdDataArray {
 		}
 		else if ( isUsableIndex(dateIndex) && isUsableIndex(hourOfDayIndex) && 
 				  isUsableIndex(minuteOfHourIndex) ) {
-			// Use date string, hour, and minute; set second to zero
+			// Use date string, hour, minute, and (if available) second
 			// Standard format of the date is yyyy-MM-dd
+			boolean hasSec = isUsableIndex(secondOfMinuteIndex);
 			for (int j = 0; j < numSamples; j++) {
 				try {
 					String[] ymd = ((String) stdObjects[j][dateIndex]).split("-");
@@ -486,38 +709,56 @@ public class StdDataArray {
 					int day = Integer.parseInt(ymd[2]);
 					int hour = ((Integer) stdObjects[j][hourOfDayIndex]).intValue();
 					int min = ((Integer) stdObjects[j][minuteOfHourIndex]).intValue();
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, min, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
+					int sec = 0;
+					int millisec = 0;
+					if ( hasSec ) {
+						try {
+							Double value = (Double) stdObjects[j][secondOfMinuteIndex];
+							sec = value.intValue();
+							value -= sec;
+							value *= 1000.0;
+							millisec = value.intValue();
+						} catch ( Exception ex ) {
+							sec = 0;
+							millisec = 0;
+						}
+					}
+					cal.clear();
+					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}
 			}
-			// If available, add the seconds
-			if ( isUsableIndex(secondOfMinuteIndex) ) {
-				for (int j = 0; j < numSamples; j++) {
-					if ( sampleTimes[j] != null ) {
-						try {
-							double sec = ((Double) stdObjects[j][secondOfMinuteIndex]).doubleValue();
-							sampleTimes[j] += sec;
-						} catch ( Exception ex ) {
-							// If a secondOfMinute value is missing, just leave as zero
-						}
-					}
-				}
-			}
 		}
 		else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) ) {
-			// Use year and day of year (presumably floating-point)
+			// Use year and day of year (floating-point)
 			for (int j = 0; j < numSamples; j++) {
 				try {
 					int year = ((Integer) stdObjects[j][yearIndex]).intValue();
-					double dayOfYear = ((Double) stdObjects[j][yearIndex]).doubleValue();
-					int intDayOfYear = (int) dayOfYear;
-					CalendarDate date = CalendarDate.withDoy(BASE_CALENDAR, year, intDayOfYear, 0, 0, 0);
-					sampleTimes[j] = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-
-					// add the fractional day
-					sampleTimes[j] += (dayOfYear - (double) intDayOfYear) * 24.0 * 60.0 * 60.0;
+					Double value = (Double) stdObjects[j][dayOfYearIndex];
+					int dayOfYear = value.intValue();
+					value -= dayOfYear;
+					value *= 24.0;
+					int hour = value.intValue();
+					value -= hour;
+					value *= 60.0;
+					int minute = value.intValue();
+					value -= minute;
+					value *= 60.0;
+					int sec = value.intValue();
+					value -= sec;
+					value *= 1000.0;
+					int millisec = value.intValue();
+					cal.clear();
+					cal.set(GregorianCalendar.YEAR, year);
+					cal.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
+					cal.set(GregorianCalendar.HOUR_OF_DAY, hour);
+					cal.set(GregorianCalendar.MINUTE, minute);
+					cal.set(GregorianCalendar.SECOND, sec);
+					cal.set(GregorianCalendar.MILLISECOND, millisec);
+					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
 				} catch ( Exception ex ) {
 					sampleTimes[j] = null;
 				}

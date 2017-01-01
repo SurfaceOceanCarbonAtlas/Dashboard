@@ -184,7 +184,6 @@ public class StdUserDataArray extends StdDataArray {
 		return msgList;
 	}
 
-	@Override
 	/**
 	 * Determines is this data column is an appropriate index.
 	 * Checks that the value is in the appropriate range and 
@@ -195,17 +194,15 @@ public class StdUserDataArray extends StdDataArray {
 	 * @return
 	 * 		if the index is valid
 	 */
-	protected boolean isUsableIndex(int idx) {
+	@Override
+	public boolean isUsableIndex(int idx) {
 		if ( idx < 0 )
 			return false;
 		if ( idx >= numDataCols )
 			return false;
-		if ( ! Boolean.TRUE.equals(standardized[idx]) )
-			return false;
-		return true;
+		return Boolean.TRUE.equals(standardized[idx]);
 	}
 
-	@Override
 	/**
 	 * Get the standard value object for the specified value (column index) 
 	 * of the specified sample (row index).
@@ -224,6 +221,7 @@ public class StdUserDataArray extends StdDataArray {
 	 * @throws IllegalStateException 
 	 * 		if the value has not been standardized
 	 */
+	@Override
 	public Object getStdVal(int sampleIdx, int columnIdx) 
 			throws IndexOutOfBoundsException, IllegalArgumentException, IllegalStateException {
 		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )

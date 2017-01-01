@@ -42,7 +42,7 @@ public class DsgNcFile extends File {
 
 	/**
 	 * See {@link java.io.File#File(java.lang.String)}
-	 * The internal metadata and data list references are set null.
+	 * The internal metadata and data array references are set null.
 	 */
 	public DsgNcFile(String filename) {
 		super(filename);
@@ -52,7 +52,7 @@ public class DsgNcFile extends File {
 
 	/**
 	 * See {@link java.io.File#File(java.io.File,java.lang.String)}
-	 * The internal metadata and data list references are set null.
+	 * The internal metadata and data array references are set null.
 	 */
 	public DsgNcFile(File parent, String child) {
 		super(parent, child);
@@ -71,17 +71,17 @@ public class DsgNcFile extends File {
 	 * @param missVal
 	 * 		if not null, the value for the missing_value and _FillValue attributes
 	 * @param longName
-	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
-	 * 		long_name attribute; cannot be null
+	 * 		if not null and not {@link DashboardUtils#STRING_MISSING_VALUE}, 
+	 * 		the value for the long_name attribute
 	 * @param standardName
-	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
-	 * 		standard_name attribute; cannot be null
+	 * 		if not null and not {@link DashboardUtils#STRING_MISSING_VALUE}, 
+	 * 		the value for the standard_name attribute
 	 * @param ioosCategory
-	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
-	 * 		ioos_category attribute; cannot be null
+	 * 		if not null and not {@link DashboardUtils#STRING_MISSING_VALUE}, 
+	 * 		the value for the ioos_category attribute
 	 * @param units
-	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
-	 * 		units attribute; cannot be null
+	 * 		if not null and not {@link DashboardUtils#STRING_MISSING_VALUE}, 
+	 * 		the value for the units attribute
 	 */
 	private void addAttributes(NetcdfFileWriter ncfile, Variable var, Number missVal, 
 			String longName, String standardName, String ioosCategory, String units) {
@@ -89,42 +89,30 @@ public class DsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
 			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
 		}
-		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(longName) ) {
+		if ( (longName != null) && ! DashboardUtils.STRING_MISSING_VALUE.equals(longName) ) {
 			ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
 		}
-		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(standardName) ) {
+		if ( (standardName != null) && ! DashboardUtils.STRING_MISSING_VALUE.equals(standardName) ) {
 			ncfile.addVariableAttribute(var, new Attribute("standard_name", standardName));
 		}
-		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(ioosCategory) ) {
+		if ( (ioosCategory != null) && ! DashboardUtils.STRING_MISSING_VALUE.equals(ioosCategory) ) {
 			ncfile.addVariableAttribute(var, new Attribute("ioos_category", ioosCategory));
 		}
-		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(units) ) {
+		if ( (units != null) && ! DashboardUtils.STRING_MISSING_VALUE.equals(units) ) {
 			ncfile.addVariableAttribute(var, new Attribute("units", units));
 		}
 	}
 
 	/**
-	 * Creates this NetCDF DSG file with the metadata given in mdata and the 
-	 * standardized data in userStdData for those data column types that are 
-	 * found in dataFileTypes.  The internal DsgMetadata reference is updated 
-	 * to the given DsgMetadata object, and the internal StdUserDataArray reference 
-	 * is updated to a new StdUserDataArray object created from the known data file 
-	 * columns in the given StdUserDataArray object.  The internal StdUserDataArray
-	 * object will also have the following columns added if not already present:
-	 * <ul>
-	 *   <li>{@link DashboardServerUtils#YEAR}</li>
-	 *   <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
-	 *   <li>{@link DashboardServerUtils#DAY_OF_MONTH}</li>
-	 *   <li>{@link DashboardServerUtils#HOUR_OF_DAY}</li>
-	 *   <li>{@link DashboardServerUtils#MINUTE_OF_HOUR}</li>
-	 *   <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
-	 *   <li>{@link DashboardServerUtils#TIME}</li>
-	 *  </ul>
-	 * TIME is always added and computed since it is not a user-provided type.
-	 * If the time to the seconds is not provided, the seconds values are all 
-	 * set to zero and the added SECOND_OF_MINUTE data will all be zero.
+	 * Creates this NetCDF DSG file with the given metadata and standardized user 
+	 * provided data.  The internal metadata reference is updated to the given 
+	 * DsgMetadata object and the internal data array reference is updated to a new 
+	 * standardized data array object created from the appropriate user provided data. 
+	 * Every data sample must have a valid longitude, latitude, sample depth, and 
+	 * complete date and time specification, to at least the minute.  If the seconds 
+	 * of the time is not provided, zero seconds will be used.
 	 * 
-	 * @param metadata
+	 * @param metaData
 	 * 		metadata for the dataset
 	 * @param userStdData
 	 * 		standardized user-provided data
@@ -132,7 +120,7 @@ public class DsgNcFile extends File {
 	 * 		known data types for data files
 	 * @throws IllegalArgumentException
 	 * 		if any argument is null,
-	 * 		if any of the data types is {@link DashboardServerUtils#UNKNOWN}
+	 * 		if any of the data types in userStdData is {@link DashboardServerUtils#UNKNOWN}
 	 * 		if any sample longitude, latitude, sample depth is missing,
 	 * 		if any sample time cannot be computed
 	 * @throws IOException
@@ -142,41 +130,15 @@ public class DsgNcFile extends File {
 	 * @throws IllegalAccessException
 	 * 		if creating the NetCDF file throws one
 	 */
-	public void create(DsgMetadata metadata, StdUserDataArray userStdData, KnownDataTypes dataFileTypes) 
+	public void create(DsgMetadata metaData, StdUserDataArray userStdData, KnownDataTypes dataFileTypes) 
 			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
-		this.metadata = metadata;
-		this.stddata = userStdData;
-
-		if ( metadata == null )
+		if ( metaData == null )
 			throw new IllegalArgumentException("no metadata given");
+		metadata = metaData;
 		if ( userStdData == null )
 			throw new IllegalArgumentException("no data given");
-		int numSamples = stddata.getNumSamples();
-		int numColumns = stddata.getNumDataCols();
-		if ( (numSamples <= 0) || (numColumns <= 0) )
-			throw new IllegalArgumentException("no data values given");
-		List<DashDataType<?>> dataTypes = stddata.getDataTypes();
-		// Check that sample longitude, latitude, depth, and time are all valid; 
-		// keep the time values for adding
-		Double[] timeVals;
-		try {
-			for ( Double value : userStdData.getSampleLongitudes() )
-				if ( value == null )
-					throw new IllegalArgumentException("a longitude value is missing");
-			for ( Double value : userStdData.getSampleLatitudes() )
-				if ( value == null )
-					throw new IllegalArgumentException("a latitude value is missing");
-			for ( Double value : userStdData.getSampleDepths() )
-				if ( value == null )
-					throw new IllegalArgumentException("a sample depth value is missing");
-			timeVals = userStdData.getSampleTimes();
-			for ( Double value : timeVals )
-				if ( value == null )
-					throw new IllegalArgumentException("a sample date/time value is missing");
-		} catch ( IllegalStateException ex ) {
-			throw new IllegalArgumentException(ex);
-		}
-
+		stddata = new StdDataArray(userStdData, dataFileTypes);
+		
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
 			// According to the CF standard if a file only has one trajectory, 
