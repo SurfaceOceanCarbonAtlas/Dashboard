@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -12,10 +13,9 @@ import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
@@ -27,12 +27,11 @@ import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriter;
 import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
-import ucar.nc2.time.Calendar;
-import ucar.nc2.time.CalendarDate;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 
 public class DsgNcFile extends File {
+
+	private static final long serialVersionUID = -7695491814772713480L;
 
 	private static final String DSG_VERSION = "DsgNcFile 2.0";
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
@@ -137,6 +136,9 @@ public class DsgNcFile extends File {
 		metadata = metaData;
 		if ( userStdData == null )
 			throw new IllegalArgumentException("no data given");
+
+		// The following verifies lon, lat, depth, and time
+		// Adds time and, if not already present, year, month, day, hour, and minute.
 		stddata = new StdDataArray(userStdData, dataFileTypes);
 		
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
@@ -162,6 +164,7 @@ public class DsgNcFile extends File {
 			List<Dimension> trajDims = new ArrayList<Dimension>();
 			trajDims.add(traj);
 
+			int numSamples = stddata.getNumSamples();
 			Dimension obslen = ncfile.addDimension(null, "obs", numSamples);
 			List<Dimension> dataDims = new ArrayList<Dimension>();
 			dataDims.add(obslen);
@@ -181,245 +184,186 @@ public class DsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("missing_value", DashboardUtils.INT_MISSING_VALUE));
 			ncfile.addVariableAttribute(var, new Attribute("_FillValue", DashboardUtils.INT_MISSING_VALUE));
 
-			// Make netCDF variables of all the metadata and data variables
 			String varName;
-			for (  StringDashDataType dtype : metadata.getStringVariables().keySet() ) {
-				// Metadata Strings
+			// Make netCDF variables of all the metadata and data variables
+			for ( DashDataType<?> dtype : metadata.valuesMap.keySet() ) {
 				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
-				// No missing_value, _FillValue, or units for strings
-				addAttributes(ncfile, var, null, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
-				if ( DashboardServerUtils.DATASET_ID.typeNameEquals(dtype) ) {
-					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
+				if ( dtype instanceof StringDashDataType ) {
+					// Metadata Strings
+					var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
+					// No missing_value, _FillValue, or units for strings
+					addAttributes(ncfile, var, null, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
+					if ( DashboardServerUtils.DATASET_ID.typeNameEquals(dtype) ) {
+						ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
+					}
+				}
+				else if ( dtype instanceof CharDashDataType ) {
+					// Metadata characters
+					var = ncfile.addVariable(null, varName, DataType.CHAR, trajCharDims);
+					// No missing_value, _FillValue, or units for characters
+					addAttributes(ncfile, var, null, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
+				}
+				else if ( dtype instanceof IntDashDataType ) {
+					// Metadata Integers
+					var = ncfile.addVariable(null, varName, DataType.INT, trajDims);
+					addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+				}
+				else if ( dtype instanceof DoubleDashDataType ) {
+					// Metadata Doubles
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
+					addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+					if ( dtype.getUnits().get(0).equals(DashboardServerUtils.TIME_UNITS.get(0)) ) {
+						// Additional attribute giving the time origin (although also mentioned in the units)
+						ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+					}
+				}
+				else {
+					throw new IllegalArgumentException("unexpected unknown metadata type: " + dtype.toString());
 				}
 			}
 
-			for (  CharDashDataType dtype : metadata.getCharVariables().keySet() ) {
-				// Metadata characters
+			for ( DashDataType<?> dtype : metadata.valuesMap.keySet() ) {
 				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.CHAR, trajCharDims);
-				// No missing_value, _FillValue, or units for characters
-				addAttributes(ncfile, var, null, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
-			}
-
-			for (  IntDashDataType dtype : metadata.getIntVariables().keySet() ) {
-				// Metadata Integers
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.INT, trajDims);
-				addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
-			}
-
-			for (  DoubleDashDataType dtype : metadata.getDoubleVariables().keySet() ) {
-				// Metadata Doubles
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
-				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
-				if ( dtype.getUnits().get(0).equals(DashboardServerUtils.TIME_UNITS.get(0)) ) {
-					// Additional attribute giving the time origin (although also mentioned in the units)
-					ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+				if ( dtype instanceof CharDashDataType ) {
+					// Data Characters
+					var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
+					// No missing_value, _FillValue, or units for characters
+					addAttributes(ncfile, var, null, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
+				}
+				else if ( dtype instanceof IntDashDataType ) {
+					// Data Integers
+					var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
+					addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+				}
+				else if ( dtype instanceof DoubleDashDataType ) {
+					// Data Doubles
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
+					addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+					if ( DashboardServerUtils.TIME.typeNameEquals(dtype) ) {
+						// Additional attribute giving the time origin (although also mentioned in the units)
+						ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+					}
+					if ( dtype.getStandardName().endsWith("depth") ) {
+						ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
+					}
+				}
+				else {
+					throw new IllegalArgumentException("unexpected unknown data type: " + dtype.toString());
 				}
 			}
-
-			for (  IntDashDataType dtype : dataList.get(0).getIntegerVariables().keySet() ) {
-				// Data Integers
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
-				addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
-			}
-
-			for (  CharDashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
-				// Data Characters
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
-				// No missing_value, _FillValue, or units for characters
-				addAttributes(ncfile, var, null, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
-			}
-
-			for (  DoubleDashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
-				// Data Doubles
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
-				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
-				if ( DashboardServerUtils.TIME.typeNameEquals(dtype) ) {
-					// Additional attribute giving the time origin (although also mentioned in the units)
-					ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
-				}
-				if ( dtype.getStandardName().endsWith("depth") ) {
-					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
-				}
-			}
-
-			// The "time" variable should have been one of the known data file variables,
-			// although it is probably all-missing.  It will be assigned below using the 
-			// year, month, day, hour, minute, and (optionally) second values for each data point
 
 			ncfile.create();
 
 			// The header has been created.  Now let's fill it up.
-
 			var = ncfile.findVariable("num_obs");
 			if ( var == null )
 				throw new RuntimeException("Unexpected failure to find ncfile variable num_obs");
 			ArrayInt.D1 obscount = new ArrayInt.D1(1);
-			obscount.set(0, dataList.size());
+			obscount.set(0, numSamples);
 			ncfile.write(var, obscount);
 
-			for (  Entry<StringDashDataType,String> entry : metadata.getStringVariables().entrySet() ) {
-				// Metadata Strings
-				varName = entry.getKey().getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				String dvalue = entry.getValue();
-				if ( dvalue == null )
-					dvalue = "";
-				ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
-				mvar.setString(0, dvalue);
-				ncfile.write(var, mvar);
-			}
-
-			for (  Entry<CharDashDataType,Character> entry : metadata.getCharVariables().entrySet() ) {
-				// Metadata characters
-				varName = entry.getKey().getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				Character dvalue = entry.getValue();
-				if ( dvalue == null )
-					dvalue = ' ';
-				ArrayChar.D2 mvar = new ArrayChar.D2(1, 1);
-				mvar.setString(0, dvalue.toString());
-				ncfile.write(var, mvar);
-			}
-
-			for ( Entry<IntDashDataType,Integer> entry : metadata.getIntVariables().entrySet() ) {
-				// Metadata Integers
-				varName = entry.getKey().getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				Integer dvalue = entry.getValue();
-				if ( dvalue == null )
-					dvalue = DashboardUtils.INT_MISSING_VALUE;
-				ArrayInt.D1 mvar = new ArrayInt.D1(1);
-				mvar.set(0, dvalue);
-				ncfile.write(var, mvar);
-			}
-			
-			for ( Entry<DoubleDashDataType,Double> entry : metadata.getDoubleVariables().entrySet() ) {
-				// Metadata Doubles
-				varName = entry.getKey().getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				Double dvalue = entry.getValue();
-				if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
-					dvalue = DashboardUtils.FP_MISSING_VALUE;
-				ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
-				mvar.set(0, dvalue);
-				ncfile.write(var, mvar);
-			}
-
-			for (  IntDashDataType dtype : dataList.get(0).getIntegerVariables().keySet() ) {
-				// Data Integers
+			for (  Entry<DashDataType<?>,Object> entry : metadata.getValuesMap().entrySet() ) {
+				DashDataType<?> dtype = entry.getKey();
 				varName = dtype.getVarName();
 				var = ncfile.findVariable(varName);
 				if ( var == null )
 					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				ArrayInt.D1 dvar = new ArrayInt.D1(dataList.size());
-				for (int index = 0; index < dataList.size(); index++) {
-					Integer dvalue = dataList.get(index).getIntegerVariables().get(dtype);
+
+				
+				if ( dtype instanceof StringDashDataType ) {
+					// Metadata Strings
+					String dvalue = (String) entry.getValue();
 					if ( dvalue == null )
-						dvalue = DashboardUtils.INT_MISSING_VALUE;
-					dvar.set(index, dvalue);
+						dvalue = "";
+					ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
+					mvar.setString(0, dvalue);
+					ncfile.write(var, mvar);
 				}
-				ncfile.write(var, dvar);
-			}
-
-			for (  CharDashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
-				// Data Characters
-				varName = dtype.getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				ArrayChar.D2 dvar = new ArrayChar.D2(dataList.size(), 1);
-				for (int index = 0; index < dataList.size(); index++) {
-					Character dvalue = dataList.get(index).getCharacterVariables().get(dtype);
+				else if ( dtype instanceof CharDashDataType ) {
+					// Metadata characters
+					Character dvalue = (Character) entry.getValue();
 					if ( dvalue == null )
 						dvalue = ' ';
-					dvar.set(index, 0, dvalue);
+					ArrayChar.D2 mvar = new ArrayChar.D2(1, 1);
+					mvar.set(0, 0, dvalue);
+					ncfile.write(var, mvar);
 				}
-				ncfile.write(var, dvar);
+				else if ( dtype instanceof IntDashDataType ) {
+					// Metadata Integers
+					Integer dvalue = (Integer) entry.getValue();
+					if ( dvalue == null )
+						dvalue = DashboardUtils.INT_MISSING_VALUE;
+					ArrayInt.D1 mvar = new ArrayInt.D1(1);
+					mvar.set(0, dvalue);
+					ncfile.write(var, mvar);
+				}
+				else if ( dtype instanceof DoubleDashDataType ) {
+					// Metadata Doubles
+					Double dvalue = (Double) entry.getValue();
+					if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+						dvalue = DashboardUtils.FP_MISSING_VALUE;
+					ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
+					mvar.set(0, dvalue);
+					ncfile.write(var, mvar);
+				}
+				else {
+					throw new IllegalArgumentException("unexpected unknown metadata type: " + dtype.toString());
+				}
 			}
 
-			for (  DoubleDashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
-				// Data Doubles
+			List<DashDataType<?>> dataTypes = stddata.getDataTypes();
+			for (int k = 0; k < stddata.getNumDataCols(); k++) {
+				DashDataType<?> dtype = dataTypes.get(k);
 				varName = dtype.getVarName();
 				var = ncfile.findVariable(varName);
 				if ( var == null )
 					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				ArrayDouble.D1 dvar = new ArrayDouble.D1(dataList.size());
-				for (int index = 0; index < dataList.size(); index++) {
-					Double dvalue = dataList.get(index).getDoubleVariables().get(dtype);
-					if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
-						dvalue = DashboardUtils.FP_MISSING_VALUE;
-					dvar.set(index, dvalue);
-				}
-				ncfile.write(var, dvar);
-			}
 
-			// Reassign the time variable using the year, month, day, hour, 
-			// minute, and (optionally) second values for each data point
-			varName = DashboardServerUtils.TIME.getVarName();
-			var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new RuntimeException("Unexpected failure to find ncfile variable '" + varName + "'");
-			ArrayDouble.D1 values = new ArrayDouble.D1(dataList.size());
-			for (int index = 0; index < dataList.size(); index++) {
-				DsgData datarow = dataList.get(index);
-				Integer year = datarow.getYear();
-				if ( year == DashboardUtils.INT_MISSING_VALUE )
-					throw new IllegalArgumentException("No year is given");
-				Integer month = datarow.getMonth();
-				if ( month == DashboardUtils.INT_MISSING_VALUE )
-					throw new IllegalArgumentException("No month is given");
-				Integer day = datarow.getDay();
-				if ( day == DashboardUtils.INT_MISSING_VALUE )
-					throw new IllegalArgumentException("No day is given");
-				Integer hour = datarow.getHour();
-				if ( hour == DashboardUtils.INT_MISSING_VALUE )
-					throw new IllegalArgumentException("No hour is given");
-				Integer minute = datarow.getMinute();
-				if ( minute == DashboardUtils.INT_MISSING_VALUE )
-					throw new IllegalArgumentException("No month is given");
-				Double second = datarow.getSecond();
-				Integer sec;
-				if ( second.isNaN() || (second == DashboardUtils.FP_MISSING_VALUE) ) {
-					sec = 0;
+				if ( dtype instanceof CharDashDataType ) {
+					// Data Characters
+					ArrayChar.D2 dvar = new ArrayChar.D2(numSamples, 1);
+					for (int j = 0; j < numSamples; j++) {
+						Character dvalue = (Character) stddata.getStdVal(j, k);
+						if ( dvalue == null )
+							dvalue = ' ';
+						dvar.set(j, 0, dvalue);
+					}
+					ncfile.write(var, dvar);
+				}
+				else if ( dtype instanceof IntDashDataType ) {
+					// Data Integers
+					ArrayInt.D1 dvar = new ArrayInt.D1(numSamples);
+					for (int j = 0; j < numSamples; j++) {
+						Integer dvalue = (Integer) stddata.getStdVal(j, k);
+						if ( dvalue == null )
+							dvalue = DashboardUtils.INT_MISSING_VALUE;
+						dvar.set(j, dvalue);
+					}
+					ncfile.write(var, dvar);
+				}
+				else if ( dtype instanceof DoubleDashDataType ) {
+					// Data Doubles
+					ArrayDouble.D1 dvar = new ArrayDouble.D1(numSamples);
+					for (int j = 0; j < numSamples; j++) {
+						Double dvalue = (Double) stddata.getStdVal(j, k);
+						if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+							dvalue = DashboardUtils.FP_MISSING_VALUE;
+						dvar.set(j, dvalue);
+					}
+					ncfile.write(var, dvar);
 				}
 				else {
-					// Truncate - don't deal with roll-overs such as from Feb 28 23:59:59.75;
-					// furthermore, Ferret will overwrite with the fractional seconds. 
-					sec = (int) Math.round(Math.floor(second));
-				}
-				try {
-					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, minute, sec);
-					double value = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-					values.set(index, value);
-				} catch (Exception ex) {
-					throw new IllegalArgumentException("Invalid timestamp " + 
-							year + "-" + month + "-" + day + " " + 
-							hour + ":" + minute + ":" + sec);
+					throw new IllegalArgumentException("unexpected unknown data type: " + dtype.toString());
 				}
 			}
-			ncfile.write(var, values);
+
 		} finally {
 			ncfile.close();
 		}
@@ -430,14 +374,20 @@ public class DsgNcFile extends File {
 	 * reference from the contents of this netCDF DSG file.
 	 * 
 	 * @param metadataTypes
-	 * 		known data types 
+	 * 		metadata file types to read
 	 * @return
-	 * 		names of the metadata fields not assigned from this 
-	 * 		netCDF file (will have its default/missing value)
+	 * 		variable names of the metadata fields not assigned from 
+	 * 		this netCDF file (will have its default/missing value)
+	 * @throws IllegalArgumentException
+	 * 		if there are no metadata types given, or
+	 * 		if an invalid type for metadata is encountered
 	 * @throws IOException
 	 * 		if there are problems opening or reading from the netCDF file
 	 */
-	public ArrayList<String> readMetadata(KnownDataTypes metadataTypes) throws IOException{
+	public ArrayList<String> readMetadata(KnownDataTypes metadataTypes) 
+			throws IllegalArgumentException, IOException{
+		if ( (metadataTypes == null) || metadataTypes.isEmpty() )
+			throw new IllegalArgumentException("no metadata file types given");
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
@@ -451,31 +401,37 @@ public class DsgNcFile extends File {
 					namesNotFound.add(varName);
 					continue;
 				}
+				if ( var.getShape(0) != 1 ) 
+					throw new IOException("more than one value for a metadata type");
 				if ( dtype instanceof StringDashDataType ) {
 					ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
-					metadata.setStringVariableValue((StringDashDataType) dtype, mvar.getString(0));
+					String strval = mvar.getString(0);
+					if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(strval) )
+						metadata.setValue(dtype, strval);
 				}
 				else if ( dtype instanceof CharDashDataType ) {
+					if ( var.getShape(1) != 1 )
+						throw new IOException("more than one character for a character type");
 					ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
-					String strval = mvar.getString(0);
-					Character charval;
-					if ( strval.length() > 0 )
-						charval = strval.charAt(0);
-					else
-						charval = ' ';
-					metadata.setCharVariableValue((CharDashDataType) dtype, charval);
+					Character charval = mvar.get(0, 0);
+					if ( ! DashboardUtils.CHAR_MISSING_VALUE.equals(charval) )
+						metadata.setValue(dtype, charval);
 				}
 				else if ( dtype instanceof IntDashDataType ) {
 					ArrayInt.D1 mvar = (ArrayInt.D1) var.read();
-					metadata.setIntVariableValue((IntDashDataType) dtype, mvar.getInt(0));
+					Integer intval = mvar.getInt(0);
+					if ( ! DashboardUtils.INT_MISSING_VALUE.equals(intval) )
+						metadata.setValue(dtype, intval);
 				}
 				else if ( dtype instanceof DoubleDashDataType ) {
 					ArrayDouble.D1 mvar = (ArrayDouble.D1) var.read();
-					metadata.setDoubleVariableValue((DoubleDashDataType) dtype, mvar.getDouble(0));
+					Double dblval = mvar.getDouble(0);
+					if ( ! DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, dblval, 
+							DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+						metadata.setValue(dtype, dblval);
 				}
 				else {
-					throw new RuntimeException("Unexpected data class name '" + 
-							dtype.getDataClassName() + "' for variable '" + varName + "'");
+					throw new IllegalArgumentException("invalid metadata file type " + dtype.getVarName());
 				}
 			}
 		} finally {
@@ -485,66 +441,103 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * Creates and assigns the internal data list
+	 * Creates and assigns the internal standard data array 
 	 * reference from the contents of this netCDF DSG file.
 	 * 
+	 * @param dataTypes
+	 * 		data files types to read
 	 * @return
-	 * 		names of the data fields not assigned from this 
-	 * 		netCDF file (will have its default/missing value)
-	 * @throws IOException
-	 * 		if there are problems opening or reading from the netCDF file
+	 * 		variable names of the data types not assigned from 
+	 * 		this netCDF file (will have its default/missing value)
 	 * @throws IllegalArgumentException
-	 * 		if the netCDF file is invalid.  Currently it must have a
-	 * 		'time' variable and all data variables must have the same
-	 * 		number of values as this variable.
+	 * 		if no known data types are given, or
+	 * 		if an invalid type for data files is encountered
+	 * @throws IOException
+	 * 		if the netCDF file is invalid: it must have a 'time' 
+	 * 		variable and all data variables must have the same
+	 * 		number of values as the 'time' variable, or
+	 * 		if there are problems opening or reading from the netCDF file
 	 */
-	public ArrayList<String> readData(KnownDataTypes knownTypes) 
-			throws IOException, IllegalArgumentException {
+	public ArrayList<String> readData(KnownDataTypes dataTypes) 
+			throws IllegalArgumentException, IOException {
+		if ( (dataTypes == null) || dataTypes.isEmpty() )
+			throw new IllegalArgumentException("no data file types given");
+		int numColumns;
+		DashDataType<?>[] dataTypesArray;
+		{
+			TreeSet<DashDataType<?>> dataTypesSet = dataTypes.getKnownTypesSet();
+			numColumns = dataTypesSet.size();
+			dataTypesArray = new DashDataType<?>[numColumns];
+			int idx = -1;
+			for ( DashDataType<?> dtype : dataTypesSet ) {
+				idx++;
+				dataTypesArray[idx] = dtype;
+			}
+		}
+
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
-			// Get the number of data points from the length of the time 1D array
+			// Get the number of samples from the length of the time 1D array
 			String varName = DashboardServerUtils.TIME.getVarName();
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			int numData = var.getShape(0);
+				throw new IOException("unable to find variable 'time' in " + getName());
+			int numSamples = var.getShape(0);
 
-			// Create the list of data values, all with default (missing) values
-			dataList = new ArrayList<DsgData>(numData);
-			for (int k = 0; k < numData; k++)
-				dataList.add(new DsgData(knownTypes));
+			// Create the array of data values
+			Object[][] dataArray = new Object[numSamples][numColumns];
 
-			for ( DashDataType<?> dtype : knownTypes.getKnownTypesSet() ) {
+			for (int k = 0; k < numColumns; k++) {
+				DashDataType<?> dtype = dataTypesArray[k];
 				varName = dtype.getVarName();
 				var = ncfile.findVariable(varName);
 				if ( var == null ) {
 					namesNotFound.add(varName);
+					for (int j = 0; j < numSamples; j++)
+						dataArray[j][k] = null;
 					continue;
 				}
-				if ( var.getShape(0) != numData )
-					throw new IllegalArgumentException("Number of values for '" + varName + 
+
+				if ( var.getShape(0) != numSamples )
+					throw new IOException("number of values for '" + varName + 
 							"' (" + Integer.toString(var.getShape(0)) + ") does not match " +
-							"the number of values for 'time' (" + Integer.toString(numData) + ")");
-				if ( dtype instanceof IntDashDataType ) {
-					ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
-					for (int k = 0; k < numData; k++)
-						dataList.get(k).setIntegerVariableValue((IntDashDataType) dtype, dvar.get(k));
-				}
-				else if ( dtype instanceof CharDashDataType ) {
+							"the number of values for 'time' (" + Integer.toString(numSamples) + ")");
+
+				if ( dtype instanceof CharDashDataType ) {
+					if ( var.getShape(1) != 1 )
+						throw new IOException("more than one character for a character type");
 					ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
-					for (int k = 0; k < numData; k++)
-						dataList.get(k).setCharacterVariableValue((CharDashDataType) dtype, dvar.get(k,0));
+					for (int j = 0; j < numSamples; j++) {
+						Character charval = dvar.get(j,0);
+						if ( DashboardUtils.CHAR_MISSING_VALUE.equals(charval) )
+							dataArray[j][k] = null;
+						else
+							dataArray[j][k] = charval;
+					}
+				}
+				else if ( dtype instanceof IntDashDataType ) {
+					ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
+					for (int j = 0; j < numSamples; j++) {
+						Integer intval = dvar.get(j);
+						if ( DashboardUtils.INT_MISSING_VALUE.equals(intval) )
+							dataArray[j][k] = null;
+						else
+							dataArray[j][k] = intval;
+					}
 				}
 				else if ( dtype instanceof DoubleDashDataType ) {
 					ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
-					for (int k = 0; k < numData; k++)
-						dataList.get(k).setDoubleVariableValue((DoubleDashDataType) dtype, dvar.get(k));
+					for (int j = 0; j < numSamples; j++) {
+						Double dblval = dvar.get(j);
+						if ( DashboardUtils.FP_MISSING_VALUE.equals(dblval) )
+							dataArray[j][k] = null;
+						else
+							dataArray[j][k] = dblval;
+					}
 				}
 				else {
-					throw new RuntimeException("Unexpected data class name '" + 
-							dtype.getDataClassName() + "' for variable '" + varName + "'");
+					throw new IllegalArgumentException("invalid data file type " + dtype.toString());
 				}
 			}
 		} finally {
@@ -563,20 +556,17 @@ public class DsgNcFile extends File {
 
 	/**
 	 * @return
-	 * 		the internal data list reference; may be null
+	 * 		the internal standard data array reference; may be null
 	 */
-	public ArrayList<DsgData> getDataList() {
-		return dataList;
+	public StdDataArray getStdDataArray() {
+		return stddata;
 	}
 
 	/**
-	 * Reads and returns the array of data values for the specified variable
-	 * contained in this DSG file.  The variable must be saved in the DSG file
-	 * as characters.  Empty strings are changed to a single blank character.
-	 * For some variables, this DSG file must have been processed by Ferret, 
-	 * such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
-	 * for the data values to be meaningful.
+	 * Reads and returns the array of data values for the specified variable 
+	 * contained in this DSG file.  The variable must be saved in the DSG 
+	 * file as characters.  For some variables, this DSG file must have been 
+	 * processed by Ferret for the data values to be meaningful.
 	 * 
 	 * @param varName
 	 * 		name of the variable to read
@@ -603,12 +593,8 @@ public class DsgNcFile extends File {
 						"' is not a single-character array variable in " + getName());
 			int numVals = var.getShape(0);
 			dataVals = new char[numVals];
-			for (int k = 0; k < numVals; k++) {
-				char value = cvar.get(k,0);
-				if ( value == (char) 0 )
-					value = ' ';
-				dataVals[k] = value;
-			}
+			for (int k = 0; k < numVals; k++)
+				dataVals[k] = cvar.get(k,0);
 		} finally {
 			ncfile.close();
 		}
@@ -619,9 +605,7 @@ public class DsgNcFile extends File {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as integers.  For some variables, this DSG file must have been processed 
-	 * by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
-	 * for the data values to be meaningful.
+	 * by Ferret for the data values to be meaningful.
 	 * 
 	 * @param varName
 	 * 		name of the variable to read
@@ -644,9 +628,8 @@ public class DsgNcFile extends File {
 			ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
 			int numVals = var.getShape(0);
 			dataVals = new int[numVals];
-			for (int k = 0; k < numVals; k++) {
+			for (int k = 0; k < numVals; k++)
 				dataVals[k] = dvar.get(k);
-			}
 		} finally {
 			ncfile.close();
 		}
@@ -654,13 +637,11 @@ public class DsgNcFile extends File {
 	}
 
 	/**
-	 * Reads and returns the array of data values for the specified variable
-	 * contained in this DSG file.  The variable must be saved in the DSG file
-	 * as doubles.  NaN and infinite values are changed to 
-	 * {@link DsgData#FP_MISSING_VALUE}.  For some variables, this 
-	 * DSG file must have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardDatasetData, String)}
-	 * for the data values to be meaningful.
+	 * Reads and returns the array of data values for the specified variable contained 
+	 * in this DSG file.  The variable must be saved in the DSG file as doubles.  
+	 * NaN and infinite values are changed to {@link DsgData#FP_MISSING_VALUE}.  
+	 * For some variables, this DSG file must have been processed by Ferret for the data 
+	 * values to be meaningful.
 	 * 
 	 * @param varName
 	 * 		name of the variable to read

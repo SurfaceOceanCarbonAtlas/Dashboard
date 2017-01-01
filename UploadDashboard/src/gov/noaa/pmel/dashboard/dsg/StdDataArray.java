@@ -104,11 +104,11 @@ public class StdDataArray {
 	 * 		if a data value object is not an appropriate object 
 	 * 			for the data column type
 	 */
-	public StdDataArray(List<DashDataType<?>> dataColumnTypes, 
+	public StdDataArray(DashDataType<?>[] dataColumnTypes, 
 			Object[][] stdDataValues) throws IllegalArgumentException {
-		if ( (dataColumnTypes == null) || (dataColumnTypes.isEmpty()) )
+		if ( (dataColumnTypes == null) || (dataColumnTypes.length == 0) )
 			throw new IllegalArgumentException("no data column types given");
-		numDataCols = dataColumnTypes.size();
+		numDataCols = dataColumnTypes.length;
 		if ( (stdDataValues == null) || (stdDataValues.length == 0) )
 			throw new IllegalArgumentException("no standardized data values given");
 		numSamples = stdDataValues.length;
@@ -120,7 +120,7 @@ public class StdDataArray {
 		stdObjects = new Object[numSamples][numDataCols];
 
 		for (int k = 0; k < numDataCols; k++) {
-			DashDataType<?> dtype = dataColumnTypes.get(k);
+			DashDataType<?> dtype = dataColumnTypes[k];
 			if ( dtype == null )
 				throw new IllegalArgumentException(
 						"no data type for column number" + Integer.toString(k+1));
@@ -280,6 +280,7 @@ public class StdDataArray {
 		dataTypes = new DashDataType<?>[numDataCols];
 		stdObjects = new Object[numSamples][numDataCols];
 		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		cal.setLenient(false);
 		for (int k = 0; k < numDataCols; k++) {
 			dataTypes[k] = userDataTypes.get(k);
 			int userIdx = userColIndices.get(k);
@@ -509,6 +510,7 @@ public class StdDataArray {
 	 */
 	public Double[] getSampleTimes() throws IllegalStateException {
 		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		cal.setLenient(false);
 		Double[] sampleTimes = new Double[numSamples];
 
 		if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) && 
