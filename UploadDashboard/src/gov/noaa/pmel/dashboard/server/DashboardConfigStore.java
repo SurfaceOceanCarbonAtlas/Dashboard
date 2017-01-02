@@ -589,7 +589,7 @@ public class DashboardConfigStore {
 		try {
 			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
 					erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf, 
-					knownMetadataTypes, knownDataFileTypes);
+					knownUserDataTypes, knownMetadataTypes, knownDataFileTypes);
 		} catch ( Exception ex ) {
 			throw new IOException(ex);
 		}

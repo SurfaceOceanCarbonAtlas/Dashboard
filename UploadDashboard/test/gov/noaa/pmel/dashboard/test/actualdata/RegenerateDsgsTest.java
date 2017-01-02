@@ -7,22 +7,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
-import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
-import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
-import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
+import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Tests of method in {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs}
@@ -58,7 +51,7 @@ public class RegenerateDsgsTest {
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		DsgMetadata origMeta = fullDataDsg.getMetadata();
-		ArrayList<DsgData> origData = fullDataDsg.getDataList();
+		StdDataArray origData = fullDataDsg.getStdDataArray();
 
 		// Regenerate the DSG files
 		RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
@@ -69,65 +62,19 @@ public class RegenerateDsgsTest {
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		DsgMetadata updatedMeta = fullDataDsg.getMetadata();
-		ArrayList<DsgData> updatedData = fullDataDsg.getDataList();
+		StdDataArray updatedData = fullDataDsg.getStdDataArray();
 
 		// Test that nothing has changed
 		assertEquals(origMeta, updatedMeta);
-		assertEquals(origData.size(), updatedData.size());
-
-		for (int k = 0; k < origData.size(); k++) {
-			DsgData origVals = origData.get(k);
-			DsgData updatedVals = updatedData.get(k);
-
-			if ( ! origVals.equals(updatedVals) ) {
-				// Report all problems for the measurement, not just the first problem
-
-				TreeMap<IntDashDataType,Integer> origIntVals = origVals.getIntegerVariables();
-				TreeMap<IntDashDataType,Integer> updatedIntVals = updatedVals.getIntegerVariables();
-				if ( origIntVals.size() != updatedIntVals.size() )
-					System.err.println("Number of integer values: expected = " + 
-							origIntVals.size() + "; found = " + updatedIntVals.size() );
-				for ( Entry<IntDashDataType,Integer> entry : origIntVals.entrySet() ) {
-					IntDashDataType key = entry.getKey();
-					Integer original = entry.getValue();
-					Integer updated = updatedIntVals.get(key);
-					if ( ! original.equals(updated) )
-						System.err.println("Value of " + key.getVarName() + ": expected = " + 
-								original + "; found = " + updated );
-				}
-
-				TreeMap<CharDashDataType,Character> origCharVals = origVals.getCharacterVariables();
-				TreeMap<CharDashDataType,Character> updatedCharVals = updatedVals.getCharacterVariables();
-				if ( origCharVals.size() != updatedCharVals.size() )
-					System.err.println("Number of character values: expected = " + 
-							origCharVals.size() + "; found = " + updatedCharVals.size() );
-				for ( Entry<CharDashDataType,Character> entry : origCharVals.entrySet() ) {
-					CharDashDataType key = entry.getKey();
-					Character original = entry.getValue();
-					Character updated = updatedCharVals.get(key);
-					if ( ! original.equals(updated) )
-						System.err.println("Value of " + key.getVarName() + ": expected = " + 
-								original + "; found = " + updated );
-				}
-
-				TreeMap<DoubleDashDataType,Double> origDoubleVals = origVals.getDoubleVariables();
-				TreeMap<DoubleDashDataType,Double> updatedDoubleVals = updatedVals.getDoubleVariables();
-				if ( origDoubleVals.size() != updatedDoubleVals.size() )
-					System.err.println("Number of character values: expected = " + 
-							origDoubleVals.size() + "; found = " + updatedDoubleVals.size() );
-				for ( Entry<DoubleDashDataType,Double> entry : origDoubleVals.entrySet() ) {
-					DoubleDashDataType key = entry.getKey();
-					Double original = entry.getValue();
-					Double updated = updatedDoubleVals.get(key);
-					if ( ! DashboardUtils.closeTo(original, updated, 
-							DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-						System.err.println("Value of " + key.getVarName() + ": expected = " + 
-								original + "; found = " + updated );
-				}
+		// Check some pieces (to easier see differences) before checking the whole thing 
+		assertEquals(origData.getNumDataCols(), updatedData.getNumDataCols());
+		assertEquals(origData.getNumSamples(), updatedData.getNumSamples());
+		for (int j = 0; j < origData.getNumSamples(); j++) {
+			for (int k = 0; k < origData.getNumDataCols(); k++) {
+				assertEquals(origData.getStdVal(j, k), updatedData.getStdVal(j, k));
 			}
-
-			assertEquals(origVals, updatedVals);
 		}
+		assertEquals(origData, updatedData);
 
 	}
 

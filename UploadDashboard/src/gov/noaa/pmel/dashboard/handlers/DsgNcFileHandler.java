@@ -14,14 +14,17 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
+import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
@@ -38,6 +41,7 @@ public class DsgNcFileHandler {
 	private File erddapDsgFlagFile;
 	private File erddapDecDsgFlagFile;
 	private FerretConfig ferretConfig;
+	private KnownDataTypes knownUserDataTypes;
 	private KnownDataTypes knownMetadataTypes;
 	private KnownDataTypes knownDataFileTypes;
 	private WatchService watcher;
@@ -64,8 +68,8 @@ public class DsgNcFileHandler {
 	 */
 	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
 			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName, 
-			FerretConfig ferretConf, KnownDataTypes knownMetadataTypes, 
-			KnownDataTypes knownDataFileTypes) {
+			FerretConfig ferretConf, KnownDataTypes knownUserDataTypes, 
+			KnownDataTypes knownMetadataTypes, KnownDataTypes knownDataFileTypes) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
@@ -83,6 +87,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("parent directory of " + 
 					erddapDecDsgFlagFile.getPath() + " is not valid");
 		ferretConfig = ferretConf;
+		this.knownUserDataTypes = knownUserDataTypes;
 		this.knownMetadataTypes = knownMetadataTypes;
 		this.knownDataFileTypes = knownDataFileTypes;
 
@@ -187,12 +192,11 @@ public class DsgNcFileHandler {
 		dsgMData.setVersion(version);
 
 		// Convert the data strings into the appropriate type
-		ArrayList<DsgData> dsgDataList = 
-				DsgData.dataListFromDashboardCruise(knownDataFileTypes, dataset);
+		StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
 		// Create the NetCDF DSG file
 		try {
-			dsgFile.create(dsgMData, dsgDataList);
+			dsgFile.create(dsgMData, stdUserData, knownDataFileTypes);
 		} catch (Exception ex) {
 			dsgFile.delete();
 			throw new IllegalArgumentException("Problems creating the DSG file " + 
@@ -284,7 +288,7 @@ public class DsgNcFileHandler {
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected data fields missing from the DSG file: " + missing);
 			try {
-				ArrayList<DsgData> dataVals = oldDsgFile.getDataList();
+				StdDataArray dataVals = oldDsgFile.getStdDataArray();
 				DsgMetadata updatedMeta = oldDsgFile.getMetadata();
 				updatedMeta.setDatasetId(newId);
 				newDsgFile.create(updatedMeta, dataVals);
@@ -376,7 +380,7 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified dataset.  The variable must 
 	 * be saved in the DSG file as characters.  Empty strings are changed to 
-	 * {@link DsgData#CHAR_MISSING_VALUE}.  For some variables, the  
+	 * {@link DashboardUtils#CHAR_MISSING_VALUE}.  For some variables, the  
 	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveDataset(OmeMetadata, DashboardDatasetData, String)}
 	 * for the data values to be meaningful.
@@ -438,7 +442,7 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the full-data DSG file for the specified dataset.  The 
 	 * variable must be saved in the DSG file as doubles.  NaN and infinite 
-	 * values are changed to {@link DsgData#FP_MISSING_VALUE}.  For 
+	 * values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  For 
 	 * some variables, the DSG file must have been processed by Ferret, such 
 	 * as when saved using {@link DsgNcFileHandler#saveDataset(OmeMetadata, 
 	 * DashboardDatasetData, String)} for the data values to be meaningful.
