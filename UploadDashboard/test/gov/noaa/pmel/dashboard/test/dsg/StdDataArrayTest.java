@@ -23,6 +23,7 @@ import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -56,6 +57,7 @@ public class StdDataArrayTest {
 		KNOWN_DATAFILE_TYPES.addTypesFromProperties(typeProps);
 	}
 
+	// StdUserDataArray constructor adds SAMPLE_NUMBER and WOCE_AUTOCHECK
 	static final ArrayList<DashDataType<?>> DATA_COLUMN_DASH_TYPES = new ArrayList<DashDataType<?>>(Arrays.asList(
 			DashboardServerUtils.SAMPLE_DEPTH, 
 			DashboardServerUtils.DATASET_NAME, 
@@ -72,7 +74,9 @@ public class StdDataArrayTest {
 			DsgNcFileTest.XCO2_WATER_SST_DRY, 
 			DsgNcFileTest.PCO2_WATER_TEQU_WET, 
 			DsgNcFileTest.PATM, 
-			DsgNcFileTest.SHIP_SPEED
+			DsgNcFileTest.SHIP_SPEED,
+			DashboardServerUtils.SAMPLE_NUMBER,
+			DashboardServerUtils.WOCE_AUTOCHECK
 	));
 
 	static final ArrayList<DataColumnType> DATA_COLUMN_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
@@ -123,37 +127,46 @@ public class StdDataArrayTest {
 			new ArrayList<String>(Arrays.asList("5,31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,1009.26,7.1".split(","))), 
 			new ArrayList<String>(Arrays.asList("5,31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,1009.237,7.1".split(",")))
 	));
-	
+
+	private static final String EXPOCODE = "31B520060606";
+
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumDataCols()} and
-	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getDataTypes()} 
+	 * Test method for 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#StdUserDataArray()}, 
+	 * (and thus {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#StdDataArray(java.util.List, 
+	 * 		gov.noaa.pmel.dashboard.datatype.KnownDataTypes)}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumDataCols()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getDataTypes()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#getStandardizationMessages()}, 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumSamples()}, and
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#getStdVal(int, int)} 
+	 * (and thus {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#isUsableIndex(int)}).
 	 */
 	@Test
-	public void testGetDataTypes() {
-		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+	public void testStdUserDataArray() {
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+
+		StdUserDataArray stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
 		int numColumns = stdData.getNumDataCols();
-		assertEquals(DATA_COLUMN_TYPES.size(), numColumns);
+		assertEquals(DATA_COLUMN_DASH_TYPES.size(), numColumns);
 		List<DashDataType<?>> dataTypes = stdData.getDataTypes();
 		assertEquals(numColumns, dataTypes.size());
 		for (int k = 0; k < numColumns; k++)
 			assertEquals(DATA_COLUMN_DASH_TYPES.get(k), dataTypes.get(k));
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#standardizeData(java.util.ArrayList)},
-	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#getNumSamples()}, and
-	 * and {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#getStdVal(int, int)}.
-	 */
-	@Test
-	public void testStandardizeData() {
-		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		Integer numDataCols = DATA_COLUMN_TYPES.size();
 
 		// Errors in data: first row has too many values (one message), 
 		// second row does not have enough values (two messages; one for the row, one for the value),
 		// third row has value that cannot be interpreted (one messages)
 		// Not the excessive large pressure in the first row should NOT generate an error at this time
-		ArrayList<ADCMessage> msgList = stdData.standardizeData(DATA_VALUE_STRINGS);
+		ArrayList<ADCMessage> msgList = stdData.getStandardizationMessages();
 		assertEquals(DATA_VALUE_STRINGS.size(), stdData.getNumSamples());
 		assertEquals(4, msgList.size());
 
@@ -171,17 +184,18 @@ public class StdDataArrayTest {
 		assertEquals(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
 		assertTrue( msg.getDetailedComment().contains(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
 
+		Integer lastUserDataColNum = DATA_COLUMN_TYPES.size();
 		msg = msgList.get(2);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(2), msg.getRowNumber());
-		assertEquals(numDataCols, msg.getColNumber());
+		assertEquals(lastUserDataColNum, msg.getColNumber());
 		assertEquals(NO_VALUE_ERRMSG, msg.getGeneralComment());
 		assertEquals(NO_VALUE_ERRMSG, msg.getDetailedComment());
 
 		msg = msgList.get(3);
 		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(3), msg.getRowNumber());
-		assertEquals(numDataCols, msg.getColNumber());
+		assertEquals(lastUserDataColNum, msg.getColNumber());
 		assertEquals(INVALID_FP_VALUE_ERRMSG, msg.getGeneralComment());
 		assertTrue( msg.getDetailedComment().contains(INVALID_FP_VALUE_ERRMSG) );
 
@@ -206,25 +220,46 @@ public class StdDataArrayTest {
 			}
 		}
 		// Rest of the columns are Double
-		for (int k = 8; k < numDataCols-1; k++) {
+		for (int k = 8; k < lastUserDataColNum-1; k++) {
 			for (int j = 0; j < numRows; j++) {
 				Double value = (Double) stdData.getStdVal(j, k);
 				assertEquals(Double.valueOf(DATA_VALUE_STRINGS.get(j).get(k)), value, 1.0E-6);
 			}
 		}
 		// Check the invalid values
-		assertNull( stdData.getStdVal(0,numDataCols-1) );
-		assertNull( stdData.getStdVal(1,numDataCols-1) );
-		assertNull( stdData.getStdVal(2,numDataCols-1) );
+		assertNull( stdData.getStdVal(0,lastUserDataColNum-1) );
+		assertNull( stdData.getStdVal(1,lastUserDataColNum-1) );
+		assertNull( stdData.getStdVal(2,lastUserDataColNum-1) );
 		for (int j = 3; j < numRows; j++) {
-			Double value = (Double) stdData.getStdVal(j, numDataCols-1);
-			assertEquals(Double.valueOf(DATA_VALUE_STRINGS.get(j).get(numDataCols-1)), value, 1.0E-6);
+			Double value = (Double) stdData.getStdVal(j, lastUserDataColNum-1);
+			assertEquals(Double.valueOf(DATA_VALUE_STRINGS.get(j).get(lastUserDataColNum-1)), value, 1.0E-6);
 		}
 
+		// Added SAMPLE_NUMBER colummn
+		int idx = dataTypes.indexOf(DashboardServerUtils.SAMPLE_NUMBER);
+		for (int j = 0; j < numRows; j++)
+			assertEquals(j+1, ((Integer) stdData.getStdVal(j, idx)).intValue());
+
+		// WOCE_AUTOCHECK values are still all default values despite errors
+		// (still need to process the messages generated)
+		idx = dataTypes.indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
+		for (int j = 0; j < numRows; j++)
+			assertEquals(DashboardServerUtils.FLAG_ACCEPTABLE, (Character) stdData.getStdVal(j, idx));
+		
 		ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
 				DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()) );
-		msgList = stdData.standardizeData(subset);
-		assertTrue( msgList.isEmpty() );
+		dataset.setDataValues(subset);
+		dataset.setRowNums(new ArrayList<Integer>(rowNums.subList(3, DATA_VALUE_STRINGS.size())));
+
+		stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
+		msgList = stdData.getStandardizationMessages();
+		assertEquals(0, msgList.size());
+
+		// Uses the sample numbers as given in the dataset
+		idx = dataTypes.indexOf(DashboardServerUtils.SAMPLE_NUMBER);
+		for (int j = 0; j < numRows-3; j++)
+			assertEquals(j+4, ((Integer) stdData.getStdVal(j, idx)).intValue());
+		
 	}
 
 	/**
@@ -235,8 +270,17 @@ public class StdDataArrayTest {
 	 */
 	@Test
 	public void testGetSampleLonLatDepthTime() {
-		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		stdData.standardizeData(DATA_VALUE_STRINGS);
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+
+		StdUserDataArray stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
 		int numSamples = stdData.getNumSamples();
 
 		int lonIdx = stdData.getDataTypes().indexOf(DashboardServerUtils.LONGITUDE);
@@ -286,16 +330,17 @@ public class StdDataArrayTest {
 	 */
 	@Test
 	public void testHasYearMonthDayHourMinuteSecond() {
-		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		// For StdUserDataArray, all columns invalid until data values are given
-		assertFalse( stdData.hasYear() );
-		assertFalse( stdData.hasMonthOfYear() );
-		assertFalse( stdData.hasDayOfMonth() );
-		assertFalse( stdData.hasHourOfDay() );
-		assertFalse( stdData.hasMinuteOfHour() );
-		assertFalse( stdData.hasSecondOfMinute() );
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
 
-		stdData.standardizeData(DATA_VALUE_STRINGS);
+		StdUserDataArray stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
 		// No seconds given in the data
 		assertTrue( stdData.hasYear() );
 		assertTrue( stdData.hasMonthOfYear() );
@@ -311,36 +356,61 @@ public class StdDataArrayTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		StdUserDataArray stdData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+
+		StdUserDataArray stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
 		assertFalse( stdData.equals(null) );
 		assertFalse( stdData.equals(USER_COLUMN_NAMES) );
 
-		StdUserDataArray other = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		assertTrue( stdData.hashCode() == other.hashCode() );
-		assertTrue( stdData.equals(other) );
+		DashboardDatasetData otherDataset = new DashboardDatasetData();
+		otherDataset.setDatasetId(EXPOCODE);
+		otherDataset.setUserColNames(USER_COLUMN_NAMES);
+		otherDataset.setDataColTypes(DATA_COLUMN_TYPES);
+		otherDataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> otherRowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			otherRowNums.add(k);
+		otherDataset.setRowNums(otherRowNums);
 
-		stdData.standardizeData(DATA_VALUE_STRINGS);
-		assertFalse( stdData.hashCode() == other.hashCode() );
-		assertFalse( stdData.equals(other) );
-
-		other.standardizeData(DATA_VALUE_STRINGS);
+		StdUserDataArray other = new StdUserDataArray(otherDataset, KNOWN_USER_TYPES);
 		assertTrue( stdData.hashCode() == other.hashCode() );
 		assertTrue( stdData.equals(other) );
 
 		ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
 				DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()) );
-		other.standardizeData(subset);
+		otherDataset.setDataValues(subset);
+		otherDataset.setRowNums(new ArrayList<Integer>(otherRowNums.subList(3, DATA_VALUE_STRINGS.size())));
+
+		other = new StdUserDataArray(otherDataset, KNOWN_USER_TYPES);
 		assertFalse( stdData.hashCode() == other.hashCode() );
 		assertFalse( stdData.equals(other) );
 	}
 
 	/**
-	 * Test method for {@link StdDataArray#StdDataArray(StdUserDataArray, KnownDataTypes)}
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#StdDataArray(
+	 * gov.noaa.pmel.dashboard.dsg.StdUserDataArray, gov.noaa.pmel.dashboard.datatype.KnownDataTypes)}
 	 */
 	@Test
 	public void testStdDataArrayStdUserDataArrayKnownTypes() {
-		StdUserDataArray stdUserData = new StdUserDataArray(USER_COLUMN_NAMES, DATA_COLUMN_TYPES, KNOWN_USER_TYPES);
-		stdUserData.standardizeData(DATA_VALUE_STRINGS);
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+		StdUserDataArray stdUserData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
+
 		StdDataArray stdFileData = new StdDataArray(stdUserData, KNOWN_DATAFILE_TYPES);
 		int numSamples = stdUserData.getNumSamples();
 		assertEquals(numSamples, stdFileData.getNumSamples());
@@ -377,11 +447,17 @@ public class StdDataArrayTest {
 			assertEquals(userVals[j], fileVal, 1.0E-6);
 		}
 
+		// standard data array of data files should not have any metadata types
 		int userIdx = stdUserData.getDataTypes().indexOf(DashboardServerUtils.DATASET_NAME);
 		assertTrue( userIdx >= 0 );
 		fileIdx = stdFileData.getDataTypes().indexOf(DashboardServerUtils.DATASET_NAME);
-		assertEquals(-1, fileIdx);
+		assertFalse( fileIdx >= 0 );
 
+		fileIdx = stdFileData.getDataTypes().indexOf(DashboardServerUtils.SAMPLE_NUMBER);
+		assertTrue( fileIdx >= 0 );
+		fileIdx = stdFileData.getDataTypes().indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
+		assertTrue( fileIdx >= 0 );
+		
 		userIdx = stdUserData.getDataTypes().indexOf(DsgNcFileTest.SST);
 		fileIdx = stdFileData.getDataTypes().indexOf(DsgNcFileTest.SST);
 		for (int j = 0; j < numSamples; j++) {
@@ -405,6 +481,49 @@ public class StdDataArrayTest {
 			}
 			else {
 				assertEquals(userVal, fileVal, 1.0E-6);
+			}
+		}
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#StdDataArray(
+	 * gov.noaa.pmel.dashboard.datatype.DashDataType[], java.lang.Object[][])}
+	 */
+	@Test
+	public void testStdDataArrayDashDataTypeArrayObjectArray() {
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		dataset.setDataValues(DATA_VALUE_STRINGS);
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(DATA_VALUE_STRINGS.size());
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+		StdUserDataArray stdUserData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
+		StdDataArray stdFileData = new StdDataArray(stdUserData, KNOWN_DATAFILE_TYPES);
+
+		int numColumns = stdFileData.getNumDataCols();
+		int numRows = stdFileData.getNumSamples();
+		List<DashDataType<?>> fileDataTypes = stdFileData.getDataTypes();
+
+		DashDataType<?>[] dataTypes = new DashDataType<?>[numColumns];
+		Object[][] dataValues = new Object[numRows][numColumns];
+
+		for (int k = 0; k < numColumns; k++) {
+			dataTypes[k] = fileDataTypes.get(k);
+			for (int j = 0; j < numRows; j++) {
+				dataValues[j][k] = stdFileData.getStdVal(j, k);
+			}
+		}
+
+		StdDataArray stdData = new StdDataArray(dataTypes, dataValues);
+		assertEquals(numColumns, stdData.getNumDataCols());
+		assertEquals(fileDataTypes, stdData.getDataTypes());
+		assertEquals(numRows, stdData.getNumSamples());
+		for (int j = 0; j < numRows; j++) {
+			for (int k = 0; k < numColumns; k++) {
+				assertEquals(stdFileData.getStdVal(j, k), stdData.getStdVal(j, k));
 			}
 		}
 	}

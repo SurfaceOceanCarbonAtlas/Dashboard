@@ -530,7 +530,8 @@ public class DsgNcFile extends File {
 					ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
 					for (int j = 0; j < numSamples; j++) {
 						Double dblval = dvar.get(j);
-						if ( DashboardUtils.FP_MISSING_VALUE.equals(dblval) )
+						if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, dblval, 
+								DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 							dataArray[j][k] = null;
 						else
 							dataArray[j][k] = dblval;
@@ -540,6 +541,7 @@ public class DsgNcFile extends File {
 					throw new IllegalArgumentException("invalid data file type " + dtype.toString());
 				}
 			}
+			stddata = new StdDataArray(dataTypesArray, dataArray);
 		} finally {
 			ncfile.close();
 		}
