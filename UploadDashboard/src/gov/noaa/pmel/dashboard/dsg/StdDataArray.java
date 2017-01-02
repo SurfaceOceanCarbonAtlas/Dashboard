@@ -47,8 +47,11 @@ public class StdDataArray {
 	protected int secondOfDayIndex;
 
 	/**
-	 * Create and assign the 1-D arrays of data column types from the given data 
-	 * column descriptions.  The 2-D array of standard data objects is not created.
+	 * Create and assign the 1-D arrays of data column types from 
+	 * the given user's descriptions of the data column.  Appends 
+	 * the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} 
+	 * and {@link DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D 
+	 * array of standard data objects is not created.
 	 * 
 	 * @param dataColumnTypes
 	 * 		user's description of the data columns in each sample
@@ -56,7 +59,7 @@ public class StdDataArray {
 	 * 		all known user data types
 	 * @throws IllegalArgumentException
 	 * 		if there are no user data column descriptions, 
-	 * 		if there are no known user data types, 
+	 * 		if there are no known user data types, or 
 	 * 		if a data column description is not a known user data type
 	 */
 	protected StdDataArray(List<DataColumnType> dataColumnTypes, 
@@ -68,7 +71,7 @@ public class StdDataArray {
 		numDataCols = dataColumnTypes.size();
 		numSamples = 0;
 
-		dataTypes = new DashDataType<?>[numDataCols];
+		dataTypes = new DashDataType<?>[numDataCols+2];
 		stdObjects = null;
 
 		for (int k = 0; k < numDataCols; k++) {
@@ -78,6 +81,9 @@ public class StdDataArray {
 				throw new IllegalArgumentException("unknown data column type: " + 
 						dataColType.getDisplayName());
 		}
+		dataTypes[numDataCols] = DashboardServerUtils.SAMPLE_NUMBER;
+		dataTypes[numDataCols+1] = DashboardServerUtils.WOCE_AUTOCHECK;
+		numDataCols += 2;
 
 		assignColumnIndicesOfInterest();
 	}
@@ -203,7 +209,8 @@ public class StdDataArray {
 	 * 		if any sample longitude, latitude, sample depth is missing, or
 	 * 		if any sample time cannot be computed.
 	 */
-	public StdDataArray(StdUserDataArray userStdData, KnownDataTypes dataFileTypes) throws IllegalArgumentException {
+	public StdDataArray(StdUserDataArray userStdData, 
+			KnownDataTypes dataFileTypes) throws IllegalArgumentException {
 		// StdUserDataArray has to have data columns, but could be missing the data values
 		numSamples = userStdData.getNumSamples();
 		if ( numSamples <= 0 )
@@ -945,14 +952,21 @@ public class StdDataArray {
 		repr += ", secondOfMinuteIndex=" + secondOfMinuteIndex;
 		repr += ", dayOfYearIndex=" + dayOfYearIndex;
 		repr += ", secondOfDayIndex=" + secondOfDayIndex;
-		repr += ",\n  dataTypes=" + Arrays.toString(dataTypes);
+		repr += ",\n  dataTypes=[";
+		for (int k = 0; k < numDataCols; k++) {
+			if ( k > 0 )
+				repr += ",";
+			repr += "\n    " + dataTypes[k].toString();
+		}
+		repr += "\n  ]";
 		repr += ",\n  stdObjects=[";
 		for (int j = 0; j < numSamples; j++) {
 			if ( j > 0 )
 				repr += ",";
 			repr += "\n    " + Arrays.toString(stdObjects[j]);
 		}
-		repr += "\n  ]\n]";
+		repr += "\n  ]";
+		repr += "\n]";
 		return repr;
 	}
 

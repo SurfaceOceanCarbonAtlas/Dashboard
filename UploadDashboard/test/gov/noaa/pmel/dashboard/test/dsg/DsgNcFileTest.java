@@ -74,10 +74,10 @@ public class DsgNcFileTest {
 	/** Known data types for users */
 	static final KnownDataTypes KNOWN_USER_DATA_TYPES;
 
-	/** Known SOCAT metadata types for files */
+	/** Known metadata types for files */
 	static final KnownDataTypes KNOWN_METADATA_FILE_TYPES;
 
-	/** Known SOCAT data types for files */
+	/** Known data types for files */
 	static final KnownDataTypes KNOWN_DATA_FILE_TYPES;
 
 	static {
@@ -162,16 +162,16 @@ public class DsgNcFileTest {
 
 		// Create the DashboardDatasetData from the above data
 		DashboardDatasetData cruise = new DashboardDatasetData();
+		cruise.setDatasetId(expocode);
 		cruise.setUserColNames(userColumnNames);
 		cruise.setDataColTypes(testTypes);
 		cruise.setDataValues(testValues);
-		ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
-		for (int k = 1; k <= testTypes.size(); k++)
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(testValues.size());
+		for (int k = 1; k <= testValues.size(); k++)
 			rowNums.add(k);
 		cruise.setRowNums(rowNums);
 
-		StdUserDataArray stdUserData = new StdUserDataArray(userColumnNames, testTypes, KNOWN_USER_DATA_TYPES);
-		stdUserData.standardizeData(testValues);
+		StdUserDataArray stdUserData = new StdUserDataArray(cruise, KNOWN_USER_DATA_TYPES);
 
 		// Create the DsgMetadata for this cruise
 		DsgMetadata metadata = new DsgMetadata(KNOWN_METADATA_FILE_TYPES);
@@ -245,16 +245,16 @@ public class DsgNcFileTest {
 
 			// Create the DashboardDatasetData from the above data
 			DashboardDatasetData cruise = new DashboardDatasetData();
+			cruise.setDatasetId(expocode);
 			cruise.setUserColNames(userColumnNames);
 			cruise.setDataColTypes(testTypes);
 			cruise.setDataValues(testValues);
-			ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
-			for (int k = 1; k <= testTypes.size(); k++)
+			ArrayList<Integer> rowNums = new ArrayList<Integer>(testValues.size());
+			for (int k = 1; k <= testValues.size(); k++)
 				rowNums.add(k);
 			cruise.setRowNums(rowNums);
 
-			StdUserDataArray stdUserData = new StdUserDataArray(userColumnNames, testTypes, KNOWN_USER_DATA_TYPES);
-			stdUserData.standardizeData(testValues);
+			StdUserDataArray stdUserData = new StdUserDataArray(cruise, KNOWN_USER_DATA_TYPES);
 
 			// Create the DsgMetadata for this cruise
 			DsgMetadata metadata = new DsgMetadata(KNOWN_METADATA_FILE_TYPES);

@@ -5,15 +5,16 @@ package gov.noaa.pmel.dashboard.dsg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.ValueConverter;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 /**
  * A 2-D array of objects corresponding to the standardized values of string values 
@@ -31,42 +32,50 @@ public class StdUserDataArray extends StdDataArray {
 	private String[] userUnits;
 	private String[] userMissVals;
 	private Boolean[] standardized;
+	private ArrayList<ADCMessage> stdMsgList;
 
 	/**
-	 * Create and assign the 1-D arrays of data column information (type, input unit, input 
-	 * missing value) from the given data column descriptions.  The 2-D array of standard
-	 * data objects is not created until {@link #standardizeData(ArrayList)} is called.
+	 * Create from the user's data column descriptions, data strings,  
+	 * data row numbers, and data check flags given for this dataset.  Any 
+	 * data columns types matching {@link DashboardServerUtils#UNKNOWN} 
+	 * or {@link DashboardServerUtils#OTHER} are ignored; 
+	 * {@link #isUsableIndex(int)} will return false, and 
+	 * {@link #getStdVal(int, int)} will throw an exception 
+	 * for data columns of these types.  
+	 * <br /><br />
+	 * The list of automated data check messages describing problems 
+	 * (critical errors) encountered when standardizing the data can 
+	 * be retrieved using {@link #getStandardizationMessages()}.
+	 * <br /><br />
+	 * No bounds checking of standardized data values is performed.
 	 * 
-	 * @param userColumnNames
-	 * 		user's name for the data columns
-	 * @param dataColumnTypes
-	 * 		user's description of the data columns in each sample
+	 * @throws IllegalArgumentException
+	 * @param dataset
+	 * 		dataset, with user's strings data, to use
 	 * @param knownTypes
 	 * 		all known user data types
 	 * @throws IllegalArgumentException
-	 * 		if there are no user column names,
-	 * 		if a user column name is null, 
-	 * 		if the number of user column names and 
-	 * 			number of user data column descriptions are not the same, 
-	 * 		if there are no known user data types, 
-	 * 		if a data column description is not a known user data type
+	 * 		if there are no data values,
+	 * 		if a data column description is not a known user data type,
+	 * 		if a required unit conversion is not supported, or
+	 * 		if a standardizer for a given data type is not known
 	 */
-	public StdUserDataArray(List<String> userColumnNames, List<DataColumnType> dataColumnTypes, 
+	public StdUserDataArray(DashboardDatasetData dataset, 
 			KnownDataTypes knownTypes) throws IllegalArgumentException {
-		super(dataColumnTypes, knownTypes);
-		if ( (userColumnNames == null) || userColumnNames.isEmpty() )
-			throw new IllegalArgumentException("no user data column names given");
-		if ( userColumnNames.size() != numDataCols )
-			throw new IllegalArgumentException("different number of data column names (" + 
-					userColumnNames.size() + ") and types (" +  numDataCols + ")");
-		userColNames = new String[numDataCols];
+		super(dataset.getDataColTypes(), knownTypes);
+
+		// Add the user's units, missing values, and user column names
 		userUnits = new String[numDataCols];
 		userMissVals = new String[numDataCols];
-
-		for (int k = 0; k < numDataCols; k++) {
-			userColNames[k] = userColumnNames.get(k);
-			if ( userColNames[k] == null )
-				throw new IllegalArgumentException("missing user data column name");
+		userColNames = new String[numDataCols];
+		ArrayList<DataColumnType> dataColumnTypes = dataset.getDataColTypes();
+		int numUserDataCols = dataColumnTypes.size();
+		ArrayList<String> names = dataset.getUserColNames();
+		if ( names.size() != numUserDataCols )
+			throw new IllegalArgumentException("number of user column names (" + 
+					names.size() + ") does not match the number of user column types (" + 
+					numUserDataCols + ")");
+		for (int k = 0; k < numUserDataCols; k++) {
 			DataColumnType dataColType = dataColumnTypes.get(k);
 			userUnits[k] = dataColType.getUnits().get(dataColType.getSelectedUnitIndex());
 			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
@@ -74,62 +83,54 @@ public class StdUserDataArray extends StdDataArray {
 			userMissVals[k] = dataColType.getSelectedMissingValue();
 			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userMissVals[k]) )
 				userMissVals[k] = null;
+			userColNames[k] = names.get(k);
 		}
+		// the StdDataArray constructor used adds SAMPLE_NUMBER and WOCE_AUTOCHECK
+		for (int k = numUserDataCols; k < numDataCols; k++) {
+			// use the standard unit, a default missing value string, 
+			// and the type display name for these added types
+			userUnits[k] = dataTypes[k].getUnits().get(0);
+			if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
+				userUnits[k] = null;
+			userMissVals[k] = null;
+			userColNames[k] = dataTypes[k].getDisplayName();
+		}
+
 		standardized = new Boolean[numDataCols];
 		for (int k = 0; k < numDataCols; k++)
 			standardized[k] = null;
-	}
 
-	/**
-	 * Create and assign the 2-D array of standard objects by interpreting the 
-	 * list of lists of strings representations of these objects using data column 
-	 * information provided in the constructor.  The list of lists of strings is 
-	 * arranged such that each inner list gives each data column value for a 
-	 * particular sample, and the outer list iterates through each sample.  
-	 * <br /><br />
-	 * Any data columns types matching {@link DashboardServerUtils#UNKNOWN} or 
-	 * {@link DashboardServerUtils#OTHER} are ignored; {@link #getStdVal(int, int)} 
-	 * will throw an IllegalArgumentException if a standard value is requested 
-	 * from such a data column.
-	 * <br /><br />
-	 * No bounds checking of standardized data values is performed.
-	 * 
-	 * @param dataVals
-	 * 		a list of list of data value strings where dataVals.get(j).get(k) is 
-	 * 		the value of the k-th data column for the j-th sample.
-	 * @return
-	 * 		a list of automated data check messages describing problems (critical 
-	 * 		errors) encountered when standardizing the data; never null but may 
-	 * 		be empty.
-	 * @throws IllegalArgumentException
-	 * 		if there are no data samples (outer list is empty),
-	 * 		if a required unit conversion is not supported, or
-	 * 		if a standardizer for a given data type is not known
-	 */
-	public ArrayList<ADCMessage> standardizeData(ArrayList<ArrayList<String>> dataVals) 
-													throws IllegalArgumentException {
-		// Create the 2-D array 
+		ArrayList<ArrayList<String>> dataVals = dataset.getDataValues();
 		if ( dataVals.isEmpty() )
 			throw new IllegalArgumentException("no data values given");
 		numSamples = dataVals.size();
+
+		ArrayList<Integer> rowNums = dataset.getRowNums();
+		if ( rowNums.size() != numSamples )
+			throw new IllegalArgumentException("number of row numbers (" + 
+					rowNums.size() + ") does not match the number of samples (" + 
+					numSamples + ")");
+
 		stdObjects = new Object[numSamples][numDataCols];
-		ArrayList<ADCMessage> msgList = new ArrayList<ADCMessage>();
+		stdMsgList = new ArrayList<ADCMessage>();
+
 		// Create a 2-D array of these Strings for efficiency
 		String[][] strDataVals = new String[numSamples][numDataCols];
+		int woceIdx = -1;
 		for (int j = 0; j < numSamples; j++) {
 			ArrayList<String> rowVals = dataVals.get(j);
-			if ( rowVals.size() != numDataCols ) {
+			if ( rowVals.size() != numUserDataCols ) {
 				// Generate a general message for this row - in case too long
 				ADCMessage msg = new ADCMessage();
 				msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
 				msg.setRowNumber(j+1);
 				msg.setGeneralComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG);
 				msg.setDetailedComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG + "; " + 
-						numDataCols + " expected but " + rowVals.size() + " found");
-				msgList.add(msg);
+						numUserDataCols + " expected but " + rowVals.size() + " found");
+				stdMsgList.add(msg);
 				// Continue on, assuming the missing values are at the end
 			}
-			for (int k = 0; k < numDataCols; k++) {
+			for (int k = 0; k < numUserDataCols; k++) {
 				try {
 					strDataVals[j][k] = rowVals.get(k);
 				} catch ( IndexOutOfBoundsException ex ) {
@@ -137,8 +138,33 @@ public class StdUserDataArray extends StdDataArray {
 					strDataVals[j][k] = null;
 				}
 			}
+			for (int k = numUserDataCols; k < numDataCols; k++) {
+				if ( DashboardServerUtils.SAMPLE_NUMBER.typeNameEquals(dataTypes[k]) ) {
+					strDataVals[j][k] = rowNums.get(j).toString();
+				}
+				else if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) ) {
+					// Default to acceptable; update afterwards
+					strDataVals[j][k] = DashboardServerUtils.FLAG_ACCEPTABLE.toString();
+					woceIdx = k;
+				}
+				else {
+					throw new IllegalArgumentException("unexpected unknown added data types");
+				}
+			}
 		}
-		// Standardize data columns that do not require values from other data columns
+		// Add the automatic data checker WOCE flags
+		if ( woceIdx >= 0 ) {
+			for ( QCFlag flag : dataset.getCheckerFlags() ) {
+				if ( DashboardServerUtils.WOCE_AUTOCHECK.getVarName().equals(flag.getFlagName()) ) {
+					Integer j = flag.getRowIndex();
+					if ( ! DashboardUtils.INT_MISSING_VALUE.equals(j) ) {
+						strDataVals[j][woceIdx] = flag.getFlagValue().toString();
+					}
+				}
+			}
+		}
+
+		// Standardize data columns
 		boolean needsAnotherPass;
 		do {
 			needsAnotherPass = false;
@@ -169,7 +195,7 @@ public class StdUserDataArray extends StdDataArray {
 									msg.setDetailedComment(ex.getMessage());
 								else
 									msg.setDetailedComment(ex.getMessage() + ": \"" + strDataVals[j][k] + "\"");
-								msgList.add(msg);
+								stdMsgList.add(msg);
 							}
 						}
 						standardized[k] = true;
@@ -180,8 +206,16 @@ public class StdUserDataArray extends StdDataArray {
 				}
 			}
 		} while ( needsAnotherPass );
+	}
 
-		return msgList;
+	/**
+	 * @return
+	 * 		the list of automated data check messages describing problems 
+	 * 		(critical errors) encountered when standardizing the data in
+	 * 		the constructor.
+	 */
+	public ArrayList<ADCMessage> getStandardizationMessages() {
+		return stdMsgList;
 	}
 
 	/**
@@ -239,6 +273,7 @@ public class StdUserDataArray extends StdDataArray {
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
+		result = prime * result + stdMsgList.hashCode();
 		result = prime * result + Arrays.hashCode(standardized);
 		result = prime * result + Arrays.hashCode(userMissVals);
 		result = prime * result + Arrays.hashCode(userUnits);
@@ -257,6 +292,8 @@ public class StdUserDataArray extends StdDataArray {
 			return false;
 		StdUserDataArray other = (StdUserDataArray) obj;
 
+		if ( ! stdMsgList.equals(other.stdMsgList) )
+			return false;
 		if ( ! Arrays.equals(standardized, other.standardized) )
 			return false;
 		if ( ! Arrays.equals(userColNames, other.userColNames) )
@@ -272,6 +309,16 @@ public class StdUserDataArray extends StdDataArray {
 	@Override
 	public String toString() {
 		String repr = "StdUserDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols;
+		repr += ",\n  stdMsgList=[";
+		boolean first = true;
+		for ( ADCMessage msg : stdMsgList ) {
+			if ( first )
+				first = false;
+			else
+				repr += ",";
+			repr += "\n    " + msg.toString();
+		}
+		repr += "\n  ]";
 		repr += ",\n  userColNames=" + Arrays.toString(userColNames);
 		repr += ",\n  userUnits=" + Arrays.toString(userUnits);
 		repr += ",\n  userMissVals=" + Arrays.toString(userMissVals);
