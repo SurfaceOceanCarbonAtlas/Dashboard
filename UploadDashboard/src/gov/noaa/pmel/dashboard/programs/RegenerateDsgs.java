@@ -9,9 +9,9 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
+import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -74,7 +74,7 @@ public class RegenerateDsgs {
 		boolean updateIt = forceIt;
 		String stdId = DashboardServerUtils.checkDatasetID(datasetId);
 		DsgNcFile fullDataDsg;
-		ArrayList<DsgData> dataVals;
+		StdDataArray dataVals;
 
 		DsgMetadata updatedMeta;
 		try {
@@ -87,7 +87,7 @@ public class RegenerateDsgs {
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected data fields missing from the DSG file: " + missing);
 			DsgMetadata fullDataMeta = fullDataDsg.getMetadata();
-			dataVals = fullDataDsg.getDataList();
+			dataVals = fullDataDsg.getStdDataArray();
 
 			// Get the metadata in the OME XML file
 			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(

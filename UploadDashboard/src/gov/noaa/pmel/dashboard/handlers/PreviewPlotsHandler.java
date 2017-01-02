@@ -7,9 +7,9 @@ import org.apache.log4j.Logger;
 
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.dsg.DsgData;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -22,6 +22,7 @@ public class PreviewPlotsHandler {
 	File plotsFilesDir;
 	DataFileHandler dataHandler;
 	DatasetChecker dataChecker;
+	KnownDataTypes knownUserDataTypes;
 	KnownDataTypes knownMetadataTypes;
 	KnownDataTypes knownDataFileTypes;
 	FerretConfig ferretConfig;
@@ -47,6 +48,7 @@ public class PreviewPlotsHandler {
 			throw new IllegalArgumentException(previewPlotsDirName + " is not a directory");
 		dataHandler = configStore.getDataFileHandler();
 		dataChecker = configStore.getDashboardDatasetChecker();
+		knownUserDataTypes = configStore.getKnownUserDataTypes();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		ferretConfig = configStore.getFerretConfig();
@@ -173,13 +175,12 @@ public class PreviewPlotsHandler {
 		dsgMData.setDatasetId(stdId);
 		dsgMData.setVersion(dataset.getVersion());
 
-		// Convert the data strings into the appropriate list of data objects
-		ArrayList<DsgData> dsgDataList = 
-				DsgData.dataListFromDashboardCruise(knownDataFileTypes, dataset);
+		// Convert the data strings into the appropriate array of data objects
+		StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
 		// Create the preview NetCDF DSG file
 		try {
-			dsgFile.create(dsgMData, dsgDataList);
+			dsgFile.create(dsgMData, stdUserData, knownDataFileTypes);
 		} catch (Exception ex) {
 			dsgFile.delete();
 			throw new IllegalArgumentException("Problems creating the preview DSG file for " + 

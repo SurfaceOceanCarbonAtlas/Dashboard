@@ -781,6 +781,30 @@ public class StdDataArray {
 
 	/**
 	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#LONGITUDE} data column
+	 */
+	public boolean hasLongitude() {
+		return isUsableIndex(longitudeIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#LATITUDE} data column
+	 */
+	public boolean hasLatitude() {
+		return isUsableIndex(latitudeIndex);
+	}
+
+	/**
+	 * @return
+	 * 		if there is a valid {@link DashboardServerUtils#SAMPLE_DEPTH} data column
+	 */
+	public boolean hasSampleDepth() {
+		return isUsableIndex(sampleDepthIndex);
+	}
+
+	/**
+	 * @return
 	 * 		if there is a valid {@link DashboardServerUtils#YEAR} data column
 	 */
 	public boolean hasYear() {

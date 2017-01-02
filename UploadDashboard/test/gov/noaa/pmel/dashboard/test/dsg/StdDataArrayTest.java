@@ -321,7 +321,11 @@ public class StdDataArrayTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasYear()},
+	 * Test method for 
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasLongitude()},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasLatitude()},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasSampleDepth()},
+	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasYear()},
 	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasMonthOfYear()}, 
 	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasDayOfMonth()}, 
 	 * {@link gov.noaa.pmel.dashboard.dsg.StdDataArray#hasHourOfDay()}, 
@@ -342,6 +346,9 @@ public class StdDataArrayTest {
 
 		StdUserDataArray stdData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
 		// No seconds given in the data
+		assertTrue( stdData.hasLongitude() );
+		assertTrue( stdData.hasLatitude() );
+		assertTrue( stdData.hasSampleDepth() );
 		assertTrue( stdData.hasYear() );
 		assertTrue( stdData.hasMonthOfYear() );
 		assertTrue( stdData.hasDayOfMonth() );

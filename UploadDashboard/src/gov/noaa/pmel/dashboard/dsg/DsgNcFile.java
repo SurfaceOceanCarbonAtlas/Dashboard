@@ -138,9 +138,64 @@ public class DsgNcFile extends File {
 			throw new IllegalArgumentException("no data given");
 
 		// The following verifies lon, lat, depth, and time
-		// Adds time and, if not already present, year, month, day, hour, and minute.
+		// Adds time and, if not already present, year, month, day, hour, minute, and second.
 		stddata = new StdDataArray(userStdData, dataFileTypes);
-		
+
+		create(metadata, stddata);
+	}
+
+	/**
+	 * Creates this NetCDF DSG file with the given metadata and standardized data
+	 * for data files.  The internal metadata and stddata references are updated 
+	 * to the given DsgMetadata and StdDataArray object.  Every data sample should 
+	 * have a valid longitude, latitude, sample depth, year, month of year, day of 
+	 * month, hour of day, minute of hour, second of minute, time, sample number, 
+	 * and WOCE autocheck value, although this is not fully verified.
+	 * 
+	 * @param metaData
+	 * 		metadata for the dataset
+	 * @param fileData
+	 * 		standardized data appropriate for data files
+	 * @throws IllegalArgumentException
+	 * 		if any argument is null, or
+	 * 		if there is no longitude, latitude, sample depth, year, month of year,
+	 * 			day of month, hour of day, minute of hour, or second of minute, or 
+	 * 			time data column
+	 * @throws IOException
+	 * 		if creating the NetCDF file throws one
+	 * @throws InvalidRangeException
+	 * 		if creating the NetCDF file throws one
+	 * @throws IllegalAccessException
+	 * 		if creating the NetCDF file throws one
+	 */
+	public void create(DsgMetadata metaData, StdDataArray fileData) 
+			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
+		if ( metaData == null )
+			throw new IllegalArgumentException("no metadata given");
+		metadata = metaData;
+		if ( fileData == null )
+			throw new IllegalArgumentException("no data given");
+		stddata = fileData;
+		// Quick check of data column indices already assigned in StdDataArray
+		if ( ! stddata.hasLongitude() )
+			throw new IllegalArgumentException("no longitude data column");
+		if ( ! stddata.hasLatitude() )
+			throw new IllegalArgumentException("no latitude data column");
+		if ( ! stddata.hasSampleDepth() )
+			throw new IllegalArgumentException("no sample depth data column");
+		if ( ! stddata.hasYear() )
+			throw new IllegalArgumentException("no year data column");
+		if ( ! stddata.hasMonthOfYear() )
+			throw new IllegalArgumentException("no month of year data column");
+		if ( ! stddata.hasDayOfMonth() )
+			throw new IllegalArgumentException("no day of month data column");
+		if ( ! stddata.hasHourOfDay() )
+			throw new IllegalArgumentException("no hour of day data column");
+		if ( ! stddata.hasMinuteOfHour() )
+			throw new IllegalArgumentException("no minute of hour data column");
+		if ( ! stddata.hasSecondOfMinute() )
+			throw new IllegalArgumentException("no second of minute data column");
+
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
 			// According to the CF standard if a file only has one trajectory, 
@@ -226,6 +281,7 @@ public class DsgNcFile extends File {
 				}
 			}
 
+			boolean timeFound = false;
 			List<DashDataType<?>> dataTypes = stddata.getDataTypes();
 			for ( DashDataType<?> dtype : dataTypes ) {
 				varName = dtype.getVarName();
@@ -250,6 +306,7 @@ public class DsgNcFile extends File {
 					if ( DashboardServerUtils.TIME.typeNameEquals(dtype) ) {
 						// Additional attribute giving the time origin (although also mentioned in the units)
 						ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+						timeFound = true;
 					}
 					if ( dtype.getStandardName().endsWith("depth") ) {
 						ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
@@ -259,6 +316,8 @@ public class DsgNcFile extends File {
 					throw new IllegalArgumentException("unexpected unknown data type: " + dtype.toString());
 				}
 			}
+			if ( ! timeFound )
+				throw new IllegalArgumentException("no time data column");
 
 			ncfile.create();
 
@@ -282,7 +341,7 @@ public class DsgNcFile extends File {
 					// Metadata Strings
 					String dvalue = (String) entry.getValue();
 					if ( dvalue == null )
-						dvalue = "";
+						dvalue = DashboardUtils.STRING_MISSING_VALUE;
 					ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
 					mvar.setString(0, dvalue);
 					ncfile.write(var, mvar);
@@ -291,7 +350,7 @@ public class DsgNcFile extends File {
 					// Metadata characters
 					Character dvalue = (Character) entry.getValue();
 					if ( dvalue == null )
-						dvalue = ' ';
+						dvalue = DashboardUtils.CHAR_MISSING_VALUE;
 					ArrayChar.D2 mvar = new ArrayChar.D2(1, 1);
 					mvar.set(0, 0, dvalue);
 					ncfile.write(var, mvar);
@@ -332,7 +391,7 @@ public class DsgNcFile extends File {
 					for (int j = 0; j < numSamples; j++) {
 						Character dvalue = (Character) stddata.getStdVal(j, k);
 						if ( dvalue == null )
-							dvalue = ' ';
+							dvalue = DashboardUtils.CHAR_MISSING_VALUE;
 						dvar.set(j, 0, dvalue);
 					}
 					ncfile.write(var, dvar);
