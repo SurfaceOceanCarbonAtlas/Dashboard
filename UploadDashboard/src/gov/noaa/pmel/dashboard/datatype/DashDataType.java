@@ -653,6 +653,43 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	}
 
 	/**
+	 * A QC flag type for another data type is a {@link CharDashDataType} with 
+	 * a category name of {@link DashboardServerUtils#QUALITY_CATEGORY} and a 
+	 * variable name that is (case insensitive): "WOCE_" or "QC_" followed 
+	 * by the other data variable name, the other data variable name 
+	 * followed by "_WOCE" or "_QC", or is the other data variable name with 
+	 * "_WOCE_" or "_QC_" inserted.
+	 * 
+	 * @param dtype
+	 * 		given data type; cannot be null
+	 * @return
+	 * 		if this type is a QC flag type for the given data type
+	 */
+	public boolean isQCTypeFor(DashDataType<?> dtype) {
+		if ( ! (this instanceof CharDashDataType) )
+			return false;
+		if ( ! categoryName.equals(DashboardServerUtils.QUALITY_CATEGORY) )
+			return false;
+		String ucname = dtype.varName.toUpperCase();
+		String ucvarname = varName.toUpperCase();
+		if ( ucvarname.equals("WOCE_" + ucname) )
+			return true;
+		if ( ucvarname.equals("QC_" + ucname) )
+			return true;
+		if ( ucvarname.equals(ucname + "_WOCE") )
+			return true;
+		if ( ucvarname.equals(ucname + "_QC") )
+			return true;
+		int idx = ucvarname.indexOf("_WOCE_");
+		if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx+9)) )
+			return true;
+		idx = ucvarname.indexOf("_QC_");
+		if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx+9)) )
+			return true;
+		return false;
+	}
+
+	/**
 	 * A (general) comment type is a {@link StringDashDataType} with a variable name 
 	 * that (case-insensitive) starts with "COMMENT_", ends with "_COMMENT", 
 	 * contains "_COMMENT_", or is just "COMMENT".

@@ -47,8 +47,6 @@ import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
-import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
-
 /**
  * Reads and holds the Dashboard configuration details
  * 
@@ -114,11 +112,6 @@ public class DashboardConfigStore {
 			COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
-			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
-			BaseConfig.SOCAT_CONFIG_FILE + "=/Path/To/DataColumnConfig/CSVFile \n" + 
-			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
-			BaseConfig.COLUMN_SPEC_SCHEMA_FILE + "=/Path/To/ColumnSpecSchema/XMLFile \n" + 
-			BaseConfig.COLUMN_CONVERSION_FILE + "=/Path/To/ColumnConversion/PropsFile \n" + 
 			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
@@ -614,34 +607,6 @@ public class DashboardConfigStore {
 			datasetChecker = new DatasetChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-		}
-
-		// Add the SanityChecker configuration files listed in this config file to the files to be watched
-		try {
-			filesToWatch.add(new File(configProps.getProperty(BaseConfig.METADATA_CONFIG_FILE)));
-		} catch ( Exception ex ) {
-			// Should not happen but ignore if it did
-		}
-		try {
-			filesToWatch.add(new File(configProps.getProperty(BaseConfig.SOCAT_CONFIG_FILE)));
-		} catch ( Exception ex ) {
-			// Should not happen but ignore if it did
-		}
-		try {
-			filesToWatch.add(new File(configProps.getProperty(BaseConfig.SANITY_CHECK_CONFIG_FILE)));
-		} catch ( Exception ex ) {
-			// Should not happen but ignore if it did
-		}
-		try {
-			filesToWatch.add(new File(configProps.getProperty(BaseConfig.COLUMN_SPEC_SCHEMA_FILE)));
-		} catch ( Exception ex ) {
-			// Should not happen but ignore if it did
-		}
-		try {
-			propVal = configProps.getProperty(BaseConfig.COLUMN_CONVERSION_FILE);
-			filesToWatch.add(new File(propVal));
-		} catch ( Exception ex ) {
-			// Should not happen but ignore if it did
 		}
 
 		// The PreviewPlotsHandler uses the various handlers just created

@@ -33,6 +33,7 @@ public class StdUserDataArray extends StdDataArray {
 	private String[] userMissVals;
 	private Boolean[] standardized;
 	private ArrayList<ADCMessage> stdMsgList;
+	int woceAutocheckIndex;
 
 	/**
 	 * Create from the user's data column descriptions, data strings,  
@@ -86,7 +87,10 @@ public class StdUserDataArray extends StdDataArray {
 			userColNames[k] = names.get(k);
 		}
 		// the StdDataArray constructor used adds SAMPLE_NUMBER and WOCE_AUTOCHECK
+		woceAutocheckIndex = -1;
 		for (int k = numUserDataCols; k < numDataCols; k++) {
+			if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) )
+				woceAutocheckIndex = k;
 			// use the standard unit, a default missing value string, 
 			// and the type display name for these added types
 			userUnits[k] = dataTypes[k].getUnits().get(0);
@@ -269,11 +273,76 @@ public class StdUserDataArray extends StdDataArray {
 		return stdObjects[sampleIdx][columnIdx];
 	}
 
+	/**
+	 * @return
+	 * 		if this standardized user data array has a WOCE_AUTOCHECK column
+	 */
+	public boolean hasWoceAutocheck() {
+		if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
+			return false;
+		return true;
+	}
+
+	/**
+	 * Reset all values in the WOCE_AUTOCHECK column, if it exists,
+	 * to {@link DashboardServerUtils#FLAG_ACCEPTABLE}.
+	 */
+	public void resetWoceAutocheck() {
+		if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
+			return;
+		for (int j = 0; j < numSamples; j++)
+			stdObjects[j][woceAutocheckIndex] = DashboardServerUtils.FLAG_ACCEPTABLE;
+	}
+
+	/**
+	 * Get the current WOCE_AUTOCHECK flag for a data sample (row).
+	 * 
+	 * @param sampleIdx
+	 * 		index of the data sample (row) to check
+	 * @return
+	 * 		the current WOCE_AUTOCHECK flag for the data sample
+	 * @throws IllegalArgumentException
+	 * 		if the sample index is invalid, or
+	 * 		if there is not WOCE_AUTOCHECK column
+	 */
+	public Character getWoceAutocheckFlag(int sampleIdx) throws IllegalArgumentException {
+		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
+			throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
+		if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
+			throw new IllegalArgumentException("no WOCE autocheck column");
+		return (Character) stdObjects[sampleIdx][woceAutocheckIndex];
+	}
+
+	/**
+	 * Set the WOCE_AUTOCHECK flag for a data sample (row).
+	 * 
+	 * @param sampleIdx
+	 * 		index of the data sample (row) to set
+	 * @param newFlag
+	 * 		WOCE flag to assign
+	 * @throws IllegalArgumentException
+	 * 		if the sample index is invalid,
+	 * 		if there is not WOCE_AUTOCHECK column, or 
+	 * 		if the flag given is not a valid WOCE flag
+	 */
+	public void setWoceAutocheck(int sampleIdx, Character newFlag) throws IllegalArgumentException {
+		if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
+			throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
+		if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
+			throw new IllegalArgumentException("no WOCE autocheck column");
+		if ( ! ( DashboardServerUtils.FLAG_ACCEPTABLE.equals(newFlag) ||
+				 DashboardServerUtils.WOCE_QUESTIONABLE.equals(newFlag) ||
+				 DashboardServerUtils.WOCE_BAD.equals(newFlag) ) )
+			throw new IllegalArgumentException("invalid WOCE flag value");
+		stdObjects[sampleIdx][woceAutocheckIndex] = newFlag;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
 		result = prime * result + stdMsgList.hashCode();
+		result = prime * result + woceAutocheckIndex;
 		result = prime * result + Arrays.hashCode(standardized);
 		result = prime * result + Arrays.hashCode(userMissVals);
 		result = prime * result + Arrays.hashCode(userUnits);
@@ -294,6 +363,8 @@ public class StdUserDataArray extends StdDataArray {
 
 		if ( ! stdMsgList.equals(other.stdMsgList) )
 			return false;
+		if ( woceAutocheckIndex != other.woceAutocheckIndex )
+			return false;
 		if ( ! Arrays.equals(standardized, other.standardized) )
 			return false;
 		if ( ! Arrays.equals(userColNames, other.userColNames) )
@@ -308,7 +379,9 @@ public class StdUserDataArray extends StdDataArray {
 
 	@Override
 	public String toString() {
-		String repr = "StdUserDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols;
+		String repr = "StdUserDataArray[numSamples=" + numSamples + 
+				", numDataCols=" + numDataCols + 
+				"' woceAutocheckIndex=" + woceAutocheckIndex;
 		repr += ",\n  stdMsgList=[";
 		boolean first = true;
 		for ( ADCMessage msg : stdMsgList ) {
