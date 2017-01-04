@@ -120,7 +120,7 @@ public class RegenerateDsgs {
 			}
 			try {
 				// Regenerate the decimated-data DSG file 
-				dsgHandler.decimateCruise(stdId);
+				dsgHandler.decimateDatasetDsg(stdId);
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Problems regenerating the decimated-data DSG files for " + 
 							stdId + ": " + ex.getMessage());

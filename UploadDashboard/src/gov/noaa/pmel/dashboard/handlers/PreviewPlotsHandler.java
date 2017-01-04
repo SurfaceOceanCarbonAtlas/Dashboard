@@ -15,6 +15,7 @@ import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 public class PreviewPlotsHandler {
 
@@ -22,7 +23,6 @@ public class PreviewPlotsHandler {
 	File plotsFilesDir;
 	DataFileHandler dataHandler;
 	DatasetChecker dataChecker;
-	KnownDataTypes knownUserDataTypes;
 	KnownDataTypes knownMetadataTypes;
 	KnownDataTypes knownDataFileTypes;
 	FerretConfig ferretConfig;
@@ -48,7 +48,6 @@ public class PreviewPlotsHandler {
 			throw new IllegalArgumentException(previewPlotsDirName + " is not a directory");
 		dataHandler = configStore.getDataFileHandler();
 		dataChecker = configStore.getDashboardDatasetChecker();
-		knownUserDataTypes = configStore.getKnownUserDataTypes();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		ferretConfig = configStore.getFerretConfig();
@@ -146,37 +145,23 @@ public class PreviewPlotsHandler {
 
 		log.debug("standardizing data for " + stdId);
 
-		/*
-		 *  Convert the data into standard units.  Add and assign year, month, 
-		 *  day, hour, minute, and second columns if not present.  Automated 
-		 *  data checker WOCE flags are added.  This updates the OME metadata 
-		 *  and the messages from the automated data checker.
-		 */
-		if ( ! dataChecker.standardizeDatasetData(dataset) ) {
-			if ( dataset.getNumDataRows() < 1 )
-				throw new IllegalArgumentException(stdId + ": unacceptable; all data points marked bad");
-			else if (  ! dataChecker.checkProcessedOkay() )
-				throw new IllegalArgumentException(stdId + ": unacceptable; automated checking of data failed");
-			else if ( dataChecker.hadGeopositionErrors() )
-				throw new IllegalArgumentException(stdId + ": unacceptable; automated checking of data " +
-						"detected longitude, latitude, sample depth, date, or time value errors");
-			else
-				throw new IllegalArgumentException(stdId + ": unacceptable for unknown reason - unexpected");
-		}
+		// Just create a minimal DsgMetadata to create the preview DSG file
+		DsgMetadata dsgMData = new DsgMetadata(knownMetadataTypes);
+		dsgMData.setDatasetId(stdId);
+		dsgMData.setVersion(dataset.getVersion());
+
+		// TODO: update DsgMetadata with metadata derived from data
+		// Although probably not important for the preview plots.
+		StdUserDataArray stdUserData = dataChecker.standardizeDataset(dataset, null);
+		if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) )
+			throw new IllegalArgumentException(stdId + ": unacceptable; check data check error messages " +
+										"(missing lon/lat/depth/time or uninterpretable values)");
 
 		// Get the preview DSG filename, creating the parent directory if it does not exist
 		DsgNcFile dsgFile = new DsgNcFile(getDatasetPreviewDsgDir(stdId), 
 				stdId + "_" + timetag + ".nc");
 
 		log.debug("generating preview DSG file " + dsgFile.getPath());
-
-		// Just create a minimal DsgMetadata to create the preview DSG file
-		DsgMetadata dsgMData = new DsgMetadata(knownMetadataTypes);
-		dsgMData.setDatasetId(stdId);
-		dsgMData.setVersion(dataset.getVersion());
-
-		// Convert the data strings into the appropriate array of data objects
-		StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
 		// Create the preview NetCDF DSG file
 		try {

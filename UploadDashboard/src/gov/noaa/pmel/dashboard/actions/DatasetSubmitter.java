@@ -6,25 +6,21 @@ package gov.noaa.pmel.dashboard.actions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
-import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
-import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 /**
  * Submits a dataset.  At this time this just means creating the 
@@ -35,11 +31,9 @@ import gov.noaa.pmel.dashboard.shared.QCFlag;
 public class DatasetSubmitter {
 
 	DataFileHandler dataHandler;
-	CheckerMessageHandler msgHandler;
 	MetadataFileHandler metadataHandler;
 	DatasetChecker datasetChecker;
 	DsgNcFileHandler dsgHandler;
-	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler databaseHandler;
 	ArchiveFilesBundler filesBundler;
 	String version;
@@ -51,11 +45,9 @@ public class DatasetSubmitter {
 	 */
 	public DatasetSubmitter(DashboardConfigStore configStore) {
 		dataHandler = configStore.getDataFileHandler();
-		msgHandler = configStore.getCheckerMsgHandler();
 		metadataHandler = configStore.getMetadataFileHandler();
 		datasetChecker = configStore.getDashboardDatasetChecker();
 		dsgHandler = configStore.getDsgNcFileHandler();
-		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		filesBundler = configStore.getArchiveFilesBundler();
 		version = configStore.getUploadVersion();
@@ -98,8 +90,8 @@ public class DatasetSubmitter {
 		HashSet<String> archiveIds = new HashSet<String>();
 		ArrayList<String> errorMsgs = new ArrayList<String>();
 		for ( String datasetId : idsSet ) {
-			// Get the properties of this dataset
-			DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
+			// Get the dataset with data since almost always submitting for QC
+			DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
 			if ( dataset == null ) 
 				throw new IllegalArgumentException("Unknown dataset " + datasetId);
 
@@ -107,60 +99,34 @@ public class DatasetSubmitter {
 			String commitMsg = "Dataset " + datasetId;
 
 			if ( Boolean.TRUE.equals(dataset.isEditable()) ) {
-				// Get the complete dataset data
-				DashboardDatasetData datasetData = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
-
-				/*
-				 *  Convert the data into standard units.  Adds and assigns 
-				 *  year, month, day, hour, minute, and seconds columns if not present.
-				 */
-				if ( ! datasetChecker.standardizeDatasetData(datasetData) ) {
-					if ( datasetData.getNumDataRows() < 1 )
-						errorMsgs.add(datasetId + ": unacceptable; no valid data points");
-					else if (  ! datasetChecker.checkProcessedOkay() )
-						errorMsgs.add(datasetId + ": unacceptable; automated checking of data failed");
-					else if ( datasetChecker.hadGeopositionErrors() )
-						errorMsgs.add(datasetId + ": unacceptable; automated checking of data " +
-								"detected longitude, latitude, sample depth, or date/time value errors");
-					else
-						errorMsgs.add(datasetId + ": unacceptable for unknown reason - unexpected");
-					continue;
-				}
-
-				// Add and assign a column for the automated data checker flags
-				int numRows = datasetData.getNumDataRows();
-				ArrayList<String> flagVals = new ArrayList<String>(numRows);
-				// For the automated data checker flag values, default to acceptable
-				for (int k = 0; k < numRows; k++)
-					flagVals.add(DashboardServerUtils.FLAG_ACCEPTABLE.toString());
-				for ( QCFlag wtype : dataset.getCheckerFlags() ) {
-					Integer rowIdx = wtype.getRowIndex();
-					if ( (rowIdx < 0) || (rowIdx >= numRows) )
-						throw new RuntimeException("Unexpected automated data checker WOCE row index: " + rowIdx.toString());
-					flagVals.set(rowIdx, wtype.getFlagValue().toString());
-				}
-				// Directly modify the lists in the dataset
-				datasetData.getUserColNames().add("WOCE_autocheck");
-				datasetData.getDataColTypes().add(DashboardServerUtils.WOCE_AUTOCHECK.duplicate());
-				datasetData.getDataValues().add(flagVals);
-				// PI-provided QC flags are already in the data (that is where they came from)
-
 				try {
 					// Get the OME metadata for this dataset
 					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
 					if ( ! version.equals(omeInfo.getVersion()) ) {
+						omeInfo.setVersion(version);
 						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " + 
 								version + " with submission of " + datasetId, false);
 					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
+					DsgMetadata dsgMData = omeMData.createDsgMetadata();
+					dsgMData.setVersion(version);
+
+					// Standardize the data
+					// TODO: update the metadata with data-derived values
+					datasetChecker.standardizeDataset(dataset, null);
+					if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
+						errorMsgs.add(datasetId + ": unacceptable; check data check error messages " +
+													"(missing lon/lat/depth/time or uninterpretable values)");
+						continue;
+					}
 
 					// Generate the NetCDF DSG file, enhanced by Ferret
 					logger.debug("Generating the full-data DSG file for " + datasetId);
-					dsgHandler.saveDataset(omeMData, datasetData, version);
+					dsgHandler.saveDatasetDsg(dsgMData, dataset);
 
 					// Generate the decimated-data DSG file from the full-data DSG file
 					logger.debug("Generating the decimated-data DSG file for " + datasetId);
-					dsgHandler.decimateCruise(datasetId);
+					dsgHandler.decimateDatasetDsg(datasetId);
 				} catch (Exception ex) {
 					errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
 					continue;
@@ -169,21 +135,6 @@ public class DatasetSubmitter {
 				// Update dataset info with status values from the dataset data object
 				dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
 				dataset.setVersion(version);
-				dataset.setDataCheckStatus(datasetData.getDataCheckStatus());
-				dataset.setNumErrorRows(datasetData.getNumErrorRows());
-				dataset.setNumWarnRows(datasetData.getNumWarnRows());
-				dataset.setUserFlags(datasetData.getUserFlags());
-				// Update the data checker QC flags, making sure the column index is valid
-				int numCols = dataset.getUserColNames().size();
-				TreeSet<QCFlag> flagsSet = datasetData.getCheckerFlags();
-				for ( QCFlag flag : flagsSet ) {
-					Integer colIdx = flag.getColumnIndex();
-					// If not in range, either is INT_MISSING_VALUE or one of the added time columns
-					// so keep the flag but set the column index to INT_MISSING_VALUE
-					if ( (colIdx < 0) || (colIdx >= numCols) )
-						flag.setColumnIndex(DashboardUtils.INT_MISSING_VALUE);
-				}
-				dataset.setCheckerFlags(flagsSet);
 
 				// Set up to save changes to version control
 				changed = true;

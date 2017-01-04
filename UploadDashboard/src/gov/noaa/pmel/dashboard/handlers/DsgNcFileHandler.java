@@ -20,7 +20,6 @@ import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -138,7 +137,7 @@ public class DsgNcFileHandler {
 	 * Creates the parent subdirectory if it does not exist.
 	 * The {@link DsgNcFile#create} and {@link DsgNcFile#updateWoceFlags} 
 	 * methods should not be used with the decimated data file; the actual 
-	 * decimated DSG file is created using {@link #decimateCruise(String)}.
+	 * decimated DSG file is created using {@link #decimateDatasetDsg(String)}.
 	 * 
 	 * @param datasetId
 	 * 		ID of the dataset
@@ -166,37 +165,31 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Saves the OME metadata and data into a new full-data NetCDF DSG file.  
+	 * Saves the DsgMetadata and data into a new full-data NetCDF DSG file.  
 	 * After successful creation of the DSG file, ERDDAP will need to be notified 
 	 * of changes to the DSG files.  This notification is not done in this 
 	 * routine so that a single notification event can be made after multiple 
 	 * modifications.
 	 * 
-	 * @param omeMData
+	 * @param metadata
 	 * 		metadata for the dataset
 	 * @param dataset
 	 * 		dataset with data to save
-	 * @param version
-	 * 		version to assign
 	 * @throws IllegalArgumentException
 	 * 		if there are problems with the metadata or data given, or
 	 * 		if there are problems creating or writing the full-data DSG file
 	 */
-	public void saveDataset(DashboardOmeMetadata omeMData, DashboardDatasetData dataset, 
-			String version) throws IllegalArgumentException {
+	public void saveDatasetDsg(DsgMetadata metadata, 
+			DashboardDatasetData dataset) throws IllegalArgumentException {
 		// Get the location and name for the NetCDF DSG file
-		DsgNcFile dsgFile = getDsgNcFile(omeMData.getDatasetId());
-
-		// Get the metadata needed for creating the DSG file
-		DsgMetadata dsgMData = omeMData.createDsgMetadata();
-		dsgMData.setVersion(version);
+		DsgNcFile dsgFile = getDsgNcFile(dataset.getDatasetId());
 
 		// Convert the data strings into the appropriate type
 		StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
 		// Create the NetCDF DSG file
 		try {
-			dsgFile.create(dsgMData, stdUserData, knownDataFileTypes);
+			dsgFile.create(metadata, stdUserData, knownDataFileTypes);
 		} catch (Exception ex) {
 			dsgFile.delete();
 			throw new IllegalArgumentException("Problems creating the DSG file " + 
@@ -212,7 +205,6 @@ public class DsgNcFileHandler {
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
 					tool.getErrorMessage());
-
 	}
 
 	/**
@@ -228,7 +220,7 @@ public class DsgNcFileHandler {
 	 * 		if there are problems reading the full-data DSG file, or
 	 * 		if there are problems creating or writing the decimated-data DSG file
 	 */
-	public void decimateCruise(String datasetId) throws IllegalArgumentException {
+	public void decimateDatasetDsg(String datasetId) throws IllegalArgumentException {
 		// Get the location and name of the full DSG file
 		File dsgFile = getDsgNcFile(datasetId);
 		if ( ! dsgFile.canRead() )
@@ -302,7 +294,7 @@ public class DsgNcFileHandler {
 					throw new IllegalArgumentException(newId + 
 							": Failure adding computed variables: " + tool.getErrorMessage());
 				// Re-create the decimated-data DSG file 
-				decimateCruise(newId);
+				decimateDatasetDsg(newId);
 				// Delete the old DSG and decimated-data DSG files
 				oldDsgFile.delete();
 				getDecDsgNcFile(oldId).delete();
