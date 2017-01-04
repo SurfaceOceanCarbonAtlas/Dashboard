@@ -156,8 +156,8 @@ public class DashboardUtilsTest {
 	@Test
 	public void testEncodeDecodeWoceTypeSet() {
 		TreeSet<QCFlag> mySet = new TreeSet<QCFlag>( Arrays.asList(
-				new QCFlag("WOCE_CO2_water", '4', Severity.BAD, 3, 7), 
-				new QCFlag("WOCE_CO2_atm", '3', Severity.QUESTIONABLE, 9, 2) ) );
+				new QCFlag("WOCE_CO2_water", '4', Severity.ERROR, 3, 7), 
+				new QCFlag("WOCE_CO2_atm", '3', Severity.WARNING, 9, 2) ) );
 		String encoded = DashboardUtils.encodeQCFlagSet(mySet);
 		TreeSet<QCFlag> decodedSet = DashboardUtils.decodeQCFlagSet(encoded);
 		assertEquals(mySet, decodedSet);

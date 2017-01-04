@@ -6,8 +6,12 @@ package gov.noaa.pmel.dashboard.dsg;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.datatype.ValueConverter;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
@@ -15,6 +19,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * A 2-D array of objects corresponding to the standardized values of string values 
@@ -50,7 +55,6 @@ public class StdUserDataArray extends StdDataArray {
 	 * <br /><br />
 	 * No bounds checking of standardized data values is performed.
 	 * 
-	 * @throws IllegalArgumentException
 	 * @param dataset
 	 * 		dataset, with user's strings data, to use
 	 * @param knownTypes
@@ -126,7 +130,7 @@ public class StdUserDataArray extends StdDataArray {
 			if ( rowVals.size() != numUserDataCols ) {
 				// Generate a general message for this row - in case too long
 				ADCMessage msg = new ADCMessage();
-				msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
+				msg.setSeverity(Severity.CRITICAL);
 				msg.setRowNumber(j+1);
 				msg.setGeneralComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG);
 				msg.setDetailedComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG + "; " + 
@@ -190,7 +194,7 @@ public class StdUserDataArray extends StdDataArray {
 							} catch ( IllegalArgumentException ex ) {
 								stdObjects[j][k] = null;
 								ADCMessage msg = new ADCMessage();
-								msg.setSeverity(ADCMessage.SCMsgSeverity.CRITICAL);
+								msg.setSeverity(Severity.CRITICAL);
 								msg.setRowNumber(j+1);
 								msg.setColNumber(k+1);
 								msg.setColName(userColNames[k]);
@@ -213,10 +217,181 @@ public class StdUserDataArray extends StdDataArray {
 	}
 
 	/**
+	 * Check for missing longitude, latitude, sample depth, and time columns 
+	 * or data values.  Any problems found generate messages that are added 
+	 * to the internal list of messages.
+	 */
+	public void checkMissingLonLatDepthTime() {
+		try {
+			Double[] longitudes = getSampleLongitudes();
+			for (int j = 0; j < numSamples; j++) {
+				if ( longitudes[j] == null ) {
+					ADCMessage msg = new ADCMessage();
+					msg.setSeverity(Severity.CRITICAL);
+					msg.setRowNumber(j+1);
+					msg.setColNumber(longitudeIndex+1);
+					msg.setColName(userColNames[longitudeIndex]);
+					String comment = "missing longitude";
+					msg.setGeneralComment(comment);
+					msg.setDetailedComment(comment);
+					stdMsgList.add(msg);
+				}
+			}
+		} catch ( Exception ex ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(Severity.CRITICAL);
+			String comment = "no longitude column";
+			msg.setGeneralComment(comment);
+			msg.setDetailedComment(comment);
+			stdMsgList.add(msg);
+		}
+		
+		try {
+			Double[] latitudes = getSampleLatitudes();
+			for (int j = 0; j < numSamples; j++) {
+				if ( latitudes[j] == null ) {
+					ADCMessage msg = new ADCMessage();
+					msg.setSeverity(Severity.CRITICAL);
+					msg.setRowNumber(j+1);
+					msg.setColNumber(latitudeIndex+1);
+					msg.setColName(userColNames[latitudeIndex]);
+					String comment = "missing latitude";
+					msg.setGeneralComment(comment);
+					msg.setDetailedComment(comment);
+					stdMsgList.add(msg);
+				}
+			}
+		} catch ( Exception ex ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(Severity.CRITICAL);
+			String comment = "no latitude column";
+			msg.setGeneralComment(comment);
+			msg.setDetailedComment(comment);
+			stdMsgList.add(msg);
+		}
+		
+		try {
+			Double[] depths = getSampleDepths();
+			for (int j = 0; j < numSamples; j++) {
+				if ( depths[j] == null ) {
+					ADCMessage msg = new ADCMessage();
+					msg.setSeverity(Severity.CRITICAL);
+					msg.setRowNumber(j+1);
+					msg.setColNumber(sampleDepthIndex+1);
+					msg.setColName(userColNames[sampleDepthIndex]);
+					String comment = "missing sample depth";
+					msg.setGeneralComment(comment);
+					msg.setDetailedComment(comment);
+					stdMsgList.add(msg);
+				}
+			}
+		} catch ( Exception ex ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(Severity.CRITICAL);
+			String comment = "no sample depth column";
+			msg.setGeneralComment(comment);
+			msg.setDetailedComment(comment);
+			stdMsgList.add(msg);
+		}
+		
+		try {
+			Double[] times = getSampleTimes();
+			for (int j = 0; j < numSamples; j++) {
+				if ( times[j] == null ) {
+					ADCMessage msg = new ADCMessage();
+					msg.setSeverity(Severity.CRITICAL);
+					msg.setRowNumber(j+1);
+					String comment = "incomplete sample date/time specification";
+					msg.setGeneralComment(comment);
+					msg.setDetailedComment(comment);
+					stdMsgList.add(msg);
+				}
+			}
+		} catch ( Exception ex ) {
+			ADCMessage msg = new ADCMessage();
+			msg.setSeverity(Severity.CRITICAL);
+			String comment = "incomplete columns specifying sample date/time";
+			msg.setGeneralComment(comment);
+			msg.setDetailedComment(comment);
+			stdMsgList.add(msg);
+		}
+	}
+
+	/**
+	 * Checks that all values given (not missing values) are within the 
+	 * acceptable range for that data type.  Any problems found generate 
+	 * (error or warning) messages that are added to the internal list of 
+	 * messages.
+	 */
+	public void checkBounds() {
+		for (int k = 0; k < numDataCols; k++) {
+			DashDataType<?> dtype = dataTypes[k];
+
+			if ( dtype instanceof StringDashDataType ) {
+				StringDashDataType strtype = (StringDashDataType) dtype;
+				for (int j = 0; j < numSamples; j++) {
+					ADCMessage msg = strtype.boundsCheckStandardValue(
+											(String) stdObjects[j][k]);
+					if ( msg != null ) {
+						msg.setRowNumber(j+1);
+						msg.setColNumber(k+1);
+						msg.setColName(userColNames[k]);
+						stdMsgList.add(msg);
+					}
+				}
+			}
+			else if ( dtype instanceof CharDashDataType ) {
+				CharDashDataType chartype = (CharDashDataType) dtype;
+				for (int j = 0; j < numSamples; j++) {
+					ADCMessage msg = chartype.boundsCheckStandardValue(
+											(Character) stdObjects[j][k]);
+					if ( msg != null ) {
+						msg.setRowNumber(j+1);
+						msg.setColNumber(k+1);
+						msg.setColName(userColNames[k]);
+						stdMsgList.add(msg);
+					}
+				}
+			}
+			else if ( dtype instanceof IntDashDataType ) {
+				IntDashDataType inttype = (IntDashDataType) dtype;
+				for (int j = 0; j < numSamples; j++) {
+					ADCMessage msg = inttype.boundsCheckStandardValue(
+											(Integer) stdObjects[j][k]);
+					if ( msg != null ) {
+						msg.setRowNumber(j+1);
+						msg.setColNumber(k+1);
+						msg.setColName(userColNames[k]);
+						stdMsgList.add(msg);
+					}
+				}
+			}
+			else if ( dtype instanceof DoubleDashDataType ) {
+				DoubleDashDataType dbltype = (DoubleDashDataType) dtype;
+				for (int j = 0; j < numSamples; j++) {
+					ADCMessage msg = dbltype.boundsCheckStandardValue(
+											(Double) stdObjects[j][k]);
+					if ( msg != null ) {
+						msg.setRowNumber(j+1);
+						msg.setColNumber(k+1);
+						msg.setColName(userColNames[k]);
+						stdMsgList.add(msg);
+					}
+				}
+			}
+			else {
+				throw new IllegalArgumentException("unexpected data type encountered " + 
+						"in bounds checking: " + dtype);
+			}
+		}
+	}
+
+	/**
 	 * @return
-	 * 		the list of automated data check messages describing problems 
-	 * 		(critical errors) encountered when standardizing the data in
-	 * 		the constructor.
+	 * 		the list of automated data check messages describing 
+	 * 		problems detected in the data.  The messages that are 
+	 * 		in this list comes from the constructor as well as any
+	 * 		check methods that were called.
 	 */
 	public ArrayList<ADCMessage> getStandardizationMessages() {
 		return stdMsgList;

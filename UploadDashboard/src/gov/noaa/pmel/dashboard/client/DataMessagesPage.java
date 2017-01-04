@@ -28,12 +28,12 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
-import gov.noaa.pmel.dashboard.shared.ADCMessageList;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * @author Karl Smith
@@ -296,10 +296,10 @@ public class DataMessagesPage extends CompositeWithUsername {
 			public String getValue(ADCMessage msg) {
 				if ( msg == null )
 					return UNKNOWN_SEVERITY_TEXT;
-				SCMsgSeverity severity = msg.getSeverity();
-				if ( severity == SCMsgSeverity.WARNING )
+				Severity severity = msg.getSeverity();
+				if ( severity == Severity.WARNING )
 					return WARNING_SEVERITY_TEXT;
-				if ( severity == SCMsgSeverity.ERROR )
+				if ( severity == Severity.ERROR )
 					return ERROR_SEVERITY_TEXT;
 				return UNKNOWN_SEVERITY_TEXT;
 			}

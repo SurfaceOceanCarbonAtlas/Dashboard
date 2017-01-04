@@ -181,7 +181,7 @@ public class DashboardUtils {
 
 
 	/**
-	 * UNKNOWN needs to be respecified as one of the (other) data column types.
+	 * UNASSIGNED needs to be respecified as one of the (other) data column types.
 	 */
 	public static final DataColumnType UNKNOWN = new DataColumnType("unknown", 
 			0.0, "(unknown)", "unknown type of data", NO_UNITS);

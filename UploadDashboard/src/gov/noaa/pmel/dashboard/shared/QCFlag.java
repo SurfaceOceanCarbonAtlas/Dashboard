@@ -23,8 +23,9 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	public enum Severity implements Serializable, IsSerializable {
 		UNASSIGNED,
 		ACCEPTABLE,
-		QUESTIONABLE,
-		BAD
+		WARNING,
+		ERROR,
+		CRITICAL
 	}
 
 	protected String flagName;
@@ -38,8 +39,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	 * Create with a 
 	 * 		flagName of {@link DashboardUtils#STRING_MISSING_VALUE}, 
 	 * 		flagValue of {@link DashboardUtils#CHAR_MISSING_VALUE}, and
-	 * 		columnIndex of {@link DashboardUtils#INT_MISSING_VALUE}, 
-	 * 		rowIndex of {@link DashboardUtils#INT_MISSING_VALUE}, 
+	 * 		column of {@link DashboardUtils#INT_MISSING_VALUE}, 
+	 * 		row of {@link DashboardUtils#INT_MISSING_VALUE}, 
 	 * 		comment of {@link DashboardUtils#STRING_MISSING_VALUE}, 
 	 */
 	public QCFlag() {
@@ -141,7 +142,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	}
 
 	/**
-	 * @param columnIndex 
+	 * @param column 
 	 * 		the index of the column to set for this QC flag;
 	 * 		if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
 	 */
@@ -162,7 +163,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 	}
 
 	/**
-	 * @param rowIndex 
+	 * @param row 
 	 * 		the index of the row to set for this QC flag;
 	 * 		if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
 	 */
@@ -225,8 +226,6 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 		int result = comment.hashCode();
 		result = prime * result + flagName.hashCode();
 		result = prime * result + flagValue.hashCode();
-		// Presumably a flag name and value directly corresponds 
-		// to a severity, but go ahead and include it
 		result = prime * result + severity.hashCode();
 		result = prime * result + rowIndex.hashCode();
 		result = prime * result + columnIndex.hashCode();
@@ -249,8 +248,6 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 			return false;
 		if ( ! flagValue.equals(other.flagValue) )
 			return false;
-		// Presumably a flag name and value directly corresponds 
-		// to a severity, but go ahead and include it
 		if ( ! severity.equals(other.severity) )
 			return false;
 		if ( ! flagName.equals(other.flagName) )
@@ -266,8 +263,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 			   "flagName=" + flagName + ", " +
 			   "flagValue='" + flagValue.toString() + "', " +
 			   "severity=" + severity.toString() + 
-			   "columnIndex=" + columnIndex.toString() + ", " +
-			   "rowIndex=" + rowIndex.toString() + 
+			   "column=" + columnIndex.toString() + ", " +
+			   "row=" + rowIndex.toString() + 
 			   "comment=\"" + comment + "\", " +
 			   "]";
 	}

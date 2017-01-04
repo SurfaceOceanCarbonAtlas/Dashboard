@@ -51,7 +51,7 @@ public class DatasetDataColumn {
 	 * 		list of all known data column types
 	 * @param cruise
 	 * 		cruise to associate with this instance
-	 * @param columnIndex
+	 * @param column
 	 * 		index of the cruise data column to associate with this instance
 	 */
 	DatasetDataColumn(ArrayList<DataColumnType> knownUserTypes, DashboardDataset cruise, int columnIndex) {
@@ -184,7 +184,7 @@ public class DatasetDataColumn {
 					// Not a recognized column type with units; set to unknown
 					idx = knownTypeUnitList.indexOf(DashboardUtils.UNKNOWN);
 					if ( idx < 0 )
-						throw new RuntimeException("Unexpected failure to find the UNKNOWN data column");
+						throw new RuntimeException("Unexpected failure to find the UNASSIGNED data column");
 				}
 				// Return the header for this column type with units
 				return typeUnitStringList.get(idx);

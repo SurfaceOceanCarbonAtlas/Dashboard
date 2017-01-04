@@ -9,9 +9,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * Unit tests for methods in {@link gov.noaa.pmel.dashboard.shared.ADCMessage}
@@ -22,17 +22,17 @@ public class ADCMessageTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getSeverity()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setSeverity(gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity)}.
+	 * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setSeverity(gov.noaa.pmel.dashboard.shared.ADCMessage.Severity)}.
 	 */
 	@Test
 	public void testGetSetSeverity() {
-		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
+		final Severity mySeverity = Severity.ERROR;
 		ADCMessage msg = new ADCMessage();
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setSeverity(mySeverity);
 		assertEquals(mySeverity, msg.getSeverity());
 		msg.setSeverity(null);
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
 		msg.setRowNumber(myRowNum);
 		assertEquals(myRowNum, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setRowNumber(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
 		msg.setRowNumber(-12);
@@ -67,7 +67,7 @@ public class ADCMessageTest {
 		msg.setLongitude(myLongitude);
 		assertEquals(myLongitude, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setLongitude(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		msg.setLongitude(Double.NaN);
@@ -95,7 +95,7 @@ public class ADCMessageTest {
 		assertEquals(myLatitude, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setLatitude(Double.NaN);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		msg.setLatitude(Double.NEGATIVE_INFINITY);
@@ -122,7 +122,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setDepth(Double.NaN);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getDepth());
 		msg.setDepth(Double.NEGATIVE_INFINITY);
@@ -149,7 +149,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setTimestamp(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 	}
@@ -169,7 +169,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setColNumber(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
 		msg.setColNumber(-12);
@@ -194,7 +194,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setColName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getColName());
 	}
@@ -216,7 +216,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setGeneralComment(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getGeneralComment());
 	}
@@ -239,7 +239,7 @@ public class ADCMessageTest {
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLatitude());
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, msg.getLongitude());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getRowNumber());
-		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		assertEquals(Severity.UNASSIGNED, msg.getSeverity());
 		msg.setDetailedComment(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getDetailedComment());
 	}
@@ -259,7 +259,7 @@ public class ADCMessageTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
+		final Severity mySeverity = Severity.ERROR;
 		final Integer myRowNum = 25;
 		final Double myLongitude = -120.35;
 		final Double myLatitude = 46.25;

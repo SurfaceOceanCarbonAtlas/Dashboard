@@ -22,7 +22,7 @@ public class QCFlagTest {
 
 	private static final String MY_FLAG_NAME = "WOCE_CO2_atm";
 	private static final Character MY_FLAG_VALUE = '3';
-	private static final Severity MY_SEVERITY = Severity.QUESTIONABLE;
+	private static final Severity MY_SEVERITY = Severity.WARNING;
 	private static final Integer MY_COLUMN_INDEX = 5;
 	private static final Integer MY_ROW_INDEX = 15;
 	private static final String MY_COMMENT = "my comment";
@@ -204,7 +204,7 @@ public class QCFlagTest {
 	 */
 	@Test
 	public void testCompareTo() {
-		QCFlag first = new QCFlag("WOCE_CO2_atm", '3', Severity.QUESTIONABLE, 5, 25);
+		QCFlag first = new QCFlag("WOCE_CO2_atm", '3', Severity.WARNING, 5, 25);
 		first.setComment("BBBB");
 
 		QCFlag second = new QCFlag("WOCE_CO2_water", '2', Severity.ACCEPTABLE, 4, 15);
@@ -222,11 +222,11 @@ public class QCFlagTest {
 		second.setFlagValue('3');
 		assertTrue( first.compareTo(second) > 0 );
 		assertTrue( second.compareTo(first) < 0 );
-		second.setSeverity(Severity.BAD);
+		second.setSeverity(Severity.ERROR);
 		assertTrue( first.compareTo(second) < 0 );
 		assertTrue( second.compareTo(first) > 0 );
 
-		second.setSeverity(Severity.QUESTIONABLE);
+		second.setSeverity(Severity.WARNING);
 		assertTrue( first.compareTo(second) > 0 );
 		assertTrue( second.compareTo(first) < 0 );
 		second.setColumnIndex(6);

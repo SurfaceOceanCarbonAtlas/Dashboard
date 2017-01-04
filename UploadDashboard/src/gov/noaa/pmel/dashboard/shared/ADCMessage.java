@@ -8,6 +8,8 @@ import java.util.Comparator;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
 /**
  * Parts of a SanityChecker Message object 
  * that needs to be transferred to the client for display.
@@ -18,21 +20,7 @@ public class ADCMessage implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = -4524821044077234564L;
 
-	/**
-	 * Enumerated type for the severity of the issue in the message
-	 */
-	public enum SCMsgSeverity implements Serializable, IsSerializable {
-		/** unassigned or just a comment */
-		UNKNOWN,
-		/** warning, WOCE-3 */
-		WARNING,
-		/** error, WOCE-4, that could remain */
-		ERROR,
-		/** critical error must be corrected */
-		CRITICAL
-	}
-
-	protected SCMsgSeverity severity;
+	protected Severity severity;
 	protected Integer rowNumber;
 	protected Double longitude;
 	protected Double latitude;
@@ -47,7 +35,7 @@ public class ADCMessage implements Serializable, IsSerializable {
 	 * Create an empty message of unknown severity
 	 */
 	public ADCMessage() {
-		severity = SCMsgSeverity.UNKNOWN;
+		severity = Severity.UNASSIGNED;
 		rowNumber = DashboardUtils.INT_MISSING_VALUE;
 		longitude = DashboardUtils.FP_MISSING_VALUE;
 		latitude = DashboardUtils.FP_MISSING_VALUE;
@@ -63,18 +51,18 @@ public class ADCMessage implements Serializable, IsSerializable {
 	 * @return 
 	 * 		the severity of the message; never null.
 	 */
-	public SCMsgSeverity getSeverity() {
+	public Severity getSeverity() {
 		return severity;
 	}
 
 	/**
 	 * @param severity 
 	 * 		the severity of the message to set; if null, 
-	 * 		{@link SCMsgSeverity#UNKNOWN} is assigned.
+	 * 		{@link SCMsgSeverity#UNASSIGNED} is assigned.
 	 */
-	public void setSeverity(SCMsgSeverity severity) {
+	public void setSeverity(Severity severity) {
 		if ( severity == null )
-			this.severity = SCMsgSeverity.UNKNOWN;
+			this.severity = Severity.UNASSIGNED;
 		else
 			this.severity = severity;
 	}

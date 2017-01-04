@@ -603,11 +603,7 @@ public class DashboardConfigStore {
 		}
 
 		// SanityChecker initialization from this same properties file 
-		try {
-			datasetChecker = new DatasetChecker(configFile, checkerMsgHandler, metadataFileHandler);
-		} catch ( IOException ex ) {
-			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-		}
+		datasetChecker = new DatasetChecker(knownUserDataTypes, checkerMsgHandler);
 
 		// The PreviewPlotsHandler uses the various handlers just created
 		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 

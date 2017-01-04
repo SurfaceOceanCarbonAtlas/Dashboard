@@ -844,9 +844,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			}
 			TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
 			Integer rowIdx = ctx.getIndex();
-			QCFlag woceCell = new QCFlag(null, null, Severity.BAD, colNum-1, rowIdx);
-			QCFlag woceRow = new QCFlag(null, null, Severity.BAD, null, rowIdx);
-			QCFlag woceCol = new QCFlag(null, null, Severity.BAD, colNum-1, null);
+			QCFlag woceCell = new QCFlag(null, null, Severity.ERROR, colNum-1, rowIdx);
+			QCFlag woceRow = new QCFlag(null, null, Severity.ERROR, null, rowIdx);
+			QCFlag woceCol = new QCFlag(null, null, Severity.ERROR, colNum-1, null);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {
@@ -866,9 +866,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				sb.appendHtmlConstant("</div>");
 				return;
 			}
-			woceCell.setSeverity(Severity.QUESTIONABLE);
-			woceRow.setSeverity(Severity.QUESTIONABLE);
-			woceCol.setSeverity(Severity.QUESTIONABLE);
+			woceCell.setSeverity(Severity.WARNING);
+			woceRow.setSeverity(Severity.WARNING);
+			woceCol.setSeverity(Severity.WARNING);
 			if ( checkerFlags.contains(woceCell) || 
 				 checkerFlags.contains(woceRow) || 
 				 checkerFlags.contains(woceCol) ) {

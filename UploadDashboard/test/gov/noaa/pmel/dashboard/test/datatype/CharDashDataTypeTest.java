@@ -21,6 +21,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * Tests for methods in {@link gov.noaa.pmel.dashboard.datatype.CharDashDataType} 
@@ -100,28 +101,28 @@ public class CharDashDataTypeTest {
 		testVal = '0';
 		msg = dtype.boundsCheckStandardValue(testVal);
 		assertNotNull( msg );
-		assertEquals(ADCMessage.SCMsgSeverity.ERROR, msg.getSeverity());
+		assertEquals(Severity.ERROR, msg.getSeverity());
 		assertTrue( msg.getGeneralComment().contains(DashDataType.UNREASONABLY_SMALL_MSG));
 		assertTrue( msg.getDetailedComment().contains(DashDataType.UNREASONABLY_SMALL_MSG));
 
 		testVal = 'A';
 		msg = dtype.boundsCheckStandardValue(testVal);
 		assertNotNull( msg );
-		assertEquals(ADCMessage.SCMsgSeverity.ERROR, msg.getSeverity());
+		assertEquals(Severity.ERROR, msg.getSeverity());
 		assertTrue( msg.getGeneralComment().contains(DashDataType.UNREASONABLY_LARGE_MSG));
 		assertTrue( msg.getDetailedComment().contains(DashDataType.UNREASONABLY_LARGE_MSG));
 
 		testVal = '1';
 		msg = dtype.boundsCheckStandardValue(testVal);
 		assertNotNull( msg );
-		assertEquals(ADCMessage.SCMsgSeverity.WARNING, msg.getSeverity());
+		assertEquals(Severity.WARNING, msg.getSeverity());
 		assertTrue( msg.getGeneralComment().contains(DashDataType.QUESTIONABLY_SMALL_MSG));
 		assertTrue( msg.getDetailedComment().contains(DashDataType.QUESTIONABLY_SMALL_MSG));
 
 		testVal = '5';
 		msg = dtype.boundsCheckStandardValue(testVal);
 		assertNotNull( msg );
-		assertEquals(ADCMessage.SCMsgSeverity.WARNING, msg.getSeverity());
+		assertEquals(Severity.WARNING, msg.getSeverity());
 		assertTrue( msg.getGeneralComment().contains(DashDataType.QUESTIONABLY_LARGE_MSG));
 		assertTrue( msg.getDetailedComment().contains(DashDataType.QUESTIONABLY_LARGE_MSG));
 	}

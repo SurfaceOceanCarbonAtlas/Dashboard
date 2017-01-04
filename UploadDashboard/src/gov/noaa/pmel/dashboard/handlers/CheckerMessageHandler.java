@@ -20,7 +20,6 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -203,10 +202,10 @@ public class CheckerMessageHandler {
 			TreeMap<String,Integer> warnCnt = new TreeMap<String,Integer>();
 			for ( ADCMessage msg : msgList ) {
 				// Start with a summary giving the counts of each general message/severity
-				ADCMessage.SCMsgSeverity severity = msg.getSeverity();
+				Severity severity = msg.getSeverity();
 				String summary = msg.getGeneralComment();
-				if ( ADCMessage.SCMsgSeverity.CRITICAL.equals(severity) || 
-					 ADCMessage.SCMsgSeverity.ERROR.equals(severity) ) {
+				if ( Severity.CRITICAL.equals(severity) || 
+					 Severity.ERROR.equals(severity) ) {
 					Integer cnt = errorCnt.get(summary);
 					if ( cnt == null )
 						cnt = 1;
@@ -214,7 +213,7 @@ public class CheckerMessageHandler {
 						cnt += 1;
 					errorCnt.put(summary, cnt);
 				}
-				else if ( ADCMessage.SCMsgSeverity.WARNING.equals(severity) ) {
+				else if ( Severity.WARNING.equals(severity) ) {
 					Integer cnt = warnCnt.get(summary);
 					if ( cnt == null )
 						cnt = 1;
@@ -240,7 +239,7 @@ public class CheckerMessageHandler {
 				// Generate a list of key-value strings describing this message
 				ArrayList<String> mappings = new ArrayList<String>();
 
-				ADCMessage.SCMsgSeverity severity = msg.getSeverity();
+				Severity severity = msg.getSeverity();
 				mappings.add(MSG_SEVERITY_KEY + MSG_KEY_VALUE_SEP + severity.name());
 
 				Integer rowNum = msg.getRowNumber();
@@ -309,26 +308,26 @@ public class CheckerMessageHandler {
 
 				// Create the QC flag for this message.
 				if ( rowNum != null ) {
-					if ( ADCMessage.SCMsgSeverity.CRITICAL.equals(severity) ||
-						 ADCMessage.SCMsgSeverity.ERROR.equals(severity) ) {
+					if ( Severity.CRITICAL.equals(severity) ||
+						 Severity.ERROR.equals(severity) ) {
 						QCFlag flag;
 						if ( colNumber != null )
 							flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD, 
-									Severity.BAD, colNumber-1, rowNum-1);
+									Severity.ERROR, colNumber-1, rowNum-1);
 						else
 							flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD, 
-									Severity.BAD, null, rowNum-1);
+									Severity.ERROR, null, rowNum-1);
 						woceFlags.add(flag);
 						stdUserData.setWoceAutocheck(rowNum-1, DashboardServerUtils.WOCE_BAD);
 					}
-					else if ( ADCMessage.SCMsgSeverity.WARNING.equals(severity) ) {
+					else if ( Severity.WARNING.equals(severity) ) {
 						QCFlag flag;
 						if ( colNumber > 0 )
 							flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE, 
-									Severity.QUESTIONABLE, colNumber-1, rowNum-1);
+									Severity.WARNING, colNumber-1, rowNum-1);
 						else
 							flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE, 
-									Severity.QUESTIONABLE, null, rowNum-1);
+									Severity.WARNING, null, rowNum-1);
 						woceFlags.add(flag);
 						stdUserData.setWoceAutocheck(rowNum-1, DashboardServerUtils.WOCE_QUESTIONABLE);
 					}
@@ -344,8 +343,8 @@ public class CheckerMessageHandler {
 		// Assign any user-provided QC flags.
 		// TODO: get severity from user-provided specification of the type
 		// This assumes QC flags indicating problems have flag values that are integers 3-9.
-		// If "WOCE" (case insensitive) is in the data type description, 3 is QUESTIONABLE 
-		// and 4-9 are BAD; otherwise 3-9 are all BAD.
+		// If "WOCE" (case insensitive) is in the data type description, 3 is WARNING 
+		// and 4-9 are ERROR; otherwise 3-9 are all ERROR.
 		TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
 		for (int k = 0; k < numUserCols; k++) {
 			DashDataType<?> colType = stdDataTypes.get(k);
@@ -359,9 +358,9 @@ public class CheckerMessageHandler {
 					break;
 				}
 			}
-			Severity severityOfThree = Severity.BAD;
+			Severity severityOfThree = Severity.ERROR;
 			if ( colType.getDescription().toUpperCase().contains("WOCE") )
-				severityOfThree = Severity.QUESTIONABLE;
+				severityOfThree = Severity.WARNING;
 			for (int j = 0; j < numSamples; j++) {
 				try {
 					Character flagVal = (Character) stdUserData.getStdVal(j, k);
@@ -371,7 +370,7 @@ public class CheckerMessageHandler {
 						if ( value == 3 )
 							severity = severityOfThree;
 						else
-							severity = Severity.BAD;
+							severity = Severity.ERROR;
 						QCFlag flag;
 						if ( qcDataIdx >= 0 )
 							flag = new QCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, k);
@@ -389,7 +388,7 @@ public class CheckerMessageHandler {
 
 	/**
 	 * Reads the list of messages from the messages file written by 
-	 * @link #processCheckerMessages(DashboardDatasetData, Output)}.
+	 * {@link #processCheckerMessages(DashboardDataset, StdUserDataArray)}.
 	 * 
 	 * @param datasetId
 	 * 		get messages for the dataset with this ID
@@ -440,50 +439,62 @@ public class CheckerMessageHandler {
 
 						String propVal = msgProps.getProperty(MSG_SEVERITY_KEY);
 						try {
-							msg.setSeverity(SCMsgSeverity.valueOf(propVal));
+							msg.setSeverity(Severity.valueOf(propVal));
 						} catch ( Exception ex ) {
-							// leave as the default SCMsgSeverity.UNKNOWN
+							// leave as the default
 						}
 
 						propVal = msgProps.getProperty(MSG_ROW_NUMBER_KEY);
 						try {
 							msg.setRowNumber(Integer.parseInt(propVal));
 						} catch ( Exception ex ) {
-							// leave as the default -1
+							// leave as the default
 						}
 
 						propVal = msgProps.getProperty(MSG_LONGITUDE_KEY);
 						try {
 							msg.setLongitude(Double.valueOf(propVal));
 						} catch ( Exception ex ) {
-							// leave as the default Double.NaN
+							// leave as the default
 						}
 
 						propVal = msgProps.getProperty(MSG_LATITUDE_KEY);
 						try {
 							msg.setLatitude(Double.valueOf(propVal));
 						} catch ( Exception ex ) {
-							// leave as the default Double.NaN
+							// leave as the default
+						}
+
+						propVal = msgProps.getProperty(MSG_LATITUDE_KEY);
+						try {
+							msg.setLatitude(Double.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default
+						}
+
+						propVal = msgProps.getProperty(MSG_DEPTH_KEY);
+						try {
+							msg.setDepth(Double.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default
 						}
 
 						propVal = msgProps.getProperty(MSG_TIMESTAMP_KEY);
 						if ( propVal != null ) {
 							msg.setTimestamp(propVal);
 						}
-						// default timestamp is an empty string
 
 						propVal = msgProps.getProperty(MSG_COLUMN_NUMBER_KEY);
 						try {
 							msg.setColNumber(Integer.parseInt(propVal));
 						} catch ( Exception ex ) {
-							// leave as the default -1
+							// leave as the default
 						}
 
 						propVal = msgProps.getProperty(MSG_COLUMN_NAME_KEY);
 						if ( propVal != null ) {
 							msg.setColName(propVal);
 						}
-						// default column name is an empty string 
 
 						propVal = msgProps.getProperty(MSG_GENERAL_MSG_KEY);
 						if ( propVal != null ) {
@@ -491,7 +502,6 @@ public class CheckerMessageHandler {
 							propVal = propVal.replace("\\n", "\n");
 							msg.setGeneralComment(propVal);
 						}
-						// default general explanation is an empty string
 
 						propVal = msgProps.getProperty(MSG_DETAILED_MSG_KEY);
 						if ( propVal != null ) {
@@ -499,7 +509,6 @@ public class CheckerMessageHandler {
 							propVal = propVal.replace("\\n", "\n");
 							msg.setDetailedComment(propVal);
 						}
-						// default detailed explanation is an empty string
 
 						msgList.add(msg);
 

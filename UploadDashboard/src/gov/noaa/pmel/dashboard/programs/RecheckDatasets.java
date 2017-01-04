@@ -81,12 +81,8 @@ public class RecheckDatasets {
 				}
 				// Check the dataset as if this was to be submitted.
 				// This will regenerate the automated data checker messages file.
-				if ( ! dataChecker.standardizeDatasetData(dataset) ) {
-					System.err.println("Error - " + datasetId + " - problems standardizing dataset data");
-					retVal = 1;
-					continue;
-				}
-				System.err.println("Success - " + datasetId);
+				dataChecker.standardizeDataset(dataset, null);
+				System.err.println("Done - " + datasetId);
 			}
 
 		} finally {

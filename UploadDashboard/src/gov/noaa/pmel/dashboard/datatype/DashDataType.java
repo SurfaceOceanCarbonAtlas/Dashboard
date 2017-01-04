@@ -18,6 +18,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * Base class for defining immutable standard data types.  Includes information 
@@ -251,7 +252,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if unreasonable small
 		if ( (minQuestionVal != null) && (minQuestionVal.compareTo(stdVal) > 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(ADCMessage.SCMsgSeverity.ERROR);
+			msg.setSeverity(Severity.ERROR);
 			msg.setGeneralComment(displayName + 
 					UNREASONABLY_SMALL_MSG + minQuestionVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
@@ -261,7 +262,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if unreasonably large
 		if ( (maxQuestionVal != null) && (maxQuestionVal.compareTo(stdVal) < 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(ADCMessage.SCMsgSeverity.ERROR);
+			msg.setSeverity(Severity.ERROR);
 			msg.setGeneralComment(displayName + 
 					UNREASONABLY_LARGE_MSG + maxQuestionVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
@@ -271,7 +272,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if questionably small
 		if ( (minAcceptVal != null) && (minAcceptVal.compareTo(stdVal) > 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(ADCMessage.SCMsgSeverity.WARNING);
+			msg.setSeverity(Severity.WARNING);
 			msg.setGeneralComment(displayName + 
 					QUESTIONABLY_SMALL_MSG + minAcceptVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
@@ -281,7 +282,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if questionably large
 		if ( (maxAcceptVal != null) && (maxAcceptVal.compareTo(stdVal) < 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(ADCMessage.SCMsgSeverity.WARNING);
+			msg.setSeverity(Severity.WARNING);
 			msg.setGeneralComment(displayName + 
 					QUESTIONABLY_LARGE_MSG + maxAcceptVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 

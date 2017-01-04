@@ -13,8 +13,8 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.ADCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 
 /**
@@ -87,7 +87,7 @@ public class ADCMessageListTest {
 				"3 errors of type: P_equ unreasonably large", 
 				"5 errors of type: calculated ship speed unreasonably large",
 				"20 warnings of type: P_equ unusually large"));
-		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
+		final Severity mySeverity = Severity.ERROR;
 		final int myRowNum = 25;
 		final int myColNum = 8;
 		final String myColName = "P_atm";

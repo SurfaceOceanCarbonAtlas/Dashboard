@@ -69,7 +69,7 @@ public class DashboardServerUtils {
 			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
 
 	/**
-	 * UNKNOWN needs to be respecified as one of the (other) data column types.
+	 * UNASSIGNED needs to be respecified as one of the (other) data column types.
 	 */
 	public static final StringDashDataType UNKNOWN = new StringDashDataType(DashboardUtils.UNKNOWN, 
 			null, null, null, null, null, null);

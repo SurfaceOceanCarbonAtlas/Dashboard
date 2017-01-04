@@ -26,6 +26,7 @@ import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * Unit tests for methods in {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray}
@@ -171,14 +172,14 @@ public class StdDataArrayTest {
 		assertEquals(4, msgList.size());
 
 		ADCMessage msg = msgList.get(0);
-		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Severity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(1), msg.getRowNumber());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
 		assertEquals(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
 		assertTrue( msg.getDetailedComment().contains(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG) );
 
 		msg = msgList.get(1);
-		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Severity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(2), msg.getRowNumber());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
 		assertEquals(StdUserDataArray.INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG, msg.getGeneralComment());
@@ -186,14 +187,14 @@ public class StdDataArrayTest {
 
 		Integer lastUserDataColNum = DATA_COLUMN_TYPES.size();
 		msg = msgList.get(2);
-		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Severity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(2), msg.getRowNumber());
 		assertEquals(lastUserDataColNum, msg.getColNumber());
 		assertEquals(NO_VALUE_ERRMSG, msg.getGeneralComment());
 		assertEquals(NO_VALUE_ERRMSG, msg.getDetailedComment());
 
 		msg = msgList.get(3);
-		assertEquals(ADCMessage.SCMsgSeverity.CRITICAL, msg.getSeverity());
+		assertEquals(Severity.CRITICAL, msg.getSeverity());
 		assertEquals(Integer.valueOf(3), msg.getRowNumber());
 		assertEquals(lastUserDataColNum, msg.getColNumber());
 		assertEquals(INVALID_FP_VALUE_ERRMSG, msg.getGeneralComment());

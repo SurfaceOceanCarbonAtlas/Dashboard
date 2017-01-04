@@ -365,8 +365,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		dataset.setDataColTypes(newSpecs.getDataColTypes());
 
 		// Run the automated data checker with the updated data types.
-		// Assigns the data check status and the WOCE-3 and WOCE-4 c flags.
-		configStore.getDashboardDatasetChecker().checkDataset(dataset);
+		// Assigns the data check status and the WOCE-3 and WOCE-4 flags.
+		configStore.getDashboardDatasetChecker().standardizeDataset(dataset, null);
 
 		// Save and commit the updated data columns
 		configStore.getDataFileHandler().saveDatasetInfoToFile(dataset, 
@@ -423,8 +423,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 						" updated by " + username + " from post-processing a multiple-dataset upload");
 			
 				// Run the automated data checker with the updated data types.  Saves the messages,
-				// and assigns the data check status and the WOCE-3 and WOCE-4 checker flags.
-				datasetChecker.checkDataset(dataset);
+				// and assigns the data check status and the WOCE-3 and WOCE-4 flags.
+				datasetChecker.standardizeDataset(dataset, null);
 
 				// Save and commit the updated dataset information
 				dataHandler.saveDatasetInfoToFile(dataset, "Automated data check status and flags for " + 

@@ -3,17 +3,12 @@
  */
 package gov.noaa.pmel.dashboard.test.actions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
@@ -21,11 +16,6 @@ import org.junit.Test;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
-import uk.ac.uea.socat.sanitychecker.Output;
-import uk.ac.uea.socat.sanitychecker.SanityChecker;
-import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
-import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 
 /**
  * Test of the sanity checker via function calls.
@@ -53,14 +43,6 @@ public class SanityCheckerTest {
 	public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm", 
 			350.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", DsgNcFileTest.PCO2_UNITS, 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
-
-	private static final String CONFIG_FILENAME;
-	private static final String LOG4J_PROPERTIES_FILENAME;
-	static {
-		String home = System.getenv("HOME");
-		CONFIG_FILENAME = home + "/content/OAPUploadDashboard/config/OAPUploadDashboard.properties";
-		LOG4J_PROPERTIES_FILENAME = home + "/content/OAPUploadDashboard/config/log4j.properties";
-	}
 
 	@Test
 	public void testSanityChecker() throws Exception {
@@ -211,7 +193,8 @@ public class SanityCheckerTest {
 		ArrayList<ArrayList<String>> badCruiseData = new ArrayList<ArrayList<String>>(badCruiseDataStrings.length);
 		for ( String dataString : badCruiseDataStrings )
 			badCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
-
+		fail("Not yet implemented");
+/*
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);
 
@@ -278,6 +261,7 @@ public class SanityCheckerTest {
 		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
 		assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
 		assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
+*/
 	}
 
 	@Test
@@ -736,6 +720,8 @@ public class SanityCheckerTest {
 		for ( String dataString : cruiseDataStrings )
 			cruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
 
+		fail("Not yet implemented");
+/*
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);
 
@@ -752,7 +738,7 @@ public class SanityCheckerTest {
 		assertTrue( output.processedOK() );
 		assertFalse( output.hasWarnings() );
 		assertTrue( output.hasErrors() );
-		
+*/		
 	}
 
 }
