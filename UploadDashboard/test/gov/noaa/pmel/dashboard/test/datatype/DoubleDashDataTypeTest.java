@@ -38,6 +38,7 @@ public class DoubleDashDataTypeTest {
 	private static final ArrayList<String> UNITS = new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 	private static final String STANDARD_NAME = "mole_fraction_co2";
 	private static final String CATEGORY_NAME = "ATMOSPHERIC_CO2";
+	private static final String FILE_UNIT = "ppm";
 	private static final Double[] BOUNDS = new Double[] { 10.0, 50.0, 3000.0, 10000.0 };
 
 	/**
@@ -46,7 +47,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testGetDataClassName() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, 
 				BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertNotNull ( dtype );
@@ -59,7 +61,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testDataValueOfString() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, 
 				BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		Double testVal = 1234.0;
@@ -87,7 +90,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testBoundsCheckStandardValue() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				DISPLAY_NAME, DESCRIPTION, false, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, 
 				BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 
@@ -139,7 +143,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testGetVarName() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, 
 				BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertEquals(VAR_NAME, dtype.getVarName());
@@ -159,126 +164,154 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testHashCodeEqualsObject() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, null, null, null, null, null, null, null, null);
+				DISPLAY_NAME, null, false, null, null, null, null, null, null, null, null);
 		assertFalse( dtype.equals(null) );
 		assertFalse( dtype.equals(VAR_NAME) );
 		DoubleDashDataType other = new DoubleDashDataType(VAR_NAME, SORT_ORDER,
-				DISPLAY_NAME, null, null, null, null, null, null, null, null);
+				DISPLAY_NAME, null, false, null, null, null, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		other = new DoubleDashDataType("blob", SORT_ORDER, 
-				DISPLAY_NAME, null, null, null, null, null, null, null, null);
+				DISPLAY_NAME, null, false, null, null, null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER + 1.0, 
-				DISPLAY_NAME, null, null, null, null, null, null, null, null);
+				DISPLAY_NAME, null, false, null, null, null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				"blob", null, null, null, null, null, null, null, null);
+				"blob", null, false, null, null, null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, null, null, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, false, null, null, 
+				null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, null, null, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, false, null, null, 
+				null, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, null, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, null, 
+				null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, null, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, null, 
+				null, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, null, null, 
+				null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, null, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, null, null, 
+				null, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				null, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				null, null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				null, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, null, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), null, null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, null, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, null, null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), null, null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
-				BOUNDS[2].toString(), null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				null, null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
-				BOUNDS[2].toString(), null);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				null, null, null);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
 
 		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
-				BOUNDS[2].toString(), BOUNDS[3].toString());
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), null, null);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
 		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
-				BOUNDS[2].toString(), BOUNDS[3].toString());
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), null, null);
+		assertTrue( dtype.hashCode() == other.hashCode() );
+		assertTrue( dtype.equals(other) );
+		assertFalse( dtype == other );
+
+		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), BOUNDS[2].toString(), null);
+		assertFalse( dtype.hashCode() == other.hashCode() );
+		assertFalse( dtype.equals(other) );
+		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), BOUNDS[2].toString(), null);
+		assertTrue( dtype.hashCode() == other.hashCode() );
+		assertTrue( dtype.equals(other) );
+		assertFalse( dtype == other );
+
+		dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), BOUNDS[2].toString(), BOUNDS[3].toString());
+		assertFalse( dtype.hashCode() == other.hashCode() );
+		assertFalse( dtype.equals(other) );
+		other = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, 
+				CATEGORY_NAME, FILE_UNIT, BOUNDS[0].toString(), 
+				BOUNDS[1].toString(), BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 		assertFalse( dtype == other );
@@ -297,55 +330,55 @@ public class DoubleDashDataTypeTest {
 		final String GREATER_DISPLAYNAME = "HHHH";
 
 		DoubleDashDataType dtype = new DoubleDashDataType(EQUAL_VARNAME, SORT_ORDER, 
-				EQUAL_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				EQUAL_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 
 		DoubleDashDataType other = new DoubleDashDataType(EQUAL_VARNAME, SORT_ORDER, 
-				EQUAL_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				EQUAL_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertTrue( dtype.compareTo(other) == 0 );
 
 		StringDashDataType another = new StringDashDataType(LESS_VARNAME, SORT_ORDER + 1.0, 
-				LESS_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				LESS_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) < 0 );
 		assertTrue( another.compareTo(dtype) > 0 );
 
 		another = new StringDashDataType(GREATER_VARNAME, SORT_ORDER - 1.0, 
-				GREATER_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				GREATER_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) > 0 );
 		assertTrue( another.compareTo(dtype) < 0 );
 
 		another = new StringDashDataType(LESS_VARNAME, SORT_ORDER, 
-				GREATER_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				GREATER_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) < 0 );
 		assertTrue( another.compareTo(dtype) > 0 );
 
 		another = new StringDashDataType(GREATER_VARNAME, SORT_ORDER, 
-				LESS_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				LESS_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) > 0 );
 		assertTrue( another.compareTo(dtype) < 0 );
 
 		another = new StringDashDataType(GREATER_VARNAME, SORT_ORDER, 
-				EQUAL_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				EQUAL_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) < 0 );
 		assertTrue( another.compareTo(dtype) > 0 );
 
 		another = new StringDashDataType(LESS_VARNAME, SORT_ORDER, 
-				EQUAL_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				EQUAL_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) > 0 );
 		assertTrue( another.compareTo(dtype) < 0 );
 
 		another = new StringDashDataType(EQUAL_VARNAME, SORT_ORDER,
-				EQUAL_DISPLAYNAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME,
-				null, null, null, null);
+				EQUAL_DISPLAYNAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME,
+				FILE_UNIT, null, null, null, null);
 		assertTrue( dtype.compareTo(another) < 0 );
 		assertTrue( another.compareTo(dtype) > 0 );
 	}
@@ -358,15 +391,15 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testDuplicateDoubleDashDataType() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		DataColumnType colType = new DataColumnType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS);
+				DISPLAY_NAME, DESCRIPTION, true, UNITS);
 		assertEquals(colType, dtype.duplicate());
 		DoubleDashDataType other = new DoubleDashDataType(colType, 
 				STANDARD_NAME, CATEGORY_NAME,
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertEquals(dtype, other);
 	}
@@ -379,8 +412,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testTypeNameEquals() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 		assertTrue( dtype.typeNameEquals(VAR_NAME) );
 		assertTrue( dtype.typeNameEquals(VAR_NAME.toUpperCase()) );
@@ -391,7 +424,7 @@ public class DoubleDashDataTypeTest {
 		assertFalse( dtype.typeNameEquals(DESCRIPTION) );
 
 		StringDashDataType other = new StringDashDataType(DISPLAY_NAME, SORT_ORDER,
-				VAR_NAME, null, null, null, null, null, null, null, null);
+				VAR_NAME, null, false, null, null, null, null, null, null, null, null);
 		assertTrue( dtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(dtype) );
 		assertFalse( dtype.typeNameEquals((DashDataType<?>) null) );
@@ -409,16 +442,16 @@ public class DoubleDashDataTypeTest {
 	public void testIsType() {
 		// DoubleDashDataType can never be a QC/WOCE flag or a comment
 		DoubleDashDataType dtype = new DoubleDashDataType("WOCE", 1.0, "WOCE flag", 
-				"WOCE flag", DashboardUtils.NO_UNITS, "WOCE_flag", 
-				DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null);
+				"WOCE flag", false, DashboardUtils.NO_UNITS, "WOCE_flag", 
+				DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
 		assertFalse( dtype.isQCType() );
 		dtype = new DoubleDashDataType("QC", 1.0, "QC flag", 
-				"QC flag", DashboardUtils.NO_UNITS, "QC_flag", 
-				DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null);
+				"QC flag", false, DashboardUtils.NO_UNITS, "QC_flag", 
+				DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
 		assertFalse( dtype.isQCType() );
 		DoubleDashDataType other = new DoubleDashDataType("QC_Comment", 1.0, "QC flag comment", 
-				"Comment for QC flag", DashboardUtils.NO_UNITS, "Comment", 
-				null, null, null, null, null);
+				"Comment for QC flag", false, DashboardUtils.NO_UNITS, "Comment", 
+				null, null, null, null, null, null);
 		assertFalse( other.isCommentType() );
 		assertFalse( other.isCommentTypeFor(dtype) );
 	}
@@ -430,8 +463,8 @@ public class DoubleDashDataTypeTest {
 	@Test
 	public void testToFromPropertyValue() {
 		DoubleDashDataType dtype = new DoubleDashDataType(VAR_NAME, SORT_ORDER, 
-				DISPLAY_NAME, DESCRIPTION, UNITS, STANDARD_NAME, CATEGORY_NAME, 
-				BOUNDS[0].toString(), BOUNDS[1].toString(), 
+				DISPLAY_NAME, DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, 
+				FILE_UNIT, BOUNDS[0].toString(), BOUNDS[1].toString(), 
 				BOUNDS[2].toString(), BOUNDS[3].toString());
 
 		String propValStr = dtype.toPropertyValue();
@@ -440,9 +473,11 @@ public class DoubleDashDataTypeTest {
 		assertTrue( propValStr.contains(SORT_ORDER.toString()) );
 		assertTrue( propValStr.contains(DISPLAY_NAME) );
 		assertTrue( propValStr.contains(DESCRIPTION) );
+		assertTrue( propValStr.contains("true") );
 		for ( String value : UNITS )
 			assertTrue( propValStr.contains(value) );
 		assertTrue( propValStr.contains(STANDARD_NAME) );
+		assertTrue( propValStr.contains(FILE_UNIT) );
 		assertTrue( propValStr.contains(BOUNDS[0].toString()) );
 		assertTrue( propValStr.contains(BOUNDS[1].toString()) );
 		assertTrue( propValStr.contains(BOUNDS[2].toString()) );

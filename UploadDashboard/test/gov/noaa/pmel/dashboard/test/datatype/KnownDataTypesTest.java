@@ -131,16 +131,16 @@ public class KnownDataTypesTest {
 	static final DashDataType<?>[] ADDN_DATA_TYPES = new DashDataType<?>[] {
 		new DoubleDashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_SORT_ORDERS[0], 
 				ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_DESCRIPTIONS[0], 
-				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[0], 
-				ADDN_TYPES_CATEGORY_NAMES[0], null, null, null, null),
+				false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[0], 
+				ADDN_TYPES_CATEGORY_NAMES[0], null, null, null, null, null),
 		new IntDashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_SORT_ORDERS[1], 
 				ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_DESCRIPTIONS[1], 
-				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[1], 
-				ADDN_TYPES_CATEGORY_NAMES[1], null, null, null, null),
+				false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[1], 
+				ADDN_TYPES_CATEGORY_NAMES[1], null, null, null, null, null),
 		new StringDashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_SORT_ORDERS[2], 
 				ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_DESCRIPTIONS[2], 
-				MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[2], 
-				ADDN_TYPES_CATEGORY_NAMES[2], null, null, null, null),
+				false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[2], 
+				ADDN_TYPES_CATEGORY_NAMES[2], null, null, null, null, null),
 	};
 
 	static final String ADDN_TYPES_PROPERTIES_STRING = 
@@ -220,10 +220,10 @@ public class KnownDataTypesTest {
 		types.addStandardTypesForUsers();
 		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType("DATASET_NAME"));
 		DataColumnType dctype = new DataColumnType("dataset_name", 5.0, "cruise name", 
-				"cruise/dataset name", DashboardUtils.NO_UNITS);
+				"cruise/dataset name", false, DashboardUtils.NO_UNITS);
 		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
 		dctype = new DataColumnType("cruise_name", 5.0, "dataset name", 
-				"cruise/dataset name", DashboardUtils.NO_UNITS);
+				"cruise/dataset name", false, DashboardUtils.NO_UNITS);
 		assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
 	}
 

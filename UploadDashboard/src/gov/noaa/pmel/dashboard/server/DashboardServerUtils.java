@@ -72,7 +72,7 @@ public class DashboardServerUtils {
 	 * UNASSIGNED needs to be respecified as one of the (other) data column types.
 	 */
 	public static final StringDashDataType UNKNOWN = new StringDashDataType(DashboardUtils.UNKNOWN, 
-			null, null, null, null, null, null);
+			null, null, null, null, null, null, null);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -81,131 +81,132 @@ public class DashboardServerUtils {
 	 * Multiple columns may have this type.
 	 */
 	public static final StringDashDataType OTHER = new StringDashDataType(DashboardUtils.OTHER, 
-			null, null, null, null, null, null);
+			null, null, null, null, null, null, null);
 
 	/**
 	 * Unique identifier for the dataset 
 	 * (metadata derived from user data column for the dataset name)
 	 */
 	public static final StringDashDataType DATASET_ID = new StringDashDataType("dataset_id", 
-			50.0, "dataset ID", "unique ID for this dataset", DashboardUtils.NO_UNITS, 
-			null, IDENTIFIER_CATEGORY, null, null, null, null);
+			50.0, "dataset ID", "unique ID for this dataset", false, DashboardUtils.NO_UNITS, 
+			null, IDENTIFIER_CATEGORY, null, null, null, null, null);
 
 	/**
 	 * Consecutive numbering of the samples after merging and ordering.
 	 */
 	public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType("sample_number", 
-			51.0, "sample num", "sample number", DashboardUtils.NO_UNITS, null, 
-			IDENTIFIER_CATEGORY, "1", null, null, null);
+			51.0, "sample num", "sample number", false, DashboardUtils.NO_UNITS, null, 
+			IDENTIFIER_CATEGORY, null, "1", null, null, null);
 
 	/**
 	 * Completely specified sampling time (seconds since 1970-01-01T00:00:00Z) 
 	 * used in file data; computed value.
 	 */
 	public static final DoubleDashDataType TIME = new DoubleDashDataType("time", 
-			52.0, "time", "sample time", TIME_UNITS, "time", 
-			TIME_CATEGORY, null, null, null, null);
+			52.0, "time", "sample time", false, TIME_UNITS, "time", 
+			TIME_CATEGORY, null, null, null, null, null);
 
 	/**
 	 * User-provided name for the dataset
 	 */
 	public static final StringDashDataType DATASET_NAME = new StringDashDataType(DashboardUtils.DATASET_NAME, 
-			"cruise_name", IDENTIFIER_CATEGORY, null, null, null, null);
+			"cruise_name", IDENTIFIER_CATEGORY, null, null, null, null, null);
 
 	public static final StringDashDataType PLATFORM_NAME = new StringDashDataType(DashboardUtils.PLATFORM_NAME, 
-			"platform_name", PLATFORM_CATEGORY, null, null, null, null);
+			"platform_name", PLATFORM_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType(DashboardUtils.PLATFORM_TYPE, 
-			"platform_name", PLATFORM_CATEGORY, null, null, null, null);
+			"platform_name", PLATFORM_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType(DashboardUtils.ORGANIZATION_NAME, 
-			"organization", PLATFORM_CATEGORY, null, null, null, null);
+			"organization", PLATFORM_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType(DashboardUtils.INVESTIGATOR_NAMES, 
-			"investigators", IDENTIFIER_CATEGORY, null, null, null, null);
+			"investigators", IDENTIFIER_CATEGORY, null, null, null, null, null);
 
 	public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_min", 
-			110.0, "westmost lon", "westernmost longitude", DashboardUtils.LONGITUDE_UNITS, 
-			"geospatial_lon_min", LOCATION_CATEGORY, "-540.0", "-180.0", "360.0", "540.0");
+			110.0, "westmost lon", "westernmost longitude", false, DashboardUtils.LONGITUDE_UNITS, 
+			"geospatial_lon_min", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
 	public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max", 
-			111.0, "eastmost lon", "easternmost longitude", DashboardUtils.LONGITUDE_UNITS, 
-			"geospatial_lon_max", LOCATION_CATEGORY, "-540.0", "-180.0", "360.0", "540.0");
+			111.0, "eastmost lon", "easternmost longitude", false, DashboardUtils.LONGITUDE_UNITS, 
+			"geospatial_lon_max", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
 	public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min", 
-			112.0, "southmost lat", "southernmost latitude", DashboardUtils.LATITUDE_UNITS, 
-			"geospatial_lat_min", LOCATION_CATEGORY, "-90.0", null, null, "90.0");
+			112.0, "southmost lat", "southernmost latitude", false, DashboardUtils.LATITUDE_UNITS, 
+			"geospatial_lat_min", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
 	public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max", 
-			113.0, "northmost lat", "northernmost latitude", DashboardUtils.LATITUDE_UNITS, 
-			"geospatial_lat_max", LOCATION_CATEGORY, "-90.0", null, null, "90.0");
+			113.0, "northmost lat", "northernmost latitude", false, DashboardUtils.LATITUDE_UNITS, 
+			"geospatial_lat_max", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
 	public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start", 
-			114.0, "start time", "starting time", TIME_UNITS, 
-			"time_coverage_start", LOCATION_CATEGORY, null, null, null, null);
+			114.0, "start time", "starting time", false, TIME_UNITS, 
+			"time_coverage_start", LOCATION_CATEGORY, null, null, null, null, null);
 	public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_converage_end", 
-			115.0, "end time", "ending time", TIME_UNITS, 
-			"time_coverage_end", LOCATION_CATEGORY, null, null, null, null);
+			115.0, "end time", "ending time", false, TIME_UNITS, 
+			"time_coverage_end", LOCATION_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType STATUS = new StringDashDataType("status",
-			120.0, "status", "status", DashboardUtils.NO_UNITS, 
-			null, IDENTIFIER_CATEGORY, null, null, null, null);
+			120.0, "status", "status", false, DashboardUtils.NO_UNITS, 
+			null, IDENTIFIER_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType VERSION = new StringDashDataType("version",
-			121.0, "version", "version", DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null, null, null, null);
+			121.0, "version", "version", false, DashboardUtils.NO_UNITS, 
+			null, IDENTIFIER_CATEGORY, null, null, null, null, null);
 
 	/**
 	 * User-provided unique ID for a sample in a dataset (user data type only). 
 	 * Used when merging files of different data types measured for a sample.
 	 */
 	public static final StringDashDataType SAMPLE_ID = new StringDashDataType(DashboardUtils.SAMPLE_ID, 
-			null, IDENTIFIER_CATEGORY, null, null, null, null);
+			null, IDENTIFIER_CATEGORY, null, null, null, null, null);
 
 	public static final DoubleDashDataType LONGITUDE = new DoubleDashDataType(DashboardUtils.LONGITUDE, 
-			"longitude", LOCATION_CATEGORY, "-540.0", "-180.0", "360.0", "540.0");
+			"longitude", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
 	public static final DoubleDashDataType LATITUDE = new DoubleDashDataType(DashboardUtils.LATITUDE, 
-			"latitude", LOCATION_CATEGORY, "-90.0", null, null, "90.0");
+			"latitude", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
 	public static final DoubleDashDataType SAMPLE_DEPTH = new DoubleDashDataType(DashboardUtils.SAMPLE_DEPTH, 
-			"depth", BATHYMETRY_CATEGORY, "0.0", null, null, "16000");
+			"depth", BATHYMETRY_CATEGORY, "meters", "0.0", null, null, "16000");
 
 	/**
 	 * Date and time of the measurement
 	 */
 	public static final StringDashDataType TIMESTAMP = new StringDashDataType(DashboardUtils.TIMESTAMP, 
-			"timestamp", TIME_CATEGORY, null, null, null, null);
+			"timestamp", TIME_CATEGORY, null, null, null, null, null);
 
 	/**
 	 * Date of the measurement - no time.
 	 */
 	public static final StringDashDataType DATE = new StringDashDataType(DashboardUtils.DATE, 
-			"date", TIME_CATEGORY, null, null, null, null);
+			"date", TIME_CATEGORY, null, null, null, null, null);
 
 	public static final IntDashDataType YEAR = new IntDashDataType(DashboardUtils.YEAR, 
-			"year", TIME_CATEGORY, "1900", "1950", "2050", "2100");
+			"year", TIME_CATEGORY, null, "1900", "1950", "2050", "2100");
 	public static final IntDashDataType MONTH_OF_YEAR = new IntDashDataType(DashboardUtils.MONTH_OF_YEAR, 
-			"month_of_year", TIME_CATEGORY, "1", null, null, "12");
+			"month_of_year", TIME_CATEGORY, "1", null, null, "12", null);
 	public static final IntDashDataType DAY_OF_MONTH = new IntDashDataType(DashboardUtils.DAY_OF_MONTH, 
-			"day_of_month", TIME_CATEGORY, "1", null, null, "31");
+			"day_of_month", TIME_CATEGORY, "1", null, null, "31", null);
 	public static final StringDashDataType TIME_OF_DAY = new StringDashDataType(DashboardUtils.TIME_OF_DAY, 
-			"time_of_day", TIME_CATEGORY, null, null, null, null);
+			"time_of_day", TIME_CATEGORY, null, null, null, null, null);
 	public static final IntDashDataType HOUR_OF_DAY = new IntDashDataType(DashboardUtils.HOUR_OF_DAY, 
-			"hour_of_day", TIME_CATEGORY, "0", null, null, "24");
+			"hour_of_day", TIME_CATEGORY, null, "0", null, null, "24");
 	public static final IntDashDataType MINUTE_OF_HOUR = new IntDashDataType(DashboardUtils.MINUTE_OF_HOUR, 
-			"minute_of_hour", TIME_CATEGORY, "0", null, null, "60");
+			"minute_of_hour", TIME_CATEGORY, null, "0", null, null, "60");
 	public static final DoubleDashDataType SECOND_OF_MINUTE = new DoubleDashDataType(DashboardUtils.SECOND_OF_MINUTE, 
-			"second_of_minute", TIME_CATEGORY, "0.0", null, null, "60.0");
+			"second_of_minute", TIME_CATEGORY, null, "0.0", null, null, "60.0");
 
 	/**
 	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
 	 * may be used to specify the date and time of the measurement.
 	 */
 	public static final DoubleDashDataType DAY_OF_YEAR = new DoubleDashDataType(DashboardUtils.DAY_OF_YEAR, 
-			"day_of_year", TIME_CATEGORY, "1.0", null, null, "367.0");
+			"day_of_year", TIME_CATEGORY, null, "1.0", null, null, "367.0");
 
 	/**
 	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
 	 * be used to specify date and time of the measurement
 	 */
 	public static final DoubleDashDataType SECOND_OF_DAY = new DoubleDashDataType(DashboardUtils.SECOND_OF_DAY, 
-			"second_of_day", TIME_CATEGORY, "0.0", null, null, "86400.0");
+			"second_of_day", TIME_CATEGORY, null, "0.0", null, null, "86400.0");
 
 	/**
 	 * WOCE flag from the automated data checker.
 	 */
 	public static final CharDashDataType WOCE_AUTOCHECK = new CharDashDataType("WOCE_autocheck",
-			500.0, "WOCE autocheck", "WOCE flag from automated data checking", DashboardUtils.NO_UNITS, 
-			"WOCE_flag", QUALITY_CATEGORY, "1", "2", "4", "9");
+			500.0, "WOCE autocheck", "WOCE flag from automated data checking", false,
+			DashboardUtils.NO_UNITS, "WOCE_flag", QUALITY_CATEGORY, null, "1", "2", "4", "9");
 
 	/** 
 	 * Value of userRealName to use to skip sending the email request in 

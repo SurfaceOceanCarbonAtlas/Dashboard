@@ -31,6 +31,9 @@ public class IntDashDataType extends DashDataType<Integer> {
 	 * @param description
 	 * 		brief description of this data column type; if null, 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param isCritical
+	 * 		if this data type is required to be present and all
+	 * 		values must be valid
 	 * @param units
 	 * 		unit strings associated with this data column type.  A new 
 	 * 		ArrayList is created from the values in the given collection.  
@@ -45,6 +48,10 @@ public class IntDashDataType extends DashDataType<Integer> {
 	 * @param categoryName
 	 * 		category name for this data column type; if null, 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param fileStdUnit
+	 * 		name of the standard unit (corresponding to the first unit 
+	 * 		of the units array) to be used in the DSG files; if null,
+	 * 		the first unit string will be used
 	 * @param minQuestionStrVal
 	 * 		string representation of the minimum questionable value for 
 	 * 		standardized values of this data column type  (less than this 
@@ -72,10 +79,12 @@ public class IntDashDataType extends DashDataType<Integer> {
 	 * 		for those values that are not null, is violated
 	 */
 	public IntDashDataType(String varName, Double sortOrder, String displayName, 
-			String description, Collection<String> units, String standardName, 
-			String categoryName, String minQuestionStrVal, String minAcceptStrVal, 
+			String description, boolean isCritical, Collection<String> units, 
+			String standardName, String categoryName, String fileStdUnit, 
+			String minQuestionStrVal, String minAcceptStrVal, 
 			String maxAcceptStrVal, String maxQuestionStrVal) throws IllegalArgumentException {
-		super(varName, sortOrder, displayName, description, units, standardName, categoryName);
+		super(varName, sortOrder, displayName, description, isCritical, 
+				units, standardName, categoryName, fileStdUnit);
 		if ( minQuestionStrVal != null ) {
 			try {
 				minQuestionVal = dataValueOf(minQuestionStrVal);
@@ -125,6 +134,10 @@ public class IntDashDataType extends DashDataType<Integer> {
 	 * @param categoryName
 	 * 		category name for this data column type; if null, 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param fileStdUnit
+	 * 		name of the standard unit (corresponding to the first unit 
+	 * 		of the units array) to be used in the DSG files; if null,
+	 * 		the first unit string will be used
 	 * @param minQuestionStrVal
 	 * 		string representation of the minimum questionable value for 
 	 * 		standardized values of this data column type  (less than this 
@@ -152,11 +165,12 @@ public class IntDashDataType extends DashDataType<Integer> {
 	 * 		for those values that are not null, is violated
 	 */
 	public IntDashDataType(DataColumnType dtype, String standardName, String categoryName, 
-			String minQuestionStrVal, String minAcceptStrVal, String maxAcceptStrVal, 
-			String maxQuestionStrVal) throws IllegalArgumentException {
+			String fileStdUnit, String minQuestionStrVal, String minAcceptStrVal, 
+			String maxAcceptStrVal, String maxQuestionStrVal) throws IllegalArgumentException {
 		this(dtype.getVarName(), dtype.getSortOrder(), dtype.getDisplayName(), 
-				dtype.getDescription(), dtype.getUnits(), standardName, categoryName, 
-				minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
+				dtype.getDescription(), dtype.isCritical(), dtype.getUnits(), 
+				standardName, categoryName, fileStdUnit, minQuestionStrVal, 
+				minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
 	}
 
 	@Override

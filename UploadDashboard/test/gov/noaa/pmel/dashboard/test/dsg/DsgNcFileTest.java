@@ -39,37 +39,37 @@ public class DsgNcFileTest {
 	public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
 	public static final ArrayList<String> SALINITY_UNITS = new ArrayList<String>(Arrays.asList("PSU"));
 	public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degrees C"));
+	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC", "K"));
 	public static final ArrayList<String> XCO2_UNITS = new ArrayList<String>(Arrays.asList("umol/mol"));
 
 	public static final DoubleDashDataType SALINITY = new DoubleDashDataType("sal", 
-			700.0, "salinity", "salinity", SALINITY_UNITS, "sea_surface_salinity", 
-			SALINITY_CATEGORY, "-0.1", "0.0", "40.0", "55.0");
+			700.0, "salinity", "salinity", false, SALINITY_UNITS, "sea_surface_salinity", 
+			SALINITY_CATEGORY, null, "-0.1", "0.0", "40.0", "55.0");
 
 	public static final DoubleDashDataType SST = new DoubleDashDataType("temp", 
-			701.0, "SST", "sea surface temperature", 
+			701.0, "SST", "sea surface temperature", false, 
 			TEMPERATURE_UNITS, "sea_surface_temperature", 
-			TEMPERATURE_CATEGORY, "-10.0", "-5.0", "40.0", "55.0");
+			TEMPERATURE_CATEGORY, "degrees C", "-10.0", "-5.0", "40.0", "55.0");
 
 	public static final DoubleDashDataType PATM = new DoubleDashDataType("Pressure_atm", 
-			703.0, "P_atm", "sea-level air pressure", 
+			703.0, "P_atm", "sea-level air pressure", false, 
 			PRESSURE_UNITS, "air_pressure_at_sea_level", 
-			PRESSURE_CATEGORY, "8000.0", "9000.0", "11000.0", "12000.0");
+			PRESSURE_CATEGORY, null, "750.0", "900.0", "1100.0", "1250.0");
 
 	public static final DoubleDashDataType XCO2_WATER_SST_DRY = new DoubleDashDataType("xCO2_water_sst_dry_ppm", 
-			704.0, "xCO2_water_SST_dry", "water xCO2 dry using sst", 
+			704.0, "xCO2_water_SST_dry", "water xCO2 dry using sst", false, 
 			XCO2_UNITS, "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
+			CO2_CATEGORY, null, "0.0", "100.0", "5000.0", "50000.0");
 
 	public static final DoubleDashDataType PCO2_WATER_TEQU_WET = new DoubleDashDataType("pCO2_water_equi_temp", 
-			705.0, "pCO2_water_Tequ_wet", "water pCO2 wet using equi temp", 
+			705.0, "pCO2_water_Tequ_wet", "water pCO2 wet using equi temp", false, 
 			PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			CO2_CATEGORY, "0.0", "50.0", "5000.0", "50000.0");
+			CO2_CATEGORY, null, "0.0", "100.0", "5000.0", "50000.0");
 
 	public static final DoubleDashDataType SHIP_SPEED = new DoubleDashDataType("ship_speed", 
-			670.0, "ship speed", "measured ship speed", 
+			670.0, "ship speed", "measured ship speed", false, 
 			SHIP_SPEED_UNITS, "platform_speed_wrt_ground", 
-			DashboardServerUtils.PLATFORM_CATEGORY, "0.0", null, "50.0", "200.0");
+			DashboardServerUtils.PLATFORM_CATEGORY, null, "0.0", null, "50.0", "200.0");
 
 	/** Known data types for users */
 	static final KnownDataTypes KNOWN_USER_DATA_TYPES;

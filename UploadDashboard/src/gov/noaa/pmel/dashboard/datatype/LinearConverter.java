@@ -33,8 +33,31 @@ public class LinearConverter extends ValueConverter<Double> {
 		SLOPES_MAP.put(key, 1.0);
 		INTERCEPTS_MAP.put(key, -273.15);
 
-		// Pressure
+		// Air Pressure
+		key = "from \"kPa\" to \"hPa\"";
+		SLOPES_MAP.put(key, 10.0);
+		INTERCEPTS_MAP.put(key, 0.0);
+		key = "from \"db\" to \"hPa\"";
+		SLOPES_MAP.put(key, 100.0);
+		INTERCEPTS_MAP.put(key, 0.0);
+		key = "from \"mbar\" to \"hPa\"";
+		SLOPES_MAP.put(key, 1.0);
+		INTERCEPTS_MAP.put(key, 0.0);
+		key = "from \"mmHg\" to \"hPa\"";
+		SLOPES_MAP.put(key, 1.3332239);
+		INTERCEPTS_MAP.put(key, 0.0);
+		key = "from \"PSI\" to \"hPa\"";
+		SLOPES_MAP.put(key, 68.9475728);
+		INTERCEPTS_MAP.put(key, 0.0);
+
+		// Water Pressure
+		key = "from \"kPa\" to \"db\"";
+		SLOPES_MAP.put(key, 0.1);
+		INTERCEPTS_MAP.put(key, 0.0);
 		key = "from \"hPa\" to \"db\"";
+		SLOPES_MAP.put(key, 0.01);
+		INTERCEPTS_MAP.put(key, 0.0);
+		key = "from \"mbar\" to \"db\"";
 		SLOPES_MAP.put(key, 0.01);
 		INTERCEPTS_MAP.put(key, 0.0);
 		key = "from \"mmHg\" to \"db\"";
@@ -81,8 +104,8 @@ public class LinearConverter extends ValueConverter<Double> {
 		}
 
 		String conversionKey = "from \"" + fromUnit + "\" to \"" + toUnit + "\"";
-		Double slope = SLOPES_MAP.get(conversionKey);
-		Double intercept = INTERCEPTS_MAP.get(conversionKey);
+		slope = SLOPES_MAP.get(conversionKey);
+		intercept = INTERCEPTS_MAP.get(conversionKey);
 		if ( (slope == null) || (intercept == null) )
 			throw new IllegalArgumentException("conversion " + conversionKey + " is not supported");
 	}
@@ -106,6 +129,17 @@ public class LinearConverter extends ValueConverter<Double> {
 		dataVal *= slope;
 		dataVal += intercept;
 		return dataVal;
+	}
+
+	@Override
+	public String toString() {
+		return "LinearConverter" +
+				"[ fromUnit=" + fromUnit + 
+				", toUnit=" + toUnit + 
+				", missVal=" + missVal + 
+				", slope=" + slope.toString() + 
+				", intercept=" + intercept.toString() + 
+				" ]";
 	}
 
 }

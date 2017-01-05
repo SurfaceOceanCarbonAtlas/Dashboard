@@ -184,7 +184,7 @@ public class DashboardUtils {
 	 * UNASSIGNED needs to be respecified as one of the (other) data column types.
 	 */
 	public static final DataColumnType UNKNOWN = new DataColumnType("unknown", 
-			0.0, "(unknown)", "unknown type of data", NO_UNITS);
+			0.0, "(unknown)", "unknown type of data", false, NO_UNITS);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -193,88 +193,88 @@ public class DashboardUtils {
 	 * Multiple columns may have this type.
 	 */
 	public static final DataColumnType OTHER = new DataColumnType("other",
-			1.0, "other", "unused and unchecked supplementary data", NO_UNITS);
+			1.0, "other", "unused and unchecked supplementary data", false, NO_UNITS);
 
 	/**
 	 * User-provided name of the cruise/dataset
 	 */
 	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
-			100.0, "cruise/dataset name", "unique name for this dataset", NO_UNITS);
+			100.0, "cruise/dataset name", "unique name for this dataset", true, NO_UNITS);
 
 	public static final DataColumnType PLATFORM_NAME = new DataColumnType("platform_name", 
-			101.0, "platform name", "platform name", NO_UNITS);
+			101.0, "platform name", "platform name", false, NO_UNITS);
 
 	public static final DataColumnType PLATFORM_TYPE = new DataColumnType("platform_type", 
-			102.0, "platform type", "platform type", NO_UNITS);
+			102.0, "platform type", "platform type", false, NO_UNITS);
 
 	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
-			103.0, "organization", "organization", NO_UNITS);
+			103.0, "organization", "organization", false, NO_UNITS);
 	
 	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators", 
-			104.0, "PI names", "investigators", NO_UNITS);
+			104.0, "PI names", "investigators", false, NO_UNITS);
 
 	/**
 	 * User-provided unique ID for a sample in a dataset (user data type only). 
 	 * Used when merging files of different data types measured for a sample.
 	 */
 	public static final DataColumnType SAMPLE_ID = new DataColumnType("sample_id",
-			300.0, "sample ID", "unique ID for this sample in the dataset", NO_UNITS);
+			300.0, "sample ID", "unique ID for this sample in the dataset", false, NO_UNITS);
 
 	public static final DataColumnType LONGITUDE = new DataColumnType("longitude", 
-			301.0, "longitude", "sample longitude", LONGITUDE_UNITS);
+			301.0, "longitude", "sample longitude", true, LONGITUDE_UNITS);
 
 	public static final DataColumnType LATITUDE = new DataColumnType("latitude", 
-			302.0, "latitude", "sample latitude", LATITUDE_UNITS);
+			302.0, "latitude", "sample latitude", true, LATITUDE_UNITS);
 
 	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", 
-			303.0, "sample depth", "sample depth", DEPTH_UNITS);
+			303.0, "sample depth", "sample depth", true, DEPTH_UNITS);
 
 	/**
 	 * Date and time of the measurement
 	 */
 	public static final DataColumnType TIMESTAMP = new DataColumnType("date_time", 
-			310.0, "date time", "sample date and time", TIMESTAMP_UNITS);
+			310.0, "date time", "sample date and time", false, TIMESTAMP_UNITS);
 
 	/**
 	 * Date of the measurement - no time.
 	 */
 	public static final DataColumnType DATE = new DataColumnType("date", 
-			311.0, "date", "sample date", DATE_UNITS);
+			311.0, "date", "sample date", false, DATE_UNITS);
 
 	public static final DataColumnType YEAR = new DataColumnType("year", 
-			312.0, "year", "sample year", NO_UNITS);
+			312.0, "year", "sample year", false, NO_UNITS);
 
 	public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month", 
-			313.0, "month of year", "sample month of year", NO_UNITS);
+			313.0, "month of year", "sample month of year", false, NO_UNITS);
 	
 	public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day", 
-			314.0, "day of month", "sample day of month", NO_UNITS);
+			314.0, "day of month", "sample day of month", false, NO_UNITS);
 
 	public static final DataColumnType TIME_OF_DAY = new DataColumnType("time_of_day", 
-			315.0, "time of day", "sample time of day", TIME_OF_DAY_UNITS);
+			315.0, "time of day", "sample time of day", false, TIME_OF_DAY_UNITS);
 
 	public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour", 
-			316.0, "hour of day", "sample hour of day", NO_UNITS);
+			316.0, "hour of day", "sample hour of day", false, NO_UNITS);
 
 	public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute", 
-			317.0, "minute of hour", "sample minute of hour", NO_UNITS);
+			317.0, "minute of hour", "sample minute of hour", false, NO_UNITS);
 
 	public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("second", 
-			318.0, "sec of minute", "sample second of minute", NO_UNITS);
+			318.0, "sec of minute", "sample second of minute", false, NO_UNITS);
 
 	/**
 	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
 	 * may be used to specify the date and time of the measurement.
 	 */
 	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year", 
-			320.0, "day of year", "sample day of year", DAY_OF_YEAR_UNITS);
+			320.0, "day of year", "sample day of year", false, DAY_OF_YEAR_UNITS);
 
 	/**
 	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
 	 * be used to specify date and time of the measurement
 	 */
 	public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day", 
-			321.0, "sec of day", "sample second of day", NO_UNITS);
+			321.0, "sec of day", "sample second of day", false, NO_UNITS);
 
 	/**
 	 * "Cleans" a username for use by substituting characters that are  

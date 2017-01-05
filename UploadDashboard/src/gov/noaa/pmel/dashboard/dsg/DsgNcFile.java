@@ -264,14 +264,14 @@ public class DsgNcFile extends File {
 					// Metadata Integers
 					var = ncfile.addVariable(null, varName, DataType.INT, trajDims);
 					addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
-							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getFileStdUnit());
 				}
 				else if ( dtype instanceof DoubleDashDataType ) {
 					// Metadata Doubles
 					var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
 					addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
-							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
-					if ( dtype.getUnits().get(0).equals(DashboardServerUtils.TIME_UNITS.get(0)) ) {
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getFileStdUnit());
+					if ( DashboardServerUtils.TIME_UNITS.get(0).equals(dtype.getUnits().get(0)) ) {
 						// Additional attribute giving the time origin (although also mentioned in the units)
 						ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
 					}
@@ -296,13 +296,13 @@ public class DsgNcFile extends File {
 					// Data Integers
 					var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
 					addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
-							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getFileStdUnit());
 				}
 				else if ( dtype instanceof DoubleDashDataType ) {
 					// Data Doubles
 					var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
 					addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
-							dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+							dtype.getStandardName(), dtype.getCategoryName(), dtype.getFileStdUnit());
 					if ( DashboardServerUtils.TIME.typeNameEquals(dtype) ) {
 						// Additional attribute giving the time origin (although also mentioned in the units)
 						ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));

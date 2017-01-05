@@ -32,11 +32,11 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 public class DsgMetadataTest {
 
 	public static final CharDashDataType QC_FLAG_TYPE = new CharDashDataType("qc_flag", 
-			200.0, "QC flag", "QC flag", DashboardUtils.NO_UNITS, "QC", 
-			DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null);
+			200.0, "QC flag", "QC flag", false, DashboardUtils.NO_UNITS, "QC", 
+			DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
 	public static final IntDashDataType SERIAL_NUMBER = new IntDashDataType("serial_number",
-			201.0, "Serial Number", "cruise serial number", DashboardUtils.NO_UNITS, null,
-			DashboardServerUtils.IDENTIFIER_CATEGORY, null, null, null, null);
+			201.0, "Serial Number", "cruise serial number", false, DashboardUtils.NO_UNITS, null,
+			DashboardServerUtils.IDENTIFIER_CATEGORY, null, null, null, null, null);
 	public static final Properties ADDN_TYPES_PROPERTIES;
 	static {
 		ADDN_TYPES_PROPERTIES = new Properties();

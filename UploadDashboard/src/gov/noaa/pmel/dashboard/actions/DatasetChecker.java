@@ -187,7 +187,7 @@ public class DatasetChecker {
 		dataset.setNumWarnRows(numWarnRows);
 
 		// Assign the data-check status message using the results of the sanity check
-		if ( ! hasCriticalError ) {
+		if ( hasCriticalError ) {
 			dataset.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 		else if ( numErrorRows > 0 ) {

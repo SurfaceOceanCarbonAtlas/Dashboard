@@ -169,10 +169,11 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testDataColumnType() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, UNITS);
+		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, true, UNITS);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getSelectedMissingValue());
 		assertEquals(DEFAULT_UNIT_INDEX, dtype.getSelectedUnitIndex());
 		assertEquals(UNITS, dtype.getUnits());
+		assertTrue( dtype.isCritical() );
 		assertEquals(DESCRIPTION, dtype.getDescription());
 		assertEquals(DISPLAY_NAME, dtype.getDisplayName());
 		assertEquals(SORT_ORDER, dtype.getSortOrder());
@@ -185,11 +186,11 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testAssignDataUnit() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, null);
+		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, true, null);
 		assertTrue( dtype.setSelectedUnit("") );
 		assertEquals(Integer.valueOf(0), dtype.getSelectedUnitIndex());
 		assertFalse( dtype.setSelectedUnit(null) );
-		dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, UNITS);
+		dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, true, UNITS);
 		assertTrue( dtype.setSelectedUnit(UNITS.get(1).toUpperCase()) );
 		assertEquals(Integer.valueOf(1), dtype.getSelectedUnitIndex());
 		assertTrue( dtype.setSelectedUnit(UNITS.get(1).toLowerCase()) );
@@ -203,7 +204,7 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testTypeNameEquals() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, UNITS);
+		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, true, UNITS);
 
 		assertTrue( dtype.typeNameEquals(DISPLAY_NAME.toUpperCase()) );
 		assertTrue( dtype.typeNameEquals(DISPLAY_NAME.toLowerCase()) );
@@ -326,6 +327,13 @@ public class DataColumnTypeTest {
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 
+		dtype.setCritical(true);
+		assertFalse( dtype.hashCode() == other.hashCode() );
+		assertFalse( dtype.equals(other) );
+		other.setCritical(true);
+		assertTrue( dtype.hashCode() == other.hashCode() );
+		assertTrue( dtype.equals(other) );
+
 		dtype.setUnits(UNITS);
 		assertFalse( dtype.hashCode() == other.hashCode() );
 		assertFalse( dtype.equals(other) );
@@ -353,7 +361,7 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testDuplicate() {
-		DataColumnType dtype = new DataColumnType(DISPLAY_NAME, SORT_ORDER, VAR_NAME, DESCRIPTION, UNITS);
+		DataColumnType dtype = new DataColumnType(DISPLAY_NAME, SORT_ORDER, VAR_NAME, DESCRIPTION, true, UNITS);
 		dtype.setSelectedUnitIndex(SELECTED_UNIT_INDEX);
 		dtype.setSelectedMissingValue(SELECTED_MISSING_VALUE);
 		DataColumnType other = dtype.duplicate();

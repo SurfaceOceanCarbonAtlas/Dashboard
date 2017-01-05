@@ -18,13 +18,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7521282556925954886L;
+	private static final long serialVersionUID = -6281568935061988193L;
 
 	protected String varName;
 	protected Double sortOrder;
 	protected String displayName;
 	protected String description;
 	protected ArrayList<String> units;
+	protected boolean isCritical;
 	protected Integer selectedUnitIndex;
 	protected String selectedMissingValue;
 
@@ -33,7 +34,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * all strings are set to {@link DashboardUtils#STRING_MISSING_VALUE},
 	 * the sort order is set to {@link DashboardUtils#FP_MISSING_VALUE},
 	 * the units list is a copy of {@link DashboardUtils#NO_UNITS}, 
-	 * the index of the selected unit is zero. 
+	 * the index of the selected unit is zero, and 
+	 * is set to not critical.
 	 * 
 	 */
 	public DataColumnType() {
@@ -41,6 +43,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		sortOrder = DashboardUtils.FP_MISSING_VALUE;
 		displayName = DashboardUtils.STRING_MISSING_VALUE;
 		description = DashboardUtils.STRING_MISSING_VALUE;
+		isCritical = false;
 		units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 		selectedUnitIndex = Integer.valueOf(0);
 		selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
@@ -66,6 +69,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * @param description
 	 * 		description of a variable of this type;
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param isCritical
+	 * 		if this type must be present and a valid value
 	 * @param units
 	 * 		unit strings associated with this type;
 	 * 		if null or empty, {@link DashboardUtils#NO_UNITS} is used
@@ -73,7 +78,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * 		if the variable name is null or blank
 	 */
 	public DataColumnType(String varName, Double sortOrder, String displayName, 
-			String description, Collection<String> units) throws IllegalArgumentException {
+			String description, boolean isCritical, Collection<String> units) 
+											throws IllegalArgumentException {
 		if ( (varName == null) || varName.trim().isEmpty() )
 			throw new IllegalArgumentException("data type variable name is invalid");
 		this.varName = varName;
@@ -89,6 +95,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			this.description = description;
 		else
 			this.description = DashboardUtils.STRING_MISSING_VALUE;
+		this.isCritical = isCritical;
 		if ( (units != null) && (units.size() > 0) ) {
 			this.units = new ArrayList<String>(units);
 		}
@@ -187,6 +194,22 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			this.description = description;
 		else
 			this.description = DashboardUtils.STRING_MISSING_VALUE;
+	}
+
+	/**
+	 * @return 
+	 * 		if this data column type is required to be present and valid
+	 */
+	public boolean isCritical() {
+		return isCritical;
+	}
+
+	/**
+	 * @param isCritical 
+	 * 		set if this data column type is required to be present and valid
+	 */
+	public void setCritical(boolean isCritical) {
+		this.isCritical = isCritical;
 	}
 
 	/**
@@ -292,7 +315,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	 * 		made of any mutable data (namely, the list of units).
 	 */
 	public DataColumnType duplicate() {
-		DataColumnType dup = new DataColumnType(varName, sortOrder, displayName, description, units);
+		DataColumnType dup = new DataColumnType(varName, sortOrder, displayName, 
+												description, isCritical, units);
 		dup.selectedUnitIndex = selectedUnitIndex;
 		dup.selectedMissingValue = selectedMissingValue;
 		return dup;
@@ -356,6 +380,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		result = description.compareTo(other.description);
 		if ( result != 0 )
 			return result;
+		result = Boolean.valueOf(isCritical).compareTo(Boolean.valueOf(other.isCritical));
+		if ( result != 0 )
+			return result;
 		result = selectedMissingValue.compareTo(other.selectedMissingValue);
 		if ( result != 0 )
 			return result;
@@ -380,6 +407,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		int result = varName.hashCode();
 		result = result * prime + displayName.hashCode();
 		result = result * prime + description.hashCode();
+		result = result * prime + Boolean.valueOf(isCritical).hashCode();
 		result = result * prime + selectedUnitIndex.hashCode();
 		result = result * prime + selectedMissingValue.hashCode();
 		result = result * prime + units.hashCode();
@@ -403,6 +431,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			return false;
 		if ( ! description.equals(other.description) )
 			return false;
+		if ( isCritical != other.isCritical )
+			return false;
 		if ( ! selectedUnitIndex.equals(other.selectedUnitIndex) )
 			return false;
 		if ( ! selectedMissingValue.equals(other.selectedMissingValue) )
@@ -423,6 +453,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 				"sortOrder=" + sortOrder.toString() + ", " +
 				"displayName=\"" + displayName + "\", " +
 				"description=\"" + description + "\", " +
+				"isCritical=" + Boolean.toString(isCritical) + ", " +
 				"units=" + units.toString() + ", " +
 				"selectedUnitIndex=" + selectedUnitIndex.toString() + ", " +
 				"selectedMissingValue=\"" + selectedMissingValue + "\" ]";

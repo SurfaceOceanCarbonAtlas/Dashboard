@@ -38,8 +38,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	public static final String SORT_ORDER_TAG = "sort_order";
 	public static final String DISPLAY_NAME_TAG = "display_name";
 	public static final String DESCRIPTION_TAG = "description";
+	public static final String IS_CRITICAL_TAG = "is_critial";
 	public static final String STANDARD_NAME_TAG = "standard_name";
 	public static final String CATEGORY_NAME_TAG = "category_name";
+	public static final String FILE_STD_UNIT_TAG = "file_std_unit";
 	public static final String UNITS_TAG = "units";
 	public static final String MIN_QUESTIONABLE_VALUE_TAG = "min_question_value";
 	public static final String MIN_ACCEPTABLE_VALUE_TAG = "min_accept_value";
@@ -50,9 +52,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	protected Double sortOrder;
 	protected String displayName;
 	protected String description;
+	protected boolean isCritical;
 	protected ArrayList<String> units;
 	protected String standardName;
 	protected String categoryName;
+	protected String fileStdUnit;
 	protected T minQuestionVal;
 	protected T minAcceptVal;
 	protected T maxAcceptVal;
@@ -98,6 +102,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * @param description
 	 * 		brief description of this data column type; if null, 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param isCritical
+	 * 		if this data type is required to be present and all
+	 * 		values must be valid
 	 * @param units
 	 * 		unit strings associated with this data column type.  
 	 * 		A new ArrayList is created from the values in the given 
@@ -112,6 +119,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * @param categoryName
 	 * 		category name for this data column type; if null, 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @param fileStdUnit
+	 * 		name of the standard unit (corresponding to the first unit 
+	 * 		of the units array) to be used in the DSG files; if null,
+	 * 		the first unit string will be used
 	 * @throws IllegalArgumentException
 	 * 		if the variable name, sort order, or display name is invalid;
 	 * 		if (in subclasses) the relationship
@@ -119,8 +130,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * 		for those values that are not null, is violated.
 	 */
 	protected DashDataType(String varName, Double sortOrder, String displayName, 
-			String description, Collection<String> units, String standardName, 
-			String categoryName) throws IllegalArgumentException {
+			String description, boolean isCritical, Collection<String> units, 
+			String standardName, String categoryName, String fileStdUnit) 
+											throws IllegalArgumentException {
 		if ( (varName == null) || varName.trim().isEmpty() )
 			throw new IllegalArgumentException("data type variable name is invalid");
 		this.varName = varName.trim();
@@ -138,6 +150,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		else
 			this.description = DashboardUtils.STRING_MISSING_VALUE;
 
+		this.isCritical = isCritical;
+
 		if ( units != null )
 			this.units = new ArrayList<String>(units);
 		else
@@ -152,6 +166,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			this.categoryName = categoryName.trim();
 		else
 			this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
+
+		if ( fileStdUnit == null )
+			this.fileStdUnit = this.units.get(0);
+		else
+			this.fileStdUnit = fileStdUnit;
 
 		this.minQuestionVal = null;
 		this.minAcceptVal = null;
@@ -252,7 +271,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if unreasonable small
 		if ( (minQuestionVal != null) && (minQuestionVal.compareTo(stdVal) > 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(Severity.ERROR);
+			if ( isCritical )
+				msg.setSeverity(Severity.CRITICAL);
+			else
+				msg.setSeverity(Severity.ERROR);
 			msg.setGeneralComment(displayName + 
 					UNREASONABLY_SMALL_MSG + minQuestionVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
@@ -262,7 +284,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		// Check if unreasonably large
 		if ( (maxQuestionVal != null) && (maxQuestionVal.compareTo(stdVal) < 0) ) {
 			ADCMessage msg = new ADCMessage();
-			msg.setSeverity(Severity.ERROR);
+			if ( isCritical )
+				msg.setSeverity(Severity.CRITICAL);
+			else
+				msg.setSeverity(Severity.ERROR);
 			msg.setGeneralComment(displayName + 
 					UNREASONABLY_LARGE_MSG + maxQuestionVal.toString());
 			msg.setDetailedComment(displayName + " value of " + stdVal.toString() + 
@@ -344,12 +369,31 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	}
 
 	/**
+	 * @return
+	 * 		if this data type is required to be present 
+	 * 		and all value required to be valid
+	 */
+	public boolean isCritical() {
+		return isCritical;
+	}
+
+	/**
 	 * @return 
 	 * 		a copy of the units associated with this data type; never null or empty, 
 	 * 		but may only contain {@link DashboardUtils#STRING_MISSING_VALUE}.
 	 */
 	public ArrayList<String> getUnits() {
 		return new ArrayList<String>(units);
+	}
+
+	/**
+	 * @return
+	 * 		name of the standard unit (corresponding to the first unit 
+	 * 		in the unit array) to be used as the unit string in DSG files;
+	 * 		never null
+	 */
+	public String getFileStdUnit() {
+		return fileStdUnit;
 	}
 
 	@Override
@@ -377,8 +421,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			result = prime * result + val.hashCode();
 		result = prime * result + Integer.hashCode(units.size());
 
+		result = result * prime + fileStdUnit.hashCode();
 		result = prime * result + categoryName.hashCode();
 		result = prime * result + standardName.hashCode();
+		result = result * prime + Boolean.valueOf(isCritical).hashCode();
 		result = prime * result + description.hashCode();
 		result = prime * result + getDataClassName().hashCode();
 		result = prime * result + varName.hashCode();
@@ -401,6 +447,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
 		if ( ! sortOrder.equals(other.sortOrder) )
 			return false;
+		if ( isCritical != other.isCritical() )
+			return false;
 		if ( ! displayName.equals(other.displayName) )
 			return false;
 		if ( ! varName.equals(other.varName) )
@@ -412,6 +460,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		if ( ! standardName.equals(other.standardName) )
 			return false;
 		if ( ! categoryName.equals(other.categoryName) )
+			return false;
+		if ( ! fileStdUnit.equals(other.fileStdUnit) )
 			return false;
 
 		if ( ! units.equals(other.units) )
@@ -463,6 +513,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		result = varName.compareTo(other.varName);
 		if ( result != 0 )
 			return result;
+		result = Boolean.valueOf(isCritical).compareTo(Boolean.valueOf(other.isCritical));
+		if ( result != 0 )
+			return result;
 
 		// This check should ensures the cast of the limits will succeed
 		result = getDataClassName().compareTo(other.getDataClassName());
@@ -478,6 +531,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		result = categoryName.compareTo(other.categoryName);
 		if ( result != 0 )
 			return result;
+		result = fileStdUnit.compareTo(other.fileStdUnit);
 
 		result = Integer.compare(units.size(), other.units.size());
 		if ( result != 0 )
@@ -549,9 +603,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 				", sortOrder=" + sortOrder.toString() + 
 				", displayName=" + displayName + 
 				", description=" + description + 
+				", isCritical=" + isCritical +
 				", units=" + units + 
 				", standardName=" + standardName + 
 				", categoryName=" + categoryName + 
+				", fileStdUnit=" + fileStdUnit + 
 				", minQuestionVal=" + minQuestionVal + 
 				", minAcceptVal=" + minAcceptVal + 
 				", maxAcceptVal=" + maxAcceptVal + 
@@ -626,7 +682,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * 		a new DataColumnType constructed from the values in this DashDataType.
 	 */
 	public DataColumnType duplicate() {
-		return new DataColumnType(varName, sortOrder, displayName, description, units);
+		return new DataColumnType(varName, sortOrder, displayName, description, isCritical, units);
 	}
 
 	/**
@@ -757,6 +813,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 		jsonObj.addProperty(DISPLAY_NAME_TAG, displayName);
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(description) )
 			jsonObj.addProperty(DESCRIPTION_TAG, description);
+		if ( isCritical ) 
+			jsonObj.addProperty(IS_CRITICAL_TAG, Boolean.valueOf(isCritical).toString());
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(fileStdUnit) )
+			jsonObj.addProperty(FILE_STD_UNIT_TAG, fileStdUnit);
 		if ( ! DashboardUtils.NO_UNITS.equals(units) ) {
 			JsonArray jsonArr = new JsonArray();
 			for ( String val : units )
@@ -786,9 +846,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 	 * 		<li>tag {@link #DISPLAY_NAME_TAG} gives the data display name,</li>
 	 * 		<li>tag {@link #DATA_CLASS_NAME_TAG} gives the data class name,</li>
 	 * 		<li>tag {@link #DESCRIPTION_TAG} gives the data type description,</li>
+	 * 		<li>tag {@link #IS_CRITICAL_TAG} indicates if this data type must be present and valid,</li>
 	 * 		<li>tag {@link #UNITS_TAG} gives the units array,</li>
 	 * 		<li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
 	 * 		<li>tag {@link #CATEGORY_NAME_TAG} gives the category name,</li>
+	 * 		<li>tag {@link #FILE_STD_UNIT_TAG} gives name of the standard unit (first unit in units array) for DSG files,</li>
 	 * 		<li>tag {@link #MIN_QUESTIONABLE_VALUE_TAG} gives the minimum questionable value,</li>
 	 * 		<li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
 	 * 		<li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>
@@ -819,9 +881,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 			String sortOrderStr = null;
 			String displayName = null;
 			String description = null;
+			boolean isCritical = false;
 			LinkedHashSet<String> units = null;
 			String standardName = null;
 			String categoryName = null;
+			String fileStdUnit = null;
 			String minQuestionStrVal = null;
 			String minAcceptStrVal = null;
 			String maxAcceptStrVal = null;
@@ -849,12 +913,20 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 						description = prop.getValue().getAsString();
 						identified = true;
 					}
+					else if ( IS_CRITICAL_TAG.equals(tag) ) {
+						isCritical = Boolean.valueOf(prop.getValue().getAsString());
+						identified = true;
+					}
 					else if ( STANDARD_NAME_TAG.equals(tag) ) {
 						standardName = prop.getValue().getAsString();
 						identified = true;
 					}
 					else if ( CATEGORY_NAME_TAG.equals(tag) ) {
 						categoryName = prop.getValue().getAsString();
+						identified = true;
+					}
+					else if ( FILE_STD_UNIT_TAG.equals(tag) ) {
+						fileStdUnit = prop.getValue().getAsString();
 						identified = true;
 					}
 					else if ( MIN_QUESTIONABLE_VALUE_TAG.equals(tag) ) {
@@ -912,26 +984,26 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
 			if ( dataClassName.equals(String.class.getSimpleName()) ) {
 				return new StringDashDataType(varName, sortOrder, displayName, description, 
-						units, standardName, categoryName, minQuestionStrVal, minAcceptStrVal, 
-						maxAcceptStrVal, maxQuestionStrVal);
+						isCritical, units, standardName, categoryName, fileStdUnit, 
+						minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
 			}
 
 			if ( dataClassName.equals(Character.class.getSimpleName()) ) {
 				return new CharDashDataType(varName, sortOrder, displayName, description, 
-						units, standardName, categoryName, minQuestionStrVal, minAcceptStrVal, 
-						maxAcceptStrVal, maxQuestionStrVal);
+						isCritical, units, standardName, categoryName, fileStdUnit, 
+						minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
 			}
 
 			if ( dataClassName.equals(Integer.class.getSimpleName()) ) {
 				return new IntDashDataType(varName, sortOrder, displayName, description, 
-						units, standardName, categoryName, minQuestionStrVal, minAcceptStrVal, 
-						maxAcceptStrVal, maxQuestionStrVal);
+						isCritical, units, standardName, categoryName, fileStdUnit, 
+						minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
 			}
 
 			if ( dataClassName.equals(Double.class.getSimpleName()) ) {
 				return new DoubleDashDataType(varName, sortOrder, displayName, description, 
-						units, standardName, categoryName, minQuestionStrVal, minAcceptStrVal, 
-						maxAcceptStrVal, maxQuestionStrVal);
+						isCritical, units, standardName, categoryName, fileStdUnit, 
+						minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
 			}
 
 			throw new IllegalArgumentException("Unknown data class name \"" + dataClassName + "\"");

@@ -124,4 +124,13 @@ public abstract class ValueConverter<T> {
 	 */
 	public abstract T convertValueOf(String valueString) throws IllegalArgumentException, IllegalStateException;
 
+	@Override
+	public String toString() {
+		return "ValueConverter" +
+				"[ fromUnit=" + fromUnit + 
+				", toUnit=" + toUnit + 
+				", missVal=" + missVal + 
+				" ]";
+	}
+
 }
