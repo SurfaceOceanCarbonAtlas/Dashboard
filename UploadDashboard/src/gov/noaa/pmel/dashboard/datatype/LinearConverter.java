@@ -6,11 +6,14 @@ package gov.noaa.pmel.dashboard.datatype;
 import java.util.TreeMap;
 
 /**
- * @author ksmith
- *
+ * Translates standard string representations of floating-point values 
+ * and performs simple (linear) unit conversions.
+ * 
+ * @author Karl Smith
  */
 public class LinearConverter extends ValueConverter<Double> {
 
+	// TreeMap so can do case-insensitive comparisons
 	private static final TreeMap<String,Double> SLOPES_MAP;
 	private static final TreeMap<String,Double> INTERCEPTS_MAP;
 	static {
