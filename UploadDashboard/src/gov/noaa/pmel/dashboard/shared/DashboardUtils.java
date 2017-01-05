@@ -169,11 +169,23 @@ public class DashboardUtils {
 
 	/** Units for longitude */
 	public static final ArrayList<String> LONGITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees_east", "degrees_west"));
+			new ArrayList<String>(Arrays.asList(
+					"deg E", 
+					"deg W", 
+					"deg min E", 
+					"deg min W", 
+					"deg min sec E", 
+					"deg min sec W"));
 
 	/** Units of latitude */
 	public static final ArrayList<String> LATITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees_north", "degrees_south"));
+			new ArrayList<String>(Arrays.asList(
+					"deg N", 
+					"deg S", 
+					"deg min N", 
+					"deg min S", 
+					"deg min sec N", 
+					"deg min sec S"));
 
 	/** Unit of depth */
 	public static final ArrayList<String> DEPTH_UNITS = 

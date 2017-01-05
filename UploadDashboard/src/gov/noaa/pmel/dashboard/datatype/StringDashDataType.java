@@ -188,20 +188,32 @@ public class StringDashDataType extends DashDataType<String> {
 	@Override
 	public ValueConverter<String> getStandardizer(String inputUnit, String missingValue, 
 			StdUserDataArray stdArray) throws IllegalArgumentException, IllegalStateException {
+		String outputUnit = units.get(0);
+		if ( DashboardUtils.STRING_MISSING_VALUE.equals(outputUnit) )
+			outputUnit = null;
 
-		if ( (inputUnit != null) || ! DashboardUtils.STRING_MISSING_VALUE.equals(units.get(0)) )
-			throw new IllegalArgumentException("unit conversion of characters not supported");
+		if ( (inputUnit == null) && (outputUnit == null) ) {
+			ValueConverter<String> stdConverter = new ValueConverter<String>(inputUnit, outputUnit, missingValue) {
+				@Override
+				public String convertValueOf(String valueString) {
+					if ( isMissingValue(valueString, true) )
+						return null;
+					return dataValueOf(valueString);
+				}
+			};
+			return stdConverter;
+		}
 
-		ValueConverter<String> stdConverter = new ValueConverter<String>(null, null, missingValue) {
-			@Override
-			public String convertValueOf(String valueString) {
-				if ( isMissingValue(valueString, true) )
-					return null;
-				return dataValueOf(valueString);
-			}
-		};
+		// timestamp, date, and time units handled here
+		try {
+			ValueConverter<String> stdConverter = new TimestampConverter(inputUnit, outputUnit, missingValue);
+			return stdConverter;
+		} catch ( IllegalArgumentException ex ) {
+			// try another converter
+		}
 
-		return stdConverter;
+		throw new IllegalArgumentException("conversion from \"" + 
+				inputUnit + "\" to \"" + outputUnit + "\" is not supported");
 	}
 
 	@Override

@@ -199,10 +199,24 @@ public class DoubleDashDataType extends DashDataType<Double> {
 		if ( DashboardUtils.STRING_MISSING_VALUE.equals(outputUnit) )
 			outputUnit = null;
 
-		// TODO: catch IllegalArgumentExceptions and use other converters (that need to be written)
-		ValueConverter<Double> stdConverter = new LinearConverter(inputUnit, outputUnit, missingValue);
-		
-		return stdConverter;
+		// longitude and latitude units of decimal degrees are handled here
+		try {
+			ValueConverter<Double> stdConverter = new LinearConverter(inputUnit, outputUnit, missingValue);
+			return stdConverter;
+		} catch ( IllegalArgumentException ex ) {
+			// try another converter
+		}
+
+		// longitude and latitude units with minutes and possibly seconds, are handlere here
+		try {
+			ValueConverter<Double> stdConverter = new LonLatConverter(inputUnit, outputUnit, missingValue);
+			return stdConverter;
+		} catch ( IllegalArgumentException ex ) {
+			// try another converter
+		}
+
+		throw new IllegalArgumentException("conversion from \"" + 
+				inputUnit + "\" to \"" + outputUnit + "\" is not supported");
 	}
 
 	@Override
