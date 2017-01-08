@@ -4,14 +4,17 @@
 package gov.noaa.pmel.dashboard.datatype;
 
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 /**
+ * For converting degree, degree-minute, and degree-minute-second 
+ * string values to decimal degree values.
+ * 
  * @author Karl Smith
- *
  */
 public class LonLatConverter extends ValueConverter<Double> {
 	// TreeSet so can do case insensitive comparisons
@@ -31,6 +34,9 @@ public class LonLatConverter extends ValueConverter<Double> {
 		SUPPORTED_FROM_UNITS.add("from \"deg min sec N\" to \"deg N\"");
 		SUPPORTED_FROM_UNITS.add("from \"deg min sec S\" to \"deg N\"");
 	}
+
+	private static final Pattern DEG_MIN_SPLIT_PATTERN = Pattern.compile("[ ',]+");
+	private static final Pattern DEG_MIN_SEC_SPLIT_PATTERN = Pattern.compile("[ '\",]+");
 
 	public LonLatConverter(String inputUnit, String outputUnit, String missingValue)
 			throws IllegalArgumentException, IllegalStateException {
@@ -63,7 +69,7 @@ public class LonLatConverter extends ValueConverter<Double> {
 		else if ( "deg min E".equalsIgnoreCase(fromUnit) || "deg min W".equalsIgnoreCase(fromUnit) ||
 				  "deg min N".equalsIgnoreCase(fromUnit) || "deg min S".equalsIgnoreCase(fromUnit) ) {
 			try {
-				String[] parts = valueString.split("[ ',]+");
+				String[] parts = DEG_MIN_SPLIT_PATTERN.split(valueString, 0);
 				if ( parts.length != 2 )
 					throw new Exception();
 				value = Double.valueOf(parts[0]);
@@ -75,7 +81,7 @@ public class LonLatConverter extends ValueConverter<Double> {
 		else if ( "deg min sec E".equalsIgnoreCase(fromUnit) || "deg min sec W".equalsIgnoreCase(fromUnit) ||
 				  "deg min sec N".equalsIgnoreCase(fromUnit) || "deg min sec S".equalsIgnoreCase(fromUnit) ) {
 			try {
-				String[] parts = valueString.split("[ '\",]+");
+				String[] parts = DEG_MIN_SEC_SPLIT_PATTERN.split(valueString, 0);
 				if ( parts.length != 3 )
 					throw new Exception();
 				value = Double.valueOf(parts[0]);
