@@ -565,22 +565,15 @@ public class StdDataArray {
 					int month = ((Integer) stdObjects[j][monthOfYearIndex]).intValue();
 					int day = ((Integer) stdObjects[j][dayOfMonthIndex]).intValue();
 					String[] hms = ((String) stdObjects[j][timeOfDayIndex]).split(":");
-					if ( hms.length > 3 )
+					if ( hms.length != 3 )
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					int sec;
-					int millisec;
-					try {
-						Double value = Double.parseDouble(hms[2]);
-						sec = value.intValue();
-						value -= sec;
-						value *= 1000.0;
-						millisec = value.intValue();
-					} catch ( Exception ex ) {
-						sec = 0;
-						millisec = 0;
-					}
+					Double value = Double.parseDouble(hms[2]);
+					int sec = value.intValue();
+					value -= sec;
+					value *= 1000.0;
+					int millisec = value.intValue();
 					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
@@ -640,22 +633,15 @@ public class StdDataArray {
 					int month = Integer.parseInt(ymd[1]);
 					int day = Integer.parseInt(ymd[2]);
 					String[] hms = dateTime[1].split(":");
-					if ( hms.length > 3 )
+					if ( hms.length != 3 )
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					int sec;
-					int millisec;
-					try {
-						Double value = Double.parseDouble(hms[2]);
-						sec = value.intValue();
-						value -= sec;
-						value *= 1000.0;
-						millisec = value.intValue();
-					} catch ( Exception ex ) {
-						sec = 0;
-						millisec = 0;
-					}
+					Double value = Double.parseDouble(hms[2]);
+					int sec = value.intValue();
+					value -= sec;
+					value *= 1000.0;
+					int millisec = value.intValue();
 					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
@@ -678,22 +664,15 @@ public class StdDataArray {
 					int month = Integer.parseInt(ymd[1]);
 					int day = Integer.parseInt(ymd[2]);
 					String[] hms = ((String) stdObjects[j][timeOfDayIndex]).split(":");
-					if ( hms.length > 3 )
+					if ( hms.length != 3 )
 						throw new Exception();
 					int hour = Integer.parseInt(hms[0]);
 					int min = Integer.parseInt(hms[1]);
-					int sec;
-					int millisec;
-					try {
-						Double value = Double.parseDouble(hms[2]);
-						sec = value.intValue();
-						value -= sec;
-						value *= 1000.0;
-						millisec = value.intValue();
-					} catch ( Exception ex ) {
-						sec = 0;
-						millisec = 0;
-					}
+					Double value = Double.parseDouble(hms[2]);
+					int sec = value.intValue();
+					value -= sec;
+					value *= 1000.0;
+					int millisec = value.intValue();
 					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
