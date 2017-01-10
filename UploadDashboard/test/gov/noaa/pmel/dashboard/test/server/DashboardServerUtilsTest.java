@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import gov.noaa.pmel.dashboard.datatype.LonLatConverter;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
@@ -16,8 +17,6 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
  * @author Karl Smith
  */
 public class DashboardServerUtilsTest {
-
-	static final String DEGREE_SYMBOL = "\u00B0";
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashboardServerUtils#getKeyForName(java.lang.String)}.
@@ -29,7 +28,7 @@ public class DashboardServerUtilsTest {
 		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2; Atm; Dry; Interp"));
 		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2, Atm, Dry, Interp"));
 		assertEquals("other", DashboardServerUtils.getKeyForName("(other)"));
-		assertEquals("tempc", DashboardServerUtils.getKeyForName("Temp [" + DEGREE_SYMBOL + "C]"));
+		assertEquals("tempc", DashboardServerUtils.getKeyForName("Temp [" + LonLatConverter.DEGREE_SYMBOL + "C]"));
 		assertEquals("tempc", DashboardServerUtils.getKeyForName("Temp [ºC]"));
 		assertEquals( "k" + DashboardOmeMetadata.oUmlaut + "rtzinger", 
 				DashboardServerUtils.getKeyForName("K" + DashboardOmeMetadata.OUmlaut + "rt*Zinger") );
@@ -43,7 +42,8 @@ public class DashboardServerUtilsTest {
 		assertEquals( "ATLANTIS120115300", 
 				DashboardServerUtils.getDatasetIDFromName("Atlantis 12-01-15 3:00") );
 		assertEquals( "N" + DashboardOmeMetadata.UUmlaut + "MBER20", 
-				DashboardServerUtils.getDatasetIDFromName("\"N" + DashboardOmeMetadata.uUmlaut + "mber 2' 0" + DEGREE_SYMBOL + "\t\"") );
+				DashboardServerUtils.getDatasetIDFromName("\"N" + DashboardOmeMetadata.uUmlaut + 
+						"mber 2' 0" + LonLatConverter.DEGREE_SYMBOL + "\t\"") );
 	}
 
 	/**

@@ -17,6 +17,9 @@ import gov.noaa.pmel.dashboard.shared.QCFlag;
  * @author Karl Smith
  */
 public class LonLatConverter extends ValueConverter<Double> {
+
+	public static final String DEGREE_SYMBOL = "\u00B0";
+
 	// TreeSet so can do case insensitive comparisons
 	private static final TreeSet<String> SUPPORTED_FROM_UNITS;
 	static {
@@ -35,8 +38,8 @@ public class LonLatConverter extends ValueConverter<Double> {
 		SUPPORTED_FROM_UNITS.add("from \"deg min sec S\" to \"deg N\"");
 	}
 
-	private static final Pattern DEG_MIN_SPLIT_PATTERN = Pattern.compile("[ ',]+");
-	private static final Pattern DEG_MIN_SEC_SPLIT_PATTERN = Pattern.compile("[ '\",]+");
+	private static final Pattern DEG_MIN_SPLIT_PATTERN = Pattern.compile("[ " + DEGREE_SYMBOL + "',]+");
+	private static final Pattern DEG_MIN_SEC_SPLIT_PATTERN = Pattern.compile("[ " + DEGREE_SYMBOL + "'\",]+");
 
 	public LonLatConverter(String inputUnit, String outputUnit, String missingValue)
 			throws IllegalArgumentException, IllegalStateException {
