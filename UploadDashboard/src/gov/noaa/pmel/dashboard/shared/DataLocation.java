@@ -12,12 +12,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * The location of a data point with a data value at that location.
  * Used for indicating locations for QC flag events which describes 
  * the data set and data column for this location and value.
+ * Also used for reordering data rows.
  * 
  * @author Karl Smith
  */
-public class DataLocation implements Serializable, IsSerializable {
+public class DataLocation implements Comparable<DataLocation>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4270820025798046106L;
+	private static final long serialVersionUID = -4529761335909387444L;
 
 	protected Integer rowNumber;
 	protected Date dataDate;
@@ -27,7 +28,8 @@ public class DataLocation implements Serializable, IsSerializable {
 	protected Double dataValue;
 
 	/**
-	 * Creates an empty location
+	 * Creates an empty location 
+	 * (all values set to the appropriate missing value)
 	 */
 	public DataLocation() {
 		rowNumber = DashboardUtils.INT_MISSING_VALUE;
@@ -168,6 +170,43 @@ public class DataLocation implements Serializable, IsSerializable {
 			this.dataValue = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.dataValue = dataValue;
+	}
+
+	/**
+	 * Compares in the order:
+	 * 		(1) date
+	 * 		(2) longitude
+	 * 		(3) latitude
+	 * 		(4) depth
+	 * 		(5) data value
+	 * 		(6) row number
+	 * All comparisons are made using the compareTo method of each type 
+	 * (Date, Double, Integer), and as such do not account for longitude
+	 * modulo or insignificant floating-point differences as is done in 
+	 * the {@link #equals(Object)} method.  Missing values are compared
+	 * using their actual value (which should be low).
+	 */
+	@Override
+	public int compareTo(DataLocation other) {
+		int result = dataDate.compareTo(other.dataDate);
+		if ( result != 0 )
+			return result;
+		result = longitude.compareTo(other.longitude);
+		if ( result != 0 )
+			return result;
+		result = latitude.compareTo(other.latitude);
+		if ( result != 0 )
+			return result;
+		result = depth.compareTo(other.depth);
+		if ( result != 0 )
+			return result;
+		result = dataValue.compareTo(other.dataValue);
+		if ( result != 0 )
+			return result;
+		result = rowNumber.compareTo(other.rowNumber);
+		if ( result != 0 )
+			return result;
+		return 0;
 	}
 
 	@Override

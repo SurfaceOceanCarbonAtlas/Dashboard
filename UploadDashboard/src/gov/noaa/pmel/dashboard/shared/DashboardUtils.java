@@ -93,9 +93,9 @@ public class DashboardUtils {
 
 	/**
 	 * Date used as a missing value - not null; 
-	 * corresponds to Jan 2, 3000 00:00:00 GMT
+	 * corresponds to Jan 2, 1800 00:00:00 UTC
 	 */
-	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
+	public static final Date DATE_MISSING_VALUE = new Date(-5364576000000L);
 
 	/** 
 	 * Maximum relative error between two floating point values 

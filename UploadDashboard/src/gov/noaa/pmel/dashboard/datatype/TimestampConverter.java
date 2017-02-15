@@ -90,11 +90,9 @@ public class TimestampConverter extends ValueConverter<String> {
 			throw new IllegalArgumentException("conversion " + key + " not supported");
 		utcCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 		utcCalendar.setLenient(false);
-		utcCalendar.clear();
 		millisNow = System.currentTimeMillis();
 		utcCalendar.setTimeInMillis(millisNow);
 		currYear = utcCalendar.get(GregorianCalendar.YEAR);
-
 	}
 
 	@Override
@@ -478,9 +476,9 @@ public class TimestampConverter extends ValueConverter<String> {
 			 (day == null) || (day < 1) || (day > 31) )
 			throw new IllegalArgumentException("invalid date value");
 		try {
-			utcCalendar.clear();
-			// Check if the year-month-day is a valid combination (utcCalendar is strict)
+			// Check if the year-month-day is a valid combination
 			utcCalendar.set(year, GregorianCalendar.JANUARY + month - 1, day, 0, 0, 0);
+			utcCalendar.set(GregorianCalendar.MILLISECOND, 0);
 			if ( utcCalendar.getTimeInMillis() > millisNow )
 				throw new Exception();
 		} catch ( Exception ex ) {

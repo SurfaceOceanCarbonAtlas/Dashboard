@@ -119,7 +119,10 @@ public class DatasetChecker {
 		StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
 		// Check for missing lon/lat/depth/time 
-		stdUserData.checkMissingLonLatDepthTime();
+		Double[] sampleTimes = stdUserData.checkMissingLonLatDepthTime();
+
+		// Reorder the data as best possible
+		stdUserData.reorderData(sampleTimes);
 
 		// Bounds check the standardized data values
 		stdUserData.checkBounds();

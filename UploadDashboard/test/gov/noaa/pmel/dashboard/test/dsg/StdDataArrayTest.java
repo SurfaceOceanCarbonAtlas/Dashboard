@@ -5,14 +5,18 @@ package gov.noaa.pmel.dashboard.test.dsg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -308,9 +312,8 @@ public class StdDataArrayTest {
 			assertEquals(5.0, sampleDepths[j], 1.0E-6);
 
 		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-		cal.clear();
-		// in java.util.Calendar, month number is zero-based
-		cal.set(2006,5,10,23,48,0);
+		cal.set(2006, GregorianCalendar.JUNE, 10, 23, 48, 0);
+		cal.set(GregorianCalendar.MILLISECOND, 0);
 		Double[] times = new Double[numSamples];
 		times[0] = cal.getTimeInMillis() / 1000.0;
 		// data times are each a minute apart; no second given
@@ -319,6 +322,95 @@ public class StdDataArrayTest {
 		Double[] sampleTimes = stdData.getSampleTimes();
 		for (int j = 0; j < numSamples; j++)
 			assertEquals(times[j], sampleTimes[j], 1.0E-6);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#reorderData(java.lang.Double[])}
+	 * and {@link gov.noaa.pmel.dashboard.dsg.StdUserDataArray#checkMissingLonLatDepthTime()}. 
+	 */
+	@Test
+	public void testReorderData() {
+		DashboardDatasetData dataset = new DashboardDatasetData();
+		dataset.setDatasetId(EXPOCODE);
+		dataset.setUserColNames(USER_COLUMN_NAMES);
+		dataset.setDataColTypes(DATA_COLUMN_TYPES);
+		int numRows = DATA_VALUE_STRINGS.size();
+		ArrayList<ArrayList<String>> disorderedData = new ArrayList<ArrayList<String>>(numRows);
+		Random rand = new Random();
+		LinkedHashSet<Integer> randOrder = new LinkedHashSet<Integer>(numRows);
+		while ( randOrder.size() < numRows ) {
+			randOrder.add(rand.nextInt(numRows));
+		}
+		// System.out.println(randOrder.toString());
+		for ( Integer idx : randOrder ) {
+			disorderedData.add(DATA_VALUE_STRINGS.get(idx));
+		}
+		dataset.setDataValues(disorderedData);
+		// Row numbers should not matter since just time will order them correctly
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(numRows);
+		for (int k = 1; k <= DATA_VALUE_STRINGS.size(); k++)
+			rowNums.add(k);
+		dataset.setRowNums(rowNums);
+		
+		StdUserDataArray stdUserData = new StdUserDataArray(dataset, KNOWN_USER_TYPES);
+		assertEquals(numRows, stdUserData.getNumSamples());
+		assertEquals(4, stdUserData.getStandardizationMessages().size());
+		Double[] sampleTimes = stdUserData.checkMissingLonLatDepthTime();
+		assertNotNull( sampleTimes );
+		// Should not have added any extra messages
+		assertEquals(4, stdUserData.getStandardizationMessages().size());
+
+		stdUserData.reorderData(sampleTimes);
+
+		// Everything should be back in the original order (which was ordered in time)
+		int lonIdx = stdUserData.getDataTypes().indexOf(DashboardServerUtils.LONGITUDE);
+		assertTrue( lonIdx >= 0 );
+		int latIdx = stdUserData.getDataTypes().indexOf(DashboardServerUtils.LATITUDE);
+		assertTrue( latIdx >= 0 );
+
+		Double[] latitudes = new Double[numRows];
+		Double[] longitudes = new Double[numRows];
+		for (int j = 0; j < numRows; j++) {
+			ArrayList<String> dataRow = DATA_VALUE_STRINGS.get(j);
+			latitudes[j] = Double.valueOf(dataRow.get(latIdx));
+			longitudes[j] = Double.valueOf(dataRow.get(lonIdx));
+		}
+		Double[] sampleLongitudes = stdUserData.getSampleLongitudes();
+		Double[] sampleLatitudes = stdUserData.getSampleLatitudes();
+		for (int j = 0; j < numRows; j++)
+			assertEquals(longitudes[j], sampleLongitudes[j], 1.0E-6);
+		for (int j = 0; j < numRows; j++)
+			assertEquals(latitudes[j], sampleLatitudes[j], 1.0E-6);
+
+		GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		cal.set(2006, GregorianCalendar.JUNE, 10, 23, 48, 0);
+		cal.set(GregorianCalendar.MILLISECOND, 0);
+		Double[] times = new Double[numRows];
+		times[0] = cal.getTimeInMillis() / 1000.0;
+		// data times are each a minute apart; no second given
+		for (int j = 1; j < numRows; j++)
+			times[j] = times[0] + j * 60.0;
+		sampleTimes = stdUserData.getSampleTimes();
+		for (int j = 0; j < numRows; j++)
+			assertEquals(times[j], sampleTimes[j], 1.0E-6);
+
+		// Try reordering without time - should be ordered by longitude, then latitude
+		ArrayList<Double> sortedLongitudes = new ArrayList<Double>(Arrays.asList(longitudes));
+		sortedLongitudes.sort(null);
+		HashSet<Double> latitudeSet = new HashSet<Double>(Arrays.asList(latitudes));
+
+		stdUserData.reorderData(null);
+		sampleLongitudes = stdUserData.getSampleLongitudes();
+		sampleLatitudes = stdUserData.getSampleLatitudes();
+		for (int j = 0; j < numRows; j++)
+			assertEquals(sortedLongitudes.get(j), sampleLongitudes[j], 1.0E-6);
+		assertTrue( latitudeSet.equals(new HashSet<Double>(Arrays.asList(sampleLatitudes))) );
+		for (int j = 1; j < numRows; j++) {
+			if ( sampleLongitudes[j-1].equals(sampleLongitudes[j]) ) {
+				// System.out.println("duplicate longitude found: " + sampleLongitudes[j].toString());
+				assertTrue( sampleLatitudes[j-1].compareTo(sampleLatitudes[j]) <= 0 );
+			}
+		}
 	}
 
 	/**

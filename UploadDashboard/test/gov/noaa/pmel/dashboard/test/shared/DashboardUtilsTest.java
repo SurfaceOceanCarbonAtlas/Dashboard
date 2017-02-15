@@ -10,6 +10,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.junit.Test;
@@ -22,6 +24,39 @@ import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
  * @author Karl Smith
  */
 public class DashboardUtilsTest {
+
+	/**
+	 * Simple test of working with the GregorianCalendar
+	 * (also a method of getting the value for DATE_MISSING_VALUE)
+	 */
+	@Test
+	public void testGregorianCalendar() {
+		TimeZone utc = TimeZone.getTimeZone("UTC");
+		GregorianCalendar cal = new GregorianCalendar(utc);
+		long value;
+
+		// Full settings
+		cal.setTimeInMillis(System.currentTimeMillis());
+		cal.clear();
+		cal.setTimeZone(utc);
+		cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+		value = cal.getTimeInMillis();
+		assertEquals(-5364576000000L, value);
+
+		// Clear does not remove the time zone
+		cal.setTimeInMillis(System.currentTimeMillis());
+		cal.clear();
+		cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+		value = cal.getTimeInMillis();
+		assertEquals(-5364576000000L, value);
+
+		// Actually just need to set milliseconds to zero
+		cal.setTimeInMillis(System.currentTimeMillis());
+		cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+		cal.set(GregorianCalendar.MILLISECOND, 0);
+		value = cal.getTimeInMillis();
+		assertEquals(-5364576000000L, value);
+	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#longitudeCloseTo(Double, Double, double, double)}

@@ -294,42 +294,36 @@ public class StdDataArray {
 			if ( DashboardUtils.INT_MISSING_VALUE.equals(userIdx) ) {
 				if ( DashboardServerUtils.YEAR.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.YEAR) );
 					}
 				}
 				else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MONTH) - GregorianCalendar.JANUARY + 1 );
 					}
 				}
 				else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.DAY_OF_MONTH) );
 					}
 				}
 				else if ( DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.HOUR_OF_DAY) );
 					}
 				}
 				else if ( DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MINUTE) );
 					}
 				}
 				else if ( DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataTypes[k]) ) {
 					for (int j = 0; j < numSamples; j++) {
-						cal.clear();
 						cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
 						Double second = ( 1000.0 * cal.get(GregorianCalendar.SECOND) + 
 											cal.get(GregorianCalendar.MILLISECOND) ) / 1000.0;
@@ -546,7 +540,6 @@ public class StdDataArray {
 							millisec = 0;
 						}
 					}
-					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
 					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
@@ -574,7 +567,6 @@ public class StdDataArray {
 					value -= sec;
 					value *= 1000.0;
 					int millisec = value.intValue();
-					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
 					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
@@ -605,7 +597,8 @@ public class StdDataArray {
 					value -= sec;
 					value *= 1000.0;
 					int millisec = value.intValue();
-					cal.clear();
+					cal.clear(GregorianCalendar.MONTH);
+					cal.clear(GregorianCalendar.DAY_OF_MONTH);
 					cal.set(GregorianCalendar.YEAR, year);
 					cal.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
 					cal.set(GregorianCalendar.HOUR_OF_DAY, hour);
@@ -642,7 +635,6 @@ public class StdDataArray {
 					value -= sec;
 					value *= 1000.0;
 					int millisec = value.intValue();
-					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
 					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
@@ -673,7 +665,6 @@ public class StdDataArray {
 					value -= sec;
 					value *= 1000.0;
 					int millisec = value.intValue();
-					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
 					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
@@ -711,7 +702,6 @@ public class StdDataArray {
 							millisec = 0;
 						}
 					}
-					cal.clear();
 					cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
 					cal.set(GregorianCalendar.MILLISECOND, millisec);
 					sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
@@ -739,7 +729,8 @@ public class StdDataArray {
 					value -= sec;
 					value *= 1000.0;
 					int millisec = value.intValue();
-					cal.clear();
+					cal.clear(GregorianCalendar.MONTH);
+					cal.clear(GregorianCalendar.DAY_OF_MONTH);
 					cal.set(GregorianCalendar.YEAR, year);
 					cal.set(GregorianCalendar.DAY_OF_YEAR, dayOfYear);
 					cal.set(GregorianCalendar.HOUR_OF_DAY, hour);

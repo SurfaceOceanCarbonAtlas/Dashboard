@@ -5,6 +5,8 @@ package gov.noaa.pmel.dashboard.dsg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.TreeSet;
 
 import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -18,6 +20,7 @@ import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
@@ -220,8 +223,13 @@ public class StdUserDataArray extends StdDataArray {
 	 * Check for missing longitude, latitude, sample depth, and time columns 
 	 * or data values.  Any problems found generate messages that are added 
 	 * to the internal list of messages.
+	 * 
+	 * @return
+	 * 		the sample times for the data;  may be null if there was incomplete 
+	 * 		specification of sample time, or may contain null values if there 
+	 * 		were problems computing the sample time
 	 */
-	public void checkMissingLonLatDepthTime() {
+	public Double[] checkMissingLonLatDepthTime() {
 		try {
 			Double[] longitudes = getSampleLongitudes();
 			for (int j = 0; j < numSamples; j++) {
@@ -245,7 +253,7 @@ public class StdUserDataArray extends StdDataArray {
 			msg.setDetailedComment(comment);
 			stdMsgList.add(msg);
 		}
-		
+
 		try {
 			Double[] latitudes = getSampleLatitudes();
 			for (int j = 0; j < numSamples; j++) {
@@ -269,7 +277,7 @@ public class StdUserDataArray extends StdDataArray {
 			msg.setDetailedComment(comment);
 			stdMsgList.add(msg);
 		}
-		
+
 		try {
 			Double[] depths = getSampleDepths();
 			for (int j = 0; j < numSamples; j++) {
@@ -293,9 +301,10 @@ public class StdUserDataArray extends StdDataArray {
 			msg.setDetailedComment(comment);
 			stdMsgList.add(msg);
 		}
-		
+
+		Double[] times = null;
 		try {
-			Double[] times = getSampleTimes();
+			times = getSampleTimes();
 			for (int j = 0; j < numSamples; j++) {
 				if ( times[j] == null ) {
 					ADCMessage msg = new ADCMessage();
@@ -315,6 +324,77 @@ public class StdUserDataArray extends StdDataArray {
 			msg.setDetailedComment(comment);
 			stdMsgList.add(msg);
 		}
+
+		return times;
+	}
+
+	/**
+	 * Reorders the data rows as best possible so that the data is
+	 * 		(1) ascending in time (old to new),
+	 * 		(2) ascending in longitude
+	 * 		(3) ascending in latitude
+	 * 		(4) ascending in depth (shallow to deep)
+	 * 		(5) original row number
+	 * Missing data columns (lon/lat/depth/time) will be treated 
+	 * as an array of missing values.  Missing values in an array 
+	 * will be ordered such that they appear before valid values.
+	 * 
+	 * @param times
+	 * 		sample times to be used for this data array; 
+	 * 		can be null to indicate sample times are not fully specified
+	 */
+	public void reorderData(Double[] times) {
+		Double[] longitudes;
+		try {
+			longitudes = getSampleLongitudes();
+		} catch ( Exception ex ) {
+			longitudes = null;
+		}
+		Double[] latitudes;
+		try {
+			latitudes = getSampleLatitudes();
+		} catch ( Exception ex ) {
+			latitudes = null;
+		}
+		Double[] depths;
+		try {
+			depths = getSampleDepths();
+		} catch ( Exception ex ) {
+			depths = null;
+		}
+		
+		TreeSet<DataLocation> orderedSet = new TreeSet<DataLocation>();
+		for (int rowIdx = 0; rowIdx < numSamples; rowIdx++) {
+			DataLocation dataLoc = new DataLocation();
+			// Assign the row index instead of the number
+			dataLoc.setRowNumber(rowIdx);
+			if ( longitudes != null )
+				dataLoc.setLongitude(longitudes[rowIdx]);
+			if ( latitudes != null )
+				dataLoc.setLatitude(latitudes[rowIdx]);
+			if ( depths != null )
+				dataLoc.setDepth(depths[rowIdx]);
+			if ( times != null ) {
+				Double timeValSecs = times[rowIdx];
+				if ( timeValSecs != null )
+					dataLoc.setDataDate( new Date(Math.round(timeValSecs * 1000.0)) );
+			}
+			// Leave dataValue as the missing value and add to the ordered set
+			if ( ! orderedSet.add(dataLoc) )
+				throw new RuntimeException("Unexpected duplicate data location with row number");
+		}
+
+		// Reorder the rows according to the ordering in orderedSet
+		// Just assign the new order of the object arrays; no need to duplicate the objects themselves
+		Object[][] orderedRows = new Object[numSamples][];
+		int rowIdx = 0;
+		for ( DataLocation dataLoc : orderedSet ) {
+			// getRowNumber returns the row index assigned above
+			orderedRows[rowIdx] = stdObjects[dataLoc.getRowNumber()];
+			rowIdx++;
+		}
+		// Update the array of array of objects to the new ordering
+		stdObjects = orderedRows;
 	}
 
 	/**
