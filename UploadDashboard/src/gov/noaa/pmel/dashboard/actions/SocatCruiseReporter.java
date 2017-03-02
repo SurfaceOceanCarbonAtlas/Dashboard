@@ -39,11 +39,11 @@ public class SocatCruiseReporter {
 	private static final String SOCAT_ENHANCED_HREF_PREFIX = "http://doi.pangaea.de/";
 
 	// SOCAT main DOI, DOI HRef, and publication citation
-	private static final String SOCAT_MAIN_DOI = "SOCATMAINDOI";
+	private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.866856";
 	private static final String[] SOCAT_MAIN_CITATION = {
 		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade ",
 		"record of high quality fCO2 data in version 3 of the Surface Ocean ",
-		"CO2 Atlas (SOCAT)\"  Earth System Science Data, 8, 383-413, 2016 ",
+		"CO2 Atlas (SOCAT)\"  Earth System Science Data, 8(2), 383-413, 2016 ",
 		"doi:10.5194/essd-8-383-2106"
 	};
 
