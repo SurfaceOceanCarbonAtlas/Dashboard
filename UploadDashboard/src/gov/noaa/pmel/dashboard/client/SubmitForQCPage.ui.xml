@@ -18,18 +18,18 @@
 				<g:HTML addStyleNames="{style.optionsintro}" ui:field="archivePlanHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
-							name="archiveRadioGroup" ui:field="socatRadio" />
+							name="archiveRadioGroup" ui:field="laterRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
-							ui:field="socatInfoAnchor" />
+							ui:field="laterInfoAnchor" />
 				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="socatAddnHtml" />
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="laterAddnHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
-							name="archiveRadioGroup" ui:field="cdiacRadio" />
+							name="archiveRadioGroup" ui:field="nowRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
-							ui:field="cdiacInfoAnchor" />
+							ui:field="nowInfoAnchor" />
 				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="cdiacAddnHtml" />
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="nowAddnHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="ownerRadio" />

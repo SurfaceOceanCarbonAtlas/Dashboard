@@ -45,7 +45,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	private static final String EMAIL_SUBJECT_MSG = 
 			"Request for immediate archival from SOCAT dashboard user ";
 	private static final String EMAIL_MSG_START =
-			"Dear CDIAC team, \n" +
+			"Dear Archival Team, \n" +
 			"\n" +
 			"As part of submitting a dataset to SOCAT for QC, the SOCAT Upload Dashboard user \n";
 	private static final String EMAIL_MSG_END = 
@@ -54,10 +54,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			"has been appended to the name for sending as an email attachment. \n" +
 			"\n" +
 			"Best regards, \n" +
-			"SOCAT team \n";
+			"SOCAT Team \n";
 
-	private String archivalEmail;
-	private String socatEmail;
+	private String[] toEmails;
+	private String[] ccEmails;
 	private String smtpHost;
 	private String smtpPort;
 	private PasswordAuthentication auth;
@@ -65,7 +65,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
 	/**
 	 * A file bundler that saves the file bundles under the given directory
-	 * and sends an email with the bundle to the given email address.
+	 * and sends an email with the bundle to the given email addresses.
 	 * 
 	 * @param outputDirname
 	 * 		save the file bundles under this directory
@@ -75,10 +75,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * 		and no version control is performed
 	 * @param svnPassword
 	 * 		password for SVN authentication
-	 * @param archivalEmailAddress
-	 * 		e-mail address to send bundles for archival
-	 * @param socatEmailAddress
-	 * 		e-mail address from which these bundles are being sent
+	 * @param toEmailAddresses
+	 * 		e-mail addresses to send bundles to for archival
+	 * @param ccEmailAddress
+	 * 		e-mail addresses to be cc'd on the archival request
 	 * @param smtpHostAddress
 	 * 		address of the SMTP host to use for email; if null or empty, "localhost" is used
 	 * @param smtpHostPort
@@ -94,12 +94,12 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * 		is not a directory, or is not under version control
 	 */
 	public ArchiveFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
-			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress,
+			String[] toEmailAddresses, String[] ccEmailAddresses, String smtpHostAddress,
 			String smtpHostPort, String smtpUsername, String smtpPassword, boolean setDebug) 
 					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
-		archivalEmail = archivalEmailAddress;
-		socatEmail = socatEmailAddress;
+		toEmails = toEmailAddresses.clone();
+		ccEmails = ccEmailAddresses.clone();
 		smtpHost = smtpHostAddress;
 		smtpPort = smtpHostPort;
 		if ( (smtpUsername == null) || smtpUsername.isEmpty() || 
@@ -197,9 +197,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
 	/**
 	 * Creates the file bundle of original data and metadata, 
-	 * and sends this bundle to the email address, if given, 
-	 * associated with this instance for archival.  This bundle 
-	 * is also committed to version control using the given message. 
+	 * and emails this bundle, if appropriate, for archival.  
+	 * This bundle is also committed to version control using 
+	 * the given message.
+	 * 
+	 * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
+	 * and the value of userEmail is {@link DashboardServerUtils#NOMAIL_USER_EMAIL},
+	 * then the bundle is created but not emailed.
 	 * 
 	 * @param expocode
 	 * 		create the bundle for the cruise with this expocode
@@ -208,10 +212,12 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 * 		if null or empty, the bundle file is not committed 
 	 * 		to version control
 	 * @param userRealName
-	 * 		real name of the user make this archival request
+	 * 		real name of the user make this archival request, or
+	 * 		{@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
 	 * @param userEmail
-	 * 		email address of the user making this archival request;
-	 * 		this address will be cc'd on the bundle email sent for archival
+	 * 		email address of the user making this archival request
+	 * 		(and this address will be cc'd on the bundle email sent 
+	 * 		for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
 	 * @return
 	 * 		an message indicating what was sent and to whom
 	 * @throws IllegalArgumentException
@@ -225,8 +231,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	 */
 	public String sendOrigFilesBundle(String expocode, String message, String userRealName, 
 			String userEmail) throws IllegalArgumentException, IOException {
-		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
+		if ( (toEmails == null) || (toEmails.length == 0) )
 			throw new IllegalArgumentException("no archival email address");
+		if ( (ccEmails == null) || (ccEmails.length == 0) )
+			throw new IllegalArgumentException("no cc email address");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
 		if ( (userEmail == null) || userEmail.isEmpty() )
@@ -273,14 +281,15 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			try {
 				commitVersion(bundleFile, message);
 			} catch (Exception ex) {
-				throw new IOException("Problems committing the archival file bundle for " + 
+				throw new IOException("Problems committing the original data files archival bundle for " + 
 						upperExpo + ": " + ex.getMessage());
 			}
 		}
 
 		// If userRealName is "nobody" and userEmail is "nobody@nowhere" then skip the email
-		if ( DashboardServerUtils.NOMAIL_USER_REAL_NAME.equals(userRealName) && DashboardServerUtils.NOMAIL_USER_EMAIL.equals(userEmail) ) {
-			return "Original data files bundle archived but not emailed";
+		if ( DashboardServerUtils.NOMAIL_USER_REAL_NAME.equals(userRealName) &&
+			 DashboardServerUtils.NOMAIL_USER_EMAIL.equals(userEmail) ) {
+			return infoMsg + "Original data files archival bundle created but not emailed\n";
 		}
 
 		// Create a Session for sending out the email
@@ -311,27 +320,30 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			sessn = Session.getInstance(props, null);
 		}
 
-		// Parse all the email addresses
-		InternetAddress socatAddress;
+		// Parse all the email addresses, add the user's email as the first cc'd address
+		InternetAddress[] ccAddresses = new InternetAddress[ccEmails.length + 1];
 		try {
-			socatAddress = new InternetAddress(socatEmail);
-		} catch (MessagingException ex) {
-			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException("Invalid SOCAT email address: " + errmsg, ex);
-		}
-		InternetAddress archivalAddress;
-		try {
-			archivalAddress = new InternetAddress(archivalEmail);
-		} catch (MessagingException ex) {
-			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException("Invalid archival email address: " + errmsg, ex);
-		}
-		InternetAddress userAddress;
-		try {
-			userAddress = new InternetAddress(userEmail);
+			ccAddresses[0] = new InternetAddress(userEmail);
 		} catch (MessagingException ex) {
 			String errmsg = getMessageExceptionMsgs(ex);
 			throw new IllegalArgumentException("Invalid user email address: " + errmsg, ex);
+		}
+		for (int k = 0; k < ccEmails.length; k++) {
+			try {
+				ccAddresses[k+1] = new InternetAddress(ccEmails[k]);
+			} catch (MessagingException ex) {
+				String errmsg = getMessageExceptionMsgs(ex);
+				throw new IllegalArgumentException("Invalid 'CC:' email address: " + errmsg, ex);
+			}
+		}
+		InternetAddress[] toAddresses = new InternetAddress[toEmails.length];
+		for (int k = 0; k < toEmails.length; k++) {
+			try {
+				toAddresses[k] = new InternetAddress(toEmails[k]);
+			} catch (MessagingException ex) {
+				String errmsg = getMessageExceptionMsgs(ex);
+				throw new IllegalArgumentException("Invalid 'To:' email address: " + errmsg, ex);
+			}
 		}
 
 		// Create the email message with the renamed zip attachment
@@ -341,10 +353,12 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
 			msg.setSentDate(new Date());
 			// Set the addresses
-			msg.setFrom(socatAddress);
-			msg.setReplyTo(new InternetAddress[] { socatAddress });
-			msg.setRecipients(Message.RecipientType.TO, new InternetAddress[] { archivalAddress });
-			msg.setRecipients(Message.RecipientType.CC, new InternetAddress[] { userAddress, socatAddress });
+			// Mark as sent from the second cc'd address (the dashboard's);
+			// the first cc address is the user and any others are purely supplemental
+			msg.setFrom(ccAddresses[1]);
+			msg.setReplyTo(ccAddresses);
+			msg.setRecipients(Message.RecipientType.TO, toAddresses);
+			msg.setRecipients(Message.RecipientType.CC, ccAddresses);
 			// Create the text message part
 			MimeBodyPart textMsgPart = new MimeBodyPart();
 			textMsgPart.setText(EMAIL_MSG_START + userRealName + EMAIL_MSG_END);
@@ -372,8 +386,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			throw new IllegalArgumentException("Problems sending the archival request email: " + errmsg, ex);
 		}
 
-		infoMsg += "Original files bundle sent to " + archivalEmail +
-				   " and cc'd to " + userEmail + " and " + socatEmail + "\n";
+		infoMsg += "Original files bundle sent To: " + toEmails[0];
+		for (int k = 1; k < toEmails.length; k++)
+			infoMsg += ", " + toEmails[k];
+		infoMsg += "; CC: " + userEmail + ", " + ccEmails[0];
+		for (int k = 1; k < ccEmails.length; k++)
+			infoMsg += ", " + ccEmails[k];
+		infoMsg += "\n";
 		return infoMsg;
 	}
 

@@ -3,20 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.actions.CruiseChecker;
-import gov.noaa.pmel.dashboard.actions.CruiseSubmitter;
-import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
-import gov.noaa.pmel.dashboard.ferret.FerretConfig;
-import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
-import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
-import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -41,11 +27,25 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
-
 import com.googlecode.gwt.crypto.bouncycastle.DataLengthException;
 import com.googlecode.gwt.crypto.bouncycastle.InvalidCipherTextException;
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
+
+import gov.noaa.pmel.dashboard.actions.CruiseChecker;
+import gov.noaa.pmel.dashboard.actions.CruiseSubmitter;
+import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
+import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
+import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 
 /**
  * Reads and holds the Dashboard configuration details
@@ -434,20 +434,20 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
-		// Read the CDIAC email address to send archival bundles
+		// Read the email addresses to send archival bundles
 		propVal = configProps.getProperty(ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
 			throw new IOException("Invalid " + ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
-		String cdiacEmailAddress = propVal.trim();
-		// Read the SOCAT email address for the from address for archival bundles
+		String[] toEmailAddresses = propVal.trim().split(",");
+		// Read the email addresses to be cc'd on the archival email
 		propVal = configProps.getProperty(CC_BUNDLES_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
 			throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
-		String socatEmailAddress = propVal.trim();
+		String[] ccEmailAddresses = propVal.trim().split("'");
 		// Read the SMTP server information
 		propVal = configProps.getProperty(SMTP_HOST_ADDRESS_TAG);
 		if ( propVal == null )
@@ -480,12 +480,18 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, 
-					svnPassword, cdiacEmailAddress, socatEmailAddress, 
+					svnPassword, toEmailAddresses, ccEmailAddresses, 
 					smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
-			itsLogger.info("CDIAC files bundler and mailer using:");
+			itsLogger.info("Archive files bundler and mailer using:");
 			itsLogger.info("    bundles directory: " + propVal);
-			itsLogger.info("    CDIAC email address: " + cdiacEmailAddress);
-			itsLogger.info("    SOCAT email address: " + socatEmailAddress);
+			String emails = toEmailAddresses[0];
+			for (int k = 1; k < toEmailAddresses.length; k++)
+				emails += ", " + toEmailAddresses[k];
+			itsLogger.info("    To: " + emails);
+			emails = ccEmailAddresses[0];
+			for (int k = 1; k < ccEmailAddresses.length; k++)
+				emails += ", " + ccEmailAddresses[k];
+			itsLogger.info("    CC: " + emails);
 			itsLogger.info("    SMTP host: " + smtpHostAddress);
 			itsLogger.info("    SMTP port: " + smtpHostPort);
 			itsLogger.info("    SMTP username: " + smtpUsername);
