@@ -419,8 +419,8 @@ public class DashboardUtils {
 			114.0, "begin time", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
 			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end", 
-			115.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
+	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_coverage_end", 
+			115.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_coverage_end", 
 			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
