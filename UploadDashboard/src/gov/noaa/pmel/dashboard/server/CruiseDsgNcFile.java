@@ -427,6 +427,8 @@ public class CruiseDsgNcFile extends File {
 						var = ncfile.findVariable("vessel_name");
 					else if ( "platform_type".equals(varName) )
 						var = ncfile.findVariable("vessel_type");
+					else if ( "time_coverage_end".equals(varName) )
+						var = ncfile.findVariable("time_converage_end");
 				}
 				if ( var == null ) {
 					namesNotFound.add(varName);
