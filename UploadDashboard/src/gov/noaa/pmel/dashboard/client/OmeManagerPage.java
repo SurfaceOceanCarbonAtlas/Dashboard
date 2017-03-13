@@ -43,7 +43,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
 			"<p>At this time, the system only uploads SOCAT OME XML metadata files.</p>" +
 			"<p>To generate a SOCAT OME XML metadata file to upload: <ul>" +
-			"<li>Go to the CDIAC OME site " +
+			"<li>Go to the Online Metadata Editor site " +
 			"<a href=\"http://mercury.ornl.gov/socatome/\" target=\"_blank\">" +
 			"http://mercury.ornl.gov/socatome/</a></li>" +
 			"<li>Fill in the appropriate metadata</li>" +

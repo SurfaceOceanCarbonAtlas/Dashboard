@@ -142,7 +142,7 @@ public class DatasetSubmitter {
 				ingestIds.add(datasetId);
 			}
 
-			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) && 
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) && 
 				 ( repeatSend || dataset.getArchiveDate().isEmpty() ) ) {
 				// Queue the request to send (or re-send) the data and metadata for archival
 				archiveIds.add(datasetId);

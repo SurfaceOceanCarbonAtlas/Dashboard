@@ -53,7 +53,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	private static final String QC_STATUS_INTRO =
 			"QC status: ";
 	private static final String ARCHIVE_STATUS_INTRO =
-			"CDIAC archive request sent on ";
+			"Archive request sent on ";
 	private static final String CRUISE_INFO_EPILOGUE =
 			")</em>";
 
@@ -61,27 +61,27 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"Archival plan for the uploaded files for these datasets: <br />" +
 			"<small><em>(this option can be modified on submitted datasets without affecting QC)</em></small>";
 
-	private static final String DELAY_ARCHIVE_TEXT = 
+	private static final String ARCHIVE_LATER_TEXT = 
 			"delay archiving at this time";
-	private static final String DELAY_ARCHIVE_ADDN_HTML = 
-			"<em>(if not archived before the next public release, archive at CDIAC)</em>";
-	private static final String DELAY_ARCHIVE_INFO_HTML = 
+	private static final String ARCHIVE_LATER_ADDN_HTML = 
+			"<em>(if not archived before the next public release, archive at OCADS)</em>";
+	private static final String ARCHIVE_LATER_INFO_HTML = 
 			"By selecting this option I wish to delay archival at this time.  " +
 			"If another archive option has not been selected before the next " +
 			"public release, I am giving permission for my uploaded files for these " +
-			"datasets, if deemed acceptable, to be archived at CDIAC at the time " +
-			"of the next public release, after which the files will be made " +
-			"accessible to the public through the CDIAC Web site.";
+			"datasets, if deemed acceptable, to be archived at OCADS (formerly CDIAC) " +
+			"at the time of the next public release, after which the files will " +
+			"be made accessible to the public through the OCADS web site.";
 
-	private static final String CDIAC_ARCHIVE_TEXT = 
-			"archive at CDIAC now";
-	private static final String CDIAC_ARCHIVE_ADDN_HTML = 
-			"<em>(an e-mail with the data and metadata files will be sent to CDIAC)</em>";
-	private static final String CDIAC_ARCHIVE_INFO_HTML =
+	private static final String ARCHIVE_NOW_TEXT = 
+			"archive at OCADS (formerly CDIAC) now";
+	private static final String ARCHIVE_NOW_ADDN_HTML = 
+			"<em>(an e-mail with the data and metadata files will be sent to OCADS)</em>";
+	private static final String ARCHIVE_NOW_INFO_HTML =
 			"By selecting this option I am requesting that my uploaded files for " +
-			"these datasets be archived at CDIAC as soon as possible.  When CDIAC " +
-			"provides a DOI, or other reference, for these archived files, please " +
-			"verify these references are in the submitted metadata for these datasets.";
+			"these datasets be archived at OCADS (formerly CDIAC) as soon as possible.  " +
+			"When OCADS provides a DOI, or other reference, for these archived files, " +
+			"please verify these references are in the metadata for these datasets.";
 
 	private static final String OWNER_ARCHIVE_TEXT =
 			"already archived or I will manage archival";
@@ -94,20 +94,20 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"reference for these archived files is provided, I will include these " + 
 			"references in the metadata supplied for these datasets.";
 
-	private static final String ALREADY_SENT_CDIAC_HTML =
+	private static final String ALREADY_ARCHIVED_HTML =
 			"<h3>WARNING</h3>" +
-			"<p>The files for some or all of these dataset were earlier sent to CDIAC " +
-			"for archival.  Normally you do not want to change the archival option " +
-			"for these datasets. </p>" +
+			"<p>The files for some or all of these dataset were earlier sent to OCADS " +
+			"(formerly CDIAC) for archival.  Normally you do not want to change the " +
+			"archival option for these datasets. </p>" +
 			"<p>If you are working with a mix of datasets that have and have not been " +
-			"sent to CDIAC, we strongly recommend you cancel this action and work with " +
-			"datasets already sent to CDIAC separately from those not sent.</p>";
+			"sent to OCADS, we strongly recommend you cancel this action and work with " +
+			"datasets already sent to OCADS separately from those not sent.</p>";
 
-	private static final String RESEND_CDIAC_QUESTION = 
-			"<p>Some or all of these datasets were earlier sent to CDIAC for archival.  " +
-			"Do you want to send the files for these datasets <b>again</b>?</p>" +
+	private static final String REARCHIVE_QUESTION = 
+			"<p>Some or all of these datasets were earlier sent to OCADS (formerly CDIAC) " +
+			"for archival.  Do you want to send the files for these datasets <b>again</b>?</p>" +
 			"<p><em>If you send the files for these datasets again, you should contact " +
-			"CDIAC to explain the reason for this repeated request for archival.</em></p>";
+			"OCADS to explain the reason for this repeated request for archival.</em></p>";
 	private static final String YES_RESEND_TEXT = "Yes, send";
 	private static final String NO_CANCEL_TEXT = "No, cancel";
 
@@ -149,12 +149,12 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField HTML archivePlanHtml;
-	@UiField RadioButton delayRadio;
-	@UiField Anchor delayInfoAnchor;
-	@UiField HTML delayAddnHtml;
-	@UiField RadioButton cdiacRadio;
-	@UiField Anchor cdiacInfoAnchor;
-	@UiField HTML cdiacAddnHtml;
+	@UiField RadioButton laterRadio;
+	@UiField Anchor laterInfoAnchor;
+	@UiField HTML laterAddnHtml;
+	@UiField RadioButton nowRadio;
+	@UiField Anchor nowInfoAnchor;
+	@UiField HTML nowAddnHtml;
 	@UiField RadioButton ownerRadio;
 	@UiField Anchor ownerInfoAnchor;
 	@UiField HTML ownerAddnHtml;
@@ -165,8 +165,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 	private HashSet<String> expocodes;
 	private boolean hasSentDataset;
-	private DashboardInfoPopup delayArchivePopup;
-	private DashboardInfoPopup cdiacInfoPopup;
+	private DashboardInfoPopup laterArchivePopup;
+	private DashboardInfoPopup nowInfoPopup;
 	private DashboardInfoPopup ownerArchivePopup;
 	private DashboardInfoPopup agreeSharePopup;
 	private DashboardAskPopup resubmitAskPopup;
@@ -191,15 +191,15 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 		archivePlanHtml.setHTML(ARCHIVE_PLAN_INTRO);
 
-		delayRadio.setText(DELAY_ARCHIVE_TEXT);
-		delayInfoAnchor.setText(MORE_INFO_TEXT);
-		delayAddnHtml.setHTML(DELAY_ARCHIVE_ADDN_HTML);
-		delayArchivePopup = null;
+		laterRadio.setText(ARCHIVE_LATER_TEXT);
+		laterInfoAnchor.setText(MORE_INFO_TEXT);
+		laterAddnHtml.setHTML(ARCHIVE_LATER_ADDN_HTML);
+		laterArchivePopup = null;
 
-		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
-		cdiacInfoAnchor.setText(MORE_INFO_TEXT);
-		cdiacAddnHtml.setHTML(CDIAC_ARCHIVE_ADDN_HTML);
-		cdiacInfoPopup = null;
+		nowRadio.setText(ARCHIVE_NOW_TEXT);
+		nowInfoAnchor.setText(MORE_INFO_TEXT);
+		nowAddnHtml.setHTML(ARCHIVE_NOW_ADDN_HTML);
+		nowInfoPopup = null;
 
 		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
 		ownerInfoAnchor.setText(MORE_INFO_TEXT);
@@ -268,7 +268,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 				// Archive with next release
 				numDelay++;
 			}
-			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) ) {
+			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ) {
 				// Archive at CDIAC now
 				numCdiac++;
 			}
@@ -317,11 +317,11 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		int numDatasets = cruises.size();
 		if ( numDelay == numDatasets ) {
 			// All "with next release", so keep that setting
-			delayRadio.setValue(true, true);
+			laterRadio.setValue(true, true);
 		}
 		else if ( numCdiac == numDatasets ) {
 			// All "sent to CDIAC", so keep that setting
-			cdiacRadio.setValue(true, true);
+			nowRadio.setValue(true, true);
 		}
 		else if ( numOwner == numDatasets ) {
 			// All "owner will archive", so keep that setting
@@ -329,8 +329,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		}
 		else {
 			// A mix, so unset all and make the user decide
-			delayRadio.setValue(false, true);
-			cdiacRadio.setValue(false, true);
+			laterRadio.setValue(false, true);
+			nowRadio.setValue(false, true);
 			ownerRadio.setValue(false, true);
 		}
 
@@ -346,34 +346,34 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		DashboardLogoutPage.showPage();
 	}
 
-	@UiHandler({"delayRadio","ownerRadio"})
+	@UiHandler({"laterRadio","ownerRadio"})
 	void radioOnClick(ClickEvent event) {
 		// If there is a cruise sent to CDIAC, warn if another selection is made
 		if ( hasSentDataset ) {
-			UploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
+			UploadDashboard.showMessage(ALREADY_ARCHIVED_HTML);
 		}
 	}
 
-	@UiHandler("delayInfoAnchor")
-	void delayInfoOnClick(ClickEvent event) {
+	@UiHandler("laterInfoAnchor")
+	void laterInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
-		if ( delayArchivePopup == null ) {
-			delayArchivePopup = new DashboardInfoPopup();
-			delayArchivePopup.setInfoMessage(DELAY_ARCHIVE_INFO_HTML);
+		if ( laterArchivePopup == null ) {
+			laterArchivePopup = new DashboardInfoPopup();
+			laterArchivePopup.setInfoMessage(ARCHIVE_LATER_INFO_HTML);
 		}
 		// Show the popup over the info anchor
-		delayArchivePopup.showRelativeTo(delayInfoAnchor);
+		laterArchivePopup.showRelativeTo(laterInfoAnchor);
 	}
 
-	@UiHandler("cdiacInfoAnchor")
-	void cdiacInfoOnClick(ClickEvent event) {
+	@UiHandler("nowInfoAnchor")
+	void nowInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
-		if ( cdiacInfoPopup == null ) {
-			cdiacInfoPopup = new DashboardInfoPopup();
-			cdiacInfoPopup.setInfoMessage(CDIAC_ARCHIVE_INFO_HTML);
+		if ( nowInfoPopup == null ) {
+			nowInfoPopup = new DashboardInfoPopup();
+			nowInfoPopup.setInfoMessage(ARCHIVE_NOW_INFO_HTML);
 		}
 		// Show the popup over the info anchor
-		cdiacInfoPopup.showRelativeTo(cdiacInfoAnchor);
+		nowInfoPopup.showRelativeTo(nowInfoAnchor);
 	}
 
 	@UiHandler("ownerInfoAnchor")
@@ -410,7 +410,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			UploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
 			return;
 		}
-		if ( hasSentDataset && cdiacRadio.getValue() ) {
+		if ( hasSentDataset && nowRadio.getValue() ) {
 			// Asking to submit to CDIAC now, but has a cruise already sent
 			if ( resubmitAskPopup == null ) {
 				resubmitAskPopup = new DashboardAskPopup(YES_RESEND_TEXT, 
@@ -430,7 +430,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 					}
 				});
 			}
-			resubmitAskPopup.askQuestion(RESEND_CDIAC_QUESTION);
+			resubmitAskPopup.askQuestion(REARCHIVE_QUESTION);
 		}
 		else {
 			// Either no cruises sent to CDIAC, or not a send to CDIAC now request. 
@@ -445,13 +445,13 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	void continueSubmit() {
 		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		String archiveStatus;
-		if ( delayRadio.getValue() ) {
+		if ( laterRadio.getValue() ) {
 			// Archive with the next release
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE;
 		}
-		else if ( cdiacRadio.getValue() ) {
+		else if ( nowRadio.getValue() ) {
 			// Tell CDIAC to archive now
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL;
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL;
 		}
 		else if ( ownerRadio.getValue() ) {
 			// Owner will archive

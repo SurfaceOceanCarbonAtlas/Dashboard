@@ -136,7 +136,7 @@ public class DashboardServerUtils {
 	public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start", 
 			114.0, "start time", "starting time", false, TIME_UNITS, 
 			"time_coverage_start", LOCATION_CATEGORY, null, null, null, null, null);
-	public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_converage_end", 
+	public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_coverage_end", 
 			115.0, "end time", "ending time", false, TIME_UNITS, 
 			"time_coverage_end", LOCATION_CATEGORY, null, null, null, null, null);
 	public static final StringDashDataType STATUS = new StringDashDataType("status",

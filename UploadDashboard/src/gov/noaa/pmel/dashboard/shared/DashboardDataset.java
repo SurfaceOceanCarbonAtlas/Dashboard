@@ -88,7 +88,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 		status = getArchiveStatus();
 		if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
 			 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
-			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ||
 			 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) 
 			return Boolean.FALSE;
 		// null for acceptable published datasets
