@@ -3,8 +3,8 @@
 	<name>SocatUploadDashboard</name>
 	<comment></comment>
 	<projects>
-		<project>OmeMetadata</project>
-		<project>SanityChecker</project>
+		<project>SocatOmeMetadata</project>
+		<project>SocatSanityChecker</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
