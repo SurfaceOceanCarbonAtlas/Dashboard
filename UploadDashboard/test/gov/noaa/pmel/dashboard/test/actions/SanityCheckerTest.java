@@ -14,8 +14,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class SanityCheckerTest {
 	static {
 		String home = System.getenv("HOME");
 		CONFIG_FILENAME = home + "/content/SocatUploadDashboard/config/SocatUploadDashboard.properties";
-		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/config/log4j.properties";
+		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/config/log4j2.properties";
 	}
 
 	@Test
@@ -190,13 +190,13 @@ public class SanityCheckerTest {
 		for ( String dataString : badCruiseDataStrings )
 			badCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
 
-		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
+		System.setProperty("log4j.configurationFile", LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);
 
 		ColumnConversionConfig convConfig = ColumnConversionConfig.getInstance();
 
 		File name = new File(expocode);
-		Logger logger = Logger.getLogger("Sanity Checker");
+		Logger logger = LogManager.getLogger("Sanity Checker");
 		ColumnSpec colSpec = new ColumnSpec(name, cruiseDoc, convConfig, logger);
 
 		OmeMetadata metadataInput = new OmeMetadata(expocode);
@@ -712,13 +712,13 @@ public class SanityCheckerTest {
 		for ( String dataString : cruiseDataStrings )
 			cruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
 
-		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
+		System.setProperty("log4j.configurationFile", LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);
 
 		ColumnConversionConfig convConfig = ColumnConversionConfig.getInstance();
 
 		File name = new File(expocode);
-		Logger logger = Logger.getLogger("Sanity Checker");
+		Logger logger = LogManager.getLogger("Sanity Checker");
 		ColumnSpec colSpec = new ColumnSpec(name, cruiseDoc, convConfig, logger);
 
 		OmeMetadata metadataInput = new OmeMetadata(expocode);

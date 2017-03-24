@@ -10,7 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
@@ -94,7 +95,7 @@ public class SanityCheckerRun {
 		
 		if (ok) {
 			// Initialise the logger
-			itsLogger = Logger.getLogger(itsDataFilename);
+			itsLogger = LogManager.getLogger(itsDataFilename);
 			
 			// Read in base config and build the column spec object
 			try {

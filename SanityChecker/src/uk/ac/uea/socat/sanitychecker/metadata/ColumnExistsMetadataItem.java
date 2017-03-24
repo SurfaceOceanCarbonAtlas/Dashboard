@@ -3,7 +3,7 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 import java.text.ParseException;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;

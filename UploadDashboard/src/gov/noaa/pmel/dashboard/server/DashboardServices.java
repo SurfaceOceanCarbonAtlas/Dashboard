@@ -29,7 +29,8 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -59,15 +60,15 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			session.invalidate();
 		} catch ( Exception ex ) {
 			// Log but otherwise ignore this error
-			Logger.getLogger("DashboardServices").error("session.invalidate failed: " + ex.getMessage());
+			LogManager.getLogger("DashboardServices").error("session.invalidate failed: " + ex.getMessage());
 		}
 		try {
 			request.logout();
 		} catch ( Exception ex ) {
-			Logger.getLogger("DashboardServices").error("request.logout failed: " + ex.getMessage());
+			LogManager.getLogger("DashboardServices").error("request.logout failed: " + ex.getMessage());
 		}
 
-		Logger.getLogger("DashboardServices").info("logged out " + username);
+		LogManager.getLogger("DashboardServices").info("logged out " + username);
 	}
 
 	/**
@@ -110,7 +111,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		if ( ! validateRequest(null) ) 
 			throw new IllegalArgumentException("Invalid user request");
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
-		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
+		LogManager.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
 
@@ -132,13 +133,13 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				;
 			}
 			// IllegalArgumentException for other problems escape as-is
-			Logger.getLogger("DashboardServices").info("cruise " + expocode + " deleted by " + username);
+			LogManager.getLogger("DashboardServices").info("cruise " + expocode + " deleted by " + username);
 		}
 
 		// Return the current list of cruises, which should 
 		// detect the missing cruises and update itself
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
-		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
+		LogManager.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
 
@@ -152,7 +153,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Add the cruises to the user's list and return the updated list
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler()
 				.addCruisesToListing(wildExpocode, username);
-		Logger.getLogger("DashboardServices").info("added cruises " + wildExpocode + " for " + username);
+		LogManager.getLogger("DashboardServices").info("added cruises " + wildExpocode + " for " + username);
 		return cruiseList;
 	}
 
@@ -166,7 +167,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Remove the cruises from the user's list and return the updated list
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler()
 				.removeCruisesFromListing(expocodeSet, username);
-		Logger.getLogger("DashboardServices").info("removed cruises " + expocodeSet.toString() + " for " + username);
+		LogManager.getLogger("DashboardServices").info("removed cruises " + expocodeSet.toString() + " for " + username);
 		return cruiseList;
 	}
 
@@ -193,7 +194,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		}
 		// Change the owner of the cruises
 		CruiseModifier modifier = new CruiseModifier(configStore);
-		Logger itsLogger = Logger.getLogger("DashboardServices");
+		Logger itsLogger = LogManager.getLogger("DashboardServices");
 		for ( String expocode : expocodeSet ) {
 			modifier.changeCruiseOwner(expocode, newUsername);
 			itsLogger.info("changed owner of " + expocode + " to " + newUsername);
@@ -219,7 +220,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		for ( String cruiseExpocode : expocodeSet ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
-		Logger.getLogger("DashboardServices").info("returned updated cruise information for " + username);
+		LogManager.getLogger("DashboardServices").info("returned updated cruise information for " + username);
 		return cruiseList;
 	}
 
@@ -263,7 +264,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Delete this OME metadata or additional documents file on the server
 		mdataHandler.removeMetadata(username, expocode, deleteFilename);
 
-		Logger.getLogger("DashboardServices").info("deleted metadata " + deleteFilename + 
+		LogManager.getLogger("DashboardServices").info("deleted metadata " + deleteFilename + 
 				" from " + expocode + " for " + username);
 
 		// Save the updated cruise
@@ -291,10 +292,10 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 				}
 				cruiseHandler.saveCruiseInfoToFile(cruise, comment);
-				Logger.getLogger("DashboardServices").info("updated QC status for " + expocode);
+				LogManager.getLogger("DashboardServices").info("updated QC status for " + expocode);
 			} catch (Exception ex) {
 				// Should not fail.  If does, record but otherwise ignore the failure.
-				Logger.getLogger("DashboardServices").error("failed to update QC status for " + 
+				LogManager.getLogger("DashboardServices").error("failed to update QC status for " + 
 						expocode + " after deleting metadata " + deleteFilename + 
 						" from " + expocode + " for " + username + ": " + ex.getMessage());
 			}
@@ -308,7 +309,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
-		Logger.getLogger("DashboardServices").info("returned updated dataset information for " + username);
+		LogManager.getLogger("DashboardServices").info("returned updated dataset information for " + username);
 		return cruiseList;
 	}
 
@@ -342,7 +343,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		cruiseTypes.setAllKnownTypes(knownTypesList);
 		cruiseTypes.setCruiseData(cruiseData);
 
-		Logger.getLogger("DashboardServices").info("data columns specs returned for " + 
+		LogManager.getLogger("DashboardServices").info("data columns specs returned for " + 
 				expocode + " for " + username);
 		// Return the cruise with the partial data
 		return cruiseTypes;
@@ -372,7 +373,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			k++;
 		}
 		int myLastRow = myFirstRow + cruiseDataWithRowNums.size() - 1;
-		Logger myLogger = Logger.getLogger("DashboardServices");
+		Logger myLogger = LogManager.getLogger("DashboardServices");
 		myLogger.info(expocode + " cruise data [" + Integer.toString(myFirstRow) + 
 				" - " + Integer.toString(myLastRow) + "] returned for " + username);
 		if ( myLogger.isDebugEnabled() ) {
@@ -429,7 +430,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 					  .clear();
 		}
 
-		Logger.getLogger("DashboardServices").info("cruise data columns specs updated for " + 
+		LogManager.getLogger("DashboardServices").info("cruise data columns specs updated for " + 
 				cruiseData.getExpocode() + " by " + username);
 		// Return the updated truncated cruise data for redisplay 
 		// in the DataColumnSpecsPage
@@ -446,7 +447,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		UserFileHandler userHandler = configStore.getUserFileHandler();
 		CruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
-		Logger dataSpecsLogger = Logger.getLogger("DashboardServices");
+		Logger dataSpecsLogger = LogManager.getLogger("DashboardServices");
 
 		for ( String expocode : cruiseExpocodes ) {
 			// Retrieve all the current cruise data
@@ -493,7 +494,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			throw new IllegalArgumentException("The sanity checker has never been run on cruise " + expocode);
 		}
 		scMsgList.setUsername(username);
-		Logger.getLogger("DashboardServices")
+		LogManager.getLogger("DashboardServices")
 			  .info("returned sanity checker messages for " + expocode + " for " + username);
 		return scMsgList;
 	}
@@ -553,7 +554,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Submit the cruises for QC and possibly send to CDIAC
 		configStore.getDashboardCruiseSubmitter().submitCruises(cruiseExpocodes, 
 				archiveStatus, localTimestamp, repeatSend, username);
-		Logger.getLogger("DashboardServices").info("cruises " + cruiseExpocodes.toString() + 
+		LogManager.getLogger("DashboardServices").info("cruises " + cruiseExpocodes.toString() + 
 				" submitted by " + username);
 	}
 

@@ -24,8 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -543,8 +544,8 @@ public class CruiseChecker {
 		Document cruiseDoc = new Document(rootElement);
 
 		// Create the column specifications object for the sanity checker
-		Logger logger = Logger.getLogger("Sanity Checker - " + expocode);
-		if ( Level.DEBUG.isGreaterOrEqual(logger.getEffectiveLevel()) ) {
+		Logger logger = LogManager.getLogger("Sanity Checker - " + expocode);
+		if ( Level.DEBUG.isMoreSpecificThan(logger.getLevel()) ) {
 			logger.debug("cruise columns specifications document:\n" + 
 					(new XMLOutputter(Format.getPrettyFormat()))
 					.outputString(cruiseDoc));

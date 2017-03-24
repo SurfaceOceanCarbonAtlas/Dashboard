@@ -31,7 +31,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Submits Dashboard cruise for SOCAT QC
@@ -65,7 +67,7 @@ public class CruiseSubmitter {
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		cdiacBundler = configStore.getArchiveFilesBundler();
 		socatVersion = configStore.getUploadVersion();
-		logger = Logger.getLogger(getClass());
+		logger = LogManager.getLogger(getClass());
 	}
 
 	/**

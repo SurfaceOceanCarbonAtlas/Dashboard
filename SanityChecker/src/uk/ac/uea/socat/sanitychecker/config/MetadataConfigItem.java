@@ -1,6 +1,7 @@
 package uk.ac.uea.socat.sanitychecker.config;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
