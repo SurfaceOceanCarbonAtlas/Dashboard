@@ -5,7 +5,8 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * The base configuration for the Sanity Checker.

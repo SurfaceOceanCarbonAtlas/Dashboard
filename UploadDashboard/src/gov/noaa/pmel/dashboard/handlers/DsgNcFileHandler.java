@@ -34,7 +34,8 @@ import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import ucar.ma2.InvalidRangeException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
@@ -118,7 +119,7 @@ public class DsgNcFileHandler {
 					ex.getMessage(), ex);
 		}
 
-		itsLogger = Logger.getLogger("DsgNcFileHandler");
+		itsLogger = LogManager.getLogger("DsgNcFileHandler");
 	}
 
 	/**

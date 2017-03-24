@@ -15,7 +15,9 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class PreviewPlotsHandler {
 
@@ -135,7 +137,7 @@ public class PreviewPlotsHandler {
 	public void createPreviewPlots(String expocode, String timetag) 
 			throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
-		Logger log = Logger.getLogger("PreviewPlotsHandler");
+		Logger log = LogManager.getLogger("PreviewPlotsHandler");
 		log.debug("reading data for " + upperExpo);
 
 		// Get the complete original cruise data

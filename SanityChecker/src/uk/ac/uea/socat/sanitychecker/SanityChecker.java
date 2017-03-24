@@ -7,7 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -100,7 +101,7 @@ public class SanityChecker {
 	 * @param filename The location of the {@link BaseConfig} file. 
 	 */
 	public static void initConfig(String filename) throws ConfigException, SanityCheckerException {
-		Logger initLogger = Logger.getLogger("SanityChecker");
+		Logger initLogger = LogManager.getLogger("SanityChecker");
 		BaseConfig.init(filename, initLogger);
 		
 		// Two-digit dates are handled, but only up to a certain time point. After that we must
@@ -146,7 +147,7 @@ public class SanityChecker {
 	public SanityChecker(String filename, OmeMetadata metadata, ColumnSpec colSpec, 
 			ArrayList<ArrayList<String>> dataInput, String dateFormat) throws SanityCheckerException {
 		
-		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
+		itsLogger = LogManager.getLogger("Sanity Checker - " + filename);
 		itsLogger.trace("SanityChecker initialised");
 		
 		/*
