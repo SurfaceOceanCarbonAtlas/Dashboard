@@ -4,6 +4,7 @@ The jar file joda-time-2.9.9.jar was obtained from the Joda-Time site http://www
 The jar files:
 	log4j-api-2.81.jar
 	log4j-core-2.8.1.jar
+	log4j-web-2.8.1.jar
 	log4j-slf4j-impl-2.8.1.jar
 were obtained from the Apache Log4j 2 site http://logging.apache.org/log4j/2.x/
 The jar file jdom-2.0.6.jar was obtained from the JDOM site http://www.jdom.org/
