@@ -21,8 +21,8 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -198,9 +198,9 @@ public class DashboardConfigStore {
 		String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator + 
 				"preview" + File.separator;
 
-		// Configure the log4j logger
-		PropertyConfigurator.configure(configAppDir + "log4j.properties");
-		itsLogger = Logger.getLogger(serverAppName);
+		// Configure the log4j2 logger
+		System.setProperty("log4j.configurationFile", configAppDir + "log4j2.properties");
+		itsLogger = LogManager.getLogger(serverAppName);
 
 		// Record configuration files that should be monitored for changes 
 		filesToWatch = new HashSet<File>();

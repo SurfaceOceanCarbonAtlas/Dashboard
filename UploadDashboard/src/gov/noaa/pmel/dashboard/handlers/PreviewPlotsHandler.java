@@ -3,7 +3,8 @@ package gov.noaa.pmel.dashboard.handlers;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -16,6 +17,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 
 public class PreviewPlotsHandler {
 
@@ -137,7 +139,7 @@ public class PreviewPlotsHandler {
 	public void createPreviewPlots(String datasetId, String timetag) 
 										throws IllegalArgumentException {
 		String stdId = DashboardServerUtils.checkDatasetID(datasetId);
-		Logger log = Logger.getLogger("PreviewPlotsHandler");
+		Logger log = LogManager.getLogger("PreviewPlotsHandler");
 		log.debug("reading data for " + stdId);
 
 		// Get the complete original cruise data

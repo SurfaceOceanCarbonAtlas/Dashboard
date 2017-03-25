@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
@@ -51,7 +52,7 @@ public class DatasetSubmitter {
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		filesBundler = configStore.getArchiveFilesBundler();
 		version = configStore.getUploadVersion();
-		logger = Logger.getLogger(getClass());
+		logger = LogManager.getLogger(getClass());
 	}
 
 	/**
