@@ -447,7 +447,7 @@ public class DashboardConfigStore {
 			throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
-		String[] ccEmailAddresses = propVal.trim().split("'");
+		String[] ccEmailAddresses = propVal.trim().split(",");
 		// Read the SMTP server information
 		propVal = configProps.getProperty(SMTP_HOST_ADDRESS_TAG);
 		if ( propVal == null )
