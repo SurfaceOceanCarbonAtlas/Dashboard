@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -43,37 +44,45 @@ public class FixWOCEColumns {
 	 * and the specified WOCE events undone.
 	 */
 	public static void main(String[] args) {
-		if ( (args.length < 3) || (args.length > 4) ) {
+		if ( (args.length < 4) || (args.length > 5) ) {
 			System.err.println();
 			System.err.println("Arguments:  ");
-			System.err.println("    Expocode  DupWOCEColName  UndoWOCEEvent1,UndoWOCEEvent2,...");
+			System.err.println("    Expocode  DupWOCEColName  CO2WaterColNameStart  CO2AtmColNameStart  UndoWOCEEvent1,UndoWOCEEvent2,...");
 			System.err.println("or");
 			System.err.println("    Expocode  WOCEWaterColName  WOCEAtmColName  UndoWOCEEvent1,UndoWOCEEvent2,...");
 			System.err.println();
-			System.err.println("In the first case (three arguments), the duplicate column names and types are changed ");
-			System.err.println("using the previous column names and types, the appropriate WOCE flags added, and the "); 
-			System.err.println("specified WOCE events undone. ");
+			System.err.println("In the first case (five arguments), the duplicated WOCE column names following the ");
+			System.err.println("columns with names starting with CO2WaterColNameStart and CO2AtmColNameStart are changed ");
+			System.err.println("by appending these names.  The types of these columns are changed to the appropriate WOCE ");
+			System.err.println("flag type, these WOCE flags are added as PI-provided WOCE flags, and the specified WOCE ");
+			System.err.println("events undone. ");
 			System.err.println(); 
-			System.err.println("In the second case (four arguments), the column names are already unique but the types ");
-			System.err.println("are assigned using the preivous column types, the appropriate WOCE flags added, and the ");
-			System.err.println("specified WOCE events undone. ");
+			System.err.println("In the second case (four arguments), the WOCE column names are the given unique names. ");
+			System.err.println("The types of these columns are changed to the appropriate WOCE flag type, these WOCE flags ");
+			System.err.println("are added as PI-provided WOCE flags, and the specified WOCE events undone. ");
 			System.err.println();
 			System.exit(1);
 		}
 
 		String expocode = args[0];
 		String dupColName;
+		String co2WaterColNameStart;
+		String co2AtmColNameStart;
 		String woceWaterColName;
 		String woceAtmColName;
 		String[] undoEvents;
-		if ( args.length == 3 ) {
+		if ( args.length == 5 ) {
 			dupColName = args[1];
-			woceWaterColName = null;
-			woceAtmColName = null;
-			undoEvents = args[2].split(",");
+			co2WaterColNameStart = args[2];
+			co2AtmColNameStart = args[3];
+			woceWaterColName = "";
+			woceAtmColName = "";
+			undoEvents = args[4].split(",");
 		}
 		else {
 			dupColName = null;
+			co2WaterColNameStart = null;
+			co2AtmColNameStart = null;
 			woceWaterColName = args[1];
 			woceAtmColName = args[2];
 			undoEvents = args[3].split(",");
@@ -92,8 +101,18 @@ public class FixWOCEColumns {
 		}
 		try {
 
+			KnownDataTypes dataTypes = configStore.getKnownDataFileTypes();
+			DataColumnType woceCO2WaterType = dataTypes.getDataColumnType("WOCE_CO2_water");
+			if ( woceCO2WaterType == null )
+				throw new RuntimeException("WOCE_CO2_water not a recognized data file data column type");
+			DataColumnType woceCO2AtmType = dataTypes.getDataColumnType("WOCE_CO2_atm");
+			if ( woceCO2AtmType == null )
+				throw new RuntimeException("WOCE_CO2_atm not a recognized data file data column type");
+
 			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+
+			String commitMsg = "";
 
 			// If needed, make unique WOCE column names
 			if ( dupColName != null ) {
@@ -103,39 +122,113 @@ public class FixWOCEColumns {
 				// First column name cannot be made unique, and should not be WOCE in this scheme, 
 				// because there is no previous column
 				newUserColNames.add(userColNames.get(0));
-				ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
 				for (int k = 1; k < numCols; k++) {
-					if ( dupColName.equalsIgnoreCase(userColNames.get(k)) ) {
-						if ( ! DashboardUtils.OTHER.typeNameEquals(dataColTypes.get(k)) )
-							throw new IllegalArgumentException("Duplicate name WOCE column type is not OTHER (" + 
-									Integer.toString(k+1) + ", " + dataColTypes.get(k).getDisplayName() + ")\n" +
-									"No changes made to this dataset.");
-						// Make unique name using previous column name
-						newUserColNames.add(dupColName + "_" + userColNames.get(k-1));
-						DataColumnType prevType = dataColTypes.get(k-1);
-						// Check if this is a WOCE on an aqueous or atmospheric CO2 value
-						// TODO:
+					String thisColName = userColNames.get(k);
+					if ( dupColName.equals(thisColName) ) {
+						String prevColName = userColNames.get(k-1);
+						if ( prevColName.startsWith(co2WaterColNameStart) ) {
+							// New unique name for WOCE CO2 water
+							woceWaterColName = dupColName + "_" + co2WaterColNameStart;
+							newUserColNames.add(woceWaterColName);
+							commitMsg += "column " + dupColName + " following " + co2WaterColNameStart + 
+									" changed to " + woceWaterColName + "; ";
+						}
+						else if ( prevColName.startsWith(co2AtmColNameStart) ) {
+							// New unique name for WOCE CO2 atm
+							woceAtmColName = dupColName + "_" + co2AtmColNameStart;
+							newUserColNames.add(woceAtmColName);
+							commitMsg += "column " + dupColName + " following " + co2AtmColNameStart + 
+									" changed to " + woceAtmColName + "; ";
+						}
+						else {
+							// Some other WOCE flag; copy over the existing (duplicate) name
+							newUserColNames.add(thisColName);
+						}
 					}
 					else {
-						// Copy over the existing name and data type
-						newUserColNames.add(userColNames.get(k));
+						// Copy over the existing name
+						newUserColNames.add(thisColName);
 					}
 				}
-				// Update the names and types in the DashboardCruiseWithData object as well as in the files
+				if ( woceWaterColName.isEmpty() && woceAtmColName.isEmpty() )
+					throw new IllegalArgumentException("No duplicated WOCE column names changed\n" +
+							"No changes made to this dataset.");
+
+				// Update the names in the DashboardCruiseWithData object
 				cruiseData.setUserColNames(newUserColNames);
-				String commitMsg = "Renamed WOCE data columns with name " + dupColName + " to make unique names";
-				cruiseHandler.saveCruiseInfoToFile(cruiseData, commitMsg);
-				cruiseHandler.saveCruiseDataToFile(cruiseData, commitMsg);
 			}
 			
-			// Add the WOCE flags given in these columns
-			if ( woceWaterColName != null ) {
-				
+			// Add the WOCE flags given in the named columns
+			if ( ! woceWaterColName.isEmpty() ) {
+				ArrayList<String> userColNames = cruiseData.getUserColNames();
+				ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
+				int numCols = dataColTypes.size();
+				ArrayList<DataColumnType> newDataColTypes = new ArrayList<DataColumnType>(numCols);
+				boolean colFound = false;
+				for (int k = 0; k < numCols; k++) {
+					if ( woceWaterColName.equals(userColNames) ) {
+						// Change to the WOCE CO2 water type
+						if ( ! DashboardUtils.OTHER.typeNameEquals(dataColTypes.get(k)) )
+							throw new IllegalArgumentException("WOCE CO2 water column does not have type OTHER (colNum = " + 
+									Integer.toString(k+1) + ", type = " + dataColTypes.get(k).getDisplayName() + ")\n" +
+									"No changes made to this dataset.");
+						if ( colFound )
+							throw new IllegalArgumentException("More than one WOCE CO2 water column named " + 
+									woceWaterColName + "\nNo changes made to this dataset.");
+						newDataColTypes.add(woceCO2WaterType);
+						colFound = true;
+					}
+					else {
+						// Copy over the existing data type
+						newDataColTypes.add(dataColTypes.get(k));
+					}
+				}
+				if ( ! colFound )
+					throw new IllegalArgumentException("No column found with name " +
+							woceWaterColName + "\nNo changes made to this dataset.");
+				commitMsg += "type of column " + woceWaterColName + " changed to WOCE_CO2_water; ";
+				cruiseData.setDataColTypes(newDataColTypes);
 			}
-			if ( woceAtmColName != null ) {
-				
+			if ( ! woceAtmColName.isEmpty() ) {
+				ArrayList<String> userColNames = cruiseData.getUserColNames();
+				ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
+				int numCols = dataColTypes.size();
+				ArrayList<DataColumnType> newDataColTypes = new ArrayList<DataColumnType>(numCols);
+				boolean colFound = false;
+				for (int k = 0; k < numCols; k++) {
+					if ( woceAtmColName.equals(userColNames) ) {
+						// Change to the WOCE CO2 atm type
+						if ( ! DashboardUtils.OTHER.typeNameEquals(dataColTypes.get(k)) )
+							throw new IllegalArgumentException("WOCE CO2 atm column does not have type OTHER (colNum = " + 
+									Integer.toString(k+1) + ", type = " + dataColTypes.get(k).getDisplayName() + ")\n" +
+									"No changes made to this dataset.");
+						if ( colFound )
+							throw new IllegalArgumentException("More than one WOCE CO2 atm column named " + 
+									woceAtmColName + "\nNo changes made to this dataset.");
+						newDataColTypes.add(woceCO2AtmType);
+						colFound = true;
+					}
+					else {
+						// Copy over the existing data type
+						newDataColTypes.add(dataColTypes.get(k));
+					}
+				}
+				if ( ! colFound )
+					throw new IllegalArgumentException("No column found with name " +
+							woceAtmColName + "\nNo changes made to this dataset.");
+				commitMsg += "type of column " + woceAtmColName + " changed to WOCE_CO2_atm; ";
+				cruiseData.setDataColTypes(newDataColTypes);
 			}
-			
+
+			if ( commitMsg.isEmpty() )
+				throw new IllegalArgumentException("No changes made to this dataset.");
+
+			// Save the new data column names and types to file
+			cruiseHandler.saveCruiseInfoToFile(cruiseData, commitMsg);
+			cruiseHandler.saveCruiseDataToFile(cruiseData, commitMsg);
+
+			// Create WOCE Events for these new WOCE columns
+
 			// Iterate through the WOCE events to update the WOCE flags, skipping the specified events
 			
 		} finally {
