@@ -4,6 +4,7 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -11,6 +12,7 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 /**
  * App to add WOCE flags given in data columns under a possibly duplicate column name.
@@ -44,23 +46,27 @@ public class FixWOCEColumns {
 	 * and the specified WOCE events undone.
 	 */
 	public static void main(String[] args) {
-		if ( (args.length < 4) || (args.length > 5) ) {
+		if ( (args.length < 3) || (args.length > 4) ) {
 			System.err.println();
 			System.err.println("Arguments:  ");
-			System.err.println("    Expocode  DupWOCEColName  CO2WaterColNameStart  CO2AtmColNameStart  UndoWOCEEvent1,UndoWOCEEvent2,...");
+			System.err.println("    Expocode  DupWOCEColName  CO2WaterColNameStart  CO2AtmColNameStart");
 			System.err.println("or");
-			System.err.println("    Expocode  WOCEWaterColName  WOCEAtmColName  UndoWOCEEvent1,UndoWOCEEvent2,...");
+			System.err.println("    Expocode  WOCEWaterColName  WOCEAtmColName");
 			System.err.println();
-			System.err.println("In the first case (five arguments), the duplicated WOCE column names following the ");
-			System.err.println("columns with names starting with CO2WaterColNameStart and CO2AtmColNameStart are changed ");
-			System.err.println("by appending these names.  The types of these columns are changed to the appropriate WOCE ");
-			System.err.println("flag type, these WOCE flags are added as PI-provided WOCE flags, and the specified WOCE ");
-			System.err.println("events undone. ");
+			System.err.println("In the first case (four arguments), duplicate WOCE column names are given by ");
+			System.err.println("the value given by DupWOCEColName.  The names for these columns following the ");
+			System.err.println("columns with names starting with the values given by the CO2WaterColNameStart ");
+			System.err.println("and CO2AtmColNameStart arguments (if not empty) are changed by appending these ");
+			System.err.println("names to the duplicated name.  The types of these columns are changed to the ");
+			System.err.println("appropriate WOCE flag type and these WOCE flags are added as PI-provided WOCE ");
+			System.err.println("flags. ");
 			System.err.println(); 
-			System.err.println("In the second case (four arguments), the WOCE column names are the given unique names. ");
-			System.err.println("The types of these columns are changed to the appropriate WOCE flag type, these WOCE flags ");
-			System.err.println("are added as PI-provided WOCE flags, and the specified WOCE events undone. ");
+			System.err.println("In the second case (three arguments), the WOCE column names are the given ");
+			System.err.println("unique names.  The types of these columns are changed to the appropriate ");
+			System.err.println("WOCE flag type, and these WOCE flags are added as PI-provided WOCE flags. ");
 			System.err.println();
+			System.err.println("In either case, the DSG files need to be updated, using the UpdateWOCEFlags ");
+			System.err.println("program/app.");
 			System.exit(1);
 		}
 
@@ -70,14 +76,12 @@ public class FixWOCEColumns {
 		String co2AtmColNameStart;
 		String woceWaterColName;
 		String woceAtmColName;
-		String[] undoEvents;
 		if ( args.length == 5 ) {
 			dupColName = args[1];
 			co2WaterColNameStart = args[2];
 			co2AtmColNameStart = args[3];
 			woceWaterColName = "";
 			woceAtmColName = "";
-			undoEvents = args[4].split(",");
 		}
 		else {
 			dupColName = null;
@@ -85,7 +89,6 @@ public class FixWOCEColumns {
 			co2AtmColNameStart = null;
 			woceWaterColName = args[1];
 			woceAtmColName = args[2];
-			undoEvents = args[3].split(",");
 		}
 
 		boolean success = true;
@@ -223,13 +226,36 @@ public class FixWOCEColumns {
 			if ( commitMsg.isEmpty() )
 				throw new IllegalArgumentException("No changes made to this dataset.");
 
+			// Assign any user-provided WOCE-3 and WOCE-4 flags
+			TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
+			TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
+			ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
+			int numCols = dataColTypes.size();
+			for (int k = 0; k < numCols; k++) {
+				DataColumnType colType = dataColTypes.get(k);
+				if ( ! colType.isWoceType() )
+					continue;
+				for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
+					try {
+						int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
+						if ( value == 4 )
+							woceFours.add(new WoceType(colType.getVarName(), null, rowIdx));
+						else if ( value == 3 )
+							woceThrees.add(new WoceType(colType.getVarName(), null, rowIdx));
+						// Only handle 3 and 4
+					} catch (NumberFormatException ex) {
+						// Assuming a missing value
+					}
+				}
+			}
+			cruiseData.setUserWoceFours(woceFours);
+			cruiseData.setUserWoceThrees(woceThrees);
+
 			// Save the new data column names and types to file
 			cruiseHandler.saveCruiseInfoToFile(cruiseData, commitMsg);
 			cruiseHandler.saveCruiseDataToFile(cruiseData, commitMsg);
 
-			// Create WOCE Events for these new WOCE columns
-
-			// Iterate through the WOCE events to update the WOCE flags, skipping the specified events
+			// TODO: Create WOCE Events for these new WOCE columns and add to database
 			
 		} finally {
 			DashboardConfigStore.shutdown();
