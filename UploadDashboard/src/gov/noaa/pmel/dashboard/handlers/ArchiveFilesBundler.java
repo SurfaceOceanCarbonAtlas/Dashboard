@@ -51,9 +51,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			"\n" +
 			"As part of submitting dataset ";
 	private static final String EMAIL_MSG_MIDDLE = 
-			" to SOCAT for QC, the SOCAT Upload Dashboard user \n";
+			" to SOCAT for QC, \nthe SOCAT Upload Dashboard user ";
 	private static final String EMAIL_MSG_END = 
-			" has requested immediate archival of the attached data and metadata. \n" +
+			" \nhas requested immediate archival of the attached data and metadata. \n" +
 			"The attached file is a ZIP file of the data and metadata, but \"" + 
 			MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
 			"has been appended to the name for sending as an email attachment. \n" +
