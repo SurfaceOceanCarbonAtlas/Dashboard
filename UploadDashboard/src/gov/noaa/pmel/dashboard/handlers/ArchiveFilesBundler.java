@@ -42,15 +42,20 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
-	private static final String EMAIL_SUBJECT_MSG = 
-			"Request for immediate archival from SOCAT dashboard user ";
+	private static final String EMAIL_SUBJECT_MSG_START = 
+			"Request for immediate archival of dataset ";
+	private static final String EMAIL_SUBJECT_MSG_MIDDLE = 
+			" from SOCAT dashboard user ";
 	private static final String EMAIL_MSG_START =
 			"Dear Archival Team, \n" +
 			"\n" +
-			"As part of submitting a dataset to SOCAT for QC, the SOCAT Upload Dashboard user \n";
+			"As part of submitting dataset ";
+	private static final String EMAIL_MSG_MIDDLE = 
+			" to SOCAT for QC, the SOCAT Upload Dashboard user \n";
 	private static final String EMAIL_MSG_END = 
 			" has requested immediate archival of the attached data and metadata. \n" +
-			"The attached file is a ZIP file of the data and metadata, but \"" + MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
+			"The attached file is a ZIP file of the data and metadata, but \"" + 
+			MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
 			"has been appended to the name for sending as an email attachment. \n" +
 			"\n" +
 			"Best regards, \n" +
@@ -350,7 +355,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 		MimeMessage msg = new MimeMessage(sessn);
 		try {
 			msg.setHeader("X-Mailer", "ArchiveFilesBundler");
-			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
+			msg.setSubject(EMAIL_SUBJECT_MSG_START + upperExpo + 
+					EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
 			msg.setSentDate(new Date());
 			// Set the addresses
 			// Mark as sent from the second cc'd address (the dashboard's);
@@ -361,7 +367,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			msg.setRecipients(Message.RecipientType.CC, ccAddresses);
 			// Create the text message part
 			MimeBodyPart textMsgPart = new MimeBodyPart();
-			textMsgPart.setText(EMAIL_MSG_START + userRealName + EMAIL_MSG_END);
+			textMsgPart.setText(EMAIL_MSG_START + upperExpo + EMAIL_MSG_MIDDLE + userRealName + EMAIL_MSG_END);
 			// Create the attachment message part
 			MimeBodyPart attMsgPart = new MimeBodyPart();
 			attMsgPart.attachFile(bundleFile);
