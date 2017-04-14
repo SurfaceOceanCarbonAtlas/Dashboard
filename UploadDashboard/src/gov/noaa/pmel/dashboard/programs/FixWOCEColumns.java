@@ -83,7 +83,7 @@ public class FixWOCEColumns {
 		String co2AtmColNameStart;
 		String woceWaterColName;
 		String woceAtmColName;
-		if ( args.length == 5 ) {
+		if ( args.length == 4 ) {
 			dupColName = args[1];
 			co2WaterColNameStart = args[2];
 			co2AtmColNameStart = args[3];
