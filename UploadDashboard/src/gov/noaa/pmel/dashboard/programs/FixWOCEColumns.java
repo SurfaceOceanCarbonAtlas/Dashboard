@@ -137,14 +137,18 @@ public class FixWOCEColumns {
 							String prevColName = userColNames.get(k-1);
 							if ( prevColName.startsWith(co2WaterColNameStart) ) {
 								// New unique name for WOCE CO2 water
-								woceWaterColName = dupColName + "_" + co2WaterColNameStart;
+								woceWaterColName = (dupColName + "_" + co2WaterColNameStart)
+													.replaceAll("\\s+", "_")
+													.replaceAll("_+", "_");
 								newUserColNames.add(woceWaterColName);
 								commitMsg += "column " + dupColName + " following " + co2WaterColNameStart + 
 										" changed to " + woceWaterColName + "; ";
 							}
 							else if ( prevColName.startsWith(co2AtmColNameStart) ) {
 								// New unique name for WOCE CO2 atm
-								woceAtmColName = dupColName + "_" + co2AtmColNameStart;
+								woceAtmColName = (dupColName + "_" + co2AtmColNameStart)
+												.replaceAll("\\s+", "_")
+												.replaceAll("_+", "_");
 								newUserColNames.add(woceAtmColName);
 								commitMsg += "column " + dupColName + " following " + co2AtmColNameStart + 
 										" changed to " + woceAtmColName + "; ";
@@ -175,7 +179,7 @@ public class FixWOCEColumns {
 					ArrayList<DataColumnType> newDataColTypes = new ArrayList<DataColumnType>(numCols);
 					boolean colFound = false;
 					for (int k = 0; k < numCols; k++) {
-						if ( woceWaterColName.equals(userColNames) ) {
+						if ( woceWaterColName.equals(userColNames.get(k)) ) {
 							// Change to the WOCE CO2 water type
 							if ( ! DashboardUtils.OTHER.typeNameEquals(dataColTypes.get(k)) )
 								throw new IllegalArgumentException("WOCE CO2 water column does not have type OTHER (colNum = " + 
@@ -205,7 +209,7 @@ public class FixWOCEColumns {
 					ArrayList<DataColumnType> newDataColTypes = new ArrayList<DataColumnType>(numCols);
 					boolean colFound = false;
 					for (int k = 0; k < numCols; k++) {
-						if ( woceAtmColName.equals(userColNames) ) {
+						if ( woceAtmColName.equals(userColNames.get(k)) ) {
 							// Change to the WOCE CO2 atm type
 							if ( ! DashboardUtils.OTHER.typeNameEquals(dataColTypes.get(k)) )
 								throw new IllegalArgumentException("WOCE CO2 atm column does not have type OTHER (colNum = " + 
