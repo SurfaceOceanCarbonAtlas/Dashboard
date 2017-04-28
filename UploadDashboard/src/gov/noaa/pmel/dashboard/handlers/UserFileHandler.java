@@ -461,7 +461,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
 				thisColType = DashboardUtils.UNKNOWN;
-			colTypes.add(thisColType);
+			colTypes.add(thisColType.duplicate());
 		}
 	}
 

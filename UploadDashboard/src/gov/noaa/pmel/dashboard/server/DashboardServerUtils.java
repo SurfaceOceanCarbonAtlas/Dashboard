@@ -110,9 +110,11 @@ public class DashboardServerUtils {
 	 * NODC codes (all upper-case) for Moorings and Fixed Buoys 
 	 */
 	private static final HashSet<String> FIXED_PLATFORM_NODC_CODES = 
-			new HashSet<String>(Arrays.asList("067F", "147F", "187F", "247F", 
-					"267F", "297F", "3119", "3164", "317F", "33GO", "33TT", 
-					"357F", "48MB", "497F", "747F", "767F", "907F", "GH7F"));
+			new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F", 
+					"187F", "18FX", "247F", "24FS", "267F", "26FS", "297F", 
+					"3119", "3164", "317F", "32FS", "33GO", "33TT", "357F", 
+					"48MB", "497F", "49FS", "747F", "74FS", "767F", "77FS", 
+					"907F", "91FS", "GH7F"));
 
 	/**
 	 * NODC codes (all upper-case) for Drifting Buoys 
@@ -198,18 +200,18 @@ public class DashboardServerUtils {
 	 * otherwise it is assumed to be a ship.
 	 * 
 	 * @param expocode
-	 * 		expocode of the dataset
+	 * 		expocode of the dataset; cannot be null
 	 * @param platformName
-	 * 		platform name for the dataset
+	 * 		platform name for the dataset; cannot be null
 	 * @return
 	 * 		one of "Mooring", "Drifting Buoy", or "Ship"
 	 */
 	public static String guessPlatformType(String expocode, String platformName) {
-		if ( "Mooring".equalsIgnoreCase(platformName) )
+		if ( platformName.toUpperCase().contains("MOORING") )
 			return "Mooring";
-		if ( "Drifting Buoy".equalsIgnoreCase(platformName) )
+		if ( platformName.toUpperCase().contains("DRIFTING BUOY") )
 			return "Drifting Buoy";
-		if ( "Bouy".equalsIgnoreCase(platformName) )
+		if ( platformName.toUpperCase().contains("BUOY") )
 			return "Mooring";
 
 		String nodc = expocode.substring(0, 4).toUpperCase();
