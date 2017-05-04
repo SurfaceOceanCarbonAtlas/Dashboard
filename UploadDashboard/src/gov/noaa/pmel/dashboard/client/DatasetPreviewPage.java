@@ -54,7 +54,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 	private static final String SAMPLE_VS_TIME_TAB_TEXT = "sample num vs time";
 
 	private static final String REFRESH_HELP_ADDENDUM = 
-			" -- if plots to not show after awhile, try pressing the '" + REFRESH_TEXT + "' button given below this image.";
+			" -- if plots do not show after awhile, try pressing the '" + REFRESH_TEXT + "' button given below this image.";
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
