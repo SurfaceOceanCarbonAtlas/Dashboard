@@ -75,7 +75,7 @@ public class TimestampConverter extends ValueConverter<String> {
 	}
 
 	private static final Pattern TIMESTAMP_SPLIT_PATTERN = Pattern.compile("[T ]");
-	private static final Pattern DATE_SPLIT_PATTERN = Pattern.compile("[/-, ]+");
+	private static final Pattern DATE_SPLIT_PATTERN = Pattern.compile("[/, -]+");
 	private static final Pattern TIME_SPLIT_PATTERN = Pattern.compile(":");
 
 	private GregorianCalendar utcCalendar;
