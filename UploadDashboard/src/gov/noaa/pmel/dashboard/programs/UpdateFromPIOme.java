@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
@@ -55,6 +56,9 @@ public class UpdateFromPIOme {
 			System.exit(1);
 		}
 
+		Pattern commaPat = Pattern.compile(",");
+		Pattern spacePat = Pattern.compile("[\\s\\.]+");
+
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;
 		try {
@@ -67,8 +71,8 @@ public class UpdateFromPIOme {
 		try {
 
 			MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-			String platformName = null;
-			String platformType = null;
+			String platformName = "";
+			String platformType = "";
 			ArrayList<String> piNames = null;
 			ArrayList<String> piOrgs = null;
 			try {
@@ -86,37 +90,72 @@ public class UpdateFromPIOme {
 				System.exit(1);
 			}
 
+			if ( platformName.startsWith("MS ") || 
+				 platformName.startsWith("MV ") || 
+				 platformName.startsWith("RS ") || 
+				 platformName.startsWith("RV ") ) {
+				platformName = platformName.substring(3);
+			}
+			else if ( platformName.startsWith("M/S ") || 
+					  platformName.startsWith("M/V ") ||
+					  platformName.startsWith("R/S ") ||
+					  platformName.startsWith("R/V ") ) {
+				platformName = platformName.substring(4);
+			}
+			else if ( platformName.startsWith("ARSV ") ) {
+				platformName = platformName.substring(5);
+			}
 			File dashOmeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
 			OmeMetadata dashOme = new OmeMetadata(expocode);
 			try {
 				Document omeDoc = (new SAXBuilder()).build(dashOmeFile);
 				dashOme.assignFromOmeXmlDoc(omeDoc);
-				dashOme.replaceValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
-				dashOme.replaceValue(OmeMetadata.PLATFORM_TYPE_STRING, platformType, -1);
+				if ( ! platformName.isEmpty() ) {
+					System.err.println("Platform name = '" + platformName + "'");
+					dashOme.replaceValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
+				}
+				if ( ! platformType.isEmpty() ) {
+					System.err.println("Platform type = '" + platformType + "'");
+					dashOme.replaceValue(OmeMetadata.PLATFORM_TYPE_STRING, platformType, -1);
+				}
 				dashOme.clearCompositeValueList(OmeMetadata.INVESTIGATOR_COMP_NAME);
 				for (int k = 0; k < piNames.size(); k++) {
 					String last = null;
 					String[] firsts = null;
 					int numFirsts = 0;
-					String[] pieces = piNames.get(k).split(",");
+					System.err.println("PI name = '" + piNames.get(k) + "'");
+					String[] pieces = commaPat.split(piNames.get(k), 2);
 					if ( pieces.length > 1 ) {
-						last = pieces[0];
-						firsts = pieces[1].split("\\s+");
+						last = pieces[0].trim();
+						firsts = spacePat.split(pieces[1].trim());
 						numFirsts = firsts.length;
 					}
 					else {
-						firsts = pieces[0].split("\\s+");
-						numFirsts = pieces.length - 1;
-						last = pieces[numFirsts];
+						firsts = spacePat.split(pieces[0].trim());
+						numFirsts = firsts.length - 1;
+						if ( (numFirsts > 1) && 
+							 ( "van".equalsIgnoreCase(firsts[numFirsts-1]) ||
+							   "von".equalsIgnoreCase(firsts[numFirsts-1]) ) ) {
+							numFirsts--;
+							last = firsts[numFirsts] + " " + firsts[numFirsts+1];
+							
+						}
+						else {
+							last = firsts[numFirsts];
+						}
 					}
 					String lastFI = last + ", ";
 					for (int j = 0; j < numFirsts; j++) {
 						String name = firsts[j];
-						if ( "Dr".equalsIgnoreCase(name) || "Dr.".equalsIgnoreCase(name) ||
-							 "Pf".equalsIgnoreCase(name) || "Pf.".equalsIgnoreCase(name) )
+						if ( name.isEmpty() ||
+							 "Dr".equalsIgnoreCase(name) ||
+							 "Pf".equalsIgnoreCase(name) ||
+							 "Prof".equalsIgnoreCase(name) )
 							continue;
 						lastFI += firsts[j].substring(0, 1) + ".";
 					}
+					System.err.println("Last name and first initial = '" + lastFI + "'");
+					System.err.println("Organization = '" + piOrgs.get(k) + "'");
 					Properties props = new Properties();
 					props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, lastFI);
 					props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, piOrgs.get(k));
