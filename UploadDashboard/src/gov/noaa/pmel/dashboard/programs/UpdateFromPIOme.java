@@ -57,7 +57,9 @@ public class UpdateFromPIOme {
 		}
 
 		Pattern commaPat = Pattern.compile(",");
-		Pattern spacePat = Pattern.compile("[\\s\\.]+");
+		Pattern spdotPat = Pattern.compile("[\\s\\.]+");
+		Pattern punctPat = Pattern.compile("\\p{Punct}+");
+		Pattern spacePat = Pattern.compile("\\s+");
 
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;
@@ -105,6 +107,11 @@ public class UpdateFromPIOme {
 			else if ( platformName.startsWith("ARSV ") ) {
 				platformName = platformName.substring(5);
 			}
+
+			if ( "SAAgulhasII".equals(platformName) ) {
+				platformName = "S.A. Agulhas II";
+			}
+
 			File dashOmeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
 			OmeMetadata dashOme = new OmeMetadata(expocode);
 			try {
@@ -127,11 +134,11 @@ public class UpdateFromPIOme {
 					String[] pieces = commaPat.split(piNames.get(k), 2);
 					if ( pieces.length > 1 ) {
 						last = pieces[0].trim();
-						firsts = spacePat.split(pieces[1].trim());
+						firsts = spdotPat.split(pieces[1].trim());
 						numFirsts = firsts.length;
 					}
 					else {
-						firsts = spacePat.split(pieces[0].trim());
+						firsts = spdotPat.split(pieces[0].trim());
 						numFirsts = firsts.length - 1;
 						if ( (numFirsts > 1) && 
 							 ( "van".equalsIgnoreCase(firsts[numFirsts-1]) ||
@@ -154,11 +161,36 @@ public class UpdateFromPIOme {
 							continue;
 						lastFI += firsts[j].substring(0, 1) + ".";
 					}
+					String org = piOrgs.get(k);
+					if ( "Cooperative Institute for Research in Environmental Sciences/UCB".equals(org) ) {
+						org = "NOAA ESRL CIRES UCB";
+					}
+					else if ( "CSIRO".equals(org) ) {
+						org = "CSIRO Oceans and Atmosphere";
+					}
+					else if ( "CSIR SOCO".equals(org) ) {
+						org = "CSIR SOCCO";
+					}
+					else if ( "Department of Atmospheric and Oceanic Sciences and Institute of Arctic and Alpine Research".equals(org) ) {
+						org = "IAAR University of Colorado";
+					}
+					else if ( "National Institute for Environmental Studie".equals(org) ||
+							  "National Institute for Environmental Studies".equals(org)) {
+						org = "NIES Japan";
+					}
+					else if ( "NOAA/Atlantic Oceanographic & Meteorological Laboratory".equals(org) ) {
+						org = "NOAA AOML";
+					}
+					else {
+						// Replace all punctuation with spaces and remove all extra spaces
+						org = punctPat.matcher(org).replaceAll(" ");
+						org = spacePat.matcher(org).replaceAll(" ").trim();
+					}
 					System.err.println("Last name and first initial = '" + lastFI + "'");
-					System.err.println("Organization = '" + piOrgs.get(k) + "'");
+					System.err.println("Organization = '" + org + "'");
 					Properties props = new Properties();
 					props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, lastFI);
-					props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, piOrgs.get(k));
+					props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, org);
 					dashOme.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
 				}
 			} catch ( Exception ex ) {
