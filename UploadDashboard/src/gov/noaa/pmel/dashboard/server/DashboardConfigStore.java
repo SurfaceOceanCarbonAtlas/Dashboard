@@ -165,10 +165,14 @@ public class DashboardConfigStore {
 	 */
 	private DashboardConfigStore(boolean startMonitors) throws IOException {
 		String baseDir = System.getenv("CATALINA_BASE");
-		if ( baseDir == null )
+		if ( baseDir == null ) {
 			baseDir = System.getProperty("CATALINA_BASE");
-		if ( baseDir == null ) 
+		}
+		if ( baseDir == null ) {
 			throw new IOException("CATALINA_BASE environment variable is not defined");
+		} else {
+			System.out.println("CATALINA_BASE:"+ baseDir);
+		}
 		baseDir += File.separator;
 
 		// First check is UPLOAD_DASHBOARD_SERVER_NAME is defined for alternate configurations 
@@ -193,13 +197,17 @@ public class DashboardConfigStore {
 			if ( serverAppName.isEmpty() )
 				throw new IOException("Unable to obtain the upload dashboard server name");
 		}
-		String configAppDir = baseDir + "content" + File.separator + serverAppName + File.separator + 
-				"config" + File.separator;
+		String appContentDirPath = baseDir + "content" + File.separator + serverAppName + File.separator;
+		String appConfigDirPath = appContentDirPath + "config" + File.separator;
+		File appConfigDir = new File(appConfigDirPath);
+		if ( !appConfigDir.exists() || !appConfigDir.isDirectory() || !appConfigDir.canRead()) {
+			throw new IllegalStateException("Problem with app config dir: " + appConfigDir.getAbsoluteFile());
+		}
 		String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator + 
 				"preview" + File.separator;
 
 		// Configure the log4j2 logger
-		System.setProperty("log4j.configurationFile", configAppDir + "log4j2.properties");
+		System.setProperty("log4j.configurationFile", appConfigDirPath + "log4j2.properties");
 		itsLogger = LogManager.getLogger(serverAppName);
 
 		// Record configuration files that should be monitored for changes 
@@ -207,18 +215,11 @@ public class DashboardConfigStore {
 
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
-		File configFile = new File(configAppDir + serverAppName + ".properties");
+		File configFile = new File(appConfigDir, serverAppName + ".properties");
 		filesToWatch.add(configFile);
-		FileReader reader;
-		try {
-			reader = new FileReader(configFile);
-			try {
-				configProps.load(reader);
-			} finally {
-				reader.close();
-			}
-		}
-		catch ( Exception ex ) {
+		try ( FileReader reader = new FileReader(configFile); ) {
+			configProps.load(reader);
+		} catch ( Exception ex ) {
 			throw new IOException("Problems reading " + configFile.getPath() +
 					"\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -406,7 +407,7 @@ public class DashboardConfigStore {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
+			propVal = getFileProperty(propVal, appConfigDir);
 			userFileHandler = new UserFileHandler(propVal, svnUsername, 
 					svnPassword, colNamesToTypesFilename, knownUserDataTypes);
 		} catch ( Exception ex ) {
@@ -420,7 +421,7 @@ public class DashboardConfigStore {
 			propVal = configProps.getProperty(DATA_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
+			propVal = getFileProperty(propVal, appConfigDir);
 			dataFileHandler = new DataFileHandler(propVal, svnUsername, 
 					svnPassword, knownUserDataTypes);
 			// Put SanityChecker message files in the same directory
@@ -436,7 +437,7 @@ public class DashboardConfigStore {
 			propVal = configProps.getProperty(METADATA_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
+			propVal = getFileProperty(propVal, appConfigDir);
 			metadataFileHandler = new MetadataFileHandler(propVal, svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
@@ -488,7 +489,7 @@ public class DashboardConfigStore {
 			propVal = configProps.getProperty(ARCHIVE_BUNDLES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
+			propVal = getFileProperty(propVal, appConfigDir);
 			archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, 
 					svnPassword, toEmailAddresses, ccEmailAddresses, 
 					smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
@@ -542,7 +543,7 @@ public class DashboardConfigStore {
 			dsgFileDirName = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
 			if ( dsgFileDirName == null )
 				throw new IllegalArgumentException(DSG_NC_FILES_DIR_NAME_TAG + " not defined");
-			dsgFileDirName = dsgFileDirName.trim();
+			dsgFileDirName = getFileProperty(dsgFileDirName, appConfigDir);
 		    itsLogger.info("DSG directory = " + dsgFileDirName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + 
@@ -554,7 +555,7 @@ public class DashboardConfigStore {
 			decDsgFileDirName = configProps.getProperty(DEC_DSG_NC_FILES_DIR_NAME_TAG);
 			if ( decDsgFileDirName == null )
 				throw new IllegalArgumentException(DEC_DSG_NC_FILES_DIR_NAME_TAG + " not defined");
-			decDsgFileDirName = decDsgFileDirName.trim();
+			decDsgFileDirName = getFileProperty(decDsgFileDirName, appConfigDir);
 		    itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG + 
@@ -566,7 +567,7 @@ public class DashboardConfigStore {
 			erddapDsgFlagFileName = configProps.getProperty(ERDDAP_DSG_FLAG_FILE_NAME_TAG);
 			if ( erddapDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			erddapDsgFlagFileName = erddapDsgFlagFileName.trim();
+			erddapDsgFlagFileName = getFileProperty(erddapDsgFlagFileName, appConfigDir);
 		    itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + 
@@ -578,7 +579,7 @@ public class DashboardConfigStore {
 			erddapDecDsgFlagFileName = configProps.getProperty(ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG);
 			if ( erddapDecDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			erddapDecDsgFlagFileName = erddapDecDsgFlagFileName.trim();
+			erddapDecDsgFlagFileName = getFileProperty(erddapDecDsgFlagFileName, appConfigDir);
 		    itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + 
@@ -598,7 +599,7 @@ public class DashboardConfigStore {
 			propVal = configProps.getProperty(DATABASE_CONFIG_FILE_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
+			propVal = getFileProperty(propVal, appConfigDir);
 			filesToWatch.add(new File(propVal));
 			databaseRequestHandler = new DatabaseRequestHandler(propVal);
 		    itsLogger.info("read Database configuration file " + propVal);
@@ -616,7 +617,7 @@ public class DashboardConfigStore {
 				previewDirname + "plots", this);
 
 		// Create the OME XML to PDF generator
-		omePdfGenerator = new OmePdfGenerator(new File(configAppDir), 
+		omePdfGenerator = new OmePdfGenerator(appConfigDir, 
 				metadataFileHandler, dataFileHandler);
 
 		// The DatasetSubmitter uses the various handlers just created
@@ -661,6 +662,27 @@ public class DashboardConfigStore {
 		if ( startMonitors ) {
 			// Watch for changes to the configuration file
 			watchConfigFiles();
+		}
+	}
+
+	private static String getFileProperty(String propVal, File baseDir) {
+		if ( propVal == null || propVal.trim().length() == 0 ) {
+			throw new IllegalArgumentException("Empty or null file path specifier");
+		}
+		String path = propVal.trim();
+		if ( path.startsWith("/")) {
+			return path;
+		} else {
+			File parentDir = baseDir;
+			while ( parentDir != null && path.length() > 0 && path.startsWith("../")) {
+				parentDir = parentDir.getParentFile();
+				path = path.substring(3);
+			}
+			if ( parentDir != null ) {
+				return parentDir.getAbsolutePath() + File.separator + path;
+			} else {
+				throw new IllegalArgumentException("Problem with relative path: " + propVal + " from " + baseDir.getAbsolutePath());
+			}
 		}
 	}
 
