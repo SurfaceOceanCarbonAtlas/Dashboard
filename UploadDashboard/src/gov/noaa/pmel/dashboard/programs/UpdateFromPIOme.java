@@ -61,6 +61,14 @@ public class UpdateFromPIOme {
 		Pattern punctPat = Pattern.compile("\\p{Punct}+");
 		Pattern spacePat = Pattern.compile("\\s+");
 
+		Pattern atmosPat1 = Pattern.compile("Atmosphere");
+		Pattern atmosPat2 = Pattern.compile("Atmospheric");
+		Pattern envPat1   = Pattern.compile("Environmental");
+		Pattern envPat2   = Pattern.compile("Environment");
+		Pattern instPat   = Pattern.compile("Institute");
+		Pattern labPat    = Pattern.compile("Laboratory");
+		Pattern univPat   = Pattern.compile("University");
+
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;
 		try {
@@ -161,18 +169,23 @@ public class UpdateFromPIOme {
 							continue;
 						lastFI += firsts[j].substring(0, 1) + ".";
 					}
+
+					// Clean up the organization name
 					String org = piOrgs.get(k);
 					if ( "Cooperative Institute for Research in Environmental Sciences/UCB".equals(org) ) {
 						org = "NOAA ESRL CIRES UCB";
 					}
 					else if ( "CSIRO".equals(org) ) {
-						org = "CSIRO Oceans and Atmosphere";
+						org = "CSIRO Oceans and Atmos";
 					}
 					else if ( "CSIR SOCO".equals(org) ) {
 						org = "CSIR SOCCO";
 					}
 					else if ( "Department of Atmospheric and Oceanic Sciences and Institute of Arctic and Alpine Research".equals(org) ) {
-						org = "IAAR University of Colorado";
+						org = "IAAR Univ of Colorado";
+					}
+					else if ( "Meteorological Research Institute".equals(org) ) {
+						org = "MRI Japan";
 					}
 					else if ( "National Institute for Environmental Studie".equals(org) ||
 							  "National Institute for Environmental Studies".equals(org)) {
@@ -185,7 +198,16 @@ public class UpdateFromPIOme {
 						// Replace all punctuation with spaces and remove all extra spaces
 						org = punctPat.matcher(org).replaceAll(" ");
 						org = spacePat.matcher(org).replaceAll(" ").trim();
+						// Abbreviate a few common long words
+						org = atmosPat1.matcher(org).replaceAll("Atmos");
+						org = atmosPat2.matcher(org).replaceAll("Atmos");
+						org = envPat1.matcher(org).replaceAll("Env");
+						org = envPat2.matcher(org).replaceAll("Env");
+						org = instPat.matcher(org).replaceAll("Inst");
+						org = labPat.matcher(org).replaceAll("Lab");
+						org = univPat.matcher(org).replaceAll("Univ");
 					}
+
 					System.err.println("Last name and first initial = '" + lastFI + "'");
 					System.err.println("Organization = '" + org + "'");
 					Properties props = new Properties();
