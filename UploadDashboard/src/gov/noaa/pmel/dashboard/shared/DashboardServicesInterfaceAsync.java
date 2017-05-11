@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -294,5 +295,7 @@ public interface DashboardServicesInterfaceAsync {
 	void submitDatasetsForQC(String username, HashSet<String> cruiseExpocodes, 
 			String archiveStatus, String localTimestamp, boolean repeatSend,
 			AsyncCallback<Void> callback);
+
+	void suspendDatasets(String username, Set<String> datasetIds,String localTimestamp, AsyncCallback<Void> callback);
 
 }

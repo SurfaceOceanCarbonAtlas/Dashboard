@@ -5,6 +5,8 @@ package gov.noaa.pmel.dashboard.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -17,6 +19,7 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -83,6 +86,10 @@ public class DatasetListPage extends CompositeWithUsername {
 	private static final String QC_SUBMIT_HOVER_HELP =
 			"submit the selected datasets for quality control assessment";
 
+	private static final String SUSPEND_TEXT = "Suspend Dataset";
+	private static final String SUSPEND_HOVER_HELP =
+			"suspend the selected datasets from quality control assessment to allow updates";
+
 	private static final String REVIEW_TEXT = "Preview Dataset";
 	private static final String REVIEW_HOVER_HELP =
 			"examine various plots of data given in the selected dataset";
@@ -133,6 +140,8 @@ public class DatasetListPage extends CompositeWithUsername {
 			"for dataset preview.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
 			"for submitting for QC and archival.";
+	private static final String FOR_SUSPEND_ERR_END =
+			"for suspension.";
 	private static final String FOR_DELETE_ERR_END = 
 			"for deletion from the system.";
 	private static final String FOR_HIDE_ERR_END = 
@@ -261,6 +270,7 @@ public class DatasetListPage extends CompositeWithUsername {
 	@UiField Button addlDocsButton;
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
+	@UiField Button suspendDatasetButton;
 	@UiField Label firstSeparator;
 	@UiField Button showDatasetButton;
 	@UiField Button hideDatasetButton;
@@ -322,6 +332,9 @@ public class DatasetListPage extends CompositeWithUsername {
 
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
+
+		suspendDatasetButton.setText(SUSPEND_TEXT);
+		suspendDatasetButton.setTitle(SUSPEND_HOVER_HELP);
 
 		showDatasetButton.setText(SHOW_DATASETS_TEXT);
 		showDatasetButton.setTitle(SHOW_DATASETS_HOVER_HELP);
@@ -704,6 +717,25 @@ public class DatasetListPage extends CompositeWithUsername {
 		checkDatasetsForSubmitting();
 	}
 
+	@UiHandler("suspendDatasetButton")
+	void suspendDatasetOnClick(ClickEvent event) {
+		if ( ! getSelectedDatasets(false) ) {
+			UploadDashboard.showMessage(
+					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_SUSPEND_ERR_END);
+			return;
+		}
+		if ( datasetsSet.size() == 0 ) {
+			UploadDashboard.showMessage(
+					NO_DATASET_SELECTED_ERR_START + FOR_SUSPEND_ERR_END);
+			return;
+		}
+		checkSet.clear();
+		checkSet.putAll(datasetsSet);
+		checkSet.setUsername(getUsername());
+		checkDatasetsForSuspension();
+		suspendDatasets();
+	}
+	
 	@UiHandler("deleteButton")
 	void deleteDatasetOnClick(ClickEvent event) {
 		if ( ! getSelectedDatasets(true) ) {
@@ -1568,4 +1600,30 @@ public class DatasetListPage extends CompositeWithUsername {
 		SubmitForQCPage.showPage(checkSet);
 	}
 
+	private void checkDatasetsForSuspension() {
+	}
+	
+	private void suspendDatasets() {
+		String username = getUsername();
+		HashSet<String> datasetIds = new HashSet<String>();
+		for (DashboardDataset ds : checkSet.values()) {
+			datasetIds.add(ds.getDatasetId());
+		}
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
+		UploadDashboard.showWaitCursor();
+		service.suspendDatasets(username, datasetIds, localTimestamp, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				String errMsg = "There was a problem suspending the datasets: " + caught.getMessage();
+				UploadDashboard.showMessage(errMsg);
+				UploadDashboard.showAutoCursor();
+			}
+			@Override
+			public void onSuccess(Void result) {
+				DatasetListPage.showPage();
+				UploadDashboard.showAutoCursor();
+			}
+		});
+		
+	}
 }

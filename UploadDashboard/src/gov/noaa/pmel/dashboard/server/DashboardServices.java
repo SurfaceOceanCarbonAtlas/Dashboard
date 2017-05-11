@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -517,4 +519,22 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				" submitted by " + username);
 	}
 
+	@Override
+	public void suspendDatasets(String pageUsername, Set<String> idsSet, String timestamp) throws IllegalArgumentException {
+		LogManager.getLogger("DashboardServices").debug("Suspending dataset ids " + idsSet);
+		// Get the dashboard data store and current username, and validate that username
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
+
+		if ( new Random().nextBoolean()) {
+			throw new IllegalArgumentException("Random problem");
+		} 
+		for (String datasetId : idsSet) {
+			String message = "Suspending dataset " + datasetId;
+			DataFileHandler df = configStore.getDataFileHandler();
+			DashboardDataset ds = df.getDatasetFromInfoFile(datasetId);
+			ds.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
+			df.saveDatasetInfoToFile(ds, message);
+		}
+	}
 }

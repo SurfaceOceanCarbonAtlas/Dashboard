@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -305,4 +306,6 @@ public interface DashboardServicesInterface extends RemoteService {
 			String archiveStatus, String localTimestamp, boolean repeatSend)
 					throws IllegalArgumentException;
 
+	void suspendDatasets(String username, Set<String> datasetIds, String localTimestamp)
+					throws IllegalArgumentException;
 }

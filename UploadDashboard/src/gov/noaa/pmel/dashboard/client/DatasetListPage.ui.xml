@@ -23,6 +23,7 @@
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addlDocsButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="reviewButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="qcSubmitButton" />
+						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="suspendDatasetButton" />
 						<g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="firstSeparator" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="showDatasetButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="hideDatasetButton" />
