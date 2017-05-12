@@ -237,6 +237,14 @@ public class CruiseSubmitter {
 					logger.debug("Generating the full-data DSG file for " + expocode);
 					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
 
+					// Pause a bit to make sure the OS is done with the full-data DSG file.
+					// (Guessing at the cause of a very rare error message.)
+					try {
+						Thread.sleep(100);
+					} catch ( Exception ex ) {
+						; // Ignore
+					}
+
 					// Generate the decimated-data DSG file from the full-data DSG file
 					logger.debug("Generating the decimated-data DSG file for " + expocode);
 					dsgNcHandler.decimateCruise(expocode);
