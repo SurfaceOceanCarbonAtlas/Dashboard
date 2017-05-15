@@ -252,14 +252,22 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		HashSet<String> usedOrganizations = new HashSet<String>();
 		StringBuffer orgGroup = new StringBuffer();
 		for ( String org : omeMData.getOrganizations() ) {
-			if ( (null != org) && usedOrganizations.add(org) ) {
+			if ( org == null )
+				continue;
+			org = org.trim();
+			if ( org.isEmpty() )
+				continue;
+			if ( usedOrganizations.add(org) ) {
 				if ( orgGroup.length() > 0 )
 					orgGroup.append(NAMES_SEPARATOR);
 				// Anglicize organizations names for NetCDF/LAS
 				orgGroup.append(anglicizeName(org));
 			}
 		}
-		scMData.setOrganizationName(orgGroup.toString());
+		String allOrgs = orgGroup.toString().trim();
+		if ( allOrgs.isEmpty() )
+			allOrgs = "(not assigned)";
+		scMData.setOrganizationName(allOrgs);
 
 		return scMData;
 	}
