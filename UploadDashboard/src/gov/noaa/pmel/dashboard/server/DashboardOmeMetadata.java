@@ -266,7 +266,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		}
 		String allOrgs = orgGroup.toString().trim();
 		if ( allOrgs.isEmpty() )
-			allOrgs = "(not assigned)";
+			allOrgs = "unassigned";
 		scMData.setOrganizationName(allOrgs);
 
 		return scMData;
