@@ -843,7 +843,30 @@ public class OmeMetadata {
 			storeValue(name, value, lineCount);
 		}
 	}
-	
+
+	/**
+	 * Clears the line of composite variables
+	 * 
+	 * @param name
+	 * 		name of the composite variables list to clear
+	 * @throws OmeMetadataException
+	 * 		if the composite variables list name is not recognized
+	 */
+	public void clearCompositeValueList(String name) throws OmeMetadataException {
+		if (name.equalsIgnoreCase(INVESTIGATOR_COMP_NAME)) {
+			investigators.clear();
+		}
+		else if (name.equalsIgnoreCase(VARIABLE_COMP_NAME)) {
+			variablesInfo.clear();
+		}
+		else if (name.equalsIgnoreCase(OTHER_SENSOR_COMP_NAME)) {
+			otherSensors.clear();
+		}
+		else {
+			throw new OmeMetadataException(-1, "Unrecognized composite entry '" + name + "'");
+		}
+	}
+
 	public void storeCompositeValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException, InvalidConflictException {
 		
 		OMECompositeVariable compositeVar = null;
