@@ -249,14 +249,22 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		HashSet<String> usedOrganizations = new HashSet<String>();
 		StringBuffer orgGroup = new StringBuffer();
 		for ( String org : omeMData.getOrganizations() ) {
-			if ( (null != org) && usedOrganizations.add(org) ) {
+			if ( org == null )
+				continue;
+			org = org.trim();
+			if ( org.isEmpty() )
+				continue;
+			if ( usedOrganizations.add(org) ) {
 				if ( orgGroup.length() > 0 )
 					orgGroup.append(NAMES_SEPARATOR);
 				// Anglicize organizations names for NetCDF/LAS
 				orgGroup.append(anglicizeName(org));
 			}
 		}
-		scMData.setOrganizationName(orgGroup.toString());
+		String allOrgs = orgGroup.toString().trim();
+		if ( allOrgs.isEmpty() )
+			allOrgs = "unassigned";
+		scMData.setOrganizationName(allOrgs);
 
 		return scMData;
 	}
@@ -703,6 +711,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		PI_NAME_CORRECTIONS.put("Jutterstroem, S.", "Jutterstr" + oUmlaut + "m, S.");
 		PI_NAME_CORRECTIONS.put("Koertzinger, A.", "K" + oUmlaut + "rtzinger, A.");
 		PI_NAME_CORRECTIONS.put("Lefevre, N.", "Lef" + eGrave + "vre, N.");
+		PI_NAME_CORRECTIONS.put("Olafsdottir, S.", OAcute + "lafsd" + oAcute + "ttir, S.");
+		PI_NAME_CORRECTIONS.put("Olafsson, J.", OAcute + "lafsson, J.");
 		PI_NAME_CORRECTIONS.put("Perez, F.F.", "P" + eAcute + "rez, F.F.");
 		PI_NAME_CORRECTIONS.put("Rios, A.F.", "R" + iAcute + "os, A.F.");
 		PI_NAME_CORRECTIONS.put("Treguer, P.", "Tr" + eAcute + "guer, P.");
