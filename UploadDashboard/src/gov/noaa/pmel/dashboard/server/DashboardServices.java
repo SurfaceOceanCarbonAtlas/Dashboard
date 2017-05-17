@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -526,9 +525,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		if ( new Random().nextBoolean()) {
-			throw new IllegalArgumentException("Random problem");
-		} 
 		for (String datasetId : idsSet) {
 			String message = "Suspending dataset " + datasetId;
 			DataFileHandler df = configStore.getDataFileHandler();
