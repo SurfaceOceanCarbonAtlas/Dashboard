@@ -118,6 +118,15 @@ public class RegenerateDsgs {
 				throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " + 
 							stdId + ": " + ex.getMessage());
 			}
+
+			// Pause a bit to make sure the OS is done with the full-data DSG file.
+			// (Guessing at the cause of a very rare error message.)
+			try {
+				Thread.sleep(100);
+			} catch ( Exception ex ) {
+				; // Ignore
+			}
+
 			try {
 				// Regenerate the decimated-data DSG file 
 				dsgHandler.decimateDatasetDsg(stdId);
