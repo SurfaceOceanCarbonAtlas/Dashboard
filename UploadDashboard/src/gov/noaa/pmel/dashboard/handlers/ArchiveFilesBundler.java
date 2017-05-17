@@ -43,17 +43,17 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
 	private static final String EMAIL_SUBJECT_MSG_START = 
-			"Request for immediate archival of dataset ";
+			"Request for OCADS archival of dataset ";
 	private static final String EMAIL_SUBJECT_MSG_MIDDLE = 
 			" from SOCAT dashboard user ";
 	private static final String EMAIL_MSG_START =
-			"Dear Archival Team, \n" +
+			"Dear OCADS Archival Team, \n" +
 			"\n" +
 			"As part of submitting dataset ";
 	private static final String EMAIL_MSG_MIDDLE = 
 			" to SOCAT for QC, \nthe SOCAT Upload Dashboard user ";
 	private static final String EMAIL_MSG_END = 
-			" \nhas requested immediate archival of the attached data and metadata. \n" +
+			" \nhas requested immediate OCADS archival of the attached data and metadata. \n" +
 			"The attached file is a ZIP file of the data and metadata, but \"" + 
 			MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
 			"has been appended to the name for sending as an email attachment. \n" +
