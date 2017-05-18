@@ -8,9 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -25,11 +29,12 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.RawUploadFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
+import sun.security.action.GetLongAction;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
@@ -194,6 +199,7 @@ public class DataUploadService extends HttpServlet {
 		}
 
 		DataFileHandler datasetHandler = configStore.getDataFileHandler();
+		RawUploadFileHandler rawFileHandler = configStore.getRawUploadFileHandler();
 
 		// List of all messages to be returned to the client
 		ArrayList<String> messages = new ArrayList<String>(datafiles.size());
@@ -201,18 +207,15 @@ public class DataUploadService extends HttpServlet {
 		// Set of IDs for successfully processed datasets
 		TreeSet<String> successes = new TreeSet<String>();
 
+		// create the directory to hold uploads now, in case there are multiple files in the upload.
+		File rawUploadsDir = rawFileHandler.createUploadTargetDir(username);
+		
 		for ( FileItem item : datafiles ) {
 			// Get the datasets from this file
 			TreeMap<String,DashboardDatasetData> datasetsMap;
 			String filename = item.getName();
-			try {
-				BufferedReader cruiseReader = new BufferedReader(
-						new InputStreamReader(item.getInputStream(), encoding));
-				try {
-					datasetsMap = datasetHandler.createDatasetsFromInput(cruiseReader, dataFormat, username, filename, timestamp);
-				} finally {
-					cruiseReader.close();
-				}
+			try ( BufferedReader cruiseReader = new BufferedReader( new InputStreamReader(item.getInputStream(), encoding)); ) {
+				datasetsMap = datasetHandler.createDatasetsFromInput(cruiseReader, dataFormat, username, filename, timestamp);
 			} catch (Exception ex) {
 				// Mark as a failed file, and go on to the next
 				messages.add(DashboardUtils.INVALID_FILE_HEADER_TAG + " " + filename);
@@ -222,6 +225,13 @@ public class DataUploadService extends HttpServlet {
 				continue;
 			}
 
+			try {
+				rawFileHandler.writeItem(item, rawUploadsDir);
+			} catch (Exception ex) {
+				// TODO: log error, notify admin?
+				ex.printStackTrace();
+			}
+			
 			// done with the uploaded data file
 			item.delete();
 

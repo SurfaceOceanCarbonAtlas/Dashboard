@@ -44,6 +44,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
+import gov.noaa.pmel.dashboard.handlers.RawUploadFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -62,6 +63,7 @@ public class DashboardConfigStore {
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String DATA_FILES_DIR_NAME_TAG = "DataFilesDir";
+	private static final String RAW_UPLOAD_FILES_DIR_NAME_TAG = "UploadFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
@@ -130,6 +132,7 @@ public class DashboardConfigStore {
 	private String qcVersion;
 	private UserFileHandler userFileHandler;
 	private DataFileHandler dataFileHandler;
+	private RawUploadFileHandler rawUploadFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private ArchiveFilesBundler archiveFilesBundler;
@@ -404,6 +407,16 @@ public class DashboardConfigStore {
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		
+		// Read the raw upload files directory name
+		try {
+			propVal = getFilePathProperty(configProps, RAW_UPLOAD_FILES_DIR_NAME_TAG, appConfigDir);
+			rawUploadFileHandler = new RawUploadFileHandler(propVal, svnUsername, svnPassword);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + RAW_UPLOAD_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -826,6 +839,14 @@ public class DashboardConfigStore {
 	 */
 	public DataFileHandler getDataFileHandler() {
 		return dataFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the handler for the raw upload files
+	 */
+	public RawUploadFileHandler getRawUploadFileHandler() {
+		return rawUploadFileHandler;
 	}
 
 	/**
