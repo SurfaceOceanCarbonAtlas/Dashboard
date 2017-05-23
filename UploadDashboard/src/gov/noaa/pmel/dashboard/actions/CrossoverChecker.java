@@ -15,7 +15,9 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 /**
- * Checks for crossovers between cruises.
+ * Checks for high-quality crossovers between datasets.  High-quality crossovers 
+ * are desirable coincidental near-overlaps of location, time, and some other 
+ * properties found in datasets from different platforms (different NODC codes).
  * 
  * @author Karl Smith
  */
