@@ -4,6 +4,7 @@
 package gov.noaa.pmel.dashboard.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -18,16 +19,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Overlap implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 3781721342737853060L;
+	private static final long serialVersionUID = 4148025909328008687L;
 
 	protected String[] expocodes;
-	protected Integer[][] rowNums;
-	protected Double[] lons;
-	protected Double[] lats;
-	protected Long[] times;
+	protected ArrayList<Integer>[] rowNums;
+	protected ArrayList<Double> lons;
+	protected ArrayList<Double> lats;
+	protected ArrayList<Long> times;
 
 	/**
-	 * Creates an crossover with no information (all null).
+	 * Creates an crossover with no information (all empty).
 	 */
 	public Overlap() {
 		setExpocodes(null);
@@ -39,7 +40,7 @@ public class Overlap implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the two expocodes of the crossover cruises; always 
+	 * 		the two expocodes of the overlapping datasets; always 
 	 * 		an array of two Strings, but each String may be null. 
 	 * 		The actual array in this instance is returned. 
 	 */
@@ -49,7 +50,7 @@ public class Overlap implements Serializable, IsSerializable {
 
 	/**
 	 * @param expocodes
-	 * 		the two expocodes of the crossover cruises to set. 
+	 * 		the two expocodes of the overlapping datasets to set. 
 	 * 		If null, an array of two nulls is assigned; otherwise 
 	 * 		an array of two Strings must be given. 
 	 */
@@ -68,114 +69,137 @@ public class Overlap implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the dataset row numbers (starts with one) of the overlap; 
-	 * 		always an array of two Integer arrays, but the Integer arrays 
+	 * 		always an array of two ArrayLists, but the ArrayLists 
 	 * 		may be empty.  The actual array in this instance is returned. 
 	 */
-	public Integer[][] getRowNums() {
+	public ArrayList<Integer>[] getRowNums() {
 		return rowNums;
 	}
 
 	/**
 	 * @param rowNums
 	 * 		the dataset row numbers (starts with one) of the overlap. 
-	 * 		If null, an array of two empty arrays is assigned; otherwise an 
-	 * 		array of two Integer arrays of the same length must be given. 
+	 * 		If null, an array of two empty ArrayLists is assigned; 
+	 * 		otherwise an array of two Integer ArrayLists of the same length must be given. 
 	 */
-	public void setRowNums(Integer[][] rowNums) {
+	@SuppressWarnings("unchecked")
+	public void setRowNums(ArrayList<Integer>[] rowNums) {
 		if ( rowNums == null ) {
-			this.rowNums = new Integer[][] { new Integer[0], new Integer[0] };
+			this.rowNums = new ArrayList[] { new ArrayList<Integer>(), new ArrayList<Integer>() };
 		}
 		else {
 			if ( rowNums.length != 2 )
 				throw new IllegalArgumentException("rowNums array not length 2");
-			int numRows = rowNums[0].length;
-			if ( rowNums[1].length != numRows )
+			if ( rowNums[0].size() != rowNums[1].size() )
 				throw new IllegalArgumentException("rowNums arrays not same length");
-			this.rowNums[0] = rowNums[0].clone();
-			this.rowNums[1] = rowNums[1].clone();
+			this.rowNums[0] = new ArrayList<Integer>(rowNums[0]);
+			this.rowNums[1] = new ArrayList<Integer>(rowNums[1]);
 		}
 	}
 
 	/**
 	 * @return
 	 * 		the longitudes of the overlap; never null but may be empty. 
-	 * 		The actual array in this instance is returned.
+	 * 		The actual ArrayList in this instance is returned.
 	 */
-	public Double[] getLons() {
+	public ArrayList<Double> getLons() {
 		return lons;
 	}
 
 	/**
 	 * @param lons
 	 * 		the longitudes of the overlap to set. 
-	 * 		If null, an empty array is assigned.
+	 * 		If null, an empty ArrayList is assigned.
 	 */
-	public void setLons(Double[] lons) {
+	public void setLons(ArrayList<Double> lons) {
 		if ( lons == null ) {
-			this.lons = new Double[0];
+			this.lons = new ArrayList<Double>();
 		}
 		else {
-			this.lons = lons.clone();
+			this.lons = new ArrayList<Double>(lons);
 		}
 	}
 
 	/**
 	 * @return
 	 * 		the latitudes of the overlap; never null but may be empty. 
-	 * 		The actual array in this instance is returned.
+	 * 		The actual ArrayList in this instance is returned.
 	 */
-	public Double[] getLats() {
+	public ArrayList<Double> getLats() {
 		return lats;
 	}
 
 	/**
 	 * @param lats
 	 * 		the latitudes of the overlap to set.
-	 * 		If null, an empty array is assigned.
+	 * 		If null, an empty ArrayList is assigned.
 	 */
-	public void setLats(Double[] lats) {
+	public void setLats(ArrayList<Double> lats) {
 		if ( lats == null ) {
-			this.lats = new Double[0];
+			this.lats = new ArrayList<Double>();
 		}
 		else {
-			this.lats = lats.clone();
+			this.lats = new ArrayList<Double>(lats);
 		}
 	}
 
 	/**
 	 * @return
-	 * 		the times, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		the times, in seconds since 1 JAN 1970 00:00:00, 
 	 * 		of the overlap; never null but may be empty.
-	 * 		The actual array in this instance is returned.
+	 * 		The actual ArrayList in this instance is returned.
 	 */
-	public Long[] getTimes() {
+	public ArrayList<Long> getTimes() {
 		return times;
 	}
 
 	/**
 	 * @param times
-	 * 		the times, in seconds with Jan 1, 1970 00:00:00, 
-	 * 		of the overlap to set.  If null, an empty array assigned.
+	 * 		the times, in seconds since 1 JAN 1970 00:00:00, 
+	 * 		of the overlap to set.  If null, an empty ArrayList assigned.
 	 */
-	public void setTimes(Long[] times) {
+	public void setTimes(ArrayList<Long> times) {
 		if ( times == null ) {
-			this.times = new Long[0];
+			this.times = new ArrayList<Long>();
 		}
 		else {
-			this.times = times.clone();
+			this.times = new ArrayList<Long>(times);
 		}
+	}
+
+	/**
+	 * Adds the given duplicated data point to this overlap.
+	 * 
+	 * @param firstRowNum
+	 * 		row number (starts with one) of the overlap data point in the first dataset
+	 * @param secondRowNum
+	 * 		row number (starts with one) of the overlap data point in the second dataset
+	 * @param longitude
+	 * 		longitude of the overlap data point in the datasets
+	 * @param latitude
+	 * 		latitude of the overlap data point in the datasets
+	 * @param time
+	 * 		time, in seconds since 1 JAN 1970 00:00:00, of the overlap data point in the datasets
+	 */
+	public void addDuplicatePoint(int firstRowNum, int secondRowNum, 
+			double longitude, double latitude, double time) {
+		rowNums[0].add(firstRowNum);
+		rowNums[1].add(secondRowNum);
+		lons.add(longitude);
+		lats.add(latitude);
+		times.add(Math.round(time));
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = Arrays.deepHashCode(expocodes);
-		result = prime * result + Arrays.deepHashCode(rowNums);
-		result = prime * result + Arrays.deepHashCode(times);
+		int result = Arrays.hashCode(expocodes);
+		result = prime * result + Arrays.hashCode(rowNums);
+		result = prime * result + times.hashCode();
 		// Do not include floating point values, as they do not have to be exact to match
 		// but do include the number of floating point values as those do have to match
-		result = prime * result + Integer.hashCode(lats.length);
-		result = prime * result + Integer.hashCode(lons.length);
+		result = prime * result + Integer.hashCode(lats.size());
+		result = prime * result + Integer.hashCode(lons.size());
 
 		return result;
 	}
@@ -194,27 +218,27 @@ public class Overlap implements Serializable, IsSerializable {
 
 		Overlap other = (Overlap) obj;
 
-		if ( ! Arrays.deepEquals(expocodes, other.expocodes) )
+		if ( ! Arrays.equals(expocodes, other.expocodes) )
 			return false;
-		if ( ! Arrays.deepEquals(rowNums, other.rowNums) )
+		if ( ! Arrays.equals(rowNums, other.rowNums) )
 			return false;
-		if ( ! Arrays.deepEquals(times, other.times) )
-			return false;
-
-		if ( lats.length != other.lats.length )
-			return false;
-		if ( lons.length != other.lons.length )
+		if ( ! times.equals(other.times) )
 			return false;
 
-		for (int k = 0; k < lats.length; k++) {
-			if ( ! DashboardUtils.closeTo(lats[k], other.lats[k], 
+		if ( lats.size() != other.lats.size() )
+			return false;
+		if ( lons.size() != other.lons.size() )
+			return false;
+
+		for (int k = 0; k < lats.size(); k++) {
+			if ( ! DashboardUtils.closeTo(lats.get(k), other.lats.get(k), 
 					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 				return false;
 			}
 		}
 
-		for (int k = 0; k < lons.length; k++) {
-			if ( ! DashboardUtils.longitudeCloseTo(lons[k], other.lons[k], 
+		for (int k = 0; k < lons.size(); k++) {
+			if ( ! DashboardUtils.longitudeCloseTo(lons.get(k), other.lons.get(k), 
 					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 				return false;
 			}			
@@ -228,9 +252,9 @@ public class Overlap implements Serializable, IsSerializable {
 		return "Overlap" + 
 				"[ expocodes=" + Arrays.toString(expocodes) + 
 				", rowNums=" + Arrays.toString(rowNums) + 
-				", lons=" + Arrays.toString(lons) + 
-				", lats=" + Arrays.toString(lats) + 
-				", times=" +Arrays.toString(times) + 
+				", lons=" + lons.toString() + 
+				", lats=" + lats.toString() + 
+				", times=" + times.toString() + 
 				"]";
 	}
 
