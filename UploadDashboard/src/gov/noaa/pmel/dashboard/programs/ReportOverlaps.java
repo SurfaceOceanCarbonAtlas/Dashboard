@@ -5,7 +5,11 @@ package gov.noaa.pmel.dashboard.programs;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -72,6 +76,9 @@ public class ReportOverlaps {
 			ex.printStackTrace();
 			System.exit(1);
 		}
+
+		SimpleDateFormat dateFmtr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		dateFmtr.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		DashboardConfigStore configStore = null;
 		try {
@@ -150,13 +157,13 @@ public class ReportOverlaps {
 					}
 					// Check that there is some overlap in time
 					double[] secondTimeMinMax = timeMinMaxMap.get(secondExpo);
-					if ( (firstTimeMinMax[1] + OverlapChecker.MAX_DIFF < secondTimeMinMax[0]) ||
-						 (secondTimeMinMax[1] + OverlapChecker.MAX_DIFF < firstTimeMinMax[0]) )
+					if ( (firstTimeMinMax[1] + OverlapChecker.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
+						 (secondTimeMinMax[1] + OverlapChecker.MAX_TIME_DIFF < firstTimeMinMax[0]) )
 						continue;
 					// Check that there is some overlap in latitude
 					double[] secondLatMinMax = latMinMaxMap.get(secondExpo);
-					if ( (firstLatMinMax[1] + OverlapChecker.MAX_DIFF < secondLatMinMax[0]) ||
-						 (secondLatMinMax[1] + OverlapChecker.MAX_DIFF < firstLatMinMax[0]) )
+					if ( (firstLatMinMax[1] + OverlapChecker.MAX_LONLAT_DIFF < secondLatMinMax[0]) ||
+						 (secondLatMinMax[1] + OverlapChecker.MAX_LONLAT_DIFF < firstLatMinMax[0]) )
 						continue;
 					checkExpos.add(secondExpo);
 				}
@@ -164,9 +171,30 @@ public class ReportOverlaps {
 				// Find any overlaps with this data set with the selected set of data sets
 				try {
 					for ( Overlap oerlap : oerlapChecker.getOverlaps(firstExpo, checkExpos, System.err, startTime)  ) {
-						System.err.println(oerlap.toString());
+						String[] expos = oerlap.getExpocodes();
+						if ( expos[0].equals(expos[1]) ) {
+							System.out.print("InternalOverlap[ expocode=" + expos[0]);
+						}
+						else {
+							System.out.print("Overlap[ expocodes=[" + expos[0] + ", " + expos[1] + "]");
+						}
+						ArrayList<Double> times = oerlap.getTimes();
+						System.out.print(", numRows=" + Integer.toString(times.size()));
+						System.out.print(", rowNums=" + Arrays.toString(oerlap.getRowNums())); 
+						System.out.print(", lons=" + oerlap.getLons().toString());
+						System.out.print(", lats=" + oerlap.getLats().toString());
+						System.out.print(", times=[");
+						boolean first = true;
+						for ( Double tval : times ) {
+							if ( first )
+								first = false;
+							else
+								System.out.print(", ");
+							System.out.print(dateFmtr.format(new Date(Math.round(tval * 1000.0))));
+						}
+						System.out.println("] ]");
 					}
-					System.err.flush();
+					System.out.flush();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					System.exit(1);

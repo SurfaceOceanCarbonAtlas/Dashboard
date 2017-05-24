@@ -24,7 +24,12 @@ import gov.noaa.pmel.dashboard.shared.Overlap;
  */
 public class OverlapChecker {
 
-	public static final double MAX_DIFF = 1.0E-3;
+	/** Time difference, in seconds, for two values to be considered different */
+	public static final double MAX_TIME_DIFF = 1.0;
+	/** Longitude or latitude difference, in degrees, for two value to be considered different */
+	public static final double MAX_LONLAT_DIFF = 0.01;
+	/** Cutoff time window, in seconds, for still considering data points */
+	public static final double TIME_WINDOW = 86400.0;
 
 	private DsgNcFileHandler dsgHandler;
 
@@ -238,26 +243,28 @@ public class OverlapChecker {
 						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
 
-				if ( times[1][k] >= times[0][j] + MAX_DIFF ) {
+				if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {
 					/* 
-					 * The rest of the second dataset occurred 
-					 * later than the point of first dataset.  
-					 * Go on to the next point of the first dataset.
+					 * The rest of the second dataset occurred much later than 
+					 * the point of first dataset, allowing for some disorder 
+					 * in time.  Go on to the next point of the first dataset.
 					 */
 					 break;
 				}
-				if ( times[1][k] <= times[0][j] - MAX_DIFF ) {
+				if ( times[1][k] <= times[0][j] - TIME_WINDOW ) {
 					/* 
-					 * The point of the second dataset occurred earlier than the point of 
-					 * the first dataset.  Go on to the next point of the second dataset, 
-					 * and mark that as the next start point for the second dataset. 
+					 * The point of the second dataset occurred much earlier than 
+					 * the point of the first dataset, allowing for some disorder
+					 * in time.  Update the start point for the second dataset and 
+					 * go on to the next point of the second dataset. 
 					 */
 					kStart = k + 1;
 					continue;
 				}
 
-				if ( DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MAX_DIFF) &&
-					 DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MAX_DIFF) ) {
+				if ( DashboardUtils.closeTo(times[0][j],  times[1][k],  0.0, MAX_TIME_DIFF) &&
+					 DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MAX_LONLAT_DIFF) &&
+					 DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MAX_LONLAT_DIFF) ) {
 					oerlap.addDuplicatePoint(j+1, k+1, longitudes[0][j], latitudes[0][j], times[0][j]);	
 				}
 			}
