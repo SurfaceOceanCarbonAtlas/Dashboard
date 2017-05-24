@@ -28,7 +28,7 @@ public class OverlapTest {
 	private static final ArrayList<Integer> secondRowNums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
 	private static final ArrayList<Double> lons = new ArrayList<Double>(Arrays.asList(125.25, 125.50, 125.75, 126.00, 126.25));
 	private static final ArrayList<Double> lats = new ArrayList<Double>(Arrays.asList(45.35, 45.30, 45.25, 45.30, 45.35));
-	private static final ArrayList<Long> times = new ArrayList<Long>(Arrays.asList(987654321L, 987754321L, 987854321L, 987954321L, 988054321L));
+	private static final ArrayList<Double> times = new ArrayList<Double>(Arrays.asList(987654321.0, 987754321.0, 987854321.0, 987954321.0, 988054321.0));
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getExpocodes} and 
@@ -42,7 +42,7 @@ public class OverlapTest {
 		assertNull(expos[0]);
 		assertNull(expos[1]);
 
-		olap.setExpocodes(new String[] {firstExpo, secondExpo});
+		olap.setExpocodes(new String[] { firstExpo, secondExpo });
 		expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
 		assertEquals(firstExpo, expos[0]);
@@ -154,7 +154,7 @@ public class OverlapTest {
 	@Test
 	public void testGetSetTimes() {
 		Overlap olap = new Overlap();
-		ArrayList<Long> mytimes = olap.getTimes();
+		ArrayList<Double> mytimes = olap.getTimes();
 		assertEquals(0, mytimes.size());
 
 		olap.setTimes(times);
@@ -198,10 +198,10 @@ public class OverlapTest {
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 
-		first.setExpocodes(new String[] {firstExpo, secondExpo});
+		first.setExpocodes(new String[] { firstExpo, secondExpo });
 		assertFalse( first.hashCode() == second.hashCode());
 		assertFalse( first.equals(second) );
-		second.setExpocodes(new String[] {firstExpo, secondExpo});
+		second.setExpocodes(new String[] { firstExpo, secondExpo });
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 
@@ -238,19 +238,19 @@ public class OverlapTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#addDuplicatePoint}
+	 * and {@link gov.noaa.pmel.dashboard.shared.Overlap#Overlap(String, String)}
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAddDuplicatePoint() {
 		Overlap first = new Overlap();
-		first.setExpocodes(new String[] {firstExpo, secondExpo});
+		first.setExpocodes(new String[] { firstExpo, secondExpo });
 		first.setRowNums(new ArrayList[] { firstRowNums, secondRowNums });
 		first.setLats(lats);
 		first.setLons(lons);
 		first.setTimes(times);
 
-		Overlap second = new Overlap();
-		second.setExpocodes(new String[] {firstExpo, secondExpo});
+		Overlap second = new Overlap(firstExpo, secondExpo);
 		for (int k = 0; k < firstRowNums.size(); k++) {
 			second.addDuplicatePoint(firstRowNums.get(k), secondRowNums.get(k), 
 					lons.get(k), lats.get(k), times.get(k));

@@ -19,16 +19,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Overlap implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4148025909328008687L;
+	private static final long serialVersionUID = -3932557106416427013L;
 
 	protected String[] expocodes;
 	protected ArrayList<Integer>[] rowNums;
 	protected ArrayList<Double> lons;
 	protected ArrayList<Double> lats;
-	protected ArrayList<Long> times;
+	protected ArrayList<Double> times;
 
 	/**
-	 * Creates an crossover with no information (all empty).
+	 * Creates an overlap with no information (all empty).
 	 */
 	public Overlap() {
 		setExpocodes(null);
@@ -36,6 +36,20 @@ public class Overlap implements Serializable, IsSerializable {
 		setLons(null);
 		setLats(null);
 		setTimes(null);
+	}
+
+	/**
+	 * Creates an empty overlap for the two expocodes.
+	 * 
+	 * @param firstExpo
+	 * 		expocode of the first dataset
+	 * @param secondExpo
+	 * 		expocode of the second dataset
+	 */
+	public Overlap(String firstExpo, String secondExpo) {
+		this();
+		expocodes[0] = firstExpo;
+		expocodes[1] = secondExpo;
 	}
 
 	/**
@@ -149,7 +163,7 @@ public class Overlap implements Serializable, IsSerializable {
 	 * 		of the overlap; never null but may be empty.
 	 * 		The actual ArrayList in this instance is returned.
 	 */
-	public ArrayList<Long> getTimes() {
+	public ArrayList<Double> getTimes() {
 		return times;
 	}
 
@@ -158,12 +172,12 @@ public class Overlap implements Serializable, IsSerializable {
 	 * 		the times, in seconds since 1 JAN 1970 00:00:00, 
 	 * 		of the overlap to set.  If null, an empty ArrayList assigned.
 	 */
-	public void setTimes(ArrayList<Long> times) {
+	public void setTimes(ArrayList<Double> times) {
 		if ( times == null ) {
-			this.times = new ArrayList<Long>();
+			this.times = new ArrayList<Double>();
 		}
 		else {
-			this.times = new ArrayList<Long>(times);
+			this.times = new ArrayList<Double>(times);
 		}
 	}
 
@@ -187,7 +201,7 @@ public class Overlap implements Serializable, IsSerializable {
 		rowNums[1].add(secondRowNum);
 		lons.add(longitude);
 		lats.add(latitude);
-		times.add(Math.round(time));
+		times.add(time);
 	}
 
 	@Override
@@ -195,9 +209,9 @@ public class Overlap implements Serializable, IsSerializable {
 		final int prime = 37;
 		int result = Arrays.hashCode(expocodes);
 		result = prime * result + Arrays.hashCode(rowNums);
-		result = prime * result + times.hashCode();
 		// Do not include floating point values, as they do not have to be exact to match
 		// but do include the number of floating point values as those do have to match
+		result = prime * result + Integer.hashCode(times.size());
 		result = prime * result + Integer.hashCode(lats.size());
 		result = prime * result + Integer.hashCode(lons.size());
 
@@ -222,21 +236,26 @@ public class Overlap implements Serializable, IsSerializable {
 			return false;
 		if ( ! Arrays.equals(rowNums, other.rowNums) )
 			return false;
-		if ( ! times.equals(other.times) )
-			return false;
 
+		if ( times.size() != other.times.size() )
+			return false;
 		if ( lats.size() != other.lats.size() )
 			return false;
 		if ( lons.size() != other.lons.size() )
 			return false;
 
+		for (int k = 0; k < times.size(); k++) {
+			if ( ! DashboardUtils.closeTo(times.get(k), other.times.get(k), 
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+				return false;
+			}
+		}
 		for (int k = 0; k < lats.size(); k++) {
 			if ( ! DashboardUtils.closeTo(lats.get(k), other.lats.get(k), 
 					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 				return false;
 			}
 		}
-
 		for (int k = 0; k < lons.size(); k++) {
 			if ( ! DashboardUtils.longitudeCloseTo(lons.get(k), other.lons.get(k), 
 					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
