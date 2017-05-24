@@ -25,9 +25,9 @@ import gov.noaa.pmel.dashboard.shared.Overlap;
 public class OverlapChecker {
 
 	/** Time difference, in seconds, for two values to be considered different */
-	public static final double MAX_TIME_DIFF = 1.0;
+	public static final double MAX_TIME_DIFF = 0.001;
 	/** Longitude or latitude difference, in degrees, for two value to be considered different */
-	public static final double MAX_LONLAT_DIFF = 0.01;
+	public static final double MAX_LONLAT_DIFF = 0.001;
 	/** Cutoff time window, in seconds, for still considering data points */
 	public static final double TIME_WINDOW = 86400.0;
 
