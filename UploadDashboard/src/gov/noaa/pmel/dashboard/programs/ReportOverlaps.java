@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -79,6 +80,8 @@ public class ReportOverlaps {
 
 		SimpleDateFormat dateFmtr = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		dateFmtr.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		TreeSet<Overlap> orderedOverlaps = new TreeSet<Overlap>();
 
 		DashboardConfigStore configStore = null;
 		try {
@@ -170,31 +173,7 @@ public class ReportOverlaps {
 
 				// Find any overlaps with this data set with the selected set of data sets
 				try {
-					for ( Overlap oerlap : oerlapChecker.getOverlaps(firstExpo, checkExpos, System.err, startTime)  ) {
-						String[] expos = oerlap.getExpocodes();
-						if ( expos[0].equals(expos[1]) ) {
-							System.out.print("InternalOverlap[ expocode=" + expos[0]);
-						}
-						else {
-							System.out.print("Overlap[ expocodes=[" + expos[0] + ", " + expos[1] + "]");
-						}
-						ArrayList<Double> times = oerlap.getTimes();
-						System.out.print(", numRows=" + Integer.toString(times.size()));
-						System.out.print(", rowNums=" + Arrays.toString(oerlap.getRowNums())); 
-						System.out.print(", lons=" + oerlap.getLons().toString());
-						System.out.print(", lats=" + oerlap.getLats().toString());
-						System.out.print(", times=[");
-						boolean first = true;
-						for ( Double tval : times ) {
-							if ( first )
-								first = false;
-							else
-								System.out.print(", ");
-							System.out.print(dateFmtr.format(new Date(Math.round(tval * 1000.0))));
-						}
-						System.out.println("] ]");
-					}
-					System.out.flush();
+					orderedOverlaps.addAll( oerlapChecker.getOverlaps(firstExpo, checkExpos, System.err, startTime) );
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					System.exit(1);
@@ -203,6 +182,37 @@ public class ReportOverlaps {
 
 		} finally {
 			DashboardConfigStore.shutdown();
+		}
+
+		Iterator<Overlap> revIter = orderedOverlaps.descendingIterator();
+		while ( revIter.hasNext() ) {
+			Overlap oerlap = revIter.next();
+
+			String[] expos = oerlap.getExpocodes();
+			if ( expos[0].equals(expos[1]) ) {
+				System.out.println("InternalOverlap[ expocode=" + expos[0] + ",");
+			}
+			else {
+				System.out.println("ExternalOverlap[ expocodes=[" + expos[0] + ", " + expos[1] + "],");
+			}
+			ArrayList<Double> times = oerlap.getTimes();
+			System.out.println("    numRows=" + Integer.toString(times.size()) + ",");
+			ArrayList<Integer>[] rowNums = oerlap.getRowNums();
+			System.out.println("    rowNums=[ " + rowNums[0].toString() + ",");
+			System.out.println("              " + rowNums[1].toString() + " ],");
+			System.out.println("    lons=" + oerlap.getLons().toString());
+			System.out.println("    lats=" + oerlap.getLats().toString());
+			System.out.print("    times=[");
+			boolean first = true;
+			for ( Double tval : times ) {
+				if ( first )
+					first = false;
+				else
+					System.out.print(", ");
+				System.out.print(dateFmtr.format(new Date(Math.round(tval * 1000.0))));
+			}
+			System.out.println("]");
+			System.out.println("]");
 		}
 		System.exit(0);
 	}
