@@ -268,6 +268,17 @@ public class OverlapTest {
 		Overlap second = new Overlap();
 		assertEquals(0, first.compareTo(second));
 
+		first = new Overlap(firstExpo, firstExpo);
+		second = new Overlap(firstExpo, secondExpo);
+		assertTrue( first.compareTo(second) < 0 );
+		second = new Overlap(secondExpo, firstExpo);
+		assertTrue( first.compareTo(second) < 0 );
+		second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), 
+				lons.get(0), lats.get(0), times.get(0));
+		assertTrue( first.compareTo(second) < 0 );
+		second = new Overlap(secondExpo, secondExpo);
+		assertEquals(firstExpo.compareTo(secondExpo), first.compareTo(second) );
+
 		first = new Overlap(firstExpo, secondExpo);
 		second = new Overlap(secondExpo, firstExpo);
 		assertEquals( firstExpo.compareTo(secondExpo), first.compareTo(second) );

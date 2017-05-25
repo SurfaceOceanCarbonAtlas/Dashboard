@@ -222,8 +222,16 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 	@Override
 	public int compareTo(Overlap other) {
 		int result;
-		// Order first on the size of the overlap;
-		// thus first compare by the number of data points (check all just in case)
+
+		// First separate internal overlaps from external overlaps
+		boolean internal = expocodes[0].equals(expocodes[1]);
+		boolean otherInternal = other.expocodes[0].equals(other.expocodes[1]);
+		if ( internal && ! otherInternal )
+			return -1;
+		if ( otherInternal && ! internal )
+			return 1;
+
+		// Then order on the size of the overlap (number of data points); check all just in case
 		result = Integer.compare(rowNums[0].size(), other.rowNums[0].size());
 		if ( result != 0 )
 			return result;
@@ -240,7 +248,7 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 		if ( result != 0 )
 			return result;
 
-		// Next by expocodes
+		// Finally order by expocodes
 		result = expocodes[0].compareTo(other.expocodes[0]);
 		if ( result != 0 )
 			return result;
