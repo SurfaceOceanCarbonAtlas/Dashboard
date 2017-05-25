@@ -10,9 +10,9 @@ import java.util.ArrayList;
 
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.Overlap;
 import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.Overlap;
 
 /**
  * Checks for overlaps between data sets.  Overlaps are duplications of location 
@@ -191,7 +191,7 @@ public class OverlapChecker {
 	 * 		if any of the arguments is not an array of two objects, or 
 	 * 		if there is not the same number of longitudes, latitudes, and times for a dataset 
 	 */
-	public static Overlap checkForOverlaps(String[] expocodes, double[][] longitudes, 
+	private Overlap checkForOverlaps(String[] expocodes, double[][] longitudes, 
 			double[][] latitudes, double[][] times) throws IllegalArgumentException {
 		if ( (expocodes == null) || (expocodes.length != 2) ||
 			 (expocodes[0] == null) || (expocodes[1] == null) )

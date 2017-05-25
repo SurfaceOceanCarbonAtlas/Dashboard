@@ -1,11 +1,10 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.shared;
+package gov.noaa.pmel.dashboard.test.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -13,10 +12,10 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import gov.noaa.pmel.dashboard.shared.Overlap;
+import gov.noaa.pmel.dashboard.server.Overlap;
 
 /**
- * Unit tests for {@link gov.noaa.pmel.dashboard.shared.Overlap}
+ * Unit tests for {@link gov.noaa.pmel.dashboard.server.Overlap}
  * 
  * @author Karl Smith
  */
@@ -31,16 +30,16 @@ public class OverlapTest {
 	private static final ArrayList<Double> times = new ArrayList<Double>(Arrays.asList(987654321.0, 987754321.0, 987854321.0, 987954321.0, 988054321.0));
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getExpocodes} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#setExpocodes}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#getExpocodes} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#setExpocodes}.
 	 */
 	@Test
 	public void testGetSetExpocodes() {
 		Overlap olap = new Overlap();
 		String[] expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 
 		olap.setExpocodes(new String[] { firstExpo, secondExpo });
 		expos = olap.getExpocodes();
@@ -51,13 +50,13 @@ public class OverlapTest {
 		olap.setExpocodes(null);
 		expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getRowNums} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#setRowNums}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#getRowNums} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#setRowNums}.
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -76,8 +75,8 @@ public class OverlapTest {
 
 		String[] expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 
 		olap.setRowNums(null);
 		rowNums = olap.getRowNums();
@@ -87,8 +86,8 @@ public class OverlapTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getLons} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#setLons}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#getLons} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#setLons}.
 	 */
 	@Test
 	public void testGetSetLons() {
@@ -107,8 +106,8 @@ public class OverlapTest {
 
 		String[] expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 
 		olap.setLons(null);
 		mylons = olap.getLons();
@@ -116,8 +115,8 @@ public class OverlapTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getLats} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#setLats}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#getLats} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#setLats}.
 	 */
 	@Test
 	public void testGetSetLats() {
@@ -139,8 +138,8 @@ public class OverlapTest {
 
 		String[] expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 
 		olap.setLats(null);
 		mylats = olap.getLats();
@@ -148,8 +147,8 @@ public class OverlapTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#getTimes} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#setTimes}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#getTimes} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#setTimes}.
 	 */
 	@Test
 	public void testGetSetTimes() {
@@ -174,8 +173,8 @@ public class OverlapTest {
 
 		String[] expos = olap.getExpocodes();
 		assertEquals(2, expos.length);
-		assertNull(expos[0]);
-		assertNull(expos[1]);
+		assertTrue( expos[0].isEmpty() );
+		assertTrue( expos[1].isEmpty() );
 
 		olap.setTimes(null);
 		mytimes = olap.getTimes();
@@ -183,8 +182,8 @@ public class OverlapTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#hashCode()} and 
-	 * {@link gov.noaa.pmel.dashboard.shared.Overlap#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#hashCode()} and 
+	 * {@link gov.noaa.pmel.dashboard.server.Overlap#equals(java.lang.Object)}.
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
@@ -237,8 +236,8 @@ public class OverlapTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.Overlap#addDuplicatePoint}
-	 * and {@link gov.noaa.pmel.dashboard.shared.Overlap#Overlap(String, String)}
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#addDuplicatePoint}
+	 * and {@link gov.noaa.pmel.dashboard.server.Overlap#Overlap(String, String)}
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -257,6 +256,41 @@ public class OverlapTest {
 		}
 
 		assertEquals(first, second);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.Overlap#addDuplicatePoint}
+	 * and {@link gov.noaa.pmel.dashboard.server.Overlap#Overlap(String, String)}
+	 */
+	@Test
+	public void testCompare() {
+		Overlap first = new Overlap();
+		Overlap second = new Overlap();
+		assertEquals(0, first.compareTo(second));
+
+		first = new Overlap(firstExpo, secondExpo);
+		second = new Overlap(secondExpo, firstExpo);
+		assertEquals( firstExpo.compareTo(secondExpo), first.compareTo(second) );
+
+		first.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), 
+					lons.get(0), lats.get(0), times.get(0));
+		assertTrue( first.compareTo(second) > 0 );
+		assertTrue( second.compareTo(first) < 0 );
+
+		second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), 
+				lons.get(0), lats.get(0), times.get(0));
+		second.addDuplicatePoint(firstRowNums.get(1), secondRowNums.get(1), 
+				lons.get(1), lats.get(1), times.get(1));
+		assertTrue( first.compareTo(second) < 0 );
+		assertTrue( second.compareTo(first) > 0 );
+
+		second = new Overlap(firstExpo, secondExpo);
+		assertTrue( first.compareTo(second) > 0 );
+		assertTrue( second.compareTo(first) < 0 );
+		second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), 
+				lons.get(0) + 360.0, lats.get(0) + 1.0E-8, times.get(0));
+		assertEquals(0, first.compareTo(second));
+		assertEquals(0, second.compareTo(first));
 	}
 
 }

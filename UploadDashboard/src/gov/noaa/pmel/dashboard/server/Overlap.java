@@ -1,13 +1,15 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.shared;
+package gov.noaa.pmel.dashboard.server;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Overlaps are duplications of location and time values either within a dataset 
@@ -17,9 +19,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class Overlap implements Serializable, IsSerializable {
+public class Overlap implements Serializable, IsSerializable, Comparable<Overlap> {
 
-	private static final long serialVersionUID = -3932557106416427013L;
+	private static final long serialVersionUID = 7268526718169557931L;
 
 	protected String[] expocodes;
 	protected ArrayList<Integer>[] rowNums;
@@ -48,14 +50,20 @@ public class Overlap implements Serializable, IsSerializable {
 	 */
 	public Overlap(String firstExpo, String secondExpo) {
 		this();
-		expocodes[0] = firstExpo;
-		expocodes[1] = secondExpo;
+		if ( firstExpo != null )
+			expocodes[0] = firstExpo;
+		else
+			expocodes[0] = "";
+		if ( secondExpo != null )
+			expocodes[1] = secondExpo;
+		else
+			expocodes[1] = "";
 	}
 
 	/**
 	 * @return
 	 * 		the two expocodes of the overlapping datasets; always 
-	 * 		an array of two Strings, but each String may be null. 
+	 * 		an array of two Strings, but each String may be empty. 
 	 * 		The actual array in this instance is returned. 
 	 */
 	public String[] getExpocodes() {
@@ -65,18 +73,25 @@ public class Overlap implements Serializable, IsSerializable {
 	/**
 	 * @param expocodes
 	 * 		the two expocodes of the overlapping datasets to set. 
-	 * 		If null, an array of two nulls is assigned; otherwise 
-	 * 		an array of two Strings must be given. 
+	 * 		If null, an array of two empty Strings is assigned; 
+	 * 		otherwise an array of two Strings must be given. 
+	 * 		If null is given as a String, an empty String is assigned.
 	 */
 	public void setExpocodes(String[] expocodes) {
 		if ( expocodes == null ) {
-			this.expocodes = new String[] { null, null };
+			this.expocodes = new String[] { "", "" };
 		}
 		else {
 			if ( expocodes.length != 2 )
 				throw new IllegalArgumentException("expocodes array not length 2");
-			this.expocodes[0] = expocodes[0];
-			this.expocodes[1] = expocodes[1];
+			if ( expocodes[0] != null )
+				this.expocodes[0] = expocodes[0];
+			else 
+				this.expocodes[0] = "";
+			if ( expocodes[1] != null )
+				this.expocodes[1] = expocodes[1];
+			else
+				this.expocodes[1] = "";
 		}
 	}
 
@@ -93,8 +108,8 @@ public class Overlap implements Serializable, IsSerializable {
 	/**
 	 * @param rowNums
 	 * 		the dataset row numbers (starts with one) of the overlap. 
-	 * 		If null, an array of two empty ArrayLists is assigned; 
-	 * 		otherwise an array of two Integer ArrayLists of the same length must be given. 
+	 * 		If null, an array of two empty ArrayLists is assigned; otherwise 
+	 * 		an array of two Integer ArrayLists of the same length must be given. 
 	 */
 	@SuppressWarnings("unchecked")
 	public void setRowNums(ArrayList<Integer>[] rowNums) {
@@ -205,6 +220,68 @@ public class Overlap implements Serializable, IsSerializable {
 	}
 
 	@Override
+	public int compareTo(Overlap other) {
+		int result;
+		// Order first on the size of the overlap;
+		// thus first compare by the number of data points (check all just in case)
+		result = Integer.compare(rowNums[0].size(), other.rowNums[0].size());
+		if ( result != 0 )
+			return result;
+		result = Integer.compare(rowNums[1].size(), other.rowNums[1].size());
+		if ( result != 0 )
+			return result;
+		result = Integer.compare(times.size(), other.times.size());
+		if ( result != 0 )
+			return result;
+		result = Integer.compare(lats.size(), other.lats.size());
+		if ( result != 0 )
+			return result;
+		result = Integer.compare(lons.size(), other.lons.size());
+		if ( result != 0 )
+			return result;
+
+		// Next by expocodes
+		result = expocodes[0].compareTo(other.expocodes[0]);
+		if ( result != 0 )
+			return result;
+		result = expocodes[1].compareTo(other.expocodes[1]);
+		if ( result != 0 )
+			return result;
+
+		// The rest is primarily to be compatible with equals
+		for (int k = 0; k < rowNums[0].size(); k++) {
+			result = rowNums[0].get(k).compareTo(other.rowNums[0].get(k));
+			if ( result != 0 )
+				return result;
+		}
+		for (int k = 0; k < rowNums[1].size(); k++) {
+			result = rowNums[1].get(k).compareTo(other.rowNums[1].get(k));
+			if ( result != 0 )
+				return result;
+		}
+		for (int k = 0 ; k < times.size(); k++) {
+			if ( ! DashboardUtils.closeTo(times.get(k), other.times.get(k), 
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+				return times.get(k).compareTo(other.times.get(k));
+			}
+		}
+		for (int k = 0 ; k < lats.size(); k++) {
+			if ( ! DashboardUtils.closeTo(lats.get(k), other.lats.get(k), 
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+				return lats.get(k).compareTo(other.lats.get(k));
+			}
+		}
+		for (int k = 0 ; k < lons.size(); k++) {
+			if ( ! DashboardUtils.longitudeCloseTo(lons.get(k), other.lons.get(k), 
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+				return lons.get(k).compareTo(other.lons.get(k));
+			}
+		}
+
+		return 0;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = Arrays.hashCode(expocodes);
@@ -232,16 +309,16 @@ public class Overlap implements Serializable, IsSerializable {
 
 		Overlap other = (Overlap) obj;
 
-		if ( ! Arrays.equals(expocodes, other.expocodes) )
-			return false;
-		if ( ! Arrays.equals(rowNums, other.rowNums) )
-			return false;
-
 		if ( times.size() != other.times.size() )
 			return false;
 		if ( lats.size() != other.lats.size() )
 			return false;
 		if ( lons.size() != other.lons.size() )
+			return false;
+
+		if ( ! Arrays.equals(expocodes, other.expocodes) )
+			return false;
+		if ( ! Arrays.equals(rowNums, other.rowNums) )
 			return false;
 
 		for (int k = 0; k < times.size(); k++) {

@@ -17,8 +17,8 @@ import gov.noaa.pmel.dashboard.actions.OverlapChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.Overlap;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.Overlap;
 
 /**
  * Finds overlaps within and between datasets
