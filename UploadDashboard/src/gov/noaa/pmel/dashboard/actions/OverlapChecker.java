@@ -24,12 +24,12 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  */
 public class OverlapChecker {
 
-	/** Time difference, in seconds, for two values to be considered different */
-	public static final double MAX_TIME_DIFF = 0.001;
-	/** Longitude or latitude difference, in degrees, for two value to be considered different */
-	public static final double MAX_LONLAT_DIFF = 0.001;
-	/** Cutoff time window, in seconds, for still considering data points */
-	public static final double TIME_WINDOW = 86400.0;
+	/** Minimum time difference, in seconds, for two values to be considered different */
+	public static final double MIN_TIME_DIFF = 0.01;
+	/** Minimum longitude or latitude difference, in degrees, for two value to be considered different */
+	public static final double MIN_LONLAT_DIFF = 0.01;
+	// /** Cutoff time window, in seconds, for still considering data points */
+	// public static final double TIME_WINDOW = 86400.0;
 
 	private DsgNcFileHandler dsgHandler;
 
@@ -235,7 +235,8 @@ public class OverlapChecker {
 		if ( (ignore[0].length != numRows[0]) || (ignore[1].length != numRows[1]) )
 			throw new IllegalArgumentException("Sizes of longitudes and ignore arrays do not match");
 
-		Overlap oerlap = new Overlap(expocodes[0], expocodes[1]);
+		// Swap the expocodes so first expocode is earlier one (if different) when reporting
+		Overlap oerlap = new Overlap(expocodes[1], expocodes[0]);
 
 		boolean sameExpo = expocodes[0].equals(expocodes[1]);
 		int kStart = 0;
@@ -270,29 +271,32 @@ public class OverlapChecker {
 						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
 
-				if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {
-					/* 
-					 * The rest of the second dataset occurred much later than 
-					 * the point of first dataset, allowing for some disorder 
-					 * in time.  Go on to the next point of the first dataset.
-					 */
-					 break;
-				}
-				if ( times[1][k] <= times[0][j] - TIME_WINDOW ) {
-					/* 
-					 * The point of the second dataset occurred much earlier than 
-					 * the point of the first dataset, allowing for some disorder
-					 * in time.  Update the start point for the second dataset and 
-					 * go on to the next point of the second dataset. 
-					 */
-					kStart = k + 1;
-					continue;
-				}
+				/*
+				 * if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {
+				 *	 / * 
+				 *	 * The rest of the second dataset occurred much later than 
+				 *	 * the point of first dataset, allowing for some disorder 
+				 *	 * in time.  Go on to the next point of the first dataset.
+				 *	 * /
+				 *	 break;
+				 * }
+				 * if ( times[1][k] <= times[0][j] - TIME_WINDOW ) {
+				 *	 / * 
+				 *	 * The point of the second dataset occurred much earlier than 
+				 *	 * the point of the first dataset, allowing for some disorder
+				 *	 * in time.  Update the start point for the second dataset and 
+				 *	 * go on to the next point of the second dataset. 
+				 *	 * /
+				 *	 kStart = k + 1;
+				 *	 continue;
+				 * }
+				 */
 
-				if ( DashboardUtils.closeTo(times[0][j],  times[1][k],  0.0, MAX_TIME_DIFF) &&
-					 DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MAX_LONLAT_DIFF) &&
-					 DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MAX_LONLAT_DIFF) ) {
-					oerlap.addDuplicatePoint(j+1, k+1, longitudes[0][j], latitudes[0][j], times[0][j]);	
+				if ( DashboardUtils.closeTo(times[0][j],  times[1][k],  0.0, MIN_TIME_DIFF) &&
+					 DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MIN_LONLAT_DIFF) &&
+					 DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MIN_LONLAT_DIFF) ) {
+					// order of row nums to match expocodes above
+					oerlap.addDuplicatePoint(k+1, j+1, longitudes[0][j], latitudes[0][j], times[0][j]);	
 				}
 			}
 		}

@@ -100,7 +100,7 @@ public class WoceOverlapTail {
 				for ( Integer num : secondRowNums )
 					secondOverlapFCO2.add(secondFCO2[num-1]);
 				for (int k = 0; k < firstOverlapFCO2.size(); k++) {
-					if ( ! DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0, 0.1) ) {
+					if ( ! DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0, 2.0) ) {
 						System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
 						System.err.println("           " + secondOverlapFCO2.toString());
 						throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() + 

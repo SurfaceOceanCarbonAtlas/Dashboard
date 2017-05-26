@@ -160,13 +160,13 @@ public class ReportOverlaps {
 					}
 					// Check that there is some overlap in time
 					double[] secondTimeMinMax = timeMinMaxMap.get(secondExpo);
-					if ( (firstTimeMinMax[1] + OverlapChecker.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
-						 (secondTimeMinMax[1] + OverlapChecker.MAX_TIME_DIFF < firstTimeMinMax[0]) )
+					if ( (firstTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
+						 (secondTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < firstTimeMinMax[0]) )
 						continue;
 					// Check that there is some overlap in latitude
 					double[] secondLatMinMax = latMinMaxMap.get(secondExpo);
-					if ( (firstLatMinMax[1] + OverlapChecker.MAX_LONLAT_DIFF < secondLatMinMax[0]) ||
-						 (secondLatMinMax[1] + OverlapChecker.MAX_LONLAT_DIFF < firstLatMinMax[0]) )
+					if ( (firstLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < secondLatMinMax[0]) ||
+						 (secondLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < firstLatMinMax[0]) )
 						continue;
 					checkExpos.add(secondExpo);
 				}
