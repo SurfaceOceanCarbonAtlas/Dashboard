@@ -337,7 +337,7 @@ public class CruiseSubmitter {
 				ingestExpos.add(expocode);
 			}
 
-			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) && 
+			if ( archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_PREFIX) && 
 				 ( repeatSend || cruise.getCdiacDate().isEmpty() ) ) {
 				// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
 				cdiacExpos.add(expocode);

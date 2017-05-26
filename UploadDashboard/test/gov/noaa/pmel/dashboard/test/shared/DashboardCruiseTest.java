@@ -851,7 +851,7 @@ public class DashboardCruiseTest {
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_TO_OCADS);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
