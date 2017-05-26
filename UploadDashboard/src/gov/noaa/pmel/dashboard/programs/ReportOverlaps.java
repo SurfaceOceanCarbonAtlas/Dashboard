@@ -125,7 +125,7 @@ public class ReportOverlaps {
 				System.err.format("%.2fm - getting data limits for %s\n", timeDiff, expo);
 				double[][] dataVals = null;
 				try {
-					dataVals = oerlapChecker.getMaskedLonLatTimeVals(expo);
+					dataVals = oerlapChecker.getMaskedLonLatTimeSstFco2Vals(expo);
 				} catch ( Exception ex ) {
 					System.err.println("Unexpected error rereading " + expo + ": " + ex.getMessage());
 					System.exit(1);

@@ -77,28 +77,35 @@ public class WoceOverlapTail {
 			}
 
 			ArrayList<Integer> firstRowNums = oerlap.getRowNums()[0];
-			double[] firstFCo2 = null;
+			double[] firstFCO2 = null;
 			try {
 				ArrayList<Integer> secondRowNums = oerlap.getRowNums()[1];
 				// Verify the overlap row numbers are appropriate for performing this automatic WOCE flagging
 				if ( firstRowNums.size() != secondRowNums.size() )
 					throw new RuntimeException("unexpected different number of data row numbers");
-				int delta = firstRowNums.get(0) - secondRowNums.get(0) + 1;
-				for (int k = 0; k < firstRowNums.size(); k++) {
-					if ( secondRowNums.get(k) != k+1 )
-						throw new IllegalArgumentException("overlap in second dataset is not contiguous start of the dataset");
-					if ( firstRowNums.get(k) != k+delta )
-						throw new IllegalArgumentException("overlap in first dataset is not contiguous");
+				int delta = firstRowNums.get(0) - secondRowNums.get(0);
+				if ( delta <= 0 )
+					throw new IllegalArgumentException("delta in row numbers between datasets is not positive");
+				for (int k = 1; k < firstRowNums.size(); k++) {
+					if ( firstRowNums.get(k) != secondRowNums.get(k) + delta )
+						throw new IllegalArgumentException("inconsistent delta in row numbers between datasets");
 				}
 				// Verify the fCO2_rec values are the same in the overlap
-				firstFCo2 = dsgHandler.readDoubleVarDataValues(firstExpo, SocatTypes.FCO2_REC.getVarName());
-				if ( firstFCo2.length != firstRowNums.get(firstRowNums.size()-1) )
-					throw new IllegalArgumentException("overlap in first dataset is not end of the dataset");
-				double[] secondFCo2 = dsgHandler.readDoubleVarDataValues(secondExpo, SocatTypes.FCO2_REC.getVarName());
-				for (int k = 0; k < firstRowNums.size(); k++) {
-					if ( ! DashboardUtils.closeTo(firstFCo2[firstRowNums.get(k) - 1], secondFCo2[secondRowNums.get(k) - 1], 
-							DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-						throw new IllegalArgumentException("overlap is not a duplicate in fCO2_rec values");
+				firstFCO2 = dsgHandler.readDoubleVarDataValues(firstExpo, SocatTypes.FCO2_REC.getVarName());
+				ArrayList<Double> firstOverlapFCO2 = new ArrayList<Double>(firstRowNums.size());
+				for ( Integer num : firstRowNums )
+					firstOverlapFCO2.add(firstFCO2[num-1]);
+				double[] secondFCO2 = dsgHandler.readDoubleVarDataValues(secondExpo, SocatTypes.FCO2_REC.getVarName());
+				ArrayList<Double> secondOverlapFCO2 = new ArrayList<Double>(secondRowNums.size());
+				for ( Integer num : secondRowNums )
+					secondOverlapFCO2.add(secondFCO2[num-1]);
+				for (int k = 0; k < firstOverlapFCO2.size(); k++) {
+					if ( ! DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0, 0.1) ) {
+						System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
+						System.err.println("           " + secondOverlapFCO2.toString());
+						throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() + 
+								" versus " + secondOverlapFCO2.get(k).toString() );
+					}
 				}
 			} catch ( Exception ex ) {
 				System.err.println("Invalid overlap between " + firstExpo + " and " + secondExpo + ": " + ex.getMessage());
@@ -118,7 +125,7 @@ public class WoceOverlapTail {
 					int k = num - 1;
 					DataLocation loc = new DataLocation();
 					loc.setDataDate(new Date(Math.round(times[k] * 1000.0)));
-					loc.setDataValue(firstFCo2[k]);
+					loc.setDataValue(firstFCO2[k]);
 					loc.setLatitude(latitudes[k]);
 					loc.setLongitude(longitudes[k]);
 					loc.setRegionID(regionIDs[k]);
