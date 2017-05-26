@@ -103,11 +103,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 			String smtpHostPort, String smtpUsername, String smtpPassword, boolean setDebug) 
 					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
-		if ( toEmails != null )
+		if ( toEmailAddresses != null )
 			toEmails = toEmailAddresses.clone();
 		else
 			toEmails = null;
-		if ( ccEmails != null )
+		if ( ccEmailAddresses != null )
 			ccEmails = ccEmailAddresses.clone();
 		else
 			ccEmails = null;
