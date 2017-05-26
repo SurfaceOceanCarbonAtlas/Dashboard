@@ -84,8 +84,8 @@ public class WoceOverlapTail {
 				if ( firstRowNums.size() != secondRowNums.size() )
 					throw new RuntimeException("unexpected different number of data row numbers");
 				int delta = firstRowNums.get(0) - secondRowNums.get(0);
-				if ( delta <= 0 )
-					throw new IllegalArgumentException("delta in row numbers between datasets is not positive");
+				if ( delta < 0 )
+					throw new IllegalArgumentException("delta in row numbers between datasets is negative (switch order of datasets)");
 				for (int k = 1; k < firstRowNums.size(); k++) {
 					if ( firstRowNums.get(k) != secondRowNums.get(k) + delta )
 						throw new IllegalArgumentException("inconsistent delta in row numbers between datasets");
