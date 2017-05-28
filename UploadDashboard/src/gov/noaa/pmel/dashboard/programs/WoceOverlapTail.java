@@ -23,6 +23,8 @@ import gov.noaa.pmel.dashboard.shared.WoceEvent;
  */
 public class WoceOverlapTail {
 
+	private static final double MIN_FCO2_DIFF = 5.0;
+
 	/**
 	 * @param args
 	 * 		firstExpo  secondExpo
@@ -84,7 +86,9 @@ public class WoceOverlapTail {
 				if ( firstRowNums.size() != secondRowNums.size() )
 					throw new RuntimeException("unexpected different number of data row numbers");
 				int delta = firstRowNums.get(0) - secondRowNums.get(0);
-				if ( delta < 0 )
+				String[] expocodes = oerlap.getExpocodes();
+				if ( (firstExpo.equals(expocodes[0]) && (delta < 0)) ||
+					 (firstExpo.equals(expocodes[1]) && (delta > 0)) )
 					throw new IllegalArgumentException("delta in row numbers between datasets is negative (switch order of datasets)");
 				for (int k = 1; k < firstRowNums.size(); k++) {
 					if ( firstRowNums.get(k) != secondRowNums.get(k) + delta )
@@ -100,7 +104,7 @@ public class WoceOverlapTail {
 				for ( Integer num : secondRowNums )
 					secondOverlapFCO2.add(secondFCO2[num-1]);
 				for (int k = 0; k < firstOverlapFCO2.size(); k++) {
-					if ( ! DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0, 2.0) ) {
+					if ( ! DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0, MIN_FCO2_DIFF) ) {
 						System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
 						System.err.println("           " + secondOverlapFCO2.toString());
 						throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() + 

@@ -25,7 +25,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 public class OverlapChecker {
 
 	/** Minimum time difference, in seconds, for two values to be considered different */
-	public static final double MIN_TIME_DIFF = 0.01;
+	public static final double MIN_TIME_DIFF = 5.0;
 	/** Minimum longitude or latitude difference, in degrees, for two value to be considered different */
 	public static final double MIN_LONLAT_DIFF = 0.01;
 	// /** Cutoff time window, in seconds, for still considering data points */
@@ -235,8 +235,17 @@ public class OverlapChecker {
 		if ( (ignore[0].length != numRows[0]) || (ignore[1].length != numRows[1]) )
 			throw new IllegalArgumentException("Sizes of longitudes and ignore arrays do not match");
 
-		// Swap the expocodes so first expocode is earlier one (if different) when reporting
-		Overlap oerlap = new Overlap(expocodes[1], expocodes[0]);
+		// Always make the first expocode the earlier one for reporting
+		Overlap oerlap;
+		boolean swapped;
+		if ( expocodes[0].compareTo(expocodes[1]) > 0) {
+			oerlap = new Overlap(expocodes[1], expocodes[0]);
+			swapped = true;
+		}
+		else {
+			oerlap = new Overlap(expocodes[0], expocodes[1]);
+			swapped = false;
+		}
 
 		boolean sameExpo = expocodes[0].equals(expocodes[1]);
 		int kStart = 0;
@@ -296,7 +305,12 @@ public class OverlapChecker {
 					 DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MIN_LONLAT_DIFF) &&
 					 DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MIN_LONLAT_DIFF) ) {
 					// order of row nums to match expocodes above
-					oerlap.addDuplicatePoint(k+1, j+1, longitudes[0][j], latitudes[0][j], times[0][j]);	
+					if ( swapped ) {
+						oerlap.addDuplicatePoint(k+1, j+1, longitudes[0][j], latitudes[0][j], times[0][j]);
+					}
+					else {
+						oerlap.addDuplicatePoint(j+1, k+1, longitudes[0][j], latitudes[0][j], times[0][j]);
+					}
 				}
 			}
 		}
