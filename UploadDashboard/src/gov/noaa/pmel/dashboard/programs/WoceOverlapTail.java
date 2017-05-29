@@ -23,6 +23,7 @@ import gov.noaa.pmel.dashboard.shared.WoceEvent;
  */
 public class WoceOverlapTail {
 
+	/** Minimum fCO2_rec difference for two values to be considered very different */
 	private static final double MIN_FCO2_DIFF = 5.0;
 
 	/**

@@ -24,10 +24,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  */
 public class OverlapChecker {
 
-	/** Minimum time difference, in seconds, for two values to be considered different */
+	/** Minimum time difference, in seconds, for two values to be considered very different */
 	public static final double MIN_TIME_DIFF = 5.0;
-	/** Minimum longitude or latitude difference, in degrees, for two value to be considered different */
-	public static final double MIN_LONLAT_DIFF = 0.01;
+	/** Minimum longitude or latitude difference, in degrees, for two value to be considered very different */
+	public static final double MIN_LONLAT_DIFF = 0.005;
 	// /** Cutoff time window, in seconds, for still considering data points */
 	// public static final double TIME_WINDOW = 86400.0;
 
