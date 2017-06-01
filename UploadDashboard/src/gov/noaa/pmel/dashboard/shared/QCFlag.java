@@ -262,10 +262,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 		return "QCFlag[" +
 			   "flagName=" + flagName + ", " +
 			   "flagValue='" + flagValue.toString() + "', " +
-			   "severity=" + severity.toString() + 
+			   "severity='" + severity.toString() +  "', " +
 			   "column=" + columnIndex.toString() + ", " +
-			   "row=" + rowIndex.toString() + 
-			   "comment=\"" + comment + "\", " +
+			   "row=" + rowIndex.toString() +  ", " +
+			   "comment=\"" + comment + "\" " +
 			   "]";
 	}
 	
