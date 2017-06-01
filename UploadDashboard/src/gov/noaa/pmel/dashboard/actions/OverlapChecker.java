@@ -24,12 +24,12 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  */
 public class OverlapChecker {
 
-	/** Minimum time difference, in seconds, for two values to be considered very different */
-	public static final double MIN_TIME_DIFF = 5.0;
-	/** Minimum longitude or latitude difference, in degrees, for two value to be considered very different */
-	public static final double MIN_LONLAT_DIFF = 0.005;
-	// /** Cutoff time window, in seconds, for still considering data points */
-	// public static final double TIME_WINDOW = 86400.0;
+	/** Minimum time difference, in seconds, for two values to be considered different */
+	public static final double MIN_TIME_DIFF = 1.0;
+	/** Minimum longitude or latitude difference, in degrees, for two value to be considered different */
+	public static final double MIN_LONLAT_DIFF = 0.001;
+	/** Cutoff time window, in seconds, for still considering data points - to allow some time disorder */
+	public static final double TIME_WINDOW = (7.0 * 24.0 * 60.0 * 60.0);
 
 	private DsgNcFileHandler dsgHandler;
 
@@ -280,26 +280,24 @@ public class OverlapChecker {
 						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
 
-				/*
-				 * if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {
-				 *	 / * 
-				 *	 * The rest of the second dataset occurred much later than 
-				 *	 * the point of first dataset, allowing for some disorder 
-				 *	 * in time.  Go on to the next point of the first dataset.
-				 *	 * /
-				 *	 break;
-				 * }
-				 * if ( times[1][k] <= times[0][j] - TIME_WINDOW ) {
-				 *	 / * 
-				 *	 * The point of the second dataset occurred much earlier than 
-				 *	 * the point of the first dataset, allowing for some disorder
-				 *	 * in time.  Update the start point for the second dataset and 
-				 *	 * go on to the next point of the second dataset. 
-				 *	 * /
-				 *	 kStart = k + 1;
-				 *	 continue;
-				 * }
-				 */
+				if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {
+					/* 
+					 * The rest of the second dataset occurred much later than 
+					 * the point of first dataset (allowing for some disorder 
+					 * in time).  Go on to the next point of the first dataset.
+					 */
+					break;
+				}
+				if ( times[1][k] <= times[0][j] - TIME_WINDOW ) {
+					/* 
+					 * The point of the second dataset occurred much earlier than 
+					 * the point of the first dataset (allowing for some disorder
+					 * in time).  Update the start point for the second dataset and 
+					 * go on to the next point of the second dataset. 
+					 */
+					kStart = k + 1;
+					continue;
+				}
 
 				if ( DashboardUtils.closeTo(times[0][j],  times[1][k],  0.0, MIN_TIME_DIFF) &&
 					 DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MIN_LONLAT_DIFF) &&
