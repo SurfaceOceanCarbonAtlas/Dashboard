@@ -6,11 +6,12 @@ package gov.noaa.pmel.dashboard.test.actions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import org.junit.Test;
 
 /**
  * @author Karl Smith
@@ -59,57 +60,6 @@ public class CrossoverCheckerTest {
 		assertNotNull( cruiseMaxTimes );
 		assertNull( cruiseMaxTimes[0] );
 		assertNull( cruiseMaxTimes[1] );
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.actions.CrossoverChecker#distanceBetween(double, double, double, double, double, double)}.
-	 */
-	@Test
-	public void testDistanceBetween() {
-		double[] lons = { -5.0, 15.0 };
-		double lonDist = DashboardUtils.EARTH_AUTHALIC_RADIUS * Math.abs(lons[1] - lons[0]) * Math.PI / 180.0;
-		double[] lats = { 60.0, 75.0 };
-		double latDist = DashboardUtils.EARTH_AUTHALIC_RADIUS * Math.abs(lats[1] - lats[0]) * Math.PI / 180.0;
-		double[] times = { System.currentTimeMillis() / 1000.0,
-				   2560 + (System.currentTimeMillis() / 1000.0) };
-		double timeDist = DashboardUtils.SEAWATER_SPEED * Math.abs(times[1] - times[0]) / (60.0 * 60.0 * 24.0);
-
-		double dist;
-		// Check longitude distance along the equator 
-		dist = CrossoverChecker.distanceBetween(lons[0], 0.0, times[0], lons[1], 0.0, times[0]);
-		assertEquals(lonDist, dist, 1.0E-5);
-		dist = CrossoverChecker.distanceBetween(lons[1], 0.0, times[0], lons[0], 0.0, times[0]);
-		assertEquals(lonDist, dist, 1.0E-5);
-		// Check latitude distance along a meridian
-		dist = CrossoverChecker.distanceBetween(lons[0], lats[0], times[0], lons[0], lats[1], times[0]);
-		assertEquals(latDist, dist, 1.0E-5);
-		dist = CrossoverChecker.distanceBetween(lons[0], lats[1], times[0], lons[0], lats[0], times[0]);
-		assertEquals(latDist, dist, 1.0E-5);
-		// Check a time difference at one location
-		dist = CrossoverChecker.distanceBetween(lons[0], lats[0], times[0], lons[0], lats[0], times[1]);
-		assertEquals(timeDist, dist, 1.0E-5);
-		dist = CrossoverChecker.distanceBetween(lons[0], lats[0], times[1], lons[0], lats[0], times[0]);
-		assertEquals(timeDist, dist, 1.0E-5);
-		double[] austin = { -97.74306, 30.26715, System.currentTimeMillis() / 1000.0 };
-		double[] dallas = { -96.80667, 32.78306, austin[2] + (24.0 * 60.0 * 60.0) };
-		double austinDallasDist = 158.5 * 1.8537936;  // 200.0 miles on interstate a few hundred feet above sea level
-		double expected = Math.sqrt(austinDallasDist * austinDallasDist + 
-									DashboardUtils.SEAWATER_SPEED * DashboardUtils.SEAWATER_SPEED);
-		dist = CrossoverChecker.distanceBetween(austin[0], austin[1], austin[2], dallas[0], dallas[1], dallas[2]);
-		assertEquals(expected, dist, 1.0);
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.actions.CrossoverChecker#getMinMaxValidData(double[])}.
-	 */
-	@Test
-	public void testGetMinMaxValidData() {
-		double[] minMax = CrossoverChecker.getMinMaxValidData(times_09AR20120105);
-		assertEquals( 1325768494.0, minMax[0], 0.1 );
-		assertEquals( 1328990968.0, minMax[1], 0.1 );
-		minMax = CrossoverChecker.getMinMaxValidData(fco2s_353L20120107);
-		assertEquals( 309.493714068311, minMax[0], 1.0E-12 );
-		assertEquals( 387.469738780931, minMax[1], 1.0E-12 );
 	}
 
 	// All the data is below

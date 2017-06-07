@@ -71,7 +71,9 @@ public class DashboardUtils {
 	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
+	public static final String ARCHIVE_STATUS_SENT_TO_PREFIX = "Sent to ";
+	public static final String ARCHIVE_STATUS_SENT_TO_OCADS = "Sent to OCADS";
+	public static final String ARCHIVE_STATUS_SENT_TO_CDIAC = "Sent to CDIAC";
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
@@ -908,6 +910,10 @@ public class DashboardUtils {
 		if ( second.isInfinite() ) {
 			return false;
 		}
+
+		// Check if they are the same value
+		if ( first.equals(second) )
+			return true;
 
 		// Check if values are close
 		double absDiff = Math.abs(first - second);

@@ -9,7 +9,9 @@ import java.util.Arrays;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Provides information about the crossover of two cruises.
+ * High-quality crossovers are desirable coincidental near-overlaps of location, 
+ * time, and some other properties found in datasets from different platforms 
+ * (different NODC codes). 
  * 
  * @author Karl Smith
  */

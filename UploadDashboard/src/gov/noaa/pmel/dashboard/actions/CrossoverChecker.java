@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -15,14 +14,13 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 /**
- * Checks for crossovers between cruises.
+ * Checks for high-quality crossovers between datasets.  High-quality crossovers 
+ * are desirable coincidental near-overlaps of location, time, and some other 
+ * properties found in datasets from different platforms (different NODC codes).
  * 
  * @author Karl Smith
  */
 public class CrossoverChecker {
-
-	private static final double MISSVAL_RTOLER = 1.0E-12;
-	private static final double MISSVAL_ATOLER = 1.0E-5;
 
 	private DsgNcFileHandler dsgHandler;
 
@@ -95,7 +93,7 @@ public class CrossoverChecker {
 		Long[] dataMinTimes = new Long[2];
 		Long[] dataMaxTimes = new Long[2];
 		for (int q = 0; q < 2; q++) {
-			double[] minMaxVals = getMinMaxValidData(times[q]);
+			double[] minMaxVals = DashboardServerUtils.getMinMaxValidData(times[q]);
 			if ( (minMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
 				 (minMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) )
 				throw new IOException("No valid times for " + expocodes[q]);
@@ -110,7 +108,7 @@ public class CrossoverChecker {
 		double[] dataMinLats = new double[2];
 		double[] dataMaxLats = new double[2];
 		for (int q = 0; q < 2; q++) {
-			double[] minMaxVals = getMinMaxValidData(lats[q]);
+			double[] minMaxVals = DashboardServerUtils.getMinMaxValidData(lats[q]);
 			if ( (minMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
 				 (minMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) )
 				throw new IOException("No valid latitudes for " + expocodes[q]);
@@ -295,28 +293,38 @@ public class CrossoverChecker {
 		Crossover crossover = null;
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j], 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 				continue;
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j], 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 				continue;
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j], 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 				continue;
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[0][j], 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 				continue;
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[0][j], 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 				continue;
 
 			for (int k = 0; k < numRows[1]; k++) {
 				// Skip this point if any missing values
-				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k], 
+						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
-				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k], 
+						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
-				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k], 
+						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
-				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[1][k], 
+						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
-				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[1][k], 
+						DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					continue;
 
 				if ( times[1][k] > times[0][j] + DashboardUtils.MAX_TIME_DIFF ) {
@@ -353,7 +361,7 @@ public class CrossoverChecker {
 					continue;
 				}
 
-				double locTimeDist = distanceBetween(longitudes[0][j], latitudes[0][j], times[0][j], 
+				double locTimeDist = DashboardServerUtils.distanceBetween(longitudes[0][j], latitudes[0][j], times[0][j], 
 												longitudes[1][k], latitudes[1][k], times[1][k]);
 				if ( locTimeDist < minDistance ) {
 					// Update this minimum distance and record the crossover
@@ -369,92 +377,6 @@ public class CrossoverChecker {
 		}
 
 		return crossover;
-	}
-
-	/**
-	 * Returns the location-time "distance" between two location-time point.
-	 * Uses {@link DashboardUtils#SEAWATER_SPEED} for converting differences 
-	 * in time into distance.  Uses the haversine formula, and 
-	 * {@link DashboardUtils#EARTH_AUTHALIC_RADIUS} for the radius of a 
-	 * spherical Earth, to compute the great circle distance from the 
-	 * longitudes and latitudes.
-	 * 
-	 * @param lon
-	 * 		longitude, in degrees, of the first data location
-	 * @param lat
-	 * 		latitude, in degrees, of the first data location
-	 * @param time
-	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the first data location
-	 * @param otherlon
-	 * 		longitude, in degrees, of the other data location
-	 * @param otherlat
-	 * 		latitude, in degrees, of the other data location
-	 * @param othertime
-	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the other data location
-	 * @return
-	 *      the location-time distance between this location-time point
-	 *      and other in kilometers
-	 */
-	public static double distanceBetween(double lon, double lat, double time, 
-							 double otherLon, double otherLat, double otherTime) {
-		// Convert longitude and latitude degrees to radians
-		double lat1 = lat * Math.PI / 180.0;
-		double lat2 = otherLat * Math.PI / 180.0;
-		double lon1 = lon * Math.PI / 180.0;
-		double lon2 = otherLon * Math.PI / 180.0;
-		/*
-		 * Use the haversine formula to compute the great circle distance, 
-		 * in radians, between the two (longitude, latitude) points. 
-		 */
-		double dellat = Math.sin(0.5 * (lat2 - lat1));
-		dellat *= dellat;
-		double dellon = Math.sin(0.5 * (lon2 - lon1));
-		dellon *= dellon * Math.cos(lat1) * Math.cos(lat2);
-		double distance = 2.0 * Math.asin(Math.sqrt(dellon + dellat));
-		// Convert the great circle distance from radians to kilometers
-		distance *= DashboardUtils.EARTH_AUTHALIC_RADIUS;
-
-		// Get the time difference in days (24 hours)
-		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0);
-		// Convert to the time difference to kilometers
-		deltime *= DashboardUtils.SEAWATER_SPEED;
-		// Combine the time distance with the surface distance
-		distance = Math.sqrt(distance * distance + deltime * deltime);
-
-		return distance;
-	}
-
-	/**
-	 * Returns the minimum and maximum valid values from the given data array.
-	 * Missing values (those very close to {@link SocatCruiseData#FP_MISSING_VALUE})
-	 * are ignored.
-	 * 
-	 * @param data
-	 * 		find the minimum and maximum valid values of this data
-	 * @return
-	 * 		(minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
-	 * 		({@link SocatCruiseData#FP_MISSING_VALUE}, {@link SocatCruiseData#FP_MISSING_VALUE})
-	 * 		if all data is missing.
-	 */
-	public static double[] getMinMaxValidData(double[] data) {
-		double maxVal = DashboardUtils.FP_MISSING_VALUE;
-		double minVal = DashboardUtils.FP_MISSING_VALUE;
-		for ( double val : data ) {
-			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, MISSVAL_RTOLER, MISSVAL_ATOLER) )
-				continue;
-			if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
-				 (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
-				maxVal = val;
-				minVal = val;
-			}
-			else if ( maxVal < val ) {
-				maxVal = val;
-			}
-			else if ( minVal > val ) {
-				minVal = val;
-			}
-		}
-		return new double[] {minVal, maxVal};
 	}
 
 }

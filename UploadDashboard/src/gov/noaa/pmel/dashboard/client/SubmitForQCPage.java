@@ -269,8 +269,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 				// Archive with next SOCAT release
 				numSocat++;
 			}
-			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
-				// Archive at CDIAC now
+			else if ( archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_PREFIX) ) {
+				// Archive now
 				numCdiac++;
 			}
 			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
@@ -321,7 +321,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			laterRadio.setValue(true, true);
 		}
 		else if ( numCdiac == numCruises ) {
-			// All "sent to CDIAC", so keep that setting
+			// All "sent to ...", so keep that setting
 			nowRadio.setValue(true, true);
 		}
 		else if ( numOwner == numCruises ) {
@@ -451,8 +451,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
 		}
 		else if ( nowRadio.getValue() ) {
-			// Tell CDIAC to archive now
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC;
+			// Tell OCADS to archive now
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_TO_OCADS;
 		}
 		else if ( ownerRadio.getValue() ) {
 			// Owner will archive

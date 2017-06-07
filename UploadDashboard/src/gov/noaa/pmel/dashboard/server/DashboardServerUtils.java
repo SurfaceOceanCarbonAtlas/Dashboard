@@ -3,13 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * @author Karl Smith
@@ -221,6 +221,93 @@ public class DashboardServerUtils {
 			return "Drifting Buoy";
 
 		return "Ship";
+	}
+
+	/**
+	 * Returns the minimum and maximum valid values from the given data array.
+	 * Missing values (those very close to {@link DashboardUtils#FP_MISSING_VALUE})
+	 * are ignored.
+	 * 
+	 * @param data
+	 * 		find the minimum and maximum valid values of this data
+	 * @return
+	 * 		(minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
+	 * 		({@link DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE})
+	 * 		if all data is missing.
+	 */
+	public static double[] getMinMaxValidData(double[] data) {
+		double maxVal = DashboardUtils.FP_MISSING_VALUE;
+		double minVal = DashboardUtils.FP_MISSING_VALUE;
+		for ( double val : data ) {
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+				continue;
+			if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
+				 (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
+				maxVal = val;
+				minVal = val;
+			}
+			else if ( maxVal < val ) {
+				maxVal = val;
+			}
+			else if ( minVal > val ) {
+				minVal = val;
+			}
+		}
+		return new double[] {minVal, maxVal};
+	}
+
+	/**
+	 * Returns the location-time "distance" between two location-time point.
+	 * Uses {@link DashboardUtils#SEAWATER_SPEED} for converting differences 
+	 * in time into distance.  Uses the haversine formula, and 
+	 * {@link DashboardUtils#EARTH_AUTHALIC_RADIUS} for the radius of a 
+	 * spherical Earth, to compute the great circle distance from the 
+	 * longitudes and latitudes.
+	 * 
+	 * @param lon
+	 * 		longitude, in degrees, of the first data location
+	 * @param lat
+	 * 		latitude, in degrees, of the first data location
+	 * @param time
+	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the first data location
+	 * @param otherlon
+	 * 		longitude, in degrees, of the other data location
+	 * @param otherlat
+	 * 		latitude, in degrees, of the other data location
+	 * @param othertime
+	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the other data location
+	 * @return
+	 *      the location-time distance between this location-time point
+	 *      and other in kilometers
+	 */
+	public static double distanceBetween(double lon, double lat, double time, 
+							 double otherLon, double otherLat, double otherTime) {
+		// Convert longitude and latitude degrees to radians
+		double lat1 = lat * Math.PI / 180.0;
+		double lat2 = otherLat * Math.PI / 180.0;
+		double lon1 = lon * Math.PI / 180.0;
+		double lon2 = otherLon * Math.PI / 180.0;
+		/*
+		 * Use the haversine formula to compute the great circle distance, 
+		 * in radians, between the two (longitude, latitude) points. 
+		 */
+		double dellat = Math.sin(0.5 * (lat2 - lat1));
+		dellat *= dellat;
+		double dellon = Math.sin(0.5 * (lon2 - lon1));
+		dellon *= dellon * Math.cos(lat1) * Math.cos(lat2);
+		double distance = 2.0 * Math.asin(Math.sqrt(dellon + dellat));
+		// Convert the great circle distance from radians to kilometers
+		distance *= DashboardUtils.EARTH_AUTHALIC_RADIUS;
+	
+		// Get the time difference in days (24 hours)
+		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0);
+		// Convert to the time difference to kilometers
+		deltime *= DashboardUtils.SEAWATER_SPEED;
+		// Combine the time distance with the surface distance
+		distance = Math.sqrt(distance * distance + deltime * deltime);
+	
+		return distance;
 	}
 
 }
