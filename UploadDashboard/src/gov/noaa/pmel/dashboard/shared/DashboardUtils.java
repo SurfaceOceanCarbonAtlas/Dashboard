@@ -706,6 +706,10 @@ public class DashboardUtils {
 			return false;
 		}
 
+		// Check if they are the same value
+		if ( first.equals(second) )
+			return true;
+
 		// Check if values are close
 		double absDiff = Math.abs(first - second);
 		double absAver = Math.abs((first + second) * 0.5);

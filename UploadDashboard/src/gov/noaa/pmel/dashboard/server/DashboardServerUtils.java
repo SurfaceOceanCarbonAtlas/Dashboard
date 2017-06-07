@@ -25,6 +25,9 @@ public class DashboardServerUtils {
 	/** Maximum length for a valid dataset ID */
 	public static final int MAX_DATASET_ID_LENGTH = 128;
 
+	/** Authalic radius, in kilometers, of Earth */
+	public static final double EARTH_AUTHALIC_RADIUS = 6371.007;
+
 	/** Sanity Checker "username" for flags */
 	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
 
@@ -276,6 +279,79 @@ public class DashboardServerUtils {
 		if ( upperID.length() != cleanID.length() )
 			throw new IllegalArgumentException("Invalid characters in the dataset ID");
 		return upperID;
+	}
+
+	/**
+	 * Returns the minimum and maximum valid values from the given data array.
+	 * Missing values (those very close to {@link DashboardUtils#FP_MISSING_VALUE})
+	 * are ignored.
+	 * 
+	 * @param data
+	 * 		find the minimum and maximum valid values of this data
+	 * @return
+	 * 		(minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
+	 * 		({@link DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE})
+	 * 		if all data is missing.
+	 */
+	public static double[] getMinMaxValidData(double[] data) {
+		double maxVal = DashboardUtils.FP_MISSING_VALUE;
+		double minVal = DashboardUtils.FP_MISSING_VALUE;
+		for ( double val : data ) {
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, 
+					DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+				continue;
+			if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
+				 (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
+				maxVal = val;
+				minVal = val;
+			}
+			else if ( maxVal < val ) {
+				maxVal = val;
+			}
+			else if ( minVal > val ) {
+				minVal = val;
+			}
+		}
+		return new double[] {minVal, maxVal};
+	}
+
+	/**
+	 * Returns the distance between two locations.  Uses the haversine formula, 
+	 * and {@link DashboardUtils#EARTH_AUTHALIC_RADIUS} for the radius of a 
+	 * spherical Earth, to compute the great circle distance from the 
+	 * longitudes and latitudes.
+	 * 
+	 * @param lon
+	 * 		longitude, in degrees, of the first data location
+	 * @param lat
+	 * 		latitude, in degrees, of the first data location
+	 * @param otherlon
+	 * 		longitude, in degrees, of the other data location
+	 * @param otherlat
+	 * 		latitude, in degrees, of the other data location
+	 * @return
+	 *      the location-time distance between this location-time point
+	 *      and other in kilometers
+	 */
+	public static double distanceBetween(double lon, double lat, double otherLon, double otherLat) {
+		// Convert longitude and latitude degrees to radians
+		double lat1 = lat * Math.PI / 180.0;
+		double lat2 = otherLat * Math.PI / 180.0;
+		double lon1 = lon * Math.PI / 180.0;
+		double lon2 = otherLon * Math.PI / 180.0;
+		/*
+		 * Use the haversine formula to compute the great circle distance, 
+		 * in radians, between the two (longitude, latitude) points. 
+		 */
+		double dellat = Math.sin(0.5 * (lat2 - lat1));
+		dellat *= dellat;
+		double dellon = Math.sin(0.5 * (lon2 - lon1));
+		dellon *= dellon * Math.cos(lat1) * Math.cos(lat2);
+		double distance = 2.0 * Math.asin(Math.sqrt(dellon + dellat));
+		// Convert the great circle distance from radians to kilometers
+		distance *= EARTH_AUTHALIC_RADIUS;
+
+		return distance;
 	}
 
 }

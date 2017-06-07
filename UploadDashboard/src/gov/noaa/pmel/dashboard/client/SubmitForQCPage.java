@@ -269,7 +269,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 				numDelay++;
 			}
 			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ) {
-				// Archive at CDIAC now
+				// Archive now
 				numCdiac++;
 			}
 			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) {
@@ -320,7 +320,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			laterRadio.setValue(true, true);
 		}
 		else if ( numCdiac == numDatasets ) {
-			// All "sent to CDIAC", so keep that setting
+			// All "sent for archival", so keep that setting
 			nowRadio.setValue(true, true);
 		}
 		else if ( numOwner == numDatasets ) {
@@ -450,7 +450,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE;
 		}
 		else if ( nowRadio.getValue() ) {
-			// Tell CDIAC to archive now
+			// Archive now
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL;
 		}
 		else if ( ownerRadio.getValue() ) {
