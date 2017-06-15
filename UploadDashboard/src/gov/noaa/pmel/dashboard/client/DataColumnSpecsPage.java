@@ -65,6 +65,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			"This cruise has been submitted for QC.  Data column types cannot be modified.";
 
 	private static final String CANCEL_TEXT = "Done";
+	private static final String SAVE_BUTTON_TEXT = "Save";
+	private static final String SAVE_BUTTON_HOVER_HELP = "Save column data type definitions";
 
 	private static final String INTRO_HTML_PROLOGUE = "Dataset: <ul><li>";
 	private static final String INTRO_HTML_EPILOGUE = "</li></ul>";
@@ -117,6 +119,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			"Problems updating the data column types";
 	private static final String MORE_DATA_FAIL_MSG = 
 			"Problems obtaining more data from the dataset";
+	private static final String SAVE_FAIL_MSG = 
+			"Problems saving column definitions";
 
 	private static final String SANITY_CHECK_FAIL_MSG = 
 			"The data check failed, indicating very serious errors in the data.";
@@ -167,6 +171,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	@UiField Button messagesButton;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
+	@UiField Button saveButton;
 
 	// Popup to confirm continue with default zero seconds
 	private DashboardAskPopup defaultSecondsPopup;
@@ -211,6 +216,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		pagerLabel.setText(PAGER_LABEL_TEXT);
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
+		saveButton.setText(SAVE_BUTTON_TEXT);
 
 		knownUserTypes = new ArrayList<DataColumnType>();
 		cruise = new DashboardDataset();
@@ -354,10 +360,14 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		if ( Boolean.TRUE.equals(cruiseSpecs.isEditable()) ) {
 			submitButton.setEnabled(true);
 			submitButton.setTitle(ENABLED_SUBMIT_HOVER_HELP);
+			saveButton.setEnabled(true);
+			saveButton.setTitle(SAVE_BUTTON_HOVER_HELP);
 		}
 		else {
 			submitButton.setEnabled(false);
 			submitButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
+			saveButton.setEnabled(false);
+			saveButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
 		}
 
 		// Clear the dataset in case the data provider gets called while clearing
@@ -809,6 +819,55 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				UploadDashboard.showAutoCursor();
 			}
 		});
+	}
+
+	@UiHandler("saveButton")
+	void saveOnClick(ClickEvent event) {
+		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+			// Should never get here, but just in case
+			UploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
+			return;
+		}
+		boolean hasChanged = false;
+		for ( DatasetDataColumn dataCol : cruiseDataCols ) {
+			if ( dataCol.hasChanged() ) {
+				hasChanged = true;
+				break;
+			}
+		}
+		if ( hasChanged ) {
+			doSave();
+		} else {
+			UploadDashboard.showMessage("There have been no changes to data column definitions.");
+		}
+	}
+
+	private void doSave() {
+		// Show the wait cursor
+		UploadDashboard.showWaitCursor();
+		// Submit the updated data column types to the server.
+		// This update invokes the SanityChecker on the data and
+		// the results are then reported back to this page.
+		service.saveDataColumnSpecs(getUsername(), cruise, 
+				new AsyncCallback<DashboardDatasetData>() {
+			@Override
+			public void onSuccess(DashboardDatasetData specs) {
+				if ( specs == null ) {
+					UploadDashboard.showMessage(SAVE_FAIL_MSG + " (unexpected null information returned)");
+				} else {
+					UploadDashboard.showMessage("Data column definitions saved.");
+					updateDatasetColumnSpecs(specs);
+				}
+				UploadDashboard.showAutoCursor();
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				UploadDashboard.showFailureMessage(SAVE_FAIL_MSG, ex);
+				// Show the normal cursor
+				UploadDashboard.showAutoCursor();
+			}
+		});
+		
 	}
 
 	/**

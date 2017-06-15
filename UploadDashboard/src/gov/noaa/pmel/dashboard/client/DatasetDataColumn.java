@@ -76,7 +76,7 @@ public class DatasetDataColumn {
 		}
 		this.cruise = cruise;
 		this.columnIndex = columnIndex;
-		this.columnHeader = createHeader();
+		this.columnHeader = createHeader(columnIndex+1);
 		this.hasChanged = false;
 	}
 
@@ -102,7 +102,7 @@ public class DatasetDataColumn {
 	/**
 	 * Creates the header for this cruise data column.
 	 */
-	private Header<DatasetDataColumn> createHeader() {
+	private Header<DatasetDataColumn> createHeader(final int columnNumber) {
 
 		// Create the TextCell giving the column name given by the user
 		HasCell<DatasetDataColumn,String> userNameCell = new HasCell<DatasetDataColumn,String>() {
@@ -112,7 +112,7 @@ public class DatasetDataColumn {
 				return new TextCell() {
 					@Override
 					public void render(Cell.Context context, String value, SafeHtmlBuilder sb) {
-						super.render(context, value, sb);
+						super.render(context, "[" + columnNumber + "] " + value, sb);
 						sb.appendHtmlConstant("<br />");
 					}
 				};

@@ -346,6 +346,42 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 	}
 
 	@Override
+	public DashboardDatasetData saveDataColumnSpecs(String pageUsername, DashboardDataset newSpecs)
+			throws IllegalArgumentException {
+		// Get the dashboard data store and current username, and validate that username
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
+
+		// Retrieve all the current cruise data
+		DashboardDatasetData dataset = configStore.getDataFileHandler()
+						.getDatasetDataFromFiles(newSpecs.getDatasetId(), 0, -1);
+		if ( ! dataset.isEditable() )
+			throw new IllegalArgumentException(newSpecs.getDatasetId() + 
+					" has been submitted for QC; data column types cannot be modified.");
+
+		// Revise the data column types and units 
+		if ( newSpecs.getDataColTypes().size() != dataset.getDataColTypes().size() )
+			throw new IllegalArgumentException("Unexpected number of data columns (" +
+					newSpecs.getDataColTypes().size() + " instead of " + 
+					dataset.getDataColTypes().size());
+		dataset.setDataColTypes(newSpecs.getDataColTypes());
+
+		// Save and commit the updated data columns
+		configStore.getDataFileHandler().saveDatasetInfoToFile(dataset, 
+				"Data column types, units, and missing values for " + 
+				dataset.getDatasetId() + " updated by " + username);
+		// Update the user-specific data column names to types, units, and missing values 
+		configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, username);
+		if ( ! username.equals(dataset.getOwner()) )
+			configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, dataset.getOwner());
+		
+		LogManager.getLogger("DashboardServices").info("data columns specs saved for " + 
+				dataset.getDatasetId() + " by " + username);
+		
+		return dataset;
+	}
+	
+	@Override
 	public DashboardDatasetData updateDataColumnSpecs(String pageUsername,
 			DashboardDataset newSpecs) throws IllegalArgumentException {
 		// Get the dashboard data store and current username, and validate that username
