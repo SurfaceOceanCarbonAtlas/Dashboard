@@ -1,4 +1,6 @@
 ! Difference between source and recalculated fCO_2
+! 9/2017. Check for no-valid fco2_recommended
+!         Previously checked fco2_source. It is set to -1 for no valid data
 
 GO preview_setup.jnl ($infile_dsg) 13
 
@@ -39,7 +41,7 @@ LET alg_id_t = reshape (fco2_source, tt)
 
 SET VIEW FULL
 
-LET nsrc = `fco2_source[i=@ngd]`
+LET nsrc = `fco2_recommended[i=@ngd]`
 IF `nsrc EQ 0` THEN
   plot/nolab/vs/hlim=0:1/vlim=0:1/set {100,200},{100,200}
   ppl axlabp,0,0
