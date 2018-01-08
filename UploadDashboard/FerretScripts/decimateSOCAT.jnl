@@ -1,4 +1,5 @@
-! ddsg_socat3.jnl
+! decimateSOCAT.jnl
+!
 ! ACM 5/16/2014
 
 ! Compute and apply sampling for a single-trajectory dsg file

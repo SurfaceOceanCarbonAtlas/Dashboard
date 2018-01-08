@@ -1,4 +1,5 @@
-
+! preview_02.jnl
+!
 ! Latitude, Longitude vs time and sample number
 
 go preview_setup ($infile_dsg) 2

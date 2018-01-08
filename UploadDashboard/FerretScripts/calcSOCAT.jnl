@@ -13,7 +13,9 @@
 !Are Olsen, Aug 2008.
 ! Converted to Ferret .jnl script Ansley Manke 10/2013
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+!
+! calcSOCAT.jnl
+!
 
 ! Here is the file to read and append to.
 ! Contains the metadata variables, global attributes, and incoming variables.

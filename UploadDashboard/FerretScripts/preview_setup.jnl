@@ -1,3 +1,5 @@
+! preview_setup.jnl
+!
 ! Setup for preview plots
 ! Open the dataset, define the output file name
 ! Make definitions used by all the scripts

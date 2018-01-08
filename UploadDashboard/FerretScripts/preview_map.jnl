@@ -1,3 +1,5 @@
+! preview_map.jnl
+!
 
 CANCEL MODE nodata_lab
 DEFINE VIEW/AXES/X=0.08:0.99/y=0.06:0.92 full_view
