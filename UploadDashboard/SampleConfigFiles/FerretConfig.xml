@@ -15,8 +15,8 @@
         executable="/home/users/socat/Ferret/bin/ferret"
         time_limit="60000"
         temp_dir="/var/tmp/socat/"
-        compute_driver="calcSOCAT3"
-        decimate_driver="ddsg_socat3"
+        compute_driver="calcSOCAT"
+        decimate_driver="decimateSOCAT"
         plots_driver="run_preview" >
         <arg>-gif</arg>
         <arg>-script</arg>

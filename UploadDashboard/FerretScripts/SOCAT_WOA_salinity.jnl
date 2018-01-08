@@ -1,4 +1,4 @@
-! SOCAT3_WOA_salinity.jnl
+! SOCAT_WOA_salinity.jnl
 !
 ! Sample World Ocean Atlas salinity at the times and locations of a SOCAT cruise dataset
 ! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
@@ -7,7 +7,10 @@
 ! Follow the Data Access link, Monthly, and get s0112an1.nc. 
 !!!!!!!!!!!!!!!!!!!!  WOA salinity !!!!!!!!!!!!!!!!!!!! 
 
+
+! use "http://ferret.pmel.noaa.gov/pmel/thredds/dodsC/data/PMEL/WOA05nc/monthly/s0112an1.nc"
 use s0112an1.nc
+
 define symbol dwoa = `s0112an1,RETURN=dsetnum`
 set data "($cruise_filename)"
 

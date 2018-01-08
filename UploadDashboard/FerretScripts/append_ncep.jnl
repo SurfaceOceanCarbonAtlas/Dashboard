@@ -12,7 +12,7 @@ def sym offst = 119765
 def sym newbad = `32766+($offst)`
 
 
-use "/home/data/socat/ncep_slp_data/slp.2015.nc"
+use "/home/data/socat/ncep_slp_data/slp.2017.nc"
 
 ! Replace the bad-flag
 set var/name=slp_in slp
@@ -24,7 +24,7 @@ def att/output slp.add_offset = ($offst)
 
 ! keep the input attributes; title, units, etc
 set att/output=all slp
-save/append/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
+save/append/nobounds/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
 
 
 exit/script

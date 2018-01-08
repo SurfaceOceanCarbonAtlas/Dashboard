@@ -4,7 +4,7 @@ GO preview_setup.jnl ($infile_dsg) 12
 
 
 
-! We compute the fco2_source in calcSOCAT3.jnl
+! We compute the fco2_source in calcSOCAT.jnl
 !  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
 !  if the values of xCO2_water_equi_temp_dry_ppm are valid, because the computed
 !  fCO2_insitu variable also depends on temperature and temperature_equi.)
