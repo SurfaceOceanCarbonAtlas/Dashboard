@@ -33,8 +33,6 @@
         <variable>
             <name>FER_DATA</name>
             <value>Datasets/data</value>
-            <value>Ferret/go</value>
-            <value>Ferret/examples</value>
             <value>Ferret/contrib</value>
         </variable>
         <variable>
@@ -53,7 +51,7 @@
             <value>Ferret/contrib</value>
         </variable>
         <variable>
-            <name>PLOTFONTS</name>
+            <name>FER_FONTS</name>
             <value>Ferret/ppl/fonts</value>
         </variable>
         <variable>
