@@ -1,4 +1,4 @@
-! SOCAT3_gvco2.jnl
+! SOCAT_gvco2.jnl
 !
 ! Sample the computed GlobalView Marine Carbon dataset at the locations of a SOCAT cruise dataset
 ! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
@@ -7,7 +7,7 @@
 !!!!!!!!!!!!!!!!!!!! GlobalViewMarineCarbon !!!!!!!!!!!!!!!!!!!! 
 
 ! gvco2_201x from  http://www.esrl.noaa.gov/gmd/ccgg/mbl/
-! and written by the scripts GlobalViewMarineCarbon_2013.jnl
+! and written by the scripts GlobalViewMarineCarbon_2017.jnl
 
 use gvco2.nc
 def sym dco2 = `co2,return=dsetnum`

@@ -1,4 +1,5 @@
 ! append_ncep.jnl
+!
 ! Data downloaded from http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
 ! Add an offset and fix the missing-value flag so that the data can be saved as SHORT
 ! If the data being added is a partial year, see ncep_slp_blank_end_year.jnl to 
@@ -12,7 +13,7 @@ def sym offst = 119765
 def sym newbad = `32766+($offst)`
 
 
-use "/home/data/socat/ncep_slp_data/slp.2015.nc"
+use "/home/data/socat/ncep_slp_data/slp.2017.nc"
 
 ! Replace the bad-flag
 set var/name=slp_in slp
@@ -24,7 +25,7 @@ def att/output slp.add_offset = ($offst)
 
 ! keep the input attributes; title, units, etc
 set att/output=all slp
-save/append/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
+save/append/nobounds/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
 
 
 exit/script

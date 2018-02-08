@@ -1,3 +1,5 @@
+! preview_01.jnl
+!
 ! Map with trajectory track
 
 GO preview_setup ($infile_dsg) 1

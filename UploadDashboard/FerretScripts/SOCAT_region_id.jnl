@@ -1,4 +1,4 @@
-! SOCAT3_region_id.jnl
+! SOCAT_region_id.jnl
 !
 ! Sample the computed distance-to-land dataset at the locations of a SOCAT cruise dataset
 ! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
@@ -25,11 +25,11 @@
 
 use SOCAT_region_ids.nc
 define symbol dmask = `region_id,return=dsetnum`
-set var/name=socat3regions region_id
+set var/name=socatregions region_id
 
 set data "($cruise_filename)"
 
-let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask),x=-180:180], longitude, latitude)
+let region_num = SAMPLEXY_CLOSEST(socatregions[d=($dmask),x=-180:180], longitude, latitude)
 
 ! If there are any missing or zero (land) values, fill them with: 
 ! Arctic, Coastal, or Southern.

@@ -1,4 +1,4 @@
-! SOCAT3_NCEP_slp.jnl
+! SOCAT_NCEP_slp.jnl
 !
 ! Sample NCEP sea level pressure at the times and locations of a SOCAT cruise dataset
 ! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
@@ -61,15 +61,25 @@ IF `year[i=@min] LT 1900` THEN
    EXIT/PROGRAM
 ENDIF
 
-let mindate = t[gt=slp[d=($dncep)],L=1]
+let tslp = t[gt=slp[d=($dncep)]]
+let mindate = tslp[L=1]
+let maxdate = tslp[L=@max]
+
+! Fill with all-missing if the dates do not overlap NCEP dates
+! If the data partially overlap, then the sampling works, returning data where
+! the dates do overlap.
 
 IF `dates_for_ncep[i=@max] LT mindate` THEN
    let/units="hPa"/title="NCEP sea level pressure" ncep_slp = (1./0)* longitude
-ELSE
+ELIF `dates_for_ncep[i=@min] GE maxdate` THEN
+   let/units="hPa"/title="NCEP sea level pressure" ncep_slp = (1./0)* longitude
+
+ELSE    
 
 ! If the data dates overlap the start of 1968 return missing prior to 1-jan-1968 
    IF `dates_for_ncep[i=@min] LT mindate` THEN 
-      LET dates_for_ncep = IF dates_for_ncep GE mindate THEN dates_for_ncep
+      LET dates_for_ncep0 = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
+      LET dates_for_ncep = IF dates_for_ncep0 GE mindate THEN dates_for_ncep0
       LET data_t_lo = mindate
    ENDIF
 

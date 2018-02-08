@@ -15,8 +15,8 @@
         executable="/home/users/socat/Ferret/bin/ferret"
         time_limit="60000"
         temp_dir="/var/tmp/socat/"
-        compute_driver="calcSOCAT3"
-        decimate_driver="ddsg_socat3"
+        compute_driver="calcSOCAT"
+        decimate_driver="decimateSOCAT"
         plots_driver="run_preview" >
         <arg>-gif</arg>
         <arg>-script</arg>
@@ -33,8 +33,6 @@
         <variable>
             <name>FER_DATA</name>
             <value>Datasets/data</value>
-            <value>Ferret/go</value>
-            <value>Ferret/examples</value>
             <value>Ferret/contrib</value>
         </variable>
         <variable>
@@ -53,7 +51,7 @@
             <value>Ferret/contrib</value>
         </variable>
         <variable>
-            <name>PLOTFONTS</name>
+            <name>FER_FONTS</name>
             <value>Ferret/ppl/fonts</value>
         </variable>
         <variable>

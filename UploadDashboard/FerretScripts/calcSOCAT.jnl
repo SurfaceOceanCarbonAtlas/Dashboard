@@ -13,7 +13,9 @@
 !Are Olsen, Aug 2008.
 ! Converted to Ferret .jnl script Ansley Manke 10/2013
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+!
+! calcSOCAT.jnl
+!
 
 ! Here is the file to read and append to.
 ! Contains the metadata variables, global attributes, and incoming variables.
@@ -53,9 +55,9 @@ define symbol outtype=`longitude,return=dtype`
 
 
 ! Set variables with ncep_slp, woaSss, etopoDepth, d2l, region_id
-GO SOCAT3_NCEP_slp
+GO SOCAT_NCEP_slp
 
-GO SOCAT3_WOA_salinity
+GO SOCAT_WOA_salinity
 
 !!!!!!!!!CALCULATIONS!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -274,13 +276,13 @@ LET/bad=999 fco2_src = IF srcl THEN srcl ELSE src14
 
 ! More variables to add: etopoDepth, d2l, region_id, gvCO2
 
-GO SOCAT3_ETOPO2_depth
+GO SOCAT_ETOPO2_depth
 
-GO SOCAT3_dist2land
+GO SOCAT_dist2land
 
-GO SOCAT3_region_id
+GO SOCAT_region_id
 
-GO SOCAT3_gvco2
+GO SOCAT_gvco2
 
 !!!!!!!Save output
 cancel mode upcase
