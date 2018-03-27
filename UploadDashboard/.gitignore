@@ -1,2 +1,4 @@
-/test-classes/
-/.gwt/
+test-classes/
+gwt-unitCache/
+war/SocatUploadDashboard/
+war/WEB-INF/deploy/
