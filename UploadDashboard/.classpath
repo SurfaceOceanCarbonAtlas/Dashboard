@@ -4,7 +4,7 @@
 	<classpathentry kind="src" output="test-classes" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry kind="con" path="com.gwtplugins.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/antlr-runtime-3.4.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/avalon-framework-api-4.3.1.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/avalon-framework-impl-4.3.1.jar"/>
