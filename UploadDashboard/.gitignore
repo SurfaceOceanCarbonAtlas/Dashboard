@@ -1,2 +1,9 @@
+SocatUploadDashboard/
+classes/
+deploy/
 gwt-unitCache/
 target/
+test-classes/
+gwt-servlet.jar
+omemetadata.jar
+sanitychecker.jar
