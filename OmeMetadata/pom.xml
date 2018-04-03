@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <properties>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
@@ -21,12 +21,8 @@
   <description>Java library for working with the OME XML for SOCAT metadata</description>
 
   <build>
-    <defaultGoal>install</defaultGoal>
+    <defaultGoal>package</defaultGoal>
     <directory>${basedir}/target</directory>
-    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-    <outputDirectory>${basedir}/target/classes</outputDirectory>
-    <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
-    <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
     <finalName>${project.artifactId}</finalName>
   </build>
 
