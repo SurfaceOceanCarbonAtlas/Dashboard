@@ -23,7 +23,7 @@
   <build>
     <defaultGoal>package</defaultGoal>
     <directory>${basedir}/target</directory>
-    <finalName>${project.artifactId}</finalName>
+    <finalName>../../UploadDashboard/src/main/webapp/WEB-INF/lib/${project.artifactId}</finalName>
   </build>
 
   <dependencies>
