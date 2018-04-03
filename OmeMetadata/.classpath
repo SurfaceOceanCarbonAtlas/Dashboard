@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" output="target/classes" path="src/main/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
-	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jdom-2.0.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/jdom-2.0.5.jar"/>
 	<classpathentry kind="output" path="target"/>
 </classpath>
