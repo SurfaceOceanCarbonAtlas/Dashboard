@@ -6,7 +6,7 @@
 
   <groupId>gov.noaa.pmel.dashboard</groupId>
   <artifactId>SocatUploadDashboard</artifactId>
-  <version>7.0.0-SNAPSHOT</version>
+  <version>7.0.0</version>
   <packaging>pom</packaging>
 
   <modules>
