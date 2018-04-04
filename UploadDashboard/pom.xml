@@ -13,11 +13,11 @@
   </properties>
 
   <groupId>gov.noaa.pmel.dashboard</groupId>
-  <artifactId>SocatUploadDashboard</artifactId>
+  <artifactId>UploadDashboard</artifactId>
   <version>7.0.0</version>
   <packaging>war</packaging>
 
-  <name>SocatUploadDashboard</name>
+  <name>UploadDashboard</name>
   <description>upload dashboard webapp for SOCAT</description>
 
   <build>
