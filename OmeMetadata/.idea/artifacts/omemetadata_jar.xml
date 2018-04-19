@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="omemetadata:jar">
+    <output-path>$PROJECT_DIR$/target/artifacts</output-path>
+    <root id="archive" name="omemetadata.jar">
+      <element id="module-output" name="omemetadata" />
+    </root>
+  </artifact>
+</component>
