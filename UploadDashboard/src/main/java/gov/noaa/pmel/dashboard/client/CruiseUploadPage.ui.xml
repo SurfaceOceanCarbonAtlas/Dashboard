@@ -1,66 +1,66 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-			 xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	<ui:style src="FullWidth.css" />
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+    <ui:style src="FullWidth.css"/>
 
-	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
-		<g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.titlepanel}">
-				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
-				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
-				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
-				<g:Label addStyleNames="{style.titlereset}" />
-			</g:FlowPanel>
-			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
-			<g:Anchor addStyleNames="{style.morehelpanchor}" ui:field="moreHelpAnchor" />
-			<g:FormPanel ui:field="uploadForm">
-				<g:FlowPanel>
-					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />
-					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
-					<g:Hidden name="cruiseaction" ui:field="actionToken" />
-					<g:Hidden name="cruiseencoding" ui:field="encodingToken" />
-					<g:Hidden name="cruiseformat" ui:field="formatToken" />
-				</g:FlowPanel>
-			</g:FormPanel>
-			<g:CaptionPanel addStyleNames="{style.settingscaptionpanel}" ui:field="settingsCaption">
-				<g:FlowPanel>
-					<g:FlowPanel addStyleNames="{style.settingsradiopanel}">
-						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
-								name="formatRadioGroup" ui:field="commaRadio" />
-						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
-								name="formatRadioGroup" ui:field="semicolonRadio" />
-						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
-								name="formatRadioGroup" ui:field="tabRadio" />
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="{style.settingsradiopanel}">
-						<g:RadioButton addStyleNames="{style.settingsradiobutton}"
-								name="actionRadioGroup" ui:field="createRadio" />
-						<g:RadioButton addStyleNames="{style.settingsradiobutton}"
-								name="actionRadioGroup" ui:field="overwriteRadio" />
-					</g:FlowPanel>
-					<g:DisclosurePanel addStyleNames="{style.advancedoptionspanel}" ui:field="advancedPanel">
-						<g:header>Advanced Options</g:header>
-						<g:FlowPanel>
-							<g:HTML addStyleNames="{style.introhtml}" ui:field="advancedHtml"/>
-							<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
-								<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel" />
-								<g:ListBox addStyleNames="{style.labeledlistbox}" ui:field="encodingListBox" />
-							</g:FlowPanel>
-							<g:Button addStyleNames="{style.previewbutton}" ui:field="previewButton" />
-							<g:CaptionPanel addStyleNames="{style.previewcaptionpanel}">
-								<g:ScrollPanel addStyleNames="{style.previewscrollpanel}">
-									<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
-								</g:ScrollPanel>
-							</g:CaptionPanel>
-						</g:FlowPanel>
-					</g:DisclosurePanel>
-				</g:FlowPanel>
-			</g:CaptionPanel>
-			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:ScrollPanel>
+    <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.titlepanel}">
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
+            </g:FlowPanel>
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
+            <g:Anchor addStyleNames="{style.morehelpanchor}" ui:field="moreHelpAnchor"/>
+            <g:FormPanel ui:field="uploadForm">
+                <g:FlowPanel>
+                    <g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload"/>
+                    <g:Hidden name="timestamp" ui:field="timestampToken"/>
+                    <g:Hidden name="cruiseaction" ui:field="actionToken"/>
+                    <g:Hidden name="cruiseencoding" ui:field="encodingToken"/>
+                    <g:Hidden name="cruiseformat" ui:field="formatToken"/>
+                </g:FlowPanel>
+            </g:FormPanel>
+            <g:CaptionPanel addStyleNames="{style.settingscaptionpanel}" ui:field="settingsCaption">
+                <g:FlowPanel>
+                    <g:FlowPanel addStyleNames="{style.settingsradiopanel}">
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="formatRadioGroup" ui:field="commaRadio"/>
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="formatRadioGroup" ui:field="semicolonRadio"/>
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="formatRadioGroup" ui:field="tabRadio"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel addStyleNames="{style.settingsradiopanel}">
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="actionRadioGroup" ui:field="createRadio"/>
+                        <g:RadioButton addStyleNames="{style.settingsradiobutton}"
+                                       name="actionRadioGroup" ui:field="overwriteRadio"/>
+                    </g:FlowPanel>
+                    <g:DisclosurePanel addStyleNames="{style.advancedoptionspanel}" ui:field="advancedPanel">
+                        <g:header>Advanced Options</g:header>
+                        <g:FlowPanel>
+                            <g:HTML addStyleNames="{style.introhtml}" ui:field="advancedHtml"/>
+                            <g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+                                <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel"/>
+                                <g:ListBox addStyleNames="{style.labeledlistbox}" ui:field="encodingListBox"/>
+                            </g:FlowPanel>
+                            <g:Button addStyleNames="{style.previewbutton}" ui:field="previewButton"/>
+                            <g:CaptionPanel addStyleNames="{style.previewcaptionpanel}">
+                                <g:ScrollPanel addStyleNames="{style.previewscrollpanel}">
+                                    <g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml"/>
+                                </g:ScrollPanel>
+                            </g:CaptionPanel>
+                        </g:FlowPanel>
+                    </g:DisclosurePanel>
+                </g:FlowPanel>
+            </g:CaptionPanel>
+            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

@@ -10,14 +10,13 @@
                     Ferret must be able to find the data file either by adding the data directory to the FER_DATA
                     environment below or by passing the script a fully qualified path.
     -->
-    <invoker
-        base_dir="/home/users/socat/"
-        executable="/home/users/socat/Ferret/bin/ferret"
-        time_limit="60000"
-        temp_dir="/var/tmp/socat/"
-        compute_driver="calcSOCAT"
-        decimate_driver="decimateSOCAT"
-        plots_driver="run_preview" >
+    <invoker base_dir="/home/users/socat/"
+             executable="/home/users/socat/Ferret/bin/ferret"
+             time_limit="60000"
+             temp_dir="/var/tmp/socat/"
+             compute_driver="calcSOCAT"
+             decimate_driver="decimateSOCAT"
+             plots_driver="run_preview">
         <arg>-gif</arg>
         <arg>-script</arg>
     </invoker>
@@ -68,7 +67,9 @@
             </text>
         </message>
         <message type="startsWith" level="error">
-            <key>**ERROR Sorry. This server cannot yet perform a time analysis and a month-of-the-year constraint together.</key>
+            <key>**ERROR Sorry. This server cannot yet perform a time analysis and a month-of-the-year constraint
+                together.
+            </key>
             <text>
                 Sorry. This server cannot yet perform a time analysis and a month-of-the-year constraint together.
             </text>
