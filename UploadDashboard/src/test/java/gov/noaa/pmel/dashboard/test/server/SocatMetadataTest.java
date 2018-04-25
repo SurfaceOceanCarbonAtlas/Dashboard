@@ -287,7 +287,7 @@ public class SocatMetadataTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getQcFlag()}
-     * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setQcFlag(java.lang.Character)}.
+     * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setQcFlag(String)}
      */
     @Test
     public void testGetSetQCFlag() {

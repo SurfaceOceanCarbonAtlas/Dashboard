@@ -160,9 +160,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @param varName
-     *         the variable name to set for this of this data column type;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     * @param sortOrder
+     *         the sort order to set for this of this data column type;
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setSortOrder(Double sortOrder) {
         if ( sortOrder != null ) {
@@ -364,8 +364,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
      * is equal, ignoring case and non-alphanumeric characters,
      * to the given name.
      *
-     * @param other
-     *         data column type to compare to
+     * @param name
+     *         name of data column type to compare to
      * @return whether the type names match
      */
     public boolean typeNameEquals(String name) {

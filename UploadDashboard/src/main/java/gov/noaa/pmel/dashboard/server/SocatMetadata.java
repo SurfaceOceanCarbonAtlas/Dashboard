@@ -330,7 +330,7 @@ public class SocatMetadata {
      * version.  Updates within a SOCAT version do NOT change an 'N'
      * to a 'U'.
      *
-     * @param version
+     * @param socatVersion
      *         the SOCAT version to set;
      *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
@@ -457,7 +457,7 @@ public class SocatMetadata {
     /**
      * @param eastmostLongitude
      *         the east-most longitude to set;
-     *         if null, {@link DashboardUtils.FP_MISSING_VALUE} is assigned
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setEastmostLongitude(Double eastmostLongitude) {
         Double value;

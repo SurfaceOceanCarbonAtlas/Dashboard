@@ -132,8 +132,7 @@ public class SocatCruiseDataTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#SocatCruiseData(gov.noaa.pmel.dashboard.server.KnownDataTypes,
-     * java.util.List, java.util.List)}
+     * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#SocatCruiseData(KnownDataTypes, java.util.List, int, java.util.List)}
      * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.dashboard.server.KnownDataTypes,
      * gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData)}.
      */
@@ -957,7 +956,7 @@ public class SocatCruiseDataTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getRegionID()}
-     * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setRegionID(java.lang.String)}.
+     * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setRegionID(Character)}
      */
     @Test
     public void testGetSetRegionID() {

@@ -850,8 +850,8 @@ public class CruiseChecker {
      *         cruise to use
      * @param colIndcs
      *         data column indices for the cruise
-     * @param processedOK
-     *         did the SanityCheck run successfully?
+     * @param output
+     *         Output object from the SanityCheck run
      */
     private void countWoceFlagsAndAssignStatus(DashboardCruise cruise,
                                                ColumnIndices colIndcs, Output output) {

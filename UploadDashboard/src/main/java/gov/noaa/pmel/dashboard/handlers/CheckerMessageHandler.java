@@ -479,7 +479,7 @@ public class CheckerMessageHandler {
      *         cruise.
      * @param dsgHandler
      *         DSG file handler to use to get the full-data DSG file for the cruise
-     * @param knowndDataFileTypes
+     * @param knownDataFileTypes
      *         known types for data files
      * @return the list of SocatWoceEvents for the cruise; never null but may be empty
      * @throws IllegalArgumentException

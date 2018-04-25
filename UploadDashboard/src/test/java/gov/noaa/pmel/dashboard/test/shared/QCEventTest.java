@@ -34,8 +34,8 @@ public class QCEventTest {
     private static final String MY_COMMENT = "from QCEvent unit test";
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#getID()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setId(java.lang.Long)}.
+     * Test method for {@link DashboardEvent#getId()}
+     * and {@link DashboardEvent#setId(Long)}
      */
     @Test
     public void testGetSetId() {
@@ -49,7 +49,7 @@ public class QCEventTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.QCEvent#getFlag()}
-     * and {@link gov.noaa.pmel.dashboard.shared.QCEvent#setFlag(java.lang.String)}.
+     * and {@link gov.noaa.pmel.dashboard.shared.QCEvent#setFlag(Character)}
      */
     @Test
     public void testGetSetFlag() {
@@ -80,7 +80,7 @@ public class QCEventTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#getVersion()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setVersion(java.lang.Double)}.
+     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setVersion(String)}
      */
     @Test
     public void testGetSetSocatVersion() {
@@ -97,7 +97,7 @@ public class QCEventTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.QCEvent#getRegionID()}
-     * and {@link gov.noaa.pmel.dashboard.shared.QCEvent#setRegionID(java.lang.String)}.
+     * and {@link gov.noaa.pmel.dashboard.shared.QCEvent#setRegionID(Character)}
      */
     @Test
     public void testGetSetRegionID() {

@@ -42,8 +42,8 @@ public class DashboardInfoPopup extends Composite {
      * The popup includes a dismiss button to hide it.
      * Use {@link #setInfoMessage(String)} to assign
      * the message to be displayed.
-     * Use {@link #showAtPosition(int, int)}
-     * or {@link #showInCenterOf(UIObject)}
+     * Use {@link #showRelativeTo(UIObject)}
+     * or {@link #showCentered()}
      * to show the popup.
      */
     DashboardInfoPopup() {

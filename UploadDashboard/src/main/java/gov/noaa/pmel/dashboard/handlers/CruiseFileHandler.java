@@ -253,7 +253,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
      * comma-separated values as in the column headers line.  Any blank
      * data value strings, or data value strings matching "null", "NaN",
      * "NA", "N/A" (all case insensitive), are set to
-     * {@value #MISSING_VALUE_STRING} to indicate a missing value.
+     * {@value DashboardUtils#STRING_MISSING_VALUE} to indicate a missing value.
      * Note: blank lines are not detected when skipping initial data lines
      * (when firstDataRow > 0).
      *
@@ -266,7 +266,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
      *         read cruise data from here;
      *         if reading from a cruise data file, must be positioned
      *         after any cruise information read by
-     *         {@link #assignCruiseFromInput(DashboardCruise, BufferedReader)}
+     *         {@link #assignCruiseDataFromInput(DashboardCruiseWithData, String, BufferedReader, int, int, boolean)}
      * @param firstDataRow
      *         index of the first data row to return; for all data for the
      *         cruise, specify zero

@@ -270,11 +270,11 @@ public class DashboardServerUtils {
      *         latitude, in degrees, of the first data location
      * @param time
      *         time, in seconds since Jan 1, 1970 00:00:00, of the first data location
-     * @param otherlon
+     * @param otherLon
      *         longitude, in degrees, of the other data location
-     * @param otherlat
+     * @param otherLat
      *         latitude, in degrees, of the other data location
-     * @param othertime
+     * @param otherTime
      *         time, in seconds since Jan 1, 1970 00:00:00, of the other data location
      * @return the location-time distance between this location-time point
      * and other in kilometers

@@ -82,7 +82,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         password for SVN authentication
      * @param toEmailAddresses
      *         e-mail addresses to send bundles to for archival
-     * @param ccEmailAddress
+     * @param ccEmailAddresses
      *         e-mail addresses to be cc'd on the archival request
      * @param smtpHostAddress
      *         address of the SMTP host to use for email; if null or empty, "localhost" is used

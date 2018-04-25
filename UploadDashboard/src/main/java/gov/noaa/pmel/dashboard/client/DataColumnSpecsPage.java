@@ -271,14 +271,14 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the cruise data column specifications page for a cruise
+     * Display the cruise data column specifications page for a dataset
      * with the latest cruise data column specifications from the server.
      * Adds this page to the page history.
      *
      * @param username
      *         username for this page
-     * @param expocode
-     *         show the specifications for this cruise
+     * @param expocodes
+     *         show the specifications for the first of these datasets
      */
     static void showPage(String username, ArrayList<String> expocodes) {
         if ( singleton == null )

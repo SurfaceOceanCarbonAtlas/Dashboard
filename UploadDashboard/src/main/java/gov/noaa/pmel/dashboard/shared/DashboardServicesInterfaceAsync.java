@@ -232,7 +232,7 @@ public interface DashboardServicesInterfaceAsync {
      * Client-side interface for getting the absolute path
      * to the OME.xml file for a cruise
      *
-     * @param username
+     * @param pageUsername
      *         name of the current user - for validation
      * @param activeExpocode
      *         get the OME for this cruise

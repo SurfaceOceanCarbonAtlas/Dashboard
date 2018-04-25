@@ -25,7 +25,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  * Class for the one special metadata file per cruise that must be present,
  * has a known format, and contains user-provided values needed by the SOCAT
  * database.  Extends DashboardMetadata, but uses
- * {@link uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata}
+ * {@link uk.ac.uea.socat.omemetadata.OmeMetadata}
  * to work with the actual metadata.
  *
  * @author Karl Smith

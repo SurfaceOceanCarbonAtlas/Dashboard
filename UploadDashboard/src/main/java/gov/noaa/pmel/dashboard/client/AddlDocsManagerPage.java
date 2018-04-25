@@ -228,7 +228,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
      * Updates the this page with the given cruises and their
      * supplemental documents.
      *
-     * @param cruiseSet
+     * @param cruises
      *         set of cruises to use
      */
     private void updateAddlDocs(DashboardCruiseList cruises) {

@@ -39,8 +39,8 @@ public class CrossoverChecker {
      * Checks for high-quality crossovers between two cruises.
      * Always reads the data for both cruises, so for a one-time
      * pair check.  If checking a cruise against many other cruises,
-     * use the {@link #getCrossovers(String, java.util.Set)} method
-     * with expocodes of cruises that potentially could have a
+     * use the {@link #getCrossovers(String, Iterable, PrintStream, long)}
+     * method with expocodes of cruises that potentially could have a
      * crossover with the cruise from the data time and latitude
      * minimums and maximums, and assign the data time minimums
      * and maximums to those crossovers found.

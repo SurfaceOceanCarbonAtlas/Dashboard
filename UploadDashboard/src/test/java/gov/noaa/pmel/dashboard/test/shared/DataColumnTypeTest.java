@@ -51,7 +51,7 @@ public class DataColumnTypeTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#getSortOrder()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#setSortOrder(java.lang.String)}.
+     * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#setSortOrder(Double)}
      */
     @Test
     public void testGetSetSOrtOrder() {

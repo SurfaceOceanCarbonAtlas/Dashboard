@@ -164,8 +164,8 @@ public class DashDataType implements Comparable<DashDataType> {
      * is equal, ignoring case and non-alphanumeric characters,
      * to the given name.
      *
-     * @param other
-     *         data type to compare to
+     * @param name
+     *         name of data type to compare to
      * @return whether the type names match
      */
     public boolean typeNameEquals(String name) {

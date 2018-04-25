@@ -420,7 +420,7 @@ public class DsgNcFileHandler {
      * Reads and returns the set of region IDs from the DSG file for the given
      * cruise.  This DSG file must have regions IDs assigned by Ferret, such as
      * when saved using
-     * {@link #saveCruise(OmeMetadata, DashboardCruiseWithData, String)},
+     * {@link #saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the set of region IDs to be meaningful.
      *
      * @param expocode
@@ -456,9 +456,9 @@ public class DsgNcFileHandler {
      * Reads and returns the array of data values for the specified variable
      * contained in the DSG file for the specified cruise.  The variable must
      * be saved in the DSG file as characters.  Empty strings are changed to
-     * {@link SocatCruiseData#CHAR_MISSING_VALUE}.  For some variables, the
+     * {@link DashboardUtils#CHAR_MISSING_VALUE}.  For some variables, the
      * DSG file must have been processed by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the data values to be meaningful.
      *
      * @param expocode
@@ -488,7 +488,7 @@ public class DsgNcFileHandler {
      * contained in the DSG file for the specified cruise.  The variable must
      * be saved in the DSG file as integers.  For some variables, the DSG file
      * must have been processed by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the data values to be meaningful.
      *
      * @param expocode
@@ -516,10 +516,11 @@ public class DsgNcFileHandler {
      * Reads and returns the array of data values for the specified variable
      * contained in the full-data DSG file for the specified cruise.  The
      * variable must be saved in the DSG file as doubles.  NaN and infinite
-     * values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  For
+     * values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  For
      * some variables, the DSG file must have been processed by Ferret, such
-     * as when saved using {@link DsgNcFileHandler#saveCruise(OmeMetadata,
-     * DashboardCruiseWithData, String)} for the data values to be meaningful.
+     * as when saved using
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
+     * for the data values to be meaningful.
      *
      * @param expocode
      *         get the data values for the cruise with this expocode
@@ -545,7 +546,7 @@ public class DsgNcFileHandler {
     /**
      * Reads and returns the longitudes, latitudes, and times contained in the
      * full-data DSG file for the specified cruise.  NaN and infinite values
-     * are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.
+     * are changed to {@link DashboardUtils#FP_MISSING_VALUE}.
      *
      * @param expocode
      *         get the data values for the cruise with this expocode
@@ -573,9 +574,9 @@ public class DsgNcFileHandler {
      * Reads and returns the longitudes, latitudes, times, SST values, and
      * fCO2_recommended values contained in the full-data DSG file for the
      * specified cruise.  NaN and infinite values are changed to
-     * {@link SocatCruiseData#FP_MISSING_VALUE}.  The full-data DSG file must
+     * {@link DashboardUtils#FP_MISSING_VALUE}.  The full-data DSG file must
      * have been processed by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the fCO2_recommended values to be meaningful.
      *
      * @param expocode

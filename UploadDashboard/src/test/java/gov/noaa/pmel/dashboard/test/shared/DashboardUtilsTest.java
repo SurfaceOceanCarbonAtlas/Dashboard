@@ -50,7 +50,7 @@ public class DashboardUtilsTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#passhashFromPlainText()}.
+     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#passhashFromPlainText(String, String)}
      */
     @Test
     public void testPasshashFromPlainText() {

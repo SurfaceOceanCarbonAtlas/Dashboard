@@ -789,9 +789,9 @@ public class DashboardUtils {
      * Encodes a set of WoceType objects suitable for decoding
      * with {@link #decodeWoceTypeSet(String)}
      *
-     * @param intList
-     *         list of integer values to encode
-     * @return the encoded list of integer values
+     * @param woceSet
+     *         set f WoceType values to encode
+     * @return the encoded list of WoceType values
      */
     public static String encodeWoceTypeSet(TreeSet<WoceType> woceSet) {
         StringBuilder sb = new StringBuilder();

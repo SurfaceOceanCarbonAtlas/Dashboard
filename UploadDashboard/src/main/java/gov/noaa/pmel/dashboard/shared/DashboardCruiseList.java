@@ -63,7 +63,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
     }
 
     /**
-     * @param version
+     * @param socatVersion
      *         the SOCAT version to set;
      *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */

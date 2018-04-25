@@ -1545,7 +1545,7 @@ public class CruiseListPage extends CompositeWithUsername {
      * If the data has serious issues to cause an automatic F flag, asks the
      * user if the submit should be continued.  If the answer is yes, or if
      * there were no serious data issues, continues the submission to SOCAT
-     * by calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
+     * by calling {@link SubmitForQCPage#showPage(DashboardCruiseList)}.
      */
     private void checkCruisesForSocat() {
         // Check if the cruises have metadata documents

@@ -509,8 +509,8 @@ public class DashboardCruiseTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getOrigDOI()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setOrigDOI(java.lang.String)}.
+     * Test method for {@link DashboardCruise#getOrigDoi()}
+     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setOrigDoi(String)}.
      */
     @Test
     public void testSetGetOrigDOI() {
@@ -543,8 +543,8 @@ public class DashboardCruiseTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getSocatDOI()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setSocatDOI(java.lang.String)}.
+     * Test method for {@link DashboardCruise#getSocatDoi()}
+     * and {@link DashboardCruise#setSocatDoi(String)}.
      */
     @Test
     public void testSetGetSocatDOI() {

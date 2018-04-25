@@ -190,7 +190,6 @@ public class SCMessageTest {
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.SCMessage#hashCode()},
      * {@link gov.noaa.pmel.dashboard.shared.SCMessage#equals(java.lang.Object)},
-     * {@link gov.noaa.pmel.dashboard.shared.SCMessage#woceTypeComparator},
      * {@link gov.noaa.pmel.dashboard.shared.SCMessage#severityComparator},
      * {@link gov.noaa.pmel.dashboard.shared.SCMessage#rowNumComparator},
      * {@link gov.noaa.pmel.dashboard.shared.SCMessage#timestampComparator},

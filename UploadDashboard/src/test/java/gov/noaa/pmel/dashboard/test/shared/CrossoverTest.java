@@ -188,7 +188,7 @@ public class CrossoverTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getTimesAtMin()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setTimesAtMin(java.util.Long[])}.
+     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setTimesAtMin(Long[])}.
      */
     @Test
     public void testGetSetTimesAtMin() {
@@ -231,7 +231,7 @@ public class CrossoverTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getCruiseMinTimes()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMinTimes(java.util.Long[])}.
+     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMinTimes(Long[])}.
      */
     @Test
     public void testGetCruiseMinTimes() {
@@ -278,7 +278,7 @@ public class CrossoverTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getCruiseMaxTimes()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMaxTimes(java.util.Long[])}.
+     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMaxTimes(Long[])}.
      */
     @Test
     public void testGetCruiseMaxTimes() {

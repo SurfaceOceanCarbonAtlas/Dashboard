@@ -164,7 +164,7 @@ public class DataMessagesPage extends CompositeWithUsername {
      * Update the cruise expocode and sanity checker messages with
      * that given in the provided SCMessageList.
      *
-     * @param msgList
+     * @param msgs
      *         cruise expocode and set of messages to show
      */
     private void updateMessages(SCMessageList msgs) {

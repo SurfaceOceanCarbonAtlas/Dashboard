@@ -195,7 +195,7 @@ public class SCMessage implements Serializable, IsSerializable {
     }
 
     /**
-     * @param detailedComment
+     * @param generalComment
      *         the sanity checker general explanation of the issue to set;
      *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */

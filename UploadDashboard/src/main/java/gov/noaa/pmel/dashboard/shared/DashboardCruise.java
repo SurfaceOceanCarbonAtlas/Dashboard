@@ -77,8 +77,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
     }
 
     /**
-     * @param cruise
-     *         cruise to check
      * @return Boolean.TRUE if the cruise is suspended, excluded, in preview, or not submitted,
      * Boolean.FALSE if the cruise is submitted or acceptable but unpublished cruise,
      * null if the cruise is (acceptable and) published (previous version)
@@ -165,7 +163,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
     }
 
     /**
-     * @param cruiseExpocode
+     * @param expocode
      *         the cruise expocode (after trimming and converting to upper-case) to set;
      *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
@@ -239,7 +237,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
     /**
      * @return the QC submission status;
-     * never null but may be {@link #QC_STATUS_NOT_SUBMITTED} if not assigned
+     * never null but may be {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED} if not assigned
      */
     public String getQcStatus() {
         return qcStatus;
@@ -248,7 +246,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
     /**
      * @param qcStatus
      *         the  QC submission status (after trimming) to set;
-     *         if null, {@link #QC_STATUS_NOT_SUBMITTED} is assigned
+     *         if null, {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED} is assigned
      */
     public void setQcStatus(String qcStatus) {
         if ( qcStatus == null )
@@ -266,7 +264,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
     }
 
     /**
-     * @param submitStatus
+     * @param archiveStatus
      *         the archive submission status (after trimming) to set;
      *         if null, {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} is assigned
      */
@@ -346,7 +344,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
     }
 
     /**
-     * @param socatDoi
+     * @param origDoi
      *         the DOI (after trimming) of the original data document to set;
      *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */

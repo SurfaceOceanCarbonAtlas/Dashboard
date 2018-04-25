@@ -86,7 +86,7 @@ public class SocatCruiseData {
      * An exception is thrown if a data column with type
      * {@link DashboardServerUtils#UNKNOWN} is encountered; otherwise data columns
      * with types not present in knownTypes are ignored.  The data types
-     * {@link DashDataType#UNKNOWN}, {@link DashDataType#OTHER}, and any
+     * {@link DashboardServerUtils#UNKNOWN}, {@link DashboardServerUtils#OTHER}, and any
      * metadata types should not be in knownTypes.
      *
      * @param knownTypes
@@ -100,7 +100,7 @@ public class SocatCruiseData {
      *         data value strings
      * @throws IllegalArgumentException
      *         if the number of data types and data values do not match,
-     *         if a data column has the type {@link DashDataType#UNKNOWN},
+     *         if a data column has the type {@link DashboardServerUtils#UNKNOWN},
      *         if a data column has a type matching a known data type but
      *         with a different data class type, or
      *         if a data value string cannot be parsed for the expected type
@@ -172,9 +172,9 @@ public class SocatCruiseData {
      * "NaN", and empty string, or null.
      * <p>
      * An exception is thrown if a data column with type
-     * {@link DashDataType#UNKNOWN} is encountered; otherwise data columns
+     * {@link DashboardServerUtils#UNKNOWN} is encountered; otherwise data columns
      * with types not present in knownTypes are ignored.  The data types
-     * {@link DashDataType#UNKNOWN}, {@link DashDataType#OTHER}, and any
+     * {@link DashboardServerUtils#UNKNOWN}, {@link DashboardServerUtils#OTHER}, and any
      * metadata types should not be in knownTypes.
      *
      * @param knownTypes
@@ -184,7 +184,7 @@ public class SocatCruiseData {
      * @return list of these data objects
      * @throws IllegalArgumentException
      *         if a row of data values has an unexpected number of values,
-     *         if a data column has the type {@link DashDataType#UNKNOWN},
+     *         if a data column has the type {@link DashboardServerUtils#UNKNOWN},
      *         if a data column has a type matching a known data type but
      *         with a different data class type, or
      *         if a data value string cannot be parsed for the expected type
@@ -562,7 +562,7 @@ public class SocatCruiseData {
     /**
      * @param woceCO2Atm
      *         the WOCE flag for atmospheric CO2 to set;
-     *         if null, {@link #WoceEvent#WOCE_NOT_CHECKED} is assigned
+     *         if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned
      */
     public void setWoceCO2Atm(Character woceCO2Atm) {
         Character value = woceCO2Atm;

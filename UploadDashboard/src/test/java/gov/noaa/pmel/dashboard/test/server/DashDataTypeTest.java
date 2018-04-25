@@ -31,9 +31,10 @@ public class DashDataTypeTest {
     private static final ArrayList<String> UNITS = new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(java.lang.String,
-     * java.lang.Double, java.lang.String, java.lang.String, java.lang.String, java.lang.String,
-     * java.util.Collection)} as well as
+     * Test method for
+     * {@link gov.noaa.pmel.dashboard.server.DashDataType#DashDataType(String, Double, String, String, String,
+     * String, String, java.util.Collection)}
+     * as well as
      * {@link gov.noaa.pmel.dashboard.server.DashDataType#getVarName()},
      * {@link gov.noaa.pmel.dashboard.server.DashDataType#getSortOrder()},
      * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDisplayName()},
@@ -300,7 +301,7 @@ public class DashDataTypeTest {
      * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#hashCode()}
      * and {@link gov.noaa.pmel.dashboard.server.DashDataType#equals(java.lang.Object)}
      * as well as
-     * {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(gov.noaa.pmel.dashboard.shared.DataColumnType)},
+     * {@link gov.noaa.pmel.dashboard.server.DashDataType#DashDataType(DataColumnType)}
      */
     @Test
     public void testHashCodeEquals() {

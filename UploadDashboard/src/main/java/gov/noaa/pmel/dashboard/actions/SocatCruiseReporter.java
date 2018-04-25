@@ -479,7 +479,7 @@ public class SocatCruiseReporter {
      *
      * @param omeMeta
      *         OME XML document with metadata values to report in the preamble
-     * @param version
+     * @param socatVersion
      *         SOCAT version to report in the preamble
      * @param origDOI
      *         DOI for the original data file
@@ -1028,7 +1028,7 @@ public class SocatCruiseReporter {
      *         date/time of this data point in seconds since 01-JAN-1970 00:00:00 UTC
      * @param expocode
      *         expocode for the cruise data report string
-     * @param version
+     * @param socatVersion
      *         SOCAT Version for the cruise data report string
      * @param socatDOI
      *         SOCAT DOI for the cruise data report string

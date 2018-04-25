@@ -59,8 +59,8 @@ public class WoceEventTest {
     private static final String MY_COMMENT = "from WoceEvent unit test";
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#getID()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setId(java.lang.Long)}.
+     * Test method for {@link DashboardEvent#getId()}
+     * and {@link DashboardEvent#setId(Long)}
      */
     @Test
     public void testGetSetId() {
@@ -122,7 +122,7 @@ public class WoceEventTest {
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#getVersion()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setVersion(java.lang.Double)}.
+     * and {@link gov.noaa.pmel.dashboard.shared.DashboardEvent#setVersion(String)}
      */
     @Test
     public void testGetSetSocatVersion() {

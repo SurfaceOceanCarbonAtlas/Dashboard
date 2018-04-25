@@ -78,7 +78,7 @@ public class CruiseModifier {
          *         dataset expocode (ignored for comparisons)
          * @param num
          *         row number of this datapoint in the dataset (ignored for comparisons)
-         * @param regionId
+         * @param regionID
          *         region ID of this datapoint (ignored for comparisons)
          * @param sectime
          *         measurement time in seconds since Jan 1, 1970 00:00:00
@@ -305,7 +305,7 @@ public class CruiseModifier {
     /**
      * @return the SOCAT version from the full-data DSG file of the cruise
      * specified in the latest call to {@link #restoreWoceFlags(String)}
-     * or {@link #regenerateWoceFlags(String)}
+     * or {@link #regenerateWoceFlags(String, double, double)}
      */
     public String getRestoredSocatVersion() {
         return restoredSocatVersion;

@@ -561,7 +561,7 @@ public class CruiseDsgNcFile extends File {
      * as characters.  Empty strings are changed to a single blank character.
      * For some variables, this DSG file must have been processed by Ferret,
      * such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the data values to be meaningful.
      *
      * @param varName
@@ -605,7 +605,7 @@ public class CruiseDsgNcFile extends File {
      * contained in this DSG file.  The variable must be saved in the DSG file
      * as integers.  For some variables, this DSG file must have been processed
      * by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the data values to be meaningful.
      *
      * @param varName
@@ -686,9 +686,9 @@ public class CruiseDsgNcFile extends File {
      * Reads and returns the array of data values for the specified variable
      * contained in this DSG file.  The variable must be saved in the DSG file
      * as doubles.  NaN and infinite values are changed to
-     * {@link SocatCruiseData#FP_MISSING_VALUE}.  For some variables, this
+     * {@link DashboardUtils#FP_MISSING_VALUE}.  For some variables, this
      * DSG file must have been processed by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the data values to be meaningful.
      *
      * @param varName
@@ -725,7 +725,7 @@ public class CruiseDsgNcFile extends File {
 
     /**
      * Reads and returns the longitudes, latitudes, and times contained in this
-     * DSG file.  NaN and infinite values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.
+     * DSG file.  NaN and infinite values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.
      *
      * @return the array { lons, lats, times } for this cruise, where
      * lons are the array of longitudes, lats are the array of latitudes,
@@ -795,9 +795,9 @@ public class CruiseDsgNcFile extends File {
     /**
      * Reads and returns the longitudes, latitudes, times, SST values, and
      * fCO2_recommended values contained in this DSG file.  NaN and infinite
-     * values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  This
+     * values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  This
      * DSG file must have been processed by Ferret, such as when saved using
-     * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+     * {@link DsgNcFileHandler#saveCruise(DashboardOmeMetadata, DashboardCruiseWithData, String, String)}
      * for the fCO2_recommended values to be meaningful.
      *
      * @return the array { lons, lats, times, ssts, fco2s } for this cruise, where

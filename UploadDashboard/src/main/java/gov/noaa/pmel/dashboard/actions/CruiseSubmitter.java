@@ -74,13 +74,12 @@ public class CruiseSubmitter {
      * Submit a dataset for SOCAT QC.  This sanity checks and generates
      * DSG and decimated DSG files for datasets which are editable
      * (have a QC status of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED},
-     * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE},
      * {@link DashboardUtils#QC_STATUS_SUSPENDED}, or
      * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
      * For all cruises, the archive status is updated to that given.
      * <p>
-     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_CDIAC},
-     * the archive request is sent to CDIAC for dataset which have not been sent,
+     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_TO_OCADS}
+     * the archive request is sent to OCADS for datasets which have not been sent,
      * or for all datasets if repeatSend is true.
      *
      * @param cruiseExpocodes
@@ -90,7 +89,7 @@ public class CruiseSubmitter {
      * @param localTimestamp
      *         local timestamp to associate with this submission
      * @param repeatSend
-     *         re-send request to CDIAC to archive for datasets
+     *         re-send request to OCADS to archive for datasets
      *         which already had a request sent?
      * @param submitter
      *         user performing this submit

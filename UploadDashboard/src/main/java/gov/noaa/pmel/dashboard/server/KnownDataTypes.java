@@ -147,7 +147,7 @@ public class KnownDataTypes {
     /**
      * Create additional known data types from values in a Properties object.
      *
-     * @param knownTypesFile
+     * @param typeProps
      *         properties file of data types to add to the known list;
      *         uses the simple line format:
      *         varName={JSON description}
@@ -187,7 +187,7 @@ public class KnownDataTypes {
      * The selected unit will be zero and the select missing value will be
      * {@link DashboardUtils#STRING_MISSING_VALUE} (default missing values).
      *
-     * @param varName
+     * @param typeName
      *         type name to find
      * @return data column type matching the given type name, or
      * null if the name does not match that of a known type
