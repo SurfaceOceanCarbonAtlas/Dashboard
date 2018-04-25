@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="omemetadata">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../OmeMetadata/target/artifacts/omemetadata.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -1,6 +1,6 @@
+.idea/
 SocatUploadDashboard/
 classes/
-codeStyles/
 deploy/
 gwt-unitCache/
 target/
@@ -8,4 +8,3 @@ test-classes/
 gwt-servlet.jar
 omemetadata.jar
 sanitychecker.jar
-workspace.xml

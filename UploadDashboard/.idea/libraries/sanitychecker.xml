@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="sanitychecker">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../SanityChecker/target/artifacts/sanitychecker.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

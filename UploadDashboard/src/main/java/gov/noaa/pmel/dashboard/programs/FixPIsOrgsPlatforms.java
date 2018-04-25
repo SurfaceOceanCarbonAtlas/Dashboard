@@ -30,28 +30,33 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  *
  * @author Karl Smith
  */
-public class FixPINamesOrgs {
+public class FixPIsOrgsPlatforms {
 
-    HashMap<String,ArrayList<String>> nameFixMap;
-    HashMap<String,String> nameOrgMap;
+    HashMap<String,ArrayList<String>> piNameFixMap;
+    HashMap<String,String> piNameOrgMap;
+    HashMap<String,String> platformNameFixMap;
 
     /**
-     * Corrects names of PIs and organizations in OME metadata
+     * Corrects names of PIs and platforms, and adds organizations, in OME metadata
      *
      * @param piNameFixesFile
-     *         TSV file of error names and corrects;
-     *         each line consists of the error 'name', a tab, and the correct name(s);
+     *         TSV file of erroneous and correct PI names;
+     *         each line consists of the erroneous PI 'name', a tab, and the correct PI name(s);
      *         multiple correct names are separated by semicolons
      * @param piNameOrgFile
-     *         TSV file of (correct) PI names and organizations;
-     *         each line consists of the PI name, a tab, and the PI organization
+     *         TSV file of (correct) PI names and associated organizations;
+     *         each line consists of the PI's name, a tab, and the PI's organization
+     * @param platformNameFixesFile
+     *         TSV file of erroneous and correct platform names;
+     *         each line consists of the erroneous platform name, a tab, and the correct platform name
      * @throws IllegalArgumentException
      *         if problems reading either of the files
      */
-    public FixPINamesOrgs(File piNameFixesFile, File piNameOrgFile) throws IllegalArgumentException {
+    public FixPIsOrgsPlatforms(File piNameFixesFile, File piNameOrgFile, File platformNameFixesFile)
+            throws IllegalArgumentException {
         BufferedReader reader;
 
-        nameFixMap = new HashMap<String,ArrayList<String>>();
+        piNameFixMap = new HashMap<String,ArrayList<String>>();
         try {
             reader = new BufferedReader(new FileReader(piNameFixesFile));
             try {
@@ -63,17 +68,17 @@ public class FixPINamesOrgs {
                         throw new IllegalArgumentException("not two values separated by a tab in '" + dataline + "'");
                     String errName = pieces[0].trim();
                     if ( errName.isEmpty() )
-                        throw new IllegalArgumentException("empty error name value in '" + dataline + "'");
+                        throw new IllegalArgumentException("empty erroneous PI name in '" + dataline + "'");
                     String[] fixNames = pieces[1].split(";");
                     ArrayList<String> fixList = new ArrayList<String>(fixNames.length);
                     for (String fix : fixNames) {
                         fix = fix.trim();
                         if ( fix.isEmpty() )
-                            throw new IllegalArgumentException("empty name correction in '" + dataline + "'");
+                            throw new IllegalArgumentException("empty corrected PI name in '" + dataline + "'");
                         fixList.add(fix);
                     }
-                    if ( nameFixMap.put(errName, fixList) != null )
-                        throw new IllegalArgumentException("more than one correction for '" + errName + "'");
+                    if ( piNameFixMap.put(errName, fixList) != null )
+                        throw new IllegalArgumentException("more than one correction for PI name '" + errName + "'");
 
                     dataline = reader.readLine();
                 }
@@ -81,11 +86,11 @@ public class FixPINamesOrgs {
                 reader.close();
             }
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Problems with " + piNameFixesFile.getPath() + ": " + ex.getMessage(),
-                                               ex);
+            throw new IllegalArgumentException("Problems with " + piNameFixesFile.getPath() +
+                                                       ": " + ex.getMessage(), ex);
         }
 
-        nameOrgMap = new HashMap<String,String>();
+        piNameOrgMap = new HashMap<String,String>();
         try {
             reader = new BufferedReader(new FileReader(piNameOrgFile));
             try {
@@ -100,8 +105,9 @@ public class FixPINamesOrgs {
                         throw new IllegalArgumentException("empty PI name in '" + dataline + "'");
                     String piOrg = pieces[1].trim();
                     if ( piOrg.isEmpty() )
-                        throw new IllegalArgumentException("empty PI organization in '" + dataline + "'");
-                    nameOrgMap.put(piName, piOrg);
+                        throw new IllegalArgumentException("empty organization name in '" + dataline + "'");
+                    if ( piNameOrgMap.put(piName, piOrg) != null )
+                        throw new IllegalArgumentException("more than one organization for PI '" + piName + "'");
 
                     dataline = reader.readLine();
                 }
@@ -109,23 +115,55 @@ public class FixPINamesOrgs {
                 reader.close();
             }
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Problems with " + piNameOrgFile.getPath() + ": " + ex.getMessage(), ex);
+            throw new IllegalArgumentException("Problems with " + piNameOrgFile.getPath() +
+                                                       ": " + ex.getMessage(), ex);
         }
+
+        platformNameFixMap = new HashMap<String,String>();
+        try {
+            reader = new BufferedReader(new FileReader(platformNameFixesFile));
+            try {
+                String dataline = reader.readLine();
+                while ( dataline != null ) {
+
+                    String[] pieces = dataline.trim().split("\\t");
+                    if ( pieces.length != 2 )
+                        throw new IllegalArgumentException("not two values separated by a tab in '" + dataline + "'");
+                    String errName = pieces[0].trim();
+                    if ( errName.isEmpty() )
+                        throw new IllegalArgumentException("empty erroneous platform name in '" + dataline + "'");
+                    String fixName = pieces[1].trim();
+                    if ( fixName.isEmpty() )
+                        throw new IllegalArgumentException("empty corrected platform name in '" + dataline + "'");
+                    if ( platformNameFixMap.put(errName, fixName) != null )
+                        throw new IllegalArgumentException("more than one correction for platform '" + errName + "'");
+
+                    dataline = reader.readLine();
+                }
+            } finally {
+                reader.close();
+            }
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Problems with " + platformNameFixesFile.getPath() +
+                                                       ": " + ex.getMessage(), ex);
+        }
+
     }
 
     /**
-     * Correct the PI name(s) and then add/correct the organization for each PI.
+     * Correct the PI name(s) and platforms, then add/correct the organization for each PI.
      *
      * @param omeMData
      *         OME metadata to correct
-     * @return if any PI or organization names were changed
+     * @return if any values were changed
      * @throws IllegalArgumentException
-     *         if assigning a PI or organization name throws an exception
+     *         if assigning a value throws an exception
      */
     public boolean fixNamesAndOrganizations(OmeMetadata omeMData) throws IllegalArgumentException {
         boolean changed = false;
         ArrayList<String> errNames = omeMData.getInvestigators();
         ArrayList<String> errOrgs = omeMData.getOrganizations();
+        String errPlatform = omeMData.getVesselName();
         int numNames = errNames.size();
 
         // TODO: match ? in error name correction template with any letter in err name
@@ -135,14 +173,14 @@ public class FixPINamesOrgs {
             String name = errNames.get(k);
             String org = errOrgs.get(k);
 
-            ArrayList<String> replacement = nameFixMap.get(name);
+            ArrayList<String> replacement = piNameFixMap.get(name);
             if ( replacement != null ) {
                 // Name correction
                 changed = true;
                 piNames.addAll(replacement);
                 // Get the organization of the new name(s)
                 for (String newName : replacement) {
-                    String newOrg = nameOrgMap.get(newName);
+                    String newOrg = piNameOrgMap.get(newName);
                     if ( newOrg == null ) {
                         newOrg = org;
                     }
@@ -152,7 +190,7 @@ public class FixPINamesOrgs {
             else {
                 // No correction to the name; check the organization
                 piNames.add(name);
-                String newOrg = nameOrgMap.get(name);
+                String newOrg = piNameOrgMap.get(name);
                 if ( newOrg == null ) {
                     newOrg = org;
                 }
@@ -161,6 +199,13 @@ public class FixPINamesOrgs {
                 }
                 piOrgs.add(newOrg);
             }
+        }
+        String platformName = platformNameFixMap.get(errPlatform);
+        if ( platformName != null ) {
+            changed = true;
+        }
+        else {
+            platformName = errPlatform;
         }
 
         if ( changed ) {
@@ -173,6 +218,7 @@ public class FixPINamesOrgs {
                     props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, piOrgs.get(k));
                     omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
                 }
+                omeMData.replaceValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
             } catch (Exception ex) {
                 throw new IllegalArgumentException("problems updating names: " + ex.getMessage(), ex);
             }
@@ -182,27 +228,30 @@ public class FixPINamesOrgs {
 
     /**
      * @param args
-     *         ExpocodesFile.txt  PINameCorrections.tsv  PINameOrganization.tsv
+     *         ExpocodesFile.txt  PINameCorrections.tsv  PINameOrganization.tsv  PlatformNameCorrections.tsv
      */
     public static void main(String[] args) {
-        if ( args.length != 3 ) {
-            System.err.println("Arguments:  ExpocodesFile  PINameCorrections.tsv  PINameOrganization.tsv");
+        if ( args.length != 4 ) {
+            System.err.println("Arguments:  ExpocodesFile  PINameCorrections.tsv  PINameOrganization.tsv PlatformNameCorrections.tsv");
             System.err.println();
-            System.err.println("Corrects PI names in the OME.xml files for datasets whose expocodes are ");
-            System.err.println("given in ExpocodesFile.txt, one expocode per line.  PINameCorrections.tsv");
-            System.err.println("consists of mispelled 'name', tab, and correct name(s), where multiple ");
-            System.err.println("correct names are be separated by semicolons.  The PINameOrganization.tsv ");
-            System.err.println("file consists of (correct) PI name, tab, and organization name. ");
+            System.err.println("Corrects PI and platform names, and adds organization names, in the OME.xml ");
+            System.err.println("files for datasets whose expocodes are given in ExpocodesFile.txt, one expocode ");
+            System.err.println("per line.  Each line of PINameCorrections.tsv contains the misspelled PI 'name', ");
+            System.err.println("a tab, and the correct name(s), where multiple correct names are be separated ");
+            System.err.println("by semicolons.  Each line of PINameOrganization.tsv contains the (correct) PI ");
+            System.err.println("name, a tab, and the organization name.  Each line of PlatformNameCorrections.tsv ");
+            System.err.println("contains the misspelled platform name, a tab, and the correct platform name. ");
             System.err.println();
             System.exit(1);
         }
         String expocodesFilename = args[0];
         String piNameFixesFilename = args[1];
         String piNameOrgFilename = args[2];
+        String platformNameFixesFilename = args[3];
 
-        FixPINamesOrgs fixer = null;
+        FixPIsOrgsPlatforms fixer = null;
         try {
-            fixer = new FixPINamesOrgs(new File(piNameFixesFilename), new File(piNameOrgFilename));
+            fixer = new FixPIsOrgsPlatforms(new File(piNameFixesFilename), new File(piNameOrgFilename), new File(platformNameFixesFilename));
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
