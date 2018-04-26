@@ -3,7 +3,12 @@
  */
 package gov.noaa.pmel.dashboard.test.handlers;
 
-import static org.junit.Assert.*;
+import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,12 +16,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test of {@link gov.noaa.pmel.dashboard.handlers.CruiseFileHandler}.

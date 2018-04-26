@@ -3,16 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.server.Overlap;
+
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.server.Overlap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link gov.noaa.pmel.dashboard.server.Overlap}

@@ -1,15 +1,15 @@
 package gov.noaa.pmel.dashboard.test.handlers;
 
-import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.dashboard.client.CruisePreviewPage;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
+import org.junit.Test;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test of generating the preview plots, which also tests the

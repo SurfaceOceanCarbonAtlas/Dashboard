@@ -3,16 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,7 +19,10 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes}.

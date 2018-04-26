@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
+import gov.noaa.pmel.dashboard.shared.Crossover;
+
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import gov.noaa.pmel.dashboard.shared.Crossover;
-
-import org.junit.Test;
 
 /**
  * Unit tests for {@link gov.noaa.pmel.dashboard.shared.Crossover}

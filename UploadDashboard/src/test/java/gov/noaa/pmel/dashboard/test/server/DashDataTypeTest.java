@@ -3,16 +3,19 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.*;
-
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link gov.noaa.pmel.dashboard.server.DashDataType}

@@ -3,11 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.*;
-
 import gov.noaa.pmel.dashboard.server.DashboardUserInfo;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Karl Smith

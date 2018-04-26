@@ -3,15 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.test.actions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import org.junit.Test;
-
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Karl Smith
@@ -19,10 +19,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 public class CrossoverCheckerTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.actions.CrossoverChecker#checkForCrossover(double[][], double[][], double[][], double[][], double[][])}.
+     * Test method for {@link CrossoverChecker#checkForCrossover(double[][], double[][], double[][], double[][], double[][])}.
      */
     @Test
-    public void testCheckForCrossoverDoubleArrayArrayDoubleArrayArrayDoubleArrayArrayDoubleArrayArrayDoubleArrayArray() {
+    public void testCheckForCrossover() {
         double[][] lons = new double[][] { lons_09AR20120105, lons_353L20120107 };
         double[][] lats = new double[][] { lats_09AR20120105, lats_353L20120107 };
         double[][] times = new double[][] { times_09AR20120105, times_353L20120107 };

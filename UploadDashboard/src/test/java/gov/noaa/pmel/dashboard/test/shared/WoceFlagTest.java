@@ -3,13 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import static org.junit.Assert.*;
-
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.WoceFlag;
 import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit tests for methods of {@link gov.noaa.pmel.dashboard.shared.WoceFlag}
