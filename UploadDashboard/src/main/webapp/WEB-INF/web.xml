@@ -8,6 +8,9 @@
 	<session-config>
 		<session-timeout>180</session-timeout>
 	</session-config>
+	<listener>
+		<listener-class>gov.noaa.pmel.dashboard.server.DashboardContextListener</listener-class>
+	</listener>
 
 	<!-- Servlets -->
 	<servlet>
