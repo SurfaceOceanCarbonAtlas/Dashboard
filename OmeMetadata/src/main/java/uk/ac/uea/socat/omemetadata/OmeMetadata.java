@@ -2548,7 +2548,7 @@ public class OmeMetadata {
 	 * Assigns the expocode for this OME metadata.  Also assigns values associated 
 	 * with the expocode: cruise ID, dataset ID, vessel ID, cruise start date.
 	 * 
-	 * @param expocode
+	 * @param newExpocode
 	 * 		expocode to assign
 	 */
 	public void setExpocode(String newExpocode) {

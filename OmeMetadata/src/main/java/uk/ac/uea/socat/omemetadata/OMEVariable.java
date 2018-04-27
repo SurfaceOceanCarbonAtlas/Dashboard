@@ -25,9 +25,9 @@ class OMEVariable {
 	 * Create an OMEVariable object based on the contents of an XML element.
 	 * If the element is empty or null, the variable is created with no value.
 	 * 
-	 * @param parentPath The path to the parent of this variable
+	 * @param path The path to the parent of this variable
 	 * @param parentElement The XML element containing the variable value
-	 * @param fullDocument The complete XML document - used to extract conflict information
+	 * @param conflictsElement The XML element containing the conflicts
 	 */
 	protected OMEVariable(OMEPath path, Element parentElement, Element conflictsElement) throws InvalidConflictException {
 		itsPath = path;
@@ -134,7 +134,7 @@ class OMEVariable {
 	 * The contents of the element will be determined as per
 	 * the {@link #getValue()} method.
 	 * 
-	 * @return
+	 * @return XML element
 	 */
 	private Element getElement() {
 		Element elem = new Element(itsPath.getElementName());
