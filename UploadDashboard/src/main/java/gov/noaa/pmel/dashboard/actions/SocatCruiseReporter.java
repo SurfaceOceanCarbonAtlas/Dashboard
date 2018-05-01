@@ -49,15 +49,15 @@ public class SocatCruiseReporter {
 
     // Expocodes for cruises missing hours and minutes (hour:minute time is 00:00)
     private static final TreeSet<String> DAY_RESOLUTION_CRUISE_EXPOCODES =
-            new TreeSet<String>(Arrays.asList(new String[] {
+            new TreeSet<String>(Arrays.asList(
                     "06AQ19911114",
                     "06AQ19911210",
                     "06MT19920510",
                     "06MT19970106",
                     "06P119910616",
                     "06P119950901",
-                    "316N19971005",
-            }));
+                    "316N19971005"
+            ));
 
     private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
     private static final SimpleDateFormat DATETIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -81,55 +81,91 @@ public class SocatCruiseReporter {
      * Class for collecting and sorting time/lat/lon/fco2rec data
      */
     private static class DataPoint implements Comparable<DataPoint> {
+        final static Double MISSING_VALUE = -999.0;
         final Date datetime;
         final Double latitude;
         final Double longitude;
+        final Double sst;
+        final Double sal;
         final Double fco2rec;
 
         /**
          * @param expocode
          *         dataset expocode, only used for error message when raising exceptions
          * @param sectime
-         *         measurement time in seconds since Jan 1, 1970 00:00:00
+         *         measurement time in seconds since Jan 1, 1970 00:00:00;
+         *         must be a valid value
          * @param latitude
-         *         measurement latitude in decimal degrees north
+         *         measurement latitude in decimal degrees north;
+         *         must be a valid value
          * @param longitude
-         *         measurment longitude in decimal degrees east in the range [-180,180]
+         *         measurment longitude in decimal degrees east in the range [-180,180];
+         *         must be a valid value
+         * @param sst
+         *         measurement SST in degrees C;
+         *         if {@link DashboardUtils#FP_MISSING_VALUE}, {@link #MISSING_VALUE} is assigned
+         * @param sal
+         *         measurement salinity in PSU;
+         *         if {@link DashboardUtils#FP_MISSING_VALUE}, {@link #MISSING_VALUE} is assigned
          * @param fco2rec
-         *         measurement recommended fCO2
+         *         measurement recommended fCO2;
+         *         must be valid value
          * @throws IllegalArgumentException
-         *         if the sectime, latitude, longitude, or fco2rec values are invalid
+         *         if the sectime, latitude, longitude, sst, sal, or fco2rec values are invalid
          */
-        DataPoint(String expocode, Double sectime, Double latitude,
-                  Double longitude, Double fco2rec) throws IllegalArgumentException {
+        DataPoint(String expocode, Double sectime, Double latitude, Double longitude,
+                  Double sst, Double sal, Double fco2rec) throws IllegalArgumentException {
             if ( sectime == null )
                 throw new IllegalArgumentException("null time for " + expocode);
             this.datetime = new Date(Math.round(sectime * 1000.0));
             if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(new Date()) )
                 throw new IllegalArgumentException("invalid time of " +
-                                                           this.datetime.toString() + " for " + expocode);
+                                                   this.datetime.toString() + " for " + expocode);
 
             if ( latitude == null )
                 throw new IllegalArgumentException("null latitude for " + expocode);
             if ( ( latitude < -90.0 ) || ( latitude > 90.0 ) )
                 throw new IllegalArgumentException("invalid latitude of " +
-                                                           Double.toString(latitude) + " for " + expocode);
+                                                   Double.toString(latitude) + " for " + expocode);
             this.latitude = latitude;
 
             if ( longitude == null )
                 throw new IllegalArgumentException("null longitude for " + expocode);
             if ( ( longitude < -180.0 ) || ( longitude > 180.0 ) )
                 throw new IllegalArgumentException("invalid longitude of " +
-                                                           Double.toString(longitude) + " for " + expocode);
+                                                   Double.toString(longitude) + " for " + expocode);
             this.longitude = longitude;
 
             if ( fco2rec == null )
                 throw new IllegalArgumentException("null fco2rec for " + expocode);
-            if ( ( !DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) ) &&
-                    ( ( fco2rec < 0.0 ) || ( fco2rec > 100000.0 ) ) )
+            if ( ( fco2rec < 0.0 ) || ( fco2rec > 100000.0 ) )
                 throw new IllegalArgumentException("invalid fCO2rec of " +
-                                                           Double.toString(fco2rec) + " for " + expocode);
+                                                   Double.toString(fco2rec) + " for " + expocode);
             this.fco2rec = fco2rec;
+
+            if ( sst == null )
+                throw new IllegalArgumentException("null SST for " + expocode);
+            if ( DashboardUtils.FP_MISSING_VALUE.equals(sst) ) {
+                this.sst = MISSING_VALUE;
+            }
+            else {
+                if ( ( sst < -10.0 ) || ( sst > 80.0 ) )
+                    throw new IllegalArgumentException("invalid SST of " +
+                                                       Double.toString(sst) + " for " + expocode);
+                this.sst = sst;
+            }
+
+            if ( sal == null )
+                throw new IllegalArgumentException("null salinity for " + expocode);
+            if ( DashboardUtils.FP_MISSING_VALUE.equals(sal) ) {
+                this.sal = MISSING_VALUE;
+            }
+            else {
+                if ( ( sal < -10.0 ) || ( sal > 100.0 ) )
+                    throw new IllegalArgumentException("invalid salinity of " +
+                                                       Double.toString(sal) + " for " + expocode);
+                this.sal = sal;
+            }
         }
 
         @Override
@@ -147,6 +183,12 @@ public class SocatCruiseReporter {
             result = this.fco2rec.compareTo(other.fco2rec);
             if ( result != 0 )
                 return result;
+            result = this.sst.compareTo(other.sst);
+            if ( result != 0 )
+                return result;
+            result = this.sal.compareTo(other.sal);
+            if ( result != 0 )
+                return result;
             return 0;
         }
 
@@ -158,6 +200,8 @@ public class SocatCruiseReporter {
             result = prime * result + latitude.hashCode();
             result = prime * result + longitude.hashCode();
             result = prime * result + fco2rec.hashCode();
+            result = prime * result + sst.hashCode();
+            result = prime * result + sal.hashCode();
             return result;
         }
 
@@ -167,16 +211,20 @@ public class SocatCruiseReporter {
                 return true;
             if ( obj == null )
                 return false;
-            if ( !( obj instanceof DataPoint ) )
+            if ( ! ( obj instanceof DataPoint ) )
                 return false;
             DataPoint other = (DataPoint) obj;
-            if ( !datetime.equals(other.datetime) )
+            if ( ! datetime.equals(other.datetime) )
                 return false;
-            if ( !latitude.equals(other.latitude) )
+            if ( ! latitude.equals(other.latitude) )
                 return false;
-            if ( !longitude.equals(other.longitude) )
+            if ( ! longitude.equals(other.longitude) )
                 return false;
-            if ( !fco2rec.equals(other.fco2rec) )
+            if ( ! fco2rec.equals(other.fco2rec) )
+                return false;
+            if ( ! sst.equals(other.sst) )
+                return false;
+            if ( ! sal.equals(other.sal) )
                 return false;
             return true;
         }
@@ -187,6 +235,8 @@ public class SocatCruiseReporter {
                     ", latitude=" + String.format("%#.6f", latitude) +
                     ", longitude=" + String.format("%#.6f", longitude) +
                     ", fco2rec=" + String.format("%#.6f", fco2rec) +
+                    ", sst =" + String.format("%#.6f", sst) +
+                    ", sal =" + String.format("%#.6f", sal) +
                     " ]";
         }
 
@@ -1051,10 +1101,10 @@ public class SocatCruiseReporter {
                                            TreeSet<DataPoint> prevDatPts) throws IllegalArgumentException {
 
         if ( prevDatPts != null ) {
-            // Add this lon/lat/time/fCO2_rec datapoint to the set; checking for duplicates
-            DataPoint datpt = new DataPoint(expocode, sectime, dataVals.getLatitude(),
-                                            dataVals.getLongitude(), dataVals.getfCO2Rec());
-            if ( !prevDatPts.add(datpt) ) {
+            // Add this lon/lat/time/sst/sal/fCO2_rec datapoint to the set; checking for duplicates
+            DataPoint datpt = new DataPoint(expocode, sectime, dataVals.getLatitude(), dataVals.getLongitude(),
+                                            dataVals.getSst(), dataVals.getSalinity(), dataVals.getfCO2Rec());
+            if ( ! prevDatPts.add(datpt) ) {
                 System.err.println("Ignored duplicate datapoint for " + expocode + ": " + datpt.toString());
                 return "";
             }
@@ -1263,11 +1313,14 @@ public class SocatCruiseReporter {
      */
     private static final String GENERATE_DATA_FILE_FOR_GRIDS_HEADER =
             "data_id\t" +
-                    "latitude\t" +
-                    "longitude\t" +
-                    "datetime\t" +
-                    "expocode\t" +
-                    "fCO2rec";
+            "latitude\t" +
+            "longitude\t" +
+            "datetime\t" +
+            "expocode\t" +
+            "fCO2rec\t" +
+            "SST\t" +
+            "salinity";
+
 
     /**
      * Print the data needed to generate the gridded-data NetCDF files.
@@ -1320,9 +1373,10 @@ public class SocatCruiseReporter {
                         continue;
                     Character woceFlag = dataVals.getWoceCO2Water();
                     if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
-                            woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
-                        DataPoint datpt = new DataPoint(upperExpo, sectimes[j],
-                                                        dataVals.getLatitude(), dataVals.getLongitude(), fco2rec);
+                         woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
+                        DataPoint datpt = new DataPoint(upperExpo, sectimes[j], dataVals.getLatitude(),
+                                                        dataVals.getLongitude(), dataVals.getSst(),
+                                                        dataVals.getSalinity(), fco2rec);
                         if ( !datSet.add(datpt) ) {
                             System.err.println(
                                     "Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
@@ -1333,9 +1387,9 @@ public class SocatCruiseReporter {
                 for (DataPoint datPt : datSet) {
                     dataID++;
                     String datetime = DATETIMESTAMPER.format(datPt.datetime);
-                    report.format("%d\t%.6f\t%.6f\t%s\t%s\t%.6f\n",
+                    report.format("%d\t%.6f\t%.6f\t%s\t%s\t%.6f\t%.3f\t%.3f\n",
                                   Long.valueOf(dataID), datPt.latitude, datPt.longitude,
-                                  datetime, upperExpo, datPt.fco2rec);
+                                  datetime, upperExpo, datPt.fco2rec, datPt.sst, datPt.sal);
                 }
             }
         } finally {
