@@ -49,8 +49,6 @@ plot($linestyle)($style1)/axes=1,1,1,0($vlimits)/set reported_t
   ppl title " "
   ppl xlab " "
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
-  let labdat = ($labnum_dset)
-  let labttl = ($labnum_datitl)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
