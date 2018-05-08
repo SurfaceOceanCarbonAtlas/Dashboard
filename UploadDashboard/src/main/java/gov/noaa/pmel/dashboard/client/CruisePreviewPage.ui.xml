@@ -1,0 +1,118 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+
+    <ui:style src="FullWidth.css"/>
+
+    <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.titlepanel}">
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
+            </g:FlowPanel>
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
+            <g:ResizeLayoutPanel addStyleNames="{style.plotspanel}">
+                <g:TabLayoutPanel barUnit='EM' barHeight='2'>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latVsLonHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latVsLonImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latLonHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latLonImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="sampleVsTimeHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="sampleVsTimeImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="timeSeriesHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="timeSeriesImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="pressuresHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="pressuresImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="temperaturesHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="temperaturesImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="salinitiesHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="salinitiesImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="xco2sHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="xco2sImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="dtXco2Fco2Html"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="dtXco2Fco2Image"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsTimeHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsTimeImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsSstHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsSstImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsSalHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsSalImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="reportRecFco2Html"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="reportRecFco2Image"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2DeltaHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2DeltaImage"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2SourcesHtml"/>
+                        </g:customHeader>
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2SourcesImage"/>
+                    </g:tab>
+                </g:TabLayoutPanel>
+            </g:ResizeLayoutPanel>
+            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="refreshButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:ScrollPanel>
+
+</ui:UiBinder>

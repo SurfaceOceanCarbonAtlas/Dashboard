@@ -1,4 +1,12 @@
-test-classes/
+.idea/
+SocatUploadDashboard/
+classes/
+deploy/
 gwt-unitCache/
-war/SocatUploadDashboard/
-war/WEB-INF/deploy/
+target/
+test-classes/
+gwt-servlet.jar
+gwt-user.jar
+omemetadata.jar
+sanitychecker.jar
+*.iml

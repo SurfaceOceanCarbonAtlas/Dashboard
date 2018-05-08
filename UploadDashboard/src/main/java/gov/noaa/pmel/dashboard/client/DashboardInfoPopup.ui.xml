@@ -1,0 +1,12 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:style src="FixedWidth.css"/>
+
+    <g:VerticalPanel addStyleNames="{style.infopanel}">
+        <g:HTML addStyleNames="{style.infohtml}" ui:field="infoHtml"/>
+        <g:Button addStyleNames="{style.infobutton}" ui:field="dismissButton"/>
+    </g:VerticalPanel>
+
+</ui:UiBinder>
