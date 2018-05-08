@@ -1,0 +1,57 @@
+! SOCAT_gvco2.jnl
+!
+! Sample the computed GlobalView Marine Carbon dataset at the locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
+
+
+!!!!!!!!!!!!!!!!!!!! GlobalViewMarineCarbon !!!!!!!!!!!!!!!!!!!! 
+
+! gvco2_201x from  http://www.esrl.noaa.gov/gmd/ccgg/mbl/
+! and written by the scripts GlobalViewMarineCarbon_2017.jnl
+
+use gvco2.nc
+def sym dco2 = `co2,return=dsetnum`
+
+set data "($cruise_filename)"
+
+! The co2 data varies only in latitude. Define a longitude axis 
+define axis/modulo=360/unitslongitude/edges/x=0:360:180 xax
+let co2wx = co2[d=($dco2)] + 0*x[gx=xax]
+
+! reconcile the time units. The co2 data has time origin of 1-jan-1970
+def sym gv_t0 = `co2[d=($dco2)],return=t0`
+if `STRINDEX("($gv_t0)", "1-JAN-1970") EQ 0` THEN
+   SAY Expected gvco2 time origin to be 01-JAN-1970. It is ($gv_t0). Stopping
+   exit/program
+endif
+
+let ttzero =  days1900(1970,1,1)
+LET dates_for_co2 = days1900(year, month, day) + hour/24 + minute/(24*60) + second/(24*60*60) - `ttzero`
+
+! sample CO2 at the cruise times and locations.
+let gvco2_sampled = SAMPLEXYT(co2wx,longitude,latitude,dates_for_co2)
+
+
+! If the dates come in with 2-digit years, then we want to return an error.  If the dates are 
+! in 1900 to the start of this dataset, then return missing values for this variable.
+
+IF `year[i=@min] LT 1900` THEN
+   MESSAGE/ERROR Dataset contains years less than 1900
+   EXIT/PROGRAM
+ENDIF
+
+let mindate = t[gt=co2[d=($dco2)],L=1]
+
+IF `dates_for_co2[i=@max)] LT mindate` THEN
+   let gvco2_sampled = (1./0)* longitude
+ELSE
+
+! If the data dates overlap the start of 1968 return missing prior to 1-jan-1968 
+   IF `dates_for_co2[i=@min)] LT mindate` THEN 
+      LET dates_for_co2 = IF dates_for_co2 GE mindate THEN dates_for_co2
+   ENDIF
+
+! sample CO2 at the cruise times and locations.
+   let gvco2_sampled = SAMPLEXYT(co2wx,longitude,latitude,dates_for_co2)
+
+ENDIF

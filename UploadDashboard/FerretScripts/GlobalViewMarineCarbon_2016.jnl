@@ -1,0 +1,111 @@
+! see
+! http://www.esrl.noaa.gov/gmd/ccgg/globalview/co2/co2_version.html  says,
+!
+!    The Reference Marine Boundary Layer matrix, which was provided in previous 
+!    releases, is no longer available. Instead, NOAA has made a more comprehensive 
+!    MBL reference product available here.  
+
+! The link references this page :
+! http://www.esrl.noaa.gov/gmd/ccgg/mbl/
+!
+! and from there, http://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php, downloading 
+!the "surface" reference type gives us sine(latitude) vs time of the Reference 
+! Marine Boundary Layer. 
+!
+! This file is in this format: 
+! # Format = (F12.6,82(1X,F12.4))
+! TIME  DATA  UNCERTAINTY  DATA  UNCERTAINTY, ...
+! e.g.
+!  1979.000000     334.6322       0.0912     334.6365       0.0975
+! Read all the data, skipping TIME.  Then keep every second value, skipping the uncertainty.
+
+! The data set lies in the YT plane.  Y is on equal intervals of SIN(latitude)
+! The T axis divides each year into 48 equal pieces ("weeks")
+
+! The date field is in year fractions -- an ugly unit for Ferret, since years
+! are not all of equal length. Here we first confirm that the years can be
+! read correctly and note that the number of points on it is correct
+
+let nskip = 78
+define symbol infile = tmp_co2_GHGreference.79750115_surface.txt
+define symbol outfile = /home/data/socat/gvco2_2016.nc
+
+file/col=1/format="(1x,F12.6)"/var=date/skip=`nskip` ($infile)
+let ndate = `date[i=@ngd]`
+list/prec=9/i=1:5 date
+list/prec=9/i=`ndate-5`:`ndate` date
+pause
+
+can dat/all
+
+! now define a time axis based on the description
+define axis/t=4-jan-1979:4-jan-2017/npoints=`ndate`/unit=days/t0=1-jan-1970 tcarbon
+
+! Input y axis with 41 values
+define axis/y=1:41:1 yaxis
+
+! define the grid of the dataset and set it up
+define grid/y=yaxis/t=tcarbon gcarbon
+
+! 13x skips the time coordinate. 14x skips the uncertainty values
+
+file/skip=`nskip`/format="(13x, 41(F12.4,14x))"/col=41/var=co2_in/grid=gcarbon ($infile)
+
+! define the latitude axis as 41 equal intervals of SIN(Y)
+let sinlat = y[y=-1:1:.05]
+define axis/y/units=degrees lats = asin(sinlat) * 180 / 3.14159
+
+! Units and title. Definintion of latitude.
+let/title="NOAA greenhouse gas MBL surface reference 2015"/units="umol/mol" co2 = co2_in[gy=lats@asn]
+shade/lev=(325,412,.5) co2; pause
+
+
+save/clobber/file="($outfile)" co2
+
+! The co2 values are followed by their uncertainty
+cancel data/all
+
+file/skip=`nskip`/format="(13x, 41(14x,F12.4))"/col=41/var=unc_in/grid=gcarbon ($infile)
+
+let/title="Uncertainty, NOAA greenhouse gas MBL surface reference 2015"/units="umol/mol" uncertain = unc_in[gy=lats@asn]
+shade uncertain; pause
+
+save/append/file="($outfile)" uncertain
+
+! Look at dataset differences
+pause
+can dat/all
+can var/all
+
+use "/home/data/socat/gvco2_2008.nc"
+use "/home/data/socat/gvco2_2012.nc"
+use "/home/data/socat/gvco2_2013.nc"
+use "/home/data/socat/gvco2_2014.nc"
+use "/home/data/socat/gvco2_2015.nc"
+use "($outfile)"
+
+let/title="gvco2 2008" co2_08 = co2[d=1]
+let/title="gvc02 2012" co2_12 = co2[d=2,gt=co2[d=1]]
+let/title="gvc02 2013" co2_13 = co2[d=3,gt=co2[d=1]]
+let/title="gvc02 2014" co2_14 = co2[d=4,gt=co2[d=1]]
+let/title="gvc02 2015" co2_15 = co2[d=5,gt=co2[d=1]]
+set data 1
+
+! Difference between what we had as gvco2 2008 and 2012
+shade co2_08 - co2_12
+
+pause
+! Difference between what we had as gvco2 2008 and 2013
+shade co2_08 - co2_13
+
+pause
+! Difference between what we had as gvco2 2008 and 2014
+shade co2_08 - co2_14
+
+pause
+! Difference between what we had as gvco2 2008 and 2015
+shade co2_08 - co2_15
+
+pause
+! Difference between what we had as gvco2 2014 and 2015
+shade co2_14 - co2_15

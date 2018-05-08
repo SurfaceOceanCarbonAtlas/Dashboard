@@ -1,4 +1,5 @@
-! oap_preview_map
+! preview_map.jnl
+!
 
 CANCEL MODE nodata_lab
 DEFINE VIEW/AXES/X=0.08:0.99/y=0.06:0.92 full_view
@@ -9,7 +10,7 @@ LET/UNITS="`latitude,RETURN=units`"/TITLE="`latitude,RETURN=title`" lat = latitu
 
 LET lonmin = `min(lon[i=@MIN]-5, 180)`
 LET lonmax = `max(lon[i=@MAX]+5, -180)`
-GO oap_preview_xy_range lonmin lonmax 100
+GO preview_xy_range lonmin lonmax 100
 
 LET xax_lo = ($ppl$range_low)
 LET xax_hi = ($ppl$range_high)
@@ -21,7 +22,7 @@ IF `IS_ELEMENT_OF_STR(varnames, "lon360") GT 0` THEN
    LET lonmin = `min(lon360[i=@MIN]-5, 360)`
    LET lonmax = `max(lon360[i=@MAX]+5, 0)`
    
-   GO oap_preview_xy_range lonmin lonmax 
+   GO preview_xy_range lonmin lonmax 
 
    LET ax_lo360 = ($ppl$range_low)
    LET ax_hi360 = ($ppl$range_high)
@@ -40,7 +41,7 @@ ENDIF
 LET latmin = `max(lat[i=@MIN]-5, -90)`
 LET latmax = `min(lat[i=@MAX]+5,  90)`
 
-GO oap_preview_xy_range latmin latmax
+GO preview_xy_range latmin latmax
 
 LET yax_lo = ($ppl$range_low)
 LET yax_hi = ($ppl$range_high)
@@ -61,13 +62,13 @@ SAY `land_pct` in-range `land_pct GT 0.01 AND land_pct LT 0.99`; \
 IF `land_pct GT 0.01 AND land_pct LT 0.95` THEN EXIT/LOOP;\
 LET lonmin = `lonmin-15`;\
 LET lonmax = `lonmax+15`;\
-GO oap_preview_xy_range lonmin lonmax 100;\
+GO preview_xy_range lonmin lonmax 100;\
 LET xax_lo = ($ppl$range_low);\
 LET xax_hi = ($ppl$range_high);\
 LET del_xax = ($ppl$range_inc);\
 LET latmin = `MAX(-90,latmin-15)`;\
 LET latmax = `MIN(90,latmax+15)`;\
-GO oap_preview_xy_range latmin latmax;\
+GO preview_xy_range latmin latmax;\
 LET yax_lo = ($ppl$range_low);\
 LET yax_hi = ($ppl$range_high);\
 LET del_yax = ($ppl$range_inc);\
@@ -114,7 +115,7 @@ DEFINE SYMBOL region_y_lo = `yax_lo`
 DEFINE SYMBOL region_y_hi = `yax_hi`
 DEFINE SYMBOL region_y_range = `yax_hi - yax_lo`
 
-GO oap_preview_fland ($land_palette)
+GO preview_fland ($land_palette)
 
 
 PLOT/over/vs/LINE/DASH=(0.1,0.04,0.1,0.04)/line=6/NOLAB lon, lat
@@ -128,4 +129,4 @@ STAT lat
 LET latconst = `($stat_std) LT 0.1`
 IF `lonconst + latconst EQ 2` THEN DEFINE SYMBOL symquals = /SYM=17/SIZE=0.15/THICK=2
 
-RIBBON/over/vs/missing=blank/NOLAB($symquals)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT lon, lat, WOCE_autocheck
+RIBBON/over/vs/missing=blank/NOLAB($symquals)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT lon, lat, WOCE_CO2_water

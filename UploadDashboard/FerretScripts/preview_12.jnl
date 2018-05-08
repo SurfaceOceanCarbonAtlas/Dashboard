@@ -1,0 +1,130 @@
+! preview_12.jnl
+!
+! sources
+
+GO preview_setup.jnl ($infile_dsg) 12
+
+
+
+! We compute the fco2_source in calcSOCAT.jnl
+!  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
+!  if the values of xCO2_water_equi_temp_dry_ppm are valid, because the computed
+!  fCO2_insitu variable also depends on temperature and temperature_equi.)
+!
+
+LET vsrc1 = IF fco2_source EQ 1 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc2 = IF fco2_source EQ 2 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc3 = IF fco2_source EQ 3 THEN pCO2_water_equi_temp ELSE 0
+LET vsrc4 = IF fco2_source EQ 4 THEN pCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc5 = IF fco2_source EQ 5 THEN fCO2_water_equi_uatm ELSE 0
+LET vsrc6 = IF fco2_source EQ 6 THEN fCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc7 = IF fco2_source EQ 7 THEN pCO2_water_equi_temp ELSE 0
+LET vsrc8 = IF fco2_source EQ 8 THEN pCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc9 = IF fco2_source EQ 9 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc10 = IF fco2_source EQ 10 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc11 = IF fco2_source EQ 11 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc12 = IF fco2_source EQ 12 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc13 = IF fco2_source EQ 13 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc14 = IF fco2_source EQ 14 THEN xCO2_water_sst_dry_ppm ELSE 0
+
+LET sources = vsrc1 + vsrc2 + vsrc3 + vsrc4 + vsrc5 + vsrc6 + vsrc7 + vsrc8 + vsrc9 + vsrc10 + vsrc11 + vsrc12 + vsrc13 + vsrc14
+
+LET mask = IF fco2_source THEN 1
+
+LET masksource = sources* mask
+
+LET diff = fco2_recommended - masksource
+LET diff_t = reshape( diff, tt)
+LET fco2_t = reshape(fco2_recommended, tt)
+LET source_t = reshape (masksource, tt)
+LET alg_id_t = reshape (fco2_source, tt)
+
+
+!  Plot histogram of source ids
+
+SET VIEW full1
+
+LET xx = x[gx=zero]
+LET miss = -9999
+LET dely = 0.25 ! half the width of the bar
+DEFINE SYMBOL dummy = ($result_directory)/dummy.txt
+SAY/QUIET/CLOBBER/OUTFILE="($dummy)" "temporary file with histogram data"
+
+CANCEL SYMBOL colors
+
+LET nsrc = 0
+LET maxloc = 0
+
+let nsrc = 0
+REPEAT/RANGE=1:15/NAME=q (\
+  DEFINE SYMBOL src = `q`;\
+  IF `IS_ELEMENT_OF(($src), fco2_source) NE 0` THEN;\
+    LET sum = IF fco2_source EQ ($src) THEN 1;\
+    LET sumsum =  sum[i=@sum];\
+    LET nsrc = `nsrc+1`;\
+    DEFINE symbol colors = ($colors)($comma)($src);\
+    DEFINE symbol comma = ,;\
+    LET maxloc = `MAX(maxloc, sumsum)`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW 0, `($src)-dely`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW sumsum, `($src)-dely`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW sumsum, `($src)+dely`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW 0, `($src)+dely`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW 0, `($src)-dely`;\
+    LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW miss, miss;\
+    LET nsrc = `nsrc+1`;\
+  ENDIF;\
+)
+
+IF `nsrc EQ 0` THEN
+  plot/nolab/vs/hlim=0:1/vlim=0:1/set {100,200},{100,200}
+  ppl axlabp,0,0
+  ppl plot
+  LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, (NO VALID DATA)
+ELSE
+
+FILE/SKIP=1/VAR="xp, yp" "($dummy)"
+SET VAR/BAD=`miss` xp
+SET VAR/BAD=`miss` yp
+
+LET colr = {($colors)}
+
+PPL %RANGE 0, `maxloc`, 5
+LET dely = `dely/2`
+
+POLYGON/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/VLIM=0:15/HLIM=0:($ppl$range_high)/SET xp, yp, colr
+  PPL xlab "Number of Measurements"
+  PPL ylab "Source number"
+  PPL title " "
+  IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+PPL POLYGON
+
+CANCEL DATA "($dummy)"
+SP rm ($dummy)
+
+CANCEL SYMBOL colors, comma
+SET DATA 1
+
+LET xloc = `($ppl$range_high)/20`
+REPEAT/RANGE=1:15/NAME=q (\
+  DEFINE SYMBOL src = `q`;\
+  IF `IS_ELEMENT_OF(($src), fco2_source) NE 0` THEN;\
+    LET sum = IF fco2_source EQ ($src) THEN 1;\
+    LET sumsum =  sum[i=@sum];\
+    LET xloc = `sumsum/2`;\
+    LABEL/USER `xloc`, `($src)+dely+0.28`,-1, 0, 0.12, "`source_labels[i=($src)]`";\
+  ENDIF;\
+)
+
+ENDIF  ! fco2_source all missing
+
+
+
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Sources
+   
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

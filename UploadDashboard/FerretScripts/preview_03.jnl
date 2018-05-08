@@ -1,0 +1,66 @@
+! Year and day-of-year
+
+go preview_setup ($infile_dsg) 3
+
+! Plot  Year and day-of-year, each with its own vertical axis
+
+let/title=Year yr = TAX_YEAR (tt,tt)
+let/title="Day of Year" day = reshape(day_of_year, tt)
+
+! Year
+
+set view full
+let tt1 = tt[L=1]
+let ttn = tt[L=@max]
+let ax1 = `tax_year(tt1,tt1)-1`
+let ax2 = `tax_year(ttn,ttn)+1`
+
+! If there's just one year, no need to evaluate function TAX_YEAR for the whole series
+IF `tax_year(tt1,tt1) EQ tax_year(ttn,ttn)` THEN let/title=Year yr = `tax_year(tt1,tt1)` + 0*tt
+
+let dy = 1
+let yint = 1
+if `ax2-ax1 GT 6` then 
+   let dy = 2
+   let yint = 2
+endif
+
+DEFINE SYMBOL style1 = /color=blue/thick=2
+
+plot($linestyle)($style1)/axes=1,1,1,0/title=" "/set  yr
+  ($taxis_setting)
+  ppl axnsig,,0
+  ppl yaxis,`ax1`,`ax2`,`dy`
+  ppl axlint,,`yint`
+  ppl ylab Year
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+ppl plot
+
+! Day
+
+set view full2
+
+DEFINE SYMBOL style2 =  /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+plot($linestyle)/axes=1,1,0,1($style2)/title=" "/set day
+  ppl ylab Day
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+ppl axnsig,2,2
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Year and Day of Year  `nobs` locations
+
+
+! Make the color key
+Go keybox ($style1) Year ($style2) "Day of Year"
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+
+

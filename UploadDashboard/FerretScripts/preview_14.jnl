@@ -1,15 +1,18 @@
+! preview_14.jnl
+!
 ! Sample number vs time
 
-go oap_preview_setup ($infile_dsg) 3
+go preview_setup ($infile_dsg) 2
 
-let/title="Sample Number" samp = reshape(sample_number, tt)
+let samp = L[gt=tt]
 
-! Plot sample number as a function of time colored by WOCE flag.
+! Plot sample number as  a function of time colored by woce flag.
 
 set view full
 
+
 ribbon($linestyle)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/line\
-/title=" "/set samp,woce_autocheck
+/title=" "/set samp,woce_co2_water
   ppl ylab Sample Number
   ppl xlab " "
   ($taxis_setting)
@@ -18,10 +21,12 @@ ribbon($linestyle)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/line\
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
 
-! Label at the top with the dataset ID and count
-DEFINE SYMBOL lab_top = Dataset `dataset_id`
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
-  Sample number vs time.  `nobs` locations colored by checker WOCE flag
+  Sample number vs time.  `nobs` locations Colored by `WOCE_CO2_water_in,return=title`
+
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

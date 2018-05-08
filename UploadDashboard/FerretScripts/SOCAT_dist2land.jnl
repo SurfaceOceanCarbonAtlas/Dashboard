@@ -1,7 +1,7 @@
-! oap_dist2land.jnl
+! SOCAT_dist2land.jnl
 !
-! Sample the computed distance-to-land dataset at the locations of a dataset
-! The dataset is already open and its name is in the symbol cruise_filename
+! Sample the computed distance-to-land dataset at the locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
 
 
 !!!!!!!!!!!!!!!!!!!!  distance to land !!!!!!!!!!!!!!!!!!!! 

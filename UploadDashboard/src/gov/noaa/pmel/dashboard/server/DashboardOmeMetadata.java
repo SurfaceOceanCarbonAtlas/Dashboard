@@ -706,6 +706,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		PI_NAME_CORRECTIONS = new HashMap<String,String>();
 		PI_NAME_CORRECTIONS.put("Begovic, M.", "B" + eAcute + "govic, M.");
 		PI_NAME_CORRECTIONS.put("Copin-Montegut, C.", "Copin-Mont" + eAcute + "gut, C.");
+		PI_NAME_CORRECTIONS.put("Diverres, D.", "Diverr" + eGrave + "s, D.");
 		PI_NAME_CORRECTIONS.put("Gonzalez-Davila, M.", "Gonz" + aAcute + "lez-D" +  aAcute + "vila, M.");
 		PI_NAME_CORRECTIONS.put("Jutterstrom, S.", "Jutterstr" + oUmlaut + "m, S.");
 		PI_NAME_CORRECTIONS.put("Jutterstroem, S.", "Jutterstr" + oUmlaut + "m, S.");

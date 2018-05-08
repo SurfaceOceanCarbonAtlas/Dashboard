@@ -1,0 +1,90 @@
+! SOCAT_NCEP_slp.jnl
+!
+! Sample NCEP sea level pressure at the times and locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
+! The slp dataset can be updated from the Sea level pressure, 4-times Daily set at
+!   http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html 
+!  (note scroll down to Sea Level Pressure, NOT the Pressure set).
+!
+!  See the script in this directory, append_ncep.jnl to apppend the 
+!  data to the master set as short integers.
+
+!!!!!!!!!!!!!!!!!!!! NCEP sea level pressure !!!!!!!!!!!!!!!!!!!! 
+
+
+
+! Open ncep SLP 6-hour data. 
+use ncep_slp
+
+define symbol dncep = `slp,return=dsetnum`
+set data "($cruise_filename)"
+
+
+! Reconcile the time data in the socat data with the time axis of ncep slp
+
+define axis/t="1-jan-1900:00:00:00":"1-jan-1900:01:00:00":1/units=hours/t0="`slp[d=($dncep)],return=t0`" time_to_zero
+let ttzero = t[gt=time_to_zero,L=1]
+
+! Times in cruise datset, hours since start of 0001 to match the time axis of ncep slp
+
+! NOTE the Matlab scripts make a correction of 2 days when computing the dates for NCEP data,
+! which uses the mixed Julian/Gregorian calendar axis of UDUNITS.
+!
+!   NCEP_base_time=24.*(datenum('0001-01-01 00:00:00', 'yyyy-mm-dd HH:MM:SS')-2);
+!
+! However the ncep pressure data in the old .mat.txt files, and cruise data from SOCAT 2 
+! compare best with the result from this script, if I use this:
+!
+!  LET dates_for_ncep = 24* (days1900(year, month, day)+2) ...
+!
+! indicating that perhaps that 2-day correction wasn't applied in the data we were using?
+
+
+LET dates_for_ncep = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
+
+! The 2-day time shift is not in the data and is not introduced by Ferret as the NCEP data now 
+! comes with its origin at the start of year 1800.
+! data from  http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+
+!LET dates_for_ncep = 24* (days1900(year, month, day)+2) + hour + minute/60 + second/(60*60) + `ttzero`
+
+! Load just the range of time we will need in the call to SAMPLEXYT
+let data_t_lo = INT(dates_for_ncep[i=@min] - 10) 
+let data_t_hi = INT(dates_for_ncep[i=@max] + 10) 
+
+
+! If the dates come in with 2-digit years, then we want to return an error.  If the dates are 
+! in 1900 to the start of the NCEP dataset, then return missing values for this variable.
+
+IF `year[i=@min] LT 1900` THEN
+   MESSAGE/ERROR Dataset contains years less than 1900
+   EXIT/PROGRAM
+ENDIF
+
+let tslp = t[gt=slp[d=($dncep)]]
+let mindate = tslp[L=1]
+let maxdate = tslp[L=@max]
+
+! Fill with all-missing if the dates do not overlap NCEP dates
+! If the data partially overlap, then the sampling works, returning data where
+! the dates do overlap.
+
+IF `dates_for_ncep[i=@max] LT mindate` THEN
+   let/units="hPa"/title="NCEP sea level pressure" ncep_slp = (1./0)* longitude
+ELIF `dates_for_ncep[i=@min] GE maxdate` THEN
+   let/units="hPa"/title="NCEP sea level pressure" ncep_slp = (1./0)* longitude
+
+ELSE    
+
+! If the data dates overlap the start of 1968 return missing prior to 1-jan-1968 
+   IF `dates_for_ncep[i=@min] LT mindate` THEN 
+      LET dates_for_ncep0 = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
+      LET dates_for_ncep = IF dates_for_ncep0 GE mindate THEN dates_for_ncep0
+      LET data_t_lo = mindate
+   ENDIF
+
+! sample SLP at the cruise times and locations.  Convert to HectoPascals.
+   let/units="hPa"/title="NCEP sea level pressure" ncep_slp = \
+    0.01* SAMPLEXYT_NRST(slp[d=($dncep),t=`data_t_lo`:`data_t_hi`],longitude, latitude, dates_for_ncep)
+
+ENDIF

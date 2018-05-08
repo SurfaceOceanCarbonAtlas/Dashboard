@@ -1,0 +1,30 @@
+! preview_08.jnl
+!
+! fCO2_rec
+
+go preview_setup ($infile_dsg) 8
+
+let fco2 =  reshape(fCO2_recommended, tt)
+
+set view full
+plot($linestyle)/line/color=blue/thick=2/title=" "/set fco2
+  ppl ylab @SRfCO_2 recommended (`fCO2_recommended,return=units`)
+  ppl xlab " "
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, fCO_2 recommended `nfnoc` Valid points 
+
+! If no data, add a label
+IF `fco2[L=@ngd] EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

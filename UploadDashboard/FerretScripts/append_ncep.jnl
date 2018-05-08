@@ -1,0 +1,58 @@
+! append_ncep.jnl
+!
+! Data downloaded from http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+! Add an offset and fix the missing-value flag so that the data can be saved as SHORT
+! If the data being added is a partial year, see ncep_slp_blank_end_year.jnl to 
+! fill it out to the end of the current year.
+
+! Note that as long as the time origins are year 1800 as they are in the datasets above,
+! we do not need to worry about Ferret introducing a 2-day time shift.
+
+set mem/siz=300
+def sym offst = 119765
+def sym newbad = `32766+($offst)`
+
+
+use "/home/data/socat/ncep_slp_data/slp.2017.nc"
+
+! Replace the bad-flag
+set var/name=slp_in slp
+let/bad=($newbad)/units="`slp_in,return=units`"/title="`slp_in,return=title`"  slp = missing(slp_in, ($newbad))
+
+! set up scale and offset
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+
+! keep the input attributes; title, units, etc
+set att/output=all slp
+save/append/nobounds/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
+
+
+exit/script
+!!!!!!!!!!!!!!!!!!!
+
+! Rewrite the whole set.  This only takes a couple minutes.
+
+use "/home/data/socat/ncep_slp_data/slp.1968.nc"
+
+! Replace the bad-flag
+set var/name=slp_in slp
+let/bad=($newbad)/units="`slp_in,return=units`"/title="`slp_in,return=title`"  slp = missing(slp_in, ($newbad))
+
+! set up scale and offset
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+
+! keep the input attributes; title, units, etc
+set att/output=all slp
+save/clobber/file="/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp
+
+repeat/range=1969:2014/name=yr (\
+can dat/all; can var/all;\
+use "/home/data/socat/ncep_slp_data/slp.`yr`.nc";\
+set var/name=slp_in slp;\
+let/bad=($newbad) slp = missing(slp_in, ($newbad));\
+def att/output slp.scale_factor = 1;\
+def att/output slp.add_offset = ($offst);\
+set att/output=all slp;\
+save/append/file= "/home/data/socat/ncep_slp_data/ncep_slp.nc"/outtype=short slp)

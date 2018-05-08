@@ -1,0 +1,114 @@
+! preview_11.jnl
+!
+! Time Series plots
+set mem/siz=60
+
+go preview_setup ($infile_dsg) 11
+
+define view/axes/x=0.1:0.9/y=0.07:0.20 y1
+define view/axes/x=0.1:0.9/y=0.25:0.38 y2
+define view/axes/x=0.1:0.9/y=0.43:0.56 y3
+define view/axes/x=0.1:0.9/y=0.61:0.74 y4
+define view/axes/x=0.1:0.9/y=0.79:0.92 y5
+
+
+let/title=Latitude lat = reshape(latitude, tt)
+let/title=Longitude lon = reshape(longitude, tt)
+let/title=Salinity salin = reshape(sal, tt)
+let/title=Temperature temper = reshape(temp, tt)
+let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
+
+
+set view y1
+ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set lat, WOCE_CO2_water
+  ppl ylab lat
+  ppl xlab " "
+  ppl axatic,,3
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl ribbon
+
+! If no data, add a label
+IF `lat[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+set view y2
+ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set lon, WOCE_CO2_water
+  ppl ylab lon
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl ribbon
+
+! If no data, add a label
+IF `lon[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+set view y3
+ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set salin, WOCE_CO2_water
+  ppl ylab sal
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl ribbon
+
+! If no data, add a label
+IF `salin[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+set view y4
+ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set temper, WOCE_CO2_water
+  ppl ylab temp
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl ribbon
+
+! If no data, add a label
+IF `temper[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+set view y5
+ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set fco2, WOCE_CO2_water
+  ppl ylab fCO_2 rec
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl ribbon
+
+! If no data, add a label
+IF `fco2[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.5*($ppl$yorg)`, 0,0,0.14,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.12, \
+   Time Series `nobs` locations Colored by `WOCE_CO2_water_in,return=title`
+
+
+! reset
+
+ppl txlabp,-1
+ppl axatic,5,5
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

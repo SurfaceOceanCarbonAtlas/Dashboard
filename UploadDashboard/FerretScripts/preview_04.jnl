@@ -1,0 +1,63 @@
+! preview_04.jnl
+!
+! Pressure variables
+
+go preview_setup ($infile_dsg) 4
+
+! Plot pressure variables each with its own vertical axis
+
+let/title="@ASP_NCEP" P_NCEP =  reshape(pressure_ncep_slp, tt)
+let/title="@ASP_atm" patm = reshape(Pressure_atm, tt)
+let/title="@ASP_equi" pequi =  reshape(Pressure_equi, tt)
+
+! Get vertical scale for 3 variables together
+plot P_NCEP, patm,pequi
+
+CANCEL VIEW
+SET VIEW full
+
+LET amin = ($yaxis_min)
+LET amax = ($yaxis_max)
+
+GO preview_xy_range amin amax 1
+
+LET yax_lo = ($ppl$range_low)
+LET yax_hi = ($ppl$range_high)
+
+DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
+
+ppl axlint,,2
+
+define symbol style1 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
+plot($linestyle)($style1)($vlimits)/title=" "/set  P_NCEP
+   ppl ylab Pressure (`Pressure_atm,return=units`)
+  ($taxis_setting)
+   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+define symbol style2 = /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+plot($linestyle)/over($style2)/nolab patm
+
+define symbol style3 = /color=blue/thick=2
+plot($linestyle)/over($style3)/nolab pequi
+
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Pressures  `nobs` locations
+
+! If no data, add a label
+IF `P_NCEP[L=@ngd] + patm[L=@ngd] + pequi[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+
+! Make the color key
+
+go keybox ($style1) "P NCEP" ($style2) patm ($style3) pequi
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
