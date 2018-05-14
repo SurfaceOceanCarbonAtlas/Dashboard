@@ -30,51 +30,50 @@ public interface DashboardServicesInterfaceAsync {
      * @param callback
      *         the callback to make with the cruise list.
      */
-    void getCruiseList(AsyncCallback<DashboardCruiseList> callback);
+    void getDatasetList(AsyncCallback<DashboardDatasetList> callback);
 
     /**
      * Client side request to deletes all files for the indicated cruises.
      *
      * @param username
      *         name of the current user - for validation
-     * @param expocodeSet
-     *         cruises to be deleted
+     * @param datasetIds
+     *         datasets to be deleted
      * @param deleteMetadata
      *         also delete metadata and additional documents?
      * @param callback
-     *         the callback to make with the updated cruise list for the current user
-     * @return the updated list of cruises for the current user
+     *         the callback to make with the updated dataset list for the current user
      */
-    void deleteCruises(String username, TreeSet<String> expocodeSet,
-                       Boolean deleteMetadata, AsyncCallback<DashboardCruiseList> callback);
+    void deleteDatasets(String username, TreeSet<String> datasetIds,
+            Boolean deleteMetadata, AsyncCallback<DashboardDatasetList> callback);
 
     /**
-     * Client side request to add the indicated cruises
-     * to the current user's list of cruises.
+     * Client side request to add the indicated datasets
+     * to the current user's list of datasets.
      *
      * @param username
      *         name of the current user - for validation
-     * @param wildExpocode
-     *         expocode, possibly with wildcards * and ?, to use
+     * @param wildDatasetId
+     *         ID, possibly with wildcards * and ?, of datasets to add
      * @param callback
-     *         the callback to make with the current user's updated cruise list
+     *         the callback to make with the current user's updated dataset list
      */
-    void addCruisesToList(String username, String wildExpocode,
-                          AsyncCallback<DashboardCruiseList> callback);
+    void addDatasetsToList(String username, String wildDatasetId,
+            AsyncCallback<DashboardDatasetList> callback);
 
     /**
-     * Client side request to remove the indicated cruises from the current
-     * user's list of cruises (but does not delete any files for these cruises).
+     * Client side request to remove the indicated datasets from the current
+     * user's list of datasets (but does not delete any files for these datasets).
      *
      * @param username
      *         name of the current user - for validation
-     * @param expocodeSet
-     *         cruises to be removed
+     * @param datasetIds
+     *         datasets to be removed
      * @param callback
-     *         the callback to make with the current user's updated cruise list
+     *         the callback to make with the current user's updated dataset list
      */
-    void removeCruisesFromList(String username, TreeSet<String> expocodeSet,
-                               AsyncCallback<DashboardCruiseList> callback);
+    void removeDatasetsFromList(String username, TreeSet<String> datasetIds,
+            AsyncCallback<DashboardDatasetList> callback);
 
     /**
      * Client side request to change the owner of the given cruises
@@ -82,178 +81,179 @@ public interface DashboardServicesInterfaceAsync {
      *
      * @param username
      *         name of the current user - for validation and current ownership of cruises
-     * @param expocodeSet
-     *         change the owner of the cruises with these expocodes
+     * @param datasetIds
+     *         change the owner of datasets with these IDs
      * @param newOwner
-     *         dashboard username of the new owner of these cruises
+     *         dashboard username of the new owner of these datasets
      * @param callback
      *         the callback to make with the current user's updated cruise list
      */
-    void changeCruiseOwner(String username, TreeSet<String> expocodeSet,
-                           String newOwner, AsyncCallback<DashboardCruiseList> callback);
+    void changeDatasetOwner(String username, TreeSet<String> datasetIds,
+            String newOwner, AsyncCallback<DashboardDatasetList> callback);
 
     /**
-     * Client side request to return the latest cruise information
-     * for the indicated cruises.
+     * Client side request to return the latest information
+     * for the indicated datasets.
      *
      * @param username
      *         name of the current user - for validation
-     * @param expocodeSet
-     *         set of all cruises to include in the returned
-     *         updated cruise information
+     * @param datasetIds
+     *         set of all datasets to include in the returned
+     *         updated dataset information
      * @param callback
      *         the callback to make with the updated cruise information
      */
-    void getUpdatedCruises(String username, TreeSet<String> expocodeSet,
-                           AsyncCallback<DashboardCruiseList> callback);
+    void getUpdatedDatasets(String username, TreeSet<String> datasetIds,
+            AsyncCallback<DashboardDatasetList> callback);
 
     /**
      * Client side request to remove (delete) an ancillary document
-     * for a cruise.
+     * for a dataset.
      *
      * @param username
      *         name of the current user - for validation
      * @param deleteFilename
      *         remove the ancillary document with this name
-     * @param expocode
-     *         remove the ancillary document from this cruise
-     * @param allExpocodes
-     *         set of all cruises to include in the returned
-     *         updated cruise information
+     * @param datasetId
+     *         remove the ancillary document from this dataset
+     * @param allDatasetIds
+     *         IDs of all datasets to include in the returned
+     *         updated dataset information
      * @param callback
      *         the callback to make with the updated cruise information
      */
     void deleteAddlDoc(String username, String deleteFilename,
-                       String expocode, TreeSet<String> allExpocodes,
-                       AsyncCallback<DashboardCruiseList> callback);
+            String datasetId, TreeSet<String> allDatasetIds,
+            AsyncCallback<DashboardDatasetList> callback);
 
     /**
-     * Reads the saved cruise file and returns the current data
-     * column specifications as well as some initial cruise data
-     * to assist in identifying cruise data columns.
+     * Reads the saved dataset file and returns the current data
+     * column specifications as well as data for some initial samples
+     * to assist in identifying data columns.
      *
      * @param username
      *         username for validation
-     * @param expocode
-     *         generate report for this cruise
+     * @param datasetId
+     *         generate report for this dataset
      * @param callback
-     *         callback to make with the current cruise data
-     *         column specifications and initial (partial) cruise data.
+     *         callback to make with the current dataset data
+     *         column specifications and initial (partial) sample data.
      *         The fail method is invoked if authentication fails,
-     *         if expocode is invalid, if the cruise does not exist,
-     *         or if there are problems obtaining the data for the cruise
+     *         if dataset ID is invalid, if the dataset does not exist,
+     *         or if there are problems obtaining the data for the dataset
      */
-    void getCruiseDataColumnSpecs(String username, String expocode,
-                                  AsyncCallback<DashboardCruiseTypes> callback);
+    void getDataColumnSpecs(String username, String datasetId,
+            AsyncCallback<TypesDatasetDataPair> callback);
 
     /**
-     * Reads the saved cruise file and returns the specified rows of cruise
-     * data.  The outer list contains the rows of cruise data; the inner list
-     * contains the columns of cruise data for that row.  (Thus, each row is
+     * Reads the saved dataset file and returns the specified rows of
+     * data.  The outer list contains the rows of data; the inner list
+     * contains the columns of data for that row.  (Thus, each row is
      * all data measured for a given sample, and each column is data of a
      * given type measured for all samples.)
      * The dashboard-generated row number is added as the first data column.
      *
      * @param username
      *         username for validation
-     * @param expocode
-     *         get data for this cruise
+     * @param datasetId
+     *         get data for this dataset
      * @param firstRow
      *         index of the first row of data to return
      * @param numRows
      *         number of rows of data to return
      * @param callback
-     *         callback to make with rows of data for a cruise.
+     *         callback to make with rows of data for a dataset.
      *         The fail method is invoked if authentication fails,
-     *         if expocode is invalid, if the cruise does not exist,
+     *         if dataset ID is invalid, if the dataset does not exist,
      *         or if there are problems obtaining the specified data
-     *         for the cruise
+     *         for the dataset
      */
-    void getCruiseDataWithRowNum(String username, String expocode,
-                                 int firstRow, int numRows,
-                                 AsyncCallback<ArrayList<ArrayList<String>>> callback);
+    void getDataWithRowNum(String username, String datasetId,
+            int firstRow, int numRows,
+            AsyncCallback<ArrayList<ArrayList<String>>> callback);
 
     /**
-     * Updates the data column specifications for a cruise to those
-     * provided.  This triggers the SanityChecker to run using the
+     * Updates the data column specifications for a dataset to those
+     * provided.  This triggers the automated data checker to run using the
      * new data column specifications.
      *
      * @param username
      *         username for validation
      * @param newSpecs
-     *         cruise data column types to assign.  The expocode in this
-     *         object specifies the cruise to update.  Any cruise data in
+     *         data column types to assign.  The dataset ID in this
+     *         object specifies the dataset to update.  Any sample data in
      *         this object is ignored.
      * @param callback
-     *         callback to make with the the updated cruise with
-     *         (abbreviated) data after processing through the SanityChecker
-     *         after processing through the SanityChecker.  The fail method
-     *         is invoked if authentication fails, if expocode is invalid,
-     *         if the cruise does not exist, or if there are problems
-     *         obtaining or evaluating the data for the cruise
+     *         callback to make with the the updated dataset with
+     *         (abbreviated) data after processing through the automated data checker
+     *         after processing through the automated data checker.  The fail method
+     *         is invoked if authentication fails, if dataset ID is invalid,
+     *         if the dataset does not exist, or if there are problems
+     *         obtaining or evaluating the data for the dataset
      */
-    void updateCruiseDataColumnSpecs(String username, DashboardCruise newSpecs,
-                                     AsyncCallback<DashboardCruiseWithData> callback);
+    void updateDataColumnSpecs(String username, DashboardDataset newSpecs,
+            AsyncCallback<DashboardDatasetData> callback);
 
     /**
-     * Updates the data column specifications for the cruises with the
-     * given expocodes.  Column types are assigned from column names-to-types
-     * saved for this user, and the SanityChecker is run using these new
+     * Updates the data column specifications for the datasets with the
+     * given IDs.  Column types are assigned from column names-to-types
+     * saved for this user, and the automated data checker is run using these new
      * column types.  Any exceptions thrown in the column assignment or
-     * sanity checking for a cruise only halt the process for that cruise
+     * sanity checking for a dataset only halt the process for that dataset
      * but otherwise is silently ignored.
      *
      * @param username
      *         username for validation
-     * @param cruiseExpocodes
-     *         process cruises with these expocodes
+     * @param datasetIds
+     *         process datasets with these IDs
      * @param callback
      *         callback to make after processing is complete.
      *         The fail method is invoked if authentication fails.
      */
-    void updateCruiseDataColumns(String username,
-                                 ArrayList<String> cruiseExpocodes, AsyncCallback<Void> callback);
+    void updateDataColumns(String username, ArrayList<String> datasetIds,
+            AsyncCallback<Void> callback);
 
     /**
      * Client side request to send the set of sanity checker
-     * data messages for a given cruise.
+     * data messages for a given dataset.
      *
      * @param username
      *         name of the current user - for validation
-     * @param expocode
-     *         get data messages for this cruise
+     * @param datasetId
+     *         get data messages for this dataset
      * @param callback
      *         the callback to make with list of sanity checker data messages
      */
-    void getDataMessages(String username, String expocode,
-                         AsyncCallback<SCMessageList> callback);
+    void getDataMessages(String username, String datasetId,
+            AsyncCallback<ADCMessageList> callback);
 
     /**
      * Client-side interface for getting the absolute path
      * to the OME.xml file for a cruise
      *
-     * @param pageUsername
+     * @param username
      *         name of the current user - for validation
-     * @param activeExpocode
-     *         get the OME for this cruise
-     * @param previousExpocode
-     *         if not empty, initialize with metadata from this cruise
+     * @param datasetId
+     *         get the OME for this dataset
+     * @param previousId
+     *         if not empty, initialize with metadata
+     *         from this dataset's metadata
      * @param callback
-     *         the callback to make with the absolute path to the OME.xml file
-     *         for activeExpocode; the onFailure method of the callback will be
+     *         the callback to make with the absolute path to the OME.xml file;
+     *         the onFailure method of the callback will be
      *         called if authentication failed, or if the appropriate content
      *         for the OME could not be found
      */
-    void getOmeXmlPath(String pageUsername, String activeExpocode,
-                       String previousExpocode, AsyncCallback<String> callback);
+    void getOmeXmlPath(String pageUsername, String datasetId,
+            String previousId, AsyncCallback<String> callback);
 
     /**
-     * Client side request to generate the preview images for a cruise.
+     * Client side request to generate the preview images for a dataset.
      *
      * @param username
      *         name of the current user - for validation
-     * @param expocode
-     *         get data messages for this cruise
+     * @param datasetId
+     *         generate preview images for this dataset
      * @param timetag
      *         tag to be added to the end of the plot file names
      *         (before the filename extension) to make them specific
@@ -266,32 +266,34 @@ public interface DashboardServicesInterfaceAsync {
      *         callback to make indicating the image-generating status
      *         (true if done generating plots)
      */
-    void buildPreviewImages(String username, String expocode, String timetag,
-                            boolean firstCall, AsyncCallback<Boolean> callback);
+    void buildPreviewImages(String username, String datasetId, String timetag,
+            boolean firstCall, AsyncCallback<Boolean> callback);
 
     /**
-     * Client-side interface for submitting cruises for QC.
+     * Client-side interface for submitting datasets for QC.
      *
      * @param username
      *         name of user making this request - for validation
-     * @param cruiseExpocodes
-     *         expocodes of cruises to submit
+     * @param datasetIds
+     *         IDs of datasets to submit
      * @param archiveStatus
      *         archive status to apply
      * @param localTimestamp
-     *         client local timestamp of this request
+     *         client local timestamp string of this request
      * @param repeatSend
-     *         if the archive request is to send to CDIAC ASAP,
-     *         should cruises already sent be resent?
+     *         if the archive request is to send for immediate archival,
+     *         should datasets already sent be sent again?
      * @param callback
      *         the callback to make when complete; the onFailure method
      *         of the callback will be called if authentication failed,
-     *         if a dashboard cruise does not exist for any of the
-     *         expocodes, or if the submitting of a cruise or change in
-     *         archive status failed.
+     *         if a dataset does not exist for any of the IDs, or if the
+     *         submitting of a dataset or change in archive status failed.
      */
-    void submitCruiseForQC(String username, HashSet<String> cruiseExpocodes,
-                           String archiveStatus, String localTimestamp, boolean repeatSend,
-                           AsyncCallback<Void> callback);
+    void submitDatasetsForQC(String username, HashSet<String> cruiseExpocodes,
+            String archiveStatus, String localTimestamp, boolean repeatSend,
+            AsyncCallback<Void> callback);
+
+    void suspendDatasets(String username, HashSet<String> datasetIds,
+            String localTimestamp, AsyncCallback<Void> callback);
 
 }

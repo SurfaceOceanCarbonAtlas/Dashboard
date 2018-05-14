@@ -26,7 +26,6 @@ body {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
 }
-
 .agreecheckbox {
     display: inline;
     margin-left: 3em;
@@ -34,14 +33,12 @@ body {
 
 .cruiselistdockpanel {
     width: 100%;
-    height: 40em;
+    height: 44em;
 }
-
 .cruiselistgrid {
     margin-top: 1em;
     margin-right: 0.5em;
 }
-
 .cruisebuttonspanel {
     background-color: #AACCEE;
     padding-top: 0em;
@@ -53,14 +50,12 @@ body {
     margin-left: 0.5em;
     margin-right: 0.5em;
 }
-
 .cruisepanelmainbutton {
     display: block;
     width: 7.25em;
     margin-top: 0.5em;
     margin-bottom: 0.75em;
 }
-
 .cruisebuttonpanelseparator {
     display: block;
     height: 0px;
@@ -69,7 +64,6 @@ body {
     margin-top: 0.75em;
     margin-bottom: 0.75em;
 }
-
 .cruisepanelbutton {
     display: block;
     width: 7.25em;
@@ -81,34 +75,28 @@ body {
     height: 27em;
     margin: 1em;
 }
-
 .datapagerlabel {
     margin-left: 7em;
     float: left;
 }
-
 .datapager {
     margin-left: 3em;
     float: left;
 }
-
 .datamsgpanel {
     display: block;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
-
 .datamsglabel {
     margin-right: 3em;
     float: right;
 }
-
 .datamsgbutton {
     font-size: small;
     margin-right: 3em;
     float: right;
 }
-
 .datamsgreset {
     clear: both;
 }
@@ -123,7 +111,6 @@ body {
     margin-top: 1em;
     margin-bottom: 1em;
 }
-
 .horizontalbutton {
     display: inline;
     font-size: 100%;
@@ -141,14 +128,12 @@ body {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
-
 .labeledlistlabel {
     display: inline;
     font-size: 100%;
     margin-left: 2em;
     margin-right: 0.5em;
 }
-
 .labeledlistbox {
     display: inline;
     font-size: 100%;
@@ -172,7 +157,6 @@ body {
     margin-left: 1em;
     margin-right: 1em;
 }
-
 .omecruiselabel {
     display: block;
     margin-top: 0.25em;
@@ -180,7 +164,6 @@ body {
     margin-left: 0.5em;
     marging-right: 1em;
 }
-
 .omeoptionradio {
     display: block;
     margin-top: 0.25em;
@@ -188,7 +171,6 @@ body {
     margin-left: 1em;
     margin-right: 1em;
 }
-
 .omeoptionradiopiece {
     display: inline;
     margin-top: 0em;
@@ -196,7 +178,6 @@ body {
     margin-left: 0em;
     margin-right: 0.5em;
 }
-
 .omeoptiontext {
     display: inline;
     width: 16em;
@@ -216,31 +197,26 @@ body {
     margin-left: 2em;
     margin-right: 1em;
 }
-
 .optionsintro {
     display: block;
     margin-left: 0.5em;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
-
 .optionpanel {
     display: block;
     margin-top: 1em;
     margin-bottom: 0em;
 }
-
 .optionradiobutton {
     display: inline;
     margin-left: 0.75em;
 }
-
 .optioninfoanchor {
     display: inline;
     font-size: small;
     margin-left: 1.5em;
 }
-
 .optionaddninfo {
     display: block;
     font-size: small;
@@ -256,11 +232,9 @@ body {
     margin-top: 1em;
     margin-bottom: 1em;
 }
-
 .plotslabel {
     font-size: small;
 }
-
 .plotsimage {
     display: inline;
     margin: 0em;
@@ -272,7 +246,6 @@ body {
     width: 10em;
     margin: 2em;
 }
-
 .previewcaptionpanel {
     display: block;
     margin: 1em;
@@ -281,11 +254,9 @@ body {
     padding-top: 0em;
     padding-bottom: 0em;
 }
-
 .previewscrollpanel {
     height: 25em;
 }
-
 .previewhtml {
     padding: 0.25em;
 }
@@ -294,7 +265,6 @@ body {
     display: block;
     margin: 1em;
 }
-
 .settingsradiopanel {
     display: block;
     margin: 0em;
@@ -302,7 +272,6 @@ body {
     border-width: 2px;
     border-color: #CCCCCC;
 }
-
 .settingsradiobutton {
     display: block;
     margin-top: 1em;
@@ -316,7 +285,6 @@ body {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
 }
-
 .titlemainpanel {
     dislay: block;
     background-color: #AACCEE;
@@ -327,7 +295,6 @@ body {
     padding-top: 1.0em;
     padding-bottom: 1.5em;
 }
-
 .titlepagelabel {
     display: inline;
     font-size: large;
@@ -336,7 +303,6 @@ body {
     margin-left: 1em;
     float: left;
 }
-
 .titleuserlabel {
     display: inline;
     font-size: small;
@@ -344,18 +310,15 @@ body {
     margin-right: 2em;
     float: right;
 }
-
 .titlelogoutbutton {
     display: inline;
     font-size: small;
     margin-right: 1em;
     float: right;
 }
-
 .titlereset {
     clear: both;
 }
-
 .titleimage {
     display: block;
     height: 44px;

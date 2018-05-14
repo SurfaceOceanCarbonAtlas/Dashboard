@@ -27,7 +27,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mysql-connector-java-5.1.41-bin.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/netcdfAll-4.6.8.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/omemetadata.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/sanitychecker.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/sequence-library-1.0.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/serializer-2.7.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-api-1.7.24.jar"/>

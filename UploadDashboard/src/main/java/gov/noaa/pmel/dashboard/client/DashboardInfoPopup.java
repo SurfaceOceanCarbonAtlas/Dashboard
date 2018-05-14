@@ -24,16 +24,14 @@ public class DashboardInfoPopup extends Composite {
 
     private static final String DISMISS_TEXT = "Dismiss";
 
-    interface DashboardInfoPopupUiBinder extends UiBinder<Widget,DashboardInfoPopup> {
+    interface DashboardInfoPopupUiBinder extends UiBinder<Widget, DashboardInfoPopup> {
     }
 
     private static DashboardInfoPopupUiBinder uiBinder =
             GWT.create(DashboardInfoPopupUiBinder.class);
 
-    @UiField
-    HTML infoHtml;
-    @UiField
-    Button dismissButton;
+    @UiField HTML infoHtml;
+    @UiField Button dismissButton;
 
     private PopupPanel parentPanel;
 
@@ -42,8 +40,8 @@ public class DashboardInfoPopup extends Composite {
      * The popup includes a dismiss button to hide it.
      * Use {@link #setInfoMessage(String)} to assign
      * the message to be displayed.
-     * Use {@link #showRelativeTo(UIObject)}
-     * or {@link #showCentered()}
+     * Use {@link #showAtPosition(int, int)}
+     * or {@link #showInCenterOf(UIObject)}
      * to show the popup.
      */
     DashboardInfoPopup() {

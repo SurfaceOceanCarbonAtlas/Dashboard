@@ -27,13 +27,14 @@
         Verify the subdirectories below (Ferret -> PyFerret?), making sure LD_LIBRARY_PATH
         and PYTHONPATH use PyFerret's .../lib/pythonX.X/site-packages subdirectory.
     -->
-    <invoker base_dir="/home/users/socat/"
-             executable="/home/users/socat/Ferret/bin/ferret"
-             time_limit="60000"
-             temp_dir="/var/tmp/socat/"
-             compute_driver="calcSOCAT"
-             decimate_driver="decimateSOCAT"
-             plots_driver="run_preview">
+    <invoker
+        base_dir="/home/users/tomcat"
+        executable="/home/users/tomcat/Ferret/bin/ferret"
+        time_limit="60000"
+        temp_dir="/var/tmp/socat/"
+        compute_driver="calcSOCAT"
+        decimate_driver="decimateSOCAT"
+        plots_driver="run_preview" >
         <arg>-gif</arg>
         <arg>-script</arg>
     </invoker>

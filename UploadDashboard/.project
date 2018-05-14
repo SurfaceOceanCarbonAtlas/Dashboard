@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>SocatUploadDashboard</name>
+	<name>OAPUploadDashboard</name>
 	<comment></comment>
 	<projects>
-		<project>SocatOmeMetadata</project>
-		<project>SocatSanityChecker</project>
+		<project>OAPOmeMetadata</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

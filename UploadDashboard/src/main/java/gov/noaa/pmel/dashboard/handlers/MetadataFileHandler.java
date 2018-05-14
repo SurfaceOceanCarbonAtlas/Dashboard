@@ -3,15 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.RowNumSet;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,10 +12,8 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +25,12 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.tmatesoft.svn.core.SVNException;
 
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 /**
  * Handles storage and retrieval of metadata files.
  *
@@ -43,14 +38,14 @@ import org.tmatesoft.svn.core.SVNException;
  */
 public class MetadataFileHandler extends VersionedFileHandler {
 
-    private static final String METADATA_INFOFILE_SUFFIX = ".properties";
+    private static final String INFOFILE_SUFFIX = ".properties";
     private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
     private static final String METADATA_OWNER_ID = "metadataowner";
     private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
     private static final String METADATA_VERSION_ID = "metadataversion";
     private static final String METADATA_DOI_ID = "metadatadoi";
+
     private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
-    private static final String FLAG_MSGS_FILENAME = "WOCE_flags.tsv";
 
     /**
      * Handles storage and retrieval of metadata files
@@ -68,77 +63,76 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         version control
      */
     public MetadataFileHandler(String metadataFilesDirName,
-                               String svnUsername, String svnPassword)
-            throws IllegalArgumentException {
+                            String svnUsername, String svnPassword)
+                                    throws IllegalArgumentException {
         super(metadataFilesDirName, svnUsername, svnPassword);
     }
 
     /**
-     * Generates the cruise-specific metadata file for a metadata document
-     * from the cruise expocode and the upload filename.
+     * Generates the virtual file for a metadata document
+     * from the dataset ID and the upload filename.
      *
-     * @param cruiseExpocode
-     *         expocode of the cruise associated with this metadata document
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document
      * @param uploadName
      *         user's name of the uploaded metadata document
-     * @return cruise-specific metadata file on the server
+     * @return virtual metadata file for this document
      * @throws IllegalArgumentException
      *         if uploadName is null or ends in a slash or backslash, or
-     *         if the expocode is invalid
+     *         if the dataset ID is invalid
      */
-    public File getMetadataFile(String cruiseExpocode, String uploadName)
-            throws IllegalArgumentException {
-        // Check and standardize the expocode
-        String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
+    public File getMetadataFile(String datasetId, String uploadName)
+                                            throws IllegalArgumentException {
+        // Check and standardize the dataset
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         // Remove any path from uploadName
         String basename = DashboardUtils.baseName(uploadName);
         if ( basename.isEmpty() )
-            throw new IllegalArgumentException(
-                    "Invalid metadate document name " + uploadName);
-        // Generate the full path filename for this cruise metadata
-        File metadataFile = new File(filesDir, expocode.substring(0, 4) +
-                File.separator + expocode + File.separator + basename);
+            throw new IllegalArgumentException("Invalid metadate file name " + uploadName);
+        // Generate the full path filename for this metadata file
+        File grandParentDir = new File(filesDir, stdId.substring(0,4));
+        File parentDir = new File(grandParentDir, stdId);
+        File metadataFile = new File(parentDir, basename);
         return metadataFile;
     }
 
     /**
-     * Returns the list of metadata (including supplemental) documents associated
-     * with the given expocode.
+     * Returns the list of valid metadata files (including supplemental
+     * documents) associated with the given dataset.
      *
-     * @param cruiseExpocode
-     *         get metadata documents for this expocode
+     * @param datasetId
+     *         get metadata documents for the dataset with this ID
      * @return list of metadata documents; never null but may be empty
      * @throws IllegalArgumentException
-     *         if the expocode is invalid
+     *         if the dataset Id is invalid
      */
-    public ArrayList<DashboardMetadata> getMetadataFiles(String cruiseExpocode)
-            throws IllegalArgumentException {
+    public ArrayList<DashboardMetadata> getMetadataFiles(String datasetId)
+                                            throws IllegalArgumentException {
         ArrayList<DashboardMetadata> metadataList = new ArrayList<DashboardMetadata>();
-        // Check and standardize the expocode
-        final String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
+        // Check and standardize the dataset
+        final String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         // Get the parent directory for these metadata documents;
-        // if it does not exist, return the empty list
-        File parentDir = new File(filesDir, expocode.substring(0, 4) + File.separator + expocode);
-        if ( !parentDir.isDirectory() )
+        File parentDir = getMetadataFile(stdId, "junk.txt").getParentFile();
+        if ( ! parentDir.isDirectory() )
             return metadataList;
-        // Get all the metadata info files for this expocode
+        // Get all the metadata info files for this dataset
         File[] metafiles = parentDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if ( name.endsWith(METADATA_INFOFILE_SUFFIX) )
+                if ( name.endsWith(INFOFILE_SUFFIX) )
                     return true;
                 return false;
             }
         });
-        // Record the metadata file for each metadata info files (may be an empty array)
-        for (File mfile : metafiles) {
+        // Record the metadata file for each metadata info file (may be empty)
+        for ( File mfile : metafiles ) {
             String basename = mfile.getName().substring(0,
-                                                        mfile.getName().length() - METADATA_INFOFILE_SUFFIX.length());
+                    mfile.getName().length() - INFOFILE_SUFFIX.length());
             try {
-                DashboardMetadata mdata = getMetadataInfo(expocode, basename);
+                DashboardMetadata mdata = getMetadataInfo(stdId, basename);
                 if ( mdata != null )
                     metadataList.add(mdata);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 // Ignore this entry if there are problems
             }
         }
@@ -147,22 +141,22 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
     /**
      * Validates that a user has permission to delete or overwrite
-     * and existing metadata document.
+     * an existing metadata document.
      *
      * @param username
      *         name of user wanting to delete or overwrite the metadata document
-     * @param expocode
-     *         expocode of the cruise associated with this metadata document
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document
      * @param metaname
      *         name of the metadata document to be deleted or overwritten
      * @throws IllegalArgumentException
-     *         if expocode or metaname are invalid, or
+     *         if the dataset ID or metaname are invalid, or
      *         if the user is not permitted to overwrite the metadata document
      */
-    private void verifyOkayToDelete(String username, String expocode,
-                                    String metaname) throws IllegalArgumentException {
+    private void verifyOkayToDelete(String username, String datasetId,
+                            String metaname) throws IllegalArgumentException {
         // If the info file does not exist, okay to delete the metadata
-        DashboardMetadata oldMetadata = getMetadataInfo(expocode, metaname);
+        DashboardMetadata oldMetadata = getMetadataInfo(datasetId, metaname);
         if ( oldMetadata == null )
             return;
         DashboardConfigStore configStore;
@@ -173,59 +167,54 @@ public class MetadataFileHandler extends VersionedFileHandler {
                     "Unexpected error obtaining the dashboard configuration");
         }
         String oldOwner = oldMetadata.getOwner();
-        if ( !configStore.userManagesOver(username, oldOwner) )
-            throw new IllegalArgumentException(
-                    "Not permitted to update metadata document " +
-                            oldMetadata.getFilename() + " for cruise " +
-                            oldMetadata.getExpocode() + " owned by " + oldOwner);
+        if ( ! configStore.userManagesOver(username, oldOwner) )
+            throw new IllegalArgumentException("Not permitted to update metadata document " +
+                    oldMetadata.getFilename() + " for dataset " +
+                    oldMetadata.getDatasetId() + " owned by " + oldOwner);
     }
 
     /**
      * Create or update a metadata document from the contents of a file upload.
      *
-     * @param cruiseExpocode
-     *         expocode of the cruise associated with this metadata document.
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document.
      * @param owner
      *         owner of this metadata document.
      * @param uploadTimestamp
-     *         timestamp giving the time of the upload.  This should be
-     *         generated on the client and sent to the server so it is
-     *         in local time for the user.
+     *         client-side timestamp giving the time of the upload.
      * @param uploadFilename
      *         upload filename to use for this metadata document;
      *         may or may not match the basename of uploadFileItem.getName()
      * @param version
-     *         SOCAT version for this metadata item
+     *         version for this metadata item
      * @param uploadFileItem
      *         upload file item providing the metadata contents
-     * @return a DashboardMetadata describing the new or updated metadata
-     * document; never null
+     * @return a DashboardMetadata describing the new or updated
+     *         metadata document; never null
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
+     *         if the dataset ID is invalid,
      *         if problems reading from the file upload stream,
      *         if problems writing to the new metadata document, or
      *         if problems committing the new metadata document to version control
      */
-    public DashboardMetadata saveMetadataFileItem(String cruiseExpocode,
-                                                  String owner, String uploadTimestamp, String uploadFilename,
-                                                  String version, FileItem uploadFileItem)
-            throws IllegalArgumentException {
+    public DashboardMetadata saveMetadataFileItem(String datasetId,
+            String owner, String uploadTimestamp, String uploadFilename,
+            String version, FileItem uploadFileItem) throws IllegalArgumentException {
         // Create the metadata filename
-        File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
+        File metadataFile = getMetadataFile(datasetId, uploadFilename);
 
         // Make sure the parent directory exists
         File parentDir = metadataFile.getParentFile();
-        if ( !parentDir.exists() ) {
-            if ( !parentDir.mkdirs() )
-                throw new IllegalArgumentException(
-                        "Problems creating the parent directory for " +
-                                metadataFile.getPath());
+        if ( ! parentDir.exists() ) {
+            if ( ! parentDir.mkdirs() )
+                throw new IllegalArgumentException("Problems creating the parent directory for " +
+                        metadataFile.getPath());
         }
 
         // Check if this will overwrite existing metadata
         boolean isUpdate;
         if ( metadataFile.exists() ) {
-            verifyOkayToDelete(owner, cruiseExpocode, uploadFilename);
+            verifyOkayToDelete(owner, datasetId, uploadFilename);
             isUpdate = true;
         }
         else {
@@ -235,35 +224,34 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Copy the uploaded data to the metadata document
         try {
             uploadFileItem.write(metadataFile);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(
-                    "Problems creating/updating the metadata document " +
-                            metadataFile.getPath() + ":\n    " + ex.getMessage());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems creating/updating the metadata document " +
+                    metadataFile.getPath() + ":\n    " + ex.getMessage());
         }
 
         // Create the appropriate check-in message
         String message;
         if ( isUpdate ) {
             message = "Updated metadata document " + uploadFilename +
-                    " for expocode " + cruiseExpocode + " and owner " + owner;
+                      " for dataset " + datasetId + " and owner " + owner;
         }
         else {
             message = "Added metadata document " + uploadFilename +
-                    " for expocode " + cruiseExpocode + " and owner " + owner;
+                      " for dataset " + datasetId + " and owner " + owner;
         }
 
         // Commit the new/updated metadata document to version control
         try {
             commitVersion(metadataFile, message);
-        } catch (SVNException ex) {
+        } catch ( SVNException ex ) {
             throw new IllegalArgumentException("Problems committing " +
-                                                       metadataFile.getPath() + " to version control:\n    " +
-                                                       ex.getMessage());
+                    metadataFile.getPath() + " to version control:\n    " +
+                    ex.getMessage());
         }
 
         // Create the DashboardMetadata to return
         DashboardMetadata metadata = new DashboardMetadata();
-        metadata.setExpocode(cruiseExpocode);
+        metadata.setDatasetId(datasetId);
         metadata.setFilename(uploadFilename);
         metadata.setUploadTimestamp(uploadTimestamp);
         metadata.setOwner(owner);
@@ -272,11 +260,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Save the metadata properties
         if ( isUpdate ) {
             message = "Updated properties of metadata document " + uploadFilename +
-                    " for expocode " + cruiseExpocode + " and owner " + owner;
+                      " for dataset " + datasetId + " and owner " + owner;
         }
         else {
             message = "Added properties of metadata document " + uploadFilename +
-                    " for expocode " + cruiseExpocode + " and owner " + owner;
+                      " for dataset " + datasetId + " and owner " + owner;
         }
         saveMetadataInfo(metadata, message, false);
 
@@ -284,12 +272,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Copy a metadata document to another cruise.  The document,
+     * Copy a metadata document to another dataset.  The document,
      * as well as the owner, upload timestamp, and version properties,
-     * are copied under appropriate names for the new cruise.
+     * are copied under appropriate names for the new dataset.
      *
-     * @param destCruiseExpo
-     *         expocode of the cruise to be associated with the
+     * @param destDatasetId
+     *         ID of the dataset to be associated with the
      *         copy of the metadata file
      * @param srcMetadata
      *         metadata document to be copied
@@ -297,50 +285,49 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         allow overwrite an existing metadata file?  If false and the
      *         metadata file exists, an IllegalArgumentException is raised
      * @return a DashboardMetadata describing the new or updated metadata
-     * document copied from the another cruise; never null
+     *         document copied from the another cruise; never null
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
+     *         if the dataset ID is invalid,
      *         if the metadata document to be copied does not exist,
      *         if there were problems reading from the source metadata document, or
      *         if there were problems writing to the destination metadata document.
      */
-    public DashboardMetadata copyMetadataFile(String destCruiseExpo,
-                                              DashboardMetadata srcMetadata, boolean allowOverwrite)
-            throws IllegalArgumentException {
+    public DashboardMetadata copyMetadataFile(String destDatasetId,
+            DashboardMetadata srcMetadata, boolean allowOverwrite) throws IllegalArgumentException {
         String owner = srcMetadata.getOwner();
         String uploadName = srcMetadata.getFilename();
-        // Get and input stream for source metadata document file
-        File srcFile = getMetadataFile(srcMetadata.getExpocode(), uploadName);
+        // Get an input stream for source metadata document file
+        File srcFile = getMetadataFile(srcMetadata.getDatasetId(), uploadName);
         DashboardMetadata mdata;
         try {
             FileInputStream src = new FileInputStream(srcFile);
             try {
                 // Create the metadata document from this input stream
                 // allowing overwrite if permissions permit it
-                mdata = saveMetadataInputStream(destCruiseExpo, owner, uploadName,
-                                                srcMetadata.getUploadTimestamp(), srcMetadata.getVersion(),
-                                                src, allowOverwrite);
+                mdata = saveMetadataInputStream(destDatasetId, owner, uploadName,
+                        srcMetadata.getUploadTimestamp(), srcMetadata.getVersion(),
+                        src, allowOverwrite);
             } finally {
                 src.close();
             }
         } catch (IOException ex) {
             // file not found; negligible possibility comes from close()
-            throw new IllegalArgumentException(
-                    "Problems with the metadata source file " + srcFile.getPath() +
-                            ":\n    " + ex.getMessage());
+            throw new IllegalArgumentException("Problems with the metadata source file " +
+                    srcFile.getPath() + ":\n    " + ex.getMessage());
         }
         return mdata;
     }
 
     /**
-     * Creates or updates a metadata document from the contents of the file at the given URL.
+     * Creates or updates a metadata document from the contents of the file
+     * at the given URL.
      *
-     * @param expocode
-     *         expocode of the cruise associated with this metadata document
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document
      * @param owner
      *         owner of this metadata document
      * @param version
-     *         SOCAT version for this metadata document
+     *         version for this metadata document
      * @param urlString
      *         URL String of the document to download
      * @param allowOverwrite
@@ -348,9 +335,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         metadata file exists, an IllegalArgumentException is raised
      *         and no data will have been read from src.
      * @return a DashboardMetadata describing the new or updated metadata
-     * document; never null.
+     *         document; never null.
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
+     *         if the dataset ID is invalid,
      *         if the URL String is invalid,
      *         if problems reading the metadata from the given URL
      *         if problems writing to the new metadata document, or
@@ -358,49 +345,49 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @throws IOException
      *         if problems opening the given URL for reading
      */
-    public DashboardMetadata saveMetadataURL(String expocode, String owner, String version,
-                                             String urlString, boolean allowOverwrite)
-            throws IllegalArgumentException, IOException {
+    public DashboardMetadata saveMetadataURL(String datasetId, String owner,
+            String version, String urlString, boolean allowOverwrite)
+                                throws IllegalArgumentException, IOException {
         if ( urlString.endsWith("/") )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
-                                                       "\n    Not a file (ends in slash)");
+                    "\n    Not a file (ends in slash)");
         URL link;
         try {
             link = new URL(urlString);
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException("Invalid document link: " +
-                                                       urlString + "\n    " + ex.getMessage());
+                    urlString + "\n    " + ex.getMessage());
         }
-        String origName = ( new File(link.getPath()) ).getName();
-        if ( ( origName == null ) || origName.trim().isEmpty() )
+        String origName = (new File(link.getPath())).getName();
+        if ( (origName == null) || origName.trim().isEmpty() )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
-                                                       "\n    Not a file (empty name)");
+                    "\n    Not a file (empty name)");
         if ( origName.equalsIgnoreCase("index.html") ||
-                origName.equalsIgnoreCase("index.htm") )
+             origName.equalsIgnoreCase("index.htm") )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
-                                                       "\n    index.html unlikely to be valid");
+                    "\n    index.html unlikely to be valid");
         String timestamp = DATETIME_FORMATTER.format(new Date());
         DashboardMetadata mdata;
         InputStream src = link.openStream();
         try {
             try {
-                mdata = saveMetadataInputStream(expocode, owner, origName,
-                                                timestamp, version, src, allowOverwrite);
+                mdata = saveMetadataInputStream(datasetId, owner, origName,
+                        timestamp, version, src, allowOverwrite);
             } finally {
                 src.close();
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException("Unable to read from the URL: " +
-                                                       urlString + "\n    " + ex.getMessage());
+                    urlString + "\n    " + ex.getMessage());
         }
         return mdata;
     }
 
     /**
-     * Create or update a dashboard metadata document from the given input stream
+     * Create or update a metadata document from the given input stream
      *
-     * @param expocode
-     *         expocode of the cruise associated with this metadata document.
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document.
      * @param owner
      *         owner of this metadata document.
      * @param origName
@@ -408,7 +395,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @param timestamp
      *         "upload" timestamp to assign for this metadata document
      * @param version
-     *         SOCAT version for this metadata document
+     *         version for this metadata document
      * @param src
      *         source to read for the contents of this metadata file
      * @param allowOverwrite
@@ -416,23 +403,22 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         metadata file exists, an IllegalArgumentException is raised
      *         and no data will have been read from src.
      * @return a DashboardMetadata describing the new or updated metadata
-     * document; never null.
+     *         document; never null.
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
+     *         if the dataset ID is invalid,
      *         if problems reading the given metadata file data,
      *         if problems writing to the new metadata document, or
      *         if problems committing the new metadata document to version control
      */
-    public DashboardMetadata saveMetadataInputStream(String expocode,
-                                                     String owner, String origName, String timestamp, String version,
-                                                     InputStream src, boolean allowOverwrite)
-            throws IllegalArgumentException {
+    public DashboardMetadata saveMetadataInputStream(String datasetId,
+            String owner, String origName, String timestamp, String version,
+            InputStream src, boolean allowOverwrite) throws IllegalArgumentException {
 
         // Get the destination metadata document
-        File destFile = getMetadataFile(expocode, origName);
+        File destFile = getMetadataFile(datasetId, origName);
         File parentDir = destFile.getParentFile();
-        if ( !parentDir.exists() ) {
-            if ( !parentDir.mkdirs() )
+        if ( ! parentDir.exists() ) {
+            if ( ! parentDir.mkdirs() )
                 throw new IllegalArgumentException(
                         "Problems creating the parent directory for " + destFile.getPath());
         }
@@ -440,10 +426,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Check if this will overwrite existing metadata
         boolean isUpdate;
         if ( destFile.exists() ) {
-            if ( !allowOverwrite )
-                throw new IllegalArgumentException(
-                        "Destination metdata file " + destFile.getName() + "already exists");
-            verifyOkayToDelete(owner, expocode, origName);
+            if ( ! allowOverwrite )
+                throw new IllegalArgumentException("Destination metdata file " +
+                        destFile.getName() + "already exists");
+            verifyOkayToDelete(owner, datasetId, origName);
             isUpdate = true;
         }
         else {
@@ -464,38 +450,38 @@ public class MetadataFileHandler extends VersionedFileHandler {
                 if ( dest != null )
                     dest.close();
             }
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException(
                     "Problems copying the metadata document " + origName +
-                            " to " + destFile.getName() + ":\n    " + ex.getMessage());
+                    " to " + destFile.getName() + ":\n    " + ex.getMessage());
         }
 
         // Create the appropriate check-in message
         String message;
         if ( isUpdate ) {
             message = "Updated metadata document " + origName +
-                    " for cruise " + expocode;
+                      " for dataset " + datasetId;
         }
         else {
             message = "Added metadata document " + origName +
-                    " for cruise " + expocode;
+                      " for dataset " + datasetId;
         }
-        if ( ( owner != null ) && !owner.trim().isEmpty() ) {
+        if ( (owner != null) && ! owner.trim().isEmpty() ) {
             message += " with owner " + owner;
         }
 
         // Commit the new/updated metadata document to version control
         try {
             commitVersion(destFile, message);
-        } catch (SVNException ex) {
+        } catch ( SVNException ex ) {
             throw new IllegalArgumentException("Problems committing " +
-                                                       destFile.getName() + " to version control:\n    " +
-                                                       ex.getMessage());
+                    destFile.getName() + " to version control:\n    " +
+                    ex.getMessage());
         }
 
         // Create the DashboardMetadata to return
         DashboardMetadata metadata = new DashboardMetadata();
-        metadata.setExpocode(expocode);
+        metadata.setDatasetId(datasetId);
         metadata.setFilename(origName);
         metadata.setUploadTimestamp(timestamp);
         metadata.setOwner(owner);
@@ -504,13 +490,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Create the appropriate check-in message
         if ( isUpdate ) {
             message = "Updated properties of metadata document " + origName +
-                    " for cruise " + expocode;
+                      " for dataset " + datasetId;
         }
         else {
             message = "Added properties of metadata document " + origName +
-                    " for cruise " + expocode;
+                      " for dataset " + datasetId;
         }
-        if ( ( owner != null ) && !owner.trim().isEmpty() ) {
+        if ( (owner != null) && ! owner.trim().isEmpty() ) {
             message += " with owner " + owner;
         }
 
@@ -525,56 +511,49 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * the information (properties) file for the metadata.  It will not
      * be "selected".
      *
-     * @param expocode
-     *         expocode of the cruise associated with this metadata
+     * @param datasetId
+     *         ID of the dataset associated with this metadata
      * @param metaname
      *         name of the metadata document
      * @return DashboardMetadata assigned from the properties file for the
-     * given metadata document.  If the properties file does not
-     * exist, null is returned.
+     *         given metadata document.  If the properties file does not
+     *         exist, null is returned.
      * @throws IllegalArgumentException
-     *         if expocode or metaname is invalid, or
+     *         if dataset ID or metaname is invalid, or
      *         if there were problems reading from the properties file
      */
-    public DashboardMetadata getMetadataInfo(String expocode, String metaname)
-            throws IllegalArgumentException {
+    public DashboardMetadata getMetadataInfo(String datasetId, String metaname)
+                                            throws IllegalArgumentException {
         // Get the full path filename of the metadata file
-        File metadataFile = getMetadataFile(expocode, metaname);
+        File metadataFile = getMetadataFile(datasetId, metaname);
         // Read the properties associated with this metadata document
         Properties metaProps = new Properties();
         try {
             FileReader propsReader = new FileReader(
-                    new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX));
+                    new File(metadataFile.getPath() + INFOFILE_SUFFIX));
             try {
                 metaProps.load(propsReader);
             } finally {
                 propsReader.close();
             }
-        } catch (FileNotFoundException ex) {
+        } catch ( FileNotFoundException ex ) {
             return null;
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException(ex);
         }
 
         // Create and assign the DashboardMetadata object to return
         DashboardMetadata metadata = new DashboardMetadata();
-        // Cruise expocode
-        metadata.setExpocode(expocode);
-        // Metadata document name
+        metadata.setDatasetId(datasetId);
         metadata.setFilename(metaname);
-        // Upload timestamp
         String value = metaProps.getProperty(UPLOAD_TIMESTAMP_ID);
         metadata.setUploadTimestamp(value);
-        // Owner
         value = metaProps.getProperty(METADATA_OWNER_ID);
         metadata.setOwner(value);
-        // Conflicted flag
         value = metaProps.getProperty(METADATA_CONFLICTED_ID);
         metadata.setConflicted(Boolean.valueOf(value));
-        // Version
         value = metaProps.getProperty(METADATA_VERSION_ID);
         metadata.setVersion(value);
-        // DOI
         value = metaProps.getProperty(METADATA_DOI_ID);
         metadata.setDOI(value);
 
@@ -599,37 +578,32 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         if there were problems committing the properties file
      */
     public void saveMetadataInfo(DashboardMetadata metadata, String message,
-                                 boolean alsoCommitFile) throws IllegalArgumentException {
+            boolean alsoCommitFile) throws IllegalArgumentException {
         // Get full path name of the metadata file
-        File metadataFile = getMetadataFile(metadata.getExpocode(),
+        File metadataFile = getMetadataFile(metadata.getDatasetId(),
                                             metadata.getFilename());
         // Commit this metadata file if requested
-        if ( alsoCommitFile && ( message != null ) && ( !message.trim().isEmpty() ) ) {
+        if ( alsoCommitFile && (message != null) && ( ! message.trim().isEmpty() ) ) {
             // Submit the metadata file to version control
             try {
                 commitVersion(metadataFile, message);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Problems committing the metadata file  " +
-                                                           metadataFile.getPath() + ":\n    " + ex.getMessage());
+                        metadataFile.getPath() + ":\n    " + ex.getMessage());
             }
         }
         // Create the full path name of the metadata properties file
-        File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
+        File propsFile = new File(metadataFile.getPath() + INFOFILE_SUFFIX);
         // Make sure the parent subdirectory exists
         File parentDir = propsFile.getParentFile();
-        if ( !parentDir.exists() )
+        if ( ! parentDir.exists() )
             parentDir.mkdirs();
         // Create the properties for this metadata properties file
         Properties metaProps = new Properties();
-        // Upload timestamp
         metaProps.setProperty(UPLOAD_TIMESTAMP_ID, metadata.getUploadTimestamp());
-        // Owner
         metaProps.setProperty(METADATA_OWNER_ID, metadata.getOwner());
-        // Conflicted flag
         metaProps.setProperty(METADATA_CONFLICTED_ID, Boolean.toString(metadata.isConflicted()));
-        // Version
         metaProps.setProperty(METADATA_VERSION_ID, metadata.getVersion());
-        // DOI
         metaProps.setProperty(METADATA_DOI_ID, metadata.getDOI());
         // Save the properties to the metadata properties file
         try {
@@ -639,78 +613,81 @@ public class MetadataFileHandler extends VersionedFileHandler {
             } finally {
                 propsWriter.close();
             }
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(
-                    "Problems writing metadata information for " +
-                            metadata.getFilename() + " to " + propsFile.getPath() +
-                            ":\n    " + ex.getMessage());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems writing metadata information for " +
+                    metadata.getFilename() + " to " + propsFile.getPath() +
+                    ":\n    " + ex.getMessage());
         }
 
-        if ( ( message == null ) || message.trim().isEmpty() )
+        if ( (message == null) || message.trim().isEmpty() )
             return;
 
         // Submit the updated information file to version control
         try {
             commitVersion(propsFile, message);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems committing updated metadata information for  " +
-                                                       metadata.getFilename() + ":\n    " + ex.getMessage());
+                    metadata.getFilename() + ":\n    " + ex.getMessage());
         }
     }
 
     /**
-     * Appropriately renames any cruise metadata documents and info files
-     * for a change in cruise expocode.  Renames the expocode in the OME
+     * Appropriately renames any metadata documents and info files
+     * for a change in dataset ID.  Renames the dataset in the OME
      * metadata file if it exists.
      *
-     * @param oldExpocode
-     *         standardized old expocode of the cruise
-     * @param newExpocode
-     *         standardized new expocode for the cruise
+     * @param oldId
+     *         standardized old ID of the dataset
+     * @param newId
+     *         standardized new ID for the dataset
      * @throws IllegalArgumentException
-     *         if a metadata or info file for the new expocode already exists,
+     *         if a metadata or info file for the new ID already exists,
      *         if the OME metadata exists but is invalid, or
      *         if unable to rename a metadata or info file
      */
-    public void renameMetadataFiles(String oldExpocode, String newExpocode)
-            throws IllegalArgumentException {
-        // Rename all the metadata documents associated with the old expocode
+    public void renameMetadataFiles(String oldId, String newId)
+                                            throws IllegalArgumentException {
+        // Rename all the metadata documents associated with the old dataset
         DashboardOmeMetadata omeMData = null;
-        for (DashboardMetadata metaDoc : getMetadataFiles(oldExpocode)) {
+        DashboardOmeMetadata piOmeMData = null;
+        for ( DashboardMetadata metaDoc : getMetadataFiles(oldId) ) {
             String uploadFilename = metaDoc.getFilename();
 
             // If this is the OME metadata file, read the contents
             if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
                 omeMData = new DashboardOmeMetadata(metaDoc, this);
             }
+            else if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
+                piOmeMData = new DashboardOmeMetadata(metaDoc, this);
+            }
 
-            File oldMetaFile = getMetadataFile(oldExpocode, uploadFilename);
-            if ( !oldMetaFile.exists() )
+            File oldMetaFile = getMetadataFile(oldId, uploadFilename);
+            if ( ! oldMetaFile.exists() )
                 throw new RuntimeException("Unexpected failure: metadata file " +
-                                                   oldMetaFile.getName() + " does not exist");
+                        oldMetaFile.getName() + " does not exist");
 
-            File oldMetaInfoFile = new File(oldMetaFile.getPath() + METADATA_INFOFILE_SUFFIX);
-            if ( !oldMetaInfoFile.exists() )
+            File oldMetaInfoFile = new File(oldMetaFile.getPath() + INFOFILE_SUFFIX);
+            if ( ! oldMetaInfoFile.exists() )
                 throw new RuntimeException("Unexpected failure: metadata info file " +
-                                                   oldMetaInfoFile.getName() + " does not exist");
+                        oldMetaInfoFile.getName() + " does not exist");
 
-            File newMetaFile = getMetadataFile(newExpocode, uploadFilename);
+            File newMetaFile = getMetadataFile(newId, uploadFilename);
             if ( newMetaFile.exists() )
                 throw new IllegalArgumentException("Metadata file " +
-                                                           uploadFilename + " already exists for " + newExpocode);
+                        uploadFilename + " already exists for " + newId);
 
-            File newMetaInfoFile = new File(newMetaFile.getPath() + METADATA_INFOFILE_SUFFIX);
+            File newMetaInfoFile = new File(newMetaFile.getPath() + INFOFILE_SUFFIX);
             if ( newMetaInfoFile.exists() )
                 throw new IllegalArgumentException("Metadata info file for " +
-                                                           uploadFilename + " already exists for " + newExpocode);
+                        uploadFilename + " already exists for " + newId);
 
             // Make sure the parent directory exists for the new file
             File parent = newMetaFile.getParentFile();
-            if ( !parent.exists() )
+            if ( ! parent.exists() )
                 parent.mkdirs();
 
             String commitMsg = "Move metadata document " + uploadFilename +
-                    " from " + oldExpocode + " to " + newExpocode;
+                    " from " + oldId + " to " + newId;
             try {
                 moveVersionedFile(oldMetaFile, newMetaFile, commitMsg);
                 moveVersionedFile(oldMetaInfoFile, newMetaInfoFile, commitMsg);
@@ -720,39 +697,52 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
 
         if ( omeMData != null ) {
-            omeMData.changeExpocode(newExpocode);
-            saveAsOmeXmlDoc(omeMData, "Change expocode from " +
-                    oldExpocode + " to " + newExpocode);
+            omeMData.changeDatasetID(newId);
+            saveAsOmeXmlDoc(omeMData, "Change dataset for OME XML document from " +
+                    oldId + " to " + newId);
+        }
+        if ( piOmeMData != null ) {
+            piOmeMData.changeDatasetID(newId);
+            saveAsOmeXmlDoc(omeMData, "Change dataset for PI OME XML document from " +
+                    oldId + " to " + newId);
+            // The PI_OME.pdf file will have been moved (as a normal metadata document)
+            // but the dataset ID it contains needs to be updated, so regenerate it.
+            try {
+                DashboardConfigStore configStore = DashboardConfigStore.get(false);
+                configStore.getOmePdfGenerator().createPiOmePdf(newId);
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException(
+                        "Unable to create the PDF from the OME XML: " + ex.getMessage());
+            }
         }
     }
 
     /**
-     * Removes (deletes) a metadata document and its properties
-     * file, committing the change to version control.
+     * Deletes a metadata document and its properties file,
+     * committing the change to version control.
      *
      * @param username
      *         name of the user wanting to remove the metadata document
-     * @param expocode
-     *         expocode of the cruise associated with this metadata
+     * @param datasetId
+     *         ID of the dataset associated with this metadata
      * @param metaname
      *         name of the metadata document
      * @throws IllegalArgumentException
-     *         if expocode or metaname is invalid,
+     *         if the dataset ID or metaname is invalid,
      *         if the user is not permitted to delete the metadata document,
      *         if there are problems deleting the document.
      */
-    public void removeMetadata(String username, String expocode,
-                               String metaname) throws IllegalArgumentException {
-        File metadataFile = getMetadataFile(expocode, metaname);
-        File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
+    public void deleteMetadata(String username, String datasetId,
+                            String metaname) throws IllegalArgumentException {
+        File metadataFile = getMetadataFile(datasetId, metaname);
+        File propsFile = new File(metadataFile.getPath() + INFOFILE_SUFFIX);
         // Do not throw an error if the props file does not exist
         if ( propsFile.exists() ) {
             // Throw an exception if not allowed to overwrite
-            verifyOkayToDelete(username, expocode, metaname);
+            verifyOkayToDelete(username, datasetId, metaname);
             try {
-                deleteVersionedFile(propsFile,
-                                    "Deleted metadata properties " + propsFile.getPath());
-            } catch (Exception ex) {
+                deleteVersionedFile(propsFile, "Deleted metadata properties " + propsFile.getPath());
+            } catch ( Exception ex ) {
                 throw new IllegalArgumentException(
                         "Unable to delete metadata properties file " + propsFile.getPath());
             }
@@ -761,9 +751,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // If the props file does not exist, assume it is okay to delete the metadata file.
         if ( metadataFile.exists() ) {
             try {
-                deleteVersionedFile(metadataFile,
-                                    "Deleted metadata document " + metadataFile.getPath());
-            } catch (Exception ex) {
+                deleteVersionedFile(metadataFile, "Deleted metadata document " + metadataFile.getPath());
+            } catch ( Exception ex ) {
                 throw new IllegalArgumentException(
                         "Unable to delete metadata file " + metadataFile.getPath());
             }
@@ -781,12 +770,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         version control commit message; if null, the commit is not
      *         performed
      * @throws IllegalArgumentException
-     *         if the expocode or uploadFilename in this object is invalid, or
+     *         if the dataset or uploadFilename in this object is invalid, or
      *         writing the metadata document file generates one.
      */
     public void saveAsOmeXmlDoc(DashboardOmeMetadata mdata, String message)
-            throws IllegalArgumentException {
-        File mdataFile = getMetadataFile(mdata.getExpocode(), mdata.getFilename());
+                                            throws IllegalArgumentException {
+        File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
 
         // Generate the OME XML document
         Document omeDoc = mdata.createOmeXmlDoc();
@@ -795,88 +784,24 @@ public class MetadataFileHandler extends VersionedFileHandler {
         try {
             FileOutputStream out = new FileOutputStream(mdataFile);
             try {
-                ( new XMLOutputter(Format.getPrettyFormat()) ).output(omeDoc, out);
+                (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, out);
             } finally {
                 out.close();
             }
         } catch (IOException ex) {
             throw new IllegalArgumentException(
-                    "Problems writing the OME metadata document: " +
-                            ex.getMessage());
+                    "Problems writing the OME metadata document: " + ex.getMessage());
         }
 
-        if ( ( message == null ) || message.trim().isEmpty() )
+        if ( (message == null) || message.trim().isEmpty() )
             return;
 
         // Submit the updated information file to version control
         try {
             commitVersion(mdataFile, message);
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(
-                    "Problems committing updated OME metadata information " +
-                            mdataFile.getPath() + ":\n    " + ex.getMessage());
-        }
-    }
-
-    /**
-     * Create the WOCE flags messages file from the WOCE flags in the database.
-     * This file is NOT committed to version control.
-     *
-     * @param expocode
-     *         create the WOCE flags messages file for this cruise
-     * @param dbHandler
-     *         get the WOCE flags from the database using this handler
-     * @throws IllegalArgumentException
-     *         if the expocode is invalid
-     * @throws SQLException
-     *         if there are problems getting WOCE flags from the database
-     */
-    public void generateWoceFlagMsgsFile(String expocode, DatabaseRequestHandler dbHandler)
-            throws IllegalArgumentException, SQLException {
-        File msgsFile = getMetadataFile(expocode, FLAG_MSGS_FILENAME);
-        PrintWriter msgsWriter;
-        try {
-            msgsWriter = new PrintWriter(msgsFile);
-        } catch (FileNotFoundException ex) {
-            throw new IllegalArgumentException(
-                    "Unexpected error opening WOCE flag messages file " +
-                            msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
-        }
-        try {
-            RowNumSet rowNums = new RowNumSet();
-            // Get the current WOCE flags for this cruise and print them to file
-            msgsWriter.println("Expocode: " + expocode);
-            msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " +
-                                       ( new SimpleDateFormat("yyyy-MM-dd HH:mm Z") ).format(new Date()));
-            msgsWriter.println("WOCE Name\tWOCE Flag\tData Name\tNum Rows\tMessage\tRows");
-            ArrayList<WoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
-            for (WoceEvent woceEvent : woceEventsList) {
-                // Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
-                Character woceFlag = woceEvent.getFlag();
-                if ( !( woceFlag.equals('3') || woceFlag.equals('4') ) )
-                    continue;
-                rowNums.clear();
-                for (DataLocation dloc : woceEvent.getLocations()) {
-                    rowNums.add(dloc.getRowNumber());
-                }
-                msgsWriter.print(woceEvent.getWoceName());
-                msgsWriter.print('\t');
-                msgsWriter.print(woceFlag);
-                msgsWriter.print('\t');
-                String dataColName = woceEvent.getVarName();
-                if ( dataColName.trim().isEmpty() )
-                    dataColName = "(none)";
-                msgsWriter.print(dataColName);
-                msgsWriter.print('\t');
-                msgsWriter.print(rowNums.size());
-                msgsWriter.print('\t');
-                msgsWriter.print(woceEvent.getComment().replaceAll("\n", "  ").replaceAll("\t", " "));
-                msgsWriter.print('\t');
-                msgsWriter.print(rowNums.toString());
-                msgsWriter.println();
-            }
-        } finally {
-            msgsWriter.close();
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems committing updated OME metadata information " +
+                    mdataFile.getPath() + ":\n    " + ex.getMessage());
         }
     }
 

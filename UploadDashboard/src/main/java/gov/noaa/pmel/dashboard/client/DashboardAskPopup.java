@@ -25,18 +25,15 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardAskPopup extends Composite {
 
-    interface DashboardAskPopupUiBinder extends UiBinder<Widget,DashboardAskPopup> {
+    interface DashboardAskPopupUiBinder extends UiBinder<Widget, DashboardAskPopup> {
     }
 
     private static DashboardAskPopupUiBinder uiBinder =
             GWT.create(DashboardAskPopupUiBinder.class);
 
-    @UiField
-    HTML askHtml;
-    @UiField
-    Button yesButton;
-    @UiField
-    Button noButton;
+    @UiField HTML askHtml;
+    @UiField Button yesButton;
+    @UiField Button noButton;
 
     private PopupPanel parentPanel;
     Boolean answer;
@@ -58,7 +55,7 @@ public class DashboardAskPopup extends Composite {
      *         never called.
      */
     public DashboardAskPopup(String yesText, String noText,
-                             final AsyncCallback<Boolean> callback) {
+            final AsyncCallback<Boolean> callback) {
         initWidget(uiBinder.createAndBindUi(this));
 
         parentPanel = new PopupPanel(false, true);
@@ -73,12 +70,12 @@ public class DashboardAskPopup extends Composite {
         // Handler to make the callback on window closing
         askHandler = parentPanel.addCloseHandler(
                 new CloseHandler<PopupPanel>() {
-                    @Override
-                    public void onClose(CloseEvent<PopupPanel> event) {
-                        // Make the appropriate call
-                        callback.onSuccess(answer);
-                    }
-                });
+            @Override
+            public void onClose(CloseEvent<PopupPanel> event) {
+                // Make the appropriate call
+                callback.onSuccess(answer);
+            }
+        });
     }
 
     /**

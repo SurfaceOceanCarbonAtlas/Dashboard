@@ -27,22 +27,17 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardInputPopup extends Composite {
 
-    interface DashboardAskPopupUiBinder extends UiBinder<Widget,DashboardInputPopup> {
+    interface DashboardAskPopupUiBinder extends UiBinder<Widget, DashboardInputPopup> {
     }
 
     private static DashboardAskPopupUiBinder uiBinder =
             GWT.create(DashboardAskPopupUiBinder.class);
 
-    @UiField
-    HTML infoHtml;
-    @UiField
-    InlineLabel inputTextLabel;
-    @UiField
-    TextBox inputTextBox;
-    @UiField
-    Button yesButton;
-    @UiField
-    Button noButton;
+    @UiField HTML infoHtml;
+    @UiField InlineLabel inputTextLabel;
+    @UiField TextBox inputTextBox;
+    @UiField Button yesButton;
+    @UiField Button noButton;
 
     private PopupPanel parentPanel;
     String answer;
@@ -66,7 +61,7 @@ public class DashboardInputPopup extends Composite {
      *         The onFailure method of this callback is never called.
      */
     public DashboardInputPopup(String labelText, String yesText,
-                               String noText, final AsyncCallback<String> callback) {
+            String noText, final AsyncCallback<String> callback) {
         initWidget(uiBinder.createAndBindUi(this));
 
         parentPanel = new PopupPanel(false, true);
@@ -81,12 +76,12 @@ public class DashboardInputPopup extends Composite {
         // Handler to make the callback on window closing
         askHandler = parentPanel.addCloseHandler(
                 new CloseHandler<PopupPanel>() {
-                    @Override
-                    public void onClose(CloseEvent<PopupPanel> event) {
-                        // Make the appropriate call
-                        callback.onSuccess(answer);
-                    }
-                });
+            @Override
+            public void onClose(CloseEvent<PopupPanel> event) {
+                // Make the appropriate call
+                callback.onSuccess(answer);
+            }
+        });
     }
 
     /**

@@ -3,20 +3,20 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.TreeSet;
 
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 /**
- * Updates the metadata and additional documents for specified cruises
- * from the current set of available documents for each cruise.
+ * Updates the metadata and additional documents for datasets
+ * with the all available documents for each dataset.
  *
  * @author Karl Smith
  */
@@ -24,105 +24,101 @@ public class AddAllMetadata {
 
     /**
      * @param args
-     *         ExpocodesFile - update metadata and additional documents
-     *         for these cruises
+     *         IDsFile - update metadata and additional documents for datasets with these IDs
      */
     public static void main(String[] args) {
         if ( args.length != 1 ) {
             System.err.println();
-            System.err.println("Arguments:  ExpocodesFile");
+            System.err.println("Arguments:  IDsFile");
             System.err.println();
-            System.err.println("Updates the metadata and additional documents for the cruises ");
-            System.err.println("specified in ExpocodesFile from the current set of available ");
-            System.err.println("documents for each cruise.  The default dashboard configuration ");
-            System.err.println("is used for this process. ");
+            System.err.println("Updates the metadata and additional documents for the datasets ");
+            System.err.println("specified in IDsFile with all available documents for each dataset. ");
+            System.err.println("The default dashboard configuration is used for this process. ");
             System.err.println();
             System.exit(1);
         }
 
-        String expocodesFilename = args[0];
+        String idsFilename = args[0];
 
-        boolean success = true;
+        // Get the IDs of the datasets to update
+        TreeSet<String> idsSet = new TreeSet<String>();
+        try {
+            BufferedReader idsReader = new BufferedReader(new FileReader(idsFilename));
+            try {
+                String dataline = idsReader.readLine();
+                while ( dataline != null ) {
+                    dataline = dataline.trim();
+                    if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+                        idsSet.add(dataline);
+                    dataline = idsReader.readLine();
+                }
+            } finally {
+                idsReader.close();
+            }
+        } catch (Exception ex) {
+            System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
 
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
         } catch (Exception ex) {
-            System.err.println("Problems reading the default dashboard "
-                                       + "configuration file: " + ex.getMessage());
+            System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
+        boolean success = true;
         try {
-            // Get the expocode of the cruises to update
-            TreeSet<String> allExpocodes = new TreeSet<String>();
-            try {
-                BufferedReader expoReader =
-                        new BufferedReader(new FileReader(expocodesFilename));
-                try {
-                    String dataline = expoReader.readLine();
-                    while ( dataline != null ) {
-                        dataline = dataline.trim();
-                        if ( !( dataline.isEmpty() || dataline.startsWith("#") ) )
-                            allExpocodes.add(dataline);
-                        dataline = expoReader.readLine();
-                    }
-                } finally {
-                    expoReader.close();
-                }
-            } catch (Exception ex) {
-                System.err.println("Error getting expocodes from " +
-                                           expocodesFilename + ": " + ex.getMessage());
-                ex.printStackTrace();
-                System.exit(1);
-            }
 
-            CruiseFileHandler fileHandler = configStore.getCruiseFileHandler();
+            DataFileHandler dataHandler = configStore.getDataFileHandler();
             MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
-            for (String expocode : allExpocodes) {
+            for ( String datasetId : idsSet ) {
                 try {
-                    DashboardCruise cruise = fileHandler.getCruiseFromInfoFile(expocode);
-                    if ( cruise == null ) {
-                        System.err.println("No dataset with the expocode " + expocode);
+                    DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
+                    if ( dataset == null ) {
+                        System.err.println("No dataset with the ID " + datasetId);
                         success = false;
                         continue;
                     }
-                    // Directly manipulate the set of additional documents for the cruise
-                    TreeSet<String> addlDocs = cruise.getAddlDocs();
-                    // Clear the OME upload timestamp and current additional documents
-                    cruise.setOmeTimestamp(null);
-                    addlDocs.clear();
-                    // And add all existing metadata documents
-                    for (DashboardMetadata mdata : metaHandler.getMetadataFiles(expocode)) {
+                    // Clear the OME upload timestamp and create a new list of supplemental documents
+                    dataset.setOmeTimestamp(null);
+                    TreeSet<String> addlDocs = new TreeSet<String>();
+                    // Add all existing metadata documents for this dataset
+                    for ( DashboardMetadata mdata : metaHandler.getMetadataFiles(datasetId) ) {
                         if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
                             // Ignore the OME.xml stub
                             ;
                         }
                         else if ( mdata.getFilename().equals(DashboardUtils.PI_OME_FILENAME) ) {
                             // PI-provided OME.xml file - set the OME upload timestamp
-                            cruise.setOmeTimestamp(mdata.getUploadTimestamp());
+                            dataset.setOmeTimestamp(mdata.getUploadTimestamp());
                         }
                         else {
                             // Add the "filename ; timestamp" additional document string
                             addlDocs.add(mdata.getAddlDocsTitle());
                         }
                     }
-                    // Save the updated additional documents/OME timestamp for the cruise
+                    dataset.setAddlDocs(addlDocs);
+                    // Save the updated dataset informations
                     // but do not commit the change - to be done manually
-                    fileHandler.saveCruiseInfoToFile(cruise, null);
-                    System.err.println("Documents updated for " + expocode);
+                    dataHandler.saveDatasetInfoToFile(dataset, null);
+                    System.err.println("Documents updated for " + datasetId);
                 } catch (Exception ex) {
-                    System.err.println("Problems working with " + expocode);
+                    System.err.println("Problems working with " + datasetId + ": " + ex.getMessage());
                     ex.printStackTrace();
                     success = false;
                     continue;
                 }
             }
+
         } finally {
             DashboardConfigStore.shutdown();
         }
-        if ( !success )
+
+        if ( ! success )
             System.exit(1);
         System.exit(0);
     }

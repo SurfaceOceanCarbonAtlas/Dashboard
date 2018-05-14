@@ -19,54 +19,54 @@ public class Crossover implements Serializable, IsSerializable {
 
     private static final long serialVersionUID = -1068460517910734247L;
 
-    protected String[] expocodes;
+    protected String[] datasetIds;
     protected Double minDistance;
     protected Integer[] rowNumsAtMin;
     protected Double[] lonsAtMin;
     protected Double[] latsAtMin;
     protected Long[] timesAtMin;
-    protected Long[] cruiseMinTimes;
-    protected Long[] cruiseMaxTimes;
+    protected Long[] datasetMinTimes;
+    protected Long[] datasetMaxTimes;
 
     /**
      * Creates an crossover with no information (all null).
      */
     public Crossover() {
-        setExpocodes(null);
+        setDatasetIds(null);
         setMinDistance(null);
         setRowNumsAtMin(null);
         setLonsAtMin(null);
         setLatsAtMin(null);
         setTimesAtMin(null);
-        setCruiseMinTimes(null);
-        setCruiseMaxTimes(null);
+        setDatasetMinTimes(null);
+        setDatasetMaxTimes(null);
     }
 
     /**
-     * @return the two expocodes of the crossover cruises;
+     * @return the two IDs of the crossover datasets;
      * always an array of two Strings, but each String may be null.
      * The actual array in this instance is returned.
      */
-    public String[] getExpocodes() {
-        return expocodes;
+    public String[] getDatasetIds() {
+        return datasetIds;
     }
 
     /**
-     * @param expocodes
-     *         the two expocodes of the crossover cruises to set.
+     * @param datasetIds
+     *         the two IDs of the crossover datasets to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Strings must be given.
      *         The values in the array, but not the array itself, are used.
      */
-    public void setExpocodes(String[] expocodes) {
-        if ( expocodes == null ) {
-            this.expocodes = new String[] { null, null };
+    public void setDatasetIds(String[] datasetIds) {
+        if ( datasetIds == null ) {
+            this.datasetIds = new String[] { null, null };
         }
         else {
-            if ( expocodes.length != 2 )
-                throw new IllegalArgumentException("expocodes array not length 2");
-            this.expocodes[0] = expocodes[0];
-            this.expocodes[1] = expocodes[1];
+            if ( datasetIds.length != 2 )
+                throw new IllegalArgumentException("datasetIds array not length 2");
+            this.datasetIds[0] = datasetIds[0];
+            this.datasetIds[1] = datasetIds[1];
         }
     }
 
@@ -86,7 +86,7 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the data row numbers (starts with one) of the two cruises at the crossover;
+     * @return the data row numbers (starts with one) of the two datasets at the crossover;
      * always an array of two Integers, but each Integer may be null.
      * The actual array in this instance is returned.
      */
@@ -96,7 +96,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param rowNumsAtMin
-     *         the data row numbers (starts with one) of the two cruises at the crossover to set.
+     *         the data row numbers (starts with one) of the two datasets at the crossover to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Integers must be given.
      *         The values in the array, but not the array itself, are used.
@@ -114,7 +114,7 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the longitudes of the two cruises at the crossover;
+     * @return the longitudes of the two datasets at the crossover;
      * always an array of two Doubles, but each Double may be null.
      * The actual array in this instance is returned.
      */
@@ -124,7 +124,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param lonsAtMin
-     *         the longitudes of the two cruises at the crossover to set.
+     *         the longitudes of the two datasets at the crossover to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Doubles must be given.
      *         The values in the array, but not the array itself, are used.
@@ -142,7 +142,7 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the latitudes of the two cruises at the crossover;
+     * @return the latitudes of the two datasets at the crossover;
      * always an array of two Doubles, but each Double may be null.
      * The actual array in this instance is returned.
      */
@@ -152,7 +152,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param latsAtMin
-     *         the latitudes of the two cruises at the crossover to set.
+     *         the latitudes of the two datasets at the crossover to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Doubles must be given.
      *         The values in the array, but not the array itself, are used.
@@ -171,7 +171,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the times, in seconds with Jan 1, 1970 00:00:00,
-     * of the two cruises at the crossover;
+     * of the two datasets at the crossover;
      * always an array of two Dates, but each Date may be null.
      * The actual array in this instance is returned.
      */
@@ -182,7 +182,7 @@ public class Crossover implements Serializable, IsSerializable {
     /**
      * @param timesAtMin
      *         the times, in seconds with Jan 1, 1970 00:00:00,
-     *         of the two cruises at the crossover to set.
+     *         of the two datasets at the crossover to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Dates must be given.
      *         The values in the array, but not the array itself, are used.
@@ -201,72 +201,72 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the minimum time, in seconds with Jan 1, 1970 00:00:00,
-     * of all data for each cruise;
+     * of all data for each dataset;
      * always an array of two Dates, but each Date may be null.
      * The actual array in this instance is returned.
      */
-    public Long[] getCruiseMinTimes() {
-        return cruiseMinTimes;
+    public Long[] getDatasetMinTimes() {
+        return datasetMinTimes;
     }
 
     /**
-     * @param cruiseMinTimes
+     * @param datasetMinTimes
      *         the minimum time, in seconds with Jan 1, 1970 00:00:00,
-     *         of all data for each cruise to set.
+     *         of all data for each dataset to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Dates must be given.
      *         The values in the array, but not the array itself, are used.
      */
-    public void setCruiseMinTimes(Long[] cruiseMinTimes) {
-        if ( cruiseMinTimes == null ) {
-            this.cruiseMinTimes = new Long[] { null, null };
+    public void setDatasetMinTimes(Long[] datasetMinTimes) {
+        if ( datasetMinTimes == null ) {
+            this.datasetMinTimes = new Long[] { null, null };
         }
         else {
-            if ( cruiseMinTimes.length != 2 )
-                throw new IllegalArgumentException("cruiseMinTimes array not length 2");
-            this.cruiseMinTimes[0] = cruiseMinTimes[0];
-            this.cruiseMinTimes[1] = cruiseMinTimes[1];
+            if ( datasetMinTimes.length != 2 )
+                throw new IllegalArgumentException("datasetMinTimes array not length 2");
+            this.datasetMinTimes[0] = datasetMinTimes[0];
+            this.datasetMinTimes[1] = datasetMinTimes[1];
         }
     }
 
     /**
      * @return maximum time, in seconds with Jan 1, 1970 00:00:00,
-     * of all data for each cruise;
+     * of all data for each dataset;
      * always an array of two Dates, but each Date may be null.
      * The actual array in this instance is returned.
      */
-    public Long[] getCruiseMaxTimes() {
-        return cruiseMaxTimes;
+    public Long[] getDatasetMaxTimes() {
+        return datasetMaxTimes;
     }
 
     /**
-     * @param cruiseMaxTimes
+     * @param datasetMaxTimes
      *         the maximum time, in seconds with Jan 1, 1970 00:00:00,
-     *         of all data for each cruise to set.
+     *         of all data for each dataset to set.
      *         If null, an array of two nulls is assigned;
      *         otherwise an array of two Dates must be given.
      *         The values in the array, but not the array itself, are used.
      */
-    public void setCruiseMaxTimes(Long[] cruiseMaxTimes) {
-        if ( cruiseMaxTimes == null ) {
-            this.cruiseMaxTimes = new Long[] { null, null };
+    public void setDatasetMaxTimes(Long[] datasetMaxTimes) {
+        if ( datasetMaxTimes == null ) {
+            this.datasetMaxTimes = new Long[] { null, null };
         }
         else {
-            if ( cruiseMaxTimes.length != 2 )
-                throw new IllegalArgumentException("cruiseMaxTimes array not length 2");
-            this.cruiseMaxTimes[0] = cruiseMaxTimes[0];
-            this.cruiseMaxTimes[1] = cruiseMaxTimes[1];
+            if ( datasetMaxTimes.length != 2 )
+                throw new IllegalArgumentException("datasetMaxTimes array not length 2");
+            this.datasetMaxTimes[0] = datasetMaxTimes[0];
+            this.datasetMaxTimes[1] = datasetMaxTimes[1];
         }
     }
 
     @Override
     public int hashCode() {
         final int prime = 37;
-        int result = Arrays.hashCode(expocodes);
+        int result = Arrays.hashCode(datasetIds);
         result = prime * result + Arrays.hashCode(rowNumsAtMin);
         result = prime * result + Arrays.hashCode(timesAtMin);
-        result = prime * result + Arrays.hashCode(cruiseMinTimes);
-        result = prime * result + Arrays.hashCode(cruiseMaxTimes);
+        result = prime * result + Arrays.hashCode(datasetMinTimes);
+        result = prime * result + Arrays.hashCode(datasetMaxTimes);
         // Do not include floating point values, as they do not have to be exact to match
 
         return result;
@@ -286,13 +286,13 @@ public class Crossover implements Serializable, IsSerializable {
 
         Crossover other = (Crossover) obj;
 
-        if ( !Arrays.equals(expocodes, other.expocodes) )
+        if ( !Arrays.equals(datasetIds, other.datasetIds) )
             return false;
         if ( !Arrays.equals(rowNumsAtMin, other.rowNumsAtMin) )
             return false;
-        if ( !Arrays.equals(cruiseMaxTimes, other.cruiseMaxTimes) )
+        if ( !Arrays.equals(datasetMaxTimes, other.datasetMaxTimes) )
             return false;
-        if ( !Arrays.equals(cruiseMinTimes, other.cruiseMinTimes) )
+        if ( !Arrays.equals(datasetMinTimes, other.datasetMinTimes) )
             return false;
         if ( !Arrays.equals(timesAtMin, other.timesAtMin) )
             return false;
@@ -343,14 +343,14 @@ public class Crossover implements Serializable, IsSerializable {
     @Override
     public String toString() {
         return "Crossover" +
-                "[ expocodes=" + Arrays.toString(expocodes) +
+                "[ datasetIds=" + Arrays.toString(datasetIds) +
                 ", minDistance=" + minDistance +
                 ", rowNumsAtMin=" + Arrays.toString(rowNumsAtMin) +
                 ", lonsAtMin=" + Arrays.toString(lonsAtMin) +
                 ", latsAtMin=" + Arrays.toString(latsAtMin) +
                 ", timesAtMin=" + Arrays.toString(timesAtMin) +
-                ", cruiseMinTimes=" + Arrays.toString(cruiseMinTimes) +
-                ", cruiseMaxTimes=" + Arrays.toString(cruiseMaxTimes) +
+                ", datasetMinTimes=" + Arrays.toString(datasetMinTimes) +
+                ", datasetMaxTimes=" + Arrays.toString(datasetMaxTimes) +
                 "]";
     }
 

@@ -18,7 +18,7 @@ public class WoceDuplicates {
 
     /**
      * @param args
-     *         expocode -	expoocode of the dataset to search for and WOCE-4
+     *         expocode - expoocode of the dataset to search for and WOCE-4
      *         any duplicate lon/lat/time/fCO2_rec duplicates
      */
     public static void main(String[] args) {

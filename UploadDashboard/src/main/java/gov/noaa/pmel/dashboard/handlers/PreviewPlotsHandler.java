@@ -1,30 +1,30 @@
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.actions.CruiseChecker;
-import gov.noaa.pmel.dashboard.ferret.FerretConfig;
-import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
+import gov.noaa.pmel.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.dashboard.ferret.SocatTool;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 
 public class PreviewPlotsHandler {
 
     File dsgFilesDir;
-    File plotsDir;
-    CruiseFileHandler cruiseHandler;
-    CruiseChecker cruiseChecker;
+    File plotsFilesDir;
+    DataFileHandler dataHandler;
+    DatasetChecker dataChecker;
     KnownDataTypes knownMetadataTypes;
     KnownDataTypes knownDataFileTypes;
     FerretConfig ferretConfig;
@@ -32,163 +32,144 @@ public class PreviewPlotsHandler {
     /**
      * Create with the given directories for the preview DSG files and plots.
      *
-     * @param dsgFilesDirName
+     * @param previewDsgsDirName
      *         directory to contain the preview DSG files
-     * @param plotsDirName
+     * @param previewPlotsDirName
      *         directory to contain the preview plots
      * @param configStore
-     *         get the CruiseFileHandler, CruiseChecker,
+     *         get the DataFileHandler, DatasetChecker,
      *         MetadataFileHandler, and FerretConfig from here
      */
-    public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName,
-                               DashboardConfigStore configStore) {
-        dsgFilesDir = new File(dsgFilesDirName);
-        if ( !dsgFilesDir.isDirectory() )
-            throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
-        plotsDir = new File(plotsDirName);
-        if ( !plotsDir.isDirectory() )
-            throw new IllegalArgumentException(plotsDirName + " is not a directory");
-        cruiseHandler = configStore.getCruiseFileHandler();
-        cruiseChecker = configStore.getDashboardCruiseChecker();
+    public PreviewPlotsHandler(String previewDsgsDirName,
+            String previewPlotsDirName, DashboardConfigStore configStore) {
+        dsgFilesDir = new File(previewDsgsDirName);
+        if ( ! dsgFilesDir.isDirectory() )
+            throw new IllegalArgumentException(previewDsgsDirName + " is not a directory");
+        plotsFilesDir = new File(previewPlotsDirName);
+        if ( ! plotsFilesDir.isDirectory() )
+            throw new IllegalArgumentException(previewPlotsDirName + " is not a directory");
+        dataHandler = configStore.getDataFileHandler();
+        dataChecker = configStore.getDashboardDatasetChecker();
         knownMetadataTypes = configStore.getKnownMetadataTypes();
         knownDataFileTypes = configStore.getKnownDataFileTypes();
         ferretConfig = configStore.getFerretConfig();
     }
 
     /**
-     * Generates the preview DSG files for a cruise.
-     * Creates this directory if it does not exist.
+     * Returns the virtual file naming the directory that will contain
+     * the preview DSG file of a dataset.  Creates this directory if it
+     * does not exist.
      *
-     * @param expocode
-     *         expocode of the cruise
-     * @return DSG files directory for the cruise
+     * @param datasetId
+     *         ID of the dataset to use
+     * @return preview DSG directory of the dataset
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
-     *         if problems creating the directory
+     *         if the dataset ID is invalid,
+     *         if there are problems creating the directory
      */
-    public File getCruisePreviewDsgDir(String expocode) throws IllegalArgumentException {
-        // Check and standardize the expocode
-        String expo = DashboardServerUtils.checkExpocode(expocode);
-        // Make sure the DSG subdirectory exists
-        File cruiseDsgDir = new File(dsgFilesDir, expo.substring(0, 4));
-        if ( cruiseDsgDir.exists() ) {
-            if ( !cruiseDsgDir.isDirectory() ) {
-                throw new IllegalArgumentException("Cruise DSG file subdirectory exists "
-                                                           + "but is not a directory: " + cruiseDsgDir.getPath());
+    public File getDatasetPreviewDsgDir(String datasetId) throws IllegalArgumentException {
+        // Check and standardize the dataset ID
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        // Create the preview DSG subdirectory if it does not exist
+        File datasetDsgDir = new File(dsgFilesDir, stdId.substring(0,4));
+        if ( datasetDsgDir.exists() ) {
+            if ( ! datasetDsgDir.isDirectory() ) {
+                throw new IllegalArgumentException("Preview DSG file subdirectory exists but is not a directory: " +
+                        datasetDsgDir.getPath());
             }
         }
-        else if ( !cruiseDsgDir.mkdirs() ) {
-            throw new IllegalArgumentException("Cannot create the cruise DSG file "
-                                                       + "subdirectory " + cruiseDsgDir.getPath());
+        else if ( ! datasetDsgDir.mkdirs() ) {
+            throw new IllegalArgumentException("Cannot create the preview DSG file subdirectory " +
+                    datasetDsgDir.getPath());
         }
-        return cruiseDsgDir;
+        return datasetDsgDir;
     }
 
     /**
-     * Generates the preview plots directory for a cruise.
-     * Creates this directory if it does not exist.
+     * Returns the virtual file naming the directory that will contain
+     * the preview plots directory for a dataset.  Creates this directory
+     * if it does not exist.
      *
-     * @param expocode
-     *         expocode of the cruise
-     * @return preview plots directory for the cruise
+     * @param datasetId
+     *         ID of the dataset to use
+     * @return preview plots directory for the dataset
      * @throws IllegalArgumentException
-     *         if the expocode is invalid, or
-     *         if problems creating the directory
+     *         if the dataset ID is invalid, or
+     *         if there are problems creating the directory
      */
-    public File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
-        // Check and standardize the expocode
-        String expo = DashboardServerUtils.checkExpocode(expocode);
-        // Make sure the plots subdirectory exists
-        File cruisePlotsDir = new File(plotsDir, expo.substring(0, 4));
-        if ( cruisePlotsDir.exists() ) {
-            if ( !cruisePlotsDir.isDirectory() ) {
-                throw new IllegalArgumentException("Plots directory exists "
-                                                           + "but is not a directory: " + cruisePlotsDir.getPath());
+    public File getDatasetPreviewPlotsDir(String datasetId) throws IllegalArgumentException {
+        // Check and standardize the dataset ID
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        // Create the preview plots subdirectory if it does not exist
+        File datasetPlotsDir = new File(plotsFilesDir, stdId.substring(0,4));
+        if ( datasetPlotsDir.exists() ) {
+            if ( ! datasetPlotsDir.isDirectory() ) {
+                throw new IllegalArgumentException("Plots directory exists but is not a directory: " +
+                        datasetPlotsDir.getPath());
             }
         }
-        else if ( !cruisePlotsDir.mkdirs() ) {
-            throw new IllegalArgumentException("Unexpected problems "
-                                                       + "creating the new subdirectory " + cruisePlotsDir.getPath());
+        else if ( ! datasetPlotsDir.mkdirs() ) {
+            throw new IllegalArgumentException("Cannot create the preview plots file subdirectory " +
+                    datasetPlotsDir.getPath());
         }
-        return cruisePlotsDir;
+        return datasetPlotsDir;
     }
 
     /**
-     * Generates the data preview plots for the given cruise.  The cruise
-     * data is checked and standardized, the preview DSG file is created,
-     * Ferret is called to add the computed variables to the DSG file, and
+     * Generates the data preview plots for the given dataset.  The data
+     * is checked and standardized, the preview DSG file is created, Ferret
+     * is called to add the computed variables to the DSG file, and
      * finally Ferret is called to generate the data preview plots from the
      * data in the DSG file.
      *
-     * @param expocode
-     *         expocode of the cruise to preview
+     * @param datasetId
+     *         ID of the dataset to preview
      * @param timetag
      *         time tag to add to the end of the names of the plots
      *         (before the filename extension)
      * @throws IllegalArgumentException
-     *         if the expocode is invalid,
+     *         if the dataset ID is invalid,
      *         if there is an error reading the data or OME metadata,
      *         if there is an error checking and standardizing the data,
      *         if there is an error generating the preview DSG file, or
      *         if there is an error generating the preview data plots
      */
-    public void createPreviewPlots(String expocode, String timetag)
-            throws IllegalArgumentException {
-        String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+    public void createPreviewPlots(String datasetId, String timetag)
+                                        throws IllegalArgumentException {
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         Logger log = LogManager.getLogger("PreviewPlotsHandler");
-        log.debug("reading data for " + upperExpo);
+        log.debug("reading data for " + stdId);
 
         // Get the complete original cruise data
-        DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(upperExpo, 0, -1);
+        DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(stdId, 0, -1);
 
-        log.debug("standardizing data for " + upperExpo);
+        log.debug("standardizing data for " + stdId);
 
-        /*
-         *  Convert the cruise data into standard units and removes
-         *  those data lines which the PI has marked as bad.
-         *  Also adds and assigns year, month, day, hour, minute, second,
-         *  and WOCE columns if not present.  SanityChecker WOCE-4 flags
-         *  are added to the WOCE column.  This updates the OME metadata
-         *  from the SanityChecker, and saves SanityChecker messages with
-         *  row numbers of the trimmed data.
-         */
-        if ( !cruiseChecker.standardizeCruiseData(cruiseData) ) {
-            if ( cruiseData.getNumDataRows() < 1 )
-                throw new IllegalArgumentException(upperExpo + ": unacceptable; all data points marked bad");
-            else if ( !cruiseChecker.checkProcessedOkay() )
-                throw new IllegalArgumentException(upperExpo + ": unacceptable; automated checking of data failed");
-            else if ( cruiseChecker.hadGeopositionErrors() )
-                throw new IllegalArgumentException(upperExpo + ": unacceptable; automated checking of data " +
-                                                           "detected longitude, latitude, date, or time value errors");
-            else
-                throw new IllegalArgumentException(upperExpo + ": unacceptable for unknown reason - unexpected");
-        }
+        // Just create a minimal DsgMetadata to create the preview DSG file
+        DsgMetadata dsgMData = new DsgMetadata(knownMetadataTypes);
+        dsgMData.setDatasetId(stdId);
+        dsgMData.setVersion(dataset.getVersion());
+
+        // TODO: update DsgMetadata with metadata derived from data
+        // Although probably not important for the preview plots.
+        StdUserDataArray stdUserData = dataChecker.standardizeDataset(dataset, null);
+        if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) )
+            throw new IllegalArgumentException(stdId + ": unacceptable; check data check error messages " +
+                                        "(missing lon/lat/depth/time or uninterpretable values)");
 
         // Get the preview DSG filename, creating the parent directory if it does not exist
-        CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(
-                getCruisePreviewDsgDir(upperExpo), upperExpo + "_" + timetag + ".nc");
+        DsgNcFile dsgFile = new DsgNcFile(getDatasetPreviewDsgDir(stdId),
+                stdId + "_" + timetag + ".nc");
 
         log.debug("generating preview DSG file " + dsgFile.getPath());
 
-        // Do not use the metadata in the DSG file, and to avoid issues with the existing
-        // OME metadata, just use what we already know to create a SocatMetadata
-        SocatMetadata socatMData = new SocatMetadata(knownMetadataTypes);
-        socatMData.setExpocode(upperExpo);
-        socatMData.setSocatVersion(cruiseData.getVersion());
-        socatMData.setQcFlag(DashboardUtils.QC_NEW_FLAG.toString());
-
-        // Convert the cruise data strings into the appropriate list of data objects
-        ArrayList<SocatCruiseData> socatDatalist =
-                SocatCruiseData.dataListFromDashboardCruise(
-                        knownDataFileTypes, cruiseData);
-
         // Create the preview NetCDF DSG file
         try {
-            dsgFile.create(socatMData, socatDatalist);
+            dsgFile.create(dsgMData, stdUserData, knownDataFileTypes);
         } catch (Exception ex) {
             dsgFile.delete();
-            throw new IllegalArgumentException("Problems creating the SOCAT DSG file " + dsgFile.getName() +
-                                                       "\n    " + ex.getMessage(), ex);
+            throw new IllegalArgumentException("Problems creating the preview DSG file for " +
+                    datasetId + ": " + ex.getMessage(), ex);
         }
 
         log.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
@@ -197,27 +178,26 @@ public class PreviewPlotsHandler {
         SocatTool tool = new SocatTool(ferretConfig);
         ArrayList<String> scriptArgs = new ArrayList<String>(1);
         scriptArgs.add(dsgFile.getPath());
-        tool.init(scriptArgs, upperExpo, FerretConfig.Action.COMPUTE);
+        tool.init(scriptArgs, stdId, FerretConfig.Action.COMPUTE);
         tool.run();
         if ( tool.hasError() )
-            throw new IllegalArgumentException("Failure adding computed variables: " +
-                                                       tool.getErrorMessage());
+            throw new IllegalArgumentException("Failure adding computed variables to the preview DSG file for " +
+                    datasetId + ": " + tool.getErrorMessage());
 
         log.debug("generating preview plots for " + dsgFile.getPath());
 
-        // Get the location for the preview plots, creating the driectory if it does not exist
-        String cruisePlotsDirname = getCruisePreviewPlotsDir(upperExpo).getPath();
+        // Get the location for the preview plots, creating the directory if it does not exist
+        String cruisePlotsDirname = getDatasetPreviewPlotsDir(stdId).getPath();
 
-        // Call Ferret to generate the plots from the preview DSG file;
-        // the plots parent directory is created if it does not exist
+        // Call Ferret to generate the plots from the preview DSG file
         tool = new SocatTool(ferretConfig);
         scriptArgs.add(cruisePlotsDirname);
         scriptArgs.add(timetag);
-        tool.init(scriptArgs, upperExpo, FerretConfig.Action.PLOTS);
+        tool.init(scriptArgs, stdId, FerretConfig.Action.PLOTS);
         tool.run();
         if ( tool.hasError() )
-            throw new IllegalArgumentException("Failure generating data preview plots: " +
-                                                       tool.getErrorMessage());
+            throw new IllegalArgumentException("Failure generating data preview plots for " +
+                    datasetId + ": " + tool.getErrorMessage());
 
         log.debug("preview plots generated in " + cruisePlotsDirname);
     }

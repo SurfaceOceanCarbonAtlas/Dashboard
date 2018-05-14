@@ -1,4 +1,3 @@
-The jar file gwt-crypto-2.3.0.jar was obtained from the gwt-crypt Google code site https://code.google.com/p/gwt-crypto/ (now https://github.com/mooreds/gwt-crypto/)
 The jar file tomcat-coyote-7.0.86.jar was obtained as part of Apache Tomcat from http://tomcat.apache.org/
 The jar file joda-time-2.9.9.jar was obtained from the Joda-Time site http://www.joda.org/joda-time/
 The jar files:

@@ -3,24 +3,60 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.WoceType;
-
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeSet;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+import java.util.TreeSet;
+
+import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
 /**
  * @author Karl Smith
  */
 public class DashboardUtilsTest {
+
+    /**
+     * Simple test of working with the GregorianCalendar
+     * (also a method of getting the value for DATE_MISSING_VALUE)
+     */
+    @Test
+    public void testGregorianCalendar() {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        GregorianCalendar cal = new GregorianCalendar(utc);
+        long value;
+
+        // Full settings
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.clear();
+        cal.setTimeZone(utc);
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+
+        // Clear does not remove the time zone
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.clear();
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+
+        // Actually just need to set milliseconds to zero
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        cal.set(GregorianCalendar.MILLISECOND, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+    }
 
     /**
      * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
@@ -32,38 +68,38 @@ public class DashboardUtilsTest {
         double deltalon1 = lon1 - 1.2E-6;
         double lon2 = deltalon1 + 360.0;
 
-        assertTrue(DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-5));
-        assertFalse(DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-6));
-        assertTrue(DashboardUtils.closeTo(lon1, deltalon1, 1.0E-8, 0.0));
-        assertFalse(DashboardUtils.closeTo(lon1, deltalon1, 1.0E-9, 0.0));
-        assertTrue(DashboardUtils.closeTo(Double.NaN, Double.NaN, 0.0, 0.0));
-        assertFalse(DashboardUtils.closeTo(Double.NaN, lon1, 1.0, 1.0));
+        assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-5) );
+        assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-6) );
+        assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-8, 0.0) );
+        assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-9, 0.0) );
+        assertTrue( DashboardUtils.closeTo(Double.NaN, Double.NaN, 0.0, 0.0) );
+        assertFalse( DashboardUtils.closeTo(Double.NaN, lon1, 1.0, 1.0) );
 
-        assertFalse(DashboardUtils.closeTo(lon1, lon2, 0.0, 1.0E-3));
-        assertTrue(DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-5));
-        assertFalse(DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-6));
-        assertFalse(DashboardUtils.closeTo(lon1, lon2, 1.0E-3, 0.0));
-        assertTrue(DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-8, 0.0));
-        assertFalse(DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0));
-        assertTrue(DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0));
-        assertFalse(DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0));
+        assertFalse( DashboardUtils.closeTo(lon1, lon2, 0.0, 1.0E-3) );
+        assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-5) );
+        assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-6) );
+        assertFalse( DashboardUtils.closeTo(lon1, lon2, 1.0E-3, 0.0) );
+        assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-8, 0.0) );
+        assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0) );
+        assertTrue( DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0) );
+        assertFalse( DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0) );
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#passhashFromPlainText(String, String)}
+     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#passhashFromPlainText()}.
      */
     @Test
     public void testPasshashFromPlainText() {
         String passhash = DashboardUtils.passhashFromPlainText("username", "password");
-        assertTrue(passhash.length() >= 32);
+        assertTrue( passhash.length() >= 32 );
 
         String otherhash = DashboardUtils.passhashFromPlainText("username", "otherpass");
-        assertTrue(otherhash.length() >= 32);
-        assertFalse(passhash.equals(otherhash));
+        assertTrue( otherhash.length() >= 32 );
+        assertFalse( passhash.equals(otherhash) );
 
         otherhash = DashboardUtils.passhashFromPlainText("otheruser", "password");
-        assertTrue(otherhash.length() >= 32);
-        assertFalse(passhash.equals(otherhash));
+        assertTrue( otherhash.length() >= 32 );
+        assertFalse( passhash.equals(otherhash) );
 
         passhash = DashboardUtils.passhashFromPlainText("me", "password");
         assertEquals(0, passhash.length());
@@ -78,7 +114,7 @@ public class DashboardUtilsTest {
     @Test
     public void testDecodeByteArray() {
         String expectedStr = "[ 3, 6, -9, 15, 0, 12 ]";
-        byte[] expectedArray = { 3, 6, -9, 15, 0, 12 };
+        byte[] expectedArray = {3, 6, -9, 15, 0, 12};
         String oneStr = "[ 8 ]";
         byte[] oneArray = { 8 };
         String emptyStr = "[  ]";
@@ -96,18 +132,18 @@ public class DashboardUtilsTest {
         boolean exceptionCaught = false;
         try {
             byteArray = DashboardUtils.decodeByteArray("3, 6, -9, 15, 0, 12");
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             exceptionCaught = true;
         }
-        assertTrue(exceptionCaught);
+        assertTrue( exceptionCaught );
 
         exceptionCaught = false;
         try {
             byteArray = DashboardUtils.decodeByteArray("[ 3, 6, -9, 1115, 0, 12 ]");
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             exceptionCaught = true;
         }
-        assertTrue(exceptionCaught);
+        assertTrue( exceptionCaught );
     }
 
     /**
@@ -149,19 +185,20 @@ public class DashboardUtilsTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeWoceTypeSet(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeWoceTypeSet(java.util.TreeSet)}.
+     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeQCFlagSet(java.lang.String)}
+     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeQCFlagSet(java.util.TreeSet)}.
      */
     @Test
     public void testEncodeDecodeWoceTypeSet() {
-        TreeSet<WoceType> mySet = new TreeSet<WoceType>(
-                Arrays.asList(new WoceType("WOCE_CO2_water", 3, 7), new WoceType("WOCE_CO2_atm", 9, 2)));
-        String encoded = DashboardUtils.encodeWoceTypeSet(mySet);
-        TreeSet<WoceType> decodedSet = DashboardUtils.decodeWoceTypeSet(encoded);
+        TreeSet<QCFlag> mySet = new TreeSet<QCFlag>( Arrays.asList(
+                new QCFlag("WOCE_CO2_water", '4', Severity.ERROR, 3, 7),
+                new QCFlag("WOCE_CO2_atm", '3', Severity.WARNING, 9, 2) ) );
+        String encoded = DashboardUtils.encodeQCFlagSet(mySet);
+        TreeSet<QCFlag> decodedSet = DashboardUtils.decodeQCFlagSet(encoded);
         assertEquals(mySet, decodedSet);
-        decodedSet = DashboardUtils.decodeWoceTypeSet("[]");
+        decodedSet = DashboardUtils.decodeQCFlagSet("[]");
         assertEquals(0, decodedSet.size());
-        decodedSet = DashboardUtils.decodeWoceTypeSet("[  ]");
+        decodedSet = DashboardUtils.decodeQCFlagSet("[  ]");
         assertEquals(0, decodedSet.size());
     }
 

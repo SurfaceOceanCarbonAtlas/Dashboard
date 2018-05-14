@@ -26,7 +26,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 public class VersionedFileHandler {
 
     // File to write commit command to - when not actually performing the commits
-    // private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
+    private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
     // Check every 15 seconds
     private static final long MILLISECONDS_CHECK_INTERVAL = 15 * 1000L;
     // Keep working while less than 3 seconds have passed
@@ -55,10 +55,10 @@ public class VersionedFileHandler {
      *         or is not under version control
      */
     VersionedFileHandler(String filesDirName, String svnUsername,
-                         String svnPassword) throws IllegalArgumentException {
+                        String svnPassword) throws IllegalArgumentException {
         filesDir = new File(filesDirName);
         // Check that this is a directory under version control
-        if ( !filesDir.isDirectory() )
+        if ( ! filesDir.isDirectory() )
             throw new IllegalArgumentException(
                     filesDirName + " is not a directory");
         if ( svnUsername == null ) {
@@ -70,7 +70,7 @@ public class VersionedFileHandler {
         }
         else {
             // Version-controlled directory
-            if ( !SVNWCUtil.isVersionedDirectory(filesDir) )
+            if ( ! SVNWCUtil.isVersionedDirectory(filesDir) )
                 throw new IllegalArgumentException(filesDirName + " is not under version control");
             // Create the version control manager with the provided credentials
             svnManager = SVNClientManager.newInstance(
@@ -93,9 +93,8 @@ public class VersionedFileHandler {
      *         message to accompany the commit
      */
     private void addFilesToCommit(File[] commitFiles, File parent, String message) {
-        if ( ( filesToCommit == null ) || ( parentToUpdate == null ) || ( commitMessage == null ) )
-            throw new NullPointerException(
-                    "addFilesToCommit called for VersionedFileHandler that is not version controlled");
+        if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+            throw new NullPointerException("addFilesToCommit called for VersionedFileHandler that is not version controlled");
         synchronized(filesToCommit) {
             filesToCommit.addLast(commitFiles);
             parentToUpdate.addLast(parent);
@@ -108,12 +107,10 @@ public class VersionedFileHandler {
      * commits any files present.  Stops when filesDir is set to null.
      */
     private static final String SVN_COMMIT_COMMANDS_FILENAME = "svn_commit_commands.sh";
-
     private void watchCommitQueue() {
-        if ( ( filesToCommit == null ) || ( parentToUpdate == null ) || ( commitMessage == null ) )
-            throw new NullPointerException(
-                    "watchCommitQueue called for VersionedFileHandler that is not version controlled");
-        ( new Timer() ).schedule(new TimerTask() {
+        if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+            throw new NullPointerException("watchCommitQueue called for VersionedFileHandler that is not version controlled");
+        (new Timer()).schedule(new TimerTask() {
             @Override
             public void run() {
                 File[] commitFiles;
@@ -127,28 +124,27 @@ public class VersionedFileHandler {
                         message = commitMessage.pollFirst();
                     }
                     if ( commitFiles != null ) {
-                        if ( ( parent != null ) && ( message != null ) ) {
+                        if ( (parent != null) && (message != null) ) {
                             try {
-								/*
-								 * TODO: still having issues with the loack still being present
-								 * when committing and adding files to be committed
-								 * 
-								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
-								// and not any other updated files under any directories specified
-								svnManager.getCommitClient().doCommit(commitFiles, false, 
-										message, null, null, false, false, SVNDepth.EMPTY);
-								// Update the parent directory
-								svnManager.getUpdateClient().doUpdate(parent, 
-										SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
-								*/
+                                /*
+                                 * TODO: still having issues with the lock still being present
+                                 * when committing and adding files to be committed
+                                 *
+                                // Use SVNDepth.EMPTY so exactly the files/directory specified are committed
+                                // and not any other updated files under any directories specified
+                                svnManager.getCommitClient().doCommit(commitFiles, false,
+                                        message, null, null, false, false, SVNDepth.EMPTY);
+                                // Update the parent directory
+                                svnManager.getUpdateClient().doUpdate(parent,
+                                        SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
+                                */
                                 // Or just write the svn commands to file to be dealt with manually
                                 PrintWriter cmdsWriter = new PrintWriter(new FileWriter(
                                         new File(filesDir, SVN_COMMIT_COMMANDS_FILENAME), true));
                                 // Need to fix issues with single quotes in message
                                 cmdsWriter.print("svn commit --depth=empty -m '" + message + "'");
-                                for (File svnfile : commitFiles) {
+                                for ( File svnfile : commitFiles )
                                     cmdsWriter.print(" " + svnfile.getPath());
-                                }
                                 cmdsWriter.println();
                                 cmdsWriter.println("svn update --depth=infinity " + parent.getPath());
                                 cmdsWriter.close();
@@ -157,12 +153,12 @@ public class VersionedFileHandler {
                                 // Should not happen, but nothing can be done about it if it does
                             }
                         }
-                        if ( ( System.currentTimeMillis() - startTime ) > MILLISECONDS_WORK_INTERVAL )
+                        if ( (System.currentTimeMillis() - startTime) > MILLISECONDS_WORK_INTERVAL )
                             break;
                     }
                 } while ( commitFiles != null );
                 // Check if this VersionedFileHander is no longer needed
-                if ( ( filesDir == null ) && ( commitFiles == null ) ) {
+                if ( (filesDir == null) && (commitFiles == null) ) {
                     cancel();
                     return;
                 }
@@ -190,19 +186,18 @@ public class VersionedFileHandler {
      *         if the version control engine throws one
      */
     void commitVersion(File wcfile, String message) throws SVNException {
-        if ( ( filesToCommit == null ) || ( parentToUpdate == null ) || ( commitMessage == null ) )
-            throw new NullPointerException(
-                    "commitVersion called for VersionedFileHandler that is not version controlled");
+        if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+            throw new NullPointerException("commitVersion called for VersionedFileHandler that is not version controlled");
         boolean needsAdd = false;
         try {
             SVNStatus status = svnManager.getStatusClient()
                                          .doStatus(wcfile, false);
             SVNStatusType contentsStatus = status.getContentsStatus();
-            if ( ( contentsStatus == SVNStatusType.STATUS_UNVERSIONED ) ||
-                    ( contentsStatus == SVNStatusType.STATUS_DELETED ) ||
-                    ( contentsStatus == SVNStatusType.STATUS_NONE ) )
+            if ( (contentsStatus == SVNStatusType.STATUS_UNVERSIONED) ||
+                 (contentsStatus == SVNStatusType.STATUS_DELETED) ||
+                 (contentsStatus == SVNStatusType.STATUS_NONE) )
                 needsAdd = true;
-        } catch (SVNException ex) {
+        } catch ( SVNException ex ) {
             // At this point, assume the parent directory is not version controlled
             needsAdd = true;
         }
@@ -220,18 +215,18 @@ public class VersionedFileHandler {
         // or find an unchanged directory
         File parent = wcfile;
         for (File currFile = wcfile.getParentFile(); currFile != null;
-                currFile = currFile.getParentFile()) {
+                                        currFile = currFile.getParentFile()) {
             SVNStatus status;
             try {
                 status = svnManager.getStatusClient().doStatus(currFile, false);
-            } catch (SVNException ex) {
+            } catch ( SVNException ex ) {
                 // Probably outside the working copy
                 break;
             }
             SVNStatusType statType = status.getContentsStatus();
-            if ( ( statType == SVNStatusType.STATUS_ADDED ) ||
-                    ( statType == SVNStatusType.STATUS_MODIFIED ) ||
-                    ( statType == SVNStatusType.STATUS_REPLACED ) ) {
+            if ( (statType == SVNStatusType.STATUS_ADDED) ||
+                 (statType == SVNStatusType.STATUS_MODIFIED) ||
+                 (statType == SVNStatusType.STATUS_REPLACED) ) {
                 commitFiles.push(currFile);
                 parent = currFile;
             }
@@ -263,9 +258,8 @@ public class VersionedFileHandler {
      *         if the version control engine throws one
      */
     void moveVersionedFile(File oldWcFile, File newWcFile, String message) throws SVNException {
-        if ( ( filesToCommit == null ) || ( parentToUpdate == null ) || ( commitMessage == null ) )
-            throw new NullPointerException(
-                    "moveVersionedFile called for VersionedFileHandler that is not version controlled");
+        if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+            throw new NullPointerException("moveVersionedFile called for VersionedFileHandler that is not version controlled");
         // Make sure the parent directory of the new file is under version control
         File parent = newWcFile.getParentFile();
         boolean needsAdd = false;
@@ -273,11 +267,11 @@ public class VersionedFileHandler {
             SVNStatus status = svnManager.getStatusClient()
                                          .doStatus(parent, false);
             SVNStatusType contentsStatus = status.getContentsStatus();
-            if ( ( contentsStatus == SVNStatusType.STATUS_UNVERSIONED ) ||
-                    ( contentsStatus == SVNStatusType.STATUS_DELETED ) ||
-                    ( contentsStatus == SVNStatusType.STATUS_NONE ) )
+            if ( (contentsStatus == SVNStatusType.STATUS_UNVERSIONED) ||
+                 (contentsStatus == SVNStatusType.STATUS_DELETED) ||
+                 (contentsStatus == SVNStatusType.STATUS_NONE) )
                 needsAdd = true;
-        } catch (SVNException ex) {
+        } catch ( SVNException ex ) {
             // At this point, assume the parent directory is not version controlled
             needsAdd = true;
         }
@@ -296,18 +290,18 @@ public class VersionedFileHandler {
         // Work down the directory tree until we fall out
         // or find an unchanged directory
         for (File currFile = newWcFile.getParentFile(); currFile != null;
-                currFile = currFile.getParentFile()) {
+                                        currFile = currFile.getParentFile()) {
             SVNStatus status;
             try {
                 status = svnManager.getStatusClient().doStatus(currFile, false);
-            } catch (SVNException ex) {
+            } catch ( SVNException ex ) {
                 // Probably outside the working copy
                 break;
             }
             SVNStatusType statType = status.getContentsStatus();
-            if ( ( statType == SVNStatusType.STATUS_ADDED ) ||
-                    ( statType == SVNStatusType.STATUS_MODIFIED ) ||
-                    ( statType == SVNStatusType.STATUS_REPLACED ) ) {
+            if ( (statType == SVNStatusType.STATUS_ADDED) ||
+                 (statType == SVNStatusType.STATUS_MODIFIED) ||
+                 (statType == SVNStatusType.STATUS_REPLACED) ) {
                 commitFiles.push(currFile);
                 parent = currFile;
             }
@@ -337,13 +331,12 @@ public class VersionedFileHandler {
      *         if deleting the file or committing the deletion throws one
      */
     void deleteVersionedFile(File wcFile, String message) throws SVNException {
-        if ( ( filesToCommit == null ) || ( parentToUpdate == null ) || ( commitMessage == null ) )
-            throw new NullPointerException(
-                    "moveVersionedFile called for VersionedFileHandler that is not version controlled");
+        if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+            throw new NullPointerException("moveVersionedFile called for VersionedFileHandler that is not version controlled");
         // Delete the file (force) from the working directory and version control
         svnManager.getWCClient().doDelete(wcFile, true, true, false);
         // schedule committing the changes
-        addFilesToCommit(new File[] { wcFile }, wcFile.getParentFile(), message);
+        addFilesToCommit(new File[] {wcFile}, wcFile.getParentFile(), message);
     }
 
 }

@@ -15,7 +15,6 @@ body {
     margin-top: 0.5em;
     margin-bottom: 1em;
 }
-
 .horizontalbutton {
     width: 5em;
     margin-left: 3.5em;
@@ -32,7 +31,6 @@ body {
     padding-left: 2em;
     padding-right: 2em;
 }
-
 .introhtml {
     display: block;
     text-align: justify;
@@ -46,12 +44,10 @@ body {
     background-color: #CCCCCC;
     width: 35em;
 }
-
 .infohtml {
     text-align: justify;
     padding: 1em;
 }
-
 .infobutton {
     margin-top: 0.5em;
     margin-bottom: 1em;
@@ -63,24 +59,20 @@ body {
     background-color: #AACCEE;
     width: 35em;
 }
-
 .inputhtml {
     text-align: justify;
     padding: 0.5em;
 }
-
 .inputtextpanel {
     margin-top: 0em;
     margin-bottom: 2em;
 }
-
 .inputtextlabel {
     font-family: monospace;
     font-weight: bold;
     font-size: large;
     margin-right: 0.5em;
 }
-
 .inputtextbox {
     width: 15em;
     margin-left: 0.5em;

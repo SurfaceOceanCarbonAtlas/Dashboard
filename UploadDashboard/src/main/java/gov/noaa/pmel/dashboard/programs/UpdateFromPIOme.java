@@ -30,7 +30,7 @@ public class UpdateFromPIOme {
 
     /**
      * @param args
-     *         expocode -	expoocode of the dataset to update the OME.xml from the PI_OME.xml
+     *         expocode - expoocode of the dataset to update the OME.xml from the PI_OME.xml
      */
     public static void main(String[] args) {
         String expocode;

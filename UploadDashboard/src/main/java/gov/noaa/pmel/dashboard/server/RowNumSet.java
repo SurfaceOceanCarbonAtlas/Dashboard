@@ -38,7 +38,7 @@ public class RowNumSet extends TreeSet<Integer> {
         Integer start = null;
         Integer end = null;
         boolean first = true;
-        for (Integer val : this) {
+        for ( Integer val : this ) {
             if ( start == null ) {
                 // start of a new sequence
                 start = val;
@@ -78,7 +78,7 @@ public class RowNumSet extends TreeSet<Integer> {
             }
         }
         // print the final stored sequence
-        if ( !first ) {
+        if ( ! first ) {
             sb.append(",");
         }
         if ( start.equals(end) ) {

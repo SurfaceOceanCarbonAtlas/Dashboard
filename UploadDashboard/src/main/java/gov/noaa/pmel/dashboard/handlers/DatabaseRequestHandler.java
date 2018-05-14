@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
- * Handles database requests for dealing with SOCAT flag events
+ * Handles database requests for dealing with flag events
  *
  * @author Karl Smith
  */
@@ -62,8 +62,8 @@ public class DatabaseRequestHandler {
      * @throws SQLException
      *         if there are problems connecting to or executing a query on the database
      */
-    public DatabaseRequestHandler(String configFilename) throws FileNotFoundException,
-                                                                IOException, IllegalArgumentException, SQLException {
+    public DatabaseRequestHandler(String configFilename) 
+            throws FileNotFoundException, IOException, IllegalArgumentException, SQLException {
         // Read the configuration properties file
         Properties configProps = new Properties();
         FileReader reader = new FileReader(configFilename);
@@ -77,7 +77,7 @@ public class DatabaseRequestHandler {
         String sqlDriverName = configProps.getProperty(SQL_DRIVER_TAG);
         if ( ( sqlDriverName == null ) || sqlDriverName.trim().isEmpty() )
             throw new IllegalArgumentException("Value for " + SQL_DRIVER_TAG +
-                                                       ", such as com.mysql.jdbc.Driver, must be given in " + configFilename);
+                    ", such as com.mysql.jdbc.Driver, must be given in " + configFilename);
         sqlDriverName = sqlDriverName.trim();
         databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
         if ( ( databaseUrl == null ) || databaseUrl.trim().isEmpty() )
@@ -87,22 +87,22 @@ public class DatabaseRequestHandler {
         selectUser = configProps.getProperty(SELECT_USER_TAG);
         if ( ( selectUser == null ) || selectUser.trim().isEmpty() )
             throw new IllegalArgumentException("Value for " + SELECT_USER_TAG +
-                                                       " must be given in " + configFilename);
+                    " must be given in " + configFilename);
         selectUser = selectUser.trim();
         selectPass = configProps.getProperty(SELECT_PASS_TAG);
         if ( ( selectPass == null ) || selectPass.trim().isEmpty() )
             throw new IllegalArgumentException("Value for " + SELECT_PASS_TAG +
-                                                       " must be given in " + configFilename);
+                    " must be given in " + configFilename);
         selectPass = selectPass.trim();
         updateUser = configProps.getProperty(UPDATE_USER_TAG);
         if ( ( updateUser == null ) || updateUser.trim().isEmpty() )
             throw new IllegalArgumentException("Value for " + UPDATE_USER_TAG +
-                                                       " must be given in " + configFilename);
+                    " must be given in " + configFilename);
         updateUser = updateUser.trim();
         updatePass = configProps.getProperty(UPDATE_PASS_TAG);
         if ( ( updatePass == null ) || updatePass.trim().isEmpty() )
             throw new IllegalArgumentException("Value for " + UPDATE_PASS_TAG +
-                                                       " must be given in " + configFilename);
+                    " must be given in " + configFilename);
         updatePass = updatePass.trim();
         testConnections(sqlDriverName);
     }
@@ -128,14 +128,14 @@ public class DatabaseRequestHandler {
      *         if there are problems connecting to or executing a query on the database
      */
     public DatabaseRequestHandler(String sqlDriverName, String databaseUrl,
-                                  String selectUser, String selectPass, String updateUser, String updatePass)
+            String selectUser, String selectPass, String updateUser, String updatePass)
             throws IllegalArgumentException, SQLException {
         if ( ( sqlDriverName == null ) || sqlDriverName.trim().isEmpty() )
             throw new IllegalArgumentException("an SQL driver class name, " +
-                                                       "such as com.mysql.jdbc.Driver, must be given");
+                    "such as com.mysql.jdbc.Driver, must be given");
         if ( ( databaseUrl == null ) || databaseUrl.isEmpty() )
             throw new IllegalArgumentException("an SQL database URL, " +
-                                                       "such as jdbc:mysql://localhost:3306/SOCATFlags, must be given");
+                    "such as jdbc:mysql://localhost:3306/SOCATFlags, must be given");
         this.databaseUrl = databaseUrl.trim();
         if ( ( selectUser == null ) || selectUser.trim().isEmpty() )
             throw new IllegalArgumentException("username for select user must be given");
@@ -220,8 +220,7 @@ public class DatabaseRequestHandler {
      *         if accessing the database throws one, or
      *         if the reviewer name cannot be found
      */
-    private int getReviewerId(Connection catConn,
-                              String username, String realname) throws SQLException {
+    private int getReviewerId(Connection catConn, String username, String realname) throws SQLException {
         int reviewerId;
         PreparedStatement prepStmt;
         if ( !username.isEmpty() ) {
@@ -303,7 +302,7 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(false);
         try {
             PreparedStatement prepStmt = catConn.prepareStatement("SELECT `username` FROM `" +
-                                                                          REVIEWERS_TABLE_NAME + "` WHERE `realname` = ?;");
+                    REVIEWERS_TABLE_NAME + "` WHERE `realname` = ?;");
             prepStmt.setString(1, realname);
             ResultSet results = prepStmt.executeQuery();
             try {
@@ -336,7 +335,7 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(false);
         try {
             PreparedStatement prepStmt = catConn.prepareStatement("SELECT `email` FROM `" +
-                                                                          REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
+                    REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
             prepStmt.setString(1, username);
             ResultSet results = prepStmt.executeQuery();
             try {
@@ -366,12 +365,11 @@ public class DatabaseRequestHandler {
     public void addQCEvent(QCEvent qcEvent) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            int reviewerId = getReviewerId(catConn,
-                                           qcEvent.getUsername(), qcEvent.getRealname());
+            int reviewerId = getReviewerId(catConn, qcEvent.getUsername(), qcEvent.getRealname());
             PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" +
-                                                                             QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
-                                                                             "`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
-                                                                             "VALUES(?, ?, ?, ?, ?, ?, ?);");
+                    QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
+                    "`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?);");
             addPrepStmt.setString(1, qcEvent.getFlag().toString());
             Date flagDate = qcEvent.getFlagDate();
             if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
@@ -411,10 +409,10 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(true);
         try {
             PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" +
-                                                                                       QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" +
-                                                                                       DashboardUtils.QC_NEW_FLAG + "','" + DashboardUtils.QC_UPDATED_FLAG +
-                                                                                       "') AND `region_id` = '" + DashboardUtils.COASTAL_REGION_ID +
-                                                                                       "' AND `qc_comment` LIKE 'Initial%'");
+                    QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" +
+                    DashboardUtils.QC_NEW_FLAG + "','" + DashboardUtils.QC_UPDATED_FLAG +
+                    "') AND `region_id` = '" + DashboardUtils.COASTAL_REGION_ID +
+                    "' AND `qc_comment` LIKE 'Initial%'");
             removeCoastalPrepStmt.setString(1, expocode);
             numDeleted = removeCoastalPrepStmt.executeUpdate();
         } finally {
@@ -446,7 +444,7 @@ public class DatabaseRequestHandler {
             // Get all the QC events for this data set, ordered so the latest are last
             PreparedStatement getPrepStmt = catConn.prepareStatement(
                     "SELECT `qc_flag`, `qc_time`, `region_id` FROM `" + QCEVENTS_TABLE_NAME +
-                            "` WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
+                    "` WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
             getPrepStmt.setString(1, expocode);
             ResultSet rslts = getPrepStmt.executeQuery();
             try {
@@ -871,8 +869,7 @@ public class DatabaseRequestHandler {
      * @throws SQLException
      *         if accessing the database or reading the results throws one
      */
-    public ArrayList<WoceEvent> getWoceEvents(String expocode,
-                                              boolean latestFirst) throws SQLException {
+    public ArrayList<WoceEvent> getWoceEvents(String expocode, boolean latestFirst) throws SQLException {
         ArrayList<WoceEvent> eventsList = new ArrayList<WoceEvent>();
         Connection catConn = makeConnection(false);
         try {
@@ -882,11 +879,11 @@ public class DatabaseRequestHandler {
             else
                 order = "ASC;";
             PreparedStatement prepStmt = catConn.prepareStatement("SELECT * FROM `" +
-                                                                          WOCEEVENTS_TABLE_NAME + "` JOIN `" + REVIEWERS_TABLE_NAME +
-                                                                          "` ON " + WOCEEVENTS_TABLE_NAME + ".reviewer_id = " +
-                                                                          REVIEWERS_TABLE_NAME + ".reviewer_id WHERE " +
-                                                                          WOCEEVENTS_TABLE_NAME + ".expocode = ? ORDER BY " +
-                                                                          WOCEEVENTS_TABLE_NAME + ".woce_time " + order);
+                    WOCEEVENTS_TABLE_NAME + "` JOIN `" + REVIEWERS_TABLE_NAME +
+                    "` ON " + WOCEEVENTS_TABLE_NAME + ".reviewer_id = " +
+                    REVIEWERS_TABLE_NAME + ".reviewer_id WHERE " +
+                    WOCEEVENTS_TABLE_NAME + ".expocode = ? ORDER BY " +
+                    WOCEEVENTS_TABLE_NAME + ".woce_time " + order);
             prepStmt.setString(1, expocode);
             ResultSet results = prepStmt.executeQuery();
             try {
@@ -897,7 +894,7 @@ public class DatabaseRequestHandler {
                 results.close();
             }
             prepStmt = catConn.prepareStatement("SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME +
-                                                        "` WHERE `woce_id` = ? ORDER BY `row_num`;");
+                    "` WHERE `woce_id` = ? ORDER BY `row_num`;");
             for (WoceEvent event : eventsList) {
                 // Directly modify the list of locations in the WOCE event
                 ArrayList<DataLocation> locations = event.getLocations();
@@ -932,7 +929,7 @@ public class DatabaseRequestHandler {
         try {
             PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
                     "UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? " +
-                            "WHERE `expocode` = ? AND `woce_flag` = ?;");
+                    "WHERE `expocode` = ? AND `woce_flag` = ?;");
             modifyWocePrepStmt.setString(2, expocode);
 
             modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_GOOD.toString());
@@ -974,8 +971,7 @@ public class DatabaseRequestHandler {
      * @throws SQLException
      *         if modifying the WOCE event in the database throws one
      */
-    public Character restoreWoceEvent(WoceEvent woceEvent)
-            throws IllegalArgumentException, SQLException {
+    public Character restoreWoceEvent(WoceEvent woceEvent) throws IllegalArgumentException, SQLException {
         if ( woceEvent.getId() < 1 )
             throw new IllegalArgumentException("Invalid ID for WOCE event");
 
@@ -1003,8 +999,8 @@ public class DatabaseRequestHandler {
         Connection catConn = makeConnection(true);
         try {
             PreparedStatement prepStmt = catConn.prepareStatement("UPDATE `" +
-                                                                          WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? WHERE " +
-                                                                          "`woce_id` = ? AND `expocode` = ? AND `woce_flag` = ?;");
+                    WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? WHERE " +
+                    "`woce_id` = ? AND `expocode` = ? AND `woce_flag` = ?;");
             prepStmt.setString(1, newFlag.toString());
             prepStmt.setLong(2, woceEvent.getId());
             prepStmt.setString(3, woceEvent.getExpocode());
@@ -1051,7 +1047,7 @@ public class DatabaseRequestHandler {
             // Update the old expocode to the new expocode in the appropriate QC events
             PreparedStatement modifyQcPrepStmt = catConn.prepareStatement(
                     "UPDATE `" + QCEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
-                            "WHERE `expocode` = ? AND `qc_flag` <> ?;");
+                    "WHERE `expocode` = ? AND `qc_flag` <> ?;");
             modifyQcPrepStmt.setString(1, newExpocode);
             modifyQcPrepStmt.setString(2, oldExpocode);
             modifyQcPrepStmt.setString(3, DashboardUtils.QC_RENAMED_FLAG.toString());
@@ -1068,8 +1064,8 @@ public class DatabaseRequestHandler {
             // Add two rename QC events; one for the old expocode and one for the new expocode
             PreparedStatement addQcPrepStmt = catConn.prepareStatement(
                     "INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
-                            "`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
-                            "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+                    "`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
             addQcPrepStmt.setString(1, DashboardUtils.QC_RENAMED_FLAG.toString());
             addQcPrepStmt.setString(8, DashboardUtils.QC_RENAMED_FLAG.toString());
             addQcPrepStmt.setString(15, DashboardUtils.QC_COMMENT.toString());
@@ -1096,7 +1092,7 @@ public class DatabaseRequestHandler {
             // Update the old expocode to the new expocode in the appropriate WOCE events
             PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
                     "UPDATE `" + WOCEEVENTS_TABLE_NAME + "` SET `expocode` = ? " +
-                            "WHERE `expocode` = ? AND `woce_flag` <> ?;");
+                    "WHERE `expocode` = ? AND `woce_flag` <> ?;");
             modifyWocePrepStmt.setString(1, newExpocode);
             modifyWocePrepStmt.setString(2, oldExpocode);
             modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_RENAME.toString());
@@ -1104,9 +1100,9 @@ public class DatabaseRequestHandler {
 
             // Add two rename WOCE events; one for the old expocode and one for the new expocode
             PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" +
-                                                                                 WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
-                                                                                 "`expocode`, `socat_version`, `reviewer_id`, `woce_comment`) " +
-                                                                                 "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+                    WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
+                    "`expocode`, `socat_version`, `reviewer_id`, `woce_comment`) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
             addWocePrepStmt.setString(1, SocatTypes.WOCE_CO2_WATER.getVarName());
             addWocePrepStmt.setString(8, SocatTypes.WOCE_CO2_WATER.getVarName());
             addWocePrepStmt.setString(2, DashboardUtils.WOCE_RENAME.toString());
@@ -1142,18 +1138,18 @@ public class DatabaseRequestHandler {
         try {
             // Remove any QC events for this cruise version
             PreparedStatement deleteQcPrepStmt = catConn.prepareStatement("DELETE FROM `" +
-                                                                                  QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `socat_version` = ?;");
+                    QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `socat_version` = ?;");
             deleteQcPrepStmt.setString(1, expocode);
             deleteQcPrepStmt.setString(2, socatVersion);
             deleteQcPrepStmt.executeUpdate();
 
             // Remove any WOCE events and associated locations for this cruise version
             PreparedStatement deleteWoceLocPrepStmt = catConn.prepareStatement("DELETE FROM `" +
-                                                                                       WOCEEVENTS_TABLE_NAME + "`, `" + WOCELOCATIONS_TABLE_NAME + "` USING `" +
-                                                                                       WOCEEVENTS_TABLE_NAME + "` JOIN `" + WOCELOCATIONS_TABLE_NAME + "` ON " +
-                                                                                       WOCEEVENTS_TABLE_NAME + ".woce_id = " + WOCELOCATIONS_TABLE_NAME + ".woce_id WHERE " +
-                                                                                       WOCEEVENTS_TABLE_NAME + ".expocode = ? AND " +
-                                                                                       WOCEEVENTS_TABLE_NAME + ".socat_version = ?;");
+                    WOCEEVENTS_TABLE_NAME + "`, `" + WOCELOCATIONS_TABLE_NAME + "` USING `" +
+                    WOCEEVENTS_TABLE_NAME + "` JOIN `" + WOCELOCATIONS_TABLE_NAME + "` ON " +
+                    WOCEEVENTS_TABLE_NAME + ".woce_id = " + WOCELOCATIONS_TABLE_NAME + ".woce_id WHERE " +
+                    WOCEEVENTS_TABLE_NAME + ".expocode = ? AND " +
+                    WOCEEVENTS_TABLE_NAME + ".socat_version = ?;");
             deleteWoceLocPrepStmt.setString(1, expocode);
             deleteWoceLocPrepStmt.setString(2, socatVersion);
             deleteWoceLocPrepStmt.executeUpdate();
