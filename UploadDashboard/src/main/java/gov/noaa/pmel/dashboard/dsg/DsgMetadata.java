@@ -104,7 +104,7 @@ public class DsgMetadata {
         }
         else if ( dtype instanceof IntDashDataType ) {
             if ( value == null )
-                newValue = DashboardUtils.INT_MISSING_VALUE);
+                newValue = DashboardUtils.INT_MISSING_VALUE;
             else if ( value instanceof Integer )
                 newValue = value;
             else

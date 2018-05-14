@@ -56,8 +56,8 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
      *         the dashboard dataset with data to set;
      *         the given dashboard dataset with data (not a copy) is assigned to this instance
      */
-    public void setDatasetData(DashboardDatasetData cruiseData) {
-        this.datasetData = cruiseData;
+    public void setDatasetData(DashboardDatasetData datasetData) {
+        this.datasetData = datasetData;
     }
 
     @Override

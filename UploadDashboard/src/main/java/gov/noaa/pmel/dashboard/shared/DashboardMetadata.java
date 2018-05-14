@@ -257,7 +257,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
         if ( selected != other.selected )
             return false;
-        if ( datasetId != other.datasetId )
+        if ( ! datasetId.equals(other.datasetId) )
             return false;
         if ( ! filename.equals(other.filename) )
             return false;

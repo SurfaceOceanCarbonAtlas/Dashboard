@@ -33,7 +33,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected String archiveDate;
     protected String uploadFilename;
     protected String uploadTimestamp;
-    protected String doi;
+    protected String origDoi;
+    protected String enhancedDoi;
     protected int numDataRows;
     protected int numErrorRows;
     protected int numWarnRows;
@@ -61,7 +62,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
         archiveDate = DashboardUtils.STRING_MISSING_VALUE;
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
         uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
-        doi = DashboardUtils.STRING_MISSING_VALUE;
+        origDoi = DashboardUtils.STRING_MISSING_VALUE;
+        enhancedDoi = DashboardUtils.STRING_MISSING_VALUE;
         numDataRows = 0;
         numErrorRows = 0;
         numWarnRows = 0;
@@ -230,8 +232,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the QC submission status;
-     * never null but may be {@link #STATUS_NOT_SUBMITTED} if not assigned
+     * @return the submission status;
+     * never null but may be {@link DashboardUtils#STATUS_NOT_SUBMITTED} if not assigned
      */
     public String getSubmitStatus() {
         return submitStatus;
@@ -239,14 +241,14 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param submitStatus
-     *         the  QC submission status (after trimming) to set;
-     *         if null, {@link #QC_STATUS_NOT_SUBMITTED} is assigned
+     *         the  submission status (after trimming) to set;
+     *         if null, {@link DashboardUtils#STATUS_NOT_SUBMITTED} is assigned
      */
-    public void setSubmitStatus(String qcStatus) {
-        if ( qcStatus == null )
+    public void setSubmitStatus(String submitStatus) {
+        if ( submitStatus == null )
             this.submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
         else
-            this.submitStatus = qcStatus.trim();
+            this.submitStatus = submitStatus.trim();
     }
 
     /**
@@ -258,7 +260,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @param submitStatus
+     * @param archiveStatus
      *         the archive submission status (after trimming) to set;
      *         if null, {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} is assigned
      */
@@ -333,20 +335,40 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return the DOI of the original data document;
      * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
-    public String getDoi() {
-        return doi;
+    public String getOrigDoi() {
+        return origDoi;
     }
 
     /**
-     * @param doi
+     * @param origDoi
      *         the DOI (after trimming) of the original data document to set;
      *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
-    public void setDoi(String doi) {
-        if ( doi == null )
-            this.doi = DashboardUtils.STRING_MISSING_VALUE;
+    public void setOrigDoi(String origDoi) {
+        if ( origDoi == null )
+            this.origDoi = DashboardUtils.STRING_MISSING_VALUE;
         else
-            this.doi = doi.trim();
+            this.origDoi = origDoi.trim();
+    }
+
+    /**
+     * @return the DOI of the enhanced data document;
+     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     */
+    public String getEnhancedDoi() {
+        return enhancedDoi;
+    }
+
+    /**
+     * @param enhancedDoi
+     *         the DOI (after trimming) of the enhanced data document to set;
+     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     */
+    public void setEnhancedDoi(String enhancedDoi) {
+        if ( enhancedDoi == null )
+            this.enhancedDoi = DashboardUtils.STRING_MISSING_VALUE;
+        else
+            this.enhancedDoi = enhancedDoi.trim();
     }
 
     /**
@@ -495,7 +517,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
         result = result * prime + archiveDate.hashCode();
         result = result * prime + uploadFilename.hashCode();
         result = result * prime + uploadTimestamp.hashCode();
-        result = result * prime + doi.hashCode();
+        result = result * prime + origDoi.hashCode();
+        result = result * prime + enhancedDoi.hashCode();
         result = result * prime + Integer.hashCode(numDataRows);
         result = result * prime + Integer.hashCode(numErrorRows);
         result = result * prime + Integer.hashCode(numWarnRows);
@@ -541,7 +564,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
             return false;
         if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
             return false;
-        if ( ! doi.equals(other.doi) )
+        if ( ! origDoi.equals(other.origDoi) )
+            return false;
+        if ( ! enhancedDoi.equals(other.enhancedDoi) )
             return false;
         if ( numDataRows != other.numDataRows )
             return false;
@@ -563,7 +588,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     @Override
     public String toString() {
         return "DashboardDataset" +
-                "[ selected=" + Boolean.toString(selected) +
+                "[\n    selected=" + Boolean.toString(selected) +
                 ",\n    version = " + version +
                 ",\n    owner=" + owner +
                 ",\n    datasetId=" + datasetId +
@@ -575,7 +600,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ",\n    archiveDate=" + archiveDate +
                 ",\n    uploadFilename=" + uploadFilename +
                 ",\n    uploadTimestamp=" + uploadTimestamp +
-                ",\n    doi=" + doi +
+                ",\n    origDoi=" + origDoi +
+                ",\n    enhancedDoi=" + enhancedDoi +
                 ",\n    numDataRows=" + Integer.toString(numDataRows) +
                 ",\n    numErrorRows=" + Integer.toString(numErrorRows) +
                 ",\n    numWarnRows=" + Integer.toString(numWarnRows) +
@@ -583,7 +609,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ",\n    dataColTypes=" + dataColTypes.toString() +
                 ";\n    checkerFlags = " + checkerFlags.toString() +
                 ";\n    userFlags = " + userFlags.toString() +
-                " ]";
+                "\n]";
     }
 
     /**

@@ -79,7 +79,7 @@ public class DataUploadPage extends CompositeWithUsername {
             "  <li>20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...</li>" +
             "  <li>20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...</li>" +
             "  <li>20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...</li>" +
-            "</ul>
+            "</ul>" +
             "The 12 character expocode is the " +
             "<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
             "for the vessel carrying the instrumentation followed by the " +

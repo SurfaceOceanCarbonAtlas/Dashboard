@@ -1,7 +1,7 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.datatype;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 

@@ -107,19 +107,12 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
 
     @Override
     public String toString() {
-        return "DataQCEvent" +
-                "[\n    id=" + id.toString() +
-                ",\n    flagDate=" + flagDate.toString() +
-                ",\n    flagName=" + flagName +
-                ",\n    flagValue='" + flagValue + "'" +
-                ",\n    datasetId=" + datasetId +
-                ",\n    version=" + version +
-                ",\n    username=" + username +
-                ",\n    realname=" + realname +
-                ",\n    comment=" + comment +
-                ",\n    varName=" + varName +
-                ",\n    locations=" + locations.toString() +
-                "]";
+        String repr = "Data" + super.toString();
+        repr = repr.substring(0, repr.length() - 2);
+        repr += ";\n    varName=" + varName +
+                ";\n    locations=" + locations.toString() +
+                "\n]";
+        return repr;
     }
 
 }

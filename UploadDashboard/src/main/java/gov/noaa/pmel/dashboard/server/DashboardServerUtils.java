@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.server;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,8 @@ import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 /**
  * @author Karl Smith
@@ -32,38 +35,54 @@ public class DashboardServerUtils {
     public static final int MAX_DATASET_ID_LENGTH = 14;
 
     /**
-     * Sanity Checker "username" for flags
+     * Automated data checker "username" for flags
      */
-    public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
+    public static final String AUTOMATED_DATA_CHECKER_USERNAME = "automated.data.checker";
 
     /**
-     * Sanity Checker "realname" for flags
+     * Automated data checker "realname" for flags
      */
-    public static final String SANITY_CHECKER_REALNAME = "automated data checker";
+    public static final String AUTOMATED_DATA_CHECKER_REALNAME = "automated data checker";
+
+    /**
+     * Dataset QC flag name
+     */
+    public static final String DATASET_QC_FLAG_NAME = "dataset";
+
+    /**
+     * QC flag value for a new dataset
+     */
+    public static final String NEW_DATASET_QC_FLAG = "N";
+
+    /**
+     * QC flag value for an updated dataset
+     */
+    public static final String UPDATED_DATASET_QC_FLAG = "U";
+
+    /**
+     * QC flag value for a renamed dataset
+     */
+    public static final String RENAMED_DATASET_QC_FLAG = "R";
 
     /**
      * General-purpose flag value for acceptable data
      */
-    public static final Character FLAG_ACCEPTABLE = '2';
+    public static final String FLAG_ACCEPTABLE = "2";
 
     /**
      * WOCE-type flag value for questionable data
      */
-    public static final Character WOCE_QUESTIONABLE = '3';
+    public static final String WOCE_QUESTIONABLE = "3";
 
     /**
      * WOCE-type flag value for bad data
      */
-    public static final Character WOCE_BAD = '4';
+    public static final String WOCE_BAD = "4";
 
     // flags for QC/WOCE events of datasets that has been updated
-    public static final Character OLD_FLAG_ACCEPTABLE = 'G';
-    public static final Character OLD_WOCE_QUESTIONABLE = 'Q';
-    public static final Character OLD_WOCE_BAD = 'B';
-
-    // flag and variable name for dataset rename events
-    public static final Character FLAG_RENAME = 'R';
-    public static final String RENAME_VARNAME = "Rename";
+    public static final String OLD_FLAG_ACCEPTABLE = "G";
+    public static final String OLD_WOCE_QUESTIONABLE = "Q";
+    public static final String OLD_WOCE_BAD = "B";
 
     /**
      * Authalic radius, in kilometers, of Earth
@@ -326,7 +345,7 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Pattern for {@link #getDatasetIDFromName(string)}
+     * Pattern for {@link #getDatasetIDFromName(String)}
      */
     private static final Pattern datasetIdStripPattern = Pattern.compile("[^\\p{javaUpperCase}\\p{Digit}-]+");
 
@@ -345,7 +364,7 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Pattern for {@link #getKeyForName(string)}
+     * Pattern for {@link #getKeyForName(String)}
      */
     private static final Pattern keyStripPattern = Pattern.compile("[^\\p{javaUpperCase}\\p{Digit}]+");
 
@@ -500,7 +519,7 @@ public class DashboardServerUtils {
                     throw new IllegalArgumentException("flag name not enclosed in double quotes");
                 String flagName = flagParts[4].substring(firstIndex+1, lastIndex);
 
-                flagSet.add(new QCFlag(flagName, flagValue.charAt(0), severity, colIndex, rowIndex));
+                flagSet.add(new QCFlag(flagName, flagValue, severity, colIndex, rowIndex));
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " + ex.getMessage(), ex);
             }
@@ -543,7 +562,7 @@ public class DashboardServerUtils {
 
     /**
      * Returns the approximate distance between two locations.  Uses the
-     * haversine formula, and {@link DashboardUtils#EARTH_AUTHALIC_RADIUS}
+     * haversine formula, and {@link #EARTH_AUTHALIC_RADIUS}
      * for the radius of a spherical Earth, to compute the great circle
      * distance between the two locations.
      *
@@ -551,9 +570,9 @@ public class DashboardServerUtils {
      *         longitude, in decimal degrees east, of the first data location
      * @param lat
      *         latitude, in decimal degrees north, of the first data location
-     * @param otherlon
+     * @param otherLon
      *         longitude, in decimal degrees east, of the other data location
-     * @param otherlat
+     * @param otherLat
      *         latitude, in decimal degrees north, of the other data location
      * @return the approximate distance, in kilometers, between the two locations
      */
@@ -580,9 +599,9 @@ public class DashboardServerUtils {
 
     /**
      * Returns the location-time "distance" between two location-time point.
-     * Uses {@link DashboardUtils#SEAWATER_SPEED} for converting differences
+     * Uses {@link #SEAWATER_SPEED} for converting differences
      * in time into a "distance".  Uses the haversine formula, and
-     * {@link DashboardUtils#EARTH_AUTHALIC_RADIUS} for the radius of a
+     * {@link #EARTH_AUTHALIC_RADIUS} for the radius of a
      * spherical Earth, to compute the great circle distance from the
      * longitudes and latitudes.
      *
@@ -592,9 +611,9 @@ public class DashboardServerUtils {
      *         latitude, in decimal degrees north, of the first data location
      * @param time
      *         time, in seconds since Jan 1, 1970 00:00:00, of the first data location
-     * @param otherlon
+     * @param otherLon
      *         longitude, in decimal degrees east, of the other data location
-     * @param otherlat
+     * @param otherLat
      *         latitude, in decimal degrees north, of the other data location
      * @param otherTime
      *         time, in seconds since Jan 1, 1970 00:00:00, of the other data location

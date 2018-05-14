@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -78,7 +77,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
      *         if the variable name is null or blank
      */
     public DataColumnType(String varName, Double sortOrder, String displayName,
-            String description, boolean isCritical, Collection<String> units)
+            String description, boolean isCritical, ArrayList<String> units)
                                             throws IllegalArgumentException {
         if ( (varName == null) || varName.trim().isEmpty() )
             throw new IllegalArgumentException("data type variable name is invalid");
@@ -137,9 +136,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @param varName
-     *         the variable name to set for this of this data column type;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     * @param sortOrder
+     *         the sort order value to set for this of this data column type;
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setSortOrder(Double sortOrder) {
         if ( sortOrder != null ) {
@@ -193,7 +192,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @return if this data column type is required to be present and valid
+     * @return if this data column type is required to be present and all its data values be valid
      */
     public boolean isCritical() {
         return isCritical;
@@ -201,7 +200,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param isCritical
-     *         set if this data column type is required to be present and valid
+     *         set if this data column type is required to be present and all its data values be valid
      */
     public void setCritical(boolean isCritical) {
         this.isCritical = isCritical;
@@ -221,7 +220,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
      *         the list of units to associate with this data column type (copied);
      *         if null or empty, a copy of {@link DashboardUtils#NO_UNITS} is assigned.
      */
-    public void setUnits(Collection<String> units) {
+    public void setUnits(ArrayList<String> units) {
         if ( (units != null) && (units.size() > 0) ) {
             this.units = new ArrayList<String>(units);
         }
@@ -236,7 +235,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
      */
     public Integer getSelectedUnitIndex() {
         if ( (selectedUnitIndex < 0) || (selectedUnitIndex >= units.size()) )
-            return 0;
+            return Integer.valueOf(0);
         return selectedUnitIndex;
     }
 
@@ -313,8 +312,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
      * Checks if the variable or displayed name of this data column type is equal,
      * ignoring case and non-alphanumeric characters, to the given name.
      *
-     * @param other
-     *         data column type to compare to
+     * @param name
+     *         data column name to compare to
      * @return whether the type names match
      */
     public boolean typeNameEquals(String name) {

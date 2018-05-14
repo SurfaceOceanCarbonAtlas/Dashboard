@@ -29,7 +29,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     protected String flagName;
-    protected Character flagValue;
+    protected String flagValue;
     protected Severity severity;
     protected Integer columnIndex;
     protected Integer rowIndex;
@@ -38,14 +38,15 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     /**
      * Create with a
      *         flagName of {@link DashboardUtils#STRING_MISSING_VALUE},
-     *         flagValue of {@link DashboardUtils#CHAR_MISSING_VALUE}, and
+     *         flagValue of {@link DashboardUtils#STRING_MISSING_VALUE},
+     *         severity of {@link Severity#UNASSIGNED},
      *         column of {@link DashboardUtils#INT_MISSING_VALUE},
-     *         row of {@link DashboardUtils#INT_MISSING_VALUE},
-     *         comment of {@link DashboardUtils#STRING_MISSING_VALUE},
+     *         row of {@link DashboardUtils#INT_MISSING_VALUE}, and
+     *         comment of {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCFlag() {
         flagName = DashboardUtils.STRING_MISSING_VALUE;
-        flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+        flagValue = DashboardUtils.STRING_MISSING_VALUE;
         severity = Severity.UNASSIGNED;
         columnIndex = DashboardUtils.INT_MISSING_VALUE;
         rowIndex = DashboardUtils.INT_MISSING_VALUE;
@@ -59,7 +60,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
      * and {@link #setRowIndex(Integer)}.
      * The comment is set to {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
-    public QCFlag(String flagName, Character flagValue, Severity severity,
+    public QCFlag(String flagName, String flagValue, Severity severity,
             Integer columnIndex, Integer rowIndex) {
         setFlagName(flagName);
         setFlagValue(flagValue);
@@ -91,22 +92,22 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @return the QC flag value;
-     * never null but may be {@link DashboardUtils#CHAR_MISSING_VALUE} if not assigned
+     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
-    public Character getFlagValue() {
+    public String getFlagValue() {
         return flagValue;
     }
 
     /**
      * @param flagValue
      *         the QC flag value to set;
-     *         if null, {@link DashboardUtils#CHAR_MISSING_VALUE} will be assigned
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} will be assigned
      */
-    public void setFlagValue(Character flagValue) {
+    public void setFlagValue(String flagValue) {
         if ( flagValue != null )
             this.flagValue = flagValue;
         else
-            this.flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+            this.flagValue = DashboardUtils.STRING_MISSING_VALUE;
     }
 
     /**
@@ -138,7 +139,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @param column
+     * @param columnIndex
      *         the index of the column to set for this QC flag;
      *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
      */
@@ -158,7 +159,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @param row
+     * @param rowIndex
      *         the index of the row to set for this QC flag;
      *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
      */
@@ -255,7 +256,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     public String toString() {
         return "QCFlag[" +
                "flagName=" + flagName + ", " +
-               "flagValue='" + flagValue.toString() + "', " +
+               "flagValue='" + flagValue + "', " +
                "severity='" + severity.toString() +  "', " +
                "column=" + columnIndex.toString() + ", " +
                "row=" + rowIndex.toString() +  ", " +

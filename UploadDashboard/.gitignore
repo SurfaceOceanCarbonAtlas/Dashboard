@@ -1,12 +1,14 @@
+.classpath
+.project
+.settings/
 .idea/
+*.iml
 SocatUploadDashboard/
 classes/
 deploy/
 gwt-unitCache/
-target/
 test-classes/
 gwt-servlet.jar
 gwt-user.jar
 omemetadata.jar
-sanitychecker.jar
-*.iml
+target/

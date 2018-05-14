@@ -25,8 +25,6 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
  */
 public class VersionedFileHandler {
 
-    // File to write commit command to - when not actually performing the commits
-    private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
     // Check every 15 seconds
     private static final long MILLISECONDS_CHECK_INTERVAL = 15 * 1000L;
     // Keep working while less than 3 seconds have passed
@@ -102,11 +100,12 @@ public class VersionedFileHandler {
         }
     }
 
+    // File to write commit command to - when not actually performing the commits
+    private static final String SVN_COMMIT_COMMANDS_FILENAME = "svn_commit_commands.sh";
     /**
      * Periodically checks the queue of files to be committed, and
      * commits any files present.  Stops when filesDir is set to null.
      */
-    private static final String SVN_COMMIT_COMMANDS_FILENAME = "svn_commit_commands.sh";
     private void watchCommitQueue() {
         if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
             throw new NullPointerException("watchCommitQueue called for VersionedFileHandler that is not version controlled");

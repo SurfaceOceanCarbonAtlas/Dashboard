@@ -40,7 +40,6 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
-import gov.noaa.pmel.dashboard.handlers.RawUploadFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -119,7 +118,6 @@ public class DashboardConfigStore {
     private String qcVersion;
     private UserFileHandler userFileHandler;
     private DataFileHandler dataFileHandler;
-    private RawUploadFileHandler rawUploadFileHandler;
     private CheckerMessageHandler checkerMsgHandler;
     private MetadataFileHandler metadataFileHandler;
     private ArchiveFilesBundler archiveFilesBundler;
@@ -365,16 +363,6 @@ public class DashboardConfigStore {
                     ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the raw upload files directory name
-        try {
-            propVal = getFilePathProperty(configProps, RAW_UPLOAD_FILES_DIR_NAME_TAG, appConfigDir);
-            rawUploadFileHandler = new RawUploadFileHandler(propVal, svnUsername, svnPassword);
-        } catch ( Exception ex ) {
-            throw new IOException("Invalid " + RAW_UPLOAD_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-        }
-
         // Read the metadata files directory name
         try {
             propVal = getFilePathProperty(configProps, METADATA_FILES_DIR_NAME_TAG, appConfigDir);
@@ -549,7 +537,7 @@ public class DashboardConfigStore {
             if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
                 continue;
             username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
-            username = DashboardUtils.cleanUsername(username);
+            username = DashboardServerUtils.cleanUsername(username);
             DashboardUserInfo userInfo;
             try {
                 userInfo = new DashboardUserInfo(username);
@@ -782,13 +770,6 @@ public class DashboardConfigStore {
     }
 
     /**
-     * @return the handler for the raw upload files
-     */
-    public RawUploadFileHandler getRawUploadFileHandler() {
-        return rawUploadFileHandler;
-    }
-
-    /**
      * @return the handler for automated data checker messages
      */
     public CheckerMessageHandler getCheckerMsgHandler() {
@@ -889,7 +870,7 @@ public class DashboardConfigStore {
     public boolean validateUser(String username) {
         if ( (username == null) || username.isEmpty() )
             return false;
-        String name = DashboardUtils.cleanUsername(username);
+        String name = DashboardServerUtils.cleanUsername(username);
         DashboardUserInfo userInfo = userInfoMap.get(name);
         if ( userInfo == null )
             return false;
@@ -912,10 +893,10 @@ public class DashboardConfigStore {
      * @return true if username is an authorized user and has manager privileges over othername
      */
     public boolean userManagesOver(String username, String othername) {
-        DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
+        DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));
         if ( userInfo == null )
             return false;
-        return userInfo.managesOver(userInfoMap.get(DashboardUtils.cleanUsername(othername)));
+        return userInfo.managesOver(userInfoMap.get(DashboardServerUtils.cleanUsername(othername)));
     }
 
     /**
@@ -925,7 +906,7 @@ public class DashboardConfigStore {
      * (regardless of whether there is anyone else in the group)
      */
     public boolean isManager(String username) {
-        DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
+        DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));
         if ( userInfo == null )
             return false;
         return userInfo.isManager();
@@ -937,7 +918,7 @@ public class DashboardConfigStore {
      * @return true is this user is an admin
      */
     public boolean isAdmin(String username) {
-        DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
+        DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));
         if ( userInfo == null )
             return false;
         return userInfo.isAdmin();

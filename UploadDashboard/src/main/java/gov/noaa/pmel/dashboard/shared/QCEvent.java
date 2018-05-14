@@ -21,9 +21,9 @@ public class QCEvent implements Serializable, IsSerializable {
     protected Long id;
     protected Date flagDate;
     protected String flagName;
-    protected Character flagValue;
+    protected String flagValue;
     protected String datasetId;
-    protected Character regionId;
+    protected String regionId;
     protected String version;
     protected String username;
     protected String realname;
@@ -31,15 +31,15 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * Creates an empty QC event where id is zero, the flag date is
-     * {@link DashboardUtils#DATE_MISSING_VALUE}, the flag value is
-     * {@link DashboardUtils#CHAR_MISSING_VALUE}, and all other values
+     * {@link DashboardUtils#DATE_MISSING_VALUE}, the region ID is
+     * {@link DashboardUtils#GLOBAL_REGION_ID}, and all other values
      * (strings) are {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCEvent() {
         id = 0L;
         flagDate = DashboardUtils.DATE_MISSING_VALUE;
         flagName = DashboardUtils.STRING_MISSING_VALUE;
-        flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+        flagValue = DashboardUtils.STRING_MISSING_VALUE;
         datasetId = DashboardUtils.STRING_MISSING_VALUE;
         regionId = DashboardUtils.GLOBAL_REGION_ID;
         version = DashboardUtils.STRING_MISSING_VALUE;
@@ -111,7 +111,7 @@ public class QCEvent implements Serializable, IsSerializable {
      * @return the QC flag value;
      * never null, but may be {@link DashboardUtils#CHAR_MISSING_VALUE}
      */
-    public Character getFlagValue() {
+    public String getFlagValue() {
         return flagValue;
     }
 
@@ -120,9 +120,9 @@ public class QCEvent implements Serializable, IsSerializable {
      *         the QC flag value to set;
      *         if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
      */
-    public void setFlagValue(Character flagValue) {
+    public void setFlagValue(String flagValue) {
         if ( flagValue == null )
-            this.flagValue = DashboardUtils.CHAR_MISSING_VALUE;
+            this.flagValue = DashboardUtils.STRING_MISSING_VALUE;
         else
             this.flagValue = flagValue;
     }
@@ -150,7 +150,7 @@ public class QCEvent implements Serializable, IsSerializable {
     /**
      * @return the region ID; never null
      */
-    public Character getRegionId() {
+    public String getRegionId() {
         return regionId;
     }
 
@@ -159,7 +159,7 @@ public class QCEvent implements Serializable, IsSerializable {
      *         the regionId to set;
      *         if null, {@link DashboardUtils#GLOBAL_REGION_ID} is assigned
      */
-    public void setRegionId(Character regionId) {
+    public void setRegionId(String regionId) {
         if ( regionId == null )
             this.regionId = DashboardUtils.GLOBAL_REGION_ID;
         else
@@ -298,16 +298,16 @@ public class QCEvent implements Serializable, IsSerializable {
     public String toString() {
         return "QCEvent" +
                 "[\n    id=" + id.toString() +
-                ",\n    flagDate=" + flagDate.toString() +
-                ",\n    flagName=" + flagName +
-                ",\n    flagValue='" + flagValue + "'" +
-                ",\n    datasetId=" + datasetId +
-                ",\n    regionId=" + regionId +
-                ",\n    version=" + version +
-                ",\n    username=" + username +
-                ",\n    realname=" + realname +
-                ",\n    comment=" + comment +
-                "]";
+                ";\n    flagDate=" + flagDate.toString() +
+                ";\n    flagName=" + flagName +
+                ";\n    flagValue=" + flagValue +
+                ";\n    datasetId=" + datasetId +
+                ";\n    regionId=" + regionId +
+                ";\n    version=" + version +
+                ";\n    username=" + username +
+                ";\n    realname=" + realname +
+                ";\n    comment=" + comment +
+                "\n]";
     }
 
 }

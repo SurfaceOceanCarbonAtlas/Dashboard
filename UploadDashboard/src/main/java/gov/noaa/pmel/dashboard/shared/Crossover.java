@@ -286,15 +286,15 @@ public class Crossover implements Serializable, IsSerializable {
 
         Crossover other = (Crossover) obj;
 
-        if ( !Arrays.equals(datasetIds, other.datasetIds) )
+        if ( ! Arrays.equals(datasetIds, other.datasetIds) )
             return false;
-        if ( !Arrays.equals(rowNumsAtMin, other.rowNumsAtMin) )
+        if ( ! Arrays.equals(rowNumsAtMin, other.rowNumsAtMin) )
             return false;
-        if ( !Arrays.equals(datasetMaxTimes, other.datasetMaxTimes) )
+        if ( ! Arrays.equals(datasetMaxTimes, other.datasetMaxTimes) )
             return false;
-        if ( !Arrays.equals(datasetMinTimes, other.datasetMinTimes) )
+        if ( ! Arrays.equals(datasetMinTimes, other.datasetMinTimes) )
             return false;
-        if ( !Arrays.equals(timesAtMin, other.timesAtMin) )
+        if ( ! Arrays.equals(timesAtMin, other.timesAtMin) )
             return false;
 
         if ( minDistance == null ) {

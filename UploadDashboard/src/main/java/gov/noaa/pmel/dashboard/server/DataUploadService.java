@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +27,6 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.RawUploadFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -41,6 +42,32 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 public class DataUploadService extends HttpServlet {
 
     private static final long serialVersionUID = 1547524322159252520L;
+
+    // Patterns for getting the PI name(s) from the metadata preamble
+    private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
+            Pattern.compile("Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("PI\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+    };
+
+    // Patterns for getting the platform name from the metadata preamble
+    private static final Pattern[] PLATFORM_NAME_PATTERNS = new Pattern[] {
+            Pattern.compile("Platform\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Platform\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+    };
+
+    // Patterns for getting the platform type from the metadata preamble
+    private static final Pattern[] PLATFORM_TYPE_PATTERNS = new Pattern[] {
+            Pattern.compile("Platform\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+    };
+
 
     private ServletFileUpload datafileUpload;
 
@@ -73,7 +100,7 @@ public class DataUploadService extends HttpServlet {
 
         String username = null;
         try {
-            username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
+            username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
         } catch (Exception ex) {
             ; // leave username null for error message later
         }
@@ -141,7 +168,6 @@ public class DataUploadService extends HttpServlet {
              (action == null)   || (timestamp == null)  || ( ! configStore.validateUser(username) ) ||
              ! ( action.equals(DashboardUtils.PREVIEW_REQUEST_TAG) ||
                  action.equals(DashboardUtils.NEW_DATASETS_REQUEST_TAG) ||
-                 action.equals(DashboardUtils.APPEND_DATASETS_REQUEST_TAG) ||
                  action.equals(DashboardUtils.OVERWRITE_DATASETS_REQUEST_TAG) ) ) {
             for ( FileItem item : datafiles )
                 item.delete();
@@ -195,16 +221,12 @@ public class DataUploadService extends HttpServlet {
         }
 
         DataFileHandler datasetHandler = configStore.getDataFileHandler();
-        RawUploadFileHandler rawFileHandler = configStore.getRawUploadFileHandler();
 
         // List of all messages to be returned to the client
         ArrayList<String> messages = new ArrayList<String>(datafiles.size());
 
         // Set of IDs for successfully processed datasets
         TreeSet<String> successes = new TreeSet<String>();
-
-        // create the directory to hold uploads now, in case there are multiple files in the upload.
-        File rawUploadsDir = rawFileHandler.createUploadTargetDir(username);
 
         for ( FileItem item : datafiles ) {
             // Get the datasets from this file
@@ -219,13 +241,6 @@ public class DataUploadService extends HttpServlet {
                 messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
                 item.delete();
                 continue;
-            }
-
-            try {
-                rawFileHandler.writeItem(item, rawUploadsDir);
-            } catch (Exception ex) {
-                // TODO: log error, notify admin?
-                ex.printStackTrace();
             }
 
             // done with the uploaded data file

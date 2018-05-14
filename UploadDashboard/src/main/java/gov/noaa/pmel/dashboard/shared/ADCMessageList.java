@@ -59,7 +59,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
     }
 
     /**
-     * @param dataset
+     * @param datasetId
      *         the dataset to set;
      *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
@@ -117,9 +117,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
             return false;
         if ( ! summaries.equals(other.summaries) )
             return false;
-        if ( ! super.equals(other) )
-            return false;
-        return true;
+        return super.equals(other);
     }
 
     @Override

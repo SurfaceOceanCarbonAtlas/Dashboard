@@ -48,7 +48,7 @@ public class AuthenticateFilter implements Filter {
         // Check for the username used by the dashboard service methods
         String username;
         try {
-            username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
+            username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
         } catch ( Exception ex ) {
             // No user principal or name in old session - unexpected
             username = "";

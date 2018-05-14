@@ -285,12 +285,27 @@ public interface DashboardServicesInterface extends RemoteService {
      * @throws IllegalArgumentException
      *         if authentication failed, if the dataset does
      *         not exist for any of the given IDs, or if submitting
-     *         the dataset failed
+     *         a dataset fails
      */
     void submitDatasetsForQC(String username, HashSet<String> datasetIds,
             String archiveStatus, String localTimestamp, boolean repeatSend)
                     throws IllegalArgumentException;
 
+    /**
+     * Suspends datasets from QC.
+     *
+     * @param username
+     *         name of user making this request - for validation
+     * @param datasetIds
+     *         IDs of the datasets to suspend
+     * @param localTimestamp
+     *         client local timestamp string of this request
+     * @throws IllegalArgumentException
+     *         if authentication failed, if the dataset does
+     *         not exist for any of the given IDs, or if suspending
+     *         a dataset fails
+     */
     void suspendDatasets(String username, HashSet<String> datasetIds, 
                     String localTimestamp) throws IllegalArgumentException;
+
 }

@@ -137,7 +137,7 @@ public class DashboardUtils {
     /**
      * Global region ID; the default region ID for QC events.
      */
-    public static final Character GLOBAL_REGION_ID = 'G';
+    public static final String GLOBAL_REGION_ID = "G";
 
 
     /** For data without any specific units */

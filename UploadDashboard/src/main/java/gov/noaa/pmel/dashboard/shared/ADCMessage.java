@@ -275,13 +275,13 @@ public class ADCMessage implements Serializable, IsSerializable {
             return false;
         ADCMessage other = (ADCMessage) obj;
 
-        if ( severity != other.severity )
+        if ( ! severity.equals(other.severity) )
             return false;
-        if ( rowNumber != other.rowNumber )
+        if ( ! rowNumber.equals(other.rowNumber) )
             return false;
         if ( ! timestamp.equals(other.timestamp) )
             return false;
-        if ( colNumber != other.colNumber )
+        if ( ! colNumber.equals(other.colNumber) )
             return false;
         if ( ! colName.equals(other.colName) )
             return false;

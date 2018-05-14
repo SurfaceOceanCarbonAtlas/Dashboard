@@ -24,9 +24,9 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
- * has a known format, and contains user-provided values needed by the SOCAT
- * database.  Extends DashboardMetadata, but uses
- * {@link uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata}
+ * has a known format, and contains user-provided values needed by the dashboard.
+ * Extends DashboardMetadata, but uses
+ * {@link uk.ac.uea.socat.omemetadata.OmeMetadata}
  * to work with the actual metadata.
  *
  * @author Karl Smith
@@ -689,6 +689,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      * Correctly spelled "anglicized" PI names (that are currently known).
      * Note that these are single PI names only; each name in a multiple-name
      * science group needs to be checked individually.
+     * TODO: create from a configuration file
      */
     private static final HashMap<String,String> PI_NAME_CORRECTIONS;
     static {
@@ -729,6 +730,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * Correctly spelled "anglicized" platform names (that are currently known).
+     * TODO: create from a configuration file
      */
     private static final HashMap<String,String> PLATFORM_NAME_CORRECTIONS =
             new HashMap<String,String>();

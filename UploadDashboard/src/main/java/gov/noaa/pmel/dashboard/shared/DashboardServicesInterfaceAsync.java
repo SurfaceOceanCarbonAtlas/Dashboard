@@ -244,7 +244,7 @@ public interface DashboardServicesInterfaceAsync {
      *         called if authentication failed, or if the appropriate content
      *         for the OME could not be found
      */
-    void getOmeXmlPath(String pageUsername, String datasetId,
+    void getOmeXmlPath(String username, String datasetId,
             String previousId, AsyncCallback<String> callback);
 
     /**
@@ -289,10 +289,25 @@ public interface DashboardServicesInterfaceAsync {
      *         if a dataset does not exist for any of the IDs, or if the
      *         submitting of a dataset or change in archive status failed.
      */
-    void submitDatasetsForQC(String username, HashSet<String> cruiseExpocodes,
+    void submitDatasetsForQC(String username, HashSet<String> datasetIds,
             String archiveStatus, String localTimestamp, boolean repeatSend,
             AsyncCallback<Void> callback);
 
+    /**
+     * Client-side interface for suspending datasets from QC.
+     *
+     * @param username
+     *         name of user making this request - for validation
+     * @param datasetIds
+     *         IDs of datasets to suspend
+     * @param localTimestamp
+     *         client local timestamp string of this request
+     * @param callback
+     *         the callback to make when complete; the onFailure method
+     *         of the callback will be called if authentication failed,
+     *         if a dataset does not exist for any of the IDs, or if the
+     *         suspending of a dataset failed.
+     */
     void suspendDatasets(String username, HashSet<String> datasetIds,
             String localTimestamp, AsyncCallback<Void> callback);
 
