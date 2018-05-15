@@ -3,11 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.TreeSet;
-
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -31,7 +26,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
@@ -42,6 +36,11 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Page for specifying the data column types in a DashboardDatasetData.
@@ -89,29 +88,29 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             "No data columns have been identified which provide a seawater CO<sub>2</sub> value";
     private static final String NO_TIMESTAMP_ERROR_MSG =
             "No data columns have been identified which provide " +
-            "the date and time of each measurement";
+                    "the date and time of each measurement";
     private static final String NO_DATE_ERROR_MSG =
             "No data columns have been identified which provide " +
-            "the date of each measurement";
+                    "the date of each measurement";
     private static final String NO_TIME_ERROR_MSG =
             "No data columns have been identified which provide " +
-            "the time of each measurement";
+                    "the time of each measurement";
     private static final String MISSING_DATE_PIECE_ERROR_MSG =
             "The data columns identified do not completely specify " +
-            "the date of each measurement";
+                    "the date of each measurement";
     private static final String MISSING_TIME_PIECE_ERROR_MSG =
             "The data columns identified do not completely specify " +
-            "the time of each measurement";
+                    "the time of each measurement";
     private static final String MULTIPLE_COLUMN_TYPES_ERROR_MSG =
             "More than one column has the type: ";
 
     private static final String DEFAULT_SECONDS_WARNING_QUESTION =
             "No data columns have been identified providing the seconds " +
-            "for the time of each measurement.  It is strongly recommended " +
-            "that seconds be provided; however, a default value of zero " +
-            "seconds can be added to the data." +
-            "<br />" +
-            "Is this okay?";
+                    "for the time of each measurement.  It is strongly recommended " +
+                    "that seconds be provided; however, a default value of zero " +
+                    "seconds can be added to the data." +
+                    "<br />" +
+                    "Is this okay?";
     private static final String USE_DEFAULT_SECONDS_TEXT = "Yes";
     private static final String NO_DEFAULT_SECONDS_TEXT = "No";
 
@@ -135,25 +134,25 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
     private static final String DATA_NEVER_CHECKED_HTML =
             "<h3>Warning: Data has not been checked.</h3>" +
-            "<p>You will need need to check the data in a dataset before you " +
-            "can submit the dataset for QC.  This data check will identify " +
-            "errors in the data and discover incorrectly identified or unknown " +
-            "data columns.  Although this data check can be run any time before " +
-            "submitting a dataset, we recommend running it immediately after " +
-            "uploading a dataset so that any incorrectly identified or unknown " +
-            "data columns are correctly identified for subsequent dataset " +
-            "uploads.</p>" +
-            "<p>Leave this page without checking the data?</p>";
+                    "<p>You will need need to check the data in a dataset before you " +
+                    "can submit the dataset for QC.  This data check will identify " +
+                    "errors in the data and discover incorrectly identified or unknown " +
+                    "data columns.  Although this data check can be run any time before " +
+                    "submitting a dataset, we recommend running it immediately after " +
+                    "uploading a dataset so that any incorrectly identified or unknown " +
+                    "data columns are correctly identified for subsequent dataset " +
+                    "uploads.</p>" +
+                    "<p>Leave this page without checking the data?</p>";
     private static final String CHANGES_NOT_SAVED_HTML =
             "<h3>Warning: Column settings not saved.</h3>" +
-            "<p>Changes to data column types, units, and missing values are not " +
-            "saved until the data has been checked with this updated data column " +
-            "information.</p>" +
-            "<p>Leave this page and lose the changes you have made?</p>";
+                    "<p>Changes to data column types, units, and missing values are not " +
+                    "saved until the data has been checked with this updated data column " +
+                    "information.</p>" +
+                    "<p>Leave this page and lose the changes you have made?</p>";
     private static final String RETURN_TO_CRUISE_LIST_TEXT = "Yes";
     private static final String STAY_ON_THIS_PAGE_TEXT = "No";
 
-    interface DataColumnSpecsPageUiBinder extends UiBinder<Widget, DataColumnSpecsPage> {
+    interface DataColumnSpecsPageUiBinder extends UiBinder<Widget,DataColumnSpecsPage> {
     }
 
     private static DataColumnSpecsPageUiBinder uiBinder =
@@ -162,18 +161,30 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField HTML introHtml;
-    @UiField DataGrid<ArrayList<String>> dataGrid;
-    @UiField Label pagerLabel;
-    @UiField Label messagesLabel;
-    @UiField SimplePager gridPager;
-    @UiField Button messagesButton;
-    @UiField Button submitButton;
-    @UiField Button cancelButton;
-    @UiField Button saveButton;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    HTML introHtml;
+    @UiField
+    DataGrid<ArrayList<String>> dataGrid;
+    @UiField
+    Label pagerLabel;
+    @UiField
+    Label messagesLabel;
+    @UiField
+    SimplePager gridPager;
+    @UiField
+    Button messagesButton;
+    @UiField
+    Button submitButton;
+    @UiField
+    Button cancelButton;
+    @UiField
+    Button saveButton;
 
     // Popup to confirm continue with default zero seconds
     private DashboardAskPopup defaultSecondsPopup;
@@ -198,8 +209,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     private static DataColumnSpecsPage singleton = null;
 
     /**
-     * Creates an empty cruise data column specification page.
-     * Allows the user to update the data column types for a
+     * Creates an empty cruise data column specification page. Allows the user to update the data column types for a
      * cruise when populated.
      */
     DataColumnSpecsPage() {
@@ -238,25 +248,26 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                 service.getDataWithRowNum(getUsername(), cruise.getDatasetId(),
                         range.getStart(), range.getLength(),
                         new AsyncCallback<ArrayList<ArrayList<String>>>() {
-                    @Override
-                    public void onSuccess(ArrayList<ArrayList<String>> newData) {
-                        int actualStart;
-                        try {
-                            actualStart = IntegerParser.instance().parse(newData.get(0).get(0).trim()) - 1;
-                        } catch (ParseException e) {
-                            actualStart = -1;
-                        }
-                        if ( actualStart < 0 )
-                            actualStart = range.getStart();
-                        updateRowData(actualStart, newData);
-                        UploadDashboard.showAutoCursor();
-                    }
-                    @Override
-                    public void onFailure(Throwable ex) {
-                        UploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
-                        UploadDashboard.showAutoCursor();
-                    }
-                });
+                            @Override
+                            public void onSuccess(ArrayList<ArrayList<String>> newData) {
+                                int actualStart;
+                                try {
+                                    actualStart = IntegerParser.instance().parse(newData.get(0).get(0).trim()) - 1;
+                                } catch ( ParseException e ) {
+                                    actualStart = -1;
+                                }
+                                if ( actualStart < 0 )
+                                    actualStart = range.getStart();
+                                updateRowData(actualStart, newData);
+                                UploadDashboard.showAutoCursor();
+                            }
+
+                            @Override
+                            public void onFailure(Throwable ex) {
+                                UploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
+                                UploadDashboard.showAutoCursor();
+                            }
+                        });
             }
         };
         dataProvider.addDataDisplay(dataGrid);
@@ -265,13 +276,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the cruise data column specifications page for a cruise
-     * with the latest cruise data column specifications from the server.
-     * Adds this page to the page history.
+     * Display the cruise data column specifications page for a cruise with the latest cruise data column specifications
+     * from the server. Adds this page to the page history.
      *
      * @param username
      *         username for this page
-     * @param dataset
+     * @param expocodes
      *         show the specifications for this cruise
      */
     static void showPage(String username, ArrayList<String> expocodes) {
@@ -283,38 +293,38 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         singleton.expocodes.addAll(expocodes);
         UploadDashboard.showWaitCursor();
         service.getDataColumnSpecs(singleton.getUsername(), expocodes.get(0),
-                                new AsyncCallback<TypesDatasetDataPair>() {
-            @Override
-            public void onSuccess(TypesDatasetDataPair cruiseSpecs) {
-                if ( cruiseSpecs != null ) {
-                    UploadDashboard.updateCurrentPage(singleton);
-                    singleton.knownUserTypes.clear();
-                    if ( cruiseSpecs.getAllKnownTypes() != null )
-                        singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
-                    singleton.updateDatasetColumnSpecs(cruiseSpecs.getDatasetData());
-                    History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
-                }
-                else {
-                    UploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG +
-                        " (unexpected null cruise column specificiations)");
-                }
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                new AsyncCallback<TypesDatasetDataPair>() {
+                    @Override
+                    public void onSuccess(TypesDatasetDataPair cruiseSpecs) {
+                        if ( cruiseSpecs != null ) {
+                            UploadDashboard.updateCurrentPage(singleton);
+                            singleton.knownUserTypes.clear();
+                            if ( cruiseSpecs.getAllKnownTypes() != null )
+                                singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
+                            singleton.updateDatasetColumnSpecs(cruiseSpecs.getDatasetData());
+                            History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
+                        }
+                        else {
+                            UploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG +
+                                    " (unexpected null cruise column specificiations)");
+                        }
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -323,21 +333,18 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     }
 
     /**
-     * Updates the data column specification page with the given
-     * column types and data.  Modifies cruiseSpecs in that the
-     * dashboard-generated sample number is inserted at the beginning
-     * of each row of data.
+     * Updates the data column specification page with the given column types and data.  Modifies cruiseSpecs in that
+     * the dashboard-generated sample number is inserted at the beginning of each row of data.
      *
      * @param cruiseSpecs
-     *         current cruise data column type specifications and
-     *         initial cruise data for display
+     *         current cruise data column type specifications and initial cruise data for display
      */
     private void updateDatasetColumnSpecs(DashboardDatasetData cruiseSpecs) {
         userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
         String status = cruiseSpecs.getDataCheckStatus();
         if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-             status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+                status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
             cruiseNeverChecked = true;
             messagesLabel.setText(NOT_CHECKED_MSG);
         }
@@ -390,13 +397,15 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 
         TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
-        for ( QCFlag chkwoce : cruiseSpecs.getCheckerFlags() )
+        for (QCFlag chkwoce : cruiseSpecs.getCheckerFlags()) {
             woceSet.add(new QCFlag(null, null, chkwoce.getSeverity(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+        }
         cruise.setCheckerFlags(woceSet);
 
         woceSet.clear();
-        for ( QCFlag uwoce : cruiseSpecs.getUserFlags() )
+        for (QCFlag uwoce : cruiseSpecs.getUserFlags()) {
             woceSet.add(new QCFlag(null, null, uwoce.getSeverity(), null, uwoce.getRowIndex()));
+        }
         cruise.setUserFlags(woceSet);
 
         cruise.setSubmitStatus(cruiseSpecs.getSubmitStatus());
@@ -411,7 +420,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         if ( cruise.getDataColTypes().size() < 4 )
             throw new IllegalArgumentException(
                     "Unexpected small number of data columns: " +
-                    cruise.getDataColTypes().size());
+                            cruise.getDataColTypes().size());
         int minTableWidth = 2;
         // First column is the dashboard-generated sample number (no header)
         ArrayListTextColumn rowNumColumn = new ArrayListTextColumn(0);
@@ -421,7 +430,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // Rest of the columns are actual data columns
         for (k = 0; k < cruise.getDataColTypes().size(); k++) {
             // TextColumn for displaying the data strings for this column
-            ArrayListTextColumn dataColumn = new ArrayListTextColumn(k+1);
+            ArrayListTextColumn dataColumn = new ArrayListTextColumn(k + 1);
             // DatasetDataColumn for creating the Header cell for this column
             DatasetDataColumn cruiseColumn = new DatasetDataColumn(knownUserTypes, cruise, k);
             // Maintain a reference to the DatasetDataColumn object
@@ -441,7 +450,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         ArrayList<ArrayList<String>> dataWithRowNums = cruiseSpecs.getDataValues();
         ArrayList<Integer> rowNums = cruiseSpecs.getRowNums();
         k = 0;
-        for ( ArrayList<String> dataRow : dataWithRowNums ) {
+        for (ArrayList<String> dataRow : dataWithRowNums) {
             String rowNumStr = rowNums.get(k).toString();
             dataRow.add(0, rowNumStr);
             k++;
@@ -459,7 +468,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     void logoutOnClick(ClickEvent event) {
         // Check if any changes have been made
         boolean hasChanged = false;
-        for ( DatasetDataColumn dataCol : cruiseDataCols ) {
+        for (DatasetDataColumn dataCol : cruiseDataCols) {
             if ( dataCol.hasChanged() ) {
                 hasChanged = true;
                 break;
@@ -482,7 +491,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     void cancelOnClick(ClickEvent event) {
         // Check if any changes have been made
         boolean hasChanged = false;
-        for ( DatasetDataColumn dataCol : cruiseDataCols ) {
+        for (DatasetDataColumn dataCol : cruiseDataCols) {
             if ( dataCol.hasChanged() ) {
                 hasChanged = true;
                 break;
@@ -520,6 +529,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                     UploadDashboard.showAutoCursor();
                     return;
                 }
+
                 @Override
                 public void onFailure(Throwable caught) {
                     // Go to the list of cruises without comment; return to the normal cursor
@@ -555,6 +565,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                     wasLoggingOut = false;
                 }
             }
+
             @Override
             public void onFailure(Throwable ex) {
                 // never called
@@ -570,7 +581,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
     @UiHandler("submitButton")
     void submitOnClick(ClickEvent event) {
-        if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+        if ( !Boolean.TRUE.equals(cruise.isEditable()) ) {
             // Should never get here, but just in case
             UploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
             return;
@@ -600,7 +611,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // can work with for time and date; only the possibility.
         // Similarly with aqueous CO2 and fCO2 recomputations.
         int k = 0;
-        for ( DataColumnType colType : cruise.getDataColTypes() ) {
+        for (DataColumnType colType : cruise.getDataColTypes()) {
             if ( DashboardUtils.UNKNOWN.typeNameEquals(colType) ) {
                 unknownIndices.add(k);
             }
@@ -675,7 +686,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             String errMsg = Integer.toString(unknownIndices.size()) +
                     UNKNOWN_COLUMN_TYPE_PROLOGUE;
             int cnt = 0;
-            for ( int idx : unknownIndices ) {
+            for (int idx : unknownIndices) {
                 cnt++;
                 if ( (cnt == 5) && (unknownIndices.size() > 5) ) {
                     errMsg += "<li> ... </li>";
@@ -687,12 +698,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             UploadDashboard.showMessage(errMsg);
             return;
         }
-        if ( ! hasLongitude ) {
+        if ( !hasLongitude ) {
             // no longitude - error
             UploadDashboard.showMessage(NO_LONGITUDE_ERROR_MSG);
             return;
         }
-        if ( ! hasLatitude ) {
+        if ( !hasLatitude ) {
             // no latitude - error
             UploadDashboard.showMessage(NO_LATITUDE_ERROR_MSG);
             return;
@@ -707,27 +718,27 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         //     UploadDashboard.showMessage(NO_DEPTH_ERROR_MSG);
         //     return;
         // }
-        if ( ! (hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
+        if ( !(hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
             // timestamp completely missing - error
             UploadDashboard.showMessage(NO_TIMESTAMP_ERROR_MSG);
             return;
         }
-        if ( ! (hasYear || hasMonth || hasDay) ) {
+        if ( !(hasYear || hasMonth || hasDay) ) {
             // date completely missing - error
             UploadDashboard.showMessage(NO_DATE_ERROR_MSG);
             return;
         }
-        if ( ! (hasHour || hasMinute) ) {
+        if ( !(hasHour || hasMinute) ) {
             // time completely missing - error
             UploadDashboard.showMessage(NO_TIME_ERROR_MSG);
             return;
         }
-        if ( ! (hasYear && hasMonth && hasDay) ) {
+        if ( !(hasYear && hasMonth && hasDay) ) {
             // incomplete date given - error
             UploadDashboard.showMessage(MISSING_DATE_PIECE_ERROR_MSG);
             return;
         }
-        if ( ! (hasHour && hasMinute) ) {
+        if ( !(hasHour && hasMinute) ) {
             // incomplete time given - error
             UploadDashboard.showMessage(MISSING_TIME_PIECE_ERROR_MSG);
             return;
@@ -736,19 +747,19 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // Make sure there is no more than one of each column types - except OTHER
         HashSet<String> typeSet = new HashSet<String>();
         TreeSet<String> duplicates = new TreeSet<String>();
-        for ( DataColumnType colType : cruise.getDataColTypes() ) {
+        for (DataColumnType colType : cruise.getDataColTypes()) {
             if ( DashboardUtils.OTHER.typeNameEquals(colType) ) {
                 // Multiple OTHER column types are allowed
                 ;
             }
-            else if ( ! typeSet.add(colType.getDisplayName()) ) {
+            else if ( !typeSet.add(colType.getDisplayName()) ) {
                 duplicates.add(colType.getDisplayName());
             }
         }
         if ( duplicates.size() > 0 ) {
             String errMsg = MULTIPLE_COLUMN_TYPES_ERROR_MSG;
             int cnt = 0;
-            for ( String displayName : duplicates ) {
+            for (String displayName : duplicates) {
                 cnt++;
                 if ( (cnt == 5) && (unknownIndices.size() > 5) ) {
                     errMsg += "<li> ... </li>";
@@ -760,7 +771,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             return;
         }
 
-        if ( ! hasSecond ) {
+        if ( !hasSecond ) {
             // Warning about missing seconds, asking whether to continue
             if ( defaultSecondsPopup == null ) {
                 defaultSecondsPopup = new DashboardAskPopup(USE_DEFAULT_SECONDS_TEXT,
@@ -771,6 +782,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                         if ( okay )
                             doSubmit();
                     }
+
                     @Override
                     public void onFailure(Throwable caught) {
                         // never called
@@ -795,55 +807,56 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // the results are then reported back to this page.
         service.updateDataColumnSpecs(getUsername(), cruise,
                 new AsyncCallback<DashboardDatasetData>() {
-            @Override
-            public void onSuccess(DashboardDatasetData specs) {
-                if ( specs == null ) {
-                    UploadDashboard.showMessage(SUBMIT_FAIL_MSG +
-                            " (unexpected null cruise information returned)");
-                    // Show the normal cursor
-                    UploadDashboard.showAutoCursor();
-                    return;
-                }
-                updateDatasetColumnSpecs(specs);
-                String status = specs.getDataCheckStatus();
-                if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-                     status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-                    // the sanity checker had serious problems
-                    UploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
-                }
-                else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
-                    // errors issued
-                    UploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
-                }
-                else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
-                    // warnings issued
-                    UploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
-                }
-                else {
-                    // no problems
-                    UploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
-                }
-                // Show the normal cursor
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
-                // Show the normal cursor
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetData specs) {
+                        if ( specs == null ) {
+                            UploadDashboard.showMessage(SUBMIT_FAIL_MSG +
+                                    " (unexpected null cruise information returned)");
+                            // Show the normal cursor
+                            UploadDashboard.showAutoCursor();
+                            return;
+                        }
+                        updateDatasetColumnSpecs(specs);
+                        String status = specs.getDataCheckStatus();
+                        if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+                                status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+                            // the sanity checker had serious problems
+                            UploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
+                        }
+                        else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
+                            // errors issued
+                            UploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
+                        }
+                        else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+                            // warnings issued
+                            UploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
+                        }
+                        else {
+                            // no problems
+                            UploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
+                        }
+                        // Show the normal cursor
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
+                        // Show the normal cursor
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     @UiHandler("saveButton")
     void saveOnClick(ClickEvent event) {
-        if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+        if ( !Boolean.TRUE.equals(cruise.isEditable()) ) {
             // Should never get here, but just in case
             UploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
             return;
         }
         boolean hasChanged = false;
-        for ( DatasetDataColumn dataCol : cruiseDataCols ) {
+        for (DatasetDataColumn dataCol : cruiseDataCols) {
             if ( dataCol.hasChanged() ) {
                 hasChanged = true;
                 break;
@@ -851,7 +864,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         }
         if ( hasChanged ) {
             doSave();
-        } else {
+        }
+        else {
             UploadDashboard.showMessage("There have been no changes to data column definitions.");
         }
     }
@@ -864,35 +878,38 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // the results are then reported back to this page.
         service.saveDataColumnSpecs(getUsername(), cruise,
                 new AsyncCallback<DashboardDatasetData>() {
-            @Override
-            public void onSuccess(DashboardDatasetData specs) {
-                if ( specs == null ) {
-                    UploadDashboard.showMessage(SAVE_FAIL_MSG + " (unexpected null information returned)");
-                } else {
-                    UploadDashboard.showMessage("Data column definitions saved.");
-                    updateDatasetColumnSpecs(specs);
-                }
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(SAVE_FAIL_MSG, ex);
-                // Show the normal cursor
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetData specs) {
+                        if ( specs == null ) {
+                            UploadDashboard.showMessage(SAVE_FAIL_MSG + " (unexpected null information returned)");
+                        }
+                        else {
+                            UploadDashboard.showMessage("Data column definitions saved.");
+                            updateDatasetColumnSpecs(specs);
+                        }
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(SAVE_FAIL_MSG, ex);
+                        // Show the normal cursor
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
 
     }
 
     /**
-     * TextColumn for displaying the value at a given index
-     * of an ArrayList of Strings
+     * TextColumn for displaying the value at a given index of an ArrayList of Strings
      */
     private class ArrayListTextColumn extends TextColumn<ArrayList<String>> {
         private int colNum;
+
         /**
-         * Creates a TextColumn for an ArrayList of Strings that
-         * displays the value at the given index in the ArrayList.
+         * Creates a TextColumn for an ArrayList of Strings that displays the value at the given index in the
+         * ArrayList.
+         *
          * @param colNum
          *         display data at this index of the ArrayList
          */
@@ -900,12 +917,14 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             super();
             this.colNum = colNum;
         }
+
         @Override
         public String getValue(ArrayList<String> dataRow) {
             if ( (dataRow != null) && (0 <= colNum) && (colNum < dataRow.size()) )
                 return dataRow.get(colNum);
             return "";
         }
+
         @Override
         public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
             if ( colNum == 0 ) {
@@ -917,12 +936,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             }
             TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
             Integer rowIdx = ctx.getIndex();
-            QCFlag woceCell = new QCFlag(null, null, Severity.ERROR, colNum-1, rowIdx);
+            QCFlag woceCell = new QCFlag(null, null, Severity.ERROR, colNum - 1, rowIdx);
             QCFlag woceRow = new QCFlag(null, null, Severity.ERROR, null, rowIdx);
-            QCFlag woceCol = new QCFlag(null, null, Severity.ERROR, colNum-1, null);
+            QCFlag woceCol = new QCFlag(null, null, Severity.ERROR, colNum - 1, null);
             if ( checkerFlags.contains(woceCell) ||
-                 checkerFlags.contains(woceRow) ||
-                 checkerFlags.contains(woceCol) ) {
+                    checkerFlags.contains(woceRow) ||
+                    checkerFlags.contains(woceCol) ) {
                 sb.appendHtmlConstant("<div style=\"background-color:" +
                         UploadDashboard.CHECKER_ERROR_COLOR + ";font-weight:bold;\">");
                 sb.appendEscaped(getValue(obj));
@@ -931,8 +950,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             }
             TreeSet<QCFlag> userFlags = cruise.getUserFlags();
             if ( userFlags.contains(woceCell) ||
-                 userFlags.contains(woceRow) ||
-                 userFlags.contains(woceCol) ) {
+                    userFlags.contains(woceRow) ||
+                    userFlags.contains(woceCol) ) {
                 sb.appendHtmlConstant("<div style=\"background-color:" +
                         UploadDashboard.USER_ERROR_COLOR + ";\">");
                 sb.appendEscaped(getValue(obj));
@@ -943,8 +962,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             woceRow.setSeverity(Severity.WARNING);
             woceCol.setSeverity(Severity.WARNING);
             if ( checkerFlags.contains(woceCell) ||
-                 checkerFlags.contains(woceRow) ||
-                 checkerFlags.contains(woceCol) ) {
+                    checkerFlags.contains(woceRow) ||
+                    checkerFlags.contains(woceCol) ) {
                 sb.appendHtmlConstant("<div style=\"background-color:" +
                         UploadDashboard.CHECKER_WARNING_COLOR + ";font-weight:bold;\">");
                 sb.appendEscaped(getValue(obj));
@@ -952,8 +971,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                 return;
             }
             if ( userFlags.contains(woceCell) ||
-                 userFlags.contains(woceRow) ||
-                 userFlags.contains(woceCol) ) {
+                    userFlags.contains(woceRow) ||
+                    userFlags.contains(woceCol) ) {
                 sb.appendHtmlConstant("<div style=\"background-color:" +
                         UploadDashboard.USER_WARNING_COLOR + ";\">");
                 sb.appendEscaped(getValue(obj));

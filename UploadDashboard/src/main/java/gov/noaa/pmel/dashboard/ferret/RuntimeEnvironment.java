@@ -1,11 +1,9 @@
 /**
- * This software is provided by NOAA for full, free and open release.  It is
- * understood by the recipient/user that NOAA assumes no liability for any
- * errors contained in the code.  Although this software is released without
- * conditions or restrictions in its use, it is expected that appropriate
- * credit be given to its author and to the National Oceanic and Atmospheric
- * Administration should the software be included by the recipient as an
- * element in other product development.
+ * This software is provided by NOAA for full, free and open release.  It is understood by the recipient/user that NOAA
+ * assumes no liability for any errors contained in the code.  Although this software is released without conditions or
+ * restrictions in its use, it is expected that appropriate credit be given to its author and to the National Oceanic
+ * and Atmospheric Administration should the software be included by the recipient as an element in other product
+ * development.
  */
 package gov.noaa.pmel.dashboard.ferret;
 
@@ -132,8 +130,8 @@ public class RuntimeEnvironment implements Cloneable {
                 int i;
                 for (i = dollarPos + 1; i < value.length(); i++) {
                     char c = value.charAt(i);
-                    if ( !( ( c >= 'A' && c <= 'Z' ) || ( c >= 'a' && c <= 'z' )
-                            || ( c >= '0' && c <= '0' ) || c == '_' ) )
+                    if ( !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+                            || (c >= '0' && c <= '0') || c == '_') )
                         break;
                 }
                 String replaceVar = value.substring(dollarPos + 1, i);

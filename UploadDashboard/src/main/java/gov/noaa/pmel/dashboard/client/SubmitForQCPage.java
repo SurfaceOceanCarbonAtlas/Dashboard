@@ -3,10 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.TreeSet;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -23,13 +19,16 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * Page for submitting cruises for QC.
@@ -59,7 +58,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
     private static final String ARCHIVE_PLAN_INTRO =
             "Archival plan for the uploaded files for these datasets: <br />" +
-            "<small><em>(this option can be modified on submitted datasets without affecting QC)</em></small>";
+                    "<small><em>(this option can be modified on submitted datasets without affecting QC)</em></small>";
 
     private static final String ARCHIVE_LATER_TEXT =
             "delay archiving at this time";
@@ -67,11 +66,11 @@ public class SubmitForQCPage extends CompositeWithUsername {
             "<em>(if not archived before the next public release, archive at OCADS)</em>";
     private static final String ARCHIVE_LATER_INFO_HTML =
             "By selecting this option I wish to delay archival at this time.  " +
-            "If another archive option has not been selected before the next " +
-            "public release, I am giving permission for my uploaded files for these " +
-            "datasets, if deemed acceptable, to be archived at OCADS (formerly CDIAC) " +
-            "at the time of the next public release, after which the files will " +
-            "be made accessible to the public through the OCADS web site.";
+                    "If another archive option has not been selected before the next " +
+                    "public release, I am giving permission for my uploaded files for these " +
+                    "datasets, if deemed acceptable, to be archived at OCADS (formerly CDIAC) " +
+                    "at the time of the next public release, after which the files will " +
+                    "be made accessible to the public through the OCADS web site.";
 
     private static final String ARCHIVE_NOW_TEXT =
             "archive at OCADS (formerly CDIAC) now";
@@ -79,9 +78,9 @@ public class SubmitForQCPage extends CompositeWithUsername {
             "<em>(an e-mail with the data and metadata files will be sent to OCADS)</em>";
     private static final String ARCHIVE_NOW_INFO_HTML =
             "By selecting this option I am requesting that my uploaded files for " +
-            "these datasets be archived at OCADS (formerly CDIAC) as soon as possible.  " +
-            "When OCADS provides a DOI, or other reference, for these archived files, " +
-            "please verify these references are in the metadata for these datasets.";
+                    "these datasets be archived at OCADS (formerly CDIAC) as soon as possible.  " +
+                    "When OCADS provides a DOI, or other reference, for these archived files, " +
+                    "please verify these references are in the metadata for these datasets.";
 
     private static final String OWNER_ARCHIVE_TEXT =
             "already archived or I will manage archival";
@@ -89,45 +88,45 @@ public class SubmitForQCPage extends CompositeWithUsername {
             "<em>(and I understand it is my responsibility to include DOIs in the submitted metadata)</em>";
     private static final String OWNER_ARCHIVE_INFO_HTML =
             "By selecting this option I am agreeing the uploaded files for these " +
-            "datasets are archived or will be archived at a data center of my choice " +
-            "before the public release containing these datasets.  If a DOI or other " +
-            "reference for these archived files is provided, I will include these " +
-            "references in the metadata supplied for these datasets.";
+                    "datasets are archived or will be archived at a data center of my choice " +
+                    "before the public release containing these datasets.  If a DOI or other " +
+                    "reference for these archived files is provided, I will include these " +
+                    "references in the metadata supplied for these datasets.";
 
     private static final String ALREADY_ARCHIVED_HTML =
             "<h3>WARNING</h3>" +
-            "<p>The files for some or all of these dataset were earlier sent to OCADS " +
-            "(formerly CDIAC) for archival.  Normally you do not want to change the " +
-            "archival option for these datasets. </p>" +
-            "<p>If you are working with a mix of datasets that have and have not been " +
-            "sent to OCADS, we strongly recommend you cancel this action and work with " +
-            "datasets already sent to OCADS separately from those not sent.</p>";
+                    "<p>The files for some or all of these dataset were earlier sent to OCADS " +
+                    "(formerly CDIAC) for archival.  Normally you do not want to change the " +
+                    "archival option for these datasets. </p>" +
+                    "<p>If you are working with a mix of datasets that have and have not been " +
+                    "sent to OCADS, we strongly recommend you cancel this action and work with " +
+                    "datasets already sent to OCADS separately from those not sent.</p>";
 
     private static final String REARCHIVE_QUESTION =
             "<p>Some or all of these datasets were earlier sent to OCADS (formerly CDIAC) " +
-            "for archival.  Do you want to send the files for these datasets <b>again</b>?</p>" +
-            "<p><em>If you send the files for these datasets again, you should contact " +
-            "OCADS to explain the reason for this repeated request for archival.</em></p>";
+                    "for archival.  Do you want to send the files for these datasets <b>again</b>?</p>" +
+                    "<p><em>If you send the files for these datasets again, you should contact " +
+                    "OCADS to explain the reason for this repeated request for archival.</em></p>";
     private static final String YES_RESEND_TEXT = "Yes, send";
     private static final String NO_CANCEL_TEXT = "No, cancel";
 
     private static final String AGREE_SHARE_TEXT =
             "I give permission for these datasets to be shared for QC assessment " +
-            "and archived as indicated above.";
+                    "and archived as indicated above.";
     private static final String AGREE_SHARE_INFO_HTML =
             "By checking this box I am giving permission for my uploaded files for " +
-            "these datasets to be shared for purposes of assessing data quality.  " +
-            "I understand that data so-released will be used only for that narrow " +
-            "purpose and will not be further distributed except as indicated in the " +
-            "above selected archival option.";
+                    "these datasets to be shared for purposes of assessing data quality.  " +
+                    "I understand that data so-released will be used only for that narrow " +
+                    "purpose and will not be further distributed except as indicated in the " +
+                    "above selected archival option.";
 
     private static final String AGREE_SHARE_REQUIRED_MSG =
             "You must give permission to share the dataset(s) for QC " +
-            "assessment before the dataset(s) can be submitted for QC.";
+                    "assessment before the dataset(s) can be submitted for QC.";
 
     private static final String ARCHIVE_PLAN_REQUIRED_MSG =
             "You must select an archival option for the uploaded data and metadata " +
-            "files before the dataset(s) can be submitted for QC.";
+                    "files before the dataset(s) can be submitted for QC.";
 
     private static final String SUBMIT_FAILURE_MSG =
             "Unexpected failure with submitting datasets for QC: ";
@@ -135,7 +134,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
     private static final String SUBMIT_TEXT = "OK";
     private static final String CANCEL_TEXT = "Cancel";
 
-    interface SubmitForQCPageUIBinder extends UiBinder<Widget, SubmitForQCPage> {
+    interface SubmitForQCPageUIBinder extends UiBinder<Widget,SubmitForQCPage> {
     }
 
     private static SubmitForQCPageUIBinder uiBinder =
@@ -144,24 +143,42 @@ public class SubmitForQCPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField HTML introHtml;
-    @UiField HTML archivePlanHtml;
-    @UiField RadioButton laterRadio;
-    @UiField Anchor laterInfoAnchor;
-    @UiField HTML laterAddnHtml;
-    @UiField RadioButton nowRadio;
-    @UiField Anchor nowInfoAnchor;
-    @UiField HTML nowAddnHtml;
-    @UiField RadioButton ownerRadio;
-    @UiField Anchor ownerInfoAnchor;
-    @UiField HTML ownerAddnHtml;
-    @UiField CheckBox agreeShareCheckBox;
-    @UiField Anchor agreeShareInfoAnchor;
-    @UiField Button submitButton;
-    @UiField Button cancelButton;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    HTML introHtml;
+    @UiField
+    HTML archivePlanHtml;
+    @UiField
+    RadioButton laterRadio;
+    @UiField
+    Anchor laterInfoAnchor;
+    @UiField
+    HTML laterAddnHtml;
+    @UiField
+    RadioButton nowRadio;
+    @UiField
+    Anchor nowInfoAnchor;
+    @UiField
+    HTML nowAddnHtml;
+    @UiField
+    RadioButton ownerRadio;
+    @UiField
+    Anchor ownerInfoAnchor;
+    @UiField
+    HTML ownerAddnHtml;
+    @UiField
+    CheckBox agreeShareCheckBox;
+    @UiField
+    Anchor agreeShareInfoAnchor;
+    @UiField
+    Button submitButton;
+    @UiField
+    Button cancelButton;
 
     private HashSet<String> expocodes;
     private boolean hasSentDataset;
@@ -175,8 +192,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
     private static SubmitForQCPage singleton;
 
     /**
-     * Creates an empty SubmitForQC page.  Do not use this constructor;
-     * instead use the static showPage or redisplayPage method.
+     * Creates an empty SubmitForQC page.  Do not use this constructor; instead use the static showPage or redisplayPage
+     * method.
      */
     SubmitForQCPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -216,8 +233,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
     }
 
     /**
-     * Display this page in the RootLayoutPanel showing the
-     * given cruises.  Adds this page to the page history.
+     * Display this page in the RootLayoutPanel showing the given cruises.  Adds this page to the page history.
      */
     static void showPage(DashboardDatasetList cruises) {
         if ( singleton == null )
@@ -228,12 +244,11 @@ public class SubmitForQCPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -242,9 +257,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
     }
 
     /**
-     * Updates the username on this page using the login page username,
-     * and updates the listing of cruises on this page with those given
-     * in the argument.
+     * Updates the username on this page using the login page username, and updates the listing of cruises on this page
+     * with those given in the argument.
      *
      * @param cruises
      *         cruises to display
@@ -260,7 +274,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
         int numOwner = 0;
         int numCdiac = 0;
         TreeSet<String> cruiseIntros = new TreeSet<String>();
-        for ( DashboardDataset cruise : cruises.values() ) {
+        for (DashboardDataset cruise : cruises.values()) {
             String expo = cruise.getDatasetId();
             // Add the status of this cruise to the counts
             String archiveStatus = cruise.getArchiveStatus();
@@ -307,7 +321,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
         // Create the intro using the ordered expocodes
         String introMsg = INTRO_HTML_PROLOGUE;
-        for ( String introItem : cruiseIntros ) {
+        for (String introItem : cruiseIntros) {
             introMsg += introItem;
         }
         introMsg += INTRO_HTML_EPILOGUE;
@@ -346,7 +360,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
         DashboardLogoutPage.showPage();
     }
 
-    @UiHandler({"laterRadio","ownerRadio"})
+    @UiHandler({ "laterRadio", "ownerRadio" })
     void radioOnClick(ClickEvent event) {
         // If there is a cruise sent to CDIAC, warn if another selection is made
         if ( hasSentDataset ) {
@@ -406,7 +420,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
     @UiHandler("submitButton")
     void submitOnClick(ClickEvent event) {
-        if ( ! agreeShareCheckBox.getValue() ) {
+        if ( !agreeShareCheckBox.getValue() ) {
             UploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
             return;
         }
@@ -423,6 +437,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
                             continueSubmit();
                         }
                     }
+
                     @Override
                     public void onFailure(Throwable ex) {
                         // Never called
@@ -468,21 +483,22 @@ public class SubmitForQCPage extends CompositeWithUsername {
         UploadDashboard.showWaitCursor();
         service.submitDatasetsForQC(getUsername(), expocodes, archiveStatus,
                 localTimestamp, repeatSend, new AsyncCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                // Success - go back to the cruise list page
-                DatasetListPage.showPage();
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                // Failure, so show fail message
-                // But still go back to the cruise list page since some may have succeeded
-                UploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
-                DatasetListPage.showPage();
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(Void result) {
+                        // Success - go back to the cruise list page
+                        DatasetListPage.showPage();
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        // Failure, so show fail message
+                        // But still go back to the cruise list page since some may have succeeded
+                        UploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
+                        DatasetListPage.showPage();
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
 }

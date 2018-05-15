@@ -3,15 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Properties;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -24,11 +19,15 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Bundles files for sending out to be archived.
@@ -46,18 +45,18 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             " from SOCAT dashboard user ";
     private static final String EMAIL_MSG_START =
             "Dear OCADS Archival Team, \n" +
-            "\n" +
-            "As part of submitting dataset ";
+                    "\n" +
+                    "As part of submitting dataset ";
     private static final String EMAIL_MSG_MIDDLE =
             " to SOCAT for QC, \nthe SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END =
             " \nhas requested immediate OCADS archival of the attached data and metadata. \n" +
-            "The attached file is a ZIP file of the data and metadata, but \"" +
-            MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
-            "has been appended to the name for sending as an email attachment. \n" +
-            "\n" +
-            "Best regards, \n" +
-            "SOCAT Team \n";
+                    "The attached file is a ZIP file of the data and metadata, but \"" +
+                    MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
+                    "has been appended to the name for sending as an email attachment. \n" +
+                    "\n" +
+                    "Best regards, \n" +
+                    "SOCAT Team \n";
 
     private String[] toEmails;
     private String[] ccEmails;
@@ -67,15 +66,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private boolean debugIt;
 
     /**
-     * A file bundler that saves the file bundles under the given directory
-     * and sends an email with the bundle to the given email addresses.
+     * A file bundler that saves the file bundles under the given directory and sends an email with the bundle to the
+     * given email addresses.
      *
      * @param outputDirname
      *         save the file bundles under this directory
      * @param svnUsername
-     *         username for SVN authentication;
-     *         if null, the directory is not checked for version control
-     *         and no version control is performed
+     *         username for SVN authentication; if null, the directory is not checked for version control and no version
+     *         control is performed
      * @param svnPassword
      *         password for SVN authentication
      * @param toEmailAddresses
@@ -92,14 +90,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         password for SMTPS authentication; if null or empty, SMTP is used without authentication
      * @param setDebug
      *         debug the SMTP connection?
+     *
      * @throws IllegalArgumentException
-     *         if the outputDirname directory does not exist,
-     *         is not a directory, or is not under version control
+     *         if the outputDirname directory does not exist, is not a directory, or is not under version control
      */
     public ArchiveFilesBundler(String outputDirname, String svnUsername, String svnPassword,
             String[] toEmailAddresses, String[] ccEmailAddresses, String smtpHostAddress,
             String smtpHostPort, String smtpUsername, String smtpPassword, boolean setDebug)
-                    throws IllegalArgumentException {
+            throws IllegalArgumentException {
         super(outputDirname, svnUsername, svnPassword);
         if ( toEmailAddresses != null )
             toEmails = toEmailAddresses.clone();
@@ -112,7 +110,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         smtpHost = smtpHostAddress;
         smtpPort = smtpHostPort;
         if ( (smtpUsername == null) || smtpUsername.isEmpty() ||
-             (smtpPassword == null) || smtpPassword.isEmpty() ) {
+                (smtpPassword == null) || smtpPassword.isEmpty() ) {
             auth = null;
         }
         else {
@@ -122,26 +120,27 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * The bundle virtual File for the given dataset.
-     * Creates the parent subdirectory, if it does not already exist, for this File.
+     * The bundle virtual File for the given dataset. Creates the parent subdirectory, if it does not already exist, for
+     * this File.
      *
      * @param datasetId
      *         return the virtual File for the dataset with this ID
+     *
      * @return the bundle virtual File
+     *
      * @throws IllegalArgumentException
-     *         if the dataset is invalid, or
-     *         if unable to generate the parent subdirectory if it does not already exist
+     *         if the dataset is invalid, or if unable to generate the parent subdirectory if it does not already exist
      */
     public File getBundleFile(String datasetId) throws IllegalArgumentException {
         // Check and standardize the dataset
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         // Create
-        File parentFile = new File(filesDir, stdId.substring(0,4));
-        if ( ! parentFile.isDirectory() ) {
+        File parentFile = new File(filesDir, stdId.substring(0, 4));
+        if ( !parentFile.isDirectory() ) {
             if ( parentFile.exists() )
                 throw new IllegalArgumentException(
                         "File exists but is not a directory: " + parentFile.getPath());
-            if ( ! parentFile.mkdir() )
+            if ( !parentFile.mkdir() )
                 throw new IllegalArgumentException(
                         "Problems creating the directory: " + parentFile.getPath());
         }
@@ -151,39 +150,32 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Creates the file bundle of original data and metadata,
-     * and emails this bundle, if appropriate, for archival.
-     * This bundle is also committed to version control using
-     * the given message.
+     * Creates the file bundle of original data and metadata, and emails this bundle, if appropriate, for archival. This
+     * bundle is also committed to version control using the given message.
+     * <p>
+     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME} and the value of userEmail is
+     * {@link DashboardServerUtils#NOMAIL_USER_EMAIL}, then the bundle is created but not emailed.
      *
-     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
-     * and the value of userEmail is {@link DashboardServerUtils#NOMAIL_USER_EMAIL},
-     * then the bundle is created but not emailed.
-     *
-     * @param dataset
-     *         create the bundle for the cruise with this dataset
+     * @param datasetId
+     *         create the bundle for the dataset with this ID
      * @param message
-     *         version control commit message for the bundle file;
-     *         if null or empty, the bundle file is not committed
-     *         to version control
+     *         version control commit message for the bundle file; if null or empty, the bundle file is not committed to
+     *         version control
      * @param userRealName
-     *         real name of the user make this archival request, or
-     *         {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
+     *         real name of the user make this archival request, or {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
      * @param userEmail
-     *         email address of the user making this archival request
-     *         (and this address will be cc'd on the bundle email sent
-     *         for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
+     *         email address of the user making this archival request (and this address will be cc'd on the bundle email
+     *         sent for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
+     *
      * @return an message indicating what was sent and to whom
+     *
      * @throws IllegalArgumentException
-     *         if the dataset is not valid, or
-     *         if there is a problem sending the archival request email
+     *         if the dataset is not valid, or if there is a problem sending the archival request email
      * @throws IOException
-     *         if unable to read the default DashboardConfigStore,
-     *         if the dataset is has no data or metadata files,
-     *         if unable to create the bundle file, or
-     *         if unable to commit the bundle to version control
+     *         if unable to read the default DashboardConfigStore, if the dataset is has no data or metadata files, if
+     *         unable to create the bundle file, or if unable to commit the bundle to version control
      */
-    public String sendOrigFilesBundle(String dateasetId, String message, String userRealName,
+    public String sendOrigFilesBundle(String datasetId, String message, String userRealName,
             String userEmail) throws IllegalArgumentException, IOException {
         if ( (toEmails == null) || (toEmails.length == 0) )
             throw new IllegalArgumentException("no archival email address");
@@ -193,22 +185,22 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             throw new IllegalArgumentException("no user name");
         if ( (userEmail == null) || userEmail.isEmpty() )
             throw new IllegalArgumentException("no user email address");
-        String stdId = DashboardServerUtils.checkDatasetID(dateasetId);
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // Get the original data file for this dataset
         File dataFile = configStore.getDataFileHandler().datasetDataFile(stdId);
-        if ( ! dataFile.exists() )
+        if ( !dataFile.exists() )
             throw new IOException("No data file for " + stdId);
 
         // Get the list of metadata documents to be bundled with this data file
         ArrayList<File> addlDocs = new ArrayList<File>();
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-        for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId) ) {
+        for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
             // Exclude the (dataset)/OME.xml document at this time;
             // do include the (dataset)/PI_OME.xml
             String filename = mdata.getFilename();
-            if ( ! filename.equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
                 addlDocs.add(metadataHandler.getMetadataFile(stdId, filename));
             }
         }
@@ -222,7 +214,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         try {
             copyFileToBundle(zipOut, dataFile);
             infoMsg += "    " + dataFile.getName() + "\n";
-            for ( File metaFile : addlDocs ) {
+            for (File metaFile : addlDocs) {
                 copyFileToBundle(zipOut, metaFile);
                 infoMsg += "    " + metaFile.getName() + "\n";
             }
@@ -231,10 +223,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         }
 
         // Commit the bundle to version control
-        if ( (message != null) && ! message.isEmpty() ) {
+        if ( (message != null) && !message.isEmpty() ) {
             try {
                 commitVersion(bundleFile, message);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 throw new IOException("Problems committing the archival file bundle for " +
                         stdId + ": " + ex.getMessage());
             }
@@ -242,7 +234,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // If userRealName is "nobody" and userEmail is "nobody@nowhere" then skip the email
         if ( DashboardServerUtils.NOMAIL_USER_REAL_NAME.equals(userRealName) &&
-             DashboardServerUtils.NOMAIL_USER_EMAIL.equals(userEmail) ) {
+                DashboardServerUtils.NOMAIL_USER_EMAIL.equals(userEmail) ) {
             return "Data files archival bundle created but not emailed";
         }
 
@@ -251,11 +243,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         if ( debugIt )
             props.setProperty("mail.debug", "true");
         props.setProperty("mail.transport.protocol", "smtp");
-        if ( (smtpHost != null) && ! smtpHost.isEmpty() )
+        if ( (smtpHost != null) && !smtpHost.isEmpty() )
             props.put("mail.smtp.host", smtpHost);
         else
             props.put("mail.smtp.host", "localhost");
-        if ( (smtpPort != null) && ! smtpPort.isEmpty() )
+        if ( (smtpPort != null) && !smtpPort.isEmpty() )
             props.put("mail.smtp.port", smtpPort);
         Session sessn;
         if ( auth != null ) {
@@ -278,14 +270,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         InternetAddress[] ccAddresses = new InternetAddress[ccEmails.length + 1];
         try {
             ccAddresses[0] = new InternetAddress(userEmail);
-        } catch (MessagingException ex) {
+        } catch ( MessagingException ex ) {
             String errmsg = getMessageExceptionMsgs(ex);
             throw new IllegalArgumentException("Invalid user email address: " + errmsg, ex);
         }
         for (int k = 0; k < ccEmails.length; k++) {
             try {
-                ccAddresses[k+1] = new InternetAddress(ccEmails[k]);
-            } catch (MessagingException ex) {
+                ccAddresses[k + 1] = new InternetAddress(ccEmails[k]);
+            } catch ( MessagingException ex ) {
                 String errmsg = getMessageExceptionMsgs(ex);
                 throw new IllegalArgumentException("Invalid 'CC:' email address: " + errmsg, ex);
             }
@@ -294,7 +286,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         for (int k = 0; k < toEmails.length; k++) {
             try {
                 toAddresses[k] = new InternetAddress(toEmails[k]);
-            } catch (MessagingException ex) {
+            } catch ( MessagingException ex ) {
                 String errmsg = getMessageExceptionMsgs(ex);
                 throw new IllegalArgumentException("Invalid 'To:' email address: " + errmsg, ex);
             }
@@ -328,38 +320,41 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             msg.setContent(mp);
             // Update the headers
             msg.saveChanges();
-        } catch (MessagingException ex) {
+        } catch ( MessagingException ex ) {
             String errmsg = getMessageExceptionMsgs(ex);
-            throw new IllegalArgumentException("Unexpected problems creating the archival request email: " + errmsg, ex);
+            throw new IllegalArgumentException("Unexpected problems creating the archival request email: " + errmsg,
+                    ex);
         }
 
         // Send the email
         try {
             Transport.send(msg);
-        } catch (MessagingException ex) {
+        } catch ( MessagingException ex ) {
             String errmsg = getMessageExceptionMsgs(ex);
             throw new IllegalArgumentException("Problems sending the archival request email: " + errmsg, ex);
         }
 
         infoMsg += "Files bundle sent To: " + toEmails[0];
-        for (int k = 1; k < toEmails.length; k++)
+        for (int k = 1; k < toEmails.length; k++) {
             infoMsg += ", " + toEmails[k];
+        }
         infoMsg += "; CC: " + userEmail + ", " + ccEmails[0];
-        for (int k = 1; k < ccEmails.length; k++)
+        for (int k = 1; k < ccEmails.length; k++) {
             infoMsg += ", " + ccEmails[k];
+        }
         infoMsg += "\n";
         return infoMsg;
     }
 
     /**
-     * Returns all messages in a possibly-nested MessagingException.
-     * The messages are returned as a single String by joining
-     * all the Exception messages together using a comma and space.
+     * Returns all messages in a possibly-nested MessagingException. The messages are returned as a single String by
+     * joining all the Exception messages together using a comma and space.
      *
      * @param ex
      *         get the error messages from this MessagingException
-     * @return all error messages concatenated together using a comma and a space;
-     *         if no messages are present, an empty String is returned
+     *
+     * @return all error messages concatenated together using a comma and a space; if no messages are present, an empty
+     * String is returned
      */
     private String getMessageExceptionMsgs(MessagingException ex) {
         String fullErrMsg = null;
@@ -393,9 +388,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         copy the contents of the given file to here
      * @param dataFile
      *         copy the contents of this file
+     *
      * @throws IOException
-     *         if reading from the data files throws one, or
-     *         if writing to the bundle file throws one
+     *         if reading from the data files throws one, or if writing to the bundle file throws one
      */
     private void copyFileToBundle(ZipOutputStream zipOut, File dataFile) throws IOException {
         // Create the entry in the zip file

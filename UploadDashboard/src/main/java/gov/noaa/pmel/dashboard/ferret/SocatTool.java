@@ -1,11 +1,11 @@
 package gov.noaa.pmel.dashboard.ferret;
 
+import org.jdom2.Element;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jdom2.Element;
 
 
 public class SocatTool extends Thread {
@@ -21,7 +21,7 @@ public class SocatTool extends Thread {
 
     public SocatTool(FerretConfig ferretConf) {
         ferret = new FerretConfig();
-        ferret.setRootElement((Element)ferretConf.getRootElement().clone());
+        ferret.setRootElement((Element) ferretConf.getRootElement().clone());
         scriptArgs = new ArrayList<String>(3);
         expocode = null;
         message = null;
@@ -69,8 +69,9 @@ public class SocatTool extends Thread {
 
             script_writer = new PrintStream(script);
             script_writer.print("go " + driver);
-            for (String scarg : scriptArgs)
+            for (String scarg : scriptArgs) {
                 script_writer.print(" \"" + scarg + "\"");
+            }
             script_writer.println();
 
             List<String> args = ferret.getArgs();
@@ -91,10 +92,10 @@ public class SocatTool extends Thread {
             }
             for (int index = 0; index < args.size(); index++) {
                 String arg = (String) args.get(index);
-                fullCmd[offset+index] = arg;
+                fullCmd[offset + index] = arg;
             }
 
-            fullCmd[args.size()+offset] = script.getAbsolutePath();
+            fullCmd[args.size() + offset] = script.getAbsolutePath();
 
             long timelimit = ferret.getTimeLimit();
 
@@ -104,7 +105,7 @@ public class SocatTool extends Thread {
             error = task.getHasError();
             message = task.getErrorMessage();
             done = true;
-            if ( ! error )
+            if ( !error )
                 script.delete();
         } catch ( Exception e ) {
             done = true;

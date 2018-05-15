@@ -51,19 +51,19 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         username = null;
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Probably null pointer exception - leave username null
         }
         HttpSession session = request.getSession(false);
         try {
             session.invalidate();
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Log but otherwise ignore this error
             LogManager.getLogger("DashboardServices").error("session.invalidate failed: " + ex.getMessage());
         }
         try {
             request.logout();
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             LogManager.getLogger("DashboardServices").error("request.logout failed: " + ex.getMessage());
         }
 
@@ -88,17 +88,17 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         HttpServletRequest request = getThreadLocalRequest();
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Probably null pointer exception
             return false;
         }
-        if ( ( pageUsername != null ) && !pageUsername.equals(username) )
+        if ( (pageUsername != null) && !pageUsername.equals(username) )
             return false;
 
         configStore = null;
         try {
             configStore = DashboardConfigStore.get(true);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
         }
         return configStore.validateUser(username);
@@ -116,7 +116,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList deleteDatasets(String pageUsername, TreeSet<String> idsSet,
-                                               Boolean deleteMetadata) throws IllegalArgumentException {
+            Boolean deleteMetadata) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -138,7 +138,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList addDatasetsToList(String pageUsername,
-                                                  String wildDatasetId) throws IllegalArgumentException {
+            String wildDatasetId) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -152,7 +152,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList removeDatasetsFromList(String pageUsername,
-                                                       TreeSet<String> idsSet) throws IllegalArgumentException {
+            TreeSet<String> idsSet) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -166,7 +166,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList changeDatasetOwner(String pageUsername,
-                                                   TreeSet<String> idsSet, String newOwner)
+            TreeSet<String> idsSet, String newOwner)
             throws IllegalArgumentException {
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -180,10 +180,10 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             // actual name given?
             try {
                 newUsername = configStore.getDatabaseRequestHandler().getReviewerUsername(newOwner);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 newUsername = null;
             }
-            if ( ( newUsername == null ) || !configStore.validateUser(newUsername) )
+            if ( (newUsername == null) || !configStore.validateUser(newUsername) )
                 throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
         }
         // Change the owner of the datasets
@@ -200,7 +200,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList getUpdatedDatasets(String pageUsername,
-                                                   TreeSet<String> idsSet) throws IllegalArgumentException {
+            TreeSet<String> idsSet) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -219,7 +219,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public DashboardDatasetList deleteAddlDoc(String pageUsername, String deleteFilename,
-                                              String datasetId, TreeSet<String> allIds)
+            String datasetId, TreeSet<String> allIds)
             throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
@@ -251,19 +251,19 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     break;
                 }
             }
-            if ( ( titleToRemove == null ) || !addlDocs.remove(titleToRemove) )
+            if ( (titleToRemove == null) || !addlDocs.remove(titleToRemove) )
                 throw new IllegalArgumentException("Document " + deleteFilename +
-                                                   " is not associated with dataset " + datasetId);
+                        " is not associated with dataset " + datasetId);
         }
         // Delete this OME metadata or additional documents file on the server
         mdataHandler.deleteMetadata(username, datasetId, deleteFilename);
 
         LogManager.getLogger("DashboardServices").info("deleted metadata " + deleteFilename +
-                                                       " from " + datasetId + " for " + username);
+                " from " + datasetId + " for " + username);
 
         // Save the updated cruise
         dataHandler.saveDatasetInfoToFile(dataset, "Removed metadata document " +
-                                                   deleteFilename + " from dataset " + datasetId);
+                deleteFilename + " from dataset " + datasetId);
 
         // If the dataset has been submitted, add QC update ('U') global flag about removal of metadata
         if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
@@ -275,7 +275,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             qcEvent.setVersion(configStore.getUploadVersion());
             qcEvent.setUsername(username);
             String comment = "Deleted metadata file \"" + deleteFilename +
-                             "\".  Data and WOCE flags were not changed.";
+                    "\".  Data and WOCE flags were not changed.";
             qcEvent.setComment(comment);
             try {
                 // Add the 'U' QC flag
@@ -289,12 +289,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 }
                 dataHandler.saveDatasetInfoToFile(dataset, comment);
                 LogManager.getLogger("DashboardServices").info("updated QC status for " + datasetId);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
                 LogManager.getLogger("DashboardServices").error("failed to update QC status for " +
-                                                                datasetId + " after deleting metadata " + deleteFilename +
-                                                                " from " + datasetId + " for " + username + ": " + ex
-                                                                        .getMessage());
+                        datasetId + " after deleting metadata " + deleteFilename +
+                        " from " + datasetId + " for " + username + ": " + ex
+                        .getMessage());
             }
         }
 
@@ -311,7 +311,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public TypesDatasetDataPair getDataColumnSpecs(String pageUsername,
-                                                   String datasetId) throws IllegalArgumentException {
+            String datasetId) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -331,7 +331,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Get the cruise with the first maximum-needed number of rows
         DashboardDatasetData dataset = configStore.getDataFileHandler()
                                                   .getDatasetDataFromFiles(datasetId, 0,
-                                                                           DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
+                                                          DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
         if ( dataset == null )
             throw new IllegalArgumentException(datasetId + " does not exist");
 
@@ -340,14 +340,14 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         typesAndDataset.setDatasetData(dataset);
 
         LogManager.getLogger("DashboardServices").info("data columns specs returned for " +
-                                                       datasetId + " for " + username);
+                datasetId + " for " + username);
         // Return the cruise with the partial data
         return typesAndDataset;
     }
 
     @Override
     public ArrayList<ArrayList<String>> getDataWithRowNum(String pageUsername,
-                                                          String datasetId, int firstRow, int numRows)
+            String datasetId, int firstRow, int numRows)
             throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
@@ -372,7 +372,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         int myLastRow = myFirstRow + dataWithRowNums.size() - 1;
         Logger myLogger = LogManager.getLogger("DashboardServices");
         myLogger.info(datasetId + " dataset data [" + Integer.toString(myFirstRow) +
-                      " - " + Integer.toString(myLastRow) + "] returned for " + username);
+                " - " + Integer.toString(myLastRow) + "] returned for " + username);
         if ( myLogger.isDebugEnabled() ) {
             for (k = 0; k < dataWithRowNums.size(); k++) {
                 myLogger.debug("  data[" + Integer.toString(k) + "]=" + dataWithRowNums.get(k).toString());
@@ -382,8 +382,13 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
+    public void saveDataColumnSpecs(String username, DashboardDataset newSpecs) throws IllegalArgumentException {
+
+    }
+
+    @Override
     public DashboardDatasetData updateDataColumnSpecs(String pageUsername,
-                                                      DashboardDataset newSpecs) throws IllegalArgumentException {
+            DashboardDataset newSpecs) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -393,13 +398,13 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                                                   .getDatasetDataFromFiles(newSpecs.getDatasetId(), 0, -1);
         if ( !dataset.isEditable() )
             throw new IllegalArgumentException(newSpecs.getDatasetId() +
-                                               " has been submitted for QC; data column types cannot be modified.");
+                    " has been submitted for QC; data column types cannot be modified.");
 
         // Revise the data column types and units
         if ( newSpecs.getDataColTypes().size() != dataset.getDataColTypes().size() )
             throw new IllegalArgumentException("Unexpected number of data columns (" +
-                                               newSpecs.getDataColTypes().size() + " instead of " +
-                                               dataset.getDataColTypes().size());
+                    newSpecs.getDataColTypes().size() + " instead of " +
+                    dataset.getDataColTypes().size());
         dataset.setDataColTypes(newSpecs.getDataColTypes());
 
         // Run the automated data checker with the updated data types.
@@ -408,8 +413,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // Save and commit the updated data columns
         configStore.getDataFileHandler().saveDatasetInfoToFile(dataset,
-                                                               "Data column types, units, and missing values for " +
-                                                               dataset.getDatasetId() + " updated by " + username);
+                "Data column types, units, and missing values for " +
+                        dataset.getDatasetId() + " updated by " + username);
         // Update the user-specific data column names to types, units, and missing values
         configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, username);
         if ( !username.equals(dataset.getOwner()) )
@@ -428,7 +433,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         }
 
         LogManager.getLogger("DashboardServices").info("data columns specs updated for " +
-                                                       dataset.getDatasetId() + " by " + username);
+                dataset.getDatasetId() + " by " + username);
         // Return the updated truncated cruise data for redisplay
         // in the DataColumnSpecsPage
         return dataset;
@@ -436,7 +441,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public void updateDataColumns(String pageUsername,
-                                  ArrayList<String> idsList) throws IllegalArgumentException {
+            ArrayList<String> idsList) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -451,14 +456,14 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
             if ( !dataset.isEditable() )
                 throw new IllegalArgumentException("Dataset " + datasetId +
-                                                   " has been submitted for QC; data column types cannot be modified.");
+                        " has been submitted for QC; data column types cannot be modified.");
 
             try {
                 // Identify the columns from stored names-to-types for this user
                 userHandler.assignDataColumnTypes(dataset);
                 // Save and commit these column assignments in case the sanity checker has problems
                 dataHandler.saveDatasetInfoToFile(dataset, "Column types for " + datasetId +
-                                                           " updated by " + username + " from post-processing a multiple-dataset upload");
+                        " updated by " + username + " from post-processing a multiple-dataset upload");
 
                 // Run the automated data checker with the updated data types.  Saves the messages,
                 // and assigns the data check status and the WOCE-3 and WOCE-4 flags.
@@ -466,9 +471,9 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
                 // Save and commit the updated dataset information
                 dataHandler.saveDatasetInfoToFile(dataset, "Automated data check status and flags for " +
-                                                           datasetId + " updated by " + username + " from post-processing a multiple-dataset upload");
+                        datasetId + " updated by " + username + " from post-processing a multiple-dataset upload");
                 dataSpecsLogger.info("Updated data column specs for " + datasetId + " for " + username);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 // ignore problems (such as unidentified columns) - cruise will not have been updated
                 dataSpecsLogger.error("Unable to update data column specs for " + datasetId + ": " + ex.getMessage());
                 continue;
@@ -478,7 +483,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public ADCMessageList getDataMessages(String pageUsername,
-                                          String datasetId) throws IllegalArgumentException {
+            String datasetId) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -487,7 +492,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         ADCMessageList scMsgList;
         try {
             scMsgList = configStore.getCheckerMsgHandler().getCheckerMessages(datasetId);
-        } catch (FileNotFoundException ex) {
+        } catch ( FileNotFoundException ex ) {
             throw new IllegalArgumentException("The automated data checker has never been run on dataset " + datasetId);
         }
         scMsgList.setUsername(username);
@@ -498,7 +503,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public String getOmeXmlPath(String pageUsername, String datasetId,
-                                String previousId) throws IllegalArgumentException {
+            String previousId) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -516,7 +521,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             // Create the merged OME and save the results
             DashboardOmeMetadata mergedOmeMData = origOmeMData.mergeModifiable(updatedOmeMData);
             metadataHandler.saveAsOmeXmlDoc(mergedOmeMData, "Merged OME of " + previousId +
-                                                            " into OME of " + datasetId);
+                    " into OME of " + datasetId);
         }
 
         // return the absolute path to the OME.xml for activeExpcode
@@ -526,7 +531,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public boolean buildPreviewImages(String pageUsername, String datasetId,
-                                      String timetag, boolean firstCall) throws IllegalArgumentException {
+            String timetag, boolean firstCall) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -542,16 +547,16 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
     @Override
     public void submitDatasetsForQC(String pageUsername, HashSet<String> idsSet, String archiveStatus,
-                                    String timestamp, boolean repeatSend) throws IllegalArgumentException {
+            String timestamp, boolean repeatSend) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
         // Submit the datasets for QC and possibly send to be archived
         configStore.getDashboardDatasetSubmitter().submitDatasets(idsSet,
-                                                                  archiveStatus, timestamp, repeatSend, username);
+                archiveStatus, timestamp, repeatSend, username);
         LogManager.getLogger("DashboardServices").info("datasets " + idsSet.toString() +
-                                                       " submitted by " + username);
+                " submitted by " + username);
     }
 
     @Override
@@ -570,6 +575,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             // TODO: Need to add QCFlag to database and set in DSG file
         }
         LogManager.getLogger("DashboardServices").info("datasets " + idsSet.toString() +
-                                                       " suspended by " + username);
+                " suspended by " + username);
     }
 }

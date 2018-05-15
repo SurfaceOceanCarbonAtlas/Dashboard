@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents an uploaded dataset and its current status.
@@ -74,23 +74,22 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return Boolean.TRUE if the dataset is suspended, excluded, or not submitted;
-     * Boolean.FALSE if the dataset is submitted or acceptable but not published;
-     * null if the dataset is (acceptable and) published.
+     * @return Boolean.TRUE if the dataset is suspended, excluded, or not submitted; Boolean.FALSE if the dataset is
+     * submitted or acceptable but not published; null if the dataset is (acceptable and) published.
      */
     public Boolean isEditable() {
         // true for datasets that are not submitted, suspended, or excluded
         String status = getSubmitStatus();
         if ( status.equals(DashboardUtils.STATUS_NOT_SUBMITTED) ||
-             status.equals(DashboardUtils.STATUS_SUSPENDED) ||
-             status.equals(DashboardUtils.STATUS_EXCLUDED)  )
+                status.equals(DashboardUtils.STATUS_SUSPENDED) ||
+                status.equals(DashboardUtils.STATUS_EXCLUDED) )
             return Boolean.TRUE;
         // false for submitted or acceptable unpublished datasets
         status = getArchiveStatus();
         if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-             status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
-             status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ||
-             status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) )
+                status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
+                status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ||
+                status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) )
             return Boolean.FALSE;
         // null for acceptable published datasets
         return null;
@@ -112,8 +111,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the dataset version;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the dataset version; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getVersion() {
         return version;
@@ -121,8 +119,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param version
-     *         the dataset version (after trimming) to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the dataset version (after trimming) to set; if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setVersion(String version) {
         if ( version == null )
@@ -132,8 +129,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the owner for this dataset;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the owner for this dataset; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getOwner() {
         return owner;
@@ -141,8 +137,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param owner
-     *         the dataset owner (after trimming) to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the dataset owner (after trimming) to set; if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setOwner(String owner) {
         if ( owner == null )
@@ -152,8 +147,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the dataset ID;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the dataset ID; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDatasetId() {
         return datasetId;
@@ -161,8 +155,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param datasetId
-     *         the dataset ID to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the dataset ID to set; if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setDatasetId(String datasetId) {
         if ( datasetId == null )
@@ -180,8 +173,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param dataCheckStatus
-     *         the data check status to set;
-     *         if null, sets to {@link DashboardUtils#CHECK_STATUS_NOT_CHECKED}
+     *         the data check status to set; if null, sets to {@link DashboardUtils#CHECK_STATUS_NOT_CHECKED}
      */
     public void setDataCheckStatus(String dataCheckStatus) {
         if ( dataCheckStatus == null )
@@ -191,8 +183,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the OME metadata timestamp;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the OME metadata timestamp; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getOmeTimestamp() {
         return omeTimestamp;
@@ -200,8 +191,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param omeTimestamp
-     *         the OME metadata timestamp to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the OME metadata timestamp to set; if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setOmeTimestamp(String omeTimestamp) {
         if ( omeTimestamp == null )
@@ -211,9 +201,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the additional document "filename; timestamp" strings
-     * associated with this dataset; never null but may be empty.
-     *         The actual set of strings in this object is returned.
+     * @return the additional document "filename; timestamp" strings associated with this dataset; never null but may be
+     * empty. The actual set of strings in this object is returned.
      */
     public TreeSet<String> getAddlDocs() {
         return addlDocs;
@@ -221,9 +210,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param addlDocs
-     *         the set of additional document "filename; timestamp" strings
-     *         for this dataset.  The set in this object is cleared and all
-     *         the contents of the given set, if not null, are added.
+     *         the set of additional document "filename; timestamp" strings for this dataset.  The set in this object is
+     *         cleared and all the contents of the given set, if not null, are added.
      */
     public void setAddlDocs(Collection<String> addlDocs) {
         this.addlDocs.clear();
@@ -232,8 +220,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the submission status;
-     * never null but may be {@link DashboardUtils#STATUS_NOT_SUBMITTED} if not assigned
+     * @return the submission status; never null but may be {@link DashboardUtils#STATUS_NOT_SUBMITTED} if not assigned
      */
     public String getSubmitStatus() {
         return submitStatus;
@@ -241,8 +228,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param submitStatus
-     *         the  submission status (after trimming) to set;
-     *         if null, {@link DashboardUtils#STATUS_NOT_SUBMITTED} is assigned
+     *         the  submission status (after trimming) to set; if null, {@link DashboardUtils#STATUS_NOT_SUBMITTED} is
+     *         assigned
      */
     public void setSubmitStatus(String submitStatus) {
         if ( submitStatus == null )
@@ -252,8 +239,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the archive submission status;
-     * never null but may be {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} if not assigned
+     * @return the archive submission status; never null but may be {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED}
+     * if not assigned
      */
     public String getArchiveStatus() {
         return archiveStatus;
@@ -261,8 +248,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param archiveStatus
-     *         the archive submission status (after trimming) to set;
-     *         if null, {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} is assigned
+     *         the archive submission status (after trimming) to set; if null, {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED}
+     *         is assigned
      */
     public void setArchiveStatus(String archiveStatus) {
         if ( archiveStatus == null )
@@ -272,8 +259,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the archive submission date;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the archive submission date; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getArchiveDate() {
         return archiveDate;
@@ -281,8 +267,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param archiveDate
-     *         the archive submission date (after trimming) to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the archive submission date (after trimming) to set; if null, sets to {@link
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setArchiveDate(String archiveDate) {
         if ( archiveDate == null )
@@ -292,8 +278,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the uploaded data filename;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the uploaded data filename; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getUploadFilename() {
         return uploadFilename;
@@ -301,8 +286,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param uploadFilename
-     *         the uploaded data filename (after trimming) to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the uploaded data filename (after trimming) to set; if null, sets to {@link
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setUploadFilename(String uploadFilename) {
         if ( uploadFilename == null )
@@ -312,8 +297,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the uploaded data timestamp;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the uploaded data timestamp; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getUploadTimestamp() {
         return uploadTimestamp;
@@ -321,8 +305,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param uploadTimestamp
-     *         the uploaded data timestamp (after trimming) to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the uploaded data timestamp (after trimming) to set; if null, sets to {@link
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setUploadTimestamp(String uploadTimestamp) {
         if ( uploadTimestamp == null )
@@ -332,8 +316,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the DOI of the original data document;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the DOI of the original data document; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getOrigDoi() {
         return origDoi;
@@ -341,8 +324,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param origDoi
-     *         the DOI (after trimming) of the original data document to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the DOI (after trimming) of the original data document to set; if null, sets to {@link
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setOrigDoi(String origDoi) {
         if ( origDoi == null )
@@ -352,8 +335,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the DOI of the enhanced data document;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the DOI of the enhanced data document; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getEnhancedDoi() {
         return enhancedDoi;
@@ -361,8 +343,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param enhancedDoi
-     *         the DOI (after trimming) of the enhanced data document to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the DOI (after trimming) of the enhanced data document to set; if null, sets to {@link
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setEnhancedDoi(String enhancedDoi) {
         if ( enhancedDoi == null )
@@ -380,8 +362,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param numDataRows
-     *         the total number of data measurements (data rows)
-     *         to set for the dataset
+     *         the total number of data measurements (data rows) to set for the dataset
      */
     public void setNumDataRows(int numDataRows) {
         this.numDataRows = numDataRows;
@@ -418,9 +399,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the list of data column header names as they appeared in
-     * the original user-provided data file for this dataset; never null
-     * but may be empty.  The actual list in this object is returned.
+     * @return the list of data column header names as they appeared in the original user-provided data file for this
+     * dataset; never null but may be empty.  The actual list in this object is returned.
      */
     public ArrayList<String> getUserColNames() {
         return userColNames;
@@ -428,10 +408,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param userColNames
-     *         the list of data column header names as they appeared in
-     *         the original user-provided data file for this dataset.  The
-     *         list in this object is cleared and all the contents of the
-     *         given list, if not null, are added.
+     *         the list of data column header names as they appeared in the original user-provided data file for this
+     *         dataset.  The list in this object is cleared and all the contents of the given list, if not null, are
+     *         added.
      */
     public void setUserColNames(ArrayList<String> userColNames) {
         this.userColNames.clear();
@@ -440,8 +419,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the list of data column types for this dataset; may be empty
-     * but never null.  The actual list in this object is returned.
+     * @return the list of data column types for this dataset; may be empty but never null.  The actual list in this
+     * object is returned.
      */
     public ArrayList<DataColumnType> getDataColTypes() {
         return dataColTypes;
@@ -449,10 +428,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param dataColTypes
-     *         the list of data column types for this dataset.  The list in
-     *         this object is cleared and all the contents of the given list,
-     *         if not null, are added. Note that this is a shallow copy;
-     *         the given DataColumnType objects are reused.
+     *         the list of data column types for this dataset.  The list in this object is cleared and all the contents
+     *         of the given list, if not null, are added. Note that this is a shallow copy; the given DataColumnType
+     *         objects are reused.
      */
     public void setDataColTypes(ArrayList<DataColumnType> dataColTypes) {
         this.dataColTypes.clear();
@@ -461,8 +439,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the set of automated data checker QC flags <b>without comments</b>;
-     * never null but may be empty.  The actual set in this object is returned.
+     * @return the set of automated data checker QC flags <b>without comments</b>; never null but may be empty.  The
+     * actual set in this object is returned.
      */
     public TreeSet<QCFlag> getCheckerFlags() {
         return checkerFlags;
@@ -470,10 +448,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param checkerFlags
-     *         the set of automated data checker QC flags <b>without comments</b>
-     *         to assign.  The set in this object is cleared and all the contents
-     *         of the given collection, if not null, are added.  Note that this
-     *         is a shallow copy; the given QCFlag objects are reused.
+     *         the set of automated data checker QC flags <b>without comments</b> to assign.  The set in this object is
+     *         cleared and all the contents of the given collection, if not null, are added.  Note that this is a
+     *         shallow copy; the given QCFlag objects are reused.
      */
     public void setCheckerFlags(Collection<QCFlag> checkerFlags) {
         this.checkerFlags.clear();
@@ -482,8 +459,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return The set of user-provided QC flags <b>without comments</b>;
-     * never null but may be empty.  The actual set in this object is returned.
+     * @return The set of user-provided QC flags <b>without comments</b>; never null but may be empty.  The actual set
+     * in this object is returned.
      */
     public TreeSet<QCFlag> getUserFlags() {
         return userFlags;
@@ -491,10 +468,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @param userFlags
-     *         The set user-provided QC flags <b>without comments</b> to assign.
-     *         The set in this object is cleared and all the contents of the given
-     *         Collection, if not null, are added.  Note that this is a shallow copy;
-     *         the given QCFlag objects are reused.
+     *         The set user-provided QC flags <b>without comments</b> to assign. The set in this object is cleared and
+     *         all the contents of the given Collection, if not null, are added.  Note that this is a shallow copy; the
+     *         given QCFlag objects are reused.
      */
     public void setUserFlags(Collection<QCFlag> userFlags) {
         this.userFlags.clear();
@@ -536,37 +512,37 @@ public class DashboardDataset implements Serializable, IsSerializable {
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DashboardDataset) )
+        if ( !(obj instanceof DashboardDataset) )
             return false;
         DashboardDataset other = (DashboardDataset) obj;
 
         if ( selected != other.selected )
             return false;
-        if ( ! version.equals(other.version) )
+        if ( !version.equals(other.version) )
             return false;
-        if ( ! owner.equals(other.owner) )
+        if ( !owner.equals(other.owner) )
             return false;
-        if ( ! datasetId.equals(other.datasetId) )
+        if ( !datasetId.equals(other.datasetId) )
             return false;
-        if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
+        if ( !dataCheckStatus.equals(other.dataCheckStatus) )
             return false;
-        if ( ! omeTimestamp.equals(other.omeTimestamp) )
+        if ( !omeTimestamp.equals(other.omeTimestamp) )
             return false;
-        if ( ! addlDocs.equals(other.addlDocs) )
+        if ( !addlDocs.equals(other.addlDocs) )
             return false;
-        if ( ! submitStatus.equals(other.submitStatus) )
+        if ( !submitStatus.equals(other.submitStatus) )
             return false;
-        if ( ! archiveStatus.equals(other.archiveStatus) )
+        if ( !archiveStatus.equals(other.archiveStatus) )
             return false;
-        if ( ! archiveDate.equals(other.archiveDate) )
+        if ( !archiveDate.equals(other.archiveDate) )
             return false;
-        if ( ! uploadFilename.equals(other.uploadFilename) )
+        if ( !uploadFilename.equals(other.uploadFilename) )
             return false;
-        if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
+        if ( !uploadTimestamp.equals(other.uploadTimestamp) )
             return false;
-        if ( ! origDoi.equals(other.origDoi) )
+        if ( !origDoi.equals(other.origDoi) )
             return false;
-        if ( ! enhancedDoi.equals(other.enhancedDoi) )
+        if ( !enhancedDoi.equals(other.enhancedDoi) )
             return false;
         if ( numDataRows != other.numDataRows )
             return false;
@@ -574,13 +550,13 @@ public class DashboardDataset implements Serializable, IsSerializable {
             return false;
         if ( numWarnRows != other.numWarnRows )
             return false;
-        if ( ! userColNames.equals(other.userColNames) )
+        if ( !userColNames.equals(other.userColNames) )
             return false;
-        if ( ! dataColTypes.equals(other.dataColTypes) )
+        if ( !dataColTypes.equals(other.dataColTypes) )
             return false;
-        if ( ! checkerFlags.equals(other.checkerFlags) )
+        if ( !checkerFlags.equals(other.checkerFlags) )
             return false;
-        if ( ! userFlags.equals(other.userFlags) )
+        if ( !userFlags.equals(other.userFlags) )
             return false;
         return true;
     }
@@ -589,251 +565,241 @@ public class DashboardDataset implements Serializable, IsSerializable {
     public String toString() {
         return "DashboardDataset" +
                 "[\n    selected=" + Boolean.toString(selected) +
-                ",\n    version = " + version +
-                ",\n    owner=" + owner +
-                ",\n    datasetId=" + datasetId +
-                ",\n    dataCheckStatus=" + dataCheckStatus +
-                ",\n    omeTimestamp=" + omeTimestamp +
-                ",\n    addlDocs=" + addlDocs.toString() +
-                ",\n    submitStatus=" + submitStatus +
-                ",\n    archiveStatus=" + archiveStatus +
-                ",\n    archiveDate=" + archiveDate +
-                ",\n    uploadFilename=" + uploadFilename +
-                ",\n    uploadTimestamp=" + uploadTimestamp +
-                ",\n    origDoi=" + origDoi +
-                ",\n    enhancedDoi=" + enhancedDoi +
-                ",\n    numDataRows=" + Integer.toString(numDataRows) +
-                ",\n    numErrorRows=" + Integer.toString(numErrorRows) +
-                ",\n    numWarnRows=" + Integer.toString(numWarnRows) +
-                ",\n    userColNames=" + userColNames.toString() +
-                ",\n    dataColTypes=" + dataColTypes.toString() +
+                ";\n    version = " + version +
+                ";\n    owner=" + owner +
+                ";\n    datasetId=" + datasetId +
+                ";\n    dataCheckStatus=" + dataCheckStatus +
+                ";\n    omeTimestamp=" + omeTimestamp +
+                ";\n    addlDocs=" + addlDocs.toString() +
+                ";\n    submitStatus=" + submitStatus +
+                ";\n    archiveStatus=" + archiveStatus +
+                ";\n    archiveDate=" + archiveDate +
+                ";\n    uploadFilename=" + uploadFilename +
+                ";\n    uploadTimestamp=" + uploadTimestamp +
+                ";\n    origDoi=" + origDoi +
+                ";\n    enhancedDoi=" + enhancedDoi +
+                ";\n    numDataRows=" + Integer.toString(numDataRows) +
+                ";\n    numErrorRows=" + Integer.toString(numErrorRows) +
+                ";\n    numWarnRows=" + Integer.toString(numWarnRows) +
+                ";\n    userColNames=" + userColNames.toString() +
+                ";\n    dataColTypes=" + dataColTypes.toString() +
                 ";\n    checkerFlags = " + checkerFlags.toString() +
                 ";\n    userFlags = " + userFlags.toString() +
                 "\n]";
     }
 
     /**
-     * Compare using the "selected" properties of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the "selected" properties of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> selectedComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            Boolean s1 = d1.isSelected();
-            return s1.compareTo(d2.isSelected());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    Boolean s1 = d1.isSelected();
+                    return s1.compareTo(d2.isSelected());
+                }
+            };
 
     /**
-     * Compare using the owners of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the owners of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> ownerComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getOwner().compareTo(d2.getOwner());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getOwner().compareTo(d2.getOwner());
+                }
+            };
 
     /**
-     * Compare using the IDs of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the IDs of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> datasetIdComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getDatasetId().compareTo(d2.getDatasetId());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getDatasetId().compareTo(d2.getDatasetId());
+                }
+            };
 
     /**
-     * Compare using the upload timestamp strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the upload timestamp strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> timestampComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
+                }
+            };
 
     /**
-     * Compare using the data check status strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the data check status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> dataCheckComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
+                }
+            };
 
     /**
-     * Compare using the OME metadata timestamp strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the OME metadata timestamp strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> omeTimestampComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
+                }
+            };
 
     /**
-     * Compare using the additional document "filename; timestamp" strings of the datasets.  
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the additional document "filename; timestamp" strings of the datasets. Note that this is
+     * inconsistent with {@link DashboardDataset#equals(Object)} in that this is only examining one field of
+     * DashboardDataset.
      */
     public static Comparator<DashboardDataset> addlDocsComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            Iterator<String> iter1 = d1.getAddlDocs().iterator();
-            Iterator<String> iter2 = d2.getAddlDocs().iterator();
-            while ( iter1.hasNext() && iter2.hasNext() ) {
-                int result = iter1.next().compareTo(iter2.next());
-                if ( result != 0 )
-                    return result;
-            }
-            // The lists are the same up to the minimum number of strings given,
-            // so the list with more items is larger; or they are equal if they
-            // both have no more items
-            if ( iter1.hasNext() )
-                return 1;
-            if ( iter2.hasNext() )
-                return -1;
-            return 0;
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    Iterator<String> iter1 = d1.getAddlDocs().iterator();
+                    Iterator<String> iter2 = d2.getAddlDocs().iterator();
+                    while ( iter1.hasNext() && iter2.hasNext() ) {
+                        int result = iter1.next().compareTo(iter2.next());
+                        if ( result != 0 )
+                            return result;
+                    }
+                    // The lists are the same up to the minimum number of strings given,
+                    // so the list with more items is larger; or they are equal if they
+                    // both have no more items
+                    if ( iter1.hasNext() )
+                        return 1;
+                    if ( iter2.hasNext() )
+                        return -1;
+                    return 0;
+                }
+            };
 
     /**
-     * Compare using the version strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the version strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> versionComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getVersion().compareTo(d2.getVersion());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getVersion().compareTo(d2.getVersion());
+                }
+            };
 
     /**
-     * Compare using the QC status strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the QC status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> qcStatusComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
+                }
+            };
 
     /**
-     * Compare using the archive status strings of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the archive status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> archiveStatusComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
+                }
+            };
 
     /**
-     * Compare using the upload filenames of the datasets.
-     * Note that this is inconsistent with {@link DashboardDataset#equals(Object)}
-     * in that this is only examining one field of DashboardDataset.
+     * Compare using the upload filenames of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
     public static Comparator<DashboardDataset> filenameComparator =
             new Comparator<DashboardDataset>() {
-        @Override
-        public int compare(DashboardDataset d1, DashboardDataset d2) {
-            if ( d1 == d2 )
-                return 0;
-            if ( d1 == null )
-                return -1;
-            if ( d2 == null )
-                return 1;
-            return d1.getUploadFilename().compareTo(d2.getUploadFilename());
-        }
-    };
+                @Override
+                public int compare(DashboardDataset d1, DashboardDataset d2) {
+                    if ( d1 == d2 )
+                        return 0;
+                    if ( d1 == null )
+                        return -1;
+                    if ( d2 == null )
+                        return 1;
+                    return d1.getUploadFilename().compareTo(d2.getUploadFilename());
+                }
+            };
 
 }

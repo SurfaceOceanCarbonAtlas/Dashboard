@@ -3,6 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,22 +20,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TimeZone;
 
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-
-import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
-
 /**
- * Class for the one special metadata file per cruise that must be present,
- * has a known format, and contains user-provided values needed by the dashboard.
- * Extends DashboardMetadata, but uses
- * {@link uk.ac.uea.socat.omemetadata.OmeMetadata}
- * to work with the actual metadata.
+ * Class for the one special metadata file per cruise that must be present, has a known format, and contains
+ * user-provided values needed by the dashboard. Extends DashboardMetadata, but uses {@link
+ * uk.ac.uea.socat.omemetadata.OmeMetadata} to work with the actual metadata.
  *
  * @author Karl Smith
  */
@@ -36,35 +32,34 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     private static final long serialVersionUID = 6970740109331521539L;
 
     /**
-     * String separating each PI listed in scienceGroup, each organization
-     * listed in organizations, and each additional document filename listed
-     * in addlDocs.  This is cannot be a semicolon due to Ferret issues.
+     * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
+     * document filename listed in addlDocs.  This is cannot be a semicolon due to Ferret issues.
      */
     private static final String NAMES_SEPARATOR = " : ";
 
     private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
+
     static {
         TimeZone utc = TimeZone.getTimeZone("UTC");
         TIMEPARSER.setTimeZone(utc);
         TIMESTAMPER.setTimeZone(utc);
     }
+
     private OmeMetadata omeMData;
 
     /**
-     * Creates from the contents of the OME XML file specified in the
-     * DashboardMetadata given.
+     * Creates from the contents of the OME XML file specified in the DashboardMetadata given.
      *
      * @param mdata
-     *         OME XML file to read.  The dataset, upload timestamp, and owner
-     *         are copied from this object, and the file specified is read to
-     *         populate the OmeMetadata member of this object.
+     *         OME XML file to read.  The dataset, upload timestamp, and owner are copied from this object, and the file
+     *         specified is read to populate the OmeMetadata member of this object.
      * @param mdataHandler
      *         MetadataFileHandler to use get the given OME XML file
+     *
      * @throws IllegalArgumentException
-     *         if mdata is null, or
-     *         if the information in the DashboardMetadata is invalid, or
-     *         if the contents of the metadata document are not valid
+     *         if mdata is null, or if the information in the DashboardMetadata is invalid, or if the contents of the
+     *         metadata document are not valid
      */
     public DashboardOmeMetadata(DashboardMetadata mdata,
             MetadataFileHandler mdataHandler) throws IllegalArgumentException {
@@ -86,7 +81,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         Document omeDoc;
         try {
             omeDoc = (new SAXBuilder()).build(mdataFile);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems interpreting " +
                     "the OME XML contents in " + mdataFile.getPath() +
                     "\n    " + ex.getMessage());
@@ -97,17 +92,17 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         try {
             omeMData = new OmeMetadata(this.datasetId);
             omeMData.assignFromOmeXmlDoc(omeDoc);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problem with " + mdataFile.getPath() +
                     "\n    " + ex.getMessage(), ex);
         }
         // If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
-        setConflicted( ! omeMData.isAcceptable() );
+        setConflicted(!omeMData.isAcceptable());
     }
 
     /**
-     * Creates with the given dataset and timestamp, and from the contents
-     * of the given OME XML document.  The owner and version is left empty.
+     * Creates with the given dataset and timestamp, and from the contents of the given OME XML document.  The owner and
+     * version is left empty.
      *
      * @param expo
      *         dataset for this metadata
@@ -115,12 +110,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      *         upload timestamp for this metadata
      * @param omeDoc
      *         document containing the metadata contents
+     *
      * @throws IllegalArgumentException
-     *         if dataset is invalid, or
-     *         if the contents of the metadata document are not valid
+     *         if dataset is invalid, or if the contents of the metadata document are not valid
      */
     public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc)
-                                            throws IllegalArgumentException {
+            throws IllegalArgumentException {
         super();
         setFilename(DashboardUtils.OME_FILENAME);
         setDatasetId(DashboardServerUtils.checkDatasetID(expo));
@@ -130,12 +125,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         try {
             omeMData = new OmeMetadata(this.datasetId);
             omeMData.assignFromOmeXmlDoc(omeDoc);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems with the provided XML document:" +
                     "\n    " + ex.getMessage(), ex);
         }
         // If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
-        setConflicted( ! omeMData.isAcceptable() );
+        setConflicted(!omeMData.isAcceptable());
     }
 
     /**
@@ -159,13 +154,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         setVersion(version);
         omeMData = omeMeta;
         // If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
-        setConflicted( ! omeMData.isAcceptable() );
+        setConflicted(!omeMData.isAcceptable());
     }
 
     /**
-     * Create a DsgMetadata object from the data in this object.
-     * Any PI or platform names will be anglicized.
-     * The version status and QC flag are not assigned.
+     * Create a DsgMetadata object from the data in this object. Any PI or platform names will be anglicized. The
+     * version status and QC flag are not assigned.
      *
      * @return created DsgMetadata object
      */
@@ -198,49 +192,51 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         } catch ( Exception ex ) {
             platformType = null;
         }
-        if ( ( platformType == null ) || platformType.trim().isEmpty() )
+        if ( (platformType == null) || platformType.trim().isEmpty() )
             platformType = DashboardServerUtils.guessPlatformType(this.datasetId, platformName);
         scMData.setPlatformType(platformType);
 
         try {
             scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));
-        } catch (NumberFormatException | NullPointerException ex) {
+        } catch ( NumberFormatException | NullPointerException ex ) {
             scMData.setWestmostLongitude(null);
         }
 
         try {
             scMData.setEastmostLongitude(Double.parseDouble(omeMData.getEastmostLongitude()));
-        } catch (NumberFormatException | NullPointerException ex) {
+        } catch ( NumberFormatException | NullPointerException ex ) {
             scMData.setEastmostLongitude(null);
         }
 
         try {
             scMData.setSouthmostLatitude(Double.parseDouble(omeMData.getSouthmostLatitude()));
-        } catch (NumberFormatException | NullPointerException ex) {
+        } catch ( NumberFormatException | NullPointerException ex ) {
             scMData.setSouthmostLatitude(null);
         }
 
         try {
             scMData.setNorthmostLatitude(Double.parseDouble(omeMData.getNorthmostLatitude()));
-        } catch (NumberFormatException | NullPointerException ex) {
+        } catch ( NumberFormatException | NullPointerException ex ) {
             scMData.setNorthmostLatitude(null);
         }
 
         SimpleDateFormat dateParser = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
         dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
-            scMData.setBeginTime(dateParser.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00").getTime() / 1000.0);
-        } catch (ParseException ex) {
+            scMData.setBeginTime(
+                    dateParser.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00").getTime() / 1000.0);
+        } catch ( ParseException ex ) {
             scMData.setBeginTime(null);
         }
         try {
-            scMData.setEndTime(dateParser.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59").getTime() / 1000.0);
-        } catch (ParseException ex) {
+            scMData.setEndTime(
+                    dateParser.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59").getTime() / 1000.0);
+        } catch ( ParseException ex ) {
             scMData.setEndTime(null);
         }
 
         StringBuffer piNames = new StringBuffer();
-        for ( String investigator : omeMData.getInvestigators() ) {
+        for (String investigator : omeMData.getInvestigators()) {
             if ( piNames.length() > 0 )
                 piNames.append(NAMES_SEPARATOR);
             // Anglicize investigator names for NetCDF/LAS
@@ -250,7 +246,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
         HashSet<String> usedOrganizations = new HashSet<String>();
         StringBuffer orgGroup = new StringBuffer();
-        for ( String org : omeMData.getOrganizations() ) {
+        for (String org : omeMData.getOrganizations()) {
             if ( org == null )
                 continue;
             org = org.trim();
@@ -272,9 +268,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Assigns the dataset ID associated with this DashboardMetadata as
-     * well as the dataset ID stored in the OME information represented
-     * by this DashboardMetadata.
+     * Assigns the dataset ID associated with this DashboardMetadata as well as the dataset ID stored in the OME
+     * information represented by this DashboardMetadata.
      *
      * @param newId
      *         new dataset ID to use
@@ -285,8 +280,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Generated an OME XML document that contains the contents
-     * of the data contained in this OME metadata object.
+     * Generated an OME XML document that contains the contents of the data contained in this OME metadata object.
      *
      * @return the generated OME XML document
      */
@@ -295,19 +289,20 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates a new DashboardOmeMetadata from merging, where appropriate,
-     * the OME content of this instance with the OME content of other.
-     * The expocodes in other must be the same as in this instance.
-     * Fields derived from the data are the same as those in this instance.
+     * Creates a new DashboardOmeMetadata from merging, where appropriate, the OME content of this instance with the OME
+     * content of other. The expocodes in other must be the same as in this instance. Fields derived from the data are
+     * the same as those in this instance.
      *
      * @param other
      *         merge with this OME content
+     *
      * @return new DasboardOmeMetadata with merged content, where appropriate
+     *
      * @throws IllegalArgumentException
      *         if the expocodes in this instance and other do not match
      */
     public DashboardOmeMetadata mergeModifiable(DashboardOmeMetadata other)
-                                            throws IllegalArgumentException {
+            throws IllegalArgumentException {
         OmeMetadata mergedOmeMData;
         try {
             // Merge the OmeMetadata documents - requires the expocodes be the same
@@ -321,35 +316,35 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             mergedOmeMData.setExpocode(this.datasetId);
 
             String value = this.omeMData.getValue(OmeMetadata.END_DATE_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.END_DATE_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.TEMP_START_DATE_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.TEMP_START_DATE_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.TEMP_END_DATE_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.TEMP_END_DATE_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.WEST_BOUND_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.WEST_BOUND_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.EAST_BOUND_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.EAST_BOUND_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.SOUTH_BOUND_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.SOUTH_BOUND_STRING, value, -1);
 
             value = this.omeMData.getValue(OmeMetadata.NORTH_BOUND_STRING);
-            if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+            if ( !OmeMetadata.CONFLICT_STRING.equals(value) )
                 mergedOmeMData.replaceValue(OmeMetadata.NORTH_BOUND_STRING, value, -1);
 
-            mergedOmeMData.setDraft( ! mergedOmeMData.isAcceptable() );
-        } catch (Exception ex) {
+            mergedOmeMData.setDraft(!mergedOmeMData.isAcceptable());
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unable to merge OME documents: " + ex.getMessage(), ex);
         }
         return new DashboardOmeMetadata(mergedOmeMData, this.uploadTimestamp, this.owner, this.version);
@@ -357,6 +352,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @return the westernmost longitude, in the range (-180,180]
+     *
      * @throws IllegalArgumentException
      *         if the westernmost longitude is invalid
      */
@@ -366,18 +362,21 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             westLon = Double.parseDouble(omeMData.getWestmostLongitude());
             if ( (westLon < -540.0) || (westLon > 540.0) )
                 throw new IllegalArgumentException("not in [-540,540]");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid westmost longitude: " + ex.getMessage());
         }
-        while ( westLon <= -180.0 )
+        while ( westLon <= -180.0 ) {
             westLon += 360.0;
-        while ( westLon > 180.0 )
+        }
+        while ( westLon > 180.0 ) {
             westLon -= 360.0;
+        }
         return westLon;
     }
 
     /**
      * @return the easternmost longitude, in the range (-180,180]
+     *
      * @throws IllegalArgumentException
      *         if the easternmost longitude is invalid
      */
@@ -387,18 +386,21 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             eastLon = Double.parseDouble(omeMData.getEastmostLongitude());
             if ( (eastLon < -540.0) || (eastLon > 540.0) )
                 throw new IllegalArgumentException("not in [-540,540]");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid eastmost longitude: " + ex.getMessage());
         }
-        while ( eastLon <= -180.0 )
+        while ( eastLon <= -180.0 ) {
             eastLon += 360.0;
-        while ( eastLon > 180.0 )
+        }
+        while ( eastLon > 180.0 ) {
             eastLon -= 360.0;
+        }
         return eastLon;
     }
 
     /**
      * @return the southernmost latitude
+     *
      * @throws IllegalArgumentException
      *         if the southernmost latitude is invalid
      */
@@ -408,7 +410,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             southLat = Double.parseDouble(omeMData.getSouthmostLatitude());
             if ( (southLat < -90.0) || (southLat > 90.0) )
                 throw new IllegalArgumentException("not in [-90,90]");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid southmost latitude: " + ex.getMessage());
         }
         return southLat;
@@ -416,6 +418,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @return the northernmost latitude
+     *
      * @throws IllegalArgumentException
      *         if the northernmost latitude is invalid
      */
@@ -425,7 +428,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             northLat = Double.parseDouble(omeMData.getNorthmostLatitude());
             if ( (northLat < -90.0) || (northLat > 90.0) )
                 throw new IllegalArgumentException("not in [-90,90]");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid northmost latitude: " + ex.getMessage());
         }
         return northLat;
@@ -433,6 +436,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @return the date stamp of the earliest data measurement
+     *
      * @throws IllegalArgumentException
      *         if the date of the earliest data measurement is invalid
      */
@@ -441,7 +445,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         try {
             Date beginTime = TIMEPARSER.parse(omeMData.getTemporalCoverageStartDate());
             beginTimestamp = TIMESTAMPER.format(beginTime);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid begin time: " + ex.getMessage());
         }
         return beginTimestamp;
@@ -449,6 +453,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @return the date stamp of the latest data measurement
+     *
      * @throws IllegalArgumentException
      *         if the date of the latest data measurement is invalid
      */
@@ -457,15 +462,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         try {
             Date endTime = TIMEPARSER.parse(omeMData.getTemporalCoverageEndDate());
             endTimestamp = TIMESTAMPER.format(endTime);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Invalid begin time: " + ex.getMessage());
         }
         return endTimestamp;
     }
 
     /**
-     * @return the name given by the PI for this dataset;
-     *         never null but may be empty
+     * @return the name given by the PI for this dataset; never null but may be empty
      */
     public String getDatasetName() {
         String cruiseName = omeMData.getExperimentName();
@@ -475,8 +479,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the platform name for this dataset;
-     *         never null but may be empty
+     * @return the platform name for this dataset; never null but may be empty
      */
     public String getPlatformName() {
         String platformName = omeMData.getVesselName();
@@ -486,8 +489,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the semicolon-separated list of PI names for this dataset;
-     *         never null but may be empty
+     * @return the semicolon-separated list of PI names for this dataset; never null but may be empty
      */
     public String getPINames() {
         ArrayList<String> investigators = omeMData.getInvestigators();
@@ -495,7 +497,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             return "";
         String piNames = "";
         boolean isFirst = true;
-        for ( String name : investigators ) {
+        for (String name : investigators) {
             if ( isFirst )
                 isFirst = false;
             else
@@ -506,8 +508,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the original reference(s) for this dataset;
-     *         never null but may be empty
+     * @return the original reference(s) for this dataset; never null but may be empty
      */
     public String getDatasetRefs() {
         String dataSetRefs;
@@ -515,7 +516,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             dataSetRefs = omeMData.getValue(OmeMetadata.DATA_SET_REFS_STRING);
             if ( dataSetRefs == null )
                 dataSetRefs = "";
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Should never happen
             dataSetRefs = "";
         }
@@ -589,6 +590,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     public static final String yUmlaut = "\u00FF";
 
     private static final HashMap<Character,String> ANGLICIZE_MAP;
+
     static {
         ANGLICIZE_MAP = new HashMap<Character,String>();
         ANGLICIZE_MAP.put("'".charAt(0), " ");
@@ -659,21 +661,20 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Returns a new String with replacements for any extended characters,
-     * apostrophes, grave symbols, or acute symbols.  Extended characters
-     * may be replaced by more than one character.  Apostrophes,
-     * grave symbols, and acute symbols are replaced by spaces.
+     * Returns a new String with replacements for any extended characters, apostrophes, grave symbols, or acute symbols.
+     * Extended characters may be replaced by more than one character.  Apostrophes, grave symbols, and acute symbols
+     * are replaced by spaces.
      *
      * @param name
      *         String to be copied; can be null
-     * @return copy of the String with character replacements,
-     * or null if the String was null
+     *
+     * @return copy of the String with character replacements, or null if the String was null
      */
     public static String anglicizeName(String name) {
         if ( name == null )
             return null;
         StringBuilder builder = new StringBuilder();
-        for ( char letter : name.toCharArray() ) {
+        for (char letter : name.toCharArray()) {
             String replacement = ANGLICIZE_MAP.get(letter);
             if ( replacement != null ) {
                 builder.append(replacement);
@@ -686,18 +687,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Correctly spelled "anglicized" PI names (that are currently known).
-     * Note that these are single PI names only; each name in a multiple-name
-     * science group needs to be checked individually.
-     * TODO: create from a configuration file
+     * Correctly spelled "anglicized" PI names (that are currently known). Note that these are single PI names only;
+     * each name in a multiple-name science group needs to be checked individually. TODO: create from a configuration
+     * file
      */
     private static final HashMap<String,String> PI_NAME_CORRECTIONS;
+
     static {
         PI_NAME_CORRECTIONS = new HashMap<String,String>();
         PI_NAME_CORRECTIONS.put("Begovic, M.", "B" + eAcute + "govic, M.");
         PI_NAME_CORRECTIONS.put("Copin-Montegut, C.", "Copin-Mont" + eAcute + "gut, C.");
         PI_NAME_CORRECTIONS.put("Diverres, D.", "Diverr" + eGrave + "s, D.");
-        PI_NAME_CORRECTIONS.put("Gonzalez-Davila, M.", "Gonz" + aAcute + "lez-D" +  aAcute + "vila, M.");
+        PI_NAME_CORRECTIONS.put("Gonzalez-Davila, M.", "Gonz" + aAcute + "lez-D" + aAcute + "vila, M.");
         PI_NAME_CORRECTIONS.put("Jutterstrom, S.", "Jutterstr" + oUmlaut + "m, S.");
         PI_NAME_CORRECTIONS.put("Jutterstroem, S.", "Jutterstr" + oUmlaut + "m, S.");
         PI_NAME_CORRECTIONS.put("Koertzinger, A.", "K" + oUmlaut + "rtzinger, A.");
@@ -710,13 +711,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Corrects the spelling of "anglicized" PI names where known corrections exist.
-     * If the name is not recognized, the given string is returned.
-     * Note that these are single PI names only; each name in a multiple-name
-     * science group needs to be checked individually.
+     * Corrects the spelling of "anglicized" PI names where known corrections exist. If the name is not recognized, the
+     * given string is returned. Note that these are single PI names only; each name in a multiple-name science group
+     * needs to be checked individually.
      *
      * @param anglicizedName
      *         anglicized PI name to be corrected; can be null
+     *
      * @return correctly spelled PI name, or null if the given String was null
      */
     public static String correctInvestigatorName(String anglicizedName) {
@@ -729,11 +730,11 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Correctly spelled "anglicized" platform names (that are currently known).
-     * TODO: create from a configuration file
+     * Correctly spelled "anglicized" platform names (that are currently known). TODO: create from a configuration file
      */
     private static final HashMap<String,String> PLATFORM_NAME_CORRECTIONS =
             new HashMap<String,String>();
+
     static {
         PLATFORM_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
         PLATFORM_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
@@ -743,11 +744,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Corrects the spelling of "anglicized" platform names where known corrections exist.
-     * If the name is not recognized, the given string is returned.
+     * Corrects the spelling of "anglicized" platform names where known corrections exist. If the name is not
+     * recognized, the given string is returned.
      *
      * @param anglicizedName
      *         anglicized platform name to be corrected; can be null
+     *
      * @return correctly spelled platform name, or null if the given String was null
      */
     public static String correctPlatformName(String anglicizedName) {

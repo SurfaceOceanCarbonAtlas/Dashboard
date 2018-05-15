@@ -3,26 +3,24 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.tomcat.util.http.fileupload.FileItem;
-import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
-
-import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
-import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Service to receive the uploaded metadata file from the client
@@ -41,7 +39,7 @@ public class MetadataUploadService extends HttpServlet {
             // Get the temporary directory used by the servlet
             servletTmpDir = (File) getServletContext().getAttribute(
                     "javax.servlet.context.tempdir");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Just use the default system temp dir (less secure)
             servletTmpDir = null;
         }
@@ -58,7 +56,7 @@ public class MetadataUploadService extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Verify the post has the correct encoding
-        if ( ! ServletFileUpload.isMultipartContent(request) ) {
+        if ( !ServletFileUpload.isMultipartContent(request) ) {
             sendErrMsg(response, "Invalid request contents format for this service.");
             return;
         }
@@ -66,8 +64,8 @@ public class MetadataUploadService extends HttpServlet {
         // Get the contents from the post request
         String username = null;
         try {
-            username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
-        } catch (Exception ex) {
+            username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
+        } catch ( Exception ex ) {
             ; // leave username null for error message later
         }
 
@@ -103,15 +101,15 @@ public class MetadataUploadService extends HttpServlet {
 
             } finally {
                 // Delete everything except for the uploaded metadata file
-                for ( List<FileItem> itemList : paramMap.values() ) {
-                    for ( FileItem item : itemList ) {
-                        if ( ! item.equals(metadataItem) ) {
+                for (List<FileItem> itemList : paramMap.values()) {
+                    for (FileItem item : itemList) {
+                        if ( !item.equals(metadataItem) ) {
                             item.delete();
                         }
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             if ( metadataItem != null )
                 metadataItem.delete();
             sendErrMsg(response, "Error processing the request\n" + ex.getMessage());
@@ -121,9 +119,9 @@ public class MetadataUploadService extends HttpServlet {
         // Verify page contents seem okay
         DashboardConfigStore configStore = DashboardConfigStore.get(true);
         if ( (username == null) || (datasetIds == null) || (uploadTimestamp == null) ||
-             (omeIndicator == null) || (metadataItem == null) ||
-             ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) ||
-             ! configStore.validateUser(username) ) {
+                (omeIndicator == null) || (metadataItem == null) ||
+                (!(omeIndicator.equals("false") || omeIndicator.equals("true"))) ||
+                !configStore.validateUser(username) ) {
             if ( metadataItem != null )
                 metadataItem.delete();
             sendErrMsg(response, "Invalid request contents for this service.");
@@ -155,9 +153,9 @@ public class MetadataUploadService extends HttpServlet {
         else {
             uploadFilename = DashboardUtils.baseName(metadataItem.getName());
             if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
-                 uploadFilename.equals(DashboardUtils.OME_PDF_FILENAME) ||
-                 uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ||
-                 uploadFilename.equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
+                    uploadFilename.equals(DashboardUtils.OME_PDF_FILENAME) ||
+                    uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ||
+                    uploadFilename.equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
                 metadataItem.delete();
                 sendErrMsg(response, "Name of the uploaded file cannot be " +
                         DashboardUtils.OME_FILENAME +
@@ -169,12 +167,13 @@ public class MetadataUploadService extends HttpServlet {
         }
 
         DashboardMetadata metadata = null;
-        for ( String id : idSet ) {
+        for (String id : idSet) {
             try {
                 // Save the metadata document for this cruise
                 if ( metadata == null ) {
                     metadata = metadataHandler.saveMetadataFileItem(id,
-                            username, uploadTimestamp, uploadFilename, version, metadataItem);
+                            username, uploadTimestamp, uploadFilename, version,
+                            metadataItem);
                 }
                 else {
                     metadata = metadataHandler.copyMetadataFile(id, metadata, true);
@@ -218,14 +217,14 @@ public class MetadataUploadService extends HttpServlet {
     }
 
     /**
-     * Returns an error message in the given Response object.
-     * The response number is still 200 (SC_OK) so the message
+     * Returns an error message in the given Response object. The response number is still 200 (SC_OK) so the message
      * goes through cleanly.
      *
      * @param response
      *         write the error message here
      * @param errMsg
      *         error message to return
+     *
      * @throws IOException
      *         if writing to the response object throws one
      */

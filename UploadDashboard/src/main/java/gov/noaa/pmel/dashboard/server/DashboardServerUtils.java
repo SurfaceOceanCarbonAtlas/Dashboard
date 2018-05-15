@@ -3,14 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
@@ -18,6 +10,12 @@ import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 /**
  * @author Karl Smith
@@ -50,14 +48,24 @@ public class DashboardServerUtils {
     public static final String DATASET_QC_FLAG_NAME = "dataset";
 
     /**
-     * QC flag value for a new dataset
+     * Dataset QC flag value for a new dataset
      */
     public static final String NEW_DATASET_QC_FLAG = "N";
 
     /**
-     * QC flag value for an updated dataset
+     * Dataset QC flag value for an updated dataset
      */
     public static final String UPDATED_DATASET_QC_FLAG = "U";
+
+    /**
+     * Dataset QC flag value for a comment on a dataset
+     */
+    public static final String COMMENT_DATASET_QC_FLAG = "H";
+
+    /**
+     * Dataset QC flag value assigned when there is a conflict in regional dataset QC values.
+     */
+    public static final String CONFLICT_DATASET_QC_FLAG = "Q";
 
     /**
      * QC flag value for a renamed dataset
@@ -117,11 +125,11 @@ public class DashboardServerUtils {
     /**
      * Max allowable difference in latitude, in decimal degrees, between two crossover data points
      */
-    public static final double MAX_LAT_DIFF = ( MAX_CROSSOVER_DIST / EARTH_AUTHALIC_RADIUS ) * ( 180.0 / Math.PI );
+    public static final double MAX_LAT_DIFF = (MAX_CROSSOVER_DIST / EARTH_AUTHALIC_RADIUS) * (180.0 / Math.PI);
 
     /**
-     * GEOPOSITION_VARNAME is a marker used in automated data checking
-     * to indicate an severe error in the combination of lon/lat/depth/time.
+     * GEOPOSITION_VARNAME is a marker used in automated data checking to indicate an severe error in the combination of
+     * lon/lat/depth/time.
      */
     public static final String GEOPOSITION_VARNAME = "geoposition";
 
@@ -143,159 +151,191 @@ public class DashboardServerUtils {
      * UNASSIGNED needs to be respecified as one of the (other) data column types.
      */
     public static final StringDashDataType UNKNOWN = new StringDashDataType(DashboardUtils.UNKNOWN,
-            null, null, null, null, null, null, null);
+            null, null, null,
+            null, null, null, null);
 
     /**
-     * OTHER is for supplementary data in the user's original data file but
-     * otherwise not used.  A description of each column with this type must
-     * be part of the metadata, but the values are not validated or used.
-     * Multiple columns may have this type.
+     * OTHER is for supplementary data in the user's original data file but otherwise not used.  A description of each
+     * column with this type must be part of the metadata, but the values are not validated or used. Multiple columns
+     * may have this type.
      */
     public static final StringDashDataType OTHER = new StringDashDataType(DashboardUtils.OTHER,
-            null, null, null, null, null, null, null);
+            null, null, null,
+            null, null, null, null);
 
     /**
-     * Unique identifier for the dataset
-     * (metadata derived from user data column for the dataset name)
-     *
-     * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC
-     * is the ship code and YYYY-MM-DD is the start date for the cruise;
-     * possibly followed by -1 or -2 for non-ship platforms where NODC
-     * does not distinguish different platform names.
+     * Unique identifier for the dataset (metadata derived from user data column for the dataset name)
+     * <p>
+     * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC is the ship code and YYYY-MM-DD is the start
+     * date for the cruise; possibly followed by -1 or -2 for non-ship platforms where NODC does not distinguish
+     * different platform names.
      */
-    public static final StringDashDataType DATASET_ID = new StringDashDataType("dataset_id",
-            50.0, "dataset ID", "unique ID for this dataset", false, DashboardUtils.NO_UNITS,
-            null, IDENTIFIER_CATEGORY, null, null, null, null, null);
+    public static final StringDashDataType DATASET_ID = new StringDashDataType("expocode",
+            50.0, "expocode", "expocode", false,
+            DashboardUtils.NO_UNITS, "expocode", IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
 
     /**
      * Consecutive numbering of the samples after merging and ordering.
      */
     public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType("sample_number",
-            51.0, "sample num", "sample number", false, DashboardUtils.NO_UNITS, null,
-            IDENTIFIER_CATEGORY, null, "1", null, null, null);
+            51.0, "sample num", "sample number", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            "1", null, null, null);
 
     /**
-     * Completely specified sampling time (seconds since 1970-01-01T00:00:00Z)
-     * used in file data; computed value.
+     * Completely specified sampling time (seconds since 1970-01-01T00:00:00Z) used in file data; computed value.
      */
     public static final DoubleDashDataType TIME = new DoubleDashDataType("time",
-            52.0, "time", "sample time", false, TIME_UNITS, "time",
-            TIME_CATEGORY, null, null, null, null, null);
+            52.0, "time", "sample time", false,
+            TIME_UNITS, "time", TIME_CATEGORY, null,
+            null, null, null, null);
 
     /**
      * User-provided name for the dataset
      */
-    public static final StringDashDataType DATASET_NAME = new StringDashDataType(DashboardUtils.DATASET_NAME,
-            "dataset_name", IDENTIFIER_CATEGORY, null, null, null, null, null);
+    public static final StringDashDataType DATASET_NAME = new StringDashDataType("dataset_name",
+            100.0, "cruise/dataset name", "unique name for this dataset", false,
+            DashboardUtils.NO_UNITS, "dataset_name", IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
 
-    public static final StringDashDataType PLATFORM_NAME = new StringDashDataType(DashboardUtils.PLATFORM_NAME,
-            "platform_name", PLATFORM_CATEGORY, null, null, null, null, null);
-    public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType(DashboardUtils.PLATFORM_TYPE,
-            "platform_type", PLATFORM_CATEGORY, null, null, null, null, null);
-    public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType(DashboardUtils.ORGANIZATION_NAME,
-            "organization", IDENTIFIER_CATEGORY, null, null, null, null, null);
-    public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType(DashboardUtils.INVESTIGATOR_NAMES,
-            "investigators", IDENTIFIER_CATEGORY, null, null, null, null, null);
+    public static final StringDashDataType PLATFORM_NAME = new StringDashDataType("platform_name",
+            101.0, "platform name", "platform name", false,
+            DashboardUtils.NO_UNITS, "platform_name", PLATFORM_CATEGORY, null,
+            null, null, null, null);
+    public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType("platform_type",
+            102.0, "platform type", "platform type", false,
+            DashboardUtils.NO_UNITS, "platform_type", PLATFORM_CATEGORY, null,
+            null, null, null, null);
+    public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
+            103.0, "organization", "organization", false,
+            DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
+    public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType("investigators",
+            104.0, "PI names", "investigators", false,
+            DashboardUtils.NO_UNITS, "investigators", IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
 
-    public static final StringDashDataType DATASET_DOI = new StringDashDataType("dataset_doi",
-            109.0, "dataset_doi", "dataset DOI", false, DashboardUtils.NO_UNITS,
-            null, IDENTIFIER_CATEGORY, null, null, null, null, null);
     public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_min",
-            110.0, "westmost lon", "westernmost longitude", false, DashboardUtils.LONGITUDE_UNITS,
-            "geospatial_lon_min", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
+            110.0, "westmost lon", "westernmost longitude", false,
+            DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_min", LOCATION_CATEGORY, "degrees_east",
+            "-540.0", "-180.0", "360.0", "540.0");
     public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max",
-            111.0, "eastmost lon", "easternmost longitude", false, DashboardUtils.LONGITUDE_UNITS,
-            "geospatial_lon_max", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
+            111.0, "eastmost lon", "easternmost longitude", false,
+            DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_max", LOCATION_CATEGORY, "degrees_east",
+            "-540.0", "-180.0", "360.0", "540.0");
     public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min",
-            112.0, "southmost lat", "southernmost latitude", false, DashboardUtils.LATITUDE_UNITS,
-            "geospatial_lat_min", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
+            112.0, "southmost lat", "southernmost latitude", false,
+            DashboardUtils.LATITUDE_UNITS, "geospatial_lat_min", LOCATION_CATEGORY, "degrees_north",
+            "-90.0", null, null, "90.0");
     public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max",
-            113.0, "northmost lat", "northernmost latitude", false, DashboardUtils.LATITUDE_UNITS,
-            "geospatial_lat_max", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
+            113.0, "northmost lat", "northernmost latitude", false,
+            DashboardUtils.LATITUDE_UNITS, "geospatial_lat_max", LOCATION_CATEGORY, "degrees_north",
+            "-90.0", null, null, "90.0");
     public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start",
-            114.0, "start time", "starting time", false, TIME_UNITS,
-            "time_coverage_start", LOCATION_CATEGORY, null, null, null, null, null);
+            114.0, "start time", "starting time", false,
+            TIME_UNITS, "time_coverage_start", LOCATION_CATEGORY, null,
+            null, null, null, null);
     public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_coverage_end",
-            115.0, "end time", "ending time", false, TIME_UNITS,
-            "time_coverage_end", LOCATION_CATEGORY, null, null, null, null, null);
+            115.0, "end time", "ending time", false,
+            TIME_UNITS, "time_coverage_end", LOCATION_CATEGORY, null,
+            null, null, null, null);
     public static final StringDashDataType STATUS = new StringDashDataType("status",
-            120.0, "status", "status", false, DashboardUtils.NO_UNITS,
-            null, IDENTIFIER_CATEGORY, null, null, null, null, null);
+            120.0, "status", "status", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
     public static final StringDashDataType VERSION = new StringDashDataType("version",
-            121.0, "version", "version", false, DashboardUtils.NO_UNITS,
-            null, IDENTIFIER_CATEGORY, null, null, null, null, null);
+            121.0, "version", "version", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
 
     /**
-     * User-provided unique ID for a sample in a dataset (user data type only).
-     * Used when merging files of different data types measured for a sample.
+     * User-provided unique ID for a sample in a dataset (user data type only). Used when merging files of different
+     * data types measured for a sample.
      */
-    public static final StringDashDataType SAMPLE_ID = new StringDashDataType(DashboardUtils.SAMPLE_ID,
-            null, IDENTIFIER_CATEGORY, null, null, null, null, null);
+    public static final StringDashDataType SAMPLE_ID = new StringDashDataType("sample_id",
+            300.0, "sample ID", "unique ID for this sample in the dataset", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
 
     public static final DoubleDashDataType LONGITUDE = new DoubleDashDataType(DashboardUtils.LONGITUDE,
-            "longitude", LOCATION_CATEGORY, "degrees_east", "-540.0", "-180.0", "360.0", "540.0");
+            "longitude", LOCATION_CATEGORY, "degrees_east",
+            "-540.0", "-180.0", "360.0", "540.0");
     public static final DoubleDashDataType LATITUDE = new DoubleDashDataType(DashboardUtils.LATITUDE,
-            "latitude", LOCATION_CATEGORY, "degrees_north", "-90.0", null, null, "90.0");
+            "latitude", LOCATION_CATEGORY, "degrees_north",
+            "-90.0", null, null, "90.0");
     public static final DoubleDashDataType SAMPLE_DEPTH = new DoubleDashDataType(DashboardUtils.SAMPLE_DEPTH,
-            "depth", BATHYMETRY_CATEGORY, "meters", "0.0", null, null, "16000");
+            "depth", BATHYMETRY_CATEGORY, "meters",
+            "0.0", null, null, "16000");
 
     /**
      * Date and time of the measurement
      */
     public static final StringDashDataType TIMESTAMP = new StringDashDataType(DashboardUtils.TIMESTAMP,
-            "timestamp", TIME_CATEGORY, null, null, null, null, null);
+            "timestamp", TIME_CATEGORY, null,
+            null, null, null, null);
 
     /**
      * Date of the measurement - no time.
      */
     public static final StringDashDataType DATE = new StringDashDataType(DashboardUtils.DATE,
-            "date", TIME_CATEGORY, null, null, null, null, null);
+            "date", TIME_CATEGORY, null,
+            null, null, null, null);
 
     public static final IntDashDataType YEAR = new IntDashDataType(DashboardUtils.YEAR,
-            "year", TIME_CATEGORY, null, "1900", "1950", "2050", "2100");
+            "year", TIME_CATEGORY, null,
+            "1900", "1950", "2050", "2100");
     public static final IntDashDataType MONTH_OF_YEAR = new IntDashDataType(DashboardUtils.MONTH_OF_YEAR,
-            "month_of_year", TIME_CATEGORY, "1", null, null, "12", null);
+            "month_of_year", TIME_CATEGORY, null,
+            "1", null, null, "12");
     public static final IntDashDataType DAY_OF_MONTH = new IntDashDataType(DashboardUtils.DAY_OF_MONTH,
-            "day_of_month", TIME_CATEGORY, "1", null, null, "31", null);
+            "day_of_month", TIME_CATEGORY, null,
+            "1", null, null, "31");
     public static final StringDashDataType TIME_OF_DAY = new StringDashDataType(DashboardUtils.TIME_OF_DAY,
-            "time_of_day", TIME_CATEGORY, null, null, null, null, null);
+            "time_of_day", TIME_CATEGORY, null,
+            null, null, null, null);
     public static final IntDashDataType HOUR_OF_DAY = new IntDashDataType(DashboardUtils.HOUR_OF_DAY,
-            "hour_of_day", TIME_CATEGORY, null, "0", null, null, "24");
+            "hour_of_day", TIME_CATEGORY, null,
+            "0", null, null, "24");
     public static final IntDashDataType MINUTE_OF_HOUR = new IntDashDataType(DashboardUtils.MINUTE_OF_HOUR,
-            "minute_of_hour", TIME_CATEGORY, null, "0", null, null, "60");
+            "minute_of_hour", TIME_CATEGORY, null,
+            "0", null, null, "60");
     public static final DoubleDashDataType SECOND_OF_MINUTE = new DoubleDashDataType(DashboardUtils.SECOND_OF_MINUTE,
-            "second_of_minute", TIME_CATEGORY, null, "0.0", null, null, "60.0");
+            "second_of_minute", TIME_CATEGORY, null,
+            "0.0", null, null, "60.0");
 
     /**
-     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
-     * may be used to specify the date and time of the measurement.
+     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY, may be used to specify the date and time of the
+     * measurement.
      */
     public static final DoubleDashDataType DAY_OF_YEAR = new DoubleDashDataType(DashboardUtils.DAY_OF_YEAR,
-            "day_of_year", TIME_CATEGORY, null, "1.0", null, null, "367.0");
+            "day_of_year", TIME_CATEGORY, null,
+            "1.0", null, null, "367.0");
 
     /**
-     * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
-     * be used to specify date and time of the measurement
+     * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may be used to specify date and time of the measurement
      */
     public static final DoubleDashDataType SECOND_OF_DAY = new DoubleDashDataType(DashboardUtils.SECOND_OF_DAY,
-            "second_of_day", TIME_CATEGORY, null, "0.0", null, null, "86400.0");
+            "second_of_day", TIME_CATEGORY, null,
+            "0.0", null, null, "86400.0");
 
     /**
      * WOCE flag from the automated data checker.
      */
-    public static final CharDashDataType WOCE_AUTOCHECK = new CharDashDataType("WOCE_autocheck",
+    public static final StringDashDataType WOCE_AUTOCHECK = new StringDashDataType("WOCE_autocheck",
             500.0, "WOCE autocheck", "WOCE flag from automated data checking", false,
-            DashboardUtils.NO_UNITS, "WOCE_flag", QUALITY_CATEGORY, null, "1", "2", "4", "9");
+            DashboardUtils.NO_UNITS, "WOCE_flag", QUALITY_CATEGORY, null,
+            "1", "2", "4", "9");
 
     /**
-     * Value of userRealName to use to skip sending the email request in
-     * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
+     * Value of userRealName to use to skip sending the email request in {@link ArchiveFilesBundler#sendOrigFilesBundle(String,
+     * String, String, String)}
      */
     public static final String NOMAIL_USER_REAL_NAME = "nobody";
 
     /**
-     * Value of userEmail to use to skip sending the email request in
-     * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
+     * Value of userEmail to use to skip sending the email request in {@link ArchiveFilesBundler#sendOrigFilesBundle(String,
+     * String, String, String)}
      */
     public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
 
@@ -304,28 +344,27 @@ public class DashboardServerUtils {
      */
     private static final HashSet<String> FIXED_PLATFORM_NODC_CODES =
             new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F",
-                                              "187F", "18FX", "247F", "24FS", "267F", "26FS", "297F",
-                                              "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F",
-                                              "48MB", "497F", "49FS", "747F", "74FS", "767F", "77FS",
-                                              "907F", "91FS", "GH7F"));
+                    "187F", "18FX", "247F", "24FS", "267F", "26FS", "297F",
+                    "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F",
+                    "48MB", "497F", "49FS", "747F", "74FS", "767F", "77FS",
+                    "907F", "91FS", "GH7F"));
 
     /**
      * NODC codes (all upper-case) for Drifting Buoys
      */
     private static final HashSet<String> DRIFTING_BUOY_NODC_CODES =
             new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ",
-                                              "61DB", "74DZ", "91DB", "99DB"));
+                    "61DB", "74DZ", "91DB", "99DB"));
 
     /**
-     * Guesses the platform type from the platform name or the expocode.
-     * If the platform name or NODC code from the expocode is that of
-     * a mooring or drifting buoy, that type is returned;
-     * otherwise it is assumed to be a ship.
+     * Guesses the platform type from the platform name or the expocode. If the platform name or NODC code from the
+     * expocode is that of a mooring or drifting buoy, that type is returned; otherwise it is assumed to be a ship.
      *
      * @param expocode
      *         expocode of the dataset; cannot be null
      * @param platformName
      *         platform name for the dataset; cannot be null
+     *
      * @return one of "Mooring", "Drifting Buoy", or "Ship"
      */
     public static String guessPlatformType(String expocode, String platformName) {
@@ -350,13 +389,13 @@ public class DashboardServerUtils {
     private static final Pattern datasetIdStripPattern = Pattern.compile("[^\\p{javaUpperCase}\\p{Digit}-]+");
 
     /**
-     * Returns the dataset ID for the given dataset name by converting characters
-     * in the name to uppercase and ignoring anything that is not an uppercase letter,
-     * a digit, or a hyphen ('-').  The value returned is equivalent to
+     * Returns the dataset ID for the given dataset name by converting characters in the name to uppercase and ignoring
+     * anything that is not an uppercase letter, a digit, or a hyphen ('-').  The value returned is equivalent to
      * <pre>name.toUpperCase().replaceAll("[^\p{javaUpperCase}\p{Digit}-]+", "")</pre>
      *
      * @param name
      *         dataset name
+     *
      * @return dataset ID for the given dataset name
      */
     public static String getDatasetIDFromName(String name) {
@@ -369,15 +408,14 @@ public class DashboardServerUtils {
     private static final Pattern keyStripPattern = Pattern.compile("[^\\p{javaUpperCase}\\p{Digit}]+");
 
     /**
-     * Computes a key for the given name by converting characters in the name
-     * to uppercase, ignoring anything that is not uppercase or a digit, then
-     * converting characters to lowercase.  (This eliminates the degree symbol,
-     * or something similar, that is part of javaLowerCase.)  The value returned
-     * is equivalent to
+     * Computes a key for the given name by converting characters in the name to uppercase, ignoring anything that is
+     * not uppercase or a digit, then converting characters to lowercase.  (This eliminates the degree symbol, or
+     * something similar, that is part of javaLowerCase.)  The value returned is equivalent to
      * <pre>name.toUpperCase().replaceAll("[^\p{javaUpperCase}\p{Digit}]+", "").toLowerCase()</pre>
      *
      * @param name
      *         name to use
+     *
      * @return key for the given name
      */
     public static String getKeyForName(String name) {
@@ -389,7 +427,9 @@ public class DashboardServerUtils {
      *
      * @param datasetID
      *         dataset ID to check
+     *
      * @return standardized (uppercase) dataset ID
+     *
      * @throws IllegalArgumentException
      *         if the dataset ID is null, too short, too long, or contains invalid characters
      */
@@ -408,13 +448,12 @@ public class DashboardServerUtils {
     }
 
     /**
-     * "Cleans" a username for use by substituting characters that are
-     * problematic (such as space characters).
-     * Also converts all alphabetic characters to lowercase.
-     * An empty string is returned if username is null.
+     * "Cleans" a username for use by substituting characters that are problematic (such as space characters). Also
+     * converts all alphabetic characters to lowercase. An empty string is returned if username is null.
      *
      * @param username
      *         username to clean
+     *
      * @return clean version of username
      */
     public static String cleanUsername(String username) {
@@ -424,18 +463,19 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}.
-     * The comments in the QCFlag objects are ignored.
+     * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}. The comments in the
+     * QCFlag objects are ignored.
      *
      * @param qcSet
      *         set of QCFlag values to encode
+     *
      * @return the encoded list of QCFlag values
      */
     public static String encodeQCFlagSet(TreeSet<QCFlag> qcSet) {
         StringBuilder sb = new StringBuilder();
         sb.append("[ ");
         boolean firstValue = true;
-        for ( QCFlag flag : qcSet ) {
+        for (QCFlag flag : qcSet) {
             if ( firstValue )
                 firstValue = false;
             else
@@ -457,19 +497,20 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Decodes an encoded QCFlag set produced by {@link #encodeQCFlagSet(java.util.TreeSet)},
-     * into a TreeSet of QCFlags.
+     * Decodes an encoded QCFlag set produced by {@link #encodeQCFlagSet(java.util.TreeSet)}, into a TreeSet of
+     * QCFlags.
      *
      * @param qcFlagSetStr
      *         the encoded set of QCFlag objects
-     * @return the decoded TreeSet ofQCFlag objects; never null, but may
-     * be empty (if the encoded set does not specify any QCFlag objects)
+     *
+     * @return the decoded TreeSet ofQCFlag objects; never null, but may be empty (if the encoded set does not specify
+     * any QCFlag objects)
+     *
      * @throws IllegalArgumentException
-     *         if qcFlagSetStr does not start with '[', does not end with ']',
-     *         or contains an invalid encoded QCFlag.
+     *         if qcFlagSetStr does not start with '[', does not end with ']', or contains an invalid encoded QCFlag.
      */
     public static TreeSet<QCFlag> decodeQCFlagSet(String qcFlagSetStr) {
-        if ( ! ( qcFlagSetStr.startsWith("[") && qcFlagSetStr.endsWith("]") ) )
+        if ( !(qcFlagSetStr.startsWith("[") && qcFlagSetStr.endsWith("]")) )
             throw new IllegalArgumentException("Encoded QCFlag set not enclosed in brackets");
         String contents = qcFlagSetStr.substring(1, qcFlagSetStr.length() - 1);
         if ( contents.trim().isEmpty() )
@@ -477,13 +518,13 @@ public class DashboardServerUtils {
         int firstIndex = contents.indexOf("[");
         int lastIndex = contents.lastIndexOf("]");
         if ( (firstIndex < 0) || (lastIndex < 0) ||
-             ( ! contents.substring(0, firstIndex).trim().isEmpty() ) ||
-             ( ! contents.substring(lastIndex+1).trim().isEmpty() ) )
+                (!contents.substring(0, firstIndex).trim().isEmpty()) ||
+                (!contents.substring(lastIndex + 1).trim().isEmpty()) )
             throw new IllegalArgumentException("A QCFlag encoding is not enclosed in brackets");
-        String[] pieces = contents.substring(firstIndex+1, lastIndex)
+        String[] pieces = contents.substring(firstIndex + 1, lastIndex)
                                   .split("\\]\\s*,\\s*\\[", -1);
         TreeSet<QCFlag> flagSet = new TreeSet<QCFlag>();
-        for ( String encFlag : pieces ) {
+        for (String encFlag : pieces) {
             String[] flagParts = encFlag.split(",", 5);
             try {
                 if ( flagParts.length != 5 )
@@ -496,57 +537,57 @@ public class DashboardServerUtils {
                 firstIndex = flagParts[2].indexOf("\"");
                 lastIndex = flagParts[2].lastIndexOf("\"");
                 if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
-                     ( ! flagParts[2].substring(0, firstIndex).trim().isEmpty() ) ||
-                     ( ! flagParts[2].substring(lastIndex+1).trim().isEmpty() ) )
+                        (!flagParts[2].substring(0, firstIndex).trim().isEmpty()) ||
+                        (!flagParts[2].substring(lastIndex + 1).trim().isEmpty()) )
                     throw new IllegalArgumentException("severity not enclosed in double quotes");
-                Severity severity = Severity.valueOf(flagParts[2].substring(firstIndex+1, lastIndex));
+                Severity severity = Severity.valueOf(flagParts[2].substring(firstIndex + 1, lastIndex));
 
                 firstIndex = flagParts[3].indexOf("\"");
                 lastIndex = flagParts[3].lastIndexOf("\"");
                 if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
-                     ( ! flagParts[3].substring(0, firstIndex).trim().isEmpty() ) ||
-                     ( ! flagParts[3].substring(lastIndex+1).trim().isEmpty() ) )
+                        (!flagParts[3].substring(0, firstIndex).trim().isEmpty()) ||
+                        (!flagParts[3].substring(lastIndex + 1).trim().isEmpty()) )
                     throw new IllegalArgumentException("flag value not enclosed in double quotes");
-                String flagValue = flagParts[3].substring(firstIndex+1, lastIndex);
+                String flagValue = flagParts[3].substring(firstIndex + 1, lastIndex);
                 if ( flagValue.length() != 1 )
                     throw new IllegalArgumentException("flag value is not a single character");
 
                 firstIndex = flagParts[4].indexOf("\"");
                 lastIndex = flagParts[4].lastIndexOf("\"");
                 if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
-                     ( ! flagParts[4].substring(0, firstIndex).trim().isEmpty() ) ||
-                     ( ! flagParts[4].substring(lastIndex+1).trim().isEmpty() ) )
+                        (!flagParts[4].substring(0, firstIndex).trim().isEmpty()) ||
+                        (!flagParts[4].substring(lastIndex + 1).trim().isEmpty()) )
                     throw new IllegalArgumentException("flag name not enclosed in double quotes");
-                String flagName = flagParts[4].substring(firstIndex+1, lastIndex);
+                String flagName = flagParts[4].substring(firstIndex + 1, lastIndex);
 
                 flagSet.add(new QCFlag(flagName, flagValue, severity, colIndex, rowIndex));
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " + ex.getMessage(), ex);
+                throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " + ex.getMessage(),
+                        ex);
             }
         }
         return flagSet;
     }
 
     /**
-     * Returns the minimum and maximum valid values from the given data array.
-     * Missing values (those very close to {@link DashboardUtils#FP_MISSING_VALUE})
-     * are ignored.
+     * Returns the minimum and maximum valid values from the given data array. Missing values (those very close to
+     * {@link DashboardUtils#FP_MISSING_VALUE}) are ignored.
      *
      * @param data
      *         find the minimum and maximum valid values of this data
-     * @return (minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
-     * ({@link DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE})
-     * if all data is missing.
+     *
+     * @return (minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or ({@link
+     * DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE}) if all data is missing.
      */
     public static double[] getMinMaxValidData(double[] data) {
         double maxVal = DashboardUtils.FP_MISSING_VALUE;
         double minVal = DashboardUtils.FP_MISSING_VALUE;
-        for ( double val : data ) {
+        for (double val : data) {
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val,
                     DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
-                 (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
+                    (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
                 maxVal = val;
                 minVal = val;
             }
@@ -557,14 +598,13 @@ public class DashboardServerUtils {
                 minVal = val;
             }
         }
-        return new double[] {minVal, maxVal};
+        return new double[] { minVal, maxVal };
     }
 
     /**
-     * Returns the approximate distance between two locations.  Uses the
-     * haversine formula, and {@link #EARTH_AUTHALIC_RADIUS}
-     * for the radius of a spherical Earth, to compute the great circle
-     * distance between the two locations.
+     * Returns the approximate distance between two locations.  Uses the haversine formula, and {@link
+     * #EARTH_AUTHALIC_RADIUS} for the radius of a spherical Earth, to compute the great circle distance between the two
+     * locations.
      *
      * @param lon
      *         longitude, in decimal degrees east, of the first data location
@@ -574,6 +614,7 @@ public class DashboardServerUtils {
      *         longitude, in decimal degrees east, of the other data location
      * @param otherLat
      *         latitude, in decimal degrees north, of the other data location
+     *
      * @return the approximate distance, in kilometers, between the two locations
      */
     public static double distanceBetween(double lon, double lat, double otherLon, double otherLat) {
@@ -598,12 +639,9 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Returns the location-time "distance" between two location-time point.
-     * Uses {@link #SEAWATER_SPEED} for converting differences
-     * in time into a "distance".  Uses the haversine formula, and
-     * {@link #EARTH_AUTHALIC_RADIUS} for the radius of a
-     * spherical Earth, to compute the great circle distance from the
-     * longitudes and latitudes.
+     * Returns the location-time "distance" between two location-time point. Uses {@link #SEAWATER_SPEED} for converting
+     * differences in time into a "distance".  Uses the haversine formula, and {@link #EARTH_AUTHALIC_RADIUS} for the
+     * radius of a spherical Earth, to compute the great circle distance from the longitudes and latitudes.
      *
      * @param lon
      *         longitude, in decimal degrees east, of the first data location
@@ -617,10 +655,11 @@ public class DashboardServerUtils {
      *         latitude, in decimal degrees north, of the other data location
      * @param otherTime
      *         time, in seconds since Jan 1, 1970 00:00:00, of the other data location
+     *
      * @return the "distance", in kilometers, between the two location-time points
      */
     public static double distanceBetween(double lon, double lat, double time,
-                                         double otherLon, double otherLat, double otherTime) {
+            double otherLon, double otherLat, double otherTime) {
         // Get the surface distance in kilometers
         double distance = distanceBetween(lon, lat, otherLon, otherLat);
         // Get the time difference in days (24 hours)

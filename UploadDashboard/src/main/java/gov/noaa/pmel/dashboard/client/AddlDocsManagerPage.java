@@ -3,12 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
-
 import com.google.gwt.cell.client.ButtonCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
@@ -37,7 +31,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
@@ -45,6 +38,12 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Page for managing supplemental documents for a dataset.
@@ -65,7 +64,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static final String UPLOAD_TEXT = "Upload";
     private static final String UPLOAD_HOVER_HELP =
             "upload a file that will be added as a new supplemental document, " +
-            "or replace an existing supplemental document, for the datasets";
+                    "or replace an existing supplemental document, for the datasets";
 
     private static final String DISMISS_TEXT = "Done";
 
@@ -74,13 +73,13 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 
     private static final String NO_OME_OVERWRITE_ERROR_MSG =
             "Documents with the name " + DashboardUtils.OME_FILENAME +
-            " or " + DashboardUtils.PI_OME_FILENAME +
-            " cannot to uploaded as supplemental documents.  " +
-            "Please upload the file under a different name.";
+                    " or " + DashboardUtils.PI_OME_FILENAME +
+                    " cannot to uploaded as supplemental documents.  " +
+                    "Please upload the file under a different name.";
 
     private static final String ADDL_DOCS_LIST_FAIL_MSG =
             "Unexpected problems obtaining the updated supplemental " +
-            "documents for the datasets";
+                    "documents for the datasets";
 
     private static final String OVERWRITE_WARNING_MSG_PROLOGUE =
             "This will overwrite the supplemental documents: <ul>";
@@ -103,10 +102,10 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 
     private static final String UNEXPLAINED_FAIL_MSG =
             "<h3>Upload failed.</h3>" +
-            "<p>Unexpectedly, no explanation of the failure was given</p>";
+                    "<p>Unexpectedly, no explanation of the failure was given</p>";
     private static final String EXPLAINED_FAIL_MSG_START =
             "<h3>Upload failed.</h3>" +
-            "<p><pre>\n";
+                    "<p><pre>\n";
     private static final String EXPLAINED_FAIL_MSG_END =
             "</pre></p>";
 
@@ -119,7 +118,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static final String UPLOAD_TIME_COLUMN_NAME = "Upload date";
     private static final String DATASETIDS_COLUMN_NAME = "Dataset";
 
-    interface AddlDocsManagerPageUiBinder extends UiBinder<Widget, AddlDocsManagerPage> {
+    interface AddlDocsManagerPageUiBinder extends UiBinder<Widget,AddlDocsManagerPage> {
     }
 
     private static AddlDocsManagerPageUiBinder uiBinder =
@@ -128,18 +127,30 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField HTML introHtml;
-    @UiField DataGrid<DashboardMetadata> addlDocsGrid;
-    @UiField FormPanel uploadForm;
-    @UiField FileUpload docUpload;
-    @UiField Hidden timestampToken;
-    @UiField Hidden datasetIdsToken;
-    @UiField Hidden omeToken;
-    @UiField Button uploadButton;
-    @UiField Button dismissButton;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    HTML introHtml;
+    @UiField
+    DataGrid<DashboardMetadata> addlDocsGrid;
+    @UiField
+    FormPanel uploadForm;
+    @UiField
+    FileUpload docUpload;
+    @UiField
+    Hidden timestampToken;
+    @UiField
+    Hidden datasetIdsToken;
+    @UiField
+    Hidden omeToken;
+    @UiField
+    Button uploadButton;
+    @UiField
+    Button dismissButton;
 
     private ListDataProvider<DashboardMetadata> listProvider;
     private HashSet<DashboardDataset> cruiseSet;
@@ -150,10 +161,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static AddlDocsManagerPage singleton;
 
     /**
-     * Creates an empty metadata list page.  Do not call this constructor;
-     * instead use the one of the showPage static methods to show the
-     * singleton instance of this page with the additional documents for
-     * a cruise.
+     * Creates an empty metadata list page.  Do not call this constructor; instead use the one of the showPage static
+     * methods to show the singleton instance of this page with the additional documents for a cruise.
      */
     AddlDocsManagerPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -182,10 +191,9 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     }
 
     /**
-     * Display this page in the RootLayoutPanel with the list of supplemental
-     * documents in the given cruises.  Note that any uploaded documents
-     * are added to all the cruises by replicating the documents.
-     * Adds this page to the page history list.
+     * Display this page in the RootLayoutPanel with the list of supplemental documents in the given cruises.  Note that
+     * any uploaded documents are added to all the cruises by replicating the documents. Adds this page to the page
+     * history list.
      *
      * @param cruiseList
      *         cruises to use
@@ -199,12 +207,11 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -213,8 +220,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     }
 
     /**
-     * Updates the this page with the given cruises and their
-     * supplemental documents.
+     * Updates the this page with the given cruises and their supplemental documents.
      *
      * @param cruiseSet
      *         set of cruises to use
@@ -233,8 +239,9 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         // Update the HTML intro naming the cruises
         StringBuilder sb = new StringBuilder();
         sb.append(INTRO_HTML_PROLOGUE);
-        for ( String expo : datasetIds )
+        for (String expo : datasetIds) {
             sb.append("<li>" + SafeHtmlUtils.htmlEscape(expo) + "</li>");
+        }
         sb.append(INTRO_HTML_EPILOGUE);
         introHtml.setHTML(sb.toString());
 
@@ -244,8 +251,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         // Update the metadata shown by resetting the data in the data provider
         List<DashboardMetadata> addlDocsList = listProvider.getList();
         addlDocsList.clear();
-        for ( DashboardDataset cruz : cruiseSet ) {
-            for ( String docTitle : cruz.getAddlDocs() ) {
+        for (DashboardDataset cruz : cruiseSet) {
+            for (String docTitle : cruz.getAddlDocs()) {
                 String[] nameDate = DashboardMetadata.splitAddlDocsTitle(docTitle);
                 DashboardMetadata mdata = new DashboardMetadata();
                 mdata.setDatasetId(cruz.getDatasetId());
@@ -302,7 +309,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 
         // Disallow any overwrite of an OME file
         if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
-             uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ) {
+                uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ) {
             UploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
             return;
         }
@@ -310,8 +317,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         // Check for any overwrites that will happen
         String message = OVERWRITE_WARNING_MSG_PROLOGUE;
         boolean willOverwrite = false;
-        for ( DashboardDataset cruz : cruiseSet ) {
-            for ( String addlDocTitle : cruz.getAddlDocs() ) {
+        for (DashboardDataset cruz : cruiseSet) {
+            for (String addlDocTitle : cruz.getAddlDocs()) {
                 String[] nameTime = DashboardMetadata.splitAddlDocsTitle(addlDocTitle);
                 if ( uploadFilename.equals(nameTime[0]) ) {
                     message += "<li>" + SafeHtmlUtils.htmlEscape(nameTime[0]) +
@@ -337,6 +344,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                             uploadForm.submit();
                         }
                     }
+
                     @Override
                     public void onFailure(Throwable ex) {
                         // Never called
@@ -366,18 +374,19 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         // of supplemental documents for the current cruises
         service.getUpdatedDatasets(getUsername(), datasetIds,
                 new AsyncCallback<DashboardDatasetList>() {
-            @Override
-            public void onSuccess(DashboardDatasetList cruiseList) {
-                // Update the list shown in this page
-                updateAddlDocs(cruiseList);
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(ADDL_DOCS_LIST_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetList cruiseList) {
+                        // Update the list shown in this page
+                        updateAddlDocs(cruiseList);
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(ADDL_DOCS_LIST_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     /**
@@ -477,12 +486,12 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardMetadata> buildFilenameColumn() {
         TextColumn<DashboardMetadata> filenameColumn =
-                        new TextColumn<DashboardMetadata> () {
-            @Override
-            public String getValue(DashboardMetadata mdata) {
-                return mdata.getFilename();
-            }
-        };
+                new TextColumn<DashboardMetadata>() {
+                    @Override
+                    public String getValue(DashboardMetadata mdata) {
+                        return mdata.getFilename();
+                    }
+                };
         return filenameColumn;
     }
 
@@ -491,12 +500,12 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardMetadata> buildUploadTimeColumn() {
         TextColumn<DashboardMetadata> uploadTimeColumn =
-                        new TextColumn<DashboardMetadata> () {
-            @Override
-            public String getValue(DashboardMetadata mdata) {
-                return mdata.getUploadTimestamp();
-            }
-        };
+                new TextColumn<DashboardMetadata>() {
+                    @Override
+                    public String getValue(DashboardMetadata mdata) {
+                        return mdata.getUploadTimestamp();
+                    }
+                };
         return uploadTimeColumn;
     }
 
@@ -505,12 +514,12 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardMetadata> buildDatasetIdColumn() {
         TextColumn<DashboardMetadata> datasetIdColumn =
-                        new TextColumn<DashboardMetadata> () {
-            @Override
-            public String getValue(DashboardMetadata mdata) {
-                return mdata.getDatasetId();
-            }
-        };
+                new TextColumn<DashboardMetadata>() {
+                    @Override
+                    public String getValue(DashboardMetadata mdata) {
+                        return mdata.getDatasetId();
+                    }
+                };
         return datasetIdColumn;
     }
 
@@ -520,11 +529,11 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private Column<DashboardMetadata,String> buildDeleteColumn() {
         Column<DashboardMetadata,String> deleteColumn =
                 new Column<DashboardMetadata,String>(new ButtonCell()) {
-            @Override
-            public String getValue(DashboardMetadata object) {
-                return DELETE_BUTTON_TEXT;
-            }
-        };
+                    @Override
+                    public String getValue(DashboardMetadata object) {
+                        return DELETE_BUTTON_TEXT;
+                    }
+                };
         deleteColumn.setFieldUpdater(new FieldUpdater<DashboardMetadata,String>() {
             @Override
             public void update(int index, DashboardMetadata mdata, String value) {
@@ -540,19 +549,20 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                         DELETE_DOC_HTML_EPILOGUE;
                 new DashboardAskPopup(DELETE_YES_TEXT, DELETE_NO_TEXT,
                         new AsyncCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean result) {
-                        // Only continue if yes returned; ignore if no or null
-                        if ( result == true ) {
-                            continueDelete(deleteFilename, deleteId);
-                        }
-                    }
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        // Never called
-                        ;
-                    }
-                }).askQuestion(message);
+                            @Override
+                            public void onSuccess(Boolean result) {
+                                // Only continue if yes returned; ignore if no or null
+                                if ( result == true ) {
+                                    continueDelete(deleteFilename, deleteId);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Throwable caught) {
+                                // Never called
+                                ;
+                            }
+                        }).askQuestion(message);
             }
         });
         return deleteColumn;
@@ -571,18 +581,19 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         UploadDashboard.showWaitCursor();
         service.deleteAddlDoc(getUsername(), deleteFilename, deleteId,
                 datasetIds, new AsyncCallback<DashboardDatasetList>() {
-            @Override
-            public void onSuccess(DashboardDatasetList cruiseList) {
-                // Update the list shown in this page
-                updateAddlDocs(cruiseList);
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(DELETE_DOCS_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetList cruiseList) {
+                        // Update the list shown in this page
+                        updateAddlDocs(cruiseList);
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(DELETE_DOCS_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
 }

@@ -7,11 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-
 /**
- * Static dashboard utility functions and constants
- * for use on both the client and server side.
+ * Static dashboard utility functions and constants for use on both the client and server side.
  *
  * @author Karl Smith
  */
@@ -35,6 +32,7 @@ public class DashboardUtils {
     public static final String NO_DATASET_ID_HEADER_TAG = "NO DATASET ID HEADER TAG";
     public static final String NO_PI_NAMES_HEADER_TAG = "NO PI NAMES HEADER TAG";
     public static final String NO_PLATFORM_NAME_HEADER_TAG = "NO PLATFORM NAME HEADER TAG";
+    public static final String UNEXPECTED_FAILURE_HEADER_TAG = "UNEXPECTED FAILURE HEADER TAG";
     public static final String END_OF_ERROR_MESSAGE_TAG = "END_OF_ERROR MESSAGE_TAG";
     public static final String SUCCESS_HEADER_TAG = "SUCCESS HEADER TAG";
 
@@ -70,12 +68,12 @@ public class DashboardUtils {
     public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
     /**
-     *  Missing value for floating-point variables - not null or NaN
+     * Missing value for floating-point variables - not null or NaN
      */
     public static final Double FP_MISSING_VALUE = -1.0E+34;
 
     /**
-     *  Missing value for integer variables - not null
+     * Missing value for integer variables - not null
      */
     public static final Integer INT_MISSING_VALUE = -99;
 
@@ -90,21 +88,18 @@ public class DashboardUtils {
     public static final Character CHAR_MISSING_VALUE = ' ';
 
     /**
-     * Date used as a missing value - not null;
-     * corresponds to Jan 2, 1800 00:00:00 UTC
+     * Date used as a missing value - not null; corresponds to Jan 2, 1800 00:00:00 UTC
      */
     public static final Date DATE_MISSING_VALUE = new Date(-5364576000000L);
 
     /**
-     * Maximum relative error between two floating point values
-     * still considered the same value for practical purposes.
+     * Maximum relative error between two floating point values still considered the same value for practical purposes.
      * Typically used for rtol in {@link #closeTo(Double, Double, double, double)}
      */
     public static final double MAX_RELATIVE_ERROR = 1.0E-6;
 
     /**
-     * Maximum absolute error between two floating point values
-     * still considered the same value for practical purposes.
+     * Maximum absolute error between two floating point values still considered the same value for practical purposes.
      * Typically used for atol in {@link #closeTo(Double, Double, double, double)}
      */
     public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
@@ -120,12 +115,10 @@ public class DashboardUtils {
     public static final String OME_PDF_FILENAME = "OME.pdf";
 
     /**
-     * The "upload filename" for all PI-provided OME metadata files
-     * that are not used for anything other than generating a supplemental
-     * document.
-     *
-     * The use of this name is just a temporary measure
-     * until the CDIAC OME brought into the dashboard.
+     * The "upload filename" for all PI-provided OME metadata files that are not used for anything other than generating
+     * a supplemental document.
+     * <p>
+     * The use of this name is just a temporary measure until the CDIAC OME brought into the dashboard.
      */
     public static final String PI_OME_FILENAME = "PI_OME.xml";
 
@@ -140,11 +133,15 @@ public class DashboardUtils {
     public static final String GLOBAL_REGION_ID = "G";
 
 
-    /** For data without any specific units */
+    /**
+     * For data without any specific units
+     */
     public static final ArrayList<String> NO_UNITS =
             new ArrayList<String>(Arrays.asList(""));
 
-    /** Formats for date-time stamps */
+    /**
+     * Formats for date-time stamps
+     */
     public static final ArrayList<String> TIMESTAMP_UNITS =
             new ArrayList<String>(Arrays.asList(
                     "yyyy-mm-dd hh:mm:ss",
@@ -153,7 +150,9 @@ public class DashboardUtils {
                     "mm-dd-yy hh:mm:ss",
                     "dd-mm-yy hh:mm:ss"));
 
-    /** Formats for dates */
+    /**
+     * Formats for dates
+     */
     public static final ArrayList<String> DATE_UNITS =
             new ArrayList<String>(Arrays.asList(
                     "yyyy-mm-dd",
@@ -162,15 +161,21 @@ public class DashboardUtils {
                     "mm-dd-yy",
                     "dd-mm-yy"));
 
-    /** Formats for time-of-day */
+    /**
+     * Formats for time-of-day
+     */
     public static final ArrayList<String> TIME_OF_DAY_UNITS =
             new ArrayList<String>(Arrays.asList("hh:mm:ss"));
 
-    /** Units for day-of-year (value of the first day of the year) */
+    /**
+     * Units for day-of-year (value of the first day of the year)
+     */
     public static final ArrayList<String> DAY_OF_YEAR_UNITS =
             new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
 
-    /** Units for longitude */
+    /**
+     * Units for longitude
+     */
     public static final ArrayList<String> LONGITUDE_UNITS =
             new ArrayList<String>(Arrays.asList(
                     "deg E",
@@ -181,7 +186,9 @@ public class DashboardUtils {
                     "deg min W",
                     "deg min sec W"));
 
-    /** Units of latitude */
+    /**
+     * Units of latitude
+     */
     public static final ArrayList<String> LATITUDE_UNITS =
             new ArrayList<String>(Arrays.asList(
                     "deg N",
@@ -192,7 +199,9 @@ public class DashboardUtils {
                     "deg min S",
                     "deg min sec S"));
 
-    /** Unit of depth */
+    /**
+     * Unit of depth
+     */
     public static final ArrayList<String> DEPTH_UNITS =
             new ArrayList<String>(Arrays.asList("meters"));
 
@@ -201,115 +210,102 @@ public class DashboardUtils {
      * UNKNOWN needs to be respecified as one of the (other) data column types.
      */
     public static final DataColumnType UNKNOWN = new DataColumnType("unknown",
-            0.0, "(unknown)", "unknown type of data", false, NO_UNITS);
+            0.0, "(unknown)", "unknown type of data",
+            false, NO_UNITS);
 
     /**
-     * OTHER is for supplementary data in the user's original data file but
-     * otherwise not used.  A description of each column with this type must
-     * be part of the metadata, but the values are not validated or used.
-     * Multiple columns may have this type.
+     * OTHER is for supplementary data in the user's original data file but otherwise not used.  A description of each
+     * column with this type must be part of the metadata, but the values are not validated or used. Multiple columns
+     * may have this type.
      */
     public static final DataColumnType OTHER = new DataColumnType("other",
-            1.0, "other", "unused and unchecked supplementary data", false, NO_UNITS);
-
-    /**
-     * User-provided name of the cruise/dataset
-     */
-    public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name",
-            100.0, "cruise/dataset name", "unique name for this dataset", true, NO_UNITS);
-
-    public static final DataColumnType PLATFORM_NAME = new DataColumnType("platform_name",
-            101.0, "platform name", "platform name", false, NO_UNITS);
-
-    public static final DataColumnType PLATFORM_TYPE = new DataColumnType("platform_type",
-            102.0, "platform type", "platform type", false, NO_UNITS);
-
-    public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization",
-            103.0, "organization", "organization", false, NO_UNITS);
-
-    public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators",
-            104.0, "PI names", "investigators", false, NO_UNITS);
-
-    /**
-     * User-provided unique ID for a sample in a dataset (user data type only).
-     * Used when merging files of different data types measured for a sample.
-     */
-    public static final DataColumnType SAMPLE_ID = new DataColumnType("sample_id",
-            300.0, "sample ID", "unique ID for this sample in the dataset", false, NO_UNITS);
+            1.0, "other", "unused and unchecked supplementary data",
+            false, NO_UNITS);
 
     public static final DataColumnType LONGITUDE = new DataColumnType("longitude",
-            301.0, "longitude", "sample longitude", true, LONGITUDE_UNITS);
+            301.0, "longitude", "sample longitude",
+            true, LONGITUDE_UNITS);
 
     public static final DataColumnType LATITUDE = new DataColumnType("latitude",
-            302.0, "latitude", "sample latitude", true, LATITUDE_UNITS);
+            302.0, "latitude", "sample latitude",
+            true, LATITUDE_UNITS);
 
     public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth",
-            303.0, "sample depth", "sample depth", true, DEPTH_UNITS);
+            303.0, "sample depth", "sample depth",
+            true, DEPTH_UNITS);
 
     /**
      * Date and time of the measurement
      */
     public static final DataColumnType TIMESTAMP = new DataColumnType("date_time",
-            310.0, "date time", "sample date and time", false, TIMESTAMP_UNITS);
+            310.0, "date time", "sample date and time",
+            false, TIMESTAMP_UNITS);
 
     /**
      * Date of the measurement - no time.
      */
     public static final DataColumnType DATE = new DataColumnType("date",
-            311.0, "date", "sample date", false, DATE_UNITS);
+            311.0, "date", "sample date",
+            false, DATE_UNITS);
 
     public static final DataColumnType YEAR = new DataColumnType("year",
-            312.0, "year", "sample year", false, NO_UNITS);
+            312.0, "year", "sample year",
+            false, NO_UNITS);
 
     public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month",
-            313.0, "month of year", "sample month of year", false, NO_UNITS);
+            313.0, "month of year", "sample month of year",
+            false, NO_UNITS);
 
     public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day",
-            314.0, "day of month", "sample day of month", false, NO_UNITS);
+            314.0, "day of month", "sample day of month",
+            false, NO_UNITS);
 
     public static final DataColumnType TIME_OF_DAY = new DataColumnType("time_of_day",
-            315.0, "time of day", "sample time of day", false, TIME_OF_DAY_UNITS);
+            315.0, "time of day", "sample time of day",
+            false, TIME_OF_DAY_UNITS);
 
     public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour",
-            316.0, "hour of day", "sample hour of day", false, NO_UNITS);
+            316.0, "hour of day", "sample hour of day",
+            false, NO_UNITS);
 
     public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute",
-            317.0, "minute of hour", "sample minute of hour", false, NO_UNITS);
+            317.0, "minute of hour", "sample minute of hour",
+            false, NO_UNITS);
 
     public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("second",
-            318.0, "sec of minute", "sample second of minute", false, NO_UNITS);
+            318.0, "sec of minute", "sample second of minute",
+            false, NO_UNITS);
 
     /**
-     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
-     * may be used to specify the date and time of the measurement.
+     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY, may be used to specify the date and time of the
+     * measurement.
      */
     public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year",
-            320.0, "day of year", "sample day of year", false, DAY_OF_YEAR_UNITS);
+            320.0, "day of year", "sample day of year",
+            false, DAY_OF_YEAR_UNITS);
 
     /**
-     * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
-     * be used to specify date and time of the measurement
+     * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may be used to specify date and time of the measurement
      */
     public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day",
-            321.0, "sec of day", "sample second of day", false, NO_UNITS);
+            321.0, "sec of day", "sample second of day",
+            false, NO_UNITS);
 
     /**
-     * Encodes an ArrayList of Strings suitable for decoding using
-     * {@link #decodeStringArrayList(String)}.  Characters within
-     * the strings are copied as-is, thus newline characters, or
-     * the character sequence double quote - comma - double quote,
-     * within a string will likely cause problems when reading or
-     * decoding the encoded string.
+     * Encodes an ArrayList of Strings suitable for decoding using {@link #decodeStringArrayList(String)}.  Characters
+     * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
+     * double quote, within a string will likely cause problems when reading or decoding the encoded string.
      *
      * @param strList
      *         the ArrayList of strings to encode
+     *
      * @return the encoded string array
      */
     public static String encodeStringArrayList(ArrayList<String> strList) {
         StringBuilder sb = new StringBuilder();
         sb.append("[ ");
         boolean firstValue = true;
-        for ( String strVal : strList ) {
+        for (String strVal : strList) {
             if ( firstValue )
                 firstValue = false;
             else
@@ -323,24 +319,23 @@ public class DashboardUtils {
     }
 
     /**
-     * Decodes an encoded string array produced by
-     * {@link #encodeStringArrayList(ArrayList)}, into an
-     * ArrayList of strings.  Each string must be enclosed in double
-     * quotes; escaped characters within a string are not recognized
-     * or modified.  Strings must be separated by commas.  Whitespace
-     * around the comma is allowed.
+     * Decodes an encoded string array produced by {@link #encodeStringArrayList(ArrayList)}, into an ArrayList of
+     * strings.  Each string must be enclosed in double quotes; escaped characters within a string are not recognized or
+     * modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
      *
      * @param arrayStr
      *         the encoded string array
-     * @return the decoded ArrayList of strings; never null, but may
-     * be empty (if the encoded string array contains no strings)
+     *
+     * @return the decoded ArrayList of strings; never null, but may be empty (if the encoded string array contains no
+     * strings)
+     *
      * @throws IllegalArgumentException
-     *         if arrayStr does not start with '[', does not end with ']',
-     *         or contains strings not enclosed within double quotes.
+     *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
+     *         double quotes.
      */
     public static ArrayList<String> decodeStringArrayList(String arrayStr)
-                                    throws IllegalArgumentException {
-        if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+            throws IllegalArgumentException {
+        if ( !(arrayStr.startsWith("[") && arrayStr.endsWith("]")) )
             throw new IllegalArgumentException(
                     "Encoded string array not enclosed in brackets");
         String contents = arrayStr.substring(1, arrayStr.length() - 1);
@@ -349,22 +344,21 @@ public class DashboardUtils {
         int firstIndex = contents.indexOf("\"");
         int lastIndex = contents.lastIndexOf("\"");
         if ( (firstIndex < 0) || (lastIndex == firstIndex) ||
-             ( ! contents.substring(0, firstIndex).trim().isEmpty() ) ||
-             ( ! contents.substring(lastIndex+1).trim().isEmpty() ) )
+                (!contents.substring(0, firstIndex).trim().isEmpty()) ||
+                (!contents.substring(lastIndex + 1).trim().isEmpty()) )
             throw new IllegalArgumentException("Strings in encoded " +
                     "string array are not enclosed in double quotes");
-        String[] pieces = contents.substring(firstIndex+1, lastIndex)
+        String[] pieces = contents.substring(firstIndex + 1, lastIndex)
                                   .split("\"\\s*,\\s*\"", -1);
         return new ArrayList<String>(Arrays.asList(pieces));
     }
 
     /**
-     * Returns the basename of a filename.  Does this by returning only the
-     * portion of the string after the last slash or backslash character
-     * (either one if both present).
-     *
-     * If null is given, or if the name ends in a slash or backslash, an empty
-     * string is returned.  Whitespace is trimmed from the returned name.
+     * Returns the basename of a filename.  Does this by returning only the portion of the string after the last slash
+     * or backslash character (either one if both present).
+     * <p>
+     * If null is given, or if the name ends in a slash or backslash, an empty string is returned.  Whitespace is
+     * trimmed from the returned name.
      */
     public static String baseName(String filename) {
         if ( filename == null )
@@ -391,13 +385,10 @@ public class DashboardUtils {
     }
 
     /**
-     * Determines if two Doubles are close to the same value.
-     * The absolute of the average value, absAver, and the
-     * absolute value in the difference in values, absDiff,
-     * of first and second are determined.
-     *
-     * The difference between is considered negligible if:
-     *     absDiff < absAver * rtol + atol
+     * Determines if two Doubles are close to the same value. The absolute of the average value, absAver, and the
+     * absolute value in the difference in values, absDiff, of first and second are determined.
+     * <p>
+     * The difference between is considered negligible if: absDiff < absAver * rtol + atol
      *
      * @param first
      *         value to compare
@@ -407,12 +398,12 @@ public class DashboardUtils {
      *         relative tolerance of the difference
      * @param atol
      *         absolute tolerance of the difference
-     * @return true is first and second are both NaN, both Infinite
-     * (regardless of whether positive or negative), or
+     *
+     * @return true is first and second are both NaN, both Infinite (regardless of whether positive or negative), or
      * have values whose difference is "negligible".
      */
     public static boolean closeTo(Double first, Double second,
-                                    double rtol, double atol) {
+            double rtol, double atol) {
 
         // NaN (only) matches NaN
         if ( first.isNaN() ) {
@@ -438,21 +429,17 @@ public class DashboardUtils {
         // Check if values are close
         double absDiff = Math.abs(first - second);
         double absAver = Math.abs((first + second) * 0.5);
-        return ( absDiff < absAver * rtol + atol );
+        return (absDiff < absAver * rtol + atol);
     }
 
     /**
-     * Determines if two longitudes are close to the same value
-     * modulo 360.0.  The absolute of the average value, absAver,
-     * and the absolute value in the difference in values, absDiff,
-     * of first and second are determined.
-     *
-     * The difference between is considered negligible if:
-     *     absDiff < absAver * rtol + atol
-     *
-     * This comparison is made to the values as given as well as for
-     * each value with 360.0 added to it.
-     * (So not a complete modulo 360 check.)
+     * Determines if two longitudes are close to the same value modulo 360.0.  The absolute of the average value,
+     * absAver, and the absolute value in the difference in values, absDiff, of first and second are determined.
+     * <p>
+     * The difference between is considered negligible if: absDiff < absAver * rtol + atol
+     * <p>
+     * This comparison is made to the values as given as well as for each value with 360.0 added to it. (So not a
+     * complete modulo 360 check.)
      *
      * @param first
      *         value to compare
@@ -462,12 +449,12 @@ public class DashboardUtils {
      *         relative tolerance of the difference
      * @param atol
      *         absolute tolerance of the difference
-     * @return true is first and second are both NaN, both Infinite
-     * (regardless of whether positive or negative), or
+     *
+     * @return true is first and second are both NaN, both Infinite (regardless of whether positive or negative), or
      * have values whose difference is "negligible".
      */
     public static boolean longitudeCloseTo(Double first, Double second,
-                                        double rtol, double atol) {
+            double rtol, double atol) {
         // Longitudes have modulo 360.0, so 359.999999 is close to 0.0
         if ( closeTo(first, second, rtol, atol) )
             return true;

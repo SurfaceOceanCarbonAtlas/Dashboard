@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * Represents QC of some number of data values in a data column.
- * Note that the inherited id field is ignored in the hashCode and equals methods.
+ * Represents QC of some number of data values in a data column. Note that the inherited id field is ignored in the
+ * hashCode and equals methods.
  *
  * @author Karl Smith
  */
@@ -22,10 +22,8 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
     protected ArrayList<DataLocation> locations;
 
     /**
-     * Creates an empty data QC event where id is zero, the flag date
-     * is {@link DashboardUtils#DATE_MISSING_VALUE}, there are
-     * no data locations, and all other values (strings) are
-     * {@link DashboardUtils#STRING_MISSING_VALUE}.
+     * Creates an empty data QC event where id is zero, the flag date is {@link DashboardUtils#DATE_MISSING_VALUE},
+     * there are no data locations, and all other values (strings) are {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
     public DataQCEvent() {
         super();
@@ -34,8 +32,8 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
     }
 
     /**
-     * @return the flagged data variable name in the DSG file;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the flagged data variable name in the DSG file; never null, but may be {@link
+     * DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getVarName() {
         return varName;
@@ -43,8 +41,8 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
 
     /**
      * @param varName
-     *         the flagged data variable name in the DSG file to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the flagged data variable name in the DSG file to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         is assigned
      */
     public void setVarName(String varName) {
         if ( varName == null )
@@ -54,9 +52,8 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
     }
 
     /**
-     * @return the list of locations associated with this data QC event;
-     * never null, but may be empty.
-     *         The actual ArrayList in this object is returned.
+     * @return the list of locations associated with this data QC event; never null, but may be empty. The actual
+     * ArrayList in this object is returned.
      */
     public ArrayList<DataLocation> getLocations() {
         return locations;
@@ -64,10 +61,8 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
 
     /**
      * @param locations
-     *         the locations to set;
-     *         the list of locations is cleared and then,
-     *         if locations is not null, the given locations are added to the list.
-     *         The actual objects in the provided list are reused (shallow copy).
+     *         the locations to set; the list of locations is cleared and then, if locations is not null, the given
+     *         locations are added to the list. The actual objects in the provided list are reused (shallow copy).
      */
     public void setLocations(ArrayList<DataLocation> locations) {
         this.locations.clear();
@@ -91,15 +86,15 @@ public class DataQCEvent extends QCEvent implements Serializable, IsSerializable
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DataQCEvent) )
+        if ( !(obj instanceof DataQCEvent) )
             return false;
         DataQCEvent other = (DataQCEvent) obj;
 
-        if ( ! super.equals(other) )
+        if ( !super.equals(other) )
             return false;
-        if ( ! varName.equals(other.varName) )
+        if ( !varName.equals(other.varName) )
             return false;
-        if ( ! locations.equals(other.locations) )
+        if ( !locations.equals(other.locations) )
             return false;
 
         return true;

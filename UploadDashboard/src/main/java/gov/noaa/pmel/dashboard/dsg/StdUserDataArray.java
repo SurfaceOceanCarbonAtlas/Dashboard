@@ -3,12 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.TreeSet;
-
-import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
@@ -24,10 +18,14 @@ import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.TreeSet;
+
 /**
- * A 2-D array of objects corresponding to the standardized values of string values
- * provided by the user.  Also contains 1-D arrays of information describing each
- * data column.
+ * A 2-D array of objects corresponding to the standardized values of string values provided by the user.  Also contains
+ * 1-D arrays of information describing each data column.
  *
  * @author Karl Smith
  */
@@ -44,32 +42,27 @@ public class StdUserDataArray extends StdDataArray {
     int woceAutocheckIndex;
 
     /**
-     * Create from the user's data column descriptions, data strings,
-     * data row numbers, and data check flags given for this dataset.  Any
-     * data columns types matching {@link DashboardServerUtils#UNKNOWN}
-     * or {@link DashboardServerUtils#OTHER} are ignored;
-     * {@link #isUsableIndex(int)} will return false, and
-     * {@link #getStdVal(int, int)} will throw an exception
-     * for data columns of these types.
-     * <br /><br />
-     * The list of automated data check messages describing problems
-     * (critical errors) encountered when standardizing the data can
-     * be retrieved using {@link #getStandardizationMessages()}.
-     * <br /><br />
+     * Create from the user's data column descriptions, data strings, data row numbers, and data check flags given for
+     * this dataset.  Any data columns types matching {@link DashboardServerUtils#UNKNOWN} or {@link
+     * DashboardServerUtils#OTHER} are ignored; {@link #isUsableIndex(int)} will return false, and {@link
+     * #getStdVal(int, int)} will throw an exception for data columns of these types.
+     * <p>
+     * The list of automated data check messages describing problems (critical errors) encountered when standardizing
+     * the data can be retrieved using {@link #getStandardizationMessages()}.
+     * <p>
      * No bounds checking of standardized data values is performed.
      *
      * @param dataset
      *         dataset, with user's strings data, to use
      * @param knownTypes
      *         all known user data types
+     *
      * @throws IllegalArgumentException
-     *         if there are no data values,
-     *         if a data column description is not a known user data type,
-     *         if a required unit conversion is not supported, or
-     *         if a standardizer for a given data type is not known
+     *         if there are no data values, if a data column description is not a known user data type, if a required
+     *         unit conversion is not supported, or if a standardizer for a given data type is not known
      */
-    public StdUserDataArray(DashboardDatasetData dataset,
-            KnownDataTypes knownTypes) throws IllegalArgumentException {
+    public StdUserDataArray(DashboardDatasetData dataset, KnownDataTypes knownTypes)
+            throws IllegalArgumentException {
         super(dataset.getDataColTypes(), knownTypes);
 
         // Add the user's units, missing values, and user column names
@@ -108,8 +101,9 @@ public class StdUserDataArray extends StdDataArray {
         }
 
         standardized = new Boolean[numDataCols];
-        for (int k = 0; k < numDataCols; k++)
+        for (int k = 0; k < numDataCols; k++) {
             standardized[k] = null;
+        }
 
         ArrayList<ArrayList<String>> dataVals = dataset.getDataValues();
         if ( dataVals.isEmpty() )
@@ -134,7 +128,7 @@ public class StdUserDataArray extends StdDataArray {
                 // Generate a general message for this row - in case too long
                 ADCMessage msg = new ADCMessage();
                 msg.setSeverity(Severity.CRITICAL);
-                msg.setRowNumber(j+1);
+                msg.setRowNumber(j + 1);
                 msg.setGeneralComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG);
                 msg.setDetailedComment(INCONSISTENT_NUMBER_OF_DATA_VALUES_MSG + "; " +
                         numUserDataCols + " expected but " + rowVals.size() + " found");
@@ -165,10 +159,10 @@ public class StdUserDataArray extends StdDataArray {
         }
         // Add the automatic data checker WOCE flags
         if ( woceIdx >= 0 ) {
-            for ( QCFlag flag : dataset.getCheckerFlags() ) {
+            for (QCFlag flag : dataset.getCheckerFlags()) {
                 if ( DashboardServerUtils.WOCE_AUTOCHECK.getVarName().equals(flag.getFlagName()) ) {
                     Integer j = flag.getRowIndex();
-                    if ( ! DashboardUtils.INT_MISSING_VALUE.equals(j) ) {
+                    if ( !DashboardUtils.INT_MISSING_VALUE.equals(j) ) {
                         strDataVals[j][woceIdx] = flag.getFlagValue().toString();
                     }
                 }
@@ -198,8 +192,8 @@ public class StdUserDataArray extends StdDataArray {
                                 stdObjects[j][k] = null;
                                 ADCMessage msg = new ADCMessage();
                                 msg.setSeverity(Severity.CRITICAL);
-                                msg.setRowNumber(j+1);
-                                msg.setColNumber(k+1);
+                                msg.setRowNumber(j + 1);
+                                msg.setColNumber(k + 1);
                                 msg.setColName(userColNames[k]);
                                 msg.setGeneralComment(ex.getMessage());
                                 if ( strDataVals[j][k] == null )
@@ -220,23 +214,21 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Check for missing longitude, latitude, sample depth, and time columns
-     * or data values.  Any problems found generate messages that are added
-     * to the internal list of messages.
+     * Check for missing longitude, latitude, and time columns or data values.  Any problems found generate messages
+     * that are added to the internal list of messages.
      *
-     * @return the sample times for the data;  may be null if there was incomplete
-     *         specification of sample time, or may contain null values if there
-     *         were problems computing the sample time
+     * @return the sample times for the data;  may be null if there was incomplete specification of sample time, or may
+     * contain null values if there were problems computing the sample time
      */
-    public Double[] checkMissingLonLatDepthTime() {
+    public Double[] checkMissingLonLatTime() {
         try {
             Double[] longitudes = getSampleLongitudes();
             for (int j = 0; j < numSamples; j++) {
                 if ( longitudes[j] == null ) {
                     ADCMessage msg = new ADCMessage();
                     msg.setSeverity(Severity.CRITICAL);
-                    msg.setRowNumber(j+1);
-                    msg.setColNumber(longitudeIndex+1);
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(longitudeIndex + 1);
                     msg.setColName(userColNames[longitudeIndex]);
                     String comment = "missing longitude";
                     msg.setGeneralComment(comment);
@@ -259,8 +251,8 @@ public class StdUserDataArray extends StdDataArray {
                 if ( latitudes[j] == null ) {
                     ADCMessage msg = new ADCMessage();
                     msg.setSeverity(Severity.CRITICAL);
-                    msg.setRowNumber(j+1);
-                    msg.setColNumber(latitudeIndex+1);
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(latitudeIndex + 1);
                     msg.setColName(userColNames[latitudeIndex]);
                     String comment = "missing latitude";
                     msg.setGeneralComment(comment);
@@ -277,30 +269,6 @@ public class StdUserDataArray extends StdDataArray {
             stdMsgList.add(msg);
         }
 
-        try {
-            Double[] depths = getSampleDepths();
-            for (int j = 0; j < numSamples; j++) {
-                if ( depths[j] == null ) {
-                    ADCMessage msg = new ADCMessage();
-                    msg.setSeverity(Severity.CRITICAL);
-                    msg.setRowNumber(j+1);
-                    msg.setColNumber(sampleDepthIndex+1);
-                    msg.setColName(userColNames[sampleDepthIndex]);
-                    String comment = "missing sample depth";
-                    msg.setGeneralComment(comment);
-                    msg.setDetailedComment(comment);
-                    stdMsgList.add(msg);
-                }
-            }
-        } catch ( Exception ex ) {
-            ADCMessage msg = new ADCMessage();
-            msg.setSeverity(Severity.CRITICAL);
-            String comment = "no sample depth column";
-            msg.setGeneralComment(comment);
-            msg.setDetailedComment(comment);
-            stdMsgList.add(msg);
-        }
-
         Double[] times = null;
         try {
             times = getSampleTimes();
@@ -308,7 +276,7 @@ public class StdUserDataArray extends StdDataArray {
                 if ( times[j] == null ) {
                     ADCMessage msg = new ADCMessage();
                     msg.setSeverity(Severity.CRITICAL);
-                    msg.setRowNumber(j+1);
+                    msg.setRowNumber(j + 1);
                     String comment = "incomplete sample date/time specification";
                     msg.setGeneralComment(comment);
                     msg.setDetailedComment(comment);
@@ -328,19 +296,14 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Reorders the data rows as best possible so that the data is
-     *         (1) ascending in time (old to new),
-     *         (2) ascending in longitude
-     *         (3) ascending in latitude
-     *         (4) ascending in depth (shallow to deep)
-     *         (5) original row number
-     * Missing data columns (lon/lat/depth/time) will be treated
-     * as an array of missing values.  Missing values in an array
-     * will be ordered such that they appear before valid values.
+     * Reorders the data rows as best possible so that the data is (1) ascending in time (old to new), (2) ascending in
+     * longitude (3) ascending in latitude (4) ascending in depth (shallow to deep) (5) original row number Missing data
+     * columns (lon/lat/depth/time) will be treated as an array of missing values.  Missing values in an array will be
+     * ordered such that they appear before valid values.
      *
      * @param times
-     *         sample times to be used for this data array;
-     *         can be null to indicate sample times are not fully specified
+     *         sample times to be used for this data array; can be null to indicate sample times are not fully
+     *         specified
      */
     public void reorderData(Double[] times) {
         Double[] longitudes;
@@ -376,10 +339,10 @@ public class StdUserDataArray extends StdDataArray {
             if ( times != null ) {
                 Double timeValSecs = times[rowIdx];
                 if ( timeValSecs != null )
-                    dataLoc.setDataDate( new Date(Math.round(timeValSecs * 1000.0)) );
+                    dataLoc.setDataDate(new Date(Math.round(timeValSecs * 1000.0)));
             }
             // Leave dataValue as the missing value and add to the ordered set
-            if ( ! orderedSet.add(dataLoc) )
+            if ( !orderedSet.add(dataLoc) )
                 throw new RuntimeException("Unexpected duplicate data location with row number");
         }
 
@@ -387,7 +350,7 @@ public class StdUserDataArray extends StdDataArray {
         // Just assign the new order of the object arrays; no need to duplicate the objects themselves
         Object[][] orderedRows = new Object[numSamples][];
         int rowIdx = 0;
-        for ( DataLocation dataLoc : orderedSet ) {
+        for (DataLocation dataLoc : orderedSet) {
             // getRowNumber returns the row index assigned above
             orderedRows[rowIdx] = stdObjects[dataLoc.getRowNumber()];
             rowIdx++;
@@ -397,10 +360,8 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Checks that all values given (not missing values) are within the
-     * acceptable range for that data type.  Any problems found generate
-     * (error or warning) messages that are added to the internal list of
-     * messages.
+     * Checks that all values given (not missing values) are within the acceptable range for that data type.  Any
+     * problems found generate (error or warning) messages that are added to the internal list of messages.
      */
     public void checkBounds() {
         for (int k = 0; k < numDataCols; k++) {
@@ -409,24 +370,10 @@ public class StdUserDataArray extends StdDataArray {
             if ( dtype instanceof StringDashDataType ) {
                 StringDashDataType strtype = (StringDashDataType) dtype;
                 for (int j = 0; j < numSamples; j++) {
-                    ADCMessage msg = strtype.boundsCheckStandardValue(
-                                            (String) stdObjects[j][k]);
+                    ADCMessage msg = strtype.boundsCheckStandardValue((String) stdObjects[j][k]);
                     if ( msg != null ) {
-                        msg.setRowNumber(j+1);
-                        msg.setColNumber(k+1);
-                        msg.setColName(userColNames[k]);
-                        stdMsgList.add(msg);
-                    }
-                }
-            }
-            else if ( dtype instanceof CharDashDataType ) {
-                CharDashDataType chartype = (CharDashDataType) dtype;
-                for (int j = 0; j < numSamples; j++) {
-                    ADCMessage msg = chartype.boundsCheckStandardValue(
-                                            (Character) stdObjects[j][k]);
-                    if ( msg != null ) {
-                        msg.setRowNumber(j+1);
-                        msg.setColNumber(k+1);
+                        msg.setRowNumber(j + 1);
+                        msg.setColNumber(k + 1);
                         msg.setColName(userColNames[k]);
                         stdMsgList.add(msg);
                     }
@@ -435,11 +382,10 @@ public class StdUserDataArray extends StdDataArray {
             else if ( dtype instanceof IntDashDataType ) {
                 IntDashDataType inttype = (IntDashDataType) dtype;
                 for (int j = 0; j < numSamples; j++) {
-                    ADCMessage msg = inttype.boundsCheckStandardValue(
-                                            (Integer) stdObjects[j][k]);
+                    ADCMessage msg = inttype.boundsCheckStandardValue((Integer) stdObjects[j][k]);
                     if ( msg != null ) {
-                        msg.setRowNumber(j+1);
-                        msg.setColNumber(k+1);
+                        msg.setRowNumber(j + 1);
+                        msg.setColNumber(k + 1);
                         msg.setColName(userColNames[k]);
                         stdMsgList.add(msg);
                     }
@@ -448,11 +394,10 @@ public class StdUserDataArray extends StdDataArray {
             else if ( dtype instanceof DoubleDashDataType ) {
                 DoubleDashDataType dbltype = (DoubleDashDataType) dtype;
                 for (int j = 0; j < numSamples; j++) {
-                    ADCMessage msg = dbltype.boundsCheckStandardValue(
-                                            (Double) stdObjects[j][k]);
+                    ADCMessage msg = dbltype.boundsCheckStandardValue((Double) stdObjects[j][k]);
                     if ( msg != null ) {
-                        msg.setRowNumber(j+1);
-                        msg.setColNumber(k+1);
+                        msg.setRowNumber(j + 1);
+                        msg.setColNumber(k + 1);
                         msg.setColName(userColNames[k]);
                         stdMsgList.add(msg);
                     }
@@ -466,22 +411,20 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * @return the list of automated data check messages describing
-     *         problems detected in the data.  The messages that are
-     *         in this list comes from the constructor as well as any
-     *         check methods that were called.
+     * @return the list of automated data check messages describing problems detected in the data.  The messages that
+     * are in this list comes from the constructor as well as any check methods that were called.
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;
     }
 
     /**
-     * Determines is this data column is an appropriate index.
-     * Checks that the value is in the appropriate range and
+     * Determines is this data column is an appropriate index. Checks that the value is in the appropriate range and
      * that the column with this index has been standardized.
      *
      * @param idx
      *         index to test
+     *
      * @return if the index is valid
      */
     @Override
@@ -494,15 +437,15 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Get the standard value object for the specified value (column index)
-     * of the specified sample (row index).
+     * Get the standard value object for the specified value (column index) of the specified sample (row index).
      *
      * @param sampleIdx
      *         index of the sample (row)
      * @param columnIdx
      *         index of the data column
-     * @return standard value object; null is returned for "missing value" or
-     *         values that could not be interpreted
+     *
+     * @return standard value object; null is returned for "missing value" or values that could not be interpreted
+     *
      * @throws IndexOutOfBoundsException
      *         if either the sample index or the column index is invalid
      * @throws IllegalArgumentException
@@ -519,47 +462,20 @@ public class StdUserDataArray extends StdDataArray {
             throw new IndexOutOfBoundsException("data column index is invalid: " + columnIdx);
         if ( standardized[columnIdx] == null )
             throw new IllegalArgumentException("value cannot be standardized");
-        if ( ! standardized[columnIdx] )
+        if ( !standardized[columnIdx] )
             throw new IllegalStateException("value has not been standardized");
         return stdObjects[sampleIdx][columnIdx];
     }
 
     /**
-     * @return if this standardized user data array has a WOCE_AUTOCHECK column
-     */
-    public boolean hasWoceAutocheck() {
-        if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
-            return false;
-        return true;
-    }
-
-    /**
-     * Reset all values in the WOCE_AUTOCHECK column, if it exists,
-     * to {@link DashboardServerUtils#FLAG_ACCEPTABLE}.
+     * Reset all values in the WOCE_AUTOCHECK column to {@link DashboardServerUtils#FLAG_ACCEPTABLE}.
      */
     public void resetWoceAutocheck() {
         if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
             return;
-        for (int j = 0; j < numSamples; j++)
+        for (int j = 0; j < numSamples; j++) {
             stdObjects[j][woceAutocheckIndex] = DashboardServerUtils.FLAG_ACCEPTABLE;
-    }
-
-    /**
-     * Get the current WOCE_AUTOCHECK flag for a data sample (row).
-     *
-     * @param sampleIdx
-     *         index of the data sample (row) to check
-     * @return the current WOCE_AUTOCHECK flag for the data sample
-     * @throws IllegalArgumentException
-     *         if the sample index is invalid, or
-     *         if there is not WOCE_AUTOCHECK column
-     */
-    public Character getWoceAutocheckFlag(int sampleIdx) throws IllegalArgumentException {
-        if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
-            throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
-        if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
-            throw new IllegalArgumentException("no WOCE autocheck column");
-        return (Character) stdObjects[sampleIdx][woceAutocheckIndex];
+        }
     }
 
     /**
@@ -569,19 +485,19 @@ public class StdUserDataArray extends StdDataArray {
      *         index of the data sample (row) to set
      * @param newFlag
      *         WOCE flag to assign
+     *
      * @throws IllegalArgumentException
-     *         if the sample index is invalid,
-     *         if there is not WOCE_AUTOCHECK column, or
-     *         if the flag given is not a valid WOCE flag
+     *         if the sample index is invalid, if there is not WOCE_AUTOCHECK column, or if the flag given is not a
+     *         valid WOCE flag
      */
-    public void setWoceAutocheck(int sampleIdx, Character newFlag) throws IllegalArgumentException {
+    public void setWoceAutocheck(int sampleIdx, String newFlag) throws IllegalArgumentException {
         if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
             throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
         if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
             throw new IllegalArgumentException("no WOCE autocheck column");
-        if ( ! ( DashboardServerUtils.FLAG_ACCEPTABLE.equals(newFlag) ||
-                 DashboardServerUtils.WOCE_QUESTIONABLE.equals(newFlag) ||
-                 DashboardServerUtils.WOCE_BAD.equals(newFlag) ) )
+        if ( !(DashboardServerUtils.FLAG_ACCEPTABLE.equals(newFlag) ||
+                DashboardServerUtils.WOCE_QUESTIONABLE.equals(newFlag) ||
+                DashboardServerUtils.WOCE_BAD.equals(newFlag)) )
             throw new IllegalArgumentException("invalid WOCE flag value");
         stdObjects[sampleIdx][woceAutocheckIndex] = newFlag;
     }
@@ -603,24 +519,24 @@ public class StdUserDataArray extends StdDataArray {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( ! super.equals(obj) )
+        if ( !super.equals(obj) )
             return false;
 
-        if ( ! ( obj instanceof StdUserDataArray ) )
+        if ( !(obj instanceof StdUserDataArray) )
             return false;
         StdUserDataArray other = (StdUserDataArray) obj;
 
-        if ( ! stdMsgList.equals(other.stdMsgList) )
+        if ( !stdMsgList.equals(other.stdMsgList) )
             return false;
         if ( woceAutocheckIndex != other.woceAutocheckIndex )
             return false;
-        if ( ! Arrays.equals(standardized, other.standardized) )
+        if ( !Arrays.equals(standardized, other.standardized) )
             return false;
-        if ( ! Arrays.equals(userColNames, other.userColNames) )
+        if ( !Arrays.equals(userColNames, other.userColNames) )
             return false;
-        if ( ! Arrays.equals(userMissVals, other.userMissVals) )
+        if ( !Arrays.equals(userMissVals, other.userMissVals) )
             return false;
-        if ( ! Arrays.equals(userUnits, other.userUnits) )
+        if ( !Arrays.equals(userUnits, other.userUnits) )
             return false;
 
         return true;
@@ -633,7 +549,7 @@ public class StdUserDataArray extends StdDataArray {
                 "' woceAutocheckIndex=" + woceAutocheckIndex;
         repr += ",\n  stdMsgList=[";
         boolean first = true;
-        for ( ADCMessage msg : stdMsgList ) {
+        for (ADCMessage msg : stdMsgList) {
             if ( first )
                 first = false;
             else

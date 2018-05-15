@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * Currently represents an uploaded metadata file of unknown contents.
- * This may change in the future when contents are standardized.
+ * Currently represents an uploaded metadata file of unknown contents. This may change in the future when contents are
+ * standardized.
  *
  * @author Karl Smith
  */
@@ -19,8 +19,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     private static final long serialVersionUID = 4800004152004279471L;
 
     /**
-     * Separator between the filename and the upload timestamp
-     * in additional document titles.
+     * Separator between the filename and the upload timestamp in additional document titles.
      */
     private static final String TITLE_SEPARATOR = " ; ";
 
@@ -48,11 +47,9 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * Returns the additional documents title for this metadata.
-     * Normally this title is the filename, followed by a space, a semicolon,
-     * another space, and the upload timestamp.  If the filename is empty,
-     * this title is empty.  If the upload timestamp is empty, the
-     * title is just the filename.
+     * Returns the additional documents title for this metadata. Normally this title is the filename, followed by a
+     * space, a semicolon, another space, and the upload timestamp.  If the filename is empty, this title is empty.  If
+     * the upload timestamp is empty, the title is just the filename.
      */
     public String getAddlDocsTitle() {
         if ( DashboardUtils.STRING_MISSING_VALUE.equals(filename) )
@@ -63,15 +60,14 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * Returns the metadata filename and the upload timestamp
-     * given in the document title.
+     * Returns the metadata filename and the upload timestamp given in the document title.
      *
      * @param docTitle
      *         document title to parse
-     * @return string array of length two with the filename as the
-     * first string and the timestamp as the second filename.
-     * If the title is empty, both strings in the returned array will be empty.
-     * If the title does not have a timestamp, the timestamp in the returned array will be empty.
+     *
+     * @return string array of length two with the filename as the first string and the timestamp as the second
+     * filename. If the title is empty, both strings in the returned array will be empty. If the title does not have a
+     * timestamp, the timestamp in the returned array will be empty.
      */
     public static String[] splitAddlDocsTitle(String docTitle) {
         String[] pieces = docTitle.split(TITLE_SEPARATOR, 2);
@@ -96,8 +92,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the dataset ID;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the dataset ID; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDatasetId() {
         return datasetId;
@@ -105,8 +100,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param datasetId
-     *         the dataset ID to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the dataset ID to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDatasetId(String datasetId) {
         if ( datasetId != null )
@@ -116,8 +110,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the filename;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the filename; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getFilename() {
         return filename;
@@ -125,8 +118,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param filename
-     *         the filename to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the filename to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setFilename(String filename) {
         if ( filename != null )
@@ -136,8 +128,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the upload timestamp;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the upload timestamp; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getUploadTimestamp() {
         return uploadTimestamp;
@@ -145,19 +136,18 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param uploadTimestamp
-     *         the upload timestamp to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the upload timestamp to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setUploadTimestamp(String uploadTimestamp) {
         if ( uploadTimestamp != null )
             this.uploadTimestamp = uploadTimestamp;
         else
-            this.uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;;
+            this.uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
+        ;
     }
 
     /**
-     * @return the owner;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the owner; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getOwner() {
         return owner;
@@ -165,8 +155,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param owner
-     *         the owner to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the owner to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setOwner(String owner) {
         if ( owner != null )
@@ -191,8 +180,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the version;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the version; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getVersion() {
         return version;
@@ -200,8 +188,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param version
-     *         the version to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the version to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setVersion(String version) {
         if ( version != null )
@@ -211,8 +198,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the DOI of this document;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the DOI of this document; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDOI() {
         return doi;
@@ -220,8 +206,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
     /**
      * @param doi
-     *         the DOI of this document to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the DOI of this document to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDOI(String doi) {
         if ( doi != null )
@@ -251,25 +236,25 @@ public class DashboardMetadata implements Serializable, IsSerializable {
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DashboardMetadata) )
+        if ( !(obj instanceof DashboardMetadata) )
             return false;
         DashboardMetadata other = (DashboardMetadata) obj;
 
         if ( selected != other.selected )
             return false;
-        if ( ! datasetId.equals(other.datasetId) )
+        if ( !datasetId.equals(other.datasetId) )
             return false;
-        if ( ! filename.equals(other.filename) )
+        if ( !filename.equals(other.filename) )
             return false;
-        if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
+        if ( !uploadTimestamp.equals(other.uploadTimestamp) )
             return false;
-        if ( ! owner.equals(other.owner) )
+        if ( !owner.equals(other.owner) )
             return false;
         if ( conflicted != other.conflicted )
             return false;
-        if ( ! version.equals(other.version) )
+        if ( !version.equals(other.version) )
             return false;
-        if ( ! doi.equals(other.doi) )
+        if ( !doi.equals(other.doi) )
             return false;
         return true;
     }
@@ -289,98 +274,93 @@ public class DashboardMetadata implements Serializable, IsSerializable {
     }
 
     /**
-     * Compare using the "selected" properties of the metadata documents.
-     * Note that this is inconsistent with DashboardMetadata.equals
-     * in that this is only examining one field of DashboardMetadata.
+     * Compare using the "selected" properties of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
     public static Comparator<DashboardMetadata> selectedComparator =
             new Comparator<DashboardMetadata>() {
-        @Override
-        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
-            if ( m1 == m2 )
-                return 0;
-            if ( m1 == null )
-                return -1;
-            if ( m2 == null )
-                return 1;
-            Boolean s1 = m1.isSelected();
-            return s1.compareTo(m2.isSelected());
-        }
-    };
+                @Override
+                public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+                    if ( m1 == m2 )
+                        return 0;
+                    if ( m1 == null )
+                        return -1;
+                    if ( m2 == null )
+                        return 1;
+                    Boolean s1 = m1.isSelected();
+                    return s1.compareTo(m2.isSelected());
+                }
+            };
 
     /**
-     * Compare using the dataset IDs associated with the metadata documents.
-     * Note that this is inconsistent with DashboardMetadata.equals
-     * in that this is only examining one field of DashboardMetadata.
+     * Compare using the dataset IDs associated with the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
     public static Comparator<DashboardMetadata> datasetIdComparator =
             new Comparator<DashboardMetadata>() {
-        @Override
-        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
-            if ( m1 == m2 )
-                return 0;
-            if ( m1 == null )
-                return -1;
-            if ( m2 == null )
-                return 1;
-            return m1.getDatasetId().compareTo(m2.getDatasetId());
-        }
-    };
+                @Override
+                public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+                    if ( m1 == m2 )
+                        return 0;
+                    if ( m1 == null )
+                        return -1;
+                    if ( m2 == null )
+                        return 1;
+                    return m1.getDatasetId().compareTo(m2.getDatasetId());
+                }
+            };
 
     /**
-     * Compare using the filenames of the metadata documents.
-     * Note that this is inconsistent with DashboardMetadata.equals
-     * in that this is only examining one field of DashboardMetadata.
+     * Compare using the filenames of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
     public static Comparator<DashboardMetadata> filenameComparator =
             new Comparator<DashboardMetadata>() {
-        @Override
-        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
-            if ( m1 == m2 )
-                return 0;
-            if ( m1 == null )
-                return -1;
-            if ( m2 == null )
-                return 1;
-            return m1.getFilename().compareTo(m2.getFilename());
-        }
-    };
+                @Override
+                public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+                    if ( m1 == m2 )
+                        return 0;
+                    if ( m1 == null )
+                        return -1;
+                    if ( m2 == null )
+                        return 1;
+                    return m1.getFilename().compareTo(m2.getFilename());
+                }
+            };
 
     /**
-     * Compare using the upload timestamp strings of the metadata documents.
-     * Note that this is inconsistent with DashboardMetadata.equals
-     * in that this is only examining one field of DashboardMetadata.
+     * Compare using the upload timestamp strings of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
     public static Comparator<DashboardMetadata> uploadTimestampComparator =
             new Comparator<DashboardMetadata>() {
-        @Override
-        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
-            if ( m1 == m2 )
-                return 0;
-            if ( m1 == null )
-                return -1;
-            if ( m2 == null )
-                return 1;
-            return m1.getUploadTimestamp().compareTo(m2.getUploadTimestamp());
-        }
-    };
+                @Override
+                public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+                    if ( m1 == m2 )
+                        return 0;
+                    if ( m1 == null )
+                        return -1;
+                    if ( m2 == null )
+                        return 1;
+                    return m1.getUploadTimestamp().compareTo(m2.getUploadTimestamp());
+                }
+            };
 
     /**
-     * Compare using the owners of the metadata documents.
-     * Note that this is inconsistent with DashboardMetadata.equals
+     * Compare using the owners of the metadata documents. Note that this is inconsistent with DashboardMetadata.equals
      * in that this is only examining one field of DashboardMetadata.
      */
     public static Comparator<DashboardMetadata> ownerComparator =
             new Comparator<DashboardMetadata>() {
-        @Override
-        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
-            if ( m1 == m2 )
-                return 0;
-            if ( m1 == null )
-                return -1;
-            if ( m2 == null )
-                return 1;
-            return m1.getOwner().compareTo(m2.getOwner());
-        }
-    };
+                @Override
+                public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+                    if ( m1 == m2 )
+                        return 0;
+                    if ( m1 == null )
+                        return -1;
+                    if ( m2 == null )
+                        return 1;
+                    return m1.getOwner().compareTo(m2.getOwner());
+                }
+            };
 }

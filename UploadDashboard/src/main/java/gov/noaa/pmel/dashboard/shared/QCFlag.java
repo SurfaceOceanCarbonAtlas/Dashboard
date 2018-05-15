@@ -3,17 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
-import java.io.Serializable;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import java.io.Serializable;
+
 /**
- * Represents a QC flag.
- * Used for combining, ordering, and searching QC flags for a dataset.
+ * Represents a QC flag. Used for combining, ordering, and searching QC flags for a dataset.
  *
  * @author Karl Smith
  */
-public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable  {
+public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable {
 
     private static final long serialVersionUID = 1802598804328743505L;
 
@@ -36,13 +35,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     protected String comment;
 
     /**
-     * Create with a
-     *         flagName of {@link DashboardUtils#STRING_MISSING_VALUE},
-     *         flagValue of {@link DashboardUtils#STRING_MISSING_VALUE},
-     *         severity of {@link Severity#UNASSIGNED},
-     *         column of {@link DashboardUtils#INT_MISSING_VALUE},
-     *         row of {@link DashboardUtils#INT_MISSING_VALUE}, and
-     *         comment of {@link DashboardUtils#STRING_MISSING_VALUE}.
+     * Create with a flagName of {@link DashboardUtils#STRING_MISSING_VALUE}, flagValue of {@link
+     * DashboardUtils#STRING_MISSING_VALUE}, severity of {@link Severity#UNASSIGNED}, column of {@link
+     * DashboardUtils#INT_MISSING_VALUE}, row of {@link DashboardUtils#INT_MISSING_VALUE}, and comment of {@link
+     * DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCFlag() {
         flagName = DashboardUtils.STRING_MISSING_VALUE;
@@ -54,11 +50,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * Create with given flag name, flag value, column index, and row index
-     * as described by {@link #setFlagName(String)}, {@link #setFlagValue(String)},
-     * {@link #setSeverity(QCFlag.Severity)}, {@link #setColumnIndex(Integer)},
-     * and {@link #setRowIndex(Integer)}.
-     * The comment is set to {@link DashboardUtils#STRING_MISSING_VALUE}.
+     * Create with given flag name, flag value, column index, and row index as described by {@link
+     * #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(QCFlag.Severity)}, {@link
+     * #setColumnIndex(Integer)}, and {@link #setRowIndex(Integer)}. The comment is set to {@link
+     * DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCFlag(String flagName, String flagValue, Severity severity,
             Integer columnIndex, Integer rowIndex) {
@@ -71,8 +66,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the QC flag name;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the QC flag name; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getFlagName() {
         return flagName;
@@ -80,8 +74,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param flagName
-     *         the QC flag name to set;
-     *         if null {@link DashboardUtils#STRING_MISSING_VALUE} will be assigned
+     *         the QC flag name to set; if null {@link DashboardUtils#STRING_MISSING_VALUE} will be assigned
      */
     public void setFlagName(String flagName) {
         if ( flagName != null )
@@ -91,8 +84,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the QC flag value;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the QC flag value; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getFlagValue() {
         return flagValue;
@@ -100,8 +92,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param flagValue
-     *         the QC flag value to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} will be assigned
+     *         the QC flag value to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} will be assigned
      */
     public void setFlagValue(String flagValue) {
         if ( flagValue != null )
@@ -111,8 +102,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the severity of the QC flag;
-     * never null but may be {@link QCFlag.Severity#UNASSIGNED} if not assigned
+     * @return the severity of the QC flag; never null but may be {@link QCFlag.Severity#UNASSIGNED} if not assigned
      */
     public Severity getSeverity() {
         return severity;
@@ -120,8 +110,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param severity
-     *         the severity to set for this QC flag value;
-     *         if null, {@link QCFlag.Severity#UNASSIGNED} will be assigned
+     *         the severity to set for this QC flag value; if null, {@link QCFlag.Severity#UNASSIGNED} will be assigned
      */
     public void setSeverity(Severity severity) {
         if ( severity != null )
@@ -131,8 +120,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the index of the column for this QC flag;
-     * never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
+     * @return the index of the column for this QC flag; never null, but may be {@link DashboardUtils#INT_MISSING_VALUE}
+     * if not assigned
      */
     public Integer getColumnIndex() {
         return columnIndex;
@@ -140,8 +129,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param columnIndex
-     *         the index of the column to set for this QC flag;
-     *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
+     *         the index of the column to set for this QC flag; if null {@link DashboardUtils#INT_MISSING_VALUE} will be
+     *         assigned
      */
     public void setColumnIndex(Integer columnIndex) {
         if ( columnIndex != null )
@@ -151,8 +140,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the index of the row for this QC flag;
-     * never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
+     * @return the index of the row for this QC flag; never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if
+     * not assigned
      */
     public Integer getRowIndex() {
         return rowIndex;
@@ -160,8 +149,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param rowIndex
-     *         the index of the row to set for this QC flag;
-     *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
+     *         the index of the row to set for this QC flag; if null {@link DashboardUtils#INT_MISSING_VALUE} will be
+     *         assigned
      */
     public void setRowIndex(Integer rowIndex) {
         if ( rowIndex != null )
@@ -171,8 +160,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the QC comment;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the QC comment; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getComment() {
         return comment;
@@ -180,8 +168,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param comment
-     *         the QC comment to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the QC comment to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setComment(String comment) {
         if ( comment != null )
@@ -233,21 +220,21 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
             return true;
         if ( obj == null )
             return false;
-        if ( ! (obj instanceof QCFlag) )
+        if ( !(obj instanceof QCFlag) )
             return false;
 
         QCFlag other = (QCFlag) obj;
-        if ( ! columnIndex.equals(other.columnIndex) )
+        if ( !columnIndex.equals(other.columnIndex) )
             return false;
-        if ( ! rowIndex.equals(other.rowIndex) )
+        if ( !rowIndex.equals(other.rowIndex) )
             return false;
-        if ( ! flagValue.equals(other.flagValue) )
+        if ( !flagValue.equals(other.flagValue) )
             return false;
-        if ( ! severity.equals(other.severity) )
+        if ( !severity.equals(other.severity) )
             return false;
-        if ( ! flagName.equals(other.flagName) )
+        if ( !flagName.equals(other.flagName) )
             return false;
-        if ( ! comment.equals(other.comment) )
+        if ( !comment.equals(other.comment) )
             return false;
         return true;
     }
@@ -255,13 +242,13 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     @Override
     public String toString() {
         return "QCFlag[" +
-               "flagName=" + flagName + ", " +
-               "flagValue='" + flagValue + "', " +
-               "severity='" + severity.toString() +  "', " +
-               "column=" + columnIndex.toString() + ", " +
-               "row=" + rowIndex.toString() +  ", " +
-               "comment=\"" + comment + "\" " +
-               "]";
+                "flagName=" + flagName + ", " +
+                "flagValue='" + flagValue + "', " +
+                "severity='" + severity.toString() + "', " +
+                "column=" + columnIndex.toString() + ", " +
+                "row=" + rowIndex.toString() + ", " +
+                "comment=\"" + comment + "\" " +
+                "]";
     }
 
 }

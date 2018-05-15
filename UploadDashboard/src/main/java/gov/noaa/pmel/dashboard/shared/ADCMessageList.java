@@ -3,15 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * Set of sanity checker ADCMessages for a dataset,
- * along with some dataset information.
+ * Set of sanity checker ADCMessages for a dataset, along with some dataset information.
  *
  * @author Karl Smith
  */
@@ -31,8 +30,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
     }
 
     /**
-     * @return the username;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the username; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getUsername() {
         return username;
@@ -40,8 +38,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
 
     /**
      * @param username
-     *         the username to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the username to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setUsername(String username) {
         if ( username == null )
@@ -51,8 +48,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
     }
 
     /**
-     * @return the dataset ID;
-     * never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the dataset ID; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDatasetId() {
         return datasetId;
@@ -60,8 +56,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
 
     /**
      * @param datasetId
-     *         the dataset to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the dataset to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDatasetId(String datasetId) {
         if ( datasetId == null )
@@ -71,8 +66,7 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
     }
 
     /**
-     * @return the summary messages; never null but may be empty.
-     * The actual list contained in this object is returned.
+     * @return the summary messages; never null but may be empty. The actual list contained in this object is returned.
      */
     public ArrayList<String> getSummaries() {
         return summaries;
@@ -80,9 +74,8 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
 
     /**
      * @param summaries
-     *         the summary messages to assign.  The current list of
-     *         summary messages is cleared, and then the contents of
-     *         this list, if not null, are added to the list.
+     *         the summary messages to assign.  The current list of summary messages is cleared, and then the contents
+     *         of this list, if not null, are added to the list.
      */
     public void setSummaries(ArrayList<String> summaries) {
         this.summaries.clear();
@@ -107,15 +100,15 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof ADCMessageList) )
+        if ( !(obj instanceof ADCMessageList) )
             return false;
         ADCMessageList other = (ADCMessageList) obj;
 
-        if ( ! datasetId.equals(other.datasetId) )
+        if ( !datasetId.equals(other.datasetId) )
             return false;
-        if ( ! username.equals(other.username) )
+        if ( !username.equals(other.username) )
             return false;
-        if ( ! summaries.equals(other.summaries) )
+        if ( !summaries.equals(other.summaries) )
             return false;
         return super.equals(other);
     }

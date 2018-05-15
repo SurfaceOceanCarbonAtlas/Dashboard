@@ -3,14 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * A simple pair of a list of known data column types
- * and a DashboardDatasetData
+ * A simple pair of a list of known data column types and a DashboardDatasetData
  *
  * @author Karl Smith
  */
@@ -27,8 +26,7 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
     }
 
     /**
-     * @return list of all known data types;
-     * the actual list in this instance (not a copy) is returned
+     * @return list of all known data types; the actual list in this instance (not a copy) is returned
      */
     public ArrayList<DataColumnType> getAllKnownTypes() {
         return allKnownTypes;
@@ -36,16 +34,14 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
 
     /**
      * @param allKnownTypes
-     *         the list of all known data types to set;
-     *         the given list (not a copy) is assigned to this instance
+     *         the list of all known data types to set; the given list (not a copy) is assigned to this instance
      */
     public void setAllKnownTypes(ArrayList<DataColumnType> allKnownTypes) {
         this.allKnownTypes = allKnownTypes;
     }
 
     /**
-     * @return the dashboard dataset with data;
-     * the actual list in this instance (not a copy) is returned
+     * @return the dashboard dataset with data; the actual list in this instance (not a copy) is returned
      */
     public DashboardDatasetData getDatasetData() {
         return datasetData;
@@ -53,8 +49,8 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
 
     /**
      * @param datasetData
-     *         the dashboard dataset with data to set;
-     *         the given dashboard dataset with data (not a copy) is assigned to this instance
+     *         the dashboard dataset with data to set; the given dashboard dataset with data (not a copy) is assigned to
+     *         this instance
      */
     public void setDatasetData(DashboardDatasetData datasetData) {
         this.datasetData = datasetData;
@@ -77,7 +73,7 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
         if ( this == obj )
             return true;
 
-        if ( ! (obj instanceof TypesDatasetDataPair) )
+        if ( !(obj instanceof TypesDatasetDataPair) )
             return false;
         TypesDatasetDataPair other = (TypesDatasetDataPair) obj;
 
@@ -86,7 +82,7 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
                 return false;
             }
         }
-        else if ( ! allKnownTypes.equals(other.allKnownTypes) ) {
+        else if ( !allKnownTypes.equals(other.allKnownTypes) ) {
             return false;
         }
 
@@ -95,7 +91,7 @@ public class TypesDatasetDataPair implements Serializable, IsSerializable {
                 return false;
             }
         }
-        else if ( ! datasetData.equals(other.datasetData) ) {
+        else if ( !datasetData.equals(other.datasetData) ) {
             return false;
         }
 

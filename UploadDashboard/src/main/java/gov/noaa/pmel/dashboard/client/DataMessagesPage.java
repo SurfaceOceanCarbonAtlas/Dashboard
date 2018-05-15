@@ -3,8 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -26,7 +24,6 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
@@ -34,6 +31,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
+import java.util.List;
 
 /**
  * @author Karl Smith
@@ -64,7 +63,7 @@ public class DataMessagesPage extends CompositeWithUsername {
 
     private static final String EMPTY_TABLE_TEXT = "No problems detected!";
 
-    interface DataMessagesPageUiBinder extends UiBinder<Widget, DataMessagesPage> {
+    interface DataMessagesPageUiBinder extends UiBinder<Widget,DataMessagesPage> {
     }
 
     private static DataMessagesPageUiBinder uiBinder =
@@ -73,11 +72,16 @@ public class DataMessagesPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField HTML introHtml;
-    @UiField DataGrid<ADCMessage> messagesGrid;
-    @UiField Button dismissButton;
-    @UiField SimplePager messagesPager;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    HTML introHtml;
+    @UiField
+    DataGrid<ADCMessage> messagesGrid;
+    @UiField
+    Button dismissButton;
+    @UiField
+    SimplePager messagesPager;
 
     private ListDataProvider<ADCMessage> listProvider;
 
@@ -85,10 +89,8 @@ public class DataMessagesPage extends CompositeWithUsername {
     private static DataMessagesPage singleton;
 
     /**
-     * Creates an empty data messages page.  Do not call this
-     * constructor; instead use the showPage static method
-     * to show the singleton instance of this page with the
-     * latest data messages for a cruise from the server.
+     * Creates an empty data messages page.  Do not call this constructor; instead use the showPage static method to
+     * show the singleton instance of this page with the latest data messages for a cruise from the server.
      */
     DataMessagesPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -104,8 +106,8 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Display this page in the RootLayoutPanel showing the messages
-     * for the specified dataset.  Adds this page to the page history.
+     * Display this page in the RootLayoutPanel showing the messages for the specified dataset.  Adds this page to the
+     * page history.
      *
      * @param username
      *         user requesting the page
@@ -129,6 +131,7 @@ public class DataMessagesPage extends CompositeWithUsername {
                 History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
                 UploadDashboard.showAutoCursor();
             }
+
             @Override
             public void onFailure(Throwable ex) {
                 UploadDashboard.showFailureMessage(
@@ -140,12 +143,11 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -159,8 +161,7 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Update the automated data checker messages with
-     * that given in the provided ADCMessageList.
+     * Update the automated data checker messages with that given in the provided ADCMessageList.
      *
      * @param msgList
      *         cruise dataset and set of messages to show

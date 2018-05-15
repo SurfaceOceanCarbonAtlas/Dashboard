@@ -3,6 +3,26 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
+import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
+import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
+import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -20,28 +40,6 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
-
-import gov.noaa.pmel.dashboard.actions.DatasetChecker;
-import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
-import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
-import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.ferret.FerretConfig;
-import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
-import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
-import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
  * Reads and holds the Dashboard configuration details
@@ -79,35 +77,35 @@ public class DashboardConfigStore {
 
     private static final String CONFIG_FILE_INFO_MSG =
             "This configuration file should look something like: \n" +
-            "# ------------------------------ \n" +
-            UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
-            QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
-            SVN_USER_NAME_TAG + "=SVNUsername \n" +
-            SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
-            USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
-            DATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Data/Files \n" +
-            METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
-            DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
-            DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
-            ARCHIVE_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Archive/Bundles \n" +
-            ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
-            CC_BUNDLES_EMAIL_ADDRESS_TAG + "=dashboard@my.group.org \n" +
-            SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.dashboard \n" +
-            SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
-            SMTP_USERNAME_TAG + "=username.for.smtp \n" +
-            SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
-            ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
-            ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DecDSG/Update \n" +
-            USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
-            METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
-            DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
-            COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
-            FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
-            DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" +
-            USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
-            USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
-            USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
-            "# ------------------------------ \n";
+                    "# ------------------------------ \n" +
+                    UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+                    QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+                    SVN_USER_NAME_TAG + "=SVNUsername \n" +
+                    SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
+                    USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
+                    DATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Data/Files \n" +
+                    METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
+                    DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
+                    DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
+                    ARCHIVE_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Archive/Bundles \n" +
+                    ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
+                    CC_BUNDLES_EMAIL_ADDRESS_TAG + "=dashboard@my.group.org \n" +
+                    SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.dashboard \n" +
+                    SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
+                    SMTP_USERNAME_TAG + "=username.for.smtp \n" +
+                    SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
+                    ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
+                    ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DecDSG/Update \n" +
+                    USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
+                    METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
+                    DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
+                    COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
+                    FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
+                    DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" +
+                    USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
+                    USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
+                    USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
+                    "# ------------------------------ \n";
 
     private static final Object SINGLETON_SYNC_OBJECT = new Object();
     private static DashboardConfigStore singleton = null;
@@ -139,15 +137,14 @@ public class DashboardConfigStore {
     private Logger itsLogger;
 
     /**
-     * Creates a data store initialized from the contents of the standard
-     * configuration file.  See the contents of {@link #CONFIG_FILE_INFO_MSG}
-     * for information on the configuration file format.
-     *
-     * Do not create an instance of this class;
-     * instead use {@link #get()} to retrieve the singleton instance
+     * Creates a data store initialized from the contents of the standard configuration file.  See the contents of
+     * {@link #CONFIG_FILE_INFO_MSG} for information on the configuration file format.
+     * <p>
+     * Do not create an instance of this class; instead use {@link #get()} to retrieve the singleton instance
      *
      * @param startMonitors
      *         start the file change monitors?
+     *
      * @throws IOException
      *         if unable to read the standard configuration file
      */
@@ -158,8 +155,9 @@ public class DashboardConfigStore {
         }
         if ( baseDir == null ) {
             throw new IOException("CATALINA_BASE environment variable is not defined");
-        } else {
-            System.out.println("CATALINA_BASE:"+ baseDir);
+        }
+        else {
+            System.out.println("CATALINA_BASE:" + baseDir);
         }
         baseDir += File.separator;
 
@@ -176,7 +174,7 @@ public class DashboardConfigStore {
                 do {
                     webAppSubDir = webAppSubDir.getParentFile();
                     serverAppName = webAppSubDir.getName();
-                } while ( ! serverAppName.equals("WEB-INF") );
+                } while ( !serverAppName.equals("WEB-INF") );
                 webAppSubDir = webAppSubDir.getParentFile();
                 serverAppName = webAppSubDir.getName();
             } catch ( Exception ex ) {
@@ -188,7 +186,7 @@ public class DashboardConfigStore {
         String appContentDirPath = baseDir + "content" + File.separator + serverAppName + File.separator;
         String appConfigDirPath = appContentDirPath + "config" + File.separator;
         File appConfigDir = new File(appConfigDirPath);
-        if ( !appConfigDir.exists() || !appConfigDir.isDirectory() || !appConfigDir.canRead()) {
+        if ( !appConfigDir.exists() || !appConfigDir.isDirectory() || !appConfigDir.canRead() ) {
             throw new IllegalStateException("Problem with app config dir: " + appConfigDir.getAbsoluteFile());
         }
         String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator +
@@ -205,7 +203,7 @@ public class DashboardConfigStore {
         Properties configProps = new Properties();
         File configFile = new File(appConfigDir, serverAppName + ".properties");
         filesToWatch.add(configFile);
-        try ( FileReader reader = new FileReader(configFile); ) {
+        try (FileReader reader = new FileReader(configFile);) {
             configProps.load(reader);
         } catch ( Exception ex ) {
             throw new IOException("Problems reading " + configFile.getPath() +
@@ -266,7 +264,7 @@ public class DashboardConfigStore {
         try {
             propVal = getFilePathProperty(configProps, USER_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
-            try ( FileReader propsReader = new FileReader(propVal); ) {
+            try (FileReader propsReader = new FileReader(propVal);) {
                 typeProps.load(propsReader);
             }
             knownUserDataTypes = new KnownDataTypes();
@@ -280,8 +278,9 @@ public class DashboardConfigStore {
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known user-provided data types: ");
             TreeSet<DashDataType<?>> knownTypes = knownUserDataTypes.getKnownTypesSet();
-            for ( DashDataType<?> dtype : knownTypes )
+            for (DashDataType<?> dtype : knownTypes) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
+            }
         }
 
         try {
@@ -290,7 +289,7 @@ public class DashboardConfigStore {
                 throw new IllegalArgumentException("value not defined");
             propVal = propVal.trim();
             Properties typeProps = new Properties();
-            try ( FileReader propsReader = new FileReader(propVal); ) {
+            try (FileReader propsReader = new FileReader(propVal);) {
                 typeProps.load(propsReader);
             }
             knownMetadataTypes = new KnownDataTypes();
@@ -304,14 +303,15 @@ public class DashboardConfigStore {
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file metadata types: ");
             TreeSet<DashDataType<?>> knownTypes = knownMetadataTypes.getKnownTypesSet();
-            for ( DashDataType<?> dtype : knownTypes )
+            for (DashDataType<?> dtype : knownTypes) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
+            }
         }
 
         try {
             propVal = getFilePathProperty(configProps, DATA_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
-            try ( FileReader propsReader = new FileReader(propVal); ) {
+            try (FileReader propsReader = new FileReader(propVal);) {
                 typeProps.load(propsReader);
             }
             knownDataFileTypes = new KnownDataTypes();
@@ -325,8 +325,9 @@ public class DashboardConfigStore {
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file data types: ");
             TreeSet<DashDataType<?>> knownTypes = knownDataFileTypes.getKnownTypesSet();
-            for ( DashDataType<?> dtype : knownTypes )
+            for (DashDataType<?> dtype : knownTypes) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
+            }
         }
 
         // Read the default column names to types with units properties file
@@ -417,16 +418,19 @@ public class DashboardConfigStore {
             propVal = getFilePathProperty(configProps, ARCHIVE_BUNDLES_DIR_NAME_TAG, appConfigDir);
             archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername,
                     svnPassword, toEmailAddresses, ccEmailAddresses,
-                    smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
+                    smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword,
+                    false);
             itsLogger.info("Archive files bundler and mailer using:");
             itsLogger.info("    bundles directory: " + propVal);
             String emails = toEmailAddresses[0];
-            for (int k = 1; k < toEmailAddresses.length; k++)
+            for (int k = 1; k < toEmailAddresses.length; k++) {
                 emails += ", " + toEmailAddresses[k];
+            }
             itsLogger.info("    To: " + emails);
             emails = ccEmailAddresses[0];
-            for (int k = 1; k < ccEmailAddresses.length; k++)
+            for (int k = 1; k < ccEmailAddresses.length; k++) {
                 emails += ", " + ccEmailAddresses[k];
+            }
             itsLogger.info("    CC: " + emails);
             itsLogger.info("    SMTP host: " + smtpHostAddress);
             itsLogger.info("    SMTP port: " + smtpHostPort);
@@ -443,11 +447,11 @@ public class DashboardConfigStore {
             // Read the Ferret configuration given in this file
             File ferretPropsFile = new File(propVal);
             filesToWatch.add(ferretPropsFile);
-            try ( InputStream stream = new FileInputStream(ferretPropsFile); ) {
+            try (InputStream stream = new FileInputStream(ferretPropsFile);) {
                 SAXBuilder sb = new SAXBuilder();
                 Document jdom = sb.build(stream);
                 ferretConf = new FerretConfig();
-                ferretConf.setRootElement((Element)jdom.getRootElement().clone());
+                ferretConf.setRootElement((Element) jdom.getRootElement().clone());
             }
             itsLogger.info("read Ferret configuration file " + propVal);
         } catch ( Exception ex ) {
@@ -486,7 +490,8 @@ public class DashboardConfigStore {
         }
         String erddapDecDsgFlagFileName;
         try {
-            erddapDecDsgFlagFileName = getFilePathProperty(configProps, ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG, appConfigDir);
+            erddapDecDsgFlagFileName = getFilePathProperty(configProps, ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG,
+                    appConfigDir);
             itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG +
@@ -529,12 +534,12 @@ public class DashboardConfigStore {
 
         // Read and assign the authorized users
         userInfoMap = new HashMap<String,DashboardUserInfo>();
-        for ( Entry<Object,Object> entry : configProps.entrySet() ) {
-            if ( ! ((entry.getKey() instanceof String) &&
+        for (Entry<Object,Object> entry : configProps.entrySet()) {
+            if ( !((entry.getKey() instanceof String) &&
                     (entry.getValue() instanceof String)) )
                 continue;
             String username = (String) entry.getKey();
-            if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
+            if ( !username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
                 continue;
             username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
             username = DashboardServerUtils.cleanUsername(username);
@@ -556,7 +561,7 @@ public class DashboardConfigStore {
             }
             userInfoMap.put(username, userInfo);
         }
-        for ( DashboardUserInfo info : userInfoMap.values() ) {
+        for (DashboardUserInfo info : userInfoMap.values()) {
             itsLogger.info("    user info: " + info.toString());
         }
         itsLogger.info("read configuration file " + configFile.getPath());
@@ -582,9 +587,10 @@ public class DashboardConfigStore {
             throw new IllegalArgumentException("Empty or null file path specifier");
         }
         String path = propVal.trim();
-        if ( path.startsWith("/")) {
+        if ( path.startsWith("/") ) {
             return path;
-        } else {
+        }
+        else {
             File parentDir = baseDir;
             File propFile = new File(parentDir, propVal);
             return propFile.getCanonicalPath();
@@ -593,9 +599,11 @@ public class DashboardConfigStore {
 
     /**
      * @param startMonitors
-     *         start the file change monitors?
-     *         (ignored if the singleton instance of the DashboardConfigStore already exists)
+     *         start the file change monitors? (ignored if the singleton instance of the DashboardConfigStore already
+     *         exists)
+     *
      * @return the singleton instance of the DashboardConfigStore
+     *
      * @throws IOException
      *         if unable to read the standard configuration file
      */
@@ -613,8 +621,8 @@ public class DashboardConfigStore {
     }
 
     /**
-     * Shuts down the handlers and monitors associated with the current singleton
-     * data store and removes it as the singleton instance of this class.
+     * Shuts down the handlers and monitors associated with the current singleton data store and removes it as the
+     * singleton instance of this class.
      */
     public static void shutdown() {
         synchronized(SINGLETON_SYNC_OBJECT) {
@@ -641,9 +649,8 @@ public class DashboardConfigStore {
     }
 
     /**
-     * Monitors the configuration files for the current DashboardConfigStore
-     * singleton object.  If a configuration file has changed, sets
-     * needsToRestart to true and the monitoring thread exits.
+     * Monitors the configuration files for the current DashboardConfigStore singleton object.  If a configuration file
+     * has changed, sets needsToRestart to true and the monitoring thread exits.
      */
     private void watchConfigFiles() {
         // Make sure the watcher is not already running
@@ -655,39 +662,39 @@ public class DashboardConfigStore {
                 // Create a new watch service for the dashboard configuration files
                 try {
                     watcher = FileSystems.getDefault().newWatchService();
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
                     return;
                 }
                 // Register the the directories containing the dashboard configuration files with the watch service
                 HashSet<File> parentDirs = new HashSet<File>();
-                for ( File configFile : filesToWatch ) {
+                for (File configFile : filesToWatch) {
                     parentDirs.add(configFile.getParentFile());
                 }
                 ArrayList<WatchKey> registrations = new ArrayList<WatchKey>(parentDirs.size());
-                for ( File watchDir : parentDirs ) {
+                for (File watchDir : parentDirs) {
                     try {
                         registrations.add(watchDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
-                    } catch (Exception ex) {
+                    } catch ( Exception ex ) {
                         itsLogger.error("Unexpected error registering " + watchDir.getPath() + " for watching", ex);
-                        for ( WatchKey reg : registrations ) {
+                        for (WatchKey reg : registrations) {
                             reg.cancel();
                             reg.pollEvents();
                         }
                         try {
                             watcher.close();
-                        } catch (Exception e) {
+                        } catch ( Exception e ) {
                             ;
                         }
                         watcher = null;
                         return;
                     }
                 }
-                for (;;) {
+                for (; ; ) {
                     try {
                         WatchKey key = watcher.take();
                         Path parentPath = (Path) key.watchable();
-                        for ( WatchEvent<?> event : key.pollEvents() ) {
+                        for (WatchEvent<?> event : key.pollEvents()) {
                             Path relPath = (Path) event.context();
                             File thisFile = parentPath.resolve(relPath).toFile();
                             if ( filesToWatch.contains(thisFile) ) {
@@ -695,20 +702,20 @@ public class DashboardConfigStore {
                                 throw new Exception();
                             }
                         }
-                        if ( ! key.reset() )
+                        if ( !key.reset() )
                             break;
-                    } catch (Exception ex) {
+                    } catch ( Exception ex ) {
                         // Probably the watcher was closed
                         break;
                     }
                 }
-                for ( WatchKey reg : registrations ) {
+                for (WatchKey reg : registrations) {
                     reg.cancel();
                     reg.pollEvents();
                 }
                 try {
                     watcher.close();
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     ;
                 }
                 watcher = null;
@@ -720,20 +727,20 @@ public class DashboardConfigStore {
     }
 
     /**
-     * Stops the monitoring the dashboard configuration files.
-     * If the dashboard configuration files are not being monitored, this call does nothing.
+     * Stops the monitoring the dashboard configuration files. If the dashboard configuration files are not being
+     * monitored, this call does nothing.
      */
     private void cancelWatch() {
         try {
             watcher.close();
             // Only the thread modifies the value of watcher
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             // Might be NullPointerException
         }
         if ( watcherThread != null ) {
             try {
                 watcherThread.join();
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 ;
             }
             watcherThread = null;
@@ -865,6 +872,7 @@ public class DashboardConfigStore {
      *
      * @param username
      *         username
+     *
      * @return true if successful
      */
     public boolean validateUser(String username) {
@@ -879,17 +887,15 @@ public class DashboardConfigStore {
 
 
     /**
-     * Determines if username has manager privilege over othername.
-     * This can be from username being an administrator, a manager
-     * of a group othername belongs to, having the same username,
-     * or othername being invalid (most likely an unspecified user),
-     * so long as username is an authorized user.
+     * Determines if username has manager privilege over othername. This can be from username being an administrator, a
+     * manager of a group othername belongs to, having the same username, or othername being invalid (most likely an
+     * unspecified user), so long as username is an authorized user.
      *
      * @param username
      *         manager username to check; if not a valid user, returns false
      * @param othername
-     *         group member username to check; if not a valid user,
-     *         returns true if username is a valid user
+     *         group member username to check; if not a valid user, returns true if username is a valid user
+     *
      * @return true if username is an authorized user and has manager privileges over othername
      */
     public boolean userManagesOver(String username, String othername) {
@@ -902,8 +908,9 @@ public class DashboardConfigStore {
     /**
      * @param username
      *         name of the user
-     * @return true is this user is an admin or a manager of a group
-     * (regardless of whether there is anyone else in the group)
+     *
+     * @return true is this user is an admin or a manager of a group (regardless of whether there is anyone else in the
+     * group)
      */
     public boolean isManager(String username) {
         DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));
@@ -915,6 +922,7 @@ public class DashboardConfigStore {
     /**
      * @param username
      *         name of the user
+     *
      * @return true is this user is an admin
      */
     public boolean isAdmin(String username) {

@@ -3,8 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.Date;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.TimeZone;
@@ -21,16 +19,16 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
+import java.util.Date;
+
 /**
- * Page showing various plots of cruise data.
- * These plots are to be examined by a user
- * to catch errors prior to submitting for QC.
+ * Page showing various plots of cruise data. These plots are to be examined by a user to catch errors prior to
+ * submitting for QC.
  *
  * @author Karl Smith
  */
@@ -101,7 +99,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     public static final String REC_FCO2_SOURCES_IMAGE_NAME = "rec_fco2_sources";
 
 
-    interface DatasetPreviewPageUiBinder extends UiBinder<Widget, DatasetPreviewPage> {
+    interface DatasetPreviewPageUiBinder extends UiBinder<Widget,DatasetPreviewPage> {
     }
 
     private static DatasetPreviewPageUiBinder uiBinder =
@@ -110,44 +108,80 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField HTML introHtml;
-    @UiField Button refreshButton;
-    @UiField Button dismissButton;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    HTML introHtml;
+    @UiField
+    Button refreshButton;
+    @UiField
+    Button dismissButton;
 
-    @UiField HTML latVsLonHtml;
-    @UiField HTML latLonHtml;
-    @UiField HTML sampleVsTimeHtml;
-    @UiField HTML timeSeriesHtml;
-    @UiField HTML pressuresHtml;
-    @UiField HTML temperaturesHtml;
-    @UiField HTML salinitiesHtml;
-    @UiField HTML xco2sHtml;
-    @UiField HTML dtXco2Fco2Html;
-    @UiField HTML recFco2VsTimeHtml;
-    @UiField HTML recFco2VsSstHtml;
-    @UiField HTML recFco2VsSalHtml;
-    @UiField HTML reportRecFco2Html;
-    @UiField HTML recFco2DeltaHtml;
-    @UiField HTML recFco2SourcesHtml;
+    @UiField
+    HTML latVsLonHtml;
+    @UiField
+    HTML latLonHtml;
+    @UiField
+    HTML sampleVsTimeHtml;
+    @UiField
+    HTML timeSeriesHtml;
+    @UiField
+    HTML pressuresHtml;
+    @UiField
+    HTML temperaturesHtml;
+    @UiField
+    HTML salinitiesHtml;
+    @UiField
+    HTML xco2sHtml;
+    @UiField
+    HTML dtXco2Fco2Html;
+    @UiField
+    HTML recFco2VsTimeHtml;
+    @UiField
+    HTML recFco2VsSstHtml;
+    @UiField
+    HTML recFco2VsSalHtml;
+    @UiField
+    HTML reportRecFco2Html;
+    @UiField
+    HTML recFco2DeltaHtml;
+    @UiField
+    HTML recFco2SourcesHtml;
 
-    @UiField Image latVsLonImage;
-    @UiField Image latLonImage;
-    @UiField Image sampleVsTimeImage;
-    @UiField Image timeSeriesImage;
-    @UiField Image pressuresImage;
-    @UiField Image temperaturesImage;
-    @UiField Image salinitiesImage;
-    @UiField Image xco2sImage;
-    @UiField Image dtXco2Fco2Image;
-    @UiField Image recFco2VsTimeImage;
-    @UiField Image recFco2VsSstImage;
-    @UiField Image recFco2VsSalImage;
-    @UiField Image reportRecFco2Image;
-    @UiField Image recFco2DeltaImage;
-    @UiField Image recFco2SourcesImage;
+    @UiField
+    Image latVsLonImage;
+    @UiField
+    Image latLonImage;
+    @UiField
+    Image sampleVsTimeImage;
+    @UiField
+    Image timeSeriesImage;
+    @UiField
+    Image pressuresImage;
+    @UiField
+    Image temperaturesImage;
+    @UiField
+    Image salinitiesImage;
+    @UiField
+    Image xco2sImage;
+    @UiField
+    Image dtXco2Fco2Image;
+    @UiField
+    Image recFco2VsTimeImage;
+    @UiField
+    Image recFco2VsSstImage;
+    @UiField
+    Image recFco2VsSalImage;
+    @UiField
+    Image reportRecFco2Image;
+    @UiField
+    Image recFco2DeltaImage;
+    @UiField
+    Image recFco2SourcesImage;
 
     String expocode;
     String timetag;
@@ -172,13 +206,14 @@ public class DatasetPreviewPage extends CompositeWithUsername {
                     }
                     // Refresh this page to get the new image(s)
                     singleton.resetImageUrls();
-                    if ( ! isDone ) {
+                    if ( !isDone ) {
                         // More images to be generated - inquire again
                         service.buildPreviewImages(getUsername(), singleton.expocode,
                                 singleton.timetag, false, checkStatusCallback);
                     }
                 }
             }
+
             @Override
             public void onFailure(Throwable ex) {
                 if ( UploadDashboard.isCurrentPage(singleton) ) {
@@ -266,8 +301,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the preview page in the RootLayoutPanel with data plots
-     * for the first cruise in the given cruiseList.
+     * Display the preview page in the RootLayoutPanel with data plots for the first cruise in the given cruiseList.
      * Adds this page to the page history.
      */
     static void showPage(DashboardDatasetList cruiseList) {
@@ -275,17 +309,16 @@ public class DatasetPreviewPage extends CompositeWithUsername {
             singleton = new DatasetPreviewPage();
         UploadDashboard.updateCurrentPage(singleton);
         singleton.updatePreviewPlots(cruiseList.keySet().iterator().next(),
-                                     cruiseList.getUsername());
+                cruiseList.getUsername());
         History.newItem(PagesEnum.PREVIEW_DATASET.name(), false);
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -324,14 +357,13 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     }
 
     /**
-     * Assigns the URLs to the images.
-     * This triggers load events so the page should refresh when this is called.
+     * Assigns the URLs to the images. This triggers load events so the page should refresh when this is called.
      */
     private void resetImageUrls() {
         String imagePrefix;
         String imageSuffix;
         if ( expocode.length() > 11 ) {
-            imagePrefix = "preview/plots/" + expocode.substring(0,4) + "/" + expocode + "_";
+            imagePrefix = "preview/plots/" + expocode.substring(0, 4) + "/" + expocode + "_";
             imageSuffix = "_" + timetag + ".gif";
         }
         else {

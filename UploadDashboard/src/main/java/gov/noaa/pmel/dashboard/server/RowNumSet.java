@@ -6,10 +6,8 @@ package gov.noaa.pmel.dashboard.server;
 import java.util.TreeSet;
 
 /**
- * Extension of a TreeSet of Integers whose toString() method prints the
- * contents in a compact form.  A sequence of consecutive integers are
- * printed using the first value, a hyphen, and the last value, such as:
- * "5-35, 67, 88-99"
+ * Extension of a TreeSet of Integers whose toString() method prints the contents in a compact form.  A sequence of
+ * consecutive integers are printed using the first value, a hyphen, and the last value, such as: "5-35, 67, 88-99"
  *
  * @author Karl Smith
  */
@@ -25,10 +23,8 @@ public class RowNumSet extends TreeSet<Integer> {
     }
 
     /**
-     * Prints the contents of this set of integers in a compact form.
-     * A sequence of consecutive integers are printed using the first
-     * value, a hyphen, and the last value, such as:
-     * "5-35,67,68,88-99"
+     * Prints the contents of this set of integers in a compact form. A sequence of consecutive integers are printed
+     * using the first value, a hyphen, and the last value, such as: "5-35,67,68,88-99"
      */
     @Override
     public String toString() {
@@ -38,7 +34,7 @@ public class RowNumSet extends TreeSet<Integer> {
         Integer start = null;
         Integer end = null;
         boolean first = true;
-        for ( Integer val : this ) {
+        for (Integer val : this) {
             if ( start == null ) {
                 // start of a new sequence
                 start = val;
@@ -78,7 +74,7 @@ public class RowNumSet extends TreeSet<Integer> {
             }
         }
         // print the final stored sequence
-        if ( ! first ) {
+        if ( !first ) {
             sb.append(",");
         }
         if ( start.equals(end) ) {

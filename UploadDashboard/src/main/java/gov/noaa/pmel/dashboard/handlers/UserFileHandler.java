@@ -3,6 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,15 +26,6 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
-
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
-import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 /**
  * Handles storage and retrieval of user data in files.
@@ -43,8 +43,7 @@ public class UserFileHandler extends VersionedFileHandler {
     private HashMap<String,DataColumnType> defaultColNamesToTypes;
 
     /**
-     * Handles storage and retrieval of user data in files under
-     * the given user files directory.
+     * Handles storage and retrieval of user data in files under the given user files directory.
      *
      * @param userFilesDirName
      *         name of the user files directory
@@ -53,19 +52,16 @@ public class UserFileHandler extends VersionedFileHandler {
      * @param svnPassword
      *         password for SVN authentication
      * @param colNamesToTypesFilename
-     *         name of properties file giving the default mapping
-     *         of column name keys to column types with units
+     *         name of properties file giving the default mapping of column name keys to column types with units
      * @param userTypes
      *         known user-provided data column types
+     *
      * @throws IllegalArgumentException
-     *         if the specified directory does not exist, is not a
-     *         directory, or is not under SVN version control;
-     *         if the default column name to type properties
-     *         file does not exist or is invalid.
+     *         if the specified directory does not exist, is not a directory, or is not under SVN version control; if
+     *         the default column name to type properties file does not exist or is invalid.
      */
-    public UserFileHandler(String userFilesDirName, String svnUsername,
-            String svnPassword, String colNamesToTypesFilename,
-            KnownDataTypes userTypes) throws IllegalArgumentException {
+    public UserFileHandler(String userFilesDirName, String svnUsername, String svnPassword,
+            String colNamesToTypesFilename, KnownDataTypes userTypes) throws IllegalArgumentException {
         super(userFilesDirName, svnUsername, svnPassword);
         this.userTypes = userTypes;
         // Generate the default data column name to type map
@@ -74,21 +70,20 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Reads a properties file mapping data column names to data column
-     * types, units, and missing values, and adds these mappings to the
-     * provided maps.
+     * Reads a properties file mapping data column names to data column types, units, and missing values, and adds these
+     * mappings to the provided maps.
      *
      * @param dataColNamesToTypes
      *         add the mappings of column name keys to types to this map
      * @param propFile
-     *         properties file where each key is the data column name key,
-     *         and each value is the varName of a DataColumnType, a comma,
-     *         a unit string, a comma, and a missing value string
+     *         properties file where each key is the data column name key, and each value is the varName of a
+     *         DataColumnType, a comma, a unit string, a comma, and a missing value string
+     *
      * @throws IllegalArgumentException
      *         if the properties file does not exist or is invalid
      */
-    private void addDataColumnNames(HashMap<String,DataColumnType> dataColNamesToTypes,
-            File propFile) throws IllegalArgumentException {
+    private void addDataColumnNames(HashMap<String,DataColumnType> dataColNamesToTypes, File propFile)
+            throws IllegalArgumentException {
         // Read the column name to type properties file
         Properties colProps = new Properties();
         try {
@@ -98,15 +93,15 @@ public class UserFileHandler extends VersionedFileHandler {
             } finally {
                 propsReader.close();
             }
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException(ex);
         }
         // Convert the properties to a map of data column name to type
         // and add to the given map
-        for ( Entry<Object,Object> prop : colProps.entrySet() ) {
+        for (Entry<Object,Object> prop : colProps.entrySet()) {
             String colName = (String) prop.getKey();
             String propVal = (String) prop.getValue();
-            String[] vals = propVal.split(",",-1);
+            String[] vals = propVal.split(",", -1);
             if ( vals.length != 3 )
                 throw new IllegalArgumentException("invalid type,unit,missing value \"" +
                         propVal + "\" for key \"" + colName + "\" given in " +
@@ -117,7 +112,7 @@ public class UserFileHandler extends VersionedFileHandler {
                 throw new IllegalArgumentException("Unknown data type \"" +
                         vals[0] + "\" for tag \"" + colName + "\"");
             DataColumnType dctype = dtype.duplicate();
-            if ( ! dctype.setSelectedUnit(vals[1]) )
+            if ( !dctype.setSelectedUnit(vals[1]) )
                 throw new IllegalArgumentException("Unknown data unit \"" + vals[1] +
                         "\" for data type \"" + vals[0] + "\"");
             dctype.setSelectedMissingValue(vals[2]);
@@ -130,17 +125,17 @@ public class UserFileHandler extends VersionedFileHandler {
      *
      * @param username
      *         get cruises for this user
-     * @return the list of datasets for the user; will not be null,
-     *         but may be empty (including if there is no saved listing)
+     *
+     * @return the list of datasets for the user; will not be null, but may be empty (including if there is no saved
+     * listing)
+     *
      * @throws IllegalArgumentException
-     *         if username is invalid,
-     *         if there was a problem reading an existing dataset listing, or
-     *         if there was an error committing the updated dataset listing to version control
+     *         if username is invalid, if there was a problem reading an existing dataset listing, or if there was an
+     *         error committing the updated dataset listing to version control
      */
-    public DashboardDatasetList getDatasetListing(String username)
-                                        throws IllegalArgumentException {
+    public DashboardDatasetList getDatasetListing(String username) throws IllegalArgumentException {
         // Get the name of the dataset list file for this user
-        String cleanUsername = DashboardUtils.cleanUsername(username);
+        String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
         File userDataFile = new File(filesDir, cleanUsername + USER_CRUISE_LIST_NAME_EXTENSION);
@@ -179,7 +174,7 @@ public class UserFileHandler extends VersionedFileHandler {
         // Create the dataset list (map) for these cruises
         DashboardDatasetList datasetList = new DashboardDatasetList();
         datasetList.setUsername(cleanUsername);
-        for ( String datasetId : dataIdsSet ) {
+        for (String datasetId : dataIdsSet) {
             // Create the DashboardDataset from the info file
             DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
             if ( dataset == null ) {
@@ -189,7 +184,7 @@ public class UserFileHandler extends VersionedFileHandler {
             }
             else {
                 String owner = dataset.getOwner();
-                if ( ! configStore.userManagesOver(cleanUsername, owner) ) {
+                if ( !configStore.userManagesOver(cleanUsername, owner) ) {
                     // No longer authorized to view - remove this ID from the saved list
                     needsCommit = true;
                     commitMessage += "remove unauthorized dataset " + datasetId + "; ";
@@ -213,15 +208,13 @@ public class UserFileHandler extends VersionedFileHandler {
      * @param datasetList
      *         listing of datasets to be saved
      * @param message
-     *         version control commit message;
-     *         if null or blank, the commit will not be performed
+     *         version control commit message; if null or blank, the commit will not be performed
+     *
      * @throws IllegalArgumentException
-     *         if the dataset listing was invalid,
-     *         if there was a problem saving the cruise listing, or
-     *         if there was an error committing the updated file to version control
+     *         if the dataset listing was invalid, if there was a problem saving the cruise listing, or if there was an
+     *         error committing the updated file to version control
      */
-    public void saveDatasetListing(DashboardDatasetList datasetList,
-                        String message) throws IllegalArgumentException {
+    public void saveDatasetListing(DashboardDatasetList datasetList, String message) throws IllegalArgumentException {
         // Get the name of the dataset list file for this user
         String username = datasetList.getUsername();
         if ( (username == null) || username.isEmpty() )
@@ -231,8 +224,9 @@ public class UserFileHandler extends VersionedFileHandler {
         try {
             PrintWriter idsWriter = new PrintWriter(userDataFile);
             try {
-                for ( String datasetId : datasetList.keySet() )
+                for (String datasetId : datasetList.keySet()) {
                     idsWriter.println(datasetId);
+                }
             } finally {
                 idsWriter.close();
             }
@@ -252,28 +246,28 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Removes an entry from a user's list of datasets, and
-     * saves the resulting list of datasets.
+     * Removes an entry from a user's list of datasets, and saves the resulting list of datasets.
      *
      * @param idsSet
      *         IDs of datasets to remove from the list
      * @param username
      *         user whose dataset list is to be updated
+     *
      * @return updated list of datasets for user
+     *
      * @throws IllegalArgumentException
-     *         if username is invalid,
-     *         if there was a problem saving the updated dataset listing, or
-     *         if there was an error committing the updated dataset listing to version control
+     *         if username is invalid, if there was a problem saving the updated dataset listing, or if there was an
+     *         error committing the updated dataset listing to version control
      */
-    public DashboardDatasetList removeDatasetsFromListing(TreeSet<String> idsSet,
-            String username) throws IllegalArgumentException {
-        String cleanUsername = DashboardUtils.cleanUsername(username);
+    public DashboardDatasetList removeDatasetsFromListing(TreeSet<String> idsSet, String username)
+            throws IllegalArgumentException {
+        String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
         DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
         boolean changeMade = false;
         String commitMessage = "datasets removed from the listing for " + cleanUsername + ": ";
-        for ( String datasetId : idsSet ) {
+        for (String datasetId : idsSet) {
             if ( datasetList.containsKey(datasetId) ) {
                 datasetList.remove(datasetId);
                 changeMade = true;
@@ -288,25 +282,24 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Adds matching entries to a user's list of datasets, and saves the
-     * resulting list of datasets.  Only datasets that are owned by the
-     * user, or owned by someone the user manages, are added.
+     * Adds matching entries to a user's list of datasets, and saves the resulting list of datasets.  Only datasets that
+     * are owned by the user, or owned by someone the user manages, are added.
      *
      * @param wildDatasetId
      *         dataset ID, possibly with wildcards * and ?, to add
      * @param username
      *         user whose dataset list is to be updated
+     *
      * @return updated list of datasets for the user
+     *
      * @throws IllegalArgumentException
-     *         if username is invalid,
-     *         if the dataset ID is invalid,
-     *         if the dataset information file does not exist,
-     *         if there was a problem saving the updated dateset listing, or
-     *         if there was an error committing the updated dataset listing to version control
+     *         if username is invalid, if the dataset ID is invalid, if the dataset information file does not exist, if
+     *         there was a problem saving the updated dateset listing, or if there was an error committing the updated
+     *         dataset listing to version control
      */
-    public DashboardDatasetList addDatasetsToListing(String wildDatasetId,
-                        String username) throws IllegalArgumentException {
-        String cleanUsername = DashboardUtils.cleanUsername(username);
+    public DashboardDatasetList addDatasetsToListing(String wildDatasetId, String username)
+            throws IllegalArgumentException {
+        String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
         DashboardConfigStore configStore;
@@ -323,7 +316,7 @@ public class UserFileHandler extends VersionedFileHandler {
         String commitMsg = "Added dataset(s) ";
         boolean needsCommit = false;
         boolean viewableFound = false;
-        for ( String datasetId : matchingIds ) {
+        for (String datasetId : matchingIds) {
             // Create a dataset entry for this data
             DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
             if ( dataset == null )
@@ -339,7 +332,7 @@ public class UserFileHandler extends VersionedFileHandler {
                 }
             }
         }
-        if ( ! viewableFound )
+        if ( !viewableFound )
             throw new IllegalArgumentException("No datasets with an ID matching " + wildDatasetId +
                     " that can be viewed by " + cleanUsername);
         if ( needsCommit )
@@ -348,24 +341,24 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Adds entries to a user's list of datasets, and saves the resulting
-     * list of datasets.  This does not check dataset ownership.
+     * Adds entries to a user's list of datasets, and saves the resulting list of datasets.  This does not check dataset
+     * ownership.
      *
      * @param idsSet
      *         list of IDs of datasets to add to the list
      * @param username
      *         user whose dataset list is to be updated
+     *
      * @return updated list of datasets for user
+     *
      * @throws IllegalArgumentException
-     *         if username is invalid,
-     *         if any of the expocodes are invalid,
-     *         if the cruise information file does not exist,
-     *         if there was a problem saving the updated cruise listing, or
-     *         if there was an error committing the updated cruise listing to version control
+     *         if username is invalid, if any of the expocodes are invalid, if the cruise information file does not
+     *         exist, if there was a problem saving the updated cruise listing, or if there was an error committing the
+     *         updated cruise listing to version control
      */
-    public DashboardDatasetList addDatasetsToListing(Collection<String> idsSet,
-                            String username) throws IllegalArgumentException {
-        String cleanUsername = DashboardUtils.cleanUsername(username);
+    public DashboardDatasetList addDatasetsToListing(Collection<String> idsSet, String username)
+            throws IllegalArgumentException {
+        String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
         DataFileHandler dataHandler;
@@ -377,7 +370,7 @@ public class UserFileHandler extends VersionedFileHandler {
         DashboardDatasetList datasetList = getDatasetListing(cleanUsername);
         String commitMsg = "Added dataset(s) ";
         boolean needsCommit = false;
-        for ( String datasetId : idsSet) {
+        for (String datasetId : idsSet) {
             // Create a dataset entry for this data
             DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
             if ( dataset == null )
@@ -397,18 +390,15 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Assigns the data column types, units, and missing values for a dataset
-     * from the user-provided data column names using the mappings of column
-     * names to types, units, and missing values associated with the dataset
-     * owner.
+     * Assigns the data column types, units, and missing values for a dataset from the user-provided data column names
+     * using the mappings of column names to types, units, and missing values associated with the dataset owner.
      *
      * @param dataset
-     *         dataset whose data column types, units, and missing values
-     *         are to be assigned
+     *         dataset whose data column types, units, and missing values are to be assigned
+     *
      * @throws IllegalArgumentException
-     *         if the data column names to types, units, and missing values
-     *         properties file for the dataset owner, if the file exists,
-     *         is invalid.
+     *         if the data column names to types, units, and missing values properties file for the dataset owner, if
+     *         the file exists, is invalid.
      */
     public void assignDataColumnTypes(DashboardDataset dataset) throws IllegalArgumentException {
         // Copy the default maps of data column names to types and units
@@ -421,7 +411,7 @@ public class UserFileHandler extends VersionedFileHandler {
         ArrayList<String> userColNames = dataset.getUserColNames();
         ArrayList<DataColumnType> colTypes = new ArrayList<DataColumnType>(userColNames.size());
         // Go through the column names to assign these lists
-        for ( String colName : userColNames ) {
+        for (String colName : userColNames) {
             String key = DashboardServerUtils.getKeyForName(colName);
             DataColumnType thisColType = userColNamesToTypes.get(key);
             if ( thisColType == null )
@@ -432,20 +422,19 @@ public class UserFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Updates and saves the data column names to types for a user from
-     * the currently assigned column names, types, units, and missing values
-     * given in a dataset.
+     * Updates and saves the data column names to types for a user from the currently assigned column names, types,
+     * units, and missing values given in a dataset.
      *
      * @param dataset
      *         update the data column names to types from this dataset
      * @param username
      *         update data column names to types for this user
+     *
      * @throws IllegalArgumentException
-     *         if the data column names to types file is invalid (if it exists), or
-     *         if unable to save or commit the updated version of this file
+     *         if the data column names to types file is invalid (if it exists), or if unable to save or commit the
+     *         updated version of this file
      */
-    public void updateUserDataColumnTypes(DashboardDataset dataset, String username)
-                                            throws IllegalArgumentException {
+    public void updateUserDataColumnTypes(DashboardDataset dataset, String username) throws IllegalArgumentException {
         // Copy the default maps of data column names to types and units
         HashMap<String,DataColumnType> userColNamesToTypes =
                 new HashMap<String,DataColumnType>(defaultColNamesToTypes);
@@ -457,30 +446,30 @@ public class UserFileHandler extends VersionedFileHandler {
         ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
         boolean changed = false;
         int k = 0;
-        for ( String colName : dataset.getUserColNames() ) {
+        for (String colName : dataset.getUserColNames()) {
             String key = DashboardServerUtils.getKeyForName(colName);
             DataColumnType thisColType = colTypes.get(k);
             DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
-            if ( ! thisColType.equals(oldType) )
+            if ( !thisColType.equals(oldType) )
                 changed = true;
             k++;
         }
 
         // If nothing has changed, nothing to do
-        if ( ! changed )
+        if ( !changed )
             return;
 
         // Remove the default name to type mappings (remove and put back if different)
-        for ( Entry<String,DataColumnType> defEntry : defaultColNamesToTypes.entrySet() ) {
+        for (Entry<String,DataColumnType> defEntry : defaultColNamesToTypes.entrySet()) {
             DataColumnType thisColType = userColNamesToTypes.remove(defEntry.getKey());
-            if ( ! defEntry.getValue().equals(thisColType) )
+            if ( !defEntry.getValue().equals(thisColType) )
                 userColNamesToTypes.put(defEntry.getKey(), thisColType);
         }
         // Create the Properties object for these mappings.
         Properties colProps = new Properties();
         // Note that the keys for the maps could no longer be identical.
         HashSet<String> allKeys = new HashSet<String>(userColNamesToTypes.keySet());
-        for ( String key : allKeys ) {
+        for (String key : allKeys) {
             DataColumnType thisColType = userColNamesToTypes.get(key);
             colProps.setProperty(key, thisColType.getVarName() + "," +
                     thisColType.getUnits().get(thisColType.getSelectedUnitIndex()) +
@@ -494,7 +483,7 @@ public class UserFileHandler extends VersionedFileHandler {
             } finally {
                 propsWriter.close();
             }
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             throw new IllegalArgumentException("Problems saving the data column names to types, units, " +
                     "and missing values file for " + username + "\n" + ex.getMessage());
         }
@@ -502,7 +491,7 @@ public class UserFileHandler extends VersionedFileHandler {
         try {
             commitVersion(propsFile, "Updated data column names to types, units, and missing values for " +
                     username);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems committing the data column names to types for " +
                     username + "\n" + ex.getMessage());
         }

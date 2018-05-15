@@ -27,25 +27,29 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardInputPopup extends Composite {
 
-    interface DashboardAskPopupUiBinder extends UiBinder<Widget, DashboardInputPopup> {
+    interface DashboardAskPopupUiBinder extends UiBinder<Widget,DashboardInputPopup> {
     }
 
     private static DashboardAskPopupUiBinder uiBinder =
             GWT.create(DashboardAskPopupUiBinder.class);
 
-    @UiField HTML infoHtml;
-    @UiField InlineLabel inputTextLabel;
-    @UiField TextBox inputTextBox;
-    @UiField Button yesButton;
-    @UiField Button noButton;
+    @UiField
+    HTML infoHtml;
+    @UiField
+    InlineLabel inputTextLabel;
+    @UiField
+    TextBox inputTextBox;
+    @UiField
+    Button yesButton;
+    @UiField
+    Button noButton;
 
     private PopupPanel parentPanel;
     String answer;
     HandlerRegistration askHandler;
 
     /**
-     * Widget for asking for input in a PopupPanel
-     * that is modal and does not auto-hide.
+     * Widget for asking for input in a PopupPanel that is modal and does not auto-hide.
      *
      * @param labelText
      *         text for the label next to the input text box
@@ -54,11 +58,9 @@ public class DashboardInputPopup extends Composite {
      * @param noText
      *         text for the no button
      * @param callback
-     *         calls the onSuccess method of this callback with the input
-     *         provided by the user if the yes button was selected.  If the
-     *         no button was selected, or if the window was (somehow) closed
-     *         without pressing either the yes or no button, null is returned.
-     *         The onFailure method of this callback is never called.
+     *         calls the onSuccess method of this callback with the input provided by the user if the yes button was
+     *         selected.  If the no button was selected, or if the window was (somehow) closed without pressing either
+     *         the yes or no button, null is returned. The onFailure method of this callback is never called.
      */
     public DashboardInputPopup(String labelText, String yesText,
             String noText, final AsyncCallback<String> callback) {
@@ -76,22 +78,20 @@ public class DashboardInputPopup extends Composite {
         // Handler to make the callback on window closing
         askHandler = parentPanel.addCloseHandler(
                 new CloseHandler<PopupPanel>() {
-            @Override
-            public void onClose(CloseEvent<PopupPanel> event) {
-                // Make the appropriate call
-                callback.onSuccess(answer);
-            }
-        });
+                    @Override
+                    public void onClose(CloseEvent<PopupPanel> event) {
+                        // Make the appropriate call
+                        callback.onSuccess(answer);
+                    }
+                });
     }
 
     /**
-     * Assigns the question asked in this PopupPanel and
-     * shows the PopupPanel centered in the browser window.
-     * The no button is given the focus.
+     * Assigns the question asked in this PopupPanel and shows the PopupPanel centered in the browser window. The no
+     * button is given the focus.
      *
      * @param htmlInfo
-     *         the unchecked HTML information to display.
-     *         For safety, use only known (static) HTML.
+     *         the unchecked HTML information to display. For safety, use only known (static) HTML.
      */
     void askForInput(String htmlInfo) {
         noButton.setFocus(true);

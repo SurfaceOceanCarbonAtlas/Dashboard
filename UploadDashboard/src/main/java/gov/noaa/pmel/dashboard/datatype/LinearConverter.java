@@ -6,8 +6,7 @@ package gov.noaa.pmel.dashboard.datatype;
 import java.util.TreeMap;
 
 /**
- * Translates standard string representations of floating-point values
- * and performs simple (linear) unit conversions.
+ * Translates standard string representations of floating-point values and performs simple (linear) unit conversions.
  *
  * @author Karl Smith
  */
@@ -16,6 +15,7 @@ public class LinearConverter extends ValueConverter<Double> {
     // TreeMap so can do case-insensitive comparisons
     private static final TreeMap<String,Double> SLOPES_MAP;
     private static final TreeMap<String,Double> INTERCEPTS_MAP;
+
     static {
         SLOPES_MAP = new TreeMap<String,Double>(String.CASE_INSENSITIVE_ORDER);
         INTERCEPTS_MAP = new TreeMap<String,Double>(String.CASE_INSENSITIVE_ORDER);
@@ -77,30 +77,27 @@ public class LinearConverter extends ValueConverter<Double> {
     Double intercept;
 
     /**
-     * Interprets string representations of floating-point values using
-     * {@link Double#valueOf(String)} after checking for missing values.
-     * Performs linear conversions between known units if the units are
-     * not equal.
+     * Interprets string representations of floating-point values using {@link Double#valueOf(String)} after checking
+     * for missing values. Performs linear conversions between known units if the units are not equal.
      *
      * @param inputUnit
-     *         unit of the values represented by the input strings, or
-     *         null for unitless values
+     *         unit of the values represented by the input strings, or null for unitless values
      * @param outputUnit
      *         unit for the values to returned, or null for unitless values
      * @param missingValue
      *         missing value string, or null for default missing values
+     *
      * @throws IllegalArgumentException
      *         if unable to perform the unit conversion
      * @throws IllegalStateException
-     *         never thrown; does not perform any conversions that require
-     *         standardized data from other data columns
+     *         never thrown; does not perform any conversions that require standardized data from other data columns
      */
     public LinearConverter(String inputUnit, String outputUnit, String missingValue)
             throws IllegalArgumentException, IllegalStateException {
         super(inputUnit, outputUnit, missingValue);
 
-        if ( ( (fromUnit == null) && (toUnit == null) ) ||
-             ( (fromUnit != null) && fromUnit.equals(toUnit) ) ) {
+        if ( ((fromUnit == null) && (toUnit == null)) ||
+                ((fromUnit != null) && fromUnit.equals(toUnit)) ) {
             slope = 1.0;
             intercept = 0.0;
             return;

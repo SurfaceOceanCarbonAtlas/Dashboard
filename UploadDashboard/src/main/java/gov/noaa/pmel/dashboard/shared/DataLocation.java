@@ -3,16 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * The location of a data point with a data value at that location.
- * Used for indicating locations for QC flag events which describes
- * the data set and data column for this location and value.
- * Also used for reordering data rows.
+ * The location of a data point with a data value at that location. Used for indicating locations for QC flag events
+ * which describes the data set and data column for this location and value. Also used for reordering data rows.
  *
  * @author Karl Smith
  */
@@ -28,8 +26,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     protected Double dataValue;
 
     /**
-     * Creates an empty location
-     * (all values set to the appropriate missing value)
+     * Creates an empty location (all values set to the appropriate missing value)
      */
     public DataLocation() {
         rowNumber = DashboardUtils.INT_MISSING_VALUE;
@@ -41,8 +38,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the data row number;
-     * never null but may be {@link DashboardUtils#INT_MISSING_VALUE}
+     * @return the data row number; never null but may be {@link DashboardUtils#INT_MISSING_VALUE}
      */
     public Integer getRowNumber() {
         return rowNumber;
@@ -50,8 +46,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param rowNumber
-     *         the data row number to set;
-     *         if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+     *         the data row number to set; if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
      */
     public void setRowNumber(Integer rowNumber) {
         if ( rowNumber == null )
@@ -61,8 +56,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the data date;
-     * never null but may be {@link DashboardUtils#DATE_MISSING_VALUE}
+     * @return the data date; never null but may be {@link DashboardUtils#DATE_MISSING_VALUE}
      */
     public Date getDataDate() {
         return dataDate;
@@ -70,8 +64,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param dataDate
-     *         the data date to set;
-     *         if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned.
+     *         the data date to set; if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned.
      */
     public void setDataDate(Date dataDate) {
         if ( dataDate == null )
@@ -81,8 +74,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the longitude in the range [-180.0, 180.0)
-     * never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+     * @return the longitude in the range [-180.0, 180.0) never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getLongitude() {
         return longitude;
@@ -90,8 +82,8 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param longitude
-     *         the longitude to set, which will be adjust the range [-180.0, 180.0);
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
+     *         the longitude to set, which will be adjust the range [-180.0, 180.0); if null, {@link
+     *         DashboardUtils#FP_MISSING_VALUE} is assigned.
      */
     public void setLongitude(Double longitude) {
         if ( longitude == null ) {
@@ -99,16 +91,17 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
         }
         else {
             this.longitude = longitude;
-            while ( this.longitude >= 180.0 )
+            while ( this.longitude >= 180.0 ) {
                 this.longitude -= 360.0;
-            while ( this.longitude < -180.0 )
+            }
+            while ( this.longitude < -180.0 ) {
                 this.longitude += 360.0;
+            }
         }
     }
 
     /**
-     * @return the latitude;
-     * never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+     * @return the latitude; never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getLatitude() {
         return latitude;
@@ -116,8 +109,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param latitude
-     *         the latitude to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
+     *         the latitude to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
      */
     public void setLatitude(Double latitude) {
         if ( latitude == null )
@@ -127,8 +119,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the sample depth;
-     * never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+     * @return the sample depth; never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getDepth() {
         return depth;
@@ -136,8 +127,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param depth
-     *         the sample depth to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
+     *         the sample depth to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
      */
     public void setDepth(Double depth) {
         if ( depth == null )
@@ -147,8 +137,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the data value;
-     * never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+     * @return the data value; never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getDataValue() {
         return dataValue;
@@ -156,8 +145,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param dataValue
-     *         the data value to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
+     *         the data value to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
      */
     public void setDataValue(Double dataValue) {
         if ( dataValue == null )
@@ -167,18 +155,10 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * Compares in the order:
-     *         (1) date
-     *         (2) longitude
-     *         (3) latitude
-     *         (4) depth
-     *         (5) data value
-     *         (6) row number
-     * All comparisons are made using the compareTo method of each type
-     * (Date, Double, Integer), and as such do not account for longitude
-     * modulo or insignificant floating-point differences as is done in
-     * the {@link #equals(Object)} method.  Missing values are compared
-     * using their actual value (which should be low).
+     * Compares in the order: (1) date (2) longitude (3) latitude (4) depth (5) data value (6) row number All
+     * comparisons are made using the compareTo method of each type (Date, Double, Integer), and as such do not account
+     * for longitude modulo or insignificant floating-point differences as is done in the {@link #equals(Object)}
+     * method.  Missing values are compared using their actual value (which should be low).
      */
     @Override
     public int compareTo(DataLocation other) {
@@ -219,25 +199,25 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DataLocation) )
+        if ( !(obj instanceof DataLocation) )
             return false;
         DataLocation other = (DataLocation) obj;
 
-        if ( ! rowNumber.equals(other.rowNumber) )
+        if ( !rowNumber.equals(other.rowNumber) )
             return false;
-        if ( ! dataDate.equals(other.dataDate) )
+        if ( !dataDate.equals(other.dataDate) )
             return false;
 
-        if ( ! DashboardUtils.closeTo(dataValue, other.dataValue,
+        if ( !DashboardUtils.closeTo(dataValue, other.dataValue,
                 DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( ! DashboardUtils.closeTo(depth, other.depth,
+        if ( !DashboardUtils.closeTo(depth, other.depth,
                 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( ! DashboardUtils.closeTo(latitude, other.latitude,
+        if ( !DashboardUtils.closeTo(latitude, other.latitude,
                 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude,
+        if ( !DashboardUtils.longitudeCloseTo(longitude, other.longitude,
                 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
 
@@ -248,7 +228,7 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     public String toString() {
         return "DataLocation" +
                 "[ rowNumber=" + rowNumber.toString() +
-                ", dataTime=" + Long.toString(Math.round((dataDate.getTime()/1000.0))) +
+                ", dataTime=" + Long.toString(Math.round((dataDate.getTime() / 1000.0))) +
                 ", longitude=" + longitude.toString() +
                 ", latitude=" + latitude.toString() +
                 ", depth=" + depth.toString() +

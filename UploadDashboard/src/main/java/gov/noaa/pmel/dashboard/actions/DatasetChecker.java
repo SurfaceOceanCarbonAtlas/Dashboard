@@ -3,8 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
-import java.util.HashSet;
-
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
@@ -13,6 +11,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
+import java.util.HashSet;
 
 /**
  * Class for interpreting, standardizing, and checking user-provided data.
@@ -47,7 +47,7 @@ public class DatasetChecker {
                 return true;
             if ( obj == null )
                 return false;
-            if ( ! ( obj instanceof RowColumn ) )
+            if ( !(obj instanceof RowColumn) )
                 return false;
             RowColumn other = (RowColumn) obj;
             if ( row != other.row )
@@ -71,9 +71,9 @@ public class DatasetChecker {
      *         all known user data types
      * @param checkerMessageHandler
      *         handler for automated data checker messages
+     *
      * @throws IllegalArgumentException
-     *         if either argument is null, or
-     *         if there are no user data types given
+     *         if either argument is null, or if there are no user data types given
      */
     public DatasetChecker(KnownDataTypes userDataTypes,
             CheckerMessageHandler checkerMessageHandler) throws IllegalArgumentException {
@@ -86,39 +86,33 @@ public class DatasetChecker {
     }
 
     /**
-     * Interprets the data string representations and standardizes, if required,
-     * these data values for given dataset.  Performs the automated data checks
-     * on these data values.  Saves the messages generated from these steps and
-     * assigns the automated data checker WOCE flags from these messages.
-     * <br /><br />
-     * The given dateset object is updated with the set of checker QC flags, the
-     * set of user-provided QC flags, the number of rows with errors (not marked
-     * by the PI), the number of rows with warnings (not marked by the PI), and
-     * the current data check status.
-     * <br /><br />
-     * The given metadata object, if not null, it is updated with values that can
-     * be derived from the data: western-most longitude, eastern-most longitude,
-     * southern-most latitude, northern-most latitude, start time, and end time.
+     * Interprets the data string representations and standardizes, if required, these data values for given dataset.
+     * Performs the automated data checks on these data values.  Saves the messages generated from these steps and
+     * assigns the automated data checker WOCE flags from these messages. <br /><br /> The given dateset object is
+     * updated with the set of checker QC flags, the set of user-provided QC flags, the number of rows with errors (not
+     * marked by the PI), the number of rows with warnings (not marked by the PI), and the current data check status.
+     * <br /><br /> The given metadata object, if not null, it is updated with values that can be derived from the data:
+     * western-most longitude, eastern-most longitude, southern-most latitude, northern-most latitude, start time, and
+     * end time.
      *
      * @param dataset
      *         dataset data to check; various fields will be updated by this method
      * @param metadata
      *         metadata to update; can be null
+     *
      * @return standardized user data array of checked values
+     *
      * @throws IllegalArgumentException
-     *         if there are no data values,
-     *         if a data column description is not a known user data type,
-     *         if a required unit conversion is not supported,
-     *         if a standardizer for a given data type is not known,
-     *         if ....
+     *         if there are no data values, if a data column description is not a known user data type, if a required
+     *         unit conversion is not supported, if a standardizer for a given data type is not known, if ....
      */
     public StdUserDataArray standardizeDataset(DashboardDatasetData dataset,
             DsgMetadata metadata) throws IllegalArgumentException {
         // Generate array of standardized data objects
         StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
-        // Check for missing lon/lat/depth/time
-        Double[] sampleTimes = stdUserData.checkMissingLonLatDepthTime();
+        // Check for missing lon/lat/time
+        Double[] sampleTimes = stdUserData.checkMissingLonLatTime();
 
         // Reorder the data as best possible
         // Do not do this in SOCAT
@@ -138,7 +132,7 @@ public class DatasetChecker {
         // Get the indices values the PI marked as bad.
         boolean hasCriticalError = false;
         HashSet<RowColumn> userErrs = new HashSet<RowColumn>();
-        for ( QCFlag wtype : dataset.getUserFlags() ) {
+        for (QCFlag wtype : dataset.getUserFlags()) {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
                 userErrs.add(new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex()));
@@ -149,7 +143,7 @@ public class DatasetChecker {
         }
         // Get the indices of values the PI marked as questionable
         HashSet<RowColumn> userWarns = new HashSet<RowColumn>();
-        for ( QCFlag wtype : dataset.getUserFlags() ) {
+        for (QCFlag wtype : dataset.getUserFlags()) {
             if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
                 userWarns.add(new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex()));
             }
@@ -157,29 +151,29 @@ public class DatasetChecker {
         // Get the indices of data rows the automated data checker
         // found having errors not not detected by the PI.
         HashSet<Integer> errRows = new HashSet<Integer>();
-        for ( QCFlag wtype : dataset.getCheckerFlags() ) {
+        for (QCFlag wtype : dataset.getCheckerFlags()) {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
-                if ( ! userErrs.contains(rowCol) )
+                if ( !userErrs.contains(rowCol) )
                     errRows.add(wtype.getRowIndex());
             }
-            if ( Severity.ERROR.equals(wtype.getSeverity())  ) {
+            if ( Severity.ERROR.equals(wtype.getSeverity()) ) {
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
-                if ( ! userErrs.contains(rowCol) )
+                if ( !userErrs.contains(rowCol) )
                     errRows.add(wtype.getRowIndex());
             }
         }
         // Get the indices of data rows the automated data checker
         // found having only warnings but not detected by the PI.
         HashSet<Integer> warnRows = new HashSet<Integer>();
-        for ( QCFlag wtype : dataset.getCheckerFlags() ) {
+        for (QCFlag wtype : dataset.getCheckerFlags()) {
             if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
                 Integer rowIdx = wtype.getRowIndex();
-                if ( ! ( userErrs.contains(rowCol) ||
-                         userWarns.contains(rowCol) ||
-                         errRows.contains(rowIdx) ) )
+                if ( !(userErrs.contains(rowCol) ||
+                        userWarns.contains(rowCol) ||
+                        errRows.contains(rowIdx)) )
                     warnRows.add(rowIdx);
             }
         }

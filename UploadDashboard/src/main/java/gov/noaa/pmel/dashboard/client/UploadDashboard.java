@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -94,9 +95,8 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     private DashboardInfoPopup msgPopup;
 
     /**
-     * Create the manager for the UploadDashboard pages.
-     * Do not use this constructor; instead use the static
-     * methods provided to display pages and messages.
+     * Create the manager for the UploadDashboard pages. Do not use this constructor; instead use the static methods
+     * provided to display pages and messages.
      */
     UploadDashboard() {
         // Just in case this gets called more than once,
@@ -128,14 +128,13 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Shows the message in a popup panel relative to the given UI obect.
-     * See {@link PopupPanel#showRelativeTo(UIObject)}.
+     * Shows the message in a popup panel relative to the given UI obect. See {@link
+     * PopupPanel#showRelativeTo(UIObject)}.
      *
      * @param htmlMsg
      *         unchecked HTML message to show.
      * @param obj
-     *         show the message relative to this object
-     *         (usually underneath, left-aligned)
+     *         show the message relative to this object (usually underneath, left-aligned)
      */
     public static void showMessageAt(String htmlMsg, UIObject obj) {
         if ( singleton == null )
@@ -147,8 +146,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Shows an error message, along with the message from an
-     * exception, in a popup panel centered on the page.
+     * Shows an error message, along with the message from an exception, in a popup panel centered on the page.
      *
      * @param htmlMsg
      *         unchecked HTML message to show before the exception message
@@ -166,8 +164,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Updates the displayed page by removing any page
-     * currently being shown and adding the given page.
+     * Updates the displayed page by removing any page currently being shown and adding the given page.
      *
      * @param newPage
      *         new page to be shown; if null, not page is shown
@@ -183,11 +180,11 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Returns whether the given page is still the current page instance
-     * in the dashboard.
+     * Returns whether the given page is still the current page instance in the dashboard.
      *
      * @param page
      *         page to check; if null, checks if there is no current page
+     *
      * @return true if the given page is the current page in the dashboard
      */
     public static boolean isCurrentPage(CompositeWithUsername page) {

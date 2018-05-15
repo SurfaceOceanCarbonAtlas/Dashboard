@@ -1,21 +1,19 @@
 /**
- * This software is provided by NOAA for full, free and open release.  It is
- * understood by the recipient/user that NOAA assumes no liability for any
- * errors contained in the code.  Although this software is released without
- * conditions or restrictions in its use, it is expected that appropriate
- * credit be given to its author and to the National Oceanic and Atmospheric
- * Administration should the software be included by the recipient as an
- * element in other product development.
+ * This software is provided by NOAA for full, free and open release.  It is understood by the recipient/user that NOAA
+ * assumes no liability for any errors contained in the code.  Although this software is released without conditions or
+ * restrictions in its use, it is expected that appropriate credit be given to its author and to the National Oceanic
+ * and Atmospheric Administration should the software be included by the recipient as an element in other product
+ * development.
  */
 package gov.noaa.pmel.dashboard.ferret;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jdom2.Document;
-import org.jdom2.Element;
 
 /**
  * This class manages the Ferret Config XML file that is used to run the Ferret IO Service Provider

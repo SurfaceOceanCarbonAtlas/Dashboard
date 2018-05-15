@@ -12,7 +12,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
@@ -28,7 +27,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     private static final String RELOGIN_TEXT = "Log in again";
     private static final String RELOGIN_HREF = "SocatUploadDashboard.html";
 
-    interface DashboardLogoutPageUiBinder extends UiBinder<Widget, DashboardLogoutPage> {
+    interface DashboardLogoutPageUiBinder extends UiBinder<Widget,DashboardLogoutPage> {
     }
 
     private static DashboardLogoutPageUiBinder uiBinder =
@@ -37,15 +36,16 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField HTML goodbyeTitle;
-    @UiField Anchor reloginAnchor;
+    @UiField
+    HTML goodbyeTitle;
+    @UiField
+    Anchor reloginAnchor;
 
     // The singleton instance of this page
     private static DashboardLogoutPage singleton = null;
 
     /**
-     * Creates a logout page.  Do not call this constructor;
-     * instead use the showPage static method to show the
+     * Creates a logout page.  Do not call this constructor; instead use the showPage static method to show the
      * singleton instance of this page.
      */
     DashboardLogoutPage() {
@@ -58,8 +58,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     }
 
     /**
-     * Shows the logout page in the RootLayoutPanel and logs out the user.
-     * Adds this page to the page history.
+     * Shows the logout page in the RootLayoutPanel and logs out the user. Adds this page to the page history.
      */
     static void showPage() {
         if ( singleton == null )
@@ -74,6 +73,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
                 UploadDashboard.stopHistoryHandling();
                 UploadDashboard.showAutoCursor();
             }
+
             @Override
             public void onFailure(Throwable ex) {
                 Cookies.removeCookie("JSESSIONID");
@@ -84,8 +84,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     }
 
     /**
-     * Shows the logout page in the RootLayoutPanel.
-     * Does not attempt to logout the user.
+     * Shows the logout page in the RootLayoutPanel. Does not attempt to logout the user.
      */
     static void redisplayPage() {
         // Allow this to succeed even if never called before

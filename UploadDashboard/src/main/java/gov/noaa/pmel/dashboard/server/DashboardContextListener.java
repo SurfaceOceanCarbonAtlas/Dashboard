@@ -14,7 +14,7 @@ public class DashboardContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
             DashboardConfigStore.get(true);
-        } catch (IOException ex) {
+        } catch ( IOException ex ) {
             LogManager.getLogger().error("Unexpected configuration error: " + ex.getMessage());
         }
     }

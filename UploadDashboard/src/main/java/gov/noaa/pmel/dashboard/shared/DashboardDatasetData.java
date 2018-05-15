@@ -3,10 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents the data given an uploaded cruise data file
@@ -31,9 +31,8 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
     }
 
     /**
-     * @return the list of metadata preamble strings;
-     * may be empty, but never null.
-     * The actual list in this object is returned.
+     * @return the list of metadata preamble strings; may be empty, but never null. The actual list in this object is
+     * returned.
      */
     public ArrayList<String> getPreamble() {
         return preamble;
@@ -41,8 +40,7 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
 
     /**
      * @param preamble
-     *         the metadata preamble strings to assign.  The list in
-     *         this object is cleared and all the contents of the
+     *         the metadata preamble strings to assign.  The list in this object is cleared and all the contents of the
      *         given list, if not null, are added.
      */
     public void setPreamble(ArrayList<String> preamble) {
@@ -52,8 +50,7 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
     }
 
     /**
-     * @return the list of row numbers; may be empty, but never null.
-     * The actual list in this object is returned.
+     * @return the list of row numbers; may be empty, but never null. The actual list in this object is returned.
      */
     public ArrayList<Integer> getRowNums() {
         return rowNums;
@@ -61,9 +58,8 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
 
     /**
      * @param rowNums
-     *         the row numbers to assign.  The list in
-     *         this object is cleared and all the contents of the
-     *         given list, if not null, are added.
+     *         the row numbers to assign.  The list in this object is cleared and all the contents of the given list, if
+     *         not null, are added.
      */
     public void setRowNums(ArrayList<Integer> rowNums) {
         this.rowNums.clear();
@@ -72,29 +68,23 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
     }
 
     /**
-     * The outer list of the data values iterates over the data samples;
-     * the rows of a table of data.  The inner list iterates over each
-     * particular data value for that sample; an entry in the column
-     * of a table of data.
+     * The outer list of the data values iterates over the data samples; the rows of a table of data.  The inner list
+     * iterates over each particular data value for that sample; an entry in the column of a table of data.
      *
-     * @return the list of data string lists; may be empty but never null.
-     * The actual list in this object is returned.
+     * @return the list of data string lists; may be empty but never null. The actual list in this object is returned.
      */
     public ArrayList<ArrayList<String>> getDataValues() {
         return dataValues;
     }
 
     /**
-     * The outer list of the data values iterates over the data samples;
-     * the rows of a table of data.  The inner list iterates over each
-     * particular data value for that sample; an entry in the column
-     * of a table of data.
+     * The outer list of the data values iterates over the data samples; the rows of a table of data.  The inner list
+     * iterates over each particular data value for that sample; an entry in the column of a table of data.
      *
      * @param dataValues
-     *         the lists of data values to assign.  The list in this object
-     *         is cleared and all the contents of the given list, if not
-     *         null, are added.  Note that this is a shallow copy; the
-     *         lists in the given list are not copied but used directly.
+     *         the lists of data values to assign.  The list in this object is cleared and all the contents of the given
+     *         list, if not null, are added.  Note that this is a shallow copy; the lists in the given list are not
+     *         copied but used directly.
      */
     public void setDataValues(ArrayList<ArrayList<String>> dataValues) {
         this.dataValues.clear();
@@ -116,18 +106,18 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if (obj == null)
+        if ( obj == null )
             return false;
 
-        if ( ! ( obj instanceof DashboardDatasetData ) )
+        if ( !(obj instanceof DashboardDatasetData) )
             return false;
         DashboardDatasetData other = (DashboardDatasetData) obj;
 
-        if ( ! super.equals(other) )
+        if ( !super.equals(other) )
             return false;
-        if ( ! preamble.equals(other.preamble) )
+        if ( !preamble.equals(other.preamble) )
             return false;
-        if ( ! rowNums.equals(other.rowNums) )
+        if ( !rowNums.equals(other.rowNums) )
             return false;
         return dataValues.equals(other.dataValues);
     }
@@ -135,11 +125,12 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst("DashboardDataset", "DashboardDatasetData");
-        repr = repr.substring(0, repr.length()-2 );
+        repr = repr.substring(0, repr.length() - 2);
         repr += ";\n    preamble = " + preamble.toString();
         repr += ";\n    dataValues = [\n";
-        for (int k = 0; k < rowNums.size(); k++)
+        for (int k = 0; k < rowNums.size(); k++) {
             repr += "         " + rowNums.get(k).toString() + ": " + dataValues.get(k).toString() + ",\n";
+        }
         repr += "    ]";
         repr += "\n]";
         return repr;

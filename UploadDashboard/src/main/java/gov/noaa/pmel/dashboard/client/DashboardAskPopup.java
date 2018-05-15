@@ -25,34 +25,34 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardAskPopup extends Composite {
 
-    interface DashboardAskPopupUiBinder extends UiBinder<Widget, DashboardAskPopup> {
+    interface DashboardAskPopupUiBinder extends UiBinder<Widget,DashboardAskPopup> {
     }
 
     private static DashboardAskPopupUiBinder uiBinder =
             GWT.create(DashboardAskPopupUiBinder.class);
 
-    @UiField HTML askHtml;
-    @UiField Button yesButton;
-    @UiField Button noButton;
+    @UiField
+    HTML askHtml;
+    @UiField
+    Button yesButton;
+    @UiField
+    Button noButton;
 
     private PopupPanel parentPanel;
     Boolean answer;
     HandlerRegistration askHandler;
 
     /**
-     * Widget for asking a question in a PopupPanel
-     * that is modal and does not auto-hide.
+     * Widget for asking a question in a PopupPanel that is modal and does not auto-hide.
      *
      * @param yesText
      *         text for the yes button
      * @param noText
      *         text for the no button
      * @param callback
-     *         calls the onSuccess method of this callback with the answer:
-     *         true for the yes button, false for the no button, or null if
-     *         the window was (somehow) closed without pressing either the
-     *         yes or no button.  The onFailure method of this callback is
-     *         never called.
+     *         calls the onSuccess method of this callback with the answer: true for the yes button, false for the no
+     *         button, or null if the window was (somehow) closed without pressing either the yes or no button.  The
+     *         onFailure method of this callback is never called.
      */
     public DashboardAskPopup(String yesText, String noText,
             final AsyncCallback<Boolean> callback) {
@@ -70,22 +70,20 @@ public class DashboardAskPopup extends Composite {
         // Handler to make the callback on window closing
         askHandler = parentPanel.addCloseHandler(
                 new CloseHandler<PopupPanel>() {
-            @Override
-            public void onClose(CloseEvent<PopupPanel> event) {
-                // Make the appropriate call
-                callback.onSuccess(answer);
-            }
-        });
+                    @Override
+                    public void onClose(CloseEvent<PopupPanel> event) {
+                        // Make the appropriate call
+                        callback.onSuccess(answer);
+                    }
+                });
     }
 
     /**
-     * Assigns the question asked in this PopupPanel and
-     * shows the PopupPanel centered in the browser window.
-     * The no button is given the focus.
+     * Assigns the question asked in this PopupPanel and shows the PopupPanel centered in the browser window. The no
+     * button is given the focus.
      *
      * @param htmlQuestion
-     *         the unchecked HTML question to display.
-     *         For safety, use only known (static) HTML.
+     *         the unchecked HTML question to display. For safety, use only known (static) HTML.
      */
     void askQuestion(String htmlQuestion) {
         noButton.setFocus(true);

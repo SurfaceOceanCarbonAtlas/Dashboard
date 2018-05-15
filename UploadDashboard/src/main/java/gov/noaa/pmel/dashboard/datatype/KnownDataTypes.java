@@ -3,25 +3,23 @@
  */
 package gov.noaa.pmel.dashboard.datatype;
 
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-
 /**
- * Known data types that can be extended as needed.
- * Provides an ordered set of known types.
+ * Known data types that can be extended as needed. Provides an ordered set of known types.
  *
  * @author Karl Smith
  */
 public class KnownDataTypes {
 
     /**
-     * Map whose keys are both variable name keys and display name keys
-     * (see {@link DashboardServerUtils#getKeyForName(String)} for a
-     * data type.
+     * Map whose keys are both variable name keys and display name keys (see {@link
+     * DashboardServerUtils#getKeyForName(String)} for a data type.
      */
     private HashMap<String,DashDataType<?>> knownTypes;
 
@@ -34,12 +32,12 @@ public class KnownDataTypes {
     }
 
     /**
-     * Adds the given data type to this collection of known data
-     * types.  The given instance of the DashDataType is added to
-     * the internal collection of known data types.
+     * Adds the given data type to this collection of known data types.  The given instance of the DashDataType is added
+     * to the internal collection of known data types.
      *
      * @param dtype
      *         new data type to add to the known list
+     *
      * @throws IllegalArgumentException
      *         if the data type already is a known type
      */
@@ -49,7 +47,7 @@ public class KnownDataTypes {
         if ( oldVal != null )
             throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
         String displayKey = DashboardServerUtils.getKeyForName(dtype.getDisplayName());
-        if ( ! displayKey.equals(varKey) ) {
+        if ( !displayKey.equals(varKey) ) {
             oldVal = knownTypes.put(displayKey, dtype);
             if ( oldVal != null )
                 throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
@@ -57,14 +55,12 @@ public class KnownDataTypes {
     }
 
     /**
-     * Adds the default well-known data column types for users
-     * to select from.
-     *         UNASSIGNED, OTHER, DATASET_NAME, PLATFORM_NAME,
-     *         PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
-     *         SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP,
-     *         DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, TIME_OF_DAY,
-     *         HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE,
-     *         DAY_OF_YEAR, SECOND_OF_DAY
+     * Adds the default well-known data column types for users to select from:
+     * <p>
+     * UNASSIGNED, OTHER, DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
+     * SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, TIME_OF_DAY,
+     * HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY
+     * <p>
      * This should be called before adding any custom types.
      *
      * @return this instance (as a convenience for chaining)
@@ -72,6 +68,7 @@ public class KnownDataTypes {
     public KnownDataTypes addStandardTypesForUsers() {
         addDataType(DashboardServerUtils.UNKNOWN);
         addDataType(DashboardServerUtils.OTHER);
+        addDataType(DashboardServerUtils.DATASET_ID);
         addDataType(DashboardServerUtils.DATASET_NAME);
         addDataType(DashboardServerUtils.PLATFORM_NAME);
         addDataType(DashboardServerUtils.PLATFORM_TYPE);
@@ -96,14 +93,12 @@ public class KnownDataTypes {
     }
 
     /**
-     * Adds the default well-known metadata column types for
-     * generating the NetCDF DSG files.
-     *         DATASET_ID, DATASET_NAME, PLATFORM_NAME,
-     *         PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
-     *         WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE,
-     *         SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE,
-     *         TIME_COVERAGE_START, TIME_COVERAGE_END,
-     *         STATUS, VERSION
+     * Adds the default well-known metadata column types for generating the NetCDF DSG files:
+     * <p>
+     * DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
+     * WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, TIME_COVERAGE_START,
+     * TIME_COVERAGE_END, STATUS, VERSION
+     * <p>
      * This should be called before adding any custom types.
      *
      * @return this instance (as a convenience for chaining)
@@ -127,11 +122,11 @@ public class KnownDataTypes {
     }
 
     /**
-     * Adds the default well-known data column types for
-     * generating the NetCDF DSG files.
-     *         SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH,
-     *         YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY,
-     *         MINUTE_OF_HOUR, SECOND_OF_MINUTE, WOCE_AUTOCHECK
+     * Adds the default well-known data column types for generating the NetCDF DSG files:
+     * <p>
+     * SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY,
+     * MINUTE_OF_HOUR, SECOND_OF_MINUTE, WOCE_AUTOCHECK
+     * <p>
      * This should be called before adding any custom types.
      *
      * @return this instance (as a convenience for chaining)
@@ -155,35 +150,32 @@ public class KnownDataTypes {
     /**
      * Create additional known data types from values in a Properties object.
      *
-     * @param knownTypesFile
-     *         properties file of data types to add to the known list;
-     *         uses the simple line format:
-     *             varName={JSON description}
-     *         where varName is the variable name of the type and
-     *         {JSON description} is a JSON string describing the type
-     *         as documented by {@link DashDataType#fromPropertyValue(String, String)}
-     * @throws IllegalArgumentException
-     *         if the data type to add is already known,
-     *         if the JSON description cannot be parsed.
+     * @param typeProps
+     *         data types properties to add to the known list; uses the simple line format: varName={JSON description}
+     *         where varName is the variable name of the type and {JSON description} is a JSON string describing the
+     *         type as documented by {@link DashDataType#fromPropertyValue(String, String)}
      *
      * @return this instance (as a convenience for chaining)
+     *
+     * @throws IllegalArgumentException
+     *         if the data type to add is already known, if the JSON description cannot be parsed.
      */
     public KnownDataTypes addTypesFromProperties(Properties typeProps) throws IllegalArgumentException {
-        for ( String name : typeProps.stringPropertyNames() ) {
+        for (String name : typeProps.stringPropertyNames()) {
             if ( containsTypeName(name) )
                 throw new IllegalArgumentException("Duplicate user-known data type \"" + name + "\"");
             String value = typeProps.getProperty(name);
-            addDataType( DashDataType.fromPropertyValue(name, value) );
+            addDataType(DashDataType.fromPropertyValue(name, value));
         }
         return this;
     }
 
     /**
-     * Determines if a given data type variable or display name
-     * exists in the list of known data types.
+     * Determines if a given data type variable or display name exists in the list of known data types.
      *
      * @param typeName
      *         search for a data type with this variable or display name
+     *
      * @return if the given data type name is known
      */
     public boolean containsTypeName(String typeName) {
@@ -195,21 +187,21 @@ public class KnownDataTypes {
      *
      * @param typeName
      *         variable or display name to find
-     * @return data type matching the given type name, or
-     *         null if the name does not match that of a known type
+     *
+     * @return data type matching the given type name, or null if the name does not match that of a known type
      */
     public DashDataType<?> getDataType(String typeName) {
         return knownTypes.get(DashboardServerUtils.getKeyForName(typeName));
     }
 
     /**
-     * Returns a new data type matching the variable or display name
-     * of the given data column type.
+     * Returns a new data type matching the variable or display name of the given data column type.
      *
      * @param dctype
      *         data column type to use
-     * @return data type matching the name in the given data column type, or
-     *         null if the name does not match that of a known type
+     *
+     * @return data type matching the name in the given data column type, or null if the name does not match that of a
+     * known type
      */
     public DashDataType<?> getDataType(DataColumnType dctype) {
         DashDataType<?> dtype = getDataType(dctype.getVarName());
@@ -236,8 +228,9 @@ public class KnownDataTypes {
     public String toString() {
         String strval = "KnownDataTypes[\n";
         // Do not show the keys, only the unique data types
-        for ( DashDataType<?> dtype : getKnownTypesSet() )
+        for (DashDataType<?> dtype : getKnownTypesSet()) {
             strval += "    " + dtype.toString() + "\n";
+        }
         strval += "]";
         return strval;
     }

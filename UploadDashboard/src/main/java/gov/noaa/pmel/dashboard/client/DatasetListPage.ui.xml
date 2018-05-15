@@ -3,45 +3,45 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
-    <ui:style src="FullWidth.css" />
+    <ui:style src="FullWidth.css"/>
 
     <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
         <g:FlowPanel>
             <g:FlowPanel addStyleNames="{style.titlemainpanel}">
-                <g:Image addStyleNames="{style.titleimage}" ui:field="titleImage" />
-                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
-                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
-                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
-                <g:Label addStyleNames="{style.titlereset}" />
+                <g:Image addStyleNames="{style.titleimage}" ui:field="titleImage"/>
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
             </g:FlowPanel>
             <g:DockLayoutPanel unit="EM" addStyleNames="{style.cruiselistdockpanel}">
                 <g:west size="8">
                     <g:FlowPanel addStyleNames="{style.cruisebuttonspanel}">
-                        <g:Button addStyleNames="{style.cruisepanelmainbutton}" ui:field="uploadButton" />
-                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="viewDataButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="omeMetadataButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addlDocsButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="reviewButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="qcSubmitButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="suspendDatasetButton" />
-                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="firstSeparator" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="showDatasetButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="hideDatasetButton" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="changeOwnerButton" />
-                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="secondSeparator" />
-                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="deleteButton" />
+                        <g:Button addStyleNames="{style.cruisepanelmainbutton}" ui:field="uploadButton"/>
+                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="viewDataButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="omeMetadataButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addlDocsButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="reviewButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="qcSubmitButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="suspendDatasetButton"/>
+                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="firstSeparator"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="showDatasetButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="hideDatasetButton"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="changeOwnerButton"/>
+                        <g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="secondSeparator"/>
+                        <g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="deleteButton"/>
                     </g:FlowPanel>
                 </g:west>
                 <g:center>
                     <g:ResizeLayoutPanel>
-                        <cell:DataGrid addStyleNames="{style.cruiselistgrid}" ui:field="datasetsGrid" />
+                        <cell:DataGrid addStyleNames="{style.cruiselistgrid}" ui:field="datasetsGrid"/>
                     </g:ResizeLayoutPanel>
                 </g:center>
             </g:DockLayoutPanel>
             <g:FlowPanel>
                 <!-- Just a spacer at the bottom -->
-                <g:Label addStyleNames="{style.horizontalbuttonpanel}" />
+                <g:Label addStyleNames="{style.horizontalbuttonpanel}"/>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:ScrollPanel>

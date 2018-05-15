@@ -5,8 +5,6 @@ package gov.noaa.pmel.dashboard.server;
 
 import java.util.HashSet;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 /**
  * User authentication and privileges
  *
@@ -27,18 +25,18 @@ public class DashboardUserInfo {
     private boolean admin;
 
     /**
-     * Creates a user with no group memberships; thus,
-     * can only work with cruises this user uploaded.
+     * Creates a user with no group memberships; thus, can only work with cruises this user uploaded.
      *
      * @param username
      *         username to use
+     *
      * @throws IllegalArgumentException
      *         if username is invalid (null or too short)
      */
     public DashboardUserInfo(String username) throws IllegalArgumentException {
         if ( (username == null) || (username.trim().length() < 4) )
             throw new IllegalArgumentException("User name too short");
-        this.username = DashboardUtils.cleanUsername(username);
+        this.username = DashboardServerUtils.cleanUsername(username);
         memberNums = new HashSet<Integer>();
         managerNums = new HashSet<Integer>();
         admin = false;
@@ -46,8 +44,10 @@ public class DashboardUserInfo {
 
     /**
      * Add privileges to this user from the roles specified
+     *
      * @param rolesString
      *         comma/semicolon/space separated list of user roles
+     *
      * @throws IllegalArgumentException
      *         if a role cannot be interpreted
      */
@@ -58,7 +58,7 @@ public class DashboardUserInfo {
                 int groupNum;
                 try {
                     groupNum = Integer.parseInt(
-                        roles[k].substring(MEMBER_NAME_TAG.length()) );
+                            roles[k].substring(MEMBER_NAME_TAG.length()));
                     if ( groupNum <= 0 )
                         throw new NumberFormatException();
                 } catch ( NumberFormatException ex ) {
@@ -71,7 +71,7 @@ public class DashboardUserInfo {
                 int groupNum;
                 try {
                     groupNum = Integer.parseInt(
-                        roles[k].substring(MANAGER_NAME_TAG.length()) );
+                            roles[k].substring(MANAGER_NAME_TAG.length()));
                     if ( groupNum <= 0 )
                         throw new NumberFormatException();
                 } catch ( NumberFormatException ex ) {
@@ -84,15 +84,15 @@ public class DashboardUserInfo {
             else if ( (roles[k]).equals(ADMIN_NAME_TAG) ) {
                 admin = true;
             }
-            else if ( ! (roles[k]).isEmpty() ) {
+            else if ( !(roles[k]).isEmpty() ) {
                 throw new IllegalArgumentException("Unknown role " + roles[k]);
             }
         }
     }
 
     /**
-     * @return true is this user is an admin or a manager of a group
-     * (regardless of whether there is anyone else in the group)
+     * @return true is this user is an admin or a manager of a group (regardless of whether there is anyone else in the
+     * group)
      */
     public boolean isManager() {
         if ( admin || (managerNums.size() > 0) )
@@ -108,15 +108,13 @@ public class DashboardUserInfo {
     }
 
     /**
-     * Determines if this user has manager privilege over a user.
-     * This can be from this user being an administrator, a manager
-     * of a group the other user belongs to, or actually being the
-     * same user (same username) as the other user.
+     * Determines if this user has manager privilege over a user. This can be from this user being an administrator, a
+     * manager of a group the other user belongs to, or actually being the same user (same username) as the other user.
      *
      * @param other
      *         the other user info; can be null
-     * @return true if this user has manager privilege over the other user;
-     * if other is null, returns true.
+     *
+     * @return true if this user has manager privilege over the other user; if other is null, returns true.
      */
     public boolean managesOver(DashboardUserInfo other) {
         // Admin manages over everyone
@@ -128,9 +126,10 @@ public class DashboardUserInfo {
         if ( username.equals(other.username) )
             return true;
         // Check groups this user manages
-        for ( Integer groupNum : managerNums )
+        for (Integer groupNum : managerNums) {
             if ( other.memberNums.contains(groupNum) )
                 return true;
+        }
         // Not a manager over other
         return false;
     }
@@ -152,17 +151,17 @@ public class DashboardUserInfo {
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DashboardUserInfo) )
+        if ( !(obj instanceof DashboardUserInfo) )
             return false;
         DashboardUserInfo other = (DashboardUserInfo) obj;
 
         if ( admin != other.admin )
             return false;
-        if ( ! username.equals(other.username) )
+        if ( !username.equals(other.username) )
             return false;
-        if ( ! managerNums.equals(other.managerNums) )
+        if ( !managerNums.equals(other.managerNums) )
             return false;
-        if ( ! memberNums.equals(other.memberNums) )
+        if ( !memberNums.equals(other.memberNums) )
             return false;
 
         return true;

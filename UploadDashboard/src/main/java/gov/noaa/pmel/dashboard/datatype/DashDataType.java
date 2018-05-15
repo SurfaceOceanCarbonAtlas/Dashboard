@@ -3,16 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.datatype;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Map.Entry;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
@@ -20,10 +14,14 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Map.Entry;
+
 /**
- * Base class for defining immutable standard data types.  Includes information
- * for converting string representations, bounds-checking values, and creating
- * variables in NetCDF files.
+ * Base class for defining immutable standard data types.  Includes information for converting string representations,
+ * bounds-checking values, and creating variables in NetCDF files.
  *
  * @author Karl Smith
  */
@@ -63,76 +61,62 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     protected T maxQuestionVal;
 
     /**
-     * Create with the given values.  The values of minQuestionVal, minAcceptVal,
-     * maxAcceptVal, and maxQuestionVal are set to null in this base class.
-     * Subclasses need to expand their constructors to: have String arguments
-     * representing these values, assign these values from those arguments, and
-     * validate the value assigned using {@link #validateLimits()}).  The meaning
-     * of these values are:
+     * Create with the given values.  The values of minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal are
+     * set to null in this base class. Subclasses need to expand their constructors to: have String arguments
+     * representing these values, assign these values from those arguments, and validate the value assigned using {@link
+     * #validateLimits()}).  The meaning of these values are:
      * <dl>
      * <dt>minQuestionVal</dt>
-     *         <dd>minimum questionable value for standardized values of this data
-     *         minimum column type (less than this value is bad); if null, there is
-     *         no questionable value</dd>
+     * <dd>minimum questionable value for standardized values of this data
+     * minimum column type (less than this value is bad); if null, there is no questionable value</dd>
      * <dt>minAcceptVal</dt>
-     *         <dd>minimum acceptable value for standardized values of this data
-     *         column type (less than this value is questionable or bad); if null,
-     *         there is no minimum acceptable value, although there still might be
-     *         a minimum questionable value.</dd>
+     * <dd>minimum acceptable value for standardized values of this data
+     * column type (less than this value is questionable or bad); if null, there is no minimum acceptable value,
+     * although there still might be a minimum questionable value.</dd>
      * <dt>maxAcceptVal</dt>
-     *         <dd>maximum acceptable value for standardized values of this data
-     *         column type (larger than this value is questionable or bad); if null,
-     *         there is no maximum acceptable value, although there still might be
-     *         a maximum questionable value.</dd>
+     * <dd>maximum acceptable value for standardized values of this data
+     * column type (larger than this value is questionable or bad); if null, there is no maximum acceptable value,
+     * although there still might be a maximum questionable value.</dd>
      * <dt>maxQuestionVal</dt>
-     *         <dd>maximum questionable value for standardized values of this data
-     *         column type (larger than this value is bad); if null, there is no
-     *         maximum questionable value.</dd>
+     * <dd>maximum questionable value for standardized values of this data
+     * column type (larger than this value is bad); if null, there is no maximum questionable value.</dd>
      * </dl>
      *
      * @param varName
-     *         NetCDF variable name for this data column type;
-     *         cannot be null or blank
+     *         NetCDF variable name for this data column type; cannot be null or blank
      * @param sortOrder
-     *         value used for ordering data column types;
-     *         cannot be null, NaN, or infinite
+     *         value used for ordering data column types; cannot be null, NaN, or infinite
      * @param displayName
-     *         name displayed in the Dashboard UI for this data column type;
-     *         cannot be null or blank
+     *         name displayed in the Dashboard UI for this data column type; cannot be null or blank
      * @param description
-     *         brief description of this data column type; if null,
-     *         {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         brief description of this data column type; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
+     *         assigned
      * @param isCritical
-     *         if this data type is required to be present and all
-     *         values must be valid
+     *         if this data type is required to be present and all values must be valid
      * @param units
-     *         unit strings associated with this data column type.
-     *         A new ArrayList is created from the values in the given
-     *         collection.  The first unit in the list is considered the
-     *         standard unit;  values in other units will be converted to
-     *         this unit when standardized.  If null or empty, a list with
-     *         only {@link DashboardUtils#STRING_MISSING_VALUE} is created.
+     *         unit strings associated with this data column type. A new ArrayList is created from the values in the
+     *         given collection.  The first unit in the list is considered the standard unit;  values in other units
+     *         will be converted to this unit when standardized.  If null or empty, a list with only {@link
+     *         DashboardUtils#STRING_MISSING_VALUE} is created.
      * @param standardName
-     *         standard name for this data column type (duplicate standard
-     *         names between data column types is acceptable);  if null,
-     *         {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         standard name for this data column type (duplicate standard names between data column types is
+     *         acceptable);  if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      * @param categoryName
-     *         category name for this data column type; if null,
-     *         {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         category name for this data column type; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
+     *         assigned
      * @param fileStdUnit
-     *         name of the standard unit (corresponding to the first unit
-     *         of the units array) to be used in the DSG files; if null,
-     *         the first unit string will be used
+     *         name of the standard unit (corresponding to the first unit of the units array) to be used in the DSG
+     *         files; if null, the first unit string will be used
+     *
      * @throws IllegalArgumentException
-     *         if the variable name, sort order, or display name is invalid;
-     *         if (in subclasses) the relationship
-     *             minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal,
-     *         for those values that are not null, is violated.
+     *         if the variable name, sort order, or display name is invalid; if (in subclasses) the relationship
+     *         minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal, for those values that are not null, is
+     *         violated.
      */
     protected DashDataType(String varName, Double sortOrder, String displayName,
             String description, boolean isCritical, Collection<String> units,
             String standardName, String categoryName, String fileStdUnit)
-                                            throws IllegalArgumentException {
+            throws IllegalArgumentException {
         if ( (varName == null) || varName.trim().isEmpty() )
             throw new IllegalArgumentException("data type variable name is invalid");
         this.varName = varName.trim();
@@ -145,7 +129,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             throw new IllegalArgumentException("data type display name is invalid");
         this.displayName = displayName;
 
-        if ( description != null)
+        if ( description != null )
             this.description = description.trim();
         else
             this.description = DashboardUtils.STRING_MISSING_VALUE;
@@ -157,12 +141,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         else
             this.units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 
-        if ( standardName != null)
+        if ( standardName != null )
             this.standardName = standardName.trim();
         else
             this.standardName = DashboardUtils.STRING_MISSING_VALUE;
 
-        if ( categoryName != null)
+        if ( categoryName != null )
             this.categoryName = categoryName.trim();
         else
             this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
@@ -186,46 +170,44 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     /**
      * @param strRepr
      *         string representation of the value to return
+     *
      * @return value represented by the string
+     *
      * @throws IllegalArgumentException
      *         if the string representation cannot be interpreted
      */
     public abstract T dataValueOf(String strRepr) throws IllegalArgumentException;
 
     /**
-     * Returns a value converter to interpreting string representations to data
-     * values of this type.  This converter use the given missing value string
-     * to interpret missing values.  If required, values should also be converted
-     * to the standard unit (the first unit in the units array) for this data type.
+     * Returns a value converter to interpreting string representations to data values of this type.  This converter use
+     * the given missing value string to interpret missing values.  If required, values should also be converted to the
+     * standard unit (the first unit in the units array) for this data type.
      *
      * @param inputUnit
-     *         unit/format of the input data string values.  If null, the value is
-     *         unitless, and in this case the standard value should also be unitless
-     *         (empty string).  The value returned, if the string does not represent
-     *         a missing value, should just be the value returned by
-     *         {@link #dataValueOf(String)}.
+     *         unit/format of the input data string values.  If null, the value is unitless, and in this case the
+     *         standard value should also be unitless (empty string).  The value returned, if the string does not
+     *         represent a missing value, should just be the value returned by {@link #dataValueOf(String)}.
      * @param missingValue
-     *         missing value for this converter; if null, standard missing values
-     *         are to be used
+     *         missing value for this converter; if null, standard missing values are to be used
      * @param stdArray
-     *         the standardized data that has been converted so far.  This is provided
-     *         for data conversions that require standardized data from other data
-     *         columns.
-     * @return a value converter, using the given missing value string, for converting
-     *         the data value strings in the given units to data values in standard units
+     *         the standardized data that has been converted so far.  This is provided for data conversions that require
+     *         standardized data from other data columns.
+     *
+     * @return a value converter, using the given missing value string, for converting the data value strings in the
+     * given units to data values in standard units
+     *
      * @throws IllegalArgumentException
      *         if there is no converter for performing this conversion
      * @throws IllegalStateException
      *         if the converter depends on other data that has not yet been standardized
      */
-    public abstract ValueConverter<T> getStandardizer(String inputUnit,
-            String missingValue, StdUserDataArray stdArray)
-                    throws IllegalArgumentException, IllegalStateException;
+    public abstract ValueConverter<T> getStandardizer(String inputUnit, String missingValue,
+            StdUserDataArray stdArray) throws IllegalArgumentException, IllegalStateException;
 
     /**
-     * Verifies that the values minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal,
-     * for those values that are not null, satisfies the relationship:
-     *             minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal
+     * Verifies that the values minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal, for those values that
+     * are not null, satisfies the relationship: minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal
+     *
      * @throws IllegalArgumentException
      */
     protected void validateLimits() throws IllegalArgumentException {
@@ -247,7 +229,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             if ( (minAcceptVal != null) && (maxQuestionVal.compareTo(minAcceptVal) < 0) )
                 throw new IllegalArgumentException("maximum questionable value is less than minimum acceptable value");
             if ( (minQuestionVal != null) && (maxQuestionVal.compareTo(minQuestionVal) < 0) )
-                throw new IllegalArgumentException("maximum questionable value is less than minimum questionable value");
+                throw new IllegalArgumentException(
+                        "maximum questionable value is less than minimum questionable value");
         }
     }
 
@@ -256,9 +239,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      *
      * @param stdVal
      *         standard value to check
-     * @return null if the given value is null (missing) or within the acceptable range;
-     *         otherwise, an message giving the severity and describing the problem
-     *         (both general comment and detailed comments are assigned).
+     *
+     * @return null if the given value is null (missing) or within the acceptable range; otherwise, an message giving
+     * the severity and describing the problem (both general comment and detailed comments are assigned).
      */
     public ADCMessage boundsCheckStandardValue(T stdVal) {
         // If the value is missing, make no comment
@@ -335,49 +318,44 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * @return description of a variable of this type; never null
-     *         but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return description of a variable of this type; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return standard name of a variable of this type; never null
-     *         but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return standard name of a variable of this type; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getStandardName() {
         return standardName;
     }
 
     /**
-     * @return category name of a variable of this type; never null
-     *         but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return category name of a variable of this type; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getCategoryName() {
         return categoryName;
     }
 
     /**
-     * @return if this data type is required to be present
-     *         and its all values are required to be valid
+     * @return if this data type is required to be present and its all values are required to be valid
      */
     public boolean isCritical() {
         return isCritical;
     }
 
     /**
-     * @return a copy of the units associated with this data type; never null or empty,
-     *         but may only contain {@link DashboardUtils#STRING_MISSING_VALUE}.
+     * @return a copy of the units associated with this data type; never null or empty, but may only contain {@link
+     * DashboardUtils#STRING_MISSING_VALUE}.
      */
     public ArrayList<String> getUnits() {
         return new ArrayList<String>(units);
     }
 
     /**
-     * @return name of the standard unit (corresponding to the first unit
-     *         in the unit array) to be used as the unit string in DSG files;
-     *         never null
+     * @return name of the standard unit (corresponding to the first unit in the unit array) to be used as the unit
+     * string in DSG files; never null
      */
     public String getFileStdUnit() {
         return fileStdUnit;
@@ -389,23 +367,24 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         int result = 0;
 
         // Most significant items last (in case there is overflow)
-        if ( minQuestionVal != null)
+        if ( minQuestionVal != null )
             result += minQuestionVal.hashCode();
 
         result *= prime;
-        if ( minAcceptVal != null)
+        if ( minAcceptVal != null )
             result += minAcceptVal.hashCode();
 
         result *= prime;
-        if ( maxAcceptVal != null)
+        if ( maxAcceptVal != null )
             result += maxAcceptVal.hashCode();
 
         result *= prime;
-        if ( maxQuestionVal != null)
+        if ( maxQuestionVal != null )
             result += maxQuestionVal.hashCode();
 
-        for ( String val : units )
+        for (String val : units) {
             result = prime * result + val.hashCode();
+        }
         result = prime * result + Integer.hashCode(units.size());
 
         result = result * prime + fileStdUnit.hashCode();
@@ -423,63 +402,63 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if ( this == obj )
             return true;
-        if (obj == null)
+        if ( obj == null )
             return false;
 
         if ( getClass() != obj.getClass() )
             return false;
         DashDataType<?> other = (DashDataType<?>) obj;
 
-        if ( ! sortOrder.equals(other.sortOrder) )
+        if ( !sortOrder.equals(other.sortOrder) )
             return false;
         if ( isCritical != other.isCritical() )
             return false;
-        if ( ! displayName.equals(other.displayName) )
+        if ( !displayName.equals(other.displayName) )
             return false;
-        if ( ! varName.equals(other.varName) )
+        if ( !varName.equals(other.varName) )
             return false;
-        if ( ! getDataClassName().equals(other.getDataClassName()) )
+        if ( !getDataClassName().equals(other.getDataClassName()) )
             return false;
-        if ( ! description.equals(other.description) )
+        if ( !description.equals(other.description) )
             return false;
-        if ( ! standardName.equals(other.standardName) )
+        if ( !standardName.equals(other.standardName) )
             return false;
-        if ( ! categoryName.equals(other.categoryName) )
+        if ( !categoryName.equals(other.categoryName) )
             return false;
-        if ( ! fileStdUnit.equals(other.fileStdUnit) )
+        if ( !fileStdUnit.equals(other.fileStdUnit) )
             return false;
 
-        if ( ! units.equals(other.units) )
+        if ( !units.equals(other.units) )
             return false;
 
         if ( minQuestionVal == null ) {
             if ( other.minQuestionVal != null )
                 return false;
         }
-        else if ( ! minQuestionVal.equals(other.minQuestionVal) )
+        else if ( !minQuestionVal.equals(other.minQuestionVal) )
             return false;
 
         if ( minAcceptVal == null ) {
             if ( other.minAcceptVal != null )
                 return false;
         }
-        else if ( ! minAcceptVal.equals(other.minAcceptVal) )
+        else if ( !minAcceptVal.equals(other.minAcceptVal) )
             return false;
 
         if ( maxAcceptVal == null ) {
             if ( other.maxAcceptVal != null )
                 return false;
         }
-        else if ( ! maxAcceptVal.equals(other.maxAcceptVal) )
+        else if ( !maxAcceptVal.equals(other.maxAcceptVal) )
             return false;
 
         if ( maxQuestionVal == null ) {
             if ( other.maxQuestionVal != null )
                 return false;
         }
-        else if ( ! maxQuestionVal.equals(other.maxQuestionVal) )
+        else if ( !maxQuestionVal.equals(other.maxQuestionVal) )
             return false;
 
         return true;
@@ -603,11 +582,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * Checks if the variable or displayed name of this data type is equal,
-     * ignoring case and non-alphanumeric characters, to the given name.
+     * Checks if the variable or displayed name of this data type is equal, ignoring case and non-alphanumeric
+     * characters, to the given name.
      *
      * @param name
      *         name to use
+     *
      * @return whether the type names match
      */
     public boolean typeNameEquals(String name) {
@@ -622,12 +602,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * Checks if the variable or displayed name of this data type is equal,
-     * ignoring case and non-alphanumeric characters, to either of those of
-     * the given data column type.
+     * Checks if the variable or displayed name of this data type is equal, ignoring case and non-alphanumeric
+     * characters, to either of those of the given data column type.
      *
      * @param other
      *         data column type to compare to
+     *
      * @return whether the type names match
      */
     public boolean typeNameEquals(DataColumnType other) {
@@ -641,12 +621,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * Checks if the variable or displayed name of this data type is equal,
-     * ignoring case and non-alphanumeric characters, to either of those of
-     * the given data column type.
+     * Checks if the variable or displayed name of this data type is equal, ignoring case and non-alphanumeric
+     * characters, to either of those of the given data column type.
      *
      * @param other
      *         data type to compare to
+     *
      * @return whether the type names match
      */
     public boolean typeNameEquals(DashDataType<?> other) {
@@ -669,44 +649,42 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * A QC flag type is a {@link CharDashDataType} with a category name of
-     * {@link DashboardServerUtils#QUALITY_CATEGORY} and a variable name that
-     * (case-insensitive) either starts with "QC_" or "WOCE_", ends with "_QC"
-     * or "_WOCE", or is just "QC" or "WOCE".
+     * A QC flag type is a {@link StringDashDataType} with a category name of {@link
+     * DashboardServerUtils#QUALITY_CATEGORY} and a variable name that (case-insensitive) either starts with "QC_" or
+     * "WOCE_", ends with "_QC" or "_WOCE", or is just "QC" or "WOCE".
      *
      * @return if this is a QC flag type
      */
     public boolean isQCType() {
-        if ( ! (this instanceof CharDashDataType) )
+        if ( !(this instanceof StringDashDataType) )
             return false;
-        if ( ! categoryName.equals(DashboardServerUtils.QUALITY_CATEGORY) )
+        if ( !categoryName.equals(DashboardServerUtils.QUALITY_CATEGORY) )
             return false;
         String ucvarname = varName.toUpperCase();
         if ( ucvarname.equals("QC") || ucvarname.equals("WOCE") )
             return true;
         if ( ucvarname.startsWith("QC_") || ucvarname.startsWith("WOCE_") )
             return true;
-        if ( ucvarname.endsWith("_QC") ||ucvarname.endsWith("_WOCE") )
+        if ( ucvarname.endsWith("_QC") || ucvarname.endsWith("_WOCE") )
             return true;
         return false;
     }
 
     /**
-     * A QC flag type for another data type is a {@link CharDashDataType} with
-     * a category name of {@link DashboardServerUtils#QUALITY_CATEGORY} and a
-     * variable name that is (case insensitive): "WOCE_" or "QC_" followed
-     * by the other data variable name, the other data variable name
-     * followed by "_WOCE" or "_QC", or is the other data variable name with
-     * "_WOCE_" or "_QC_" inserted.
+     * A QC flag type for another data type is a {@link StringDashDataType} with a category name of {@link
+     * DashboardServerUtils#QUALITY_CATEGORY} and a variable name that is (case insensitive): "WOCE_" or "QC_" followed
+     * by the other data variable name, the other data variable name followed by "_WOCE" or "_QC", or is the other data
+     * variable name with "_WOCE_" or "_QC_" inserted.
      *
      * @param dtype
      *         given data type; cannot be null
+     *
      * @return if this type is a QC flag type for the given data type
      */
     public boolean isQCTypeFor(DashDataType<?> dtype) {
-        if ( ! (this instanceof CharDashDataType) )
+        if ( !(this instanceof StringDashDataType) )
             return false;
-        if ( ! categoryName.equals(DashboardServerUtils.QUALITY_CATEGORY) )
+        if ( !categoryName.equals(DashboardServerUtils.QUALITY_CATEGORY) )
             return false;
         String ucname = dtype.varName.toUpperCase();
         String ucvarname = varName.toUpperCase();
@@ -719,23 +697,22 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         if ( ucvarname.equals(ucname + "_QC") )
             return true;
         int idx = ucvarname.indexOf("_WOCE_");
-        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx+9)) )
+        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx + 9)) )
             return true;
         idx = ucvarname.indexOf("_QC_");
-        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx+9)) )
+        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx + 9)) )
             return true;
         return false;
     }
 
     /**
-     * A (general) comment type is a {@link StringDashDataType} with a variable name
-     * that (case-insensitive) starts with "COMMENT_", ends with "_COMMENT",
-     * contains "_COMMENT_", or is just "COMMENT".
+     * A (general) comment type is a {@link StringDashDataType} with a variable name that (case-insensitive) starts with
+     * "COMMENT_", ends with "_COMMENT", contains "_COMMENT_", or is just "COMMENT".
      *
      * @return if this type is a comment
      */
     public boolean isCommentType() {
-        if ( ! (this instanceof StringDashDataType) )
+        if ( !(this instanceof StringDashDataType) )
             return false;
         String ucvarname = varName.toUpperCase();
         if ( ucvarname.equals("COMMENT") )
@@ -750,18 +727,17 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * A comment type for another data type is a {@link StringDashDataType}
-     * with a variable name that is (case insensitive): "COMMENT_" followed
-     * by the other data variable name, the other data variable name
-     * followed by "_COMMENT", or is the other data variable name with
-     * "_COMMENT_" inserted.
+     * A comment type for another data type is a {@link StringDashDataType} with a variable name that is (case
+     * insensitive): "COMMENT_" followed by the other data variable name, the other data variable name followed by
+     * "_COMMENT", or is the other data variable name with "_COMMENT_" inserted.
      *
      * @param dtype
      *         given data type; cannot be null
+     *
      * @return if this type is a comment for the given data type
      */
     public boolean isCommentTypeFor(DashDataType<?> dtype) {
-        if ( ! (this instanceof StringDashDataType) )
+        if ( !(this instanceof StringDashDataType) )
             return false;
         String ucname = dtype.varName.toUpperCase();
         String ucvarname = varName.toUpperCase();
@@ -770,17 +746,15 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         if ( ucvarname.equals(ucname + "_COMMENT") )
             return true;
         int idx = ucvarname.indexOf("_COMMENT_");
-        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx+9)) )
+        if ( (idx >= 0) && ucname.equals(ucvarname.substring(0, idx) + ucvarname.substring(idx + 9)) )
             return true;
         return false;
     }
 
     /**
-     * Creates a JSON description string of this data types that can be
-     * used as a Property value with a key that is the variable name
-     * of this data type.  The data types can be regenerated from the
-     * variable name and this JSON description string using
-     * {@link #fromPropertyValue(String, String)}
+     * Creates a JSON description string of this data types that can be used as a Property value with a key that is the
+     * variable name of this data type.  The data types can be regenerated from the variable name and this JSON
+     * description string using {@link #fromPropertyValue(String, String)}
      *
      * @return the JSON description string of this data type
      */
@@ -789,21 +763,22 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         jsonObj.addProperty(DATA_CLASS_NAME_TAG, getDataClassName());
         jsonObj.addProperty(SORT_ORDER_TAG, sortOrder.toString());
         jsonObj.addProperty(DISPLAY_NAME_TAG, displayName);
-        if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(description) )
+        if ( !DashboardUtils.STRING_MISSING_VALUE.equals(description) )
             jsonObj.addProperty(DESCRIPTION_TAG, description);
         if ( isCritical )
             jsonObj.addProperty(IS_CRITICAL_TAG, Boolean.valueOf(isCritical).toString());
-        if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(fileStdUnit) )
+        if ( !DashboardUtils.STRING_MISSING_VALUE.equals(fileStdUnit) )
             jsonObj.addProperty(FILE_STD_UNIT_TAG, fileStdUnit);
-        if ( ! DashboardUtils.NO_UNITS.equals(units) ) {
+        if ( !DashboardUtils.NO_UNITS.equals(units) ) {
             JsonArray jsonArr = new JsonArray();
-            for ( String val : units )
+            for (String val : units) {
                 jsonArr.add(val);
+            }
             jsonObj.add(UNITS_TAG, jsonArr);
         }
-        if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(standardName) )
+        if ( !DashboardUtils.STRING_MISSING_VALUE.equals(standardName) )
             jsonObj.addProperty(STANDARD_NAME_TAG, standardName);
-        if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(categoryName) )
+        if ( !DashboardUtils.STRING_MISSING_VALUE.equals(categoryName) )
             jsonObj.addProperty(CATEGORY_NAME_TAG, categoryName);
         if ( minQuestionVal != null )
             jsonObj.addProperty(MIN_QUESTIONABLE_VALUE_TAG, minQuestionVal.toString());
@@ -817,40 +792,40 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * Create a DashDataType with the given variable name (Property key)
-     * using the given JSON description string (Property value) where:
+     * Create a DashDataType with the given variable name (Property key) using the given JSON description string
+     * (Property value) where:
      * <ul>
-     *         <li>tag {@link #SORT_ORDER_TAG} gives the sort order value, </li>
-     *         <li>tag {@link #DISPLAY_NAME_TAG} gives the data display name,</li>
-     *         <li>tag {@link #DATA_CLASS_NAME_TAG} gives the data class name,</li>
-     *         <li>tag {@link #DESCRIPTION_TAG} gives the data type description,</li>
-     *         <li>tag {@link #IS_CRITICAL_TAG} indicates if this data type must be present and valid,</li>
-     *         <li>tag {@link #UNITS_TAG} gives the units array,</li>
-     *         <li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
-     *         <li>tag {@link #CATEGORY_NAME_TAG} gives the category name,</li>
-     *         <li>tag {@link #FILE_STD_UNIT_TAG} gives name of the standard unit (first unit in units array) for DSG files,</li>
-     *         <li>tag {@link #MIN_QUESTIONABLE_VALUE_TAG} gives the minimum questionable value,</li>
-     *         <li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
-     *         <li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>
-     *         <li>tag {@link #MAX_QUESTIONABLE_VALUE_TAG} gives the maximum questionable value,</li>
+     * <li>tag {@link #SORT_ORDER_TAG} gives the sort order value, </li>
+     * <li>tag {@link #DISPLAY_NAME_TAG} gives the data display name,</li>
+     * <li>tag {@link #DATA_CLASS_NAME_TAG} gives the data class name,</li>
+     * <li>tag {@link #DESCRIPTION_TAG} gives the data type description,</li>
+     * <li>tag {@link #IS_CRITICAL_TAG} indicates if this data type must be present and valid,</li>
+     * <li>tag {@link #UNITS_TAG} gives the units array,</li>
+     * <li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
+     * <li>tag {@link #CATEGORY_NAME_TAG} gives the category name,</li>
+     * <li>tag {@link #FILE_STD_UNIT_TAG} gives name of the standard unit (first unit in units array) for DSG
+     * files,</li>
+     * <li>tag {@link #MIN_QUESTIONABLE_VALUE_TAG} gives the minimum questionable value,</li>
+     * <li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
+     * <li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>
+     * <li>tag {@link #MAX_QUESTIONABLE_VALUE_TAG} gives the maximum questionable value,</li>
      * </ul>
-     * The data class name tag, sort order tag, and display name tag must all be
-     * given with valid values.  Other tags can be omitted, in which case null is
-     * passed for that parameter to the constructor of the appropriate subclass
+     * The data class name tag, sort order tag, and display name tag must all be given with valid values.  Other tags
+     * can be omitted, in which case null is passed for that parameter to the constructor of the appropriate subclass
      * (based on the data class name) of {@link #DashDataType}.
      *
      * @param varName
      *         the variable name for the DashDataType
      * @param jsonDesc
      *         the JSON description string to parse
+     *
      * @return the newly created DashDataType subclass
+     *
      * @throws IllegalArgumentException
-     *         if the variable name is null or empty,
-     *         if the JSON description string cannot be parsed, or
-     *         if a required tag is missing from the JSON description
+     *         if the variable name is null or empty, if the JSON description string cannot be parsed, or if a required
+     *         tag is missing from the JSON description
      */
-    static public DashDataType<?> fromPropertyValue(String varName,
-            String jsonDesc) throws IllegalArgumentException {
+    static public DashDataType<?> fromPropertyValue(String varName, String jsonDesc) throws IllegalArgumentException {
         if ( (varName == null) || varName.trim().isEmpty() )
             throw new IllegalArgumentException("null or empty variable name given");
         try {
@@ -870,7 +845,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
             JsonParser parser = new JsonParser();
             JsonObject jsonObj = parser.parse(jsonDesc).getAsJsonObject();
-            for ( Entry<String, JsonElement> prop : jsonObj.entrySet() ) {
+            for (Entry<String,JsonElement> prop : jsonObj.entrySet()) {
                 String tag = prop.getKey();
                 boolean identified = false;
                 try {
@@ -926,18 +901,19 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
                     throw new IllegalArgumentException("value of \"" + tag +
                             "\" is not a string", ex);
                 }
-                if ( ( ! identified ) && UNITS_TAG.equals(tag) ) {
+                if ( (!identified) && UNITS_TAG.equals(tag) ) {
                     try {
                         units = new LinkedHashSet<String>();
-                        for ( JsonElement jsonElem : prop.getValue().getAsJsonArray() )
+                        for (JsonElement jsonElem : prop.getValue().getAsJsonArray()) {
                             units.add(jsonElem.getAsString());
+                        }
                         identified = true;
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException("value of \"" + UNITS_TAG +
                                 "\" is not an JSON string array of strings", ex);
                     }
                 }
-                if ( ! identified )
+                if ( !identified )
                     throw new IllegalArgumentException("unrecognized tag \"" + tag + "\"");
             }
 
@@ -953,20 +929,13 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             Double sortOrder;
             try {
                 sortOrder = Double.valueOf(sortOrderStr);
-            }
-            catch ( NumberFormatException ex ) {
+            } catch ( NumberFormatException ex ) {
                 throw new IllegalArgumentException("invalid value for sort order tag \"" +
                         SORT_ORDER_TAG + "\": " + ex.getMessage());
             }
 
             if ( dataClassName.equals(String.class.getSimpleName()) ) {
                 return new StringDashDataType(varName, sortOrder, displayName, description,
-                        isCritical, units, standardName, categoryName, fileStdUnit,
-                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
-            }
-
-            if ( dataClassName.equals(Character.class.getSimpleName()) ) {
-                return new CharDashDataType(varName, sortOrder, displayName, description,
                         isCritical, units, standardName, categoryName, fileStdUnit,
                         minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
             }

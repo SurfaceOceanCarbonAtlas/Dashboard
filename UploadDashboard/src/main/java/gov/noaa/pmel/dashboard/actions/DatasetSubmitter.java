@@ -3,13 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -22,10 +15,15 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
- * Submits a dataset.  At this time this just means creating the
- * DSG and decimated DSG files for the dataset.
+ * Submits a dataset.  At this time this just means creating the DSG and decimated DSG files for the dataset.
  *
  * @author Karl Smith
  */
@@ -56,17 +54,13 @@ public class DatasetSubmitter {
     }
 
     /**
-     * Submit a dataset.  This standardized the data using the automated data checker
-     * and generates DSG and decimated DSG files for datasets which are editable
-     * (have a QC status of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED},
-     * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE},
-     * {@link DashboardUtils#QC_STATUS_SUSPENDED}, or
-     * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
-     * For all datasets, the archive status is updated to the given value.
-     *
-     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARHCIVAL},
-     * the archive request is sent for dataset which have not already been sent,
-     * or for all datasets if repeatSend is true.
+     * Submit a dataset.  This standardized the data using the automated data checker and generates DSG and decimated
+     * DSG files for datasets which are editable (have a QC status of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED},
+     * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE}, {@link DashboardUtils#QC_STATUS_SUSPENDED}, or {@link
+     * DashboardUtils#QC_STATUS_EXCLUDED}. For all datasets, the archive status is updated to the given value.
+     * <p>
+     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARHCIVAL}, the archive request is sent for
+     * dataset which have not already been sent, or for all datasets if repeatSend is true.
      *
      * @param idsSet
      *         IDs of the datasets to submit
@@ -78,10 +72,9 @@ public class DatasetSubmitter {
      *         re-send request to archive for datasets which already had a request sent?
      * @param submitter
      *         user performing this submit
+     *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid,
-     *         if the data or metadata is missing,
-     *         if the DSG files cannot be created, or
+     *         if the dataset ID is invalid, if the data or metadata is missing, if the DSG files cannot be created, or
      *         if there was a problem saving the updated dataset information (including archive status)
      */
     public void submitDatasets(Collection<String> idsSet, String archiveStatus, String timestamp,
@@ -90,7 +83,7 @@ public class DatasetSubmitter {
         HashSet<String> ingestIds = new HashSet<String>();
         HashSet<String> archiveIds = new HashSet<String>();
         ArrayList<String> errorMsgs = new ArrayList<String>();
-        for ( String datasetId : idsSet ) {
+        for (String datasetId : idsSet) {
             // Get the dataset with data since almost always submitting for QC
             DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(datasetId, 0, -1);
             if ( dataset == null )
@@ -103,7 +96,7 @@ public class DatasetSubmitter {
                 try {
                     // Get the OME metadata for this dataset
                     DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
-                    if ( ! version.equals(omeInfo.getVersion()) ) {
+                    if ( !version.equals(omeInfo.getVersion()) ) {
                         omeInfo.setVersion(version);
                         metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " +
                                 version + " with submission of " + datasetId, false);
@@ -117,7 +110,7 @@ public class DatasetSubmitter {
                     datasetChecker.standardizeDataset(dataset, null);
                     if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
                         errorMsgs.add(datasetId + ": unacceptable; check data check error messages " +
-                                                    "(missing lon/lat/depth/time or uninterpretable values)");
+                                "(missing lon/lat/depth/time or uninterpretable values)");
                         continue;
                     }
 
@@ -128,8 +121,8 @@ public class DatasetSubmitter {
                     // Generate the decimated-data DSG file from the full-data DSG file
                     logger.debug("Generating the decimated-data DSG file for " + datasetId);
                     dsgHandler.decimateDatasetDsg(datasetId);
-//TODO: need to submit QC and WOCE events to database
-                } catch (Exception ex) {
+                    //TODO: need to submit QC and WOCE events to database
+                } catch ( Exception ex ) {
                     errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
                     continue;
                 }
@@ -145,11 +138,11 @@ public class DatasetSubmitter {
             }
 
             if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) &&
-                 ( repeatSend || dataset.getArchiveDate().isEmpty() ) ) {
+                    (repeatSend || dataset.getArchiveDate().isEmpty()) ) {
                 // Queue the request to send (or re-send) the data and metadata for archival
                 archiveIds.add(datasetId);
             }
-            else if ( ! archiveStatus.equals(dataset.getArchiveStatus()) ) {
+            else if ( !archiveStatus.equals(dataset.getArchiveStatus()) ) {
                 // Update the archive status now
                 dataset.setArchiveStatus(archiveStatus);
                 changed = true;
@@ -166,22 +159,22 @@ public class DatasetSubmitter {
                 // or clear;  submits of lots of datasets can sometimes cause
                 // messed-up DSG files not seen when submitted in small numbers.
                 Thread.sleep(100);
-            } catch (InterruptedException ex) {
+            } catch ( InterruptedException ex ) {
                 // Ignore
                 ;
             }
         }
 
         // notify ERDDAP of new/updated dataset
-        if ( ! ingestIds.isEmpty() )
+        if ( !ingestIds.isEmpty() )
             dsgHandler.flagErddap(true, true);
 
         // Send dataset data and metadata for archival where user requested immediate archival
-        if ( ! archiveIds.isEmpty() ) {
+        if ( !archiveIds.isEmpty() ) {
             String userRealName;
             try {
                 userRealName = databaseHandler.getReviewerRealname(submitter);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 userRealName = null;
             }
             if ( (userRealName == null) || userRealName.isEmpty() )
@@ -190,18 +183,18 @@ public class DatasetSubmitter {
             String userEmail;
             try {
                 userEmail = databaseHandler.getReviewerEmail(submitter);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 userEmail = null;
             }
             if ( (userEmail == null) || userEmail.isEmpty() )
                 throw new IllegalArgumentException("Unknown e-mail address for user " + submitter);
 
-            for ( String datasetId : archiveIds ) {
+            for (String datasetId : archiveIds) {
                 String commitMsg = "Immediate archival of dataset " + datasetId + " requested by " +
                         userRealName + " (" + userEmail + ") at " + timestamp;
                 try {
                     filesBundler.sendOrigFilesBundle(datasetId, commitMsg, userRealName, userEmail);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     errorMsgs.add("Failed to submit request for immediate archival of " +
                             datasetId + ": " + ex.getMessage());
                     continue;
@@ -218,7 +211,7 @@ public class DatasetSubmitter {
         // TODO: do this in a return message, not an IllegalArgumentException
         if ( errorMsgs.size() > 0 ) {
             StringBuilder sb = new StringBuilder();
-            for ( String msg : errorMsgs ) {
+            for (String msg : errorMsgs) {
                 sb.append(msg);
                 sb.append("\n");
             }

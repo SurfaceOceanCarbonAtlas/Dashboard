@@ -3,13 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
-
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -37,11 +30,11 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
@@ -50,11 +43,16 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
+
 /**
- * Main upload dashboard page.  Shows uploaded cruise files
- * and their status.  Provides connections to upload data files,
- * describe the contents of these data files, and submit the data
- * for QC.
+ * Main upload dashboard page.  Shows uploaded cruise files and their status.  Provides connections to upload data
+ * files, describe the contents of these data files, and submit the data for QC.
  *
  * @author Karl Smith
  */
@@ -67,12 +65,12 @@ public class DatasetListPage extends CompositeWithUsername {
     private static final String UPLOAD_TEXT = "Upload Datasets";
     private static final String UPLOAD_HOVER_HELP =
             "upload data to create a new dataset " +
-            "or replace an existing dataset";
+                    "or replace an existing dataset";
 
     private static final String VIEW_DATA_TEXT = "Identify Columns";
     private static final String VIEW_DATA_HOVER_HELP =
             "review and modify data column type assignments for the " +
-            "selected dataset; identify issues in the data";
+                    "selected dataset; identify issues in the data";
 
     static final String OME_METADATA_TEXT = "Edit OME Metadata";
     private static final String OME_METADATA_HOVER_HELP =
@@ -103,7 +101,7 @@ public class DatasetListPage extends CompositeWithUsername {
             "Hide Datasets";
     private static final String HIDE_DATASETS_HOVER_HELP =
             "hides the selected datasets from your list of displayed datasets; " +
-            "this will NOT delete the datasets from the system";
+                    "this will NOT delete the datasets from the system";
 
     private static final String CHANGE_OWNER_TEXT =
             "Change Datasets Owner";
@@ -121,7 +119,7 @@ public class DatasetListPage extends CompositeWithUsername {
     // Starts of error messages for improper cruise selections
     private static final String SUBMITTED_DATASETS_SELECTED_ERR_START =
             "Only datasets which have not been submitted for QC, " +
-            "or which have been suspended or excluded, may be selected ";
+                    "or which have been suspended or excluded, may be selected ";
     private static final String ARCHIVED_DATASETS_SELECTED_ERR_START =
             "Only datasets which have not been archived may be selected ";
     private static final String NO_DATASET_SELECTED_ERR_START =
@@ -151,55 +149,55 @@ public class DatasetListPage extends CompositeWithUsername {
 
     private static final String CANNOT_PREVIEW_UNCHECKED_ERRMSG =
             "Preview plots cannot be generated for datasets " +
-            "with unidentified columns or unchecked data.";
+                    "with unidentified columns or unchecked data.";
     private static final String CANNOT_PREVIEW_WITH_SERIOUS_ERRORS_ERRMSG =
             "Preview plots cannot be generated for datasets " +
-            "with longitude, latitude, or time errors.";
+                    "with longitude, latitude, or time errors.";
 
     private static final String NO_METADATA_HTML_PROLOGUE =
             "The following datasets do not have appropriate metadata: <ul>";
     private static final String NO_METADATA_HTML_EPILOGUE =
             "</ul> Appropriate metadata needs to be uploaded " +
-            "for these datasets before submitting them for QC or archival. ";
+                    "for these datasets before submitting them for QC or archival. ";
     private static final String CANNOT_SUBMIT_HTML_PROLOGUE =
             "The following datasets have not been checked, or have very " +
-            "serious errors detected by the automated data checker: <ul>";
+                    "serious errors detected by the automated data checker: <ul>";
     private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
             "</ul> These datasets cannot be submitted for QC or archival " +
-            "until these problems have been resolved.";
+                    "until these problems have been resolved.";
     private static final String DATA_AUTOFAIL_HTML_PROLOGUE =
             "The following datasets have errors detected " +
-            "by the automated data checker: <ul>";
+                    "by the automated data checker: <ul>";
     private static final String AUTOFAIL_HTML_EPILOGUE =
             "</ul> These dataset can be submitted for QC and archival, " +
-            "but datsets with a large number of error will <em>probably</em> " +
-            "be suspended by reviewers.<br />" +
-            "Do you want to continue? ";
+                    "but datsets with a large number of error will <em>probably</em> " +
+                    "be suspended by reviewers.<br />" +
+                    "Do you want to continue? ";
     private static final String AUTOFAIL_YES_TEXT = "Yes";
     private static final String AUTOFAIL_NO_TEXT = "No";
 
     private static final String DATASETS_TO_SHOW_MSG =
             "Enter the ID, possibly with wildcards * and ?, of the dataset(s) " +
-            "you want to show in your list of displayed datasets";
+                    "you want to show in your list of displayed datasets";
     private static final String SHOW_DATASET_FAIL_MSG =
             "Unable to show the specified datasets " +
-            "in your personal list of displayed datasets";
+                    "in your personal list of displayed datasets";
 
     private static final String HIDE_DATASET_HTML_PROLOGUE =
             "The following datasets will be hidden from your " +
-            "list of displayed datasets; the data, metadata, and " +
-            "supplemental documents will <b>not</b> be removed: <ul>";
+                    "list of displayed datasets; the data, metadata, and " +
+                    "supplemental documents will <b>not</b> be removed: <ul>";
     private static final String HIDE_DATASET_HTML_EPILOGUE =
             "</ul> Do you want to proceed?";
     private static final String HIDE_YES_TEXT = "Yes";
     private static final String HIDE_NO_TEXT = "No";
     private static final String HIDE_DATASET_FAIL_MSG =
             "Unable to hide the selected datasets from " +
-            "your list of displayed datasets";
+                    "your list of displayed datasets";
 
     private static final String CHANGE_OWNER_HTML_PROLOGUE =
             "The owner of the following datasets will be " +
-            "changed to the new owner you specify below: <ul>";
+                    "changed to the new owner you specify below: <ul>";
     private static final String CHANGE_OWNER_HTML_EPILOGUE =
             "</ul>";
     private static final String CHANGE_OWNER_INPUT_TEXT = "New Owner:";
@@ -252,7 +250,7 @@ public class DatasetListPage extends CompositeWithUsername {
     private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
     private static final String NO_OWNER_STRING = "(unknown)";
 
-    interface DatasetListPageUiBinder extends UiBinder<Widget, DatasetListPage> {
+    interface DatasetListPageUiBinder extends UiBinder<Widget,DatasetListPage> {
     }
 
     private static DatasetListPageUiBinder uiBinder =
@@ -261,24 +259,42 @@ public class DatasetListPage extends CompositeWithUsername {
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
-    @UiField Label titleLabel;
-    @UiField Image titleImage;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField Button uploadButton;
-    @UiField Button viewDataButton;
-    @UiField Button omeMetadataButton;
-    @UiField Button addlDocsButton;
-    @UiField Button reviewButton;
-    @UiField Button qcSubmitButton;
-    @UiField Button suspendDatasetButton;
-    @UiField Label firstSeparator;
-    @UiField Button showDatasetButton;
-    @UiField Button hideDatasetButton;
-    @UiField Button changeOwnerButton;
-    @UiField Label secondSeparator;
-    @UiField Button deleteButton;
-    @UiField DataGrid<DashboardDataset> datasetsGrid;
+    @UiField
+    Label titleLabel;
+    @UiField
+    Image titleImage;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    Button uploadButton;
+    @UiField
+    Button viewDataButton;
+    @UiField
+    Button omeMetadataButton;
+    @UiField
+    Button addlDocsButton;
+    @UiField
+    Button reviewButton;
+    @UiField
+    Button qcSubmitButton;
+    @UiField
+    Button suspendDatasetButton;
+    @UiField
+    Label firstSeparator;
+    @UiField
+    Button showDatasetButton;
+    @UiField
+    Button hideDatasetButton;
+    @UiField
+    Button changeOwnerButton;
+    @UiField
+    Label secondSeparator;
+    @UiField
+    Button deleteButton;
+    @UiField
+    DataGrid<DashboardDataset> datasetsGrid;
 
     private ListDataProvider<DashboardDataset> listProvider;
     private DashboardAskPopup askDeletePopup;
@@ -296,10 +312,8 @@ public class DatasetListPage extends CompositeWithUsername {
     private static DatasetListPage singleton;
 
     /**
-     * Creates an empty dataset list page.  Do not call this
-     * constructor; instead use the showPage static method
-     * to show the singleton instance of this page with the
-     * latest dataset list from the server.
+     * Creates an empty dataset list page.  Do not call this constructor; instead use the showPage static method to show
+     * the singleton instance of this page with the latest dataset list from the server.
      */
     DatasetListPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -358,9 +372,8 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the dataset list page in the RootLayoutPanel
-     * with the latest information from the server.
-     * Adds this page to the page history.
+     * Display the dataset list page in the RootLayoutPanel with the latest information from the server. Adds this page
+     * to the page history.
      */
     static void showPage() {
         UploadDashboard.showWaitCursor();
@@ -375,6 +388,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
                 UploadDashboard.showAutoCursor();
             }
+
             @Override
             public void onFailure(Throwable ex) {
                 UploadDashboard.showFailureMessage(GET_DATASET_LIST_ERROR_MSG, ex);
@@ -384,25 +398,22 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) )
+                (singleton == null) || !singleton.getUsername().equals(username) )
             DatasetListPage.showPage();
         else
             UploadDashboard.updateCurrentPage(singleton);
     }
 
     /**
-     * Add a dataset to the selected list when the page is displayed.
-     * This should be called just prior to calling showPage().
-     * If no dataset with the given ID exists in the updated
-     * list of datasets, this ID will be ignored.
+     * Add a dataset to the selected list when the page is displayed. This should be called just prior to calling
+     * showPage(). If no dataset with the given ID exists in the updated list of datasets, this ID will be ignored.
      *
-     * @param dataset
-     *         select the cruise with this dataset
+     * @param datasetId
+     *         select the dataset with this ID
      */
     static void addSelectedDataset(String datasetId) {
         if ( singleton == null )
@@ -411,8 +422,7 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Resorts the cruise list table first by upload timestamp
-     * in descending order, then by dataset in ascending order.
+     * Resorts the cruise list table first by upload timestamp in descending order, then by dataset in ascending order.
      */
     static void resortTable() {
         if ( singleton == null )
@@ -424,8 +434,7 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Updates the dataset list page with the current username and
-     * with the datasets given in the argument.
+     * Updates the dataset list page with the current username and with the datasets given in the argument.
      *
      * @param newList
      *         datasets to display
@@ -440,7 +449,7 @@ public class DatasetListPage extends CompositeWithUsername {
         if ( newList != null ) {
             providerList.addAll(newList.values());
         }
-        for ( DashboardDataset dataset : providerList ) {
+        for (DashboardDataset dataset : providerList) {
             if ( datasetIdsSet.contains(dataset.getDatasetId()) )
                 dataset.setSelected(true);
             else
@@ -453,17 +462,14 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Selects dataset of the given type in the dataset list, supplementing the currently
-     * selected datasets, or clears all selected datasets.
+     * Selects dataset of the given type in the dataset list, supplementing the currently selected datasets, or clears
+     * all selected datasets.
      *
      * @param option
-     *         string indicating the cruise types to select;  one of: <br />
-     *         SELECTION_OPTION_LABEL - does nothing; <br />
-     *         ALL_SELECTION_OPTION - selects all cruises; <br />
-     *         EDITABLE_SELECTION_OPTION - selects editable cruises; <br />
-     *         SUBMITTED_SELECTION_OPTION - selects submitted cruises; <br />
-     *         PUBLISHED_SELECTION_OPTION - selects published cruises; or <br />
-     *         CLEAR_SELECTION_OPTION - clears all selected cruises.
+     *         string indicating the cruise types to select;  one of: <br /> SELECTION_OPTION_LABEL - does nothing; <br
+     *         /> ALL_SELECTION_OPTION - selects all cruises; <br /> EDITABLE_SELECTION_OPTION - selects editable
+     *         cruises; <br /> SUBMITTED_SELECTION_OPTION - selects submitted cruises; <br /> PUBLISHED_SELECTION_OPTION
+     *         - selects published cruises; or <br /> CLEAR_SELECTION_OPTION - clears all selected cruises.
      */
     private void setDatasetSelection(String option) {
         // Do nothing is SELECTION_OPTION_LABEL is given
@@ -472,11 +478,12 @@ public class DatasetListPage extends CompositeWithUsername {
         // Modify the dataset selection
         List<DashboardDataset> providerList = listProvider.getList();
         if ( ALL_SELECTION_OPTION.equals(option) ) {
-            for ( DashboardDataset dataset : providerList )
+            for (DashboardDataset dataset : providerList) {
                 dataset.setSelected(true);
+            }
         }
         else if ( EDITABLE_SELECTION_OPTION.equals(option) ) {
-            for ( DashboardDataset dataset : providerList ) {
+            for (DashboardDataset dataset : providerList) {
                 if ( Boolean.TRUE.equals(dataset.isEditable()) )
                     dataset.setSelected(true);
                 else
@@ -484,7 +491,7 @@ public class DatasetListPage extends CompositeWithUsername {
             }
         }
         else if ( SUBMITTED_SELECTION_OPTION.equals(option) ) {
-            for ( DashboardDataset dataset : providerList ) {
+            for (DashboardDataset dataset : providerList) {
                 if ( Boolean.FALSE.equals(dataset.isEditable()) )
                     dataset.setSelected(true);
                 else
@@ -492,15 +499,17 @@ public class DatasetListPage extends CompositeWithUsername {
             }
         }
         else if ( PUBLISHED_SELECTION_OPTION.equals(option) ) {
-            for ( DashboardDataset dataset : providerList )
+            for (DashboardDataset dataset : providerList) {
                 if ( null == dataset.isEditable() )
                     dataset.setSelected(true);
                 else
                     dataset.setSelected(false);
+            }
         }
         else if ( CLEAR_SELECTION_OPTION.equals(option) ) {
-            for ( DashboardDataset dataset : providerList )
+            for (DashboardDataset dataset : providerList) {
                 dataset.setSelected(false);
+            }
         }
         else {
             throw new RuntimeException("Unexpected option given the setDatasetSelection: " + option);
@@ -512,20 +521,19 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Assigns datasetsSet with the selected cruises, and
-     * datasetIdsSet with the expocodes of these cruises.
+     * Assigns datasetsSet with the selected cruises, and datasetIdsSet with the expocodes of these cruises.
      *
      * @param onlyEditable
-     *         if true, fails if a submitted or published cruise is selected;
-     *         if false, fails if a published cruise is selected;
-     *         if null, always succeeds.
+     *         if true, fails if a submitted or published cruise is selected; if false, fails if a published cruise is
+     *         selected; if null, always succeeds.
+     *
      * @return if successful
      */
     private boolean getSelectedDatasets(Boolean onlyEditable) {
         datasetsSet.clear();
         datasetsSet.setUsername(getUsername());
         datasetIdsSet.clear();
-        for ( DashboardDataset dataset : listProvider.getList() ) {
+        for (DashboardDataset dataset : listProvider.getList()) {
             if ( dataset.isSelected() ) {
                 if ( onlyEditable != null ) {
                     Boolean editable = dataset.isEditable();
@@ -533,7 +541,7 @@ public class DatasetListPage extends CompositeWithUsername {
                     if ( editable == null )
                         return false;
                     // check if editable, if requested
-                    if ( onlyEditable && ! editable )
+                    if ( onlyEditable && !editable )
                         return false;
                 }
                 String expocode = dataset.getDatasetId();
@@ -559,7 +567,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
     @UiHandler("viewDataButton")
     void dataCheckOnClick(ClickEvent event) {
-        if ( ! getSelectedDatasets(true) ) {
+        if ( !getSelectedDatasets(true) ) {
             UploadDashboard.showMessage(
                     SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
             return;
@@ -613,7 +621,7 @@ public class DatasetListPage extends CompositeWithUsername {
                     MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
             return;
         }
-        for ( DashboardDataset dataset : datasetsSet.values() ) {
+        for (DashboardDataset dataset : datasetsSet.values()) {
             String status = dataset.getDataCheckStatus();
             if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ) {
                 UploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
@@ -630,7 +638,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
     @UiHandler("qcSubmitButton")
     void qcSubmitOnClick(ClickEvent event) {
-        if ( ! getSelectedDatasets(false) ) {
+        if ( !getSelectedDatasets(false) ) {
             UploadDashboard.showMessage(
                     ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
             return;
@@ -648,7 +656,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
     @UiHandler("suspendDatasetButton")
     void suspendDatasetOnClick(ClickEvent event) {
-        if ( ! getSelectedDatasets(false) ) {
+        if ( !getSelectedDatasets(false) ) {
             UploadDashboard.showMessage(
                     ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_SUSPEND_ERR_END);
             return;
@@ -667,7 +675,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
     @UiHandler("deleteButton")
     void deleteDatasetOnClick(ClickEvent event) {
-        if ( ! getSelectedDatasets(true) ) {
+        if ( !getSelectedDatasets(true) ) {
             UploadDashboard.showMessage(
                     SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_DELETE_ERR_END);
             return;
@@ -679,8 +687,9 @@ public class DatasetListPage extends CompositeWithUsername {
         }
         // Confirm cruises to be deleted
         String message = DELETE_DATASET_HTML_PROLOGUE;
-        for ( String datasetId : datasetIdsSet )
+        for (String datasetId : datasetIdsSet) {
             message += "<li>" + SafeHtmlUtils.htmlEscape(datasetId) + "</li>";
+        }
         message += DELETE_DATASET_HTML_EPILOGUE;
         if ( askDeletePopup == null ) {
             askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT,
@@ -693,6 +702,7 @@ public class DatasetListPage extends CompositeWithUsername {
                         continueDeleteDatasets(false);
                     }
                 }
+
                 @Override
                 public void onFailure(Throwable ex) {
                     // Never called
@@ -704,58 +714,59 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Makes the request to delete the currently selected cruises,
-     * and processes the results.
+     * Makes the request to delete the currently selected cruises, and processes the results.
      */
     private void continueDeleteDatasets(Boolean deleteMetadata) {
         UploadDashboard.showWaitCursor();
         service.deleteDatasets(getUsername(), datasetIdsSet, deleteMetadata,
                 new AsyncCallback<DashboardDatasetList>() {
-            @Override
-            public void onSuccess(DashboardDatasetList datasetList) {
-                if ( getUsername().equals(datasetList.getUsername()) ) {
-                    DatasetListPage.this.updateDatasets(datasetList);
-                }
-                else {
-                    UploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG +
-                            UNEXPECTED_INVALID_DATESET_LIST_MSG);
-                }
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetList datasetList) {
+                        if ( getUsername().equals(datasetList.getUsername()) ) {
+                            DatasetListPage.this.updateDatasets(datasetList);
+                        }
+                        else {
+                            UploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG +
+                                    UNEXPECTED_INVALID_DATESET_LIST_MSG);
+                        }
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     @UiHandler("showDatasetButton")
     void addToListOnClick(ClickEvent event) {
         String wildDatasetId = Window.prompt(DATASETS_TO_SHOW_MSG, "");
-        if ( (wildDatasetId != null) && ! wildDatasetId.trim().isEmpty() ) {
+        if ( (wildDatasetId != null) && !wildDatasetId.trim().isEmpty() ) {
             UploadDashboard.showWaitCursor();
             // Save the currently selected cruises
             getSelectedDatasets(null);
             service.addDatasetsToList(getUsername(), wildDatasetId,
                     new AsyncCallback<DashboardDatasetList>() {
-                @Override
-                public void onSuccess(DashboardDatasetList cruises) {
-                    if ( getUsername().equals(cruises.getUsername()) ) {
-                        DatasetListPage.this.updateDatasets(cruises);
-                    }
-                    else {
-                        UploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG +
-                                UNEXPECTED_INVALID_DATESET_LIST_MSG);
-                    }
-                    UploadDashboard.showAutoCursor();
-                }
-                @Override
-                public void onFailure(Throwable ex) {
-                    UploadDashboard.showFailureMessage(SHOW_DATASET_FAIL_MSG, ex);
-                    UploadDashboard.showAutoCursor();
-                }
-            });
+                        @Override
+                        public void onSuccess(DashboardDatasetList cruises) {
+                            if ( getUsername().equals(cruises.getUsername()) ) {
+                                DatasetListPage.this.updateDatasets(cruises);
+                            }
+                            else {
+                                UploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG +
+                                        UNEXPECTED_INVALID_DATESET_LIST_MSG);
+                            }
+                            UploadDashboard.showAutoCursor();
+                        }
+
+                        @Override
+                        public void onFailure(Throwable ex) {
+                            UploadDashboard.showFailureMessage(SHOW_DATASET_FAIL_MSG, ex);
+                            UploadDashboard.showAutoCursor();
+                        }
+                    });
         }
     }
 
@@ -769,8 +780,9 @@ public class DatasetListPage extends CompositeWithUsername {
         }
         // Confirm cruises to be removed
         String message = HIDE_DATASET_HTML_PROLOGUE;
-        for ( String expocode : datasetIdsSet )
+        for (String expocode : datasetIdsSet) {
             message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+        }
         message += HIDE_DATASET_HTML_EPILOGUE;
         if ( askRemovePopup == null ) {
             askRemovePopup = new DashboardAskPopup(HIDE_YES_TEXT,
@@ -781,6 +793,7 @@ public class DatasetListPage extends CompositeWithUsername {
                     if ( result == true )
                         continueRemoveDatasetsFromList();
                 }
+
                 @Override
                 public void onFailure(Throwable ex) {
                     // Never called
@@ -792,30 +805,30 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Makes the request to remove cruises from a user's list,
-     * and processes the results.
+     * Makes the request to remove cruises from a user's list, and processes the results.
      */
     private void continueRemoveDatasetsFromList() {
         UploadDashboard.showWaitCursor();
         service.removeDatasetsFromList(getUsername(), datasetIdsSet,
                 new AsyncCallback<DashboardDatasetList>() {
-            @Override
-            public void onSuccess(DashboardDatasetList cruises) {
-                if ( getUsername().equals(cruises.getUsername()) ) {
-                    DatasetListPage.this.updateDatasets(cruises);
-                }
-                else {
-                    UploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG +
-                            UNEXPECTED_INVALID_DATESET_LIST_MSG);
-                }
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetList cruises) {
+                        if ( getUsername().equals(cruises.getUsername()) ) {
+                            DatasetListPage.this.updateDatasets(cruises);
+                        }
+                        else {
+                            UploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG +
+                                    UNEXPECTED_INVALID_DATESET_LIST_MSG);
+                        }
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     @UiHandler("changeOwnerButton")
@@ -828,8 +841,9 @@ public class DatasetListPage extends CompositeWithUsername {
         }
         // Confirm cruises to be removed
         String message = CHANGE_OWNER_HTML_PROLOGUE;
-        for ( String expocode : datasetIdsSet )
+        for (String expocode : datasetIdsSet) {
             message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+        }
         message += CHANGE_OWNER_HTML_EPILOGUE;
         if ( changeOwnerPopup == null ) {
             changeOwnerPopup = new DashboardInputPopup(CHANGE_OWNER_INPUT_TEXT,
@@ -840,6 +854,7 @@ public class DatasetListPage extends CompositeWithUsername {
                         continueChangeOwner(newOwner);
                     }
                 }
+
                 @Override
                 public void onFailure(Throwable ex) {
                     // Never called
@@ -851,35 +866,35 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Makes the request to remove cruises from a user's list,
-     * and processes the results.
+     * Makes the request to remove cruises from a user's list, and processes the results.
      */
     private void continueChangeOwner(String newOwner) {
         UploadDashboard.showWaitCursor();
         service.changeDatasetOwner(getUsername(), datasetIdsSet, newOwner,
                 new AsyncCallback<DashboardDatasetList>() {
-            @Override
-            public void onSuccess(DashboardDatasetList cruises) {
-                if ( getUsername().equals(cruises.getUsername()) ) {
-                    DatasetListPage.this.updateDatasets(cruises);
-                }
-                else {
-                    UploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG +
-                            UNEXPECTED_INVALID_DATESET_LIST_MSG);
-                }
-                UploadDashboard.showAutoCursor();
-            }
-            @Override
-            public void onFailure(Throwable ex) {
-                UploadDashboard.showFailureMessage(CHANGE_OWNER_FAIL_MSG, ex);
-                UploadDashboard.showAutoCursor();
-            }
-        });
+                    @Override
+                    public void onSuccess(DashboardDatasetList cruises) {
+                        if ( getUsername().equals(cruises.getUsername()) ) {
+                            DatasetListPage.this.updateDatasets(cruises);
+                        }
+                        else {
+                            UploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG +
+                                    UNEXPECTED_INVALID_DATESET_LIST_MSG);
+                        }
+                        UploadDashboard.showAutoCursor();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        UploadDashboard.showFailureMessage(CHANGE_OWNER_FAIL_MSG, ex);
+                        UploadDashboard.showAutoCursor();
+                    }
+                });
     }
 
     /**
-     * Creates the cruise data table columns.  The table will still need
-     * to be populated using {@link #updateDatasets(DashboardDatasetList)}.
+     * Creates the cruise data table columns.  The table will still need to be populated using {@link
+     * #updateDatasets(DashboardDatasetList)}.
      */
     private void buildDatasetListTable() {
         Header<String> selectHeader = buildSelectionHeader();
@@ -1033,16 +1048,18 @@ public class DatasetListPage extends CompositeWithUsername {
                         break;
                     k++;
                 }
-                return Integer.toString(k+1);
+                return Integer.toString(k + 1);
             }
+
             @Override
             public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
+                    SafeHtmlBuilder sb) {
                 String msg = getValue(cruise);
                 sb.appendHtmlConstant("<div style=\"color: " +
                         UploadDashboard.ROW_NUMBER_COLOR + ";\">");
-                for (int k = msg.length(); k < 4; k++)
+                for (int k = msg.length(); k < 4; k++) {
                     sb.appendHtmlConstant("&nbsp;");
+                }
                 sb.appendEscaped(msg);
                 sb.appendHtmlConstant("</div>");
             }
@@ -1084,15 +1101,15 @@ public class DatasetListPage extends CompositeWithUsername {
     private Column<DashboardDataset,Boolean> buildSelectedColumn() {
         Column<DashboardDataset,Boolean> selectedColumn =
                 new Column<DashboardDataset,Boolean>(new CheckboxCell(true, true)) {
-            @Override
-            public Boolean getValue(DashboardDataset cruise) {
-                return cruise.isSelected();
-            }
-        };
+                    @Override
+                    public Boolean getValue(DashboardDataset cruise) {
+                        return cruise.isSelected();
+                    }
+                };
         selectedColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,Boolean>() {
             @Override
             public void update(int index, DashboardDataset cruise, Boolean value) {
-                if ( ! value ) {
+                if ( !value ) {
                     cruise.setSelected(false);
                 }
                 else {
@@ -1108,15 +1125,15 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardDataset> buildDatasetIdColumn() {
         TextColumn<DashboardDataset> expocodeColumn =
-                new TextColumn<DashboardDataset> () {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String expocode = cruise.getDatasetId();
-                if ( expocode.isEmpty() )
-                    expocode = NO_DATASET_ID_STRING;
-                return expocode;
-            }
-        };
+                new TextColumn<DashboardDataset>() {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String expocode = cruise.getDatasetId();
+                        if ( expocode.isEmpty() )
+                            expocode = NO_DATASET_ID_STRING;
+                        return expocode;
+                    }
+                };
         return expocodeColumn;
     }
 
@@ -1125,15 +1142,15 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardDataset> buildTimestampColumn() {
         TextColumn<DashboardDataset> timestampColumn =
-                new TextColumn<DashboardDataset> () {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String timestamp = cruise.getUploadTimestamp();
-                if ( timestamp.isEmpty() )
-                    timestamp = NO_TIMESTAMP_STRING;
-                return timestamp;
-            }
-        };
+                new TextColumn<DashboardDataset>() {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String timestamp = cruise.getUploadTimestamp();
+                        if ( timestamp.isEmpty() )
+                            timestamp = NO_TIMESTAMP_STRING;
+                        return timestamp;
+                    }
+                };
         return timestampColumn;
     }
 
@@ -1142,54 +1159,55 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private Column<DashboardDataset,String> buildDataCheckColumn() {
         Column<DashboardDataset,String> dataCheckColumn =
-                new Column<DashboardDataset,String> (new ClickableTextCell()) {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String status = cruise.getDataCheckStatus();
-                if ( status.isEmpty() ) {
-                    status = NO_DATA_CHECK_STATUS_STRING;
-                }
-                else if ( status.startsWith(
-                        DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
-                    status = status.substring(
-                            DashboardUtils.CHECK_STATUS_ERRORS_PREFIX.length());
-                }
-                else if ( status.startsWith(
-                        DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
-                    status = status.substring(
-                            DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX.length());
-                }
-                return status;
-            }
-            @Override
-            public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
-                String msg = getValue(cruise);
-                if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
-                    // No problems - use normal background
-                    sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-                    sb.appendEscaped(msg);
-                    sb.appendHtmlConstant("</em></u></div>");
-                }
-                else if ( msg.contains("warnings") ||
-                          ( msg.contains("errors") &&
-                            ( ! msg.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) &&
-                            ( cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS ) ) ) {
-                    // Only warnings or a few minor errors - use warning background color
-                    sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-                            UploadDashboard.CHECKER_WARNING_COLOR + ";\"><u><em>");
-                    sb.appendEscaped(msg);
-                    sb.appendHtmlConstant("</em></u></div>");
-                }
-                else {
-                    // Many errors, unacceptable, or not checked - use error background color
-                    sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-                            UploadDashboard.CHECKER_ERROR_COLOR + ";\"><u><em>");
-                    sb.appendEscaped(msg);
-                    sb.appendHtmlConstant("</em></u></div>");
-                }
-            }
-        };
+                new Column<DashboardDataset,String>(new ClickableTextCell()) {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String status = cruise.getDataCheckStatus();
+                        if ( status.isEmpty() ) {
+                            status = NO_DATA_CHECK_STATUS_STRING;
+                        }
+                        else if ( status.startsWith(
+                                DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
+                            status = status.substring(
+                                    DashboardUtils.CHECK_STATUS_ERRORS_PREFIX.length());
+                        }
+                        else if ( status.startsWith(
+                                DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+                            status = status.substring(
+                                    DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX.length());
+                        }
+                        return status;
+                    }
+
+                    @Override
+                    public void render(Cell.Context ctx, DashboardDataset cruise,
+                            SafeHtmlBuilder sb) {
+                        String msg = getValue(cruise);
+                        if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
+                            // No problems - use normal background
+                            sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+                            sb.appendEscaped(msg);
+                            sb.appendHtmlConstant("</em></u></div>");
+                        }
+                        else if ( msg.contains("warnings") ||
+                                (msg.contains("errors") &&
+                                        (!msg.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG)) &&
+                                        (cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
+                            // Only warnings or a few minor errors - use warning background color
+                            sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+                                    UploadDashboard.CHECKER_WARNING_COLOR + ";\"><u><em>");
+                            sb.appendEscaped(msg);
+                            sb.appendHtmlConstant("</em></u></div>");
+                        }
+                        else {
+                            // Many errors, unacceptable, or not checked - use error background color
+                            sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+                                    UploadDashboard.CHECKER_ERROR_COLOR + ";\"><u><em>");
+                            sb.appendEscaped(msg);
+                            sb.appendHtmlConstant("</em></u></div>");
+                        }
+                    }
+                };
         dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
             @Override
             public void update(int index, DashboardDataset cruise, String value) {
@@ -1209,22 +1227,23 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private Column<DashboardDataset,String> buildOmeMetadataColumn() {
         Column<DashboardDataset,String> omeMetadataColumn =
-                new Column<DashboardDataset,String> (new ClickableTextCell()) {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String omeTimestamp = cruise.getOmeTimestamp();
-                if ( omeTimestamp.isEmpty() )
-                    omeTimestamp = NO_OME_METADATA_STATUS_STRING;
-                return omeTimestamp;
-            }
-            @Override
-            public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
-                sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-                sb.appendEscaped(getValue(cruise));
-                sb.appendHtmlConstant("</em></u></div>");
-            }
-        };
+                new Column<DashboardDataset,String>(new ClickableTextCell()) {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String omeTimestamp = cruise.getOmeTimestamp();
+                        if ( omeTimestamp.isEmpty() )
+                            omeTimestamp = NO_OME_METADATA_STATUS_STRING;
+                        return omeTimestamp;
+                    }
+
+                    @Override
+                    public void render(Cell.Context ctx, DashboardDataset cruise,
+                            SafeHtmlBuilder sb) {
+                        sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+                        sb.appendEscaped(getValue(cruise));
+                        sb.appendHtmlConstant("</em></u></div>");
+                    }
+                };
         omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
             @Override
             public void update(int index, DashboardDataset cruise, String value) {
@@ -1246,34 +1265,35 @@ public class DatasetListPage extends CompositeWithUsername {
     private Column<DashboardDataset,String> buildAddnDocsColumn() {
         Column<DashboardDataset,String> addnDocsColumn =
                 new Column<DashboardDataset,String>(new ClickableTextCell()) {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                TreeSet<String> addlDocTitles = cruise.getAddlDocs();
-                if ( addlDocTitles.size() == 0 )
-                    return NO_ADDL_DOCS_STATUS_STRING;
-                SafeHtmlBuilder sb = new SafeHtmlBuilder();
-                boolean firstEntry = true;
-                for ( String title : addlDocTitles ) {
-                    if ( firstEntry )
-                        firstEntry = false;
-                    else
-                        sb.appendHtmlConstant("<br />");
-                    String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
-                    sb.appendEscaped(pieces[0]);
-                    sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;(");
-                    sb.appendEscaped(pieces[1]);
-                    sb.appendHtmlConstant(")</small>");
-                }
-                return sb.toSafeHtml().asString();
-            }
-            @Override
-            public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
-                sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-                sb.appendHtmlConstant(getValue(cruise));
-                sb.appendHtmlConstant("</em></u></div>");
-            }
-        };
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+                        if ( addlDocTitles.size() == 0 )
+                            return NO_ADDL_DOCS_STATUS_STRING;
+                        SafeHtmlBuilder sb = new SafeHtmlBuilder();
+                        boolean firstEntry = true;
+                        for (String title : addlDocTitles) {
+                            if ( firstEntry )
+                                firstEntry = false;
+                            else
+                                sb.appendHtmlConstant("<br />");
+                            String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
+                            sb.appendEscaped(pieces[0]);
+                            sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;(");
+                            sb.appendEscaped(pieces[1]);
+                            sb.appendHtmlConstant(")</small>");
+                        }
+                        return sb.toSafeHtml().asString();
+                    }
+
+                    @Override
+                    public void render(Cell.Context ctx, DashboardDataset cruise,
+                            SafeHtmlBuilder sb) {
+                        sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+                        sb.appendHtmlConstant(getValue(cruise));
+                        sb.appendHtmlConstant("</em></u></div>");
+                    }
+                };
         addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
             @Override
             public void update(int index, DashboardDataset cruise, String value) {
@@ -1295,12 +1315,12 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardDataset> buildVersionColumn() {
         TextColumn<DashboardDataset> versionColumn =
-                new TextColumn<DashboardDataset> () {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                return cruise.getVersion();
-            }
-        };
+                new TextColumn<DashboardDataset>() {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        return cruise.getVersion();
+                    }
+                };
         return versionColumn;
     }
 
@@ -1309,30 +1329,31 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private Column<DashboardDataset,String> buildQCStatusColumn() {
         Column<DashboardDataset,String> qcStatusColumn =
-                new Column<DashboardDataset,String> (new ClickableTextCell()) {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String status = cruise.getSubmitStatus();
-                if ( status.isEmpty() )
-                    status = NO_QC_STATUS_STRING;
-                return status;
-            }
-            @Override
-            public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
-                Boolean editable = cruise.isEditable();
-                if ( editable != null ) {
-                    sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-                    sb.appendEscaped(getValue(cruise));
-                    sb.appendHtmlConstant("</em></u></div>");
-                }
-                else {
-                    sb.appendHtmlConstant("<div>");
-                    sb.appendEscaped(getValue(cruise));
-                    sb.appendHtmlConstant("</div>");
-                }
-            }
-        };
+                new Column<DashboardDataset,String>(new ClickableTextCell()) {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String status = cruise.getSubmitStatus();
+                        if ( status.isEmpty() )
+                            status = NO_QC_STATUS_STRING;
+                        return status;
+                    }
+
+                    @Override
+                    public void render(Cell.Context ctx, DashboardDataset cruise,
+                            SafeHtmlBuilder sb) {
+                        Boolean editable = cruise.isEditable();
+                        if ( editable != null ) {
+                            sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+                            sb.appendEscaped(getValue(cruise));
+                            sb.appendHtmlConstant("</em></u></div>");
+                        }
+                        else {
+                            sb.appendHtmlConstant("<div>");
+                            sb.appendEscaped(getValue(cruise));
+                            sb.appendHtmlConstant("</div>");
+                        }
+                    }
+                };
         qcStatusColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
             @Override
             public void update(int index, DashboardDataset cruise, String value) {
@@ -1357,30 +1378,31 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private Column<DashboardDataset,String> buildArchiveStatusColumn() {
         Column<DashboardDataset,String> archiveStatusColumn =
-                new Column<DashboardDataset,String> (new ClickableTextCell()) {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String status = cruise.getArchiveStatus();
-                if ( status.isEmpty() )
-                    status = NO_ARCHIVE_STATUS_STRING;
-                return status;
-            }
-            @Override
-            public void render(Cell.Context ctx, DashboardDataset cruise,
-                                                    SafeHtmlBuilder sb) {
-                Boolean editable = cruise.isEditable();
-                if ( editable != null ) {
-                    sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-                    sb.appendEscaped(getValue(cruise));
-                    sb.appendHtmlConstant("</em></u></div>");
-                }
-                else {
-                    sb.appendHtmlConstant("<div>");
-                    sb.appendEscaped(getValue(cruise));
-                    sb.appendHtmlConstant("</div>");
-                }
-            }
-        };
+                new Column<DashboardDataset,String>(new ClickableTextCell()) {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String status = cruise.getArchiveStatus();
+                        if ( status.isEmpty() )
+                            status = NO_ARCHIVE_STATUS_STRING;
+                        return status;
+                    }
+
+                    @Override
+                    public void render(Cell.Context ctx, DashboardDataset cruise,
+                            SafeHtmlBuilder sb) {
+                        Boolean editable = cruise.isEditable();
+                        if ( editable != null ) {
+                            sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+                            sb.appendEscaped(getValue(cruise));
+                            sb.appendHtmlConstant("</em></u></div>");
+                        }
+                        else {
+                            sb.appendHtmlConstant("<div>");
+                            sb.appendEscaped(getValue(cruise));
+                            sb.appendHtmlConstant("</div>");
+                        }
+                    }
+                };
         archiveStatusColumn.setFieldUpdater(new FieldUpdater<DashboardDataset,String>() {
             @Override
             public void update(int index, DashboardDataset cruise, String value) {
@@ -1405,57 +1427,53 @@ public class DatasetListPage extends CompositeWithUsername {
      */
     private TextColumn<DashboardDataset> buildFilenameColumn() {
         TextColumn<DashboardDataset> filenameColumn =
-                new TextColumn<DashboardDataset> () {
-            @Override
-            public String getValue(DashboardDataset cruise) {
-                String uploadFilename = cruise.getUploadFilename();
-                if ( uploadFilename.isEmpty() )
-                    uploadFilename = NO_UPLOAD_FILENAME_STRING;
-                return uploadFilename;
-            }
-        };
+                new TextColumn<DashboardDataset>() {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String uploadFilename = cruise.getUploadFilename();
+                        if ( uploadFilename.isEmpty() )
+                            uploadFilename = NO_UPLOAD_FILENAME_STRING;
+                        return uploadFilename;
+                    }
+                };
         return filenameColumn;
     }
 
     /**
      * @return the owner column for the table
      */
-     private TextColumn<DashboardDataset> buildOwnerColumn() {
-         TextColumn<DashboardDataset> myOwnerColumn =
-                 new TextColumn<DashboardDataset> () {
-             @Override
-             public String getValue(DashboardDataset cruise) {
-                 String owner = cruise.getOwner();
-                 if ( owner.isEmpty() )
-                     owner = NO_OWNER_STRING;
-                 return owner;
-             }
-         };
-         return myOwnerColumn;
-     }
+    private TextColumn<DashboardDataset> buildOwnerColumn() {
+        TextColumn<DashboardDataset> myOwnerColumn =
+                new TextColumn<DashboardDataset>() {
+                    @Override
+                    public String getValue(DashboardDataset cruise) {
+                        String owner = cruise.getOwner();
+                        if ( owner.isEmpty() )
+                            owner = NO_OWNER_STRING;
+                        return owner;
+                    }
+                };
+        return myOwnerColumn;
+    }
 
     /**
-     * Checks the cruises given in checkSet in this instance for metadata
-     * compatibility for submitting for QC.  At this time this only checks
-     * that an OME metadata document is associated with each cruise.
-     *
-     * Then checks the cruises given in checkSet in this instance for data
-     * compatibility for submitting for QC.  If the data has not been checked
-     * or is unacceptable, this method presents an error message and returns.
-     * If the data has many serious issues, asks the user if the submit should
-     * be continued.  If the answer is yes, or if there were no serious data
-     * issues, continues submitting for QC by calling
-     * {@link SubmitForQCPage#showPage(java.util.HashSet)}.
+     * Checks the cruises given in checkSet in this instance for metadata compatibility for submitting for QC.  At this
+     * time this only checks that an OME metadata document is associated with each cruise.
+     * <p>
+     * Then checks the cruises given in checkSet in this instance for data compatibility for submitting for QC.  If the
+     * data has not been checked or is unacceptable, this method presents an error message and returns. If the data has
+     * many serious issues, asks the user if the submit should be continued.  If the answer is yes, or if there were no
+     * serious data issues, continues submitting for QC by calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
      */
     private void checkDatasetsForSubmitting() {
         // Check if the cruises have metadata documents
         String errMsg = NO_METADATA_HTML_PROLOGUE;
         boolean cannotSubmit = false;
-        for ( DashboardDataset cruise : checkSet.values() ) {
+        for (DashboardDataset cruise : checkSet.values()) {
             // At this time, just check that some metadata file exists
             // and do not worry about the contents
             if ( cruise.getOmeTimestamp().isEmpty() &&
-                 cruise.getAddlDocs().isEmpty() ) {
+                    cruise.getAddlDocs().isEmpty() ) {
                 errMsg += "<li>" +
                         SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
                 cannotSubmit = true;
@@ -1473,25 +1491,25 @@ public class DatasetListPage extends CompositeWithUsername {
         errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
         String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
         boolean willAutofail = false;
-        for ( DashboardDataset cruise : checkSet.values() ) {
+        for (DashboardDataset cruise : checkSet.values()) {
             String status = cruise.getDataCheckStatus();
             if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-                 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ||
-                 status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
+                    status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ||
+                    status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
                 errMsg += "<li>" +
-                         SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
+                        SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
                 cannotSubmit = true;
             }
             else if ( status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ||
-                      status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ||
-                      ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) &&
-                        (cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS) ) ) {
+                    status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ||
+                    (status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) &&
+                            (cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
                 // Acceptable
                 ;
             }
             else {
                 warnMsg += "<li>" +
-                     SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
+                        SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + "</li>";
                 willAutofail = true;
             }
         }
@@ -1515,6 +1533,7 @@ public class DatasetListPage extends CompositeWithUsername {
                         if ( okay )
                             SubmitForQCPage.showPage(checkSet);
                     }
+
                     @Override
                     public void onFailure(Throwable ex) {
                         // Never called
@@ -1547,6 +1566,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 UploadDashboard.showMessage(errMsg);
                 UploadDashboard.showAutoCursor();
             }
+
             @Override
             public void onSuccess(Void result) {
                 DatasetListPage.showPage();

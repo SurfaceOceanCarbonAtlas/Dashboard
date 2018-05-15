@@ -3,14 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashMap;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
 /**
- * Represents a list of uploaded datasets for a user,
- * mapped by dataset ID.
+ * Represents a list of uploaded datasets for a user, mapped by dataset ID.
  *
  * @author Karl Smith
  */
@@ -33,8 +32,7 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
     }
 
     /**
-     * @return the username;
-     * never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the username; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getUsername() {
         return username;
@@ -42,8 +40,7 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
 
     /**
      * @param username
-     *         the username to set;
-     *         if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         the username to set; if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public void setUsername(String username) {
         if ( username == null )
@@ -83,17 +80,17 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DashboardDatasetList) )
+        if ( !(obj instanceof DashboardDatasetList) )
             return false;
         DashboardDatasetList other = (DashboardDatasetList) obj;
 
-        if ( ! username.equals(other.username) )
+        if ( !username.equals(other.username) )
             return false;
 
         if ( manager != other.manager )
             return false;
 
-        if ( ! super.equals(other) )
+        if ( !super.equals(other) )
             return false;
 
         return true;
@@ -102,9 +99,10 @@ public class DashboardDatasetList extends HashMap<String,DashboardDataset> imple
     @Override
     public String toString() {
         String repr = "DashboardDatasetList[ username=" + username +
-                      ",\n    manager=" + Boolean.valueOf(manager).toString();
-        for ( String cruiseId : keySet() )
+                ",\n    manager=" + Boolean.valueOf(manager).toString();
+        for (String cruiseId : keySet()) {
             repr += ",\n    " + cruiseId + ":" + get(cruiseId).toString();
+        }
         repr += " ]";
         return repr;
     }

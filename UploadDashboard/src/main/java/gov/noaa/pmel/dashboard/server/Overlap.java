@@ -3,19 +3,17 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 /**
- * Overlaps are duplications of location and time values either within a dataset
- * or between any two datasets.  Extensive overlaps are very likely to be erroneous
- * duplication of data, although there is the rare possibility of two instruments
- * on the same platform.
+ * Overlaps are duplications of location and time values either within a dataset or between any two datasets.  Extensive
+ * overlaps are very likely to be erroneous duplication of data, although there is the rare possibility of two
+ * instruments on the same platform.
  *
  * @author Karl Smith
  */
@@ -61,9 +59,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
     }
 
     /**
-     * @return the two expocodes of the overlapping datasets; always
-     * an array of two Strings, but each String may be empty.
-     * The actual array in this instance is returned.
+     * @return the two expocodes of the overlapping datasets; always an array of two Strings, but each String may be
+     * empty. The actual array in this instance is returned.
      */
     public String[] getExpocodes() {
         return expocodes;
@@ -71,10 +68,9 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
     /**
      * @param expocodes
-     *         the two expocodes of the overlapping datasets to set.
-     *         If null, an array of two empty Strings is assigned;
-     *         otherwise an array of two Strings must be given.
-     *         If null is given as a String, an empty String is assigned.
+     *         the two expocodes of the overlapping datasets to set. If null, an array of two empty Strings is assigned;
+     *         otherwise an array of two Strings must be given. If null is given as a String, an empty String is
+     *         assigned.
      */
     public void setExpocodes(String[] expocodes) {
         if ( expocodes == null ) {
@@ -95,9 +91,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
     }
 
     /**
-     * @return the dataset row numbers (starts with one) of the overlap;
-     * always an array of two ArrayLists, but the ArrayLists
-     * may be empty.  The actual array in this instance is returned.
+     * @return the dataset row numbers (starts with one) of the overlap; always an array of two ArrayLists, but the
+     * ArrayLists may be empty.  The actual array in this instance is returned.
      */
     public ArrayList<Integer>[] getRowNums() {
         return rowNums;
@@ -105,9 +100,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
     /**
      * @param rowNums
-     *         the dataset row numbers (starts with one) of the overlap.
-     *         If null, an array of two empty ArrayLists is assigned; otherwise
-     *         an array of two Integer ArrayLists of the same length must be given.
+     *         the dataset row numbers (starts with one) of the overlap. If null, an array of two empty ArrayLists is
+     *         assigned; otherwise an array of two Integer ArrayLists of the same length must be given.
      */
     @SuppressWarnings("unchecked")
     public void setRowNums(ArrayList<Integer>[] rowNums) {
@@ -125,8 +119,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
     }
 
     /**
-     * @return the longitudes of the overlap; never null but may be empty.
-     * The actual ArrayList in this instance is returned.
+     * @return the longitudes of the overlap; never null but may be empty. The actual ArrayList in this instance is
+     * returned.
      */
     public ArrayList<Double> getLons() {
         return lons;
@@ -134,8 +128,7 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
     /**
      * @param lons
-     *         the longitudes of the overlap to set.
-     *         If null, an empty ArrayList is assigned.
+     *         the longitudes of the overlap to set. If null, an empty ArrayList is assigned.
      */
     public void setLons(ArrayList<Double> lons) {
         if ( lons == null ) {
@@ -147,8 +140,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
     }
 
     /**
-     * @return the latitudes of the overlap; never null but may be empty.
-     * The actual ArrayList in this instance is returned.
+     * @return the latitudes of the overlap; never null but may be empty. The actual ArrayList in this instance is
+     * returned.
      */
     public ArrayList<Double> getLats() {
         return lats;
@@ -156,8 +149,7 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
     /**
      * @param lats
-     *         the latitudes of the overlap to set.
-     *         If null, an empty ArrayList is assigned.
+     *         the latitudes of the overlap to set. If null, an empty ArrayList is assigned.
      */
     public void setLats(ArrayList<Double> lats) {
         if ( lats == null ) {
@@ -169,9 +161,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
     }
 
     /**
-     * @return the times, in seconds since 1 JAN 1970 00:00:00,
-     * of the overlap; never null but may be empty.
-     * The actual ArrayList in this instance is returned.
+     * @return the times, in seconds since 1 JAN 1970 00:00:00, of the overlap; never null but may be empty. The actual
+     * ArrayList in this instance is returned.
      */
     public ArrayList<Double> getTimes() {
         return times;
@@ -179,8 +170,8 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
     /**
      * @param times
-     *         the times, in seconds since 1 JAN 1970 00:00:00,
-     *         of the overlap to set.  If null, an empty ArrayList assigned.
+     *         the times, in seconds since 1 JAN 1970 00:00:00, of the overlap to set.  If null, an empty ArrayList
+     *         assigned.
      */
     public void setTimes(ArrayList<Double> times) {
         if ( times == null ) {
@@ -206,7 +197,7 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
      *         time, in seconds since 1 JAN 1970 00:00:00, of the overlap data point in the datasets
      */
     public void addDuplicatePoint(int firstRowNum, int secondRowNum,
-                                  double longitude, double latitude, double time) {
+            double longitude, double latitude, double time) {
         rowNums[0].add(firstRowNum);
         rowNums[1].add(secondRowNum);
         lons.add(longitude);
@@ -264,19 +255,19 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
         }
         for (int k = 0; k < times.size(); k++) {
             if ( !DashboardUtils.closeTo(times.get(k), other.times.get(k),
-                                         0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return times.get(k).compareTo(other.times.get(k));
             }
         }
         for (int k = 0; k < lats.size(); k++) {
             if ( !DashboardUtils.closeTo(lats.get(k), other.lats.get(k),
-                                         0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return lats.get(k).compareTo(other.lats.get(k));
             }
         }
         for (int k = 0; k < lons.size(); k++) {
             if ( !DashboardUtils.longitudeCloseTo(lons.get(k), other.lons.get(k),
-                                                  0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return lons.get(k).compareTo(other.lons.get(k));
             }
         }
@@ -306,7 +297,7 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
         if ( obj == null ) {
             return false;
         }
-        if ( !( obj instanceof Overlap ) ) {
+        if ( !(obj instanceof Overlap) ) {
             return false;
         }
 
@@ -326,19 +317,19 @@ public class Overlap implements Serializable, IsSerializable, Comparable<Overlap
 
         for (int k = 0; k < times.size(); k++) {
             if ( !DashboardUtils.closeTo(times.get(k), other.times.get(k),
-                                         0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return false;
             }
         }
         for (int k = 0; k < lats.size(); k++) {
             if ( !DashboardUtils.closeTo(lats.get(k), other.lats.get(k),
-                                         0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return false;
             }
         }
         for (int k = 0; k < lons.size(); k++) {
             if ( !DashboardUtils.longitudeCloseTo(lons.get(k), other.lons.get(k),
-                                                  0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                 return false;
             }
         }

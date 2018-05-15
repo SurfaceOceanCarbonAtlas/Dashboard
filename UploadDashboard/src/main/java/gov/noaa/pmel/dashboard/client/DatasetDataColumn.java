@@ -3,9 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CompositeCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -15,15 +12,16 @@ import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.cellview.client.Header;
-
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
- * Class for creating a CompositeCell Header for a cruise data column.
- * The cell includes a selection box for specifying the column type
- * with units, and a text input for specifying a missing value.
+ * Class for creating a CompositeCell Header for a cruise data column. The cell includes a selection box for specifying
+ * the column type with units, and a text input for specifying a missing value.
  *
  * @author Karl Smith
  */
@@ -56,7 +54,7 @@ public class DatasetDataColumn {
      */
     DatasetDataColumn(ArrayList<DataColumnType> knownUserTypes, DashboardDataset cruise, int columnIndex) {
         knownTypeUnitList = new ArrayList<DataColumnType>(2 * knownUserTypes.size());
-        for ( DataColumnType dataType : knownUserTypes ) {
+        for (DataColumnType dataType : knownUserTypes) {
             for (int k = 0; k < dataType.getUnits().size(); k++) {
                 DataColumnType dctype = dataType.duplicate();
                 dctype.setSelectedUnitIndex(k);
@@ -64,7 +62,7 @@ public class DatasetDataColumn {
             }
         }
         typeUnitStringList = new ArrayList<String>(knownTypeUnitList.size());
-        for ( DataColumnType dctype : knownTypeUnitList ) {
+        for (DataColumnType dctype : knownTypeUnitList) {
             String displayName = dctype.getDisplayName();
             String unit = dctype.getUnits().get(dctype.getSelectedUnitIndex());
             if ( DashboardUtils.STRING_MISSING_VALUE.equals(unit) ) {
@@ -76,16 +74,14 @@ public class DatasetDataColumn {
         }
         this.cruise = cruise;
         this.columnIndex = columnIndex;
-        this.columnHeader = createHeader(columnIndex+1);
+        this.columnHeader = createHeader(columnIndex + 1);
         this.hasChanged = false;
     }
 
     /**
-     * Returns the header for this cruise data column.  This header is a
-     * CompositeCell consisting of a TextCell, for displaying the user-
-     * provided column name, a SelectionCell, for selecting the standard
-     * column type, a TextCell, and a TextInputCell, for the user to
-     * specify a missing value.
+     * Returns the header for this cruise data column.  This header is a CompositeCell consisting of a TextCell, for
+     * displaying the user- provided column name, a SelectionCell, for selecting the standard column type, a TextCell,
+     * and a TextInputCell, for the user to specify a missing value.
      */
     Header<DatasetDataColumn> getHeader() {
         return columnHeader;
@@ -116,10 +112,12 @@ public class DatasetDataColumn {
                     }
                 };
             }
+
             @Override
             public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
                 return null;
             }
+
             @Override
             public String getValue(DatasetDataColumn dataCol) {
                 return dataCol.cruise.getUserColNames().get(dataCol.columnIndex);
@@ -140,6 +138,7 @@ public class DatasetDataColumn {
                     }
                 };
             }
+
             @Override
             public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
                 return new FieldUpdater<DatasetDataColumn,String>() {
@@ -170,6 +169,7 @@ public class DatasetDataColumn {
                     }
                 };
             }
+
             @Override
             public String getValue(DatasetDataColumn dataCol) {
                 // Find this column type with units
@@ -197,6 +197,7 @@ public class DatasetDataColumn {
                 return new TextInputCell();
                 // TODO: capture start-edit events to erase DEFAULT_MISSING_VALUE
             }
+
             @Override
             public FieldUpdater<DatasetDataColumn,String> getFieldUpdater() {
                 return new FieldUpdater<DatasetDataColumn,String>() {
@@ -219,6 +220,7 @@ public class DatasetDataColumn {
                     }
                 };
             }
+
             @Override
             public String getValue(DatasetDataColumn dataCol) {
                 DataColumnType dctype = dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
@@ -230,9 +232,9 @@ public class DatasetDataColumn {
         };
         // Create the CompositeCell to be used for the header
         CompositeCell<DatasetDataColumn> compCell =
-            new CompositeCell<DatasetDataColumn>(
-                new ArrayList<HasCell<DatasetDataColumn,?>>(
-                    Arrays.asList(userNameCell, stdNameCell, missValCell)));
+                new CompositeCell<DatasetDataColumn>(
+                        new ArrayList<HasCell<DatasetDataColumn,?>>(
+                                Arrays.asList(userNameCell, stdNameCell, missValCell)));
 
         // Create and return the Header
         Header<DatasetDataColumn> headerCell = new Header<DatasetDataColumn>(compCell) {

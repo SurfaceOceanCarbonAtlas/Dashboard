@@ -10,9 +10,8 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
- * For converting various timestamp, date, and time-of-day strings (various
- * orderings of year, month, and day as well as various separators to standard
- * formats of yyyy-MM-dd HH:mm:ss.SSS for timestamps, yyyy-MM-dd for dates and
+ * For converting various timestamp, date, and time-of-day strings (various orderings of year, month, and day as well as
+ * various separators to standard formats of yyyy-MM-dd HH:mm:ss.SSS for timestamps, yyyy-MM-dd for dates and
  * HH:mm:ss.SSS for times-of-day.
  *
  * @author Karl Smith
@@ -23,6 +22,7 @@ public class TimestampConverter extends ValueConverter<String> {
     // TreeSet and TreeMap so can do case insensitive comparisons
     private static final TreeSet<String> SUPPORTED_FROM_UNITS;
     private static final TreeMap<String,Integer> MONTH_NAMES_MAP;
+
     static {
         SUPPORTED_FROM_UNITS = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         // timestamps
@@ -86,7 +86,7 @@ public class TimestampConverter extends ValueConverter<String> {
             throws IllegalArgumentException, IllegalStateException {
         super(inputUnit, outputUnit, missingValue);
         String key = "from \"" + fromUnit + "\" to \"" + toUnit + "\"";
-        if ( ! SUPPORTED_FROM_UNITS.contains(key) )
+        if ( !SUPPORTED_FROM_UNITS.contains(key) )
             throw new IllegalArgumentException("conversion " + key + " not supported");
         utcCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         utcCalendar.setLenient(false);
@@ -124,20 +124,22 @@ public class TimestampConverter extends ValueConverter<String> {
      *
      * @param valueString
      *         timestamp to use
-     * @return array of two Strings, the first being the date part of the timestamp
-     *         and the second being the time part of the timestamp
+     *
+     * @return array of two Strings, the first being the date part of the timestamp and the second being the time part
+     * of the timestamp
+     *
      * @throws IllegalArgumentException
-     *         if the fromUnit format is not recognized, or
-     *         if the value is not a valid timestamp (no space or 'T' divider)
+     *         if the fromUnit format is not recognized, or if the value is not a valid timestamp (no space or 'T'
+     *         divider)
      */
     private String[] splitTimestamp(String valueString) throws IllegalArgumentException {
         String datePiece;
         String timePiece;
         if ( "yyyy-mm-dd hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-             "mm-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-             "dd-mm-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-             "mm-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-             "dd-mm-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "mm-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
+                "dd-mm-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
+                "mm-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
+                "dd-mm-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             // Date could possibly have spaces; split and then concatenate everything
             // except the last as the date piece, and the last is the time piece.
             try {
@@ -145,17 +147,18 @@ public class TimestampConverter extends ValueConverter<String> {
                 if ( pieces.length < 2 )
                     throw new Exception();
                 datePiece = pieces[0];
-                for (int k = 1; k < (pieces.length - 1); k++)
+                for (int k = 1; k < (pieces.length - 1); k++) {
                     datePiece += " " + pieces[k];
-                timePiece = pieces[pieces.length-1];
+                }
+                timePiece = pieces[pieces.length - 1];
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("not a valid timestamp value");
             }
         }
         else if ( "mon-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-                  "dd-mon-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-                  "mon-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
-                  "dd-mon-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "dd-mon-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
+                "mon-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ||
+                "dd-mon-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             // Date could possibly have spaces, or the month be SEPT or OCT; change
             // SEPT to Sept, OCT to Oct, split, and then concatenate everything
             // except the last as the date piece, and the last is the time piece.
@@ -164,9 +167,10 @@ public class TimestampConverter extends ValueConverter<String> {
                 String[] pieces = TIMESTAMP_SPLIT_PATTERN.split(otherString, 0);
                 if ( pieces.length >= 2 ) {
                     datePiece = pieces[0];
-                    for (int k = 1; k < (pieces.length - 1); k++)
+                    for (int k = 1; k < (pieces.length - 1); k++) {
                         datePiece += " " + pieces[k];
-                    timePiece = pieces[pieces.length-1];
+                    }
+                    timePiece = pieces[pieces.length - 1];
                 }
                 else {
                     throw new Exception();
@@ -186,17 +190,18 @@ public class TimestampConverter extends ValueConverter<String> {
      *
      * @param valueString
      *         date string in the format of fromUnit
+     *
      * @return standardized date string
+     *
      * @throws IllegalArgumentException
-     *         if the fromUnit format is not recognized, or
-     *         if the value is not a valid date string
+     *         if the fromUnit format is not recognized, or if the value is not a valid date string
      */
     private String standardizeDate(String valueString) throws IllegalArgumentException {
         Integer year;
         Integer month;
         Integer day;
         if ( "yyyy-mm-dd".equalsIgnoreCase(fromUnit) ||
-             "yyyy-mm-dd hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "yyyy-mm-dd hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -219,7 +224,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "mm-dd-yyyy".equalsIgnoreCase(fromUnit) ||
-                  "mm-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit)) {
+                "mm-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -242,7 +247,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "dd-mm-yyyy".equalsIgnoreCase(fromUnit) ||
-                  "dd-mm-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "dd-mm-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -265,7 +270,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "dd-mon-yyyy".equalsIgnoreCase(fromUnit) ||
-                  "dd-mon-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "dd-mon-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -304,7 +309,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "mon-dd-yyyy".equalsIgnoreCase(fromUnit) ||
-                  "mon-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "mon-dd-yyyy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -318,8 +323,8 @@ public class TimestampConverter extends ValueConverter<String> {
                     if ( (dayIdx > 0) && (valueString.length() == (dayIdx + 6)) ) {
                         pieces = new String[3];
                         pieces[0] = valueString.substring(0, dayIdx);
-                        pieces[1] = valueString.substring(dayIdx, dayIdx+2);
-                        pieces[2] = valueString.substring(dayIdx+2);
+                        pieces[1] = valueString.substring(dayIdx, dayIdx + 2);
+                        pieces[2] = valueString.substring(dayIdx + 2);
                     }
                     else
                         throw new Exception();
@@ -334,7 +339,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "mm-dd-yy".equalsIgnoreCase(fromUnit) ||
-                  "mm-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "mm-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -362,7 +367,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "dd-mm-yy".equalsIgnoreCase(fromUnit) ||
-                  "dd-mm-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "dd-mm-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -390,7 +395,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "dd-mon-yy".equalsIgnoreCase(fromUnit) ||
-                  "dd-mon-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "dd-mon-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -433,7 +438,7 @@ public class TimestampConverter extends ValueConverter<String> {
             }
         }
         else if ( "mon-dd-yy".equalsIgnoreCase(fromUnit) ||
-                  "mon-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
+                "mon-dd-yy hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] pieces = DATE_SPLIT_PATTERN.split(valueString, 0);
                 if ( pieces.length != 3 ) {
@@ -447,8 +452,8 @@ public class TimestampConverter extends ValueConverter<String> {
                     if ( (dayIdx > 0) && (valueString.length() == (dayIdx + 4)) ) {
                         pieces = new String[3];
                         pieces[0] = valueString.substring(0, dayIdx);
-                        pieces[1] = valueString.substring(dayIdx, dayIdx+2);
-                        pieces[2] = valueString.substring(dayIdx+2);
+                        pieces[1] = valueString.substring(dayIdx, dayIdx + 2);
+                        pieces[2] = valueString.substring(dayIdx + 2);
                     }
                     else
                         throw new Exception();
@@ -470,8 +475,8 @@ public class TimestampConverter extends ValueConverter<String> {
             throw new IllegalArgumentException("conversion from \"" + fromUnit + "\" is not supported");
         }
         if ( (year == null) || (year < 1900) || (year > currYear) ||
-             (month == null) || (month < 1) || (month > 12) ||
-             (day == null) || (day < 1) || (day > 31) )
+                (month == null) || (month < 1) || (month > 12) ||
+                (day == null) || (day < 1) || (day > 31) )
             throw new IllegalArgumentException("invalid date value");
         try {
             // Check if the year-month-day is a valid combination
@@ -491,10 +496,11 @@ public class TimestampConverter extends ValueConverter<String> {
      *
      * @param valueString
      *         time string in the fromUnit format
+     *
      * @return standardized time string
+     *
      * @throws IllegalArgumentException
-     *         if the fromUnit format is not recognized, or
-     *         if the value is not a valid time string
+     *         if the fromUnit format is not recognized, or if the value is not a valid time string
      */
     private String standardizeTime(String valueString) throws IllegalArgumentException {
         Integer hour;
@@ -502,7 +508,7 @@ public class TimestampConverter extends ValueConverter<String> {
         Double second;
         if ( "hh:mm:ss".equalsIgnoreCase(fromUnit) ) {
             try {
-                String[] pieces = TIME_SPLIT_PATTERN.split(valueString,0);
+                String[] pieces = TIME_SPLIT_PATTERN.split(valueString, 0);
                 if ( (pieces.length < 2) || (pieces.length > 3) ) {
                     int idx = valueString.indexOf('.');
                     if ( (idx == 6) || ((idx < 0) && (valueString.length() >= 6)) ) {
@@ -537,8 +543,8 @@ public class TimestampConverter extends ValueConverter<String> {
             throw new IllegalArgumentException("conversion from \"" + fromUnit + "\" is not supported");
         }
         if ( (hour == null) || (hour < 0) || (hour >= 24) ||
-             (minute == null) || (minute < 0) || (minute >= 60) ||
-             (second == null) || second.isNaN() || (second < 0.0) || (second >= 60.0) )
+                (minute == null) || (minute < 0) || (minute >= 60) ||
+                (second == null) || second.isNaN() || (second < 0.0) || (second >= 60.0) )
             throw new IllegalArgumentException("invalid time value");
         String stdVal = String.format("%02d:%02d:%05.3f", hour, minute, second);
         return stdVal;

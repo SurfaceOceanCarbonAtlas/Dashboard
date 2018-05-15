@@ -3,36 +3,36 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
-    <ui:style src="FullWidth.css" />
+    <ui:style src="FullWidth.css"/>
 
     <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
         <g:FlowPanel>
             <g:FlowPanel addStyleNames="{style.titlepanel}">
-                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
-                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
-                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
-                <g:Label addStyleNames="{style.titlereset}" />
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
             </g:FlowPanel>
-            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
             <g:ResizeLayoutPanel addStyleNames="{style.plotspanel}">
                 <g:TabLayoutPanel barUnit='EM' barHeight='2'>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latVsLonHtml" />
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latVsLonHtml"/>
                         </g:customHeader>
-                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latVsLonImage" />
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latVsLonImage"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latLonHtml" />
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="latLonHtml"/>
                         </g:customHeader>
-                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latLonImage" />
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="latLonImage"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="sampleVsTimeHtml" />
+                            <g:HTML addStyleNames="{style.plotslabel}" ui:field="sampleVsTimeHtml"/>
                         </g:customHeader>
-                        <g:Image addStyleNames="{style.plotsimage}" ui:field="sampleVsTimeImage" />
+                        <g:Image addStyleNames="{style.plotsimage}" ui:field="sampleVsTimeImage"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
@@ -109,8 +109,8 @@
                 </g:TabLayoutPanel>
             </g:ResizeLayoutPanel>
             <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="refreshButton" />
-                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="refreshButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton"/>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:ScrollPanel>

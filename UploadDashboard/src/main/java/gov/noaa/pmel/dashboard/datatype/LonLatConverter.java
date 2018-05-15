@@ -3,16 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.datatype;
 
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 
+import java.util.TreeSet;
+import java.util.regex.Pattern;
+
 /**
- * For converting degree, degree-minute, and degree-minute-second
- * string values to decimal degree values.
+ * For converting degree, degree-minute, and degree-minute-second string values to decimal degree values.
  *
  * @author Karl Smith
  */
@@ -20,10 +19,11 @@ public class LonLatConverter extends ValueConverter<Double> {
 
     public static final String DEGREE_SYMBOL = "\u00B0";
 
-// TODO: also support DDD.MMSSss format
+    // TODO: also support DDD.MMSSss format
 
     // TreeSet so can do case insensitive comparisons
     private static final TreeSet<String> SUPPORTED_FROM_UNITS;
+
     static {
         SUPPORTED_FROM_UNITS = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         SUPPORTED_FROM_UNITS.add("from \"deg E\" to \"deg E\"");
@@ -47,7 +47,7 @@ public class LonLatConverter extends ValueConverter<Double> {
             throws IllegalArgumentException, IllegalStateException {
         super(inputUnit, outputUnit, missingValue);
         String key = "from \"" + fromUnit + "\" to \"" + toUnit + "\"";
-        if ( ! SUPPORTED_FROM_UNITS.contains(key) )
+        if ( !SUPPORTED_FROM_UNITS.contains(key) )
             throw new IllegalArgumentException("conversion " + key + " not supported");
     }
 
@@ -57,14 +57,14 @@ public class LonLatConverter extends ValueConverter<Double> {
         if ( isMissingValue(valueString, true) )
             return null;
         // Make sure nothing unexpected was added
-        if ( ! ( "deg E".equalsIgnoreCase(toUnit) || "deg N".equalsIgnoreCase(toUnit) ) )
+        if ( !("deg E".equalsIgnoreCase(toUnit) || "deg N".equalsIgnoreCase(toUnit)) )
             throw new IllegalArgumentException("conversion to \"" + toUnit + "\" is not supported");
         // can be given in decimal degrees, or
         // degrees and decimal minutes, or
         // degrees, minutes, and decimal seconds
         Double value;
         if ( "deg E".equalsIgnoreCase(fromUnit) || "deg W".equalsIgnoreCase(fromUnit) ||
-             "deg N".equalsIgnoreCase(fromUnit) || "deg S".equalsIgnoreCase(fromUnit) ) {
+                "deg N".equalsIgnoreCase(fromUnit) || "deg S".equalsIgnoreCase(fromUnit) ) {
             try {
                 value = Double.valueOf(valueString);
             } catch ( Exception ex ) {
@@ -72,7 +72,7 @@ public class LonLatConverter extends ValueConverter<Double> {
             }
         }
         else if ( "deg min E".equalsIgnoreCase(fromUnit) || "deg min W".equalsIgnoreCase(fromUnit) ||
-                  "deg min N".equalsIgnoreCase(fromUnit) || "deg min S".equalsIgnoreCase(fromUnit) ) {
+                "deg min N".equalsIgnoreCase(fromUnit) || "deg min S".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] parts = DEG_MIN_SPLIT_PATTERN.split(valueString, 0);
                 if ( parts.length != 2 )
@@ -84,7 +84,7 @@ public class LonLatConverter extends ValueConverter<Double> {
             }
         }
         else if ( "deg min sec E".equalsIgnoreCase(fromUnit) || "deg min sec W".equalsIgnoreCase(fromUnit) ||
-                  "deg min sec N".equalsIgnoreCase(fromUnit) || "deg min sec S".equalsIgnoreCase(fromUnit) ) {
+                "deg min sec N".equalsIgnoreCase(fromUnit) || "deg min sec S".equalsIgnoreCase(fromUnit) ) {
             try {
                 String[] parts = DEG_MIN_SEC_SPLIT_PATTERN.split(valueString, 0);
                 if ( parts.length != 3 )
@@ -101,19 +101,21 @@ public class LonLatConverter extends ValueConverter<Double> {
         }
         // check if it needs to be negated
         if ( fromUnit.endsWith("W") || fromUnit.endsWith("S") ||
-             fromUnit.endsWith("w") || fromUnit.endsWith("s") ) {
+                fromUnit.endsWith("w") || fromUnit.endsWith("s") ) {
             if ( value != null )
                 value *= -1.0;
         }
         // if longitude, if not an outrageous value, convert to (-180,180]
         if ( fromUnit.endsWith("E") || fromUnit.endsWith("W") ||
-             fromUnit.endsWith("e") || fromUnit.endsWith("w") ) {
+                fromUnit.endsWith("e") || fromUnit.endsWith("w") ) {
             ADCMessage msg = DashboardServerUtils.LONGITUDE.boundsCheckStandardValue(value);
             if ( (msg == null) || msg.getSeverity().equals(QCFlag.Severity.WARNING) ) {
-                while ( value <= -180.0 )
+                while ( value <= -180.0 ) {
                     value += 360.0;
-                while ( value > 180.0 )
+                }
+                while ( value > 180.0 ) {
                     value -= 360.0;
+                }
             }
         }
         return value;

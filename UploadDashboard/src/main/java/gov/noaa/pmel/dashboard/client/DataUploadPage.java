@@ -3,9 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,9 +26,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
-
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Page for uploading new or updated cruise data files.
@@ -47,75 +46,75 @@ public class DataUploadPage extends CompositeWithUsername {
 
     private static final String UPLOAD_FILE_DESCRIPTION_HTML =
             "<p>A data file for upload has the general format:<ul>" +
-            "<li>a line of metadata for each metadata item,</li> " +
-            "<li>a line of data column headers,</li>" +
-            "<li>a line of data column units (optional),</li>" +
-            "<li>a line of data values for each data sample</li>" +
-            "</ul></p>" +
-            "<p>The expocode, vessel (ship) name, and investigators " +
-            "names must be given (vessel type is optional) in either " +
-            "the metadata lines: " +
-            "<ul style=\"list-style-type: none\">" +
-            "<li>expocode: ZZZZ20051231</li>" +
-            "<li>vessel name: Pacific Minnow</li>" +
-            "<li>PIs: Smith, K.; Doe, J.</li>" +
-            "<li>vessel type: Ship</li>" +
-            "</ul> " +
-            "or they can be in columns with appropriate names.  </p>";
+                    "<li>a line of metadata for each metadata item,</li> " +
+                    "<li>a line of data column headers,</li>" +
+                    "<li>a line of data column units (optional),</li>" +
+                    "<li>a line of data values for each data sample</li>" +
+                    "</ul></p>" +
+                    "<p>The expocode, vessel (ship) name, and investigators " +
+                    "names must be given (vessel type is optional) in either " +
+                    "the metadata lines: " +
+                    "<ul style=\"list-style-type: none\">" +
+                    "<li>expocode: ZZZZ20051231</li>" +
+                    "<li>vessel name: Pacific Minnow</li>" +
+                    "<li>PIs: Smith, K.; Doe, J.</li>" +
+                    "<li>vessel type: Ship</li>" +
+                    "</ul> " +
+                    "or they can be in columns with appropriate names.  </p>";
 
     private static final String MORE_HELP_HTML =
             "<p>The first few lines of a comma-separated upload datafile " +
-            "should look something like the follow.  (Note that the data" +
-            "lines were truncated to make it easier to see the format.)" +
-            "<ul style=\"list-style-type:none\">" +
-            "  <li>Expocode: 33AT20120417</li>" +
-            "  <li>Vessel Name: Atlantis</li>" +
-            "  <li>PI: Wanninkhof, R.</li>" +
-            "  <li>Vessel Type: Ship</li>" +
-            "  <li></li>" +
-            "  <li>CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...</li>" +
-            "  <li>20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...</li>" +
-            "  <li>20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...</li>" +
-            "  <li>20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...</li>" +
-            "  <li>20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...</li>" +
-            "  <li>20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...</li>" +
-            "</ul>" +
-            "The 12 character expocode is the " +
-            "<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
-            "for the vessel carrying the instrumentation followed by the " +
-            "numeric year, month, and day of departure.  For example, " +
-            "49P120101218 indicates a cruise on the Japanese (49) ship" +
-            " of opportunity Pyxis (P1) with the first day of the cruise " +
-            "on 18 December 2010.  " +
-            "</p><p>" +
-            "Tags for metadata items are case insensitive.  The tag is followed " +
-            "by either a colon or equals sign, which can have spaces around them.  " +
-            "Tags for the expocode include 'expocode' and 'cruise expocode'.  " +
-            "Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
-            "and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
-            "'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
-            "'PI name', and PI names'.  For datasets with multiple investigators, " +
-            "put all names on one metadata line and separate the names with semicolons.  " +
-            "Tags for the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
-            "If the vessel type is not specified, an intelligent guess is made based " +
-            "on the vessel name and/or the NODC code part of the expocode.  " +
-            "</p><p>" +
-            "Units for the columns can be given on a second column header line, " +
-            "such as the following:" +
-            "<ul style=\"list-style-type:none\">" +
-            "  <li>Expocode = 33AT20120417</li>" +
-            "  <li>Vessel Name = Atlantis</li>" +
-            "  <li>Investigator = Wanninkhof, R.</li>" +
-            "  <li>Vessel Type = Ship</li>" +
-            "  <li></li>" +
-            "  <li>CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...</li>" +
-            "  <li>,Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...</li>" +
-            "  <li>20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...</li>" +
-            "  <li>20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...</li>" +
-            "  <li>20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...</li>" +
-            "  <li>20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...</li>" +
-            "  <li>20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...</li>" +
-            "</ul></p>";
+                    "should look something like the follow.  (Note that the data" +
+                    "lines were truncated to make it easier to see the format.)" +
+                    "<ul style=\"list-style-type:none\">" +
+                    "  <li>Expocode: 33AT20120417</li>" +
+                    "  <li>Vessel Name: Atlantis</li>" +
+                    "  <li>PI: Wanninkhof, R.</li>" +
+                    "  <li>Vessel Type: Ship</li>" +
+                    "  <li></li>" +
+                    "  <li>CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...</li>" +
+                    "  <li>20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...</li>" +
+                    "  <li>20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...</li>" +
+                    "  <li>20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...</li>" +
+                    "  <li>20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...</li>" +
+                    "  <li>20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...</li>" +
+                    "</ul>" +
+                    "The 12 character expocode is the " +
+                    "<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
+                    "for the vessel carrying the instrumentation followed by the " +
+                    "numeric year, month, and day of departure.  For example, " +
+                    "49P120101218 indicates a cruise on the Japanese (49) ship" +
+                    " of opportunity Pyxis (P1) with the first day of the cruise " +
+                    "on 18 December 2010.  " +
+                    "</p><p>" +
+                    "Tags for metadata items are case insensitive.  The tag is followed " +
+                    "by either a colon or equals sign, which can have spaces around them.  " +
+                    "Tags for the expocode include 'expocode' and 'cruise expocode'.  " +
+                    "Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
+                    "and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
+                    "'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
+                    "'PI name', and PI names'.  For datasets with multiple investigators, " +
+                    "put all names on one metadata line and separate the names with semicolons.  " +
+                    "Tags for the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
+                    "If the vessel type is not specified, an intelligent guess is made based " +
+                    "on the vessel name and/or the NODC code part of the expocode.  " +
+                    "</p><p>" +
+                    "Units for the columns can be given on a second column header line, " +
+                    "such as the following:" +
+                    "<ul style=\"list-style-type:none\">" +
+                    "  <li>Expocode = 33AT20120417</li>" +
+                    "  <li>Vessel Name = Atlantis</li>" +
+                    "  <li>Investigator = Wanninkhof, R.</li>" +
+                    "  <li>Vessel Type = Ship</li>" +
+                    "  <li></li>" +
+                    "  <li>CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...</li>" +
+                    "  <li>,Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...</li>" +
+                    "  <li>20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...</li>" +
+                    "  <li>20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...</li>" +
+                    "  <li>20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...</li>" +
+                    "  <li>20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...</li>" +
+                    "  <li>20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...</li>" +
+                    "</ul></p>";
 
     private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
@@ -125,21 +124,21 @@ public class DataUploadPage extends CompositeWithUsername {
 
     private static final String ADVANCED_HTML_MSG =
             "Select a character set encoding for this file." +
-            "<ul>" +
-            "<li>If you are unsure of the encoding, UTF-8 should work fine.</li>" +
-            "<li>The main differences in UTF-8 and ISO encodings are the " +
-            "\"extended\" characters.</li>" +
-            "<li>Use UTF-16 only if you know your file is encoded in that format, " +
-            "but be aware that only Western European characters can be " +
-            "properly handled.</li>" +
-            "<li>Use the Window encoding only for files produced by older " +
-            "Window programs. </li>" +
-            "<li>The preview button will show the beginning of the file as it will " +
-            "be seen by the dashboard using the given encoding.</li>" +
-            "</ul>";
+                    "<ul>" +
+                    "<li>If you are unsure of the encoding, UTF-8 should work fine.</li>" +
+                    "<li>The main differences in UTF-8 and ISO encodings are the " +
+                    "\"extended\" characters.</li>" +
+                    "<li>Use UTF-16 only if you know your file is encoded in that format, " +
+                    "but be aware that only Western European characters can be " +
+                    "properly handled.</li>" +
+                    "<li>Use the Window encoding only for files produced by older " +
+                    "Window programs. </li>" +
+                    "<li>The preview button will show the beginning of the file as it will " +
+                    "be seen by the dashboard using the given encoding.</li>" +
+                    "</ul>";
     private static final String ENCODING_TEXT = "File encoding:";
     private static final String[] KNOWN_ENCODINGS = {
-        "ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
+            "ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
     };
     private static final String PREVIEW_TEXT = "Preview Data File";
     private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
@@ -159,129 +158,154 @@ public class DataUploadPage extends CompositeWithUsername {
             "Please select a data file to upload";
     private static final String UNEXPLAINED_FAIL_MSG =
             "<h3>Upload failed.</h3>" +
-            "<p>Unexpectedly, no explanation of the failure was given</p>";
+                    "<p>Unexpectedly, no explanation of the failure was given</p>";
     private static final String FAIL_MSG_START =
             "<h3>";
     private static final String EXPLAINED_FAIL_MSG_START =
             "<br />Upload failed.</h3>" +
-            "<p><pre>\n";
+                    "<p><pre>\n";
     private static final String EXPLAINED_FAIL_MSG_END =
             "</pre></p>";
     private static final String NO_DATASET_ID_FAIL_MSG =
             "<br />Expocode not found.</h3>" +
-            "<p>The data file needs to contain the dataset expocode in the " +
-            "lines of metadata preceding the data, or in a data column. " +
-            "</p><p>" +
-            "The expocode metadata line or column header should use the " +
-            "tag 'Expocode' or 'Cruise Expocode' (uppercase or lowercase " +
-            "does not matter).  The metadata line should look something " +
-            "like one of the following (when using the 'Expocode' tag): " +
-            "<ul style=\"list-style-type: none\">" +
-            "  <li>Expocode = 49P120101218</li>" +
-            "  <li>Expocode: 49P120101218</li>" +
-            "</ul>" +
-            "The 12 character expocode is the " +
-            "<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
-            "for the vessel carrying the instrumentation followed by the " +
-            "numeric year, month, and day of departure.  For example, " +
-            "49P120101218 indicates a cruise on the Japanese (49) ship" +
-            " of opportunity Pyxis (P1) with the first day of the cruise " +
-            "on 18 December 2010. " +
-            "</p><p>" +
-            "Please verify a valid expocode is given in your file.  You " +
-            "might want to click the Advanced Settings option on this " +
-            "page and then click the Preview Data File button.  This will " +
-            "enable you to see how your file appears to this system and " +
-            "change the file encoding type if appropriate." +
-            "</p>";
+                    "<p>The data file needs to contain the dataset expocode in the " +
+                    "lines of metadata preceding the data, or in a data column. " +
+                    "</p><p>" +
+                    "The expocode metadata line or column header should use the " +
+                    "tag 'Expocode' or 'Cruise Expocode' (uppercase or lowercase " +
+                    "does not matter).  The metadata line should look something " +
+                    "like one of the following (when using the 'Expocode' tag): " +
+                    "<ul style=\"list-style-type: none\">" +
+                    "  <li>Expocode = 49P120101218</li>" +
+                    "  <li>Expocode: 49P120101218</li>" +
+                    "</ul>" +
+                    "The 12 character expocode is the " +
+                    "<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
+                    "for the vessel carrying the instrumentation followed by the " +
+                    "numeric year, month, and day of departure.  For example, " +
+                    "49P120101218 indicates a cruise on the Japanese (49) ship" +
+                    " of opportunity Pyxis (P1) with the first day of the cruise " +
+                    "on 18 December 2010. " +
+                    "</p><p>" +
+                    "Please verify a valid expocode is given in your file.  You " +
+                    "might want to click the Advanced Settings option on this " +
+                    "page and then click the Preview Data File button.  This will " +
+                    "enable you to see how your file appears to this system and " +
+                    "change the file encoding type if appropriate." +
+                    "</p>";
     private static final String NO_PLATFORM_NAME_FAIL_MSG =
             "<br />Platform (Ship) name not found.</h3>" +
-            "<p>The data file needs to contain the platform (ship) name in " +
-            "the lines of metadata preceding the data, or in a data column. " +
-            "</p><p>" +
-            "The platform name metadata line or column header should use " +
-            "one of the tags 'ship', 'ship name', 'vessel', 'vessel name', " +
-            "'platform', or 'platform name' (uppercase or lowercase does not " +
-            "matter).  The metadata line should look something like one of " +
-            "the following (when using the 'ship' tag): " +
-            "<ul style=\"list-style-type: none\">" +
-            "  <li>ship = Pacific Minnow</li>" +
-            "  <li>ship: Pacific Minnow</li>" +
-            "</ul>" +
-            "Please verify a ship or vessel name is given in your file.  " +
-            "You might want to click the Advanced Settings option on this " +
-            "page and then click the Preview Data File button.  This will " +
-            "enable you to see how your file appears to this system and " +
-            "change the file encoding type if appropriate." +
-            "</p>";
+                    "<p>The data file needs to contain the platform (ship) name in " +
+                    "the lines of metadata preceding the data, or in a data column. " +
+                    "</p><p>" +
+                    "The platform name metadata line or column header should use " +
+                    "one of the tags 'ship', 'ship name', 'vessel', 'vessel name', " +
+                    "'platform', or 'platform name' (uppercase or lowercase does not " +
+                    "matter).  The metadata line should look something like one of " +
+                    "the following (when using the 'ship' tag): " +
+                    "<ul style=\"list-style-type: none\">" +
+                    "  <li>ship = Pacific Minnow</li>" +
+                    "  <li>ship: Pacific Minnow</li>" +
+                    "</ul>" +
+                    "Please verify a ship or vessel name is given in your file.  " +
+                    "You might want to click the Advanced Settings option on this " +
+                    "page and then click the Preview Data File button.  This will " +
+                    "enable you to see how your file appears to this system and " +
+                    "change the file encoding type if appropriate." +
+                    "</p>";
     private static final String NO_PI_NAMES_FAIL_MSG =
             "<br />Investigator Name(s) not found.</h3>" +
-            "<p>The data file needs to contain the investigator name(s) in " +
-            "the lines of metadata preceding the data, or in a data column. " +
-            "</p><p>" +
-            "The investigator name(s) metadata line or column header should use " +
-            "one of the tags 'investigator', 'investigator name', 'investigators', " +
-            "'investigator names', 'PI', 'PI name', 'PIs', or 'PI names' " +
-            "(uppercase or lowercase does not matter).  Use a semicolon ';' to " +
-            "separate different investigator names.  The metadata line should " +
-            "look something like one of the following (when using the 'PI names' tag): " +
-            "<ul style=\"list-style-type: none\">" +
-            "  <li>PI names: Smith, K.; Doe, J.</li>" +
-            "  <li>PI names = Smith, K.; Doe, J.</li>" +
-            "</ul>" +
-            "Please verify investigator names are given in your file.  " +
-            "You might want to click the Advanced Settings option on this " +
-            "page and then click the Preview Data File button.  This will " +
-            "enable you to see how your file appears to this system and " +
-            "change the file encoding type if appropriate." +
-            "</p>";
+                    "<p>The data file needs to contain the investigator name(s) in " +
+                    "the lines of metadata preceding the data, or in a data column. " +
+                    "</p><p>" +
+                    "The investigator name(s) metadata line or column header should use " +
+                    "one of the tags 'investigator', 'investigator name', 'investigators', " +
+                    "'investigator names', 'PI', 'PI name', 'PIs', or 'PI names' " +
+                    "(uppercase or lowercase does not matter).  Use a semicolon ';' to " +
+                    "separate different investigator names.  The metadata line should " +
+                    "look something like one of the following (when using the 'PI names' tag): " +
+                    "<ul style=\"list-style-type: none\">" +
+                    "  <li>PI names: Smith, K.; Doe, J.</li>" +
+                    "  <li>PI names = Smith, K.; Doe, J.</li>" +
+                    "</ul>" +
+                    "Please verify investigator names are given in your file.  " +
+                    "You might want to click the Advanced Settings option on this " +
+                    "page and then click the Preview Data File button.  This will " +
+                    "enable you to see how your file appears to this system and " +
+                    "change the file encoding type if appropriate." +
+                    "</p>";
     private static final String DATASET_EXISTS_FAIL_MSG_START =
             "<br />A dataset already exists with this expocode.</h3>";
     private static final String DATASET_EXISTS_FAIL_MSG_END =
             "<p>Either you specified that this file should create a new " +
-            "dataset, or the existing dataset with this expocode cannot be " +
-            "overwritten.  Datasets cannot be overwritten if they have been " +
-            "submitted for QC, or if they do not belong to you.</p>";
+                    "dataset, or the existing dataset with this expocode cannot be " +
+                    "overwritten.  Datasets cannot be overwritten if they have been " +
+                    "submitted for QC, or if they do not belong to you.</p>";
     private static final String DATASET_DOES_NOT_EXIST_FAIL_MSG =
             "<br />A dataset with this expocode does not exist.</h3>" +
-            "<p>You specified that this file should update an existing " +
-            "dataset; however, no dataset exists with this expocode</p>";
+                    "<p>You specified that this file should update an existing " +
+                    "dataset; however, no dataset exists with this expocode</p>";
 
     // Remove javascript added by the firewall
     private static final String JAVASCRIPT_START = "<script language=\"javascript\">";
     private static final String JAVASCRIPT_CLOSE = "</script>";
 
-    interface DashboardDatasetUploadPageUiBinder extends UiBinder<Widget, DataUploadPage> {
+    interface DashboardDatasetUploadPageUiBinder extends UiBinder<Widget,DataUploadPage> {
     }
 
     private static DashboardDatasetUploadPageUiBinder uiBinder =
             GWT.create(DashboardDatasetUploadPageUiBinder.class);
 
-    @UiField InlineLabel titleLabel;
-    @UiField InlineLabel userInfoLabel;
-    @UiField Button logoutButton;
-    @UiField HTML introHtml;
-    @UiField Anchor moreHelpAnchor;
-    @UiField FormPanel uploadForm;
-    @UiField HTML dataUpload;
-    @UiField Hidden timestampToken;
-    @UiField Hidden actionToken;
-    @UiField Hidden encodingToken;
-    @UiField Hidden formatToken;
-    @UiField CaptionPanel settingsCaption;
-    @UiField RadioButton commaRadio;
-    @UiField RadioButton semicolonRadio;
-    @UiField RadioButton tabRadio;
-    @UiField DisclosurePanel advancedPanel;
-    @UiField HTML advancedHtml;
-    @UiField Label encodingLabel;
-    @UiField ListBox encodingListBox;
-    @UiField Button previewButton;
-    @UiField HTML previewHtml;
-    @UiField RadioButton createRadio;
-    @UiField RadioButton overwriteRadio;
-    @UiField Button submitButton;
-    @UiField Button cancelButton;
+    @UiField
+    InlineLabel titleLabel;
+    @UiField
+    InlineLabel userInfoLabel;
+    @UiField
+    Button logoutButton;
+    @UiField
+    HTML introHtml;
+    @UiField
+    Anchor moreHelpAnchor;
+    @UiField
+    FormPanel uploadForm;
+    @UiField
+    HTML dataUpload;
+    @UiField
+    Hidden timestampToken;
+    @UiField
+    Hidden actionToken;
+    @UiField
+    Hidden encodingToken;
+    @UiField
+    Hidden formatToken;
+    @UiField
+    CaptionPanel settingsCaption;
+    @UiField
+    RadioButton commaRadio;
+    @UiField
+    RadioButton semicolonRadio;
+    @UiField
+    RadioButton tabRadio;
+    @UiField
+    DisclosurePanel advancedPanel;
+    @UiField
+    HTML advancedHtml;
+    @UiField
+    Label encodingLabel;
+    @UiField
+    ListBox encodingListBox;
+    @UiField
+    Button previewButton;
+    @UiField
+    HTML previewHtml;
+    @UiField
+    RadioButton createRadio;
+    @UiField
+    RadioButton overwriteRadio;
+    @UiField
+    Button submitButton;
+    @UiField
+    Button cancelButton;
 
     private DashboardInfoPopup moreHelpPopup;
     private Element uploadElement;
@@ -290,9 +314,8 @@ public class DataUploadPage extends CompositeWithUsername {
     private static DataUploadPage singleton = null;
 
     /**
-     * Creates an empty cruise upload page.  Do not call this
-     * constructor; instead use the showPage static method
-     * to show the singleton instance of this page.
+     * Creates an empty cruise upload page.  Do not call this constructor; instead use the showPage static method to
+     * show the singleton instance of this page.
      */
     DataUploadPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -346,16 +369,15 @@ public class DataUploadPage extends CompositeWithUsername {
         advancedHtml.setHTML(ADVANCED_HTML_MSG);
         encodingLabel.setText(ENCODING_TEXT);
         encodingListBox.setVisibleItemCount(1);
-        for ( String encoding : KNOWN_ENCODINGS )
+        for (String encoding : KNOWN_ENCODINGS) {
             encodingListBox.addItem(encoding);
+        }
         previewButton.setText(PREVIEW_TEXT);
     }
 
     /**
-     * Display the cruise upload page in the RootLayoutPanel
-     * after clearing as much of the page as possible.
-     * The upload filename cannot be cleared.
-     * Adds this page to the page history.
+     * Display the cruise upload page in the RootLayoutPanel after clearing as much of the page as possible. The upload
+     * filename cannot be cleared. Adds this page to the page history.
      */
     static void showPage(String username) {
         if ( singleton == null )
@@ -371,12 +393,11 @@ public class DataUploadPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
-             (singleton == null) || ! singleton.getUsername().equals(username) ) {
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -436,20 +457,20 @@ public class DataUploadPage extends CompositeWithUsername {
     /**
      * @param input
      *         multiple file input HTML element
-     * @return a " ; "-separated list of the filenames given
-     * in the multiple file input HTML element
+     *
+     * @return a " ; "-separated list of the filenames given in the multiple file input HTML element
      */
     private static native String getInputFileNames(Element input) /*-{
         var namesString = "";
 
         // Just in case not multiple
-        if ( typeof (input.files) == 'undefined' ||
-             typeof (input.files.length) == 'undefined') {
+        if (typeof (input.files) == 'undefined' ||
+            typeof (input.files.length) == 'undefined') {
             return input.value;
         }
 
         for (var k = 0; k < input.files.length; k++) {
-            if ( k > 0 ) {
+            if (k > 0) {
                 namesString += " ; ";
             }
             namesString += input.files[k].name;
@@ -460,7 +481,7 @@ public class DataUploadPage extends CompositeWithUsername {
     @UiHandler("previewButton")
     void previewButtonOnClick(ClickEvent event) {
         String namesString = getInputFileNames(uploadElement).trim();
-        if (  namesString.isEmpty() ) {
+        if ( namesString.isEmpty() ) {
             UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
             return;
         }
@@ -471,7 +492,7 @@ public class DataUploadPage extends CompositeWithUsername {
     @UiHandler("submitButton")
     void createButtonOnClick(ClickEvent event) {
         String namesString = getInputFileNames(uploadElement).trim();
-        if (  namesString.isEmpty() ) {
+        if ( namesString.isEmpty() ) {
             UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
             return;
         }
@@ -527,7 +548,7 @@ public class DataUploadPage extends CompositeWithUsername {
                         k++;
                         if ( k >= splitMsgs.length )
                             break;
-                    } while ( ! splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
+                    } while ( !splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
                 }
                 else {
                     previewMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
@@ -562,38 +583,42 @@ public class DataUploadPage extends CompositeWithUsername {
                 // No expocode was found in the file
                 String filename = header.substring(
                         DashboardUtils.NO_DATASET_ID_HEADER_TAG.length()).trim();
-                errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_DATASET_ID_FAIL_MSG);
+                errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + NO_DATASET_ID_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.NO_PLATFORM_NAME_HEADER_TAG) ) {
                 // No platform name was found in the file
                 String filename = header.substring(
                         DashboardUtils.NO_PLATFORM_NAME_HEADER_TAG.length()).trim();
-                errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_PLATFORM_NAME_FAIL_MSG);
+                errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + NO_PLATFORM_NAME_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.NO_PI_NAMES_HEADER_TAG) ) {
                 // No investigator name was found in the file
                 String filename = header.substring(
                         DashboardUtils.NO_PI_NAMES_HEADER_TAG.length()).trim();
-                errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_PI_NAMES_FAIL_MSG);
+                errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + NO_PI_NAMES_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
                 // Dataset file exists and not permitted to modify
-                String[] info = header.substring(DashboardUtils.DATASET_EXISTS_HEADER_TAG.length()).trim().split(" ; ", 4);
+                String[] info = header.substring(DashboardUtils.DATASET_EXISTS_HEADER_TAG.length()).trim()
+                                      .split(" ; ", 4);
                 String failMsg = FAIL_MSG_START;
                 if ( info.length > 1 )
                     failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
                 failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
                 failMsg += DATASET_EXISTS_FAIL_MSG_START;
                 if ( info.length > 2 )
-                    failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Owner = " + SafeHtmlUtils.htmlEscape(info[2].trim()) + "</p>";
+                    failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Owner = " + SafeHtmlUtils
+                            .htmlEscape(info[2].trim()) + "</p>";
                 if ( info.length > 3 )
-                    failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Submit Status = " + SafeHtmlUtils.htmlEscape(info[3].trim()) + "</p>";
+                    failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Submit Status = " + SafeHtmlUtils
+                            .htmlEscape(info[3].trim()) + "</p>";
                 errMsgs.add(failMsg + DATASET_EXISTS_FAIL_MSG_END);
             }
             else if ( header.startsWith(DashboardUtils.DATASET_DOES_NOT_EXIST_HEADER_TAG) ) {
                 // Dataset file does not exist and request was to overwrite
-                String[] info = header.substring(DashboardUtils.DATASET_DOES_NOT_EXIST_HEADER_TAG.length()).trim().split(" ; ", 2);
-                String failMsg = FAIL_MSG_HEADER;
+                String[] info = header.substring(DashboardUtils.DATASET_DOES_NOT_EXIST_HEADER_TAG.length()).trim()
+                                      .split(" ; ", 2);
+                String failMsg = FAIL_MSG_START;
                 if ( info.length > 1 )
                     failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
                 failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
@@ -605,7 +630,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     k++;
                     if ( k >= splitMsgs.length )
                         break;
-                } while ( ! splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
+                } while ( !splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
             }
             else {
                 //  some other error message, display the whole message and be done with it
@@ -621,15 +646,17 @@ public class DataUploadPage extends CompositeWithUsername {
         // Display any error messages from the upload
         if ( errMsgs.size() > 0 ) {
             String errors = "";
-            for ( String msg : errMsgs )
+            for (String msg : errMsgs) {
                 errors += msg;
+            }
             UploadDashboard.showMessage(errors);
         }
 
         // Process any successes
-        if ( ! cruiseIDs.isEmpty() ) {
-            for ( String expo : cruiseIDs )
+        if ( !cruiseIDs.isEmpty() ) {
+            for (String expo : cruiseIDs) {
                 DatasetListPage.addSelectedDataset(expo);
+            }
             DatasetListPage.resortTable();
             DataColumnSpecsPage.showPage(getUsername(), cruiseIDs);
         }

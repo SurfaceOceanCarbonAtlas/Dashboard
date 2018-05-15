@@ -3,6 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,18 +19,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
-import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
-import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
-import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
-
 /**
- * A 2-D array of objects corresponding to the standardized values in a dataset,
- * as well as 1-D arrays of information describing each data column.
+ * A 2-D array of objects corresponding to the standardized values in a dataset, as well as 1-D arrays of information
+ * describing each data column.
  *
  * @author Karl Smith
  */
@@ -47,23 +47,21 @@ public class StdDataArray {
     protected int secondOfDayIndex;
 
     /**
-     * Create and assign the 1-D arrays of data column types from
-     * the given user's descriptions of the data column.  Appends
-     * the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER}
-     * and {@link DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D
-     * array of standard data objects is not created.
+     * Create and assign the 1-D arrays of data column types from the given user's descriptions of the data column.
+     * Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and {@link
+     * DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D array of standard data objects is not created.
      *
      * @param dataColumnTypes
      *         user's description of the data columns in each sample
      * @param knownTypes
      *         all known user data types
+     *
      * @throws IllegalArgumentException
-     *         if there are no user data column descriptions,
-     *         if there are no known user data types, or
-     *         if a data column description is not a known user data type
+     *         if there are no user data column descriptions, if there are no known user data types, or if a data column
+     *         description is not a known user data type
      */
-    protected StdDataArray(List<DataColumnType> dataColumnTypes,
-            KnownDataTypes knownTypes) throws IllegalArgumentException {
+    protected StdDataArray(List<DataColumnType> dataColumnTypes, KnownDataTypes knownTypes)
+            throws IllegalArgumentException {
         if ( (dataColumnTypes == null) || dataColumnTypes.isEmpty() )
             throw new IllegalArgumentException("no data column types given");
         if ( (knownTypes == null) || knownTypes.isEmpty() )
@@ -71,7 +69,7 @@ public class StdDataArray {
         numDataCols = dataColumnTypes.size();
         numSamples = 0;
 
-        dataTypes = new DashDataType<?>[numDataCols+2];
+        dataTypes = new DashDataType<?>[numDataCols + 2];
         stdObjects = null;
 
         for (int k = 0; k < numDataCols; k++) {
@@ -82,36 +80,31 @@ public class StdDataArray {
                         dataColType.getDisplayName());
         }
         dataTypes[numDataCols] = DashboardServerUtils.SAMPLE_NUMBER;
-        dataTypes[numDataCols+1] = DashboardServerUtils.WOCE_AUTOCHECK;
+        dataTypes[numDataCols + 1] = DashboardServerUtils.WOCE_AUTOCHECK;
         numDataCols += 2;
 
         assignColumnIndicesOfInterest();
     }
 
     /**
-     * Create with the given data file data types for each column and the given
-     * standardized data objects for each data column value (second index) in each
-     * sample (first index).  The data types given must be known subclasses of
-     * DashDataType valid for data files: {@link CharDashDataType},
-     * {@link IntDashDataType}, or {@link DoubleDashDataType}.
+     * Create with the given data file data types for each column and the given standardized data objects for each data
+     * column value (second index) in each sample (first index).  The data types given must be known subclasses of
+     * DashDataType valid for data files: {@link StringDashDataType}, {@link IntDashDataType}, or {@link
+     * DoubleDashDataType}.
      *
      * @param dataColumnTypes
      *         types for the data columns in each sample
      * @param stdDataValues
-     *         standard values; the value at stdDataValues[j][k] is the appropriate
-     *         object for the value of the k-th data column in the j-th sample.
-     *         Missing values correspond to null objects.
+     *         standard values; the value at stdDataValues[j][k] is the appropriate object for the value of the k-th
+     *         data column in the j-th sample. Missing values correspond to null objects.
+     *
      * @throws IllegalArgumentException
-     *         if not data column types are given,
-     *         if a data column type is not a known subclass type,
-     *         if no data values are given,
-     *         if the number of data columns in the array of data values does
-     *             not match the number of data column types, or
-     *         if a data value object is not an appropriate object
-     *             for the data column type
+     *         if not data column types are given, if a data column type is not a known subclass type, if no data values
+     *         are given, if the number of data columns in the array of data values does not match the number of data
+     *         column types, or if a data value object is not an appropriate object for the data column type
      */
-    public StdDataArray(DashDataType<?>[] dataColumnTypes,
-            Object[][] stdDataValues) throws IllegalArgumentException {
+    public StdDataArray(DashDataType<?>[] dataColumnTypes, Object[][] stdDataValues)
+            throws IllegalArgumentException {
         if ( (dataColumnTypes == null) || (dataColumnTypes.length == 0) )
             throw new IllegalArgumentException("no data column types given");
         numDataCols = dataColumnTypes.length;
@@ -120,7 +113,7 @@ public class StdDataArray {
         numSamples = stdDataValues.length;
         if ( stdDataValues[0].length != numDataCols )
             throw new IllegalArgumentException("Different number of data column values (" +
-                    stdDataValues[0].length + ") and types (" +  numDataCols + ")");
+                    stdDataValues[0].length + ") and types (" + numDataCols + ")");
 
         dataTypes = new DashDataType<?>[numDataCols];
         stdObjects = new Object[numSamples][numDataCols];
@@ -129,18 +122,18 @@ public class StdDataArray {
             DashDataType<?> dtype = dataColumnTypes[k];
             if ( dtype == null )
                 throw new IllegalArgumentException(
-                        "no data type for column number" + Integer.toString(k+1));
+                        "no data type for column number" + Integer.toString(k + 1));
             dataTypes[k] = dtype;
 
             // Catch invalid data column types and invalid data objects
             // while assigning the standard data values
-            if ( dtype instanceof CharDashDataType ) {
+            if ( dtype instanceof StringDashDataType ) {
                 for (int j = 0; j < numSamples; j++) {
                     try {
-                        stdObjects[j][k] = (Character) stdDataValues[j][k];
+                        stdObjects[j][k] = (String) stdDataValues[j][k];
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException("standard data object for sample number " +
-                                Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+                                Integer.toString(j + 1) + ", column number " + Integer.toString(j + 1) +
                                 " is invalid: " + ex.getMessage());
                     }
                 }
@@ -151,7 +144,7 @@ public class StdDataArray {
                         stdObjects[j][k] = (Integer) stdDataValues[j][k];
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException("standard data object for sample number " +
-                                Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+                                Integer.toString(j + 1) + ", column number " + Integer.toString(j + 1) +
                                 " is invalid: " + ex.getMessage());
                     }
                 }
@@ -162,7 +155,7 @@ public class StdDataArray {
                         stdObjects[j][k] = (Double) stdDataValues[j][k];
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException("standard data object for sample number " +
-                                Integer.toString(j+1) + ", column number " + Integer.toString(j+1) +
+                                Integer.toString(j + 1) + ", column number " + Integer.toString(j + 1) +
                                 " is invalid: " + ex.getMessage());
                     }
                 }
@@ -177,40 +170,36 @@ public class StdDataArray {
     }
 
     /**
-     * Creates with the standardized data file types and values in the given
-     * user standard data array.  The methods {@link #getSampleLongitudes()},
-     * {@link #getSampleLatitudes()}, {@link #getSampleDepths()}, and
-     * {@link #getSampleTimes()} on the standardized user data must succeed
-     * and return arrays with no null (missing) values.  No data column can be
-     * the type {@link DashboardServerUtils#UNKNOWN}.  Only those data columns
-     * matching one of the given known data files types is copied from the
-     * standardized user data.  The following data columns will be added and
-     * assigned if not already present:
+     * Creates with the standardized data file types and values in the given user standard data array.  The methods
+     * {@link #getSampleLongitudes()}, {@link #getSampleLatitudes()}, {@link #getSampleDepths()}, and {@link
+     * #getSampleTimes()} on the standardized user data must succeed and return arrays with no null (missing) values. No
+     * data column can be the type {@link DashboardServerUtils#UNKNOWN}.  Only those data columns matching one of the
+     * given known data files types is copied from the standardized user data.  The following data columns will be added
+     * and assigned if not already present:
      * <ul>
-     *   <li>{@link DashboardServerUtils#YEAR}</li>
-     *   <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
-     *   <li>{@link DashboardServerUtils#DAY_OF_MONTH}</li>
-     *   <li>{@link DashboardServerUtils#HOUR_OF_DAY}</li>
-     *   <li>{@link DashboardServerUtils#MINUTE_OF_HOUR}</li>
-     *   <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
-     *   <li>{@link DashboardServerUtils#TIME}</li>
+     * <li>{@link DashboardServerUtils#YEAR}</li>
+     * <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
+     * <li>{@link DashboardServerUtils#DAY_OF_MONTH}</li>
+     * <li>{@link DashboardServerUtils#HOUR_OF_DAY}</li>
+     * <li>{@link DashboardServerUtils#MINUTE_OF_HOUR}</li>
+     * <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
+     * <li>{@link DashboardServerUtils#TIME}</li>
      * </ul>
-     * (TIME should always added and assigned since it is not a user provided type.)
-     * If the time to the seconds is not provided, the seconds values are all
-     * set to zero and the added SECOND_OF_MINUTE column added will be all zeros.
+     * (TIME should always added and assigned since it is not a user provided type.) If the time to the seconds is not
+     * provided, the seconds values are all set to zero and the added SECOND_OF_MINUTE column added will be all zeros.
      *
      * @param userStdData
      *         standardized user data values
      * @param dataFileTypes
      *         known data file column types
+     *
      * @throws IllegalArgumentException
-     *         if no standard user data values are given,
-     *         if any of the user data types is {@link DashboardServerUtils#UNKNOWN}
-     *         if any sample longitude, latitude, sample depth is missing, or
-     *         if any sample time cannot be computed.
+     *         if no standard user data values are given, if any of the user data types is {@link
+     *         DashboardServerUtils#UNKNOWN} if any sample longitude, latitude, sample depth is missing, or if any
+     *         sample time cannot be computed.
      */
-    public StdDataArray(StdUserDataArray userStdData,
-            KnownDataTypes dataFileTypes) throws IllegalArgumentException {
+    public StdDataArray(StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
+            throws IllegalArgumentException {
         // StdUserDataArray has to have data columns, but could be missing the data values
         numSamples = userStdData.getNumSamples();
         if ( numSamples <= 0 )
@@ -221,19 +210,23 @@ public class StdDataArray {
         // hang onto the time values for adding to this standardized data
         Double[] timeVals;
         try {
-            for ( Double value : userStdData.getSampleLongitudes() )
+            for (Double value : userStdData.getSampleLongitudes()) {
                 if ( value == null )
                     throw new IllegalArgumentException("a longitude value is missing");
-            for ( Double value : userStdData.getSampleLatitudes() )
+            }
+            for (Double value : userStdData.getSampleLatitudes()) {
                 if ( value == null )
                     throw new IllegalArgumentException("a latitude value is missing");
-            for ( Double value : userStdData.getSampleDepths() )
+            }
+            for (Double value : userStdData.getSampleDepths()) {
                 if ( value == null )
                     throw new IllegalArgumentException("a sample depth value is missing");
+            }
             timeVals = userStdData.getSampleTimes();
-            for ( Double value : timeVals )
+            for (Double value : timeVals) {
                 if ( value == null )
                     throw new IllegalArgumentException("a sample date/time value is missing");
+            }
         } catch ( IllegalStateException ex ) {
             throw new IllegalArgumentException(ex);
         }
@@ -241,11 +234,11 @@ public class StdDataArray {
         // Get the list of data file types present in the standardized user data
         ArrayList<DashDataType<?>> userDataTypes = new ArrayList<DashDataType<?>>(numUserColumns + 7);
         ArrayList<Integer> userColIndices = new ArrayList<Integer>(numUserColumns + 7);
-        List <DashDataType<?>> userTypes = userStdData.getDataTypes();
+        List<DashDataType<?>> userTypes = userStdData.getDataTypes();
         for (int k = 0; k < numUserColumns; k++) {
             DashDataType<?> dtype = userTypes.get(k);
             if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dtype) )
-                throw new IllegalArgumentException("user column number " + Integer.toString(k+1) +
+                throw new IllegalArgumentException("user column number " + Integer.toString(k + 1) +
                         " is type " + DashboardServerUtils.UNKNOWN.getDisplayName());
             if ( userStdData.isUsableIndex(k) && dataFileTypes.containsTypeName(dtype.getVarName()) ) {
                 // OTHER and metadata column types are not added
@@ -254,31 +247,31 @@ public class StdDataArray {
             }
         }
         // Add required data columns if not present
-        if ( ! userStdData.hasYear() ) {
+        if ( !userStdData.hasYear() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.YEAR);
         }
-        if ( ! userStdData.hasMonthOfYear() ) {
+        if ( !userStdData.hasMonthOfYear() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.MONTH_OF_YEAR);
         }
-        if ( ! userStdData.hasDayOfMonth() ) {
+        if ( !userStdData.hasDayOfMonth() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.DAY_OF_MONTH);
         }
-        if ( ! userStdData.hasHourOfDay() ) {
+        if ( !userStdData.hasHourOfDay() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.HOUR_OF_DAY);
         }
-        if ( ! userStdData.hasMinuteOfHour() ) {
+        if ( !userStdData.hasMinuteOfHour() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.MINUTE_OF_HOUR);
         }
-        if ( ! userStdData.hasSecondOfMinute() ) {
+        if ( !userStdData.hasSecondOfMinute() ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.SECOND_OF_MINUTE);
         }
-        if ( ! userDataTypes.contains(DashboardServerUtils.TIME) ) {
+        if ( !userDataTypes.contains(DashboardServerUtils.TIME) ) {
             userColIndices.add(DashboardUtils.INT_MISSING_VALUE);
             userDataTypes.add(DashboardServerUtils.TIME);
         }
@@ -295,38 +288,39 @@ public class StdDataArray {
                 if ( DashboardServerUtils.YEAR.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.YEAR) );
+                        stdObjects[j][k] = Integer.valueOf(cal.get(GregorianCalendar.YEAR));
                     }
                 }
                 else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MONTH) - GregorianCalendar.JANUARY + 1 );
+                        stdObjects[j][k] = Integer.valueOf(cal.get(GregorianCalendar.MONTH) -
+                                GregorianCalendar.JANUARY + 1);
                     }
                 }
                 else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.DAY_OF_MONTH) );
+                        stdObjects[j][k] = Integer.valueOf(cal.get(GregorianCalendar.DAY_OF_MONTH));
                     }
                 }
                 else if ( DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.HOUR_OF_DAY) );
+                        stdObjects[j][k] = Integer.valueOf(cal.get(GregorianCalendar.HOUR_OF_DAY));
                     }
                 }
                 else if ( DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        stdObjects[j][k] = Integer.valueOf( cal.get(GregorianCalendar.MINUTE) );
+                        stdObjects[j][k] = Integer.valueOf(cal.get(GregorianCalendar.MINUTE));
                     }
                 }
                 else if ( DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataTypes[k]) ) {
                     for (int j = 0; j < numSamples; j++) {
                         cal.setTimeInMillis(Double.valueOf(timeVals[j] * 1000.0).longValue());
-                        Double second = ( 1000.0 * cal.get(GregorianCalendar.SECOND) +
-                                            cal.get(GregorianCalendar.MILLISECOND) ) / 1000.0;
+                        Double second = (1000.0 * cal.get(GregorianCalendar.SECOND) +
+                                cal.get(GregorianCalendar.MILLISECOND)) / 1000.0;
                         stdObjects[j][k] = second;
                     }
                 }
@@ -351,8 +345,8 @@ public class StdDataArray {
     }
 
     /**
-     * Assigns the data column indices of interest (longitude, latitude, sample
-     * depth, and various time types) from the assigned types of the data columns.
+     * Assigns the data column indices of interest (longitude, latitude, sample depth, and various time types) from the
+     * assigned types of the data columns.
      */
     private void assignColumnIndicesOfInterest() {
         longitudeIndex = DashboardUtils.INT_MISSING_VALUE;
@@ -416,12 +410,12 @@ public class StdDataArray {
     }
 
     /**
-     * Determines is this data column is an appropriate index.  This version
-     * of the method just checks that the value is in the appropriate range.
-     * Subclasses should override this method if further validation is required.
+     * Determines is this data column is an appropriate index.  This version of the method just checks that the value is
+     * in the appropriate range. Subclasses should override this method if further validation is required.
      *
      * @param idx
      *         index to test
+     *
      * @return if the index is valid
      */
     public boolean isUsableIndex(int idx) {
@@ -433,73 +427,93 @@ public class StdDataArray {
     }
 
     /**
-     * @return an array containing the standardized longitudes;
-     *         missing values are null
+     * @return the maximum length of all String data values; never less than one even if there are no valid Strings
+     */
+    public int getMaxStringLength() {
+        int maxStrLen = 1;
+        for (int k = 0; k < numDataCols; k++) {
+            if ( dataTypes[k] instanceof StringDashDataType ) {
+                for (int j = 0; j < numSamples; j++) {
+                    String strval = (String) stdObjects[j][k];
+                    if ( strval != null ) {
+                        if ( maxStrLen < strval.length() )
+                            maxStrLen = strval.length();
+                    }
+                }
+            }
+        }
+        return maxStrLen;
+    }
+
+    /**
+     * @return an array containing the standardized longitudes; missing values are null
+     *
      * @throws IllegalStateException
      *         if there are no standardized longitudes
      */
     public Double[] getSampleLongitudes() throws IllegalStateException {
-        if ( ! isUsableIndex(longitudeIndex) )
+        if ( !isUsableIndex(longitudeIndex) )
             throw new IllegalStateException("no valid longitude data column");
         Double[] sampleLongitudes = new Double[numSamples];
-        for (int j = 0; j < numSamples; j++)
+        for (int j = 0; j < numSamples; j++) {
             sampleLongitudes[j] = (Double) stdObjects[j][longitudeIndex];
+        }
         return sampleLongitudes;
     }
 
     /**
-     * @return an array containing the standardized latitudes;
-     *         missing values are null
+     * @return an array containing the standardized latitudes; missing values are null
+     *
      * @throws IllegalStateException
      *         if there are no standardized latitudes
      */
     public Double[] getSampleLatitudes() throws IllegalStateException {
-        if ( ! isUsableIndex(latitudeIndex) )
+        if ( !isUsableIndex(latitudeIndex) )
             throw new IllegalStateException("no valid latitude data column");
         Double[] sampleLatitudes = new Double[numSamples];
-        for (int j = 0; j < numSamples; j++)
+        for (int j = 0; j < numSamples; j++) {
             sampleLatitudes[j] = (Double) stdObjects[j][latitudeIndex];
+        }
         return sampleLatitudes;
     }
 
     /**
-     * @return an array containing the standardized sample depths;
-     *         missing values are null
+     * @return an array containing the standardized sample depths; missing values are null
+     *
      * @throws IllegalStateException
      *         if there are no standardized sample depths
      */
     public Double[] getSampleDepths() throws IllegalStateException {
-        if ( ! isUsableIndex(sampleDepthIndex) )
+        if ( !isUsableIndex(sampleDepthIndex) )
             throw new IllegalStateException("no valid sample depth data column");
         Double[] sampleDepths = new Double[numSamples];
-        for (int j = 0; j < numSamples; j++)
+        for (int j = 0; j < numSamples; j++) {
             sampleDepths[j] = (Double) stdObjects[j][sampleDepthIndex];
+        }
         return sampleDepths;
     }
 
     /**
-     * Computes the fully-specified time, in units of "seconds since 1970-01-01T00:00:00Z"
-     * from the standardized date and time data values that can be found in the data.
-     * One of the following combinations of date/time columns must be given; if more than
-     * one time specification is found, the first specification in this list is used.
+     * Computes the fully-specified time, in units of "seconds since 1970-01-01T00:00:00Z" from the standardized date
+     * and time data values that can be found in the data. One of the following combinations of date/time columns must
+     * be given; if more than one time specification is found, the first specification in this list is used.
      * <ul>
-     *   <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE</li>
-     *   <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
-     *   <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, TIME_OF_DAY</li>
-     *   <li>YEAR, DAY_OF_YEAR, SECOND_OF_DAY</li>
-     *   <li>TIMESTAMP</li>
-     *   <li>DATE, TIME_OF_DAY</li>
-     *   <li>DATE, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE</li>
-     *   <li>DATE, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
-     *   <li>YEAR, DAY_OF_YEAR</li>
+     * <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE</li>
+     * <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
+     * <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, TIME_OF_DAY</li>
+     * <li>YEAR, DAY_OF_YEAR, SECOND_OF_DAY</li>
+     * <li>TIMESTAMP</li>
+     * <li>DATE, TIME_OF_DAY</li>
+     * <li>DATE, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE</li>
+     * <li>DATE, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
+     * <li>YEAR, DAY_OF_YEAR</li>
      * </ul>
-     * In the formats without seconds, or TIME_OF_DAY values without seconds, the seconds
-     * are set to zero.  The logic in this ordering is the most likely mistake is with the
-     * interpretation of a date string (year-month-day, day-month-year, month-day-year),
-     * especially if the user gave years with only the last two digits.
+     * In the formats without seconds, or TIME_OF_DAY values without seconds, the seconds are set to zero.  The logic in
+     * this ordering is the most likely mistake is with the interpretation of a date string (year-month-day,
+     * day-month-year, month-day-year), especially if the user gave years with only the last two digits.
      *
-     * @return an array containing the sample times;
-     *         missing values are null
+     * @return an array containing the sample times; missing values are null
+     *
      * @throws IllegalStateException
      *         if specification of the sample date and time is incomplete
      */
@@ -509,8 +523,8 @@ public class StdDataArray {
         Double[] sampleTimes = new Double[numSamples];
 
         if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) &&
-             isUsableIndex(dayOfMonthIndex) && isUsableIndex(hourOfDayIndex) &&
-             isUsableIndex(minuteOfHourIndex) ) {
+                isUsableIndex(dayOfMonthIndex) && isUsableIndex(hourOfDayIndex) &&
+                isUsableIndex(minuteOfHourIndex) ) {
             // Get time using year, month, day, hour, minute, and (if available) second
             boolean hasSec = isUsableIndex(secondOfMinuteIndex);
             for (int j = 0; j < numSamples; j++) {
@@ -534,16 +548,16 @@ public class StdDataArray {
                             millisec = 0;
                         }
                     }
-                    cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+                    cal.set(year, GregorianCalendar.JANUARY + month - 1, day, hour, min, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
             }
         }
         else if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) &&
-                  isUsableIndex(dayOfMonthIndex) && isUsableIndex(timeOfDayIndex) ) {
+                isUsableIndex(dayOfMonthIndex) && isUsableIndex(timeOfDayIndex) ) {
             // Use year, month, day, and time string
             // Standard format of time string is HH:mm:ss.SSS
             for (int j = 0; j < numSamples; j++) {
@@ -561,16 +575,16 @@ public class StdDataArray {
                     value -= sec;
                     value *= 1000.0;
                     int millisec = value.intValue();
-                    cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+                    cal.set(year, GregorianCalendar.JANUARY + month - 1, day, hour, min, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
             }
         }
         else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) &&
-                  isUsableIndex(secondOfDayIndex) ) {
+                isUsableIndex(secondOfDayIndex) ) {
             // Use year, day of year (an integer), and second of day
             for (int j = 0; j < numSamples; j++) {
                 try {
@@ -599,7 +613,7 @@ public class StdDataArray {
                     cal.set(GregorianCalendar.MINUTE, minute);
                     cal.set(GregorianCalendar.SECOND, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
@@ -629,9 +643,9 @@ public class StdDataArray {
                     value -= sec;
                     value *= 1000.0;
                     int millisec = value.intValue();
-                    cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+                    cal.set(year, GregorianCalendar.JANUARY + month - 1, day, hour, min, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
@@ -659,16 +673,16 @@ public class StdDataArray {
                     value -= sec;
                     value *= 1000.0;
                     int millisec = value.intValue();
-                    cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+                    cal.set(year, GregorianCalendar.JANUARY + month - 1, day, hour, min, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
             }
         }
         else if ( isUsableIndex(dateIndex) && isUsableIndex(hourOfDayIndex) &&
-                  isUsableIndex(minuteOfHourIndex) ) {
+                isUsableIndex(minuteOfHourIndex) ) {
             // Use date string, hour, minute, and (if available) second
             // Standard format of the date is yyyy-MM-dd
             boolean hasSec = isUsableIndex(secondOfMinuteIndex);
@@ -696,9 +710,9 @@ public class StdDataArray {
                             millisec = 0;
                         }
                     }
-                    cal.set(year, GregorianCalendar.JANUARY+month-1, day, hour, min, sec);
+                    cal.set(year, GregorianCalendar.JANUARY + month - 1, day, hour, min, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
@@ -731,7 +745,7 @@ public class StdDataArray {
                     cal.set(GregorianCalendar.MINUTE, minute);
                     cal.set(GregorianCalendar.SECOND, sec);
                     cal.set(GregorianCalendar.MILLISECOND, millisec);
-                    sampleTimes[j] = Double.valueOf( cal.getTimeInMillis() / 1000.0 );
+                    sampleTimes[j] = Double.valueOf(cal.getTimeInMillis() / 1000.0);
                 } catch ( Exception ex ) {
                     sampleTimes[j] = null;
                 }
@@ -814,19 +828,19 @@ public class StdDataArray {
     }
 
     /**
-     * Get the standard value object for the specified value (column index)
-     * of the specified sample (row index).
+     * Get the standard value object for the specified value (column index) of the specified sample (row index).
      *
      * @param sampleIdx
      *         index of the sample (row)
      * @param columnIdx
      *         index of the data column
-     * @return standard value object; null is returned for "missing value" or
-     *         values that could not be interpreted
+     *
+     * @return standard value object; null is returned for "missing value" or values that could not be interpreted
+     *
      * @throws IndexOutOfBoundsException
      *         if the sample index or the data column index is invalid
      */
-    public Object getStdVal(int sampleIdx, int columnIdx) throws IndexOutOfBoundsException{
+    public Object getStdVal(int sampleIdx, int columnIdx) throws IndexOutOfBoundsException {
         if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
             throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
         if ( (columnIdx < 0) || (columnIdx >= numDataCols) )
@@ -865,7 +879,7 @@ public class StdDataArray {
         if ( obj == null )
             return false;
 
-        if ( ! ( obj instanceof StdDataArray ) )
+        if ( !(obj instanceof StdDataArray) )
             return false;
         StdDataArray other = (StdDataArray) obj;
 
@@ -903,10 +917,10 @@ public class StdDataArray {
         if ( secondOfDayIndex != other.secondOfDayIndex )
             return false;
 
-        if ( ! Arrays.equals(dataTypes, other.dataTypes) )
+        if ( !Arrays.equals(dataTypes, other.dataTypes) )
             return false;
 
-        if ( ! Arrays.deepEquals(stdObjects, other.stdObjects) )
+        if ( !Arrays.deepEquals(stdObjects, other.stdObjects) )
             return false;
 
         return true;

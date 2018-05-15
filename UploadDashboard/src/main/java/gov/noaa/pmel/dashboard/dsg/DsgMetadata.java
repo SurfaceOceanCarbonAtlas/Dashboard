@@ -2,22 +2,20 @@
  */
 package gov.noaa.pmel.dashboard.dsg;
 
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
-import gov.noaa.pmel.dashboard.datatype.CharDashDataType;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 /**
- * Class for working with metadata values of interest,
- * including those derived from dataset data.
+ * Class for working with metadata values of interest, including those derived from dataset data.
  *
  * @author Karl Smith
  */
@@ -27,28 +25,23 @@ public class DsgMetadata {
     TreeMap<DashDataType<?>,Object> valuesMap;
 
     /**
-     * Create with the given data types.  Sets all values for these types
-     * to the appropriate missing value for each type.  The data types given
-     * must be known subclasses of DashDataType valid for metadata files:
-     * {@link StringDashDataType}, {@link CharDashDataType},
-     * {@link IntDashDataType}, or {@link DoubleDashDataType}.
+     * Create with the given data types.  Sets all values for these types to the appropriate missing value for each
+     * type.  The data types given must be known subclasses of DashDataType valid for metadata files: {@link
+     * StringDashDataType}, {@link IntDashDataType}, or {@link DoubleDashDataType}.
      *
      * @param knownTypes
      *         all known metadata types; cannot be null or empty
+     *
      * @throws IllegalArgumentException
-     *         if no data types are given, or
-     *         if the data type not a known subclass type
+     *         if no data types are given, or if the data type not a known subclass type
      */
     public DsgMetadata(KnownDataTypes knownTypes) throws IllegalArgumentException {
         if ( (knownTypes == null) || knownTypes.isEmpty() )
             throw new IllegalArgumentException("no known metadata types");
         valuesMap = new TreeMap<DashDataType<?>,Object>();
-        for ( DashDataType<?> dtype : knownTypes.getKnownTypesSet() ) {
+        for (DashDataType<?> dtype : knownTypes.getKnownTypesSet()) {
             if ( dtype instanceof StringDashDataType ) {
                 valuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
-            }
-            else if ( dtype instanceof CharDashDataType ) {
-                valuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
             }
             else if ( dtype instanceof IntDashDataType ) {
                 valuesMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
@@ -62,42 +55,32 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the map of (metadata) data types to values;
-     *         the actual map in this instance is returned.
+     * @return the map of (metadata) data types to values; the actual map in this instance is returned.
      */
     public TreeMap<DashDataType<?>,Object> getValuesMap() {
         return valuesMap;
     }
 
     /**
-     * Updates the value of the given (metadata) data type
-     * to the given value.
+     * Updates the value of the given (metadata) data type to the given value.
      *
      * @param dtype
      *         the data type of the value
      * @param value
-     *         the value to assign;
-     *         if null, the appropriate missing value is assigned
+     *         the value to assign; if null, the appropriate missing value is assigned
+     *
      * @throws IllegalArgumentException
-     *         if the data type is not a known data type in this metadata, or
-     *         if the value is not an appropriate object for this data type
+     *         if the data type is not a known data type in this metadata, or if the value is not an appropriate object
+     *         for this data type
      */
     public void setValue(DashDataType<?> dtype, Object value) throws IllegalArgumentException {
-        if ( ! valuesMap.containsKey(dtype) )
+        if ( !valuesMap.containsKey(dtype) )
             throw new IllegalArgumentException("unknown metadata type " + dtype.toString());
         Object newValue;
         if ( dtype instanceof StringDashDataType ) {
             if ( value == null )
                 newValue = DashboardUtils.STRING_MISSING_VALUE;
             else if ( value instanceof String )
-                newValue = value;
-            else
-                throw new IllegalArgumentException("invalid value (" + value + ") for data type " + dtype.toString());
-        }
-        else if ( dtype instanceof CharDashDataType ) {
-            if ( value == null )
-                newValue = DashboardUtils.CHAR_MISSING_VALUE;
-            else if ( value instanceof Character )
                 newValue = value;
             else
                 throw new IllegalArgumentException("invalid value (" + value + ") for data type " + dtype.toString());
@@ -126,8 +109,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the dataset ID;
-     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the dataset ID; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getDatasetId() {
         String value = (String) valuesMap.get(DashboardServerUtils.DATASET_ID);
@@ -138,8 +120,7 @@ public class DsgMetadata {
 
     /**
      * @param datasetId
-     *         the dataset ID to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the dataset ID to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDatasetId(String datasetId) {
         String value;
@@ -151,8 +132,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the dataset name;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the dataset name; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getDatasetName() {
         String value = (String) valuesMap.get(DashboardServerUtils.DATASET_NAME);
@@ -163,8 +143,7 @@ public class DsgMetadata {
 
     /**
      * @param datasetName
-     *         the dataset name to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the dataset name to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDatasetName(String datasetName) {
         String value;
@@ -176,33 +155,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the dataset DOI;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
-     */
-    public String getDatasetDOI() {
-        String value = (String) valuesMap.get(DashboardServerUtils.DATASET_DOI);
-        if ( value == null )
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        return value;
-    }
-
-    /**
-     * @param datasetDOI
-     *         the dataset DOI to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-     */
-    public void setDatasetDOI(String datasetDOI) {
-        String value;
-        if ( datasetName != null )
-            value = datasetName;
-        else
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(DashboardServerUtils.DATASET_DOI, value);
-    }
-
-    /**
-     * @return the platform name;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the platform name; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getPlatformName() {
         String value = (String) valuesMap.get(DashboardServerUtils.PLATFORM_NAME);
@@ -213,8 +166,7 @@ public class DsgMetadata {
 
     /**
      * @param platformName
-     *         the platform name to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the platform name to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setPlatformName(String platformName) {
         String value;
@@ -227,8 +179,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the name of the organization/institution;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the name of the organization/institution; never null but could be {@link
+     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getOrganizationName() {
         String value = (String) valuesMap.get(DashboardServerUtils.ORGANIZATION_NAME);
@@ -239,8 +191,8 @@ public class DsgMetadata {
 
     /**
      * @param organizationName
-     *         the name of the organization/institution to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the name of the organization/institution to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
+     *         assigned
      */
     public void setOrganizationName(String organizationName) {
         String value;
@@ -252,8 +204,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the investigator names;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the investigator names; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
+     * assigned
      */
     public String getInvestigatorNames() {
         String value = (String) valuesMap.get(DashboardServerUtils.INVESTIGATOR_NAMES);
@@ -264,8 +216,7 @@ public class DsgMetadata {
 
     /**
      * @param investigatorNames
-     *         the investigator names to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the investigator names to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setInvestigatorNames(String investigatorNames) {
         String value;
@@ -277,8 +228,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the platform type;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the platform type; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getPlatformType() {
         String value = (String) valuesMap.get(DashboardServerUtils.PLATFORM_TYPE);
@@ -289,8 +239,7 @@ public class DsgMetadata {
 
     /**
      * @param platformType
-     *         the platform type to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the platform type to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setPlatformType(String platformType) {
         String value;
@@ -302,33 +251,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the version associated with this instance;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
-     */
-    public String getVersion() {
-        String value = (String) valuesMap.get(DashboardServerUtils.VERSION);
-        if ( value == null )
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        return value;
-    }
-
-    /**
-     * @param version
-     *         the version to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-     */
-    public void setVersion(String version) {
-        String value;
-        if ( version != null )
-            value = version;
-        else
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(DashboardServerUtils.VERSION, value);
-    }
-
-    /**
-     * @return the west-most longitude for the cruise;
-     * never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the west-most longitude for the cruise; never null could be {@link DashboardUtils#FP_MISSING_VALUE} if
+     * not assigned.
      */
     public Double getWestmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.WESTERNMOST_LONGITUDE);
@@ -339,8 +263,7 @@ public class DsgMetadata {
 
     /**
      * @param westmostLongitude
-     *         the west-most longitude to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the west-most longitude to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setWestmostLongitude(Double westmostLongitude) {
         Double value;
@@ -352,8 +275,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the east-most longitude for the cruise;
-     * never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the east-most longitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
+     * if not assigned.
      */
     public Double getEastmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE);
@@ -364,8 +287,7 @@ public class DsgMetadata {
 
     /**
      * @param eastmostLongitude
-     *         the east-most longitude to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the east-most longitude to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setEastmostLongitude(Double eastmostLongitude) {
         Double value;
@@ -377,8 +299,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the south-most latitude for the cruise;
-     * never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
+     * if not assigned.
      */
     public Double getSouthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
@@ -389,8 +311,7 @@ public class DsgMetadata {
 
     /**
      * @param southmostLatitude
-     *         the south-most latitude to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the south-most latitude to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setSouthmostLatitude(Double southmostLatitude) {
         Double value;
@@ -402,8 +323,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the south-most latitude for the cruise;
-     * never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
+     * if not assigned.
      */
     public Double getNorthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.NORTHERNMOST_LATITUDE);
@@ -414,8 +335,7 @@ public class DsgMetadata {
 
     /**
      * @param northmostLatitude
-     *         the north-most latitude to set;
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the north-most latitude to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setNorthmostLatitude(Double northmostLatitude) {
         Double value;
@@ -427,8 +347,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
-     * never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could
+     * be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getBeginTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_START);
@@ -439,21 +359,21 @@ public class DsgMetadata {
 
     /**
      * @param beginTime
-     *         the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00"; if null,
+     *         {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setBeginTime(Double beginTime) {
         Double value;
         if ( beginTime != null )
             value = beginTime;
         else
-            value = DashboardUtils.FP_MISSING_TIME;
+            value = DashboardUtils.FP_MISSING_VALUE;
         valuesMap.put(DashboardServerUtils.TIME_COVERAGE_START, value);
     }
 
     /**
-     * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
-     * never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could be
+     * {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getEndTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_END);
@@ -464,22 +384,71 @@ public class DsgMetadata {
 
     /**
      * @param endTime
-     *         the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
-     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00"; if null, {@link
+     *         DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setEndTime(Double endTime) {
         Double value;
         if ( endTime != null )
             value = endTime;
         else
-            value = DashboardUtils.FP_MISSING_TIME;
+            value = DashboardUtils.FP_MISSING_VALUE;
         valuesMap.put(DashboardServerUtils.TIME_COVERAGE_END, value);
     }
 
-    // Start of SOCAT-specific metadata
     /**
-     * @return the String of all region IDs;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the status associated with this instance; never null but could be {@link
+     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getStatus() {
+        String value = (String) valuesMap.get(DashboardServerUtils.STATUS);
+        if ( value == null )
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        return value;
+    }
+
+    /**
+     * @param status
+     *         the status to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setStatus(String status) {
+        String value;
+        if ( status != null )
+            value = status;
+        else
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        valuesMap.put(DashboardServerUtils.STATUS, value);
+    }
+
+    /**
+     * @return the version associated with this instance; never null but could be {@link
+     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getVersion() {
+        String value = (String) valuesMap.get(DashboardServerUtils.VERSION);
+        if ( value == null )
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        return value;
+    }
+
+    /**
+     * @param version
+     *         the version to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setVersion(String version) {
+        String value;
+        if ( version != null )
+            value = version;
+        else
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        valuesMap.put(DashboardServerUtils.VERSION, value);
+    }
+
+    // Start of SOCAT-specific metadata
+
+    /**
+     * @return the String of all region IDs; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
+     * assigned
      */
     public String getAllRegionIDs() {
         String value = (String) valuesMap.get(SocatTypes.ALL_REGION_IDS);
@@ -488,10 +457,9 @@ public class DsgMetadata {
         return value;
     }
 
-     /**
+    /**
      * @param allRegionIDs
-     *         the String of all region IDs to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the String of all region IDs to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setAllRegionIDs(String allRegionIDs) {
         String value;
@@ -503,8 +471,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the SOCAT DOI for this dataset;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the SOCAT DOI for this dataset; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if
+     * not assigned
      */
     public String getSocatDOI() {
         String value = (String) valuesMap.get(SocatTypes.SOCAT_DOI);
@@ -515,8 +483,7 @@ public class DsgMetadata {
 
     /**
      * @param socatDOI
-     *         the SOCAT DOI for this dataset to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the SOCAT DOI for this dataset to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setSocatDOI(String socatDOI) {
         String value;
@@ -526,41 +493,15 @@ public class DsgMetadata {
             value = DashboardUtils.STRING_MISSING_VALUE;
         valuesMap.put(SocatTypes.SOCAT_DOI, value);
     }
-
-    /**
-     * @return the dataset QC flag;
-     * never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
-     */
-    public String getDatasetQcFlag() {
-        String value = stringValuesMap.get(SocatTypes.DATASET_QC_FLAG);
-        if ( value == null )
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        return value;
-    }
-
-    /**
-     * @param qcFlag
-     *         the dataset QC flag to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-     */
-    public void setQcFlag(String qcFlag) {
-        String value;
-        if ( qcFlag != null )
-            value = qcFlag;
-        else
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(SocatTypes.DATASET_QC_FLAG, value);
-    }
     // End of SOCAT-specific metadata
 
     /**
-     * @return the maximum length of String values given in the fields
-     * of this instance, rounded up to the nearest multiple of 32
-     * (and never less than 32).
+     * @return the maximum length of String values given in the fields of this instance, rounded up to the nearest
+     * multiple of 32 (and never less than 32).
      */
     public int getMaxStringLength() {
         int maxLength = 32;
-        for ( Entry<DashDataType<?>,Object> entry : valuesMap.entrySet() ) {
+        for (Entry<DashDataType<?>,Object> entry : valuesMap.entrySet()) {
             if ( entry.getKey() instanceof StringDashDataType ) {
                 String value = (String) entry.getValue();
                 if ( maxLength < value.length() )
@@ -574,7 +515,7 @@ public class DsgMetadata {
     @Override
     public int hashCode() {
         int result = 0;
-        for ( Entry<DashDataType<?>,Object> entry : valuesMap.entrySet() ) {
+        for (Entry<DashDataType<?>,Object> entry : valuesMap.entrySet()) {
             // Consider only the keys of the floating-point fields set
             // since floating point values do not have to be exactly
             // the same for equals to return true.
@@ -596,14 +537,14 @@ public class DsgMetadata {
         if ( obj == null )
             return false;
 
-        if ( ! (obj instanceof DsgMetadata) )
+        if ( !(obj instanceof DsgMetadata) )
             return false;
         DsgMetadata other = (DsgMetadata) obj;
 
-        if ( ! valuesMap.keySet().equals(other.valuesMap.keySet()) )
+        if ( !valuesMap.keySet().equals(other.valuesMap.keySet()) )
             return false;
 
-        for ( Entry<DashDataType<?>,Object> entry : valuesMap.entrySet() ) {
+        for (Entry<DashDataType<?>,Object> entry : valuesMap.entrySet()) {
             DashDataType<?> key = entry.getKey();
             if ( key instanceof DoubleDashDataType ) {
                 // Floating-point comparisons - values don't have to be exactly the same
@@ -611,14 +552,14 @@ public class DsgMetadata {
                 Double otherVal = (Double) other.valuesMap.get(key);
                 if ( key.getVarName().toUpperCase().contains("LONGITUDE") ) {
                     // Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-                    if ( ! DashboardUtils.longitudeCloseTo(thisVal, otherVal, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    if ( !DashboardUtils.longitudeCloseTo(thisVal, otherVal, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                         return false;
                 }
-                else if ( ! DashboardUtils.closeTo(thisVal, otherVal, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                else if ( !DashboardUtils.closeTo(thisVal, otherVal, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                     return false;
                 }
             }
-            else if ( ! entry.getValue().equals(other.valuesMap.get(key)) ) {
+            else if ( !entry.getValue().equals(other.valuesMap.get(key)) ) {
                 return false;
             }
         }
@@ -629,14 +570,9 @@ public class DsgMetadata {
     @Override
     public String toString() {
         String repr = "DsgMetadata[\n";
-        for ( Entry<DashDataType<?>,Object> entry : valuesMap.entrySet() ) {
+        for (Entry<DashDataType<?>,Object> entry : valuesMap.entrySet()) {
             DashDataType<?> key = entry.getKey();
-            if ( key instanceof StringDashDataType )
-                repr += "    " + key.getVarName() + "=\"" + entry.getValue() + "\"\n";
-            else if ( key instanceof CharDashDataType )
-                repr += "    " + key.getVarName() + "='" + entry.getValue() + "'\n";
-            else
-                repr += "    " + key.getVarName() + "=" + entry.getValue() + "\n";
+            repr += "    " + key.getVarName() + "=" + entry.getValue() + "\n";
         }
         repr += "]";
         return repr;
