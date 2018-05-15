@@ -21,6 +21,7 @@ import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -274,13 +275,17 @@ public class StdUserDataArray extends StdDataArray {
             times = getSampleTimes();
             for (int j = 0; j < numSamples; j++) {
                 if ( times[j] == null ) {
-                    ADCMessage msg = new ADCMessage();
-                    msg.setSeverity(Severity.CRITICAL);
-                    msg.setRowNumber(j + 1);
-                    String comment = "incomplete sample date/time specification";
-                    msg.setGeneralComment(comment);
-                    msg.setDetailedComment(comment);
-                    stdMsgList.add(msg);
+                    for (int k = 0; k < indicesForTime.length; k++) {
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.CRITICAL);
+                        msg.setRowNumber(j + 1);
+                        msg.setColNumber(indicesForTime[k] + 1);
+                        msg.setColName(userColNames[indicesForTime[k]]);
+                        String comment = "incomplete sample date/time specification";
+                        msg.setGeneralComment(comment);
+                        msg.setDetailedComment(comment);
+                        stdMsgList.add(msg);
+                    }
                 }
             }
         } catch ( Exception ex ) {
@@ -296,16 +301,13 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Reorders the data rows as best possible so that the data is (1) ascending in time (old to new), (2) ascending in
-     * longitude (3) ascending in latitude (4) ascending in depth (shallow to deep) (5) original row number Missing data
-     * columns (lon/lat/depth/time) will be treated as an array of missing values.  Missing values in an array will be
-     * ordered such that they appear before valid values.
+     * Verifies data samples are ascending in time (oldest to newest). Any misorderings detected generate error messages
+     * that are added to the internal list of automated data checker messages.
      *
      * @param times
-     *         sample times to be used for this data array; can be null to indicate sample times are not fully
-     *         specified
+     *         sample times to be used for this data array
      */
-    public void reorderData(Double[] times) {
+    public void checkDataOrder(Double[] times) {
         Double[] longitudes;
         try {
             longitudes = getSampleLongitudes();
@@ -328,8 +330,6 @@ public class StdUserDataArray extends StdDataArray {
         TreeSet<DataLocation> orderedSet = new TreeSet<DataLocation>();
         for (int rowIdx = 0; rowIdx < numSamples; rowIdx++) {
             DataLocation dataLoc = new DataLocation();
-            // Assign the row index instead of the number
-            dataLoc.setRowNumber(rowIdx);
             if ( longitudes != null )
                 dataLoc.setLongitude(longitudes[rowIdx]);
             if ( latitudes != null )
@@ -341,22 +341,61 @@ public class StdUserDataArray extends StdDataArray {
                 if ( timeValSecs != null )
                     dataLoc.setDataDate(new Date(Math.round(timeValSecs * 1000.0)));
             }
+            dataLoc.setRowNumber(rowIdx + 1);
             // Leave dataValue as the missing value and add to the ordered set
             if ( !orderedSet.add(dataLoc) )
                 throw new RuntimeException("Unexpected duplicate data location with row number");
         }
 
-        // Reorder the rows according to the ordering in orderedSet
-        // Just assign the new order of the object arrays; no need to duplicate the objects themselves
-        Object[][] orderedRows = new Object[numSamples][];
-        int rowIdx = 0;
+        // TODO: needs a better method of figuring out which rows are actually misordered
+        // the following works okay if there is only one block of misordered data
+        // or if multiple blocks are consistent in the "direction" they are misordered.
+
+        // The following will say:
+        // 4,5,6 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
+        // 1,2 are misordered in 3,4,1,2,5,6
+        HashSet<Integer> forwardErrs = new HashSet<Integer>();
+        int expectedRowNum = 1;
         for (DataLocation dataLoc : orderedSet) {
-            // getRowNumber returns the row index assigned above
-            orderedRows[rowIdx] = stdObjects[dataLoc.getRowNumber()];
-            rowIdx++;
+            int actualRowNum = dataLoc.getRowNumber();
+            while ( expectedRowNum < actualRowNum ) {
+                forwardErrs.add(expectedRowNum);
+                expectedRowNum += 1;
+            }
+            if ( expectedRowNum == actualRowNum ) {
+                expectedRowNum += 1;
+            }
         }
-        // Update the array of array of objects to the new ordering
-        stdObjects = orderedRows;
+        // The following will say:
+        // 7,8,9 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
+        // 3,4 are misordered in 3,4,1,2,5,6
+        HashSet<Integer> reverseErrs = new HashSet<Integer>();
+        expectedRowNum = numSamples;
+        for (DataLocation dataLoc : orderedSet.descendingSet()) {
+            int actualRowNum = dataLoc.getRowNumber();
+            if ( expectedRowNum > actualRowNum ) {
+                reverseErrs.add(expectedRowNum);
+                expectedRowNum -= 1;
+            }
+            if ( expectedRowNum == actualRowNum ) {
+                expectedRowNum -= 1;
+            }
+        }
+        // Guess that the set with fewer errors is the correct one
+        HashSet<Integer> errorRowsNums = (forwardErrs.size() <= reverseErrs.size()) ? forwardErrs : reverseErrs;
+        for (int j = 0; j < errorRowsNums.size(); j++) {
+            for (int k = 0; k < indicesForTime.length; k++) {
+                ADCMessage msg = new ADCMessage();
+                msg.setSeverity(Severity.CRITICAL);
+                msg.setRowNumber(j + 1);
+                msg.setColNumber(indicesForTime[k] + 1);
+                msg.setColName(userColNames[indicesForTime[k]]);
+                String comment = "time-misordered data row";
+                msg.setGeneralComment(comment);
+                msg.setDetailedComment(comment);
+                stdMsgList.add(msg);
+            }
+        }
     }
 
     /**

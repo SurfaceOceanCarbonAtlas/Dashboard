@@ -200,8 +200,7 @@ public class CheckerMessageHandler {
                 // Start with a summary giving the counts of each general message/severity
                 Severity severity = msg.getSeverity();
                 String summary = msg.getGeneralComment();
-                if ( Severity.CRITICAL.equals(severity) ||
-                        Severity.ERROR.equals(severity) ) {
+                if ( Severity.CRITICAL.equals(severity) || Severity.ERROR.equals(severity) ) {
                     Integer cnt = errorCnt.get(summary);
                     if ( cnt == null )
                         cnt = 1;

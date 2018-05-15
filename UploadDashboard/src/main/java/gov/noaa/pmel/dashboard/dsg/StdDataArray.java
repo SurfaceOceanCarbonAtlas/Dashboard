@@ -45,6 +45,8 @@ public class StdDataArray {
     protected int secondOfMinuteIndex;
     protected int dayOfYearIndex;
     protected int secondOfDayIndex;
+    // Indices used for compute sample time by getSampleTime; used for flagging data misordered in time
+    protected int[] indicesForTime;
 
     /**
      * Create and assign the 1-D arrays of data column types from the given user's descriptions of the data column.
@@ -393,6 +395,8 @@ public class StdDataArray {
             else if ( DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(dataTypes[k]) )
                 secondOfDayIndex = k;
         }
+        // indices for time assigned when getSampleTimes called
+        indicesForTime = null;
     }
 
     /**
@@ -521,12 +525,19 @@ public class StdDataArray {
         GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         cal.setLenient(false);
         Double[] sampleTimes = new Double[numSamples];
+        indicesForTime = null;
 
         if ( isUsableIndex(yearIndex) && isUsableIndex(monthOfYearIndex) &&
                 isUsableIndex(dayOfMonthIndex) && isUsableIndex(hourOfDayIndex) &&
                 isUsableIndex(minuteOfHourIndex) ) {
             // Get time using year, month, day, hour, minute, and (if available) second
             boolean hasSec = isUsableIndex(secondOfMinuteIndex);
+            if ( hasSec )
+                indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex,
+                       hourOfDayIndex, minuteOfHourIndex, secondOfMinuteIndex};
+            else
+                indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex,
+                        hourOfDayIndex, minuteOfHourIndex};
             for (int j = 0; j < numSamples; j++) {
                 try {
                     int year = ((Integer) stdObjects[j][yearIndex]).intValue();
@@ -560,6 +571,8 @@ public class StdDataArray {
                 isUsableIndex(dayOfMonthIndex) && isUsableIndex(timeOfDayIndex) ) {
             // Use year, month, day, and time string
             // Standard format of time string is HH:mm:ss.SSS
+            indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex, timeOfDayIndex};
+
             for (int j = 0; j < numSamples; j++) {
                 try {
                     int year = ((Integer) stdObjects[j][yearIndex]).intValue();
@@ -583,9 +596,9 @@ public class StdDataArray {
                 }
             }
         }
-        else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) &&
-                isUsableIndex(secondOfDayIndex) ) {
+        else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) && isUsableIndex(secondOfDayIndex) ) {
             // Use year, day of year (an integer), and second of day
+            indicesForTime = new int[] { yearIndex, dayOfYearIndex, secondOfDayIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     int year = ((Integer) stdObjects[j][yearIndex]).intValue();
@@ -622,6 +635,7 @@ public class StdDataArray {
         else if ( isUsableIndex(timestampIndex) ) {
             // Use full timestamp
             // Standard format of the timestamp is yyyy-MM-dd HH:mm:sss.SSS
+            indicesForTime = new int[] { timestampIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     String[] dateTime = ((String) stdObjects[j][timestampIndex]).split(" ");
@@ -655,6 +669,7 @@ public class StdDataArray {
             // Use date string and time string
             // Standard format of the date is yyyy-MM-dd
             // Standard format of time string is HH:mm:ss.SSS
+            indicesForTime = new int[] { dateIndex, timeOfDayIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     String[] ymd = ((String) stdObjects[j][dateIndex]).split("-");
@@ -681,11 +696,14 @@ public class StdDataArray {
                 }
             }
         }
-        else if ( isUsableIndex(dateIndex) && isUsableIndex(hourOfDayIndex) &&
-                isUsableIndex(minuteOfHourIndex) ) {
+        else if ( isUsableIndex(dateIndex) && isUsableIndex(hourOfDayIndex) && isUsableIndex(minuteOfHourIndex) ) {
             // Use date string, hour, minute, and (if available) second
             // Standard format of the date is yyyy-MM-dd
             boolean hasSec = isUsableIndex(secondOfMinuteIndex);
+            if ( hasSec )
+                indicesForTime = new int[] { dateIndex, hourOfDayIndex, minuteOfHourIndex, secondOfMinuteIndex };
+            else
+                indicesForTime = new int[] { dateIndex, hourOfDayIndex, minuteOfHourIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     String[] ymd = ((String) stdObjects[j][dateIndex]).split("-");
@@ -720,6 +738,7 @@ public class StdDataArray {
         }
         else if ( isUsableIndex(yearIndex) && isUsableIndex(dayOfYearIndex) ) {
             // Use year and day of year (floating-point)
+            indicesForTime = new int[] { yearIndex, dayOfYearIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     int year = ((Integer) stdObjects[j][yearIndex]).intValue();

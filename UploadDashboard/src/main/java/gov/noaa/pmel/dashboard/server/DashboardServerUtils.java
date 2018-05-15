@@ -463,8 +463,7 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}. The comments in the
-     * QCFlag objects are ignored.
+     * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}.
      *
      * @param qcSet
      *         set of QCFlag values to encode
@@ -549,8 +548,6 @@ public class DashboardServerUtils {
                         (!flagParts[3].substring(lastIndex + 1).trim().isEmpty()) )
                     throw new IllegalArgumentException("flag value not enclosed in double quotes");
                 String flagValue = flagParts[3].substring(firstIndex + 1, lastIndex);
-                if ( flagValue.length() != 1 )
-                    throw new IllegalArgumentException("flag value is not a single character");
 
                 firstIndex = flagParts[4].indexOf("\"");
                 lastIndex = flagParts[4].lastIndexOf("\"");
@@ -562,8 +559,8 @@ public class DashboardServerUtils {
 
                 flagSet.add(new QCFlag(flagName, flagValue, severity, colIndex, rowIndex));
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " + ex.getMessage(),
-                        ex);
+                throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " +
+                        ex.getMessage(), ex);
             }
         }
         return flagSet;

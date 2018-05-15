@@ -592,214 +592,203 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * Compare using the "selected" properties of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> selectedComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    Boolean s1 = d1.isSelected();
-                    return s1.compareTo(d2.isSelected());
-                }
-            };
+    public static Comparator<DashboardDataset> selectedComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            Boolean s1 = d1.isSelected();
+            return s1.compareTo(d2.isSelected());
+        }
+    };
 
     /**
      * Compare using the owners of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> ownerComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getOwner().compareTo(d2.getOwner());
-                }
-            };
+    public static Comparator<DashboardDataset> ownerComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getOwner().compareTo(d2.getOwner());
+        }
+    };
 
     /**
      * Compare using the IDs of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> datasetIdComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getDatasetId().compareTo(d2.getDatasetId());
-                }
-            };
+    public static Comparator<DashboardDataset> datasetIdComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getDatasetId().compareTo(d2.getDatasetId());
+        }
+    };
 
     /**
      * Compare using the upload timestamp strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> timestampComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
-                }
-            };
+    public static Comparator<DashboardDataset> timestampComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
+        }
+    };
 
     /**
      * Compare using the data check status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataCheckComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
-                }
-            };
+    public static Comparator<DashboardDataset> dataCheckComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
+        }
+    };
 
     /**
      * Compare using the OME metadata timestamp strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> omeTimestampComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
-                }
-            };
+    public static Comparator<DashboardDataset> omeTimestampComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
+        }
+    };
 
     /**
      * Compare using the additional document "filename; timestamp" strings of the datasets. Note that this is
      * inconsistent with {@link DashboardDataset#equals(Object)} in that this is only examining one field of
      * DashboardDataset.
      */
-    public static Comparator<DashboardDataset> addlDocsComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    Iterator<String> iter1 = d1.getAddlDocs().iterator();
-                    Iterator<String> iter2 = d2.getAddlDocs().iterator();
-                    while ( iter1.hasNext() && iter2.hasNext() ) {
-                        int result = iter1.next().compareTo(iter2.next());
-                        if ( result != 0 )
-                            return result;
-                    }
-                    // The lists are the same up to the minimum number of strings given,
-                    // so the list with more items is larger; or they are equal if they
-                    // both have no more items
-                    if ( iter1.hasNext() )
-                        return 1;
-                    if ( iter2.hasNext() )
-                        return -1;
-                    return 0;
-                }
-            };
+    public static Comparator<DashboardDataset> addlDocsComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            Iterator<String> iter1 = d1.getAddlDocs().iterator();
+            Iterator<String> iter2 = d2.getAddlDocs().iterator();
+            while ( iter1.hasNext() && iter2.hasNext() ) {
+                int result = iter1.next().compareTo(iter2.next());
+                if ( result != 0 )
+                    return result;
+            }
+            // The lists are the same up to the minimum number of strings given,
+            // so the list with more items is larger; or they are equal if they
+            // both have no more items
+            if ( iter1.hasNext() )
+                return 1;
+            if ( iter2.hasNext() )
+                return -1;
+            return 0;
+        }
+    };
 
     /**
      * Compare using the version strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> versionComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getVersion().compareTo(d2.getVersion());
-                }
-            };
+    public static Comparator<DashboardDataset> versionComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getVersion().compareTo(d2.getVersion());
+        }
+    };
 
     /**
      * Compare using the QC status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> qcStatusComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
-                }
-            };
+    public static Comparator<DashboardDataset> qcStatusComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
+        }
+    };
 
     /**
      * Compare using the archive status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> archiveStatusComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
-                }
-            };
+    public static Comparator<DashboardDataset> archiveStatusComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
+        }
+    };
 
     /**
      * Compare using the upload filenames of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> filenameComparator =
-            new Comparator<DashboardDataset>() {
-                @Override
-                public int compare(DashboardDataset d1, DashboardDataset d2) {
-                    if ( d1 == d2 )
-                        return 0;
-                    if ( d1 == null )
-                        return -1;
-                    if ( d2 == null )
-                        return 1;
-                    return d1.getUploadFilename().compareTo(d2.getUploadFilename());
-                }
-            };
+    public static Comparator<DashboardDataset> filenameComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getUploadFilename().compareTo(d2.getUploadFilename());
+        }
+    };
 
 }

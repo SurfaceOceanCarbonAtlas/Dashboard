@@ -302,11 +302,10 @@ public class SocatCruiseReporter {
         // Get the SOCAT version and QC flag from the DSG metadata
         DsgMetadata socatMeta = dsgFile.getMetadata();
         String socatVersion = socatMeta.getVersion();
-        String qcFlag = socatMeta.getDatasetQcFlag();
+        String qcFlag = socatMeta.getStatus();
 
         // Get the rest of the metadata info from the OME XML
-        DashboardMetadata metadata =
-                metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
+        DashboardMetadata metadata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
         DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
 
         // Get the list of additional document filenames associated with this cruise.
@@ -337,9 +336,9 @@ public class SocatCruiseReporter {
                     socatVersion, origDOI, socatDOI, qcFlag, addlDocs, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, false);
-            int j = -1;
-            for (StdDataArray dataVals : dsgFile.getStdDataArray()) {
-                j++;
+            StdDataArray dataArray = dsgFile.getStdDataArray();
+            for (int j = 0; j < dataArray.getNumSamples(); j++) {
+                ArrayList<Object> dataVals = dataArray.get
                 // Reported WOCE-3 might be duplicates, so do not check for duplicates
                 String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo,
                         socatVersion, socatDOI, qcFlag, false, null);

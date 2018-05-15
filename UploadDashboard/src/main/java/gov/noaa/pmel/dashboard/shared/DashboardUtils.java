@@ -296,7 +296,7 @@ public class DashboardUtils {
      * Encodes an ArrayList of Strings suitable for decoding using {@link #decodeStringArrayList(String)}.  Characters
      * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
      * double quote, within a string will likely cause problems when reading or decoding the encoded string.
-     *
+     * <p>
      * ArrayList is used instead of Collection to simplify the JavaScript GWT creates.
      *
      * @param strList
@@ -322,9 +322,9 @@ public class DashboardUtils {
     }
 
     /**
-     * Decodes an string produced by {@link #encodeStringArrayList(ArrayList)}, into an ArrayList of strings.
-     * Each string must be enclosed in double quotes; escaped characters within a string are not recognized
-     * or modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
+     * Decodes an string produced by {@link #encodeStringArrayList(ArrayList)}, into an ArrayList of strings. Each
+     * string must be enclosed in double quotes; escaped characters within a string are not recognized or modified.
+     * Strings must be separated by commas.  Whitespace around the comma is allowed.
      *
      * @param arrayStr
      *         the encoded string array
@@ -357,7 +357,7 @@ public class DashboardUtils {
      * Encodes an TreeSet of Strings suitable for decoding using {@link #decodeStringTreeSet(String)}.  Characters
      * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
      * double quote, within a string will likely cause problems when reading or decoding the encoded string.
-     *
+     * <p>
      * TreeSet is used instead of Collection to simplify the JavaScript GWT creates.
      *
      * @param strSet
@@ -383,15 +383,15 @@ public class DashboardUtils {
     }
 
     /**
-     * Decodes a string produced by {@link #encodeStringTreeSet(TreeSet)}, into an TreeSet of strings.
-     * Each string must be enclosed in double quotes; escaped characters within a string are not recognized
-     * or modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
+     * Decodes a string produced by {@link #encodeStringTreeSet(TreeSet)}, into an TreeSet of strings. Each string must
+     * be enclosed in double quotes; escaped characters within a string are not recognized or modified.  Strings must be
+     * separated by commas.  Whitespace around the comma is allowed.
      *
      * @param setStr
      *         the encoded string set
      *
-     * @return the decoded TreeSet of strings; never null, but may be empty
-     * (if the encoded string tree set contains no strings)
+     * @return the decoded TreeSet of strings; never null, but may be empty (if the encoded string tree set contains no
+     * strings)
      *
      * @throws IllegalArgumentException
      *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
@@ -414,7 +414,7 @@ public class DashboardUtils {
         return new TreeSet<String>(Arrays.asList(pieces));
     }
 
-    /**
+   /**
      * Returns the basename of a filename.  Does this by returning only the portion of the string after the last slash
      * or backslash character (either one if both present).
      * <p>

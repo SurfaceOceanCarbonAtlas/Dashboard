@@ -88,10 +88,13 @@ public class DatasetChecker {
     /**
      * Interprets the data string representations and standardizes, if required, these data values for given dataset.
      * Performs the automated data checks on these data values.  Saves the messages generated from these steps and
-     * assigns the automated data checker WOCE flags from these messages. <br /><br /> The given dateset object is
-     * updated with the set of checker QC flags, the set of user-provided QC flags, the number of rows with errors (not
-     * marked by the PI), the number of rows with warnings (not marked by the PI), and the current data check status.
-     * <br /><br /> The given metadata object, if not null, it is updated with values that can be derived from the data:
+     * assigns the automated data checker WOCE flags from these messages.
+     *
+     * The given dataset object is updated with the set of checker QC flags, the set of user-provided QC flags,
+     * the number of rows with errors (not marked by the PI), the number of rows with warnings (not marked by the PI),
+     * and the current data check status.
+     *
+     * The given metadata object, if not null, it is updated with values that can be derived from the data:
      * western-most longitude, eastern-most longitude, southern-most latitude, northern-most latitude, start time, and
      * end time.
      *
@@ -114,24 +117,23 @@ public class DatasetChecker {
         // Check for missing lon/lat/time
         Double[] sampleTimes = stdUserData.checkMissingLonLatTime();
 
-        // Reorder the data as best possible
-        // Do not do this in SOCAT
-        // stdUserData.reorderData(sampleTimes);
-        // TODO: Instead, check that the data is ordered in time - generate errors if not.
+        // Check that the data is ordered in time - generate errors if not.
+        stdUserData.checkDataOrder(sampleTimes);
 
         // Bounds check the standardized data values
         stdUserData.checkBounds();
 
         // Perform any other data checks
-        // TODO:
+        // TODO: calculated ship speed
 
         // Save the messages accumulated in stdUserData for this dataset.
         // Assigns the sets of checker-generated QC flags and user-provided QC flags
         msgHandler.processCheckerMessages(dataset, stdUserData);
 
-        // Get the indices values the PI marked as bad.
+        // Get the indices values the PI marked as bad or questionable.
         boolean hasCriticalError = false;
         HashSet<RowColumn> userErrs = new HashSet<RowColumn>();
+        HashSet<RowColumn> userWarns = new HashSet<RowColumn>();
         for (QCFlag wtype : dataset.getUserFlags()) {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
@@ -140,11 +142,7 @@ public class DatasetChecker {
             else if ( Severity.ERROR.equals(wtype.getSeverity()) ) {
                 userErrs.add(new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex()));
             }
-        }
-        // Get the indices of values the PI marked as questionable
-        HashSet<RowColumn> userWarns = new HashSet<RowColumn>();
-        for (QCFlag wtype : dataset.getUserFlags()) {
-            if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
+            else if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
                 userWarns.add(new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex()));
             }
         }
@@ -155,12 +153,12 @@ public class DatasetChecker {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
-                if ( !userErrs.contains(rowCol) )
+                if ( ! userErrs.contains(rowCol) )
                     errRows.add(wtype.getRowIndex());
             }
             if ( Severity.ERROR.equals(wtype.getSeverity()) ) {
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
-                if ( !userErrs.contains(rowCol) )
+                if ( ! userErrs.contains(rowCol) )
                     errRows.add(wtype.getRowIndex());
             }
         }
@@ -171,9 +169,7 @@ public class DatasetChecker {
             if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
                 Integer rowIdx = wtype.getRowIndex();
-                if ( !(userErrs.contains(rowCol) ||
-                        userWarns.contains(rowCol) ||
-                        errRows.contains(rowIdx)) )
+                if ( ! ( userErrs.contains(rowCol) || userWarns.contains(rowCol) || errRows.contains(rowIdx) ) )
                     warnRows.add(rowIdx);
             }
         }

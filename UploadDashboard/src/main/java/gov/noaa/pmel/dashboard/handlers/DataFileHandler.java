@@ -551,8 +551,9 @@ public class DataFileHandler extends VersionedFileHandler {
         datasetProps.setProperty(UPLOAD_FILENAME_ID, dataset.getUploadFilename());
         // Upload timestamp
         datasetProps.setProperty(UPLOAD_TIMESTAMP_ID, dataset.getUploadTimestamp());
-        // Data DOI
-        datasetProps.setProperty(DOI_ID, dataset.getDoi());
+        // DOIs
+        datasetProps.setProperty(ORIG_DOI_ID, dataset.getOrigDoi());
+        datasetProps.setProperty(ENHANCED_DOI_ID, dataset.getEnhancedDoi());
         // Data-check status string
         datasetProps.setProperty(DATA_CHECK_STATUS_ID, dataset.getDataCheckStatus());
         // OME metadata timestamp
@@ -566,17 +567,13 @@ public class DataFileHandler extends VersionedFileHandler {
         // Date of request to archive original data and metadata files
         datasetProps.setProperty(ARCHIVAL_DATE_ID, dataset.getArchiveDate());
         // Total number of data measurements (rows of data)
-        datasetProps.setProperty(NUM_DATA_ROWS_ID,
-                Integer.toString(dataset.getNumDataRows()));
+        datasetProps.setProperty(NUM_DATA_ROWS_ID, Integer.toString(dataset.getNumDataRows()));
         // Number of data rows with error messages
-        datasetProps.setProperty(NUM_ERROR_ROWS_ID,
-                Integer.toString(dataset.getNumErrorRows()));
+        datasetProps.setProperty(NUM_ERROR_ROWS_ID, Integer.toString(dataset.getNumErrorRows()));
         // Number of data rows with warning messages
-        datasetProps.setProperty(NUM_WARN_ROWS_ID,
-                Integer.toString(dataset.getNumWarnRows()));
+        datasetProps.setProperty(NUM_WARN_ROWS_ID, Integer.toString(dataset.getNumWarnRows()));
         // Data column name in the original upload data file
-        datasetProps.setProperty(USER_COLUMN_NAMES_ID,
-                DashboardUtils.encodeStringArrayList(dataset.getUserColNames()));
+        datasetProps.setProperty(USER_COLUMN_NAMES_ID, DashboardUtils.encodeStringArrayList(dataset.getUserColNames()));
         // Data column type information
         int numCols = dataset.getDataColTypes().size();
         ArrayList<String> colTypeNames = new ArrayList<String>(numCols);
@@ -588,20 +585,15 @@ public class DataFileHandler extends VersionedFileHandler {
             colMissValues.add(colType.getSelectedMissingValue());
         }
         // Data column type/variable name
-        datasetProps.setProperty(DATA_COLUMN_TYPES_ID,
-                DashboardUtils.encodeStringArrayList(colTypeNames));
+        datasetProps.setProperty(DATA_COLUMN_TYPES_ID, DashboardUtils.encodeStringArrayList(colTypeNames));
         // Unit for each data column
-        datasetProps.setProperty(DATA_COLUMN_UNITS_ID,
-                DashboardUtils.encodeStringArrayList(colUnitNames));
+        datasetProps.setProperty(DATA_COLUMN_UNITS_ID, DashboardUtils.encodeStringArrayList(colUnitNames));
         // Missing value for each data column
-        datasetProps.setProperty(MISSING_VALUES_ID,
-                DashboardUtils.encodeStringArrayList(colMissValues));
+        datasetProps.setProperty(MISSING_VALUES_ID, DashboardUtils.encodeStringArrayList(colMissValues));
 
         // Flags
-        datasetProps.setProperty(CHECKER_FLAGS,
-                DashboardUtils.encodeQCFlagSet(dataset.getCheckerFlags()));
-        datasetProps.setProperty(USER_FLAGS,
-                DashboardUtils.encodeQCFlagSet(dataset.getUserFlags()));
+        datasetProps.setProperty(CHECKER_FLAGS, DashboardServerUtils.encodeQCFlagSet(dataset.getCheckerFlags()));
+        datasetProps.setProperty(USER_FLAGS, DashboardServerUtils.encodeQCFlagSet(dataset.getUserFlags()));
 
         // Save the properties to the cruise information file
         try {
@@ -728,8 +720,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         there are problems updating and committing the dataset information, if the filename of the document is
      *         the OME filename but the document is not an instance of OmeMetadata
      */
-    public DashboardDataset addAddlDocTitleToDataset(String datasetId,
-            DashboardMetadata addlDoc) throws IllegalArgumentException {
+    public DashboardDataset addAddlDocTitleToDataset(String datasetId, DashboardMetadata addlDoc)
+            throws IllegalArgumentException {
         DashboardDataset dataset = getDatasetFromInfoFile(datasetId);
         if ( dataset == null )
             throw new IllegalArgumentException("No dataset with the ID " + datasetId);
@@ -745,11 +737,11 @@ public class DataFileHandler extends VersionedFileHandler {
         else {
             String uploadFilename = addlDoc.getFilename();
             if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) )
-                throw new IllegalArgumentException("Supplemental documents cannot " +
-                        "have the upload filename of " + DashboardUtils.OME_FILENAME);
+                throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
+                        DashboardUtils.OME_FILENAME);
             if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) )
-                throw new IllegalArgumentException("Supplemental documents cannot " +
-                        "have the upload filename of " + DashboardUtils.PI_OME_FILENAME);
+                throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
+                        DashboardUtils.PI_OME_FILENAME);
             // Work directly on the additional documents list in the cruise object
             TreeSet<String> addlDocTitles = dataset.getAddlDocs();
             String titleToDelete = null;
@@ -1020,12 +1012,17 @@ public class DataFileHandler extends VersionedFileHandler {
                     UPLOAD_TIMESTAMP_ID + " given in " + infoFile.getPath());
         dataset.setUploadTimestamp(value);
 
-        // Data file DOI
-        value = cruiseProps.getProperty(DOI_ID);
+        // DOIs
+        value = cruiseProps.getProperty(ORIG_DOI_ID);
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
-                    DOI_ID + " given in " + infoFile.getPath());
-        dataset.setDoi(value);
+                    ORIG_DOI_ID + " given in " + infoFile.getPath());
+        dataset.setOrigDoi(value);
+        value = cruiseProps.getProperty(ENHANCED_DOI_ID);
+        if ( value == null )
+            throw new IllegalArgumentException("No property value for " +
+                    ENHANCED_DOI_ID + " given in " + infoFile.getPath());
+        dataset.setEnhancedDoi(value);
 
         // Data check status
         value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);
@@ -1155,14 +1152,14 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     CHECKER_FLAGS + " given in " + infoFile.getPath());
-        TreeSet<QCFlag> checkerFlags = DashboardUtils.decodeQCFlagSet(value);
+        TreeSet<QCFlag> checkerFlags = DashboardServerUtils.decodeQCFlagSet(value);
         dataset.setCheckerFlags(checkerFlags);
 
         value = cruiseProps.getProperty(USER_FLAGS);
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     USER_FLAGS + " given in " + infoFile.getPath());
-        TreeSet<QCFlag> userFlags = DashboardUtils.decodeQCFlagSet(value);
+        TreeSet<QCFlag> userFlags = DashboardServerUtils.decodeQCFlagSet(value);
         dataset.setUserFlags(userFlags);
     }
 
@@ -1186,8 +1183,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         if reading from datasetReader throws one, if there is a blank data column name with units, if there is an
      *         inconsistent number of data values, if there are too few data columns read
      */
-    private void assignDataFromInput(DashboardDatasetData datasetData,
-            BufferedReader datasetReader, int firstDataRow, int numDataRows) throws IOException {
+    private void assignDataFromInput(DashboardDatasetData datasetData, BufferedReader datasetReader,
+            int firstDataRow, int numDataRows) throws IOException {
         // data row numbers
         ArrayList<Integer> rowNums = new ArrayList<Integer>();
         // data values
@@ -1217,9 +1214,8 @@ public class DataFileHandler extends VersionedFileHandler {
 
                 // Data line
                 if ( record.size() != numDataColumns )
-                    throw new IOException("Inconsistent number of data columns (" +
-                            record.size() + " instead of " + numDataColumns +
-                            ") for measurement " + dataParser.getRecordNumber() + ":\n    " +
+                    throw new IOException("Inconsistent number of data columns (" + record.size() + " instead of " +
+                            numDataColumns + ") for measurement " + dataParser.getRecordNumber() + ":\n    " +
                             rebuildDataline(record, '\t'));
 
                 dataRowNum++;
