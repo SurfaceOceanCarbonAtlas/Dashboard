@@ -15,7 +15,7 @@ The jar files:
 	sequence-library-1.0.3.jar
 	antlr-runtime-3.4.jar
 were obtained from the SVNKit (version 1.8.15) site http://svnkit.com/
-The jar file javax.mail-api-1.6.1.jar was obtained as javax.mail.jar (version 1.6.1) from the JavaMail site https://java.net/projects/javamail/
+The jar file javax.mail-1.6.1.jar was obtained as javax.mail.jar (version 1.6.1) from the JavaMail site https://java.net/projects/javamail/
 The jar file netcdfAll-4.6.11.jar was obtained from the Unidata netCDF downloads site http://www.unidata.ucar.edu/downloads/netcdf/
 The jar file slf4j-1.7.25.jar (for netcdfAll-4.6.11.jar) was obtained from the SLF4J site https://www.slf4j.org/download.html
 The jar file commons-csv-1.5.jar was obtained from the Apache Commons CSV download site http://commons.apache.org/proper/commons-csv/download_csv.cgi
