@@ -186,8 +186,7 @@ public interface DashboardServicesInterfaceAsync {
      *         if authentication fails, if dataset ID is invalid, if the dataset does not exist, or if there are
      *         problems obtaining or evaluating the data for the dataset
      */
-    void updateDataColumnSpecs(String username, DashboardDataset newSpecs,
-            AsyncCallback<DashboardDatasetData> callback);
+    void updateDataColumnSpecs(String username, DashboardDataset newSpecs, AsyncCallback<DashboardDatasetData> callback);
 
     /**
      * Updates the data column specifications for the datasets with the given IDs.  Column types are assigned from

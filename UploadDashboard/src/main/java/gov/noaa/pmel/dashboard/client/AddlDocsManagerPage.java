@@ -222,7 +222,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     /**
      * Updates the this page with the given cruises and their supplemental documents.
      *
-     * @param cruiseSet
+     * @param cruises
      *         set of cruises to use
      */
     private void updateAddlDocs(DashboardDatasetList cruises) {
@@ -283,7 +283,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private void assignTokens() {
         String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
         timestampToken.setValue(localTimestamp);
-        datasetIdsToken.setValue(DashboardUtils.encodeStringArrayList(new ArrayList<String>(datasetIds)));
+        datasetIdsToken.setValue(DashboardUtils.encodeStringTreeSet(datasetIds));
         omeToken.setValue("false");
     }
 

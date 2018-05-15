@@ -82,8 +82,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             "No data column has been identified as the longitude";
     private static final String NO_LATITUDE_ERROR_MSG =
             "No data column has been identified as the latitude";
-    private static final String NO_DEPTH_ERROR_MSG =
-            "No data column has been identified as the sample depth";
     private static final String NO_CO2_ERROR_MSG =
             "No data columns have been identified which provide a seawater CO<sub>2</sub> value";
     private static final String NO_TIMESTAMP_ERROR_MSG =
@@ -245,8 +243,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                 UploadDashboard.showWaitCursor();
                 // Get the data for the cruise from the server
                 final Range range = display.getVisibleRange();
-                service.getDataWithRowNum(getUsername(), cruise.getDatasetId(),
-                        range.getStart(), range.getLength(),
+                service.getDataWithRowNum(getUsername(), cruise.getDatasetId(), range.getStart(), range.getLength(),
                         new AsyncCallback<ArrayList<ArrayList<String>>>() {
                             @Override
                             public void onSuccess(ArrayList<ArrayList<String>> newData) {
@@ -545,33 +542,33 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
      * Generate the question popup warning that the data has never been checked
      */
     private void makeNotCheckedPopup() {
-        notCheckedPopup = new DashboardAskPopup(RETURN_TO_CRUISE_LIST_TEXT,
-                STAY_ON_THIS_PAGE_TEXT, new AsyncCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean result) {
-                if ( result ) {
-                    if ( wasLoggingOut ) {
-                        wasLoggingOut = false;
-                        DashboardLogoutPage.showPage();
+        notCheckedPopup = new DashboardAskPopup(RETURN_TO_CRUISE_LIST_TEXT, STAY_ON_THIS_PAGE_TEXT,
+                new AsyncCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean result) {
+                        if ( result ) {
+                            if ( wasLoggingOut ) {
+                                wasLoggingOut = false;
+                                DashboardLogoutPage.showPage();
+                            }
+                            else {
+                                // Return to the latest cruise listing page, which may
+                                // have been updated from previous actions on this page.
+                                DatasetListPage.showPage();
+                            }
+                        }
+                        else {
+                            // Just stay on this page
+                            wasLoggingOut = false;
+                        }
                     }
-                    else {
-                        // Return to the latest cruise listing page, which may
-                        // have been updated from previous actions on this page.
-                        DatasetListPage.showPage();
-                    }
-                }
-                else {
-                    // Just stay on this page
-                    wasLoggingOut = false;
-                }
-            }
 
-            @Override
-            public void onFailure(Throwable ex) {
-                // never called
-                ;
-            }
-        });
+                    @Override
+                    public void onFailure(Throwable ex) {
+                        // never called
+                        ;
+                    }
+                });
     }
 
     @UiHandler("messagesButton")
@@ -591,8 +588,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         boolean hasLongitude = false;
         // latitude given?
         boolean hasLatitude = false;
-        // sample depth given?
-        boolean hasDepth = false;
         // sea water CO2 value given?
         boolean hasco2 = false;
         // date/time given?
@@ -670,9 +665,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             else if ( DashboardUtils.LATITUDE.typeNameEquals(colType) ) {
                 hasLatitude = true;
             }
-            else if ( DashboardUtils.SAMPLE_DEPTH.typeNameEquals(colType) ) {
-                hasDepth = true;
-            }
             else if ( colType.getDisplayName().startsWith("xCO2_water") ||
                     colType.getDisplayName().startsWith("pCO2_water") ||
                     colType.getDisplayName().startsWith("fCO2_water") ) {
@@ -713,11 +705,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             UploadDashboard.showMessage(NO_CO2_ERROR_MSG);
             return;
         }
-        // if ( ! hasDepth ) {
-        //     // no sample depth - error
-        //     UploadDashboard.showMessage(NO_DEPTH_ERROR_MSG);
-        //     return;
-        // }
         if ( !(hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
             // timestamp completely missing - error
             UploadDashboard.showMessage(NO_TIMESTAMP_ERROR_MSG);
@@ -794,8 +781,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             return;
         }
 
-        // longitude, latitude, sea water co2, and some form of a timestamp
-        // is present so continue on
+        // longitude, latitude, sea water co2, and some form of a timestamp is present so continue on
         doSubmit();
     }
 
@@ -805,47 +791,45 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // Submit the updated data column types to the server.
         // This update invokes the automated data checker on the data and
         // the results are then reported back to this page.
-        service.updateDataColumnSpecs(getUsername(), cruise,
-                new AsyncCallback<DashboardDatasetData>() {
-                    @Override
-                    public void onSuccess(DashboardDatasetData specs) {
-                        if ( specs == null ) {
-                            UploadDashboard.showMessage(SUBMIT_FAIL_MSG +
-                                    " (unexpected null cruise information returned)");
-                            // Show the normal cursor
-                            UploadDashboard.showAutoCursor();
-                            return;
-                        }
-                        updateDatasetColumnSpecs(specs);
-                        String status = specs.getDataCheckStatus();
-                        if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-                                status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-                            // the sanity checker had serious problems
-                            UploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
-                        }
-                        else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
-                            // errors issued
-                            UploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
-                        }
-                        else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
-                            // warnings issued
-                            UploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
-                        }
-                        else {
-                            // no problems
-                            UploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
-                        }
-                        // Show the normal cursor
-                        UploadDashboard.showAutoCursor();
-                    }
+        service.updateDataColumnSpecs(getUsername(), cruise, new AsyncCallback<DashboardDatasetData>() {
+            @Override
+            public void onSuccess(DashboardDatasetData specs) {
+                if ( specs == null ) {
+                    UploadDashboard.showMessage(SUBMIT_FAIL_MSG + " (unexpected null cruise information returned)");
+                    // Show the normal cursor
+                    UploadDashboard.showAutoCursor();
+                    return;
+                }
+                updateDatasetColumnSpecs(specs);
+                String status = specs.getDataCheckStatus();
+                if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+                        status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+                    // the sanity checker had serious problems
+                    UploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
+                }
+                else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
+                    // errors issued
+                    UploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
+                }
+                else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+                    // warnings issued
+                    UploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
+                }
+                else {
+                    // no problems
+                    UploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
+                }
+                // Show the normal cursor
+                UploadDashboard.showAutoCursor();
+            }
 
-                    @Override
-                    public void onFailure(Throwable ex) {
-                        UploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
-                        // Show the normal cursor
-                        UploadDashboard.showAutoCursor();
-                    }
-                });
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
+                // Show the normal cursor
+                UploadDashboard.showAutoCursor();
+            }
+        });
     }
 
     @UiHandler("saveButton")
@@ -874,29 +858,23 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         // Show the wait cursor
         UploadDashboard.showWaitCursor();
         // Submit the updated data column types to the server.
-        // This update invokes the automated data checker on the data and
-        // the results are then reported back to this page.
-        service.saveDataColumnSpecs(getUsername(), cruise,
-                new AsyncCallback<DashboardDatasetData>() {
-                    @Override
-                    public void onSuccess(DashboardDatasetData specs) {
-                        if ( specs == null ) {
-                            UploadDashboard.showMessage(SAVE_FAIL_MSG + " (unexpected null information returned)");
-                        }
-                        else {
-                            UploadDashboard.showMessage("Data column definitions saved.");
-                            updateDatasetColumnSpecs(specs);
-                        }
-                        UploadDashboard.showAutoCursor();
-                    }
+        // This just saves the data column types but does not do
+        // any data checking so no changes needed to the current page.
+        service.saveDataColumnSpecs(getUsername(), cruise, new AsyncCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                UploadDashboard.showMessage("Data column definitions saved.");
+                // Show the normal cursor
+                UploadDashboard.showAutoCursor();
+            }
 
-                    @Override
-                    public void onFailure(Throwable ex) {
-                        UploadDashboard.showFailureMessage(SAVE_FAIL_MSG, ex);
-                        // Show the normal cursor
-                        UploadDashboard.showAutoCursor();
-                    }
-                });
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showFailureMessage(SAVE_FAIL_MSG, ex);
+                // Show the normal cursor
+                UploadDashboard.showAutoCursor();
+            }
+        });
 
     }
 

@@ -558,8 +558,7 @@ public class DataFileHandler extends VersionedFileHandler {
         // OME metadata timestamp
         datasetProps.setProperty(OME_TIMESTAMP_ID, dataset.getOmeTimestamp());
         // Metadata documents
-        datasetProps.setProperty(ADDL_DOC_TITLES_ID,
-                DashboardUtils.encodeStringArrayList(dataset.getAddlDocs()));
+        datasetProps.setProperty(ADDL_DOC_TITLES_ID, DashboardUtils.encodeStringTreeSet(dataset.getAddlDocs()));
         // QC-submission status string
         datasetProps.setProperty(SUBMIT_STATUS_ID, dataset.getSubmitStatus());
         // Archive status string
@@ -633,7 +632,7 @@ public class DataFileHandler extends VersionedFileHandler {
      * Saves and commits the dataset data to the data file. The dataset information file needs to be saved using {@link
      * #saveDatasetInfoToFile(DashboardDataset, String)}.
      *
-     * @param datasetData
+     * @param dataset
      *         dataset data to save
      * @param message
      *         version control commit message; if null or blank, the commit will not be performed
@@ -642,8 +641,7 @@ public class DataFileHandler extends VersionedFileHandler {
      *         if the ID for the dataset is  not valid, if there was an error writing data for this dataset to file, or
      *         if there was an error committing the updated file to version control
      */
-    public void saveDatasetDataToFile(DashboardDatasetData dataset,
-            String message) throws IllegalArgumentException {
+    public void saveDatasetDataToFile(DashboardDatasetData dataset, String message) throws IllegalArgumentException {
         // Get the dataset data filename
         String datasetId = dataset.getDatasetId();
         File dataFile = datasetDataFile(datasetId);
@@ -1048,7 +1046,7 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     ADDL_DOC_TITLES_ID + " given in " + infoFile.getPath());
-        dataset.setAddlDocs(DashboardUtils.decodeStringArrayList(value));
+        dataset.setAddlDocs(DashboardUtils.decodeStringTreeSet(value));
 
         // Submit status
         value = cruiseProps.getProperty(SUBMIT_STATUS_ID);

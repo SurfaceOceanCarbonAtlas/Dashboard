@@ -279,8 +279,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             qcEvent.setComment(comment);
             try {
                 // Add the 'U' QC flag
-                configStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
-                configStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
+                configStore.getDatabaseRequestHandler().addDatasetQCEvent(qcEvent);
+                configStore.getDsgNcFileHandler().updateDatasetQCFlag(qcEvent);
                 // TODO: also need to update version in DSG file
                 // Update the dashboard status for the 'U' QC flag
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);

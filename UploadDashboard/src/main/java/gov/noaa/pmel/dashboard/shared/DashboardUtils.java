@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TreeSet;
 
 /**
  * Static dashboard utility functions and constants for use on both the client and server side.
@@ -296,6 +297,8 @@ public class DashboardUtils {
      * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
      * double quote, within a string will likely cause problems when reading or decoding the encoded string.
      *
+     * ArrayList is used instead of Collection to simplify the JavaScript GWT creates.
+     *
      * @param strList
      *         the ArrayList of strings to encode
      *
@@ -319,9 +322,9 @@ public class DashboardUtils {
     }
 
     /**
-     * Decodes an encoded string array produced by {@link #encodeStringArrayList(ArrayList)}, into an ArrayList of
-     * strings.  Each string must be enclosed in double quotes; escaped characters within a string are not recognized or
-     * modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
+     * Decodes an string produced by {@link #encodeStringArrayList(ArrayList)}, into an ArrayList of strings.
+     * Each string must be enclosed in double quotes; escaped characters within a string are not recognized
+     * or modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
      *
      * @param arrayStr
      *         the encoded string array
@@ -333,11 +336,9 @@ public class DashboardUtils {
      *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
      *         double quotes.
      */
-    public static ArrayList<String> decodeStringArrayList(String arrayStr)
-            throws IllegalArgumentException {
+    public static ArrayList<String> decodeStringArrayList(String arrayStr) throws IllegalArgumentException {
         if ( !(arrayStr.startsWith("[") && arrayStr.endsWith("]")) )
-            throw new IllegalArgumentException(
-                    "Encoded string array not enclosed in brackets");
+            throw new IllegalArgumentException("Encoded string array not enclosed in brackets");
         String contents = arrayStr.substring(1, arrayStr.length() - 1);
         if ( contents.trim().isEmpty() )
             return new ArrayList<String>(0);
@@ -346,11 +347,71 @@ public class DashboardUtils {
         if ( (firstIndex < 0) || (lastIndex == firstIndex) ||
                 (!contents.substring(0, firstIndex).trim().isEmpty()) ||
                 (!contents.substring(lastIndex + 1).trim().isEmpty()) )
-            throw new IllegalArgumentException("Strings in encoded " +
-                    "string array are not enclosed in double quotes");
+            throw new IllegalArgumentException("Strings in encoded string array are not enclosed in double quotes");
         String[] pieces = contents.substring(firstIndex + 1, lastIndex)
                                   .split("\"\\s*,\\s*\"", -1);
         return new ArrayList<String>(Arrays.asList(pieces));
+    }
+
+    /**
+     * Encodes an TreeSet of Strings suitable for decoding using {@link #decodeStringTreeSet(String)}.  Characters
+     * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
+     * double quote, within a string will likely cause problems when reading or decoding the encoded string.
+     *
+     * TreeSet is used instead of Collection to simplify the JavaScript GWT creates.
+     *
+     * @param strSet
+     *         the TreeSet of strings to encode
+     *
+     * @return the encoded string array
+     */
+    public static String encodeStringTreeSet(TreeSet<String> strSet) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[ ");
+        boolean firstValue = true;
+        for (String strVal : strSet) {
+            if ( firstValue )
+                firstValue = false;
+            else
+                sb.append(", ");
+            sb.append("\"");
+            sb.append(strVal);
+            sb.append("\"");
+        }
+        sb.append(" ]");
+        return sb.toString();
+    }
+
+    /**
+     * Decodes a string produced by {@link #encodeStringTreeSet(TreeSet)}, into an TreeSet of strings.
+     * Each string must be enclosed in double quotes; escaped characters within a string are not recognized
+     * or modified.  Strings must be separated by commas.  Whitespace around the comma is allowed.
+     *
+     * @param setStr
+     *         the encoded string set
+     *
+     * @return the decoded TreeSet of strings; never null, but may be empty
+     * (if the encoded string tree set contains no strings)
+     *
+     * @throws IllegalArgumentException
+     *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
+     *         double quotes.
+     */
+    public static TreeSet<String> decodeStringTreeSet(String setStr) throws IllegalArgumentException {
+        if ( !(setStr.startsWith("[") && setStr.endsWith("]")) )
+            throw new IllegalArgumentException("Encoded string set not enclosed in brackets");
+        String contents = setStr.substring(1, setStr.length() - 1);
+        if ( contents.trim().isEmpty() )
+            return new TreeSet<String>();
+        int firstIndex = contents.indexOf("\"");
+        int lastIndex = contents.lastIndexOf("\"");
+        if ( (firstIndex < 0) || (lastIndex == firstIndex) ||
+                (!contents.substring(0, firstIndex).trim().isEmpty()) ||
+                (!contents.substring(lastIndex + 1).trim().isEmpty()) )
+            throw new IllegalArgumentException("Strings in encoded string set are not enclosed in double quotes");
+        String[] pieces = contents.substring(firstIndex + 1, lastIndex)
+                                  .split("\"\\s*,\\s*\"", -1);
+        return new TreeSet<String>(Arrays.asList(pieces));
     }
 
     /**

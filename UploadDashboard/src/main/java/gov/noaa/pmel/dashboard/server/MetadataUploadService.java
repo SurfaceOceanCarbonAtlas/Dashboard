@@ -128,9 +128,9 @@ public class MetadataUploadService extends HttpServlet {
             return;
         }
         // Extract the set of dataset ID from the datasetIds String
-        TreeSet<String> idSet = new TreeSet<String>();
+        TreeSet<String> idSet;
         try {
-            idSet.addAll(DashboardUtils.decodeStringArrayList(datasetIds));
+            idSet = DashboardUtils.decodeStringTreeSet(datasetIds);
             if ( idSet.size() < 1 )
                 throw new IllegalArgumentException();
         } catch ( IllegalArgumentException ex ) {

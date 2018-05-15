@@ -4,6 +4,7 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -688,6 +689,176 @@ public class DsgNcFile extends File {
         return dataVals;
     }
 
-    // TODO: re-add any functions that might be needed
+    /**
+     * Reads and returns the longitudes, latitudes, and times contained in this DSG file.  NaN and infinite values are
+     * changed to {@link DashboardUtils#FP_MISSING_VALUE}.
+     *
+     * @return the array { lons, lats, times } for this cruise, where lons are the array of longitudes, lats are the
+     * array of latitudes, times are the array of times.
+     *
+     * @throws IOException
+     *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
+     *         file
+     */
+    public double[][] readLonLatTimeDataValues() throws IOException {
+        double[] lons;
+        double[] lats;
+        double[] times;
+
+        NetcdfFile ncfile = NetcdfFile.open(getPath());
+        try {
+            Variable lonVar = ncfile.findVariable(DashboardServerUtils.LONGITUDE.getVarName());
+            if ( lonVar == null )
+                throw new IOException("Unable to find longitudes in " + getName());
+            int numVals = lonVar.getShape(0);
+
+            Variable latVar = ncfile.findVariable(DashboardServerUtils.LATITUDE.getVarName());
+            if ( latVar == null )
+                throw new IOException("Unable to find latitudes in " + getName());
+            if ( latVar.getShape(0) != numVals )
+                throw new IOException("Unexpected number of latitudes in " + getName());
+
+            Variable timeVar = ncfile.findVariable(DashboardServerUtils.TIME.getVarName());
+            if ( timeVar == null )
+                throw new IOException("Unable to find times in " + getName());
+            if ( timeVar.getShape(0) != numVals )
+                throw new IOException("Unexpected number of time values in " + getName());
+
+            lons = new double[numVals];
+            lats = new double[numVals];
+            times = new double[numVals];
+
+            ArrayDouble.D1 dvar = (ArrayDouble.D1) lonVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                lons[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) latVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                lats[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) timeVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                times[k] = value;
+            }
+        } finally {
+            ncfile.close();
+        }
+
+        return new double[][] { lons, lats, times };
+    }
+
+    /**
+     * Reads and returns the longitudes, latitudes, times, SST values, and fCO2_recommended values contained in this DSG
+     * file.  NaN and infinite values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  This DSG file must have
+     * been processed by Ferret for the fCO2_recommended values to be meaningful.
+     *
+     * @return the array { lons, lats, times, ssts, fco2s } for this cruise, where lons are the array of longitudes,
+     * lats are the array of latitudes, times are the array of times, ssts are the array of SST values, and fco2s are
+     * the array of fCO2_recommended values.
+     *
+     * @throws IOException
+     *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
+     *         file
+     */
+    public double[][] readLonLatTimeSstFco2DataValues() throws IOException {
+        double[] lons;
+        double[] lats;
+        double[] times;
+        double[] ssts;
+        double[] fco2s;
+
+        NetcdfFile ncfile = NetcdfFile.open(getPath());
+        try {
+            Variable lonVar = ncfile.findVariable(DashboardServerUtils.LONGITUDE.getVarName());
+            if ( lonVar == null )
+                throw new IOException("Unable to find longitudes in " + getName());
+            int numVals = lonVar.getShape(0);
+
+            Variable latVar = ncfile.findVariable(DashboardServerUtils.LATITUDE.getVarName());
+            if ( latVar == null )
+                throw new IOException("Unable to find latitudes in " + getName());
+            if ( latVar.getShape(0) != numVals )
+                throw new IOException("Unexpected number of latitudes in " + getName());
+
+            Variable timeVar = ncfile.findVariable(DashboardServerUtils.TIME.getVarName());
+            if ( timeVar == null )
+                throw new IOException("Unable to find times in " + getName());
+            if ( timeVar.getShape(0) != numVals )
+                throw new IOException("Unexpected number of time values in " + getName());
+
+            Variable sstVar = ncfile.findVariable(SocatTypes.SST.getVarName());
+            if ( sstVar == null )
+                throw new IOException("Unable to find SST in " + getName());
+            if ( sstVar.getShape(0) != numVals )
+                throw new IOException("Unexpected number of SST values in " + getName());
+
+            Variable fco2Var = ncfile.findVariable(SocatTypes.FCO2_REC.getVarName());
+            if ( fco2Var == null )
+                throw new IOException("Unable to find fCO2_recommended in " + getName());
+            if ( fco2Var.getShape(0) != numVals )
+                throw new IOException("Unexpected number of fCO2_recommeded values in " + getName());
+
+            lons = new double[numVals];
+            lats = new double[numVals];
+            times = new double[numVals];
+            ssts = new double[numVals];
+            fco2s = new double[numVals];
+
+            ArrayDouble.D1 dvar = (ArrayDouble.D1) lonVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                lons[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) latVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                lats[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) timeVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                times[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) sstVar.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                ssts[k] = value;
+            }
+
+            dvar = (ArrayDouble.D1) fco2Var.read();
+            for (int k = 0; k < numVals; k++) {
+                double value = dvar.get(k);
+                if ( Double.isNaN(value) || Double.isInfinite(value) )
+                    value = DashboardUtils.FP_MISSING_VALUE;
+                fco2s[k] = value;
+            }
+        } finally {
+            ncfile.close();
+        }
+
+        return new double[][] { lons, lats, times, ssts, fco2s };
+    }
 
 }
