@@ -246,21 +246,21 @@ public class CheckerMessageHandler {
 
                 Double longitude = msg.getLongitude();
                 if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitude,
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     mappings.add(MSG_LONGITUDE_KEY + MSG_KEY_VALUE_SEP + longitude);
                 else
                     longitude = null;
 
                 Double latitude = msg.getLatitude();
                 if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitude,
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     mappings.add(MSG_LATITUDE_KEY + MSG_KEY_VALUE_SEP + latitude);
                 else
                     latitude = null;
 
                 Double depth = msg.getDepth();
                 if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, depth,
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     mappings.add(MSG_DEPTH_KEY + MSG_KEY_VALUE_SEP + depth);
                 else
                     depth = null;

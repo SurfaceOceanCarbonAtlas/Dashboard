@@ -602,18 +602,17 @@ public class DashboardServerUtils {
      * @param data
      *         find the minimum and maximum valid values of this data
      *
-     * @return (minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or ({@link
-     *         DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE}) if all data is missing.
+     * @return (minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
+     *         ({@link DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE}) if all data is
+     *         missing.
      */
     public static double[] getMinMaxValidData(double[] data) {
         double maxVal = DashboardUtils.FP_MISSING_VALUE;
         double minVal = DashboardUtils.FP_MISSING_VALUE;
         for (double val : data) {
-            if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val,
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+            if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
-            if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
-                    (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
+            if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) || (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
                 maxVal = val;
                 minVal = val;
             }

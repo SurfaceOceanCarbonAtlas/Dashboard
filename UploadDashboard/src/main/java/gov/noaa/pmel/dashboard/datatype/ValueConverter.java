@@ -88,8 +88,7 @@ public abstract class ValueConverter<T> {
                 try {
                     Double value = Double.valueOf(trimVal);
                     for (Double mvdbl : DEFAULT_MISSING_NUMBERS_ARRAY) {
-                        if ( DashboardUtils.closeTo(value, mvdbl,
-                                DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                        if ( DashboardUtils.closeTo(value, mvdbl, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
                             return true;
                         }
                     }

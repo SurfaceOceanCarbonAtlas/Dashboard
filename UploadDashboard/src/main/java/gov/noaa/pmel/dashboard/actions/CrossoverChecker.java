@@ -287,37 +287,37 @@ public class CrossoverChecker {
         for (int j = 0; j < numRows[0]; j++) {
             // Skip this point if any missing values
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
 
             for (int k = 0; k < numRows[1]; k++) {
                 // Skip this point if any missing values
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
 
                 if ( times[1][k] > times[0][j] + DashboardServerUtils.MAX_TIME_DIFF ) {

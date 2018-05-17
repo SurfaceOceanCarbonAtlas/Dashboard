@@ -221,14 +221,11 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
         if ( !DashboardUtils.closeTo(dataValue, other.dataValue,
                 DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( !DashboardUtils.closeTo(depth, other.depth,
-                0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+        if ( !DashboardUtils.closeTo(depth, other.depth, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( !DashboardUtils.closeTo(latitude, other.latitude,
-                0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+        if ( !DashboardUtils.closeTo(latitude, other.latitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( !DashboardUtils.longitudeCloseTo(longitude, other.longitude,
-                0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+        if ( !DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
 
         return true;

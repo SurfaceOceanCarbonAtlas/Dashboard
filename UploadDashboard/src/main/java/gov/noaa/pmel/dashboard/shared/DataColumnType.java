@@ -408,8 +408,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         if ( !units.equals(other.units) )
             return false;
         // Floating point only needs to be insignificantly different
-        if ( !DashboardUtils.closeTo(sortOrder, other.sortOrder,
-                DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+        if ( !DashboardUtils.closeTo(sortOrder, other.sortOrder, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
         return true;
     }

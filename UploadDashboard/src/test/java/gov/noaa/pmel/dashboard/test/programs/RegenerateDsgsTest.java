@@ -11,7 +11,6 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,7 +29,8 @@ import static org.junit.Assert.assertTrue;
 public class RegenerateDsgsTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs#regenerateDsgFiles(java.lang.String, boolean)}.
+     * Test method for {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs#regenerateDsgFiles(java.lang.String,
+     * boolean)}.
      * Uses the full-data DSG file in an existing Dashboard installaltion.
      */
     @Test
@@ -43,7 +43,7 @@ public class RegenerateDsgsTest {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -61,7 +61,7 @@ public class RegenerateDsgsTest {
         // Regenerate the DSG files
         RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
         assertTrue("regenerateDsgFiles returned false when 'always' set to true",
-                   regenerator.regenerateDsgFiles(expocode, true));
+                regenerator.regenerateDsgFiles(expocode, true));
 
         // Re-read the data and metadata
         fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
@@ -84,43 +84,43 @@ public class RegenerateDsgsTest {
                 TreeMap<DashDataType,Integer> updatedIntVals = updatedVals.getIntegerVariables();
                 if ( origIntVals.size() != updatedIntVals.size() )
                     System.err.println("Number of integer values: expected = " +
-                                               origIntVals.size() + "; found = " + updatedIntVals.size());
+                            origIntVals.size() + "; found = " + updatedIntVals.size());
                 for (Entry<DashDataType,Integer> entry : origIntVals.entrySet()) {
                     DashDataType key = entry.getKey();
                     Integer original = entry.getValue();
                     Integer updated = updatedIntVals.get(key);
                     if ( !original.equals(updated) )
                         System.err.println("Value of " + key.getVarName() + ": expected = " +
-                                                   original + "; found = " + updated);
+                                original + "; found = " + updated);
                 }
 
                 TreeMap<DashDataType,Character> origCharVals = origVals.getCharacterVariables();
                 TreeMap<DashDataType,Character> updatedCharVals = updatedVals.getCharacterVariables();
                 if ( origCharVals.size() != updatedCharVals.size() )
                     System.err.println("Number of character values: expected = " +
-                                               origCharVals.size() + "; found = " + updatedCharVals.size());
+                            origCharVals.size() + "; found = " + updatedCharVals.size());
                 for (Entry<DashDataType,Character> entry : origCharVals.entrySet()) {
                     DashDataType key = entry.getKey();
                     Character original = entry.getValue();
                     Character updated = updatedCharVals.get(key);
                     if ( !original.equals(updated) )
                         System.err.println("Value of " + key.getVarName() + ": expected = " +
-                                                   original + "; found = " + updated);
+                                original + "; found = " + updated);
                 }
 
                 TreeMap<DashDataType,Double> origDoubleVals = origVals.getDoubleVariables();
                 TreeMap<DashDataType,Double> updatedDoubleVals = updatedVals.getDoubleVariables();
                 if ( origDoubleVals.size() != updatedDoubleVals.size() )
                     System.err.println("Number of character values: expected = " +
-                                               origDoubleVals.size() + "; found = " + updatedDoubleVals.size());
+                            origDoubleVals.size() + "; found = " + updatedDoubleVals.size());
                 for (Entry<DashDataType,Double> entry : origDoubleVals.entrySet()) {
                     DashDataType key = entry.getKey();
                     Double original = entry.getValue();
                     Double updated = updatedDoubleVals.get(key);
                     if ( !DashboardUtils.closeTo(original, updated,
-                                                 DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                            DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                         System.err.println("Value of " + key.getVarName() + ": expected = " +
-                                                   original + "; found = " + updated);
+                                original + "; found = " + updated);
                 }
             }
 

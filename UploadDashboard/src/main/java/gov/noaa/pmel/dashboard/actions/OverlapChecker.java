@@ -99,8 +99,7 @@ public class OverlapChecker {
         ignores[0] = new boolean[dataVals[4].length];
         for (int k = 0; k < dataVals[4].length; k++) {
             ignores[0][k] = DashboardUtils.closeTo(dataVals[4][k], DashboardUtils.FP_MISSING_VALUE,
-                    DashboardUtils.MAX_RELATIVE_ERROR,
-                    DashboardUtils.MAX_ABSOLUTE_ERROR);
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR);
         }
 
         for (String otherExpo : checkExpos) {
@@ -125,8 +124,7 @@ public class OverlapChecker {
                 ignores[1] = new boolean[dataVals[4].length];
                 for (int k = 0; k < dataVals[4].length; k++) {
                     ignores[1][k] = DashboardUtils.closeTo(dataVals[4][k], DashboardUtils.FP_MISSING_VALUE,
-                            DashboardUtils.MAX_RELATIVE_ERROR,
-                            DashboardUtils.MAX_ABSOLUTE_ERROR);
+                            0.0, DashboardUtils.MAX_ABSOLUTE_ERROR);
                 }
             }
 
@@ -258,13 +256,13 @@ public class OverlapChecker {
                 continue;
             // Skip this point if any missing values
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j],
-                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
 
             if ( sameExpo )
@@ -275,13 +273,13 @@ public class OverlapChecker {
                     continue;
                 // Skip this point if any missing values
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k],
-                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
 
                 if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {

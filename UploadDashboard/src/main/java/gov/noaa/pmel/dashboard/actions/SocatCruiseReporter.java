@@ -304,7 +304,7 @@ public class SocatCruiseReporter {
         // Get the SOCAT version and QC flag from the DSG metadata
         DsgMetadata socatMeta = dsgFile.getMetadata();
         String socatVersion = socatMeta.getVersion();
-        String qcFlag = socatMeta.getStatus();
+        String qcFlag = socatMeta.getDatasetQCFlag();
 
         // Get the rest of the metadata info from the OME XML
         DashboardMetadata metadata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
@@ -373,7 +373,7 @@ public class SocatCruiseReporter {
      * @throws IOException
      *         if unable to read a DSG NC file, or if unable to create the cruise report file
      */
-    public ArrayList<String> generateReport(TreeSet<String> expocodes, Character regionID,
+    public ArrayList<String> generateReport(TreeSet<String> expocodes, String regionID,
             File reportFile) throws IllegalArgumentException, IOException {
         int numDatasets = expocodes.size();
         ArrayList<String> upperExpoList = new ArrayList<String>(numDatasets);
@@ -412,7 +412,7 @@ public class SocatCruiseReporter {
                             " is not defined in the DSG file for " + upperExpo);
                 for (int j = 0; j < dataVals.getNumSamples(); j++) {
                     if ( regionID.equals(dataVals.getStdVal(j, regionIndex)) ) {
-                        Character woceFlag = dataVals.getWoceCO2Water();
+                        String woceFlag = dataVals.getWoceCO2Water();
                         // Ignore WOCE-3 and WOCE-4 as they are not reported
                         // and may be indicating invalid locations for this cruise
                         if ( DashboardUtils.WOCE_GOOD.equals(woceFlag) ||
@@ -429,7 +429,7 @@ public class SocatCruiseReporter {
             if ( inRegion ) {
                 DsgMetadata socatMeta = dsgFile.getMetadata();
                 socatVersionList.add(socatMeta.getVersion());
-                qcFlagList.add(socatMeta.getQcFlag());
+                qcFlagList.add(socatMeta.getDatasetQCFlag();
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
                 String origDOI = cruise.getSourceDOI();
                 if ( origDOI.isEmpty() )
@@ -505,7 +505,7 @@ public class SocatCruiseReporter {
                         continue;
                     if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
                         continue;
-                    Character woceFlag = dataVals.getWoceCO2Water();
+                    String woceFlag = dataVals.getWoceCO2Water();
                     if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
                             woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
                         String tsvdat = dataReportString(dataVals, j, sectimes[j], upperExpo,
@@ -1286,14 +1286,13 @@ public class SocatCruiseReporter {
 
         // if fCO2_rec not given, always set to nine ("bottle not sampled");
         // otherwise if missing or zero, it is presumed to be good (two)
-        Character charVal = dataVals.getWoceCO2Water();
+        String woceVal = dataVals.getWoceCO2Water();
         if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
             fmtr.format("9");
-        else if ( Character.valueOf(' ').equals(charVal) ||
-                Character.valueOf('0').equals(charVal) )
+        else if ( woceVal.equals(DashboardUtils.STRING_MISSING_VALUE) || woceVal.equals("0") )
             fmtr.format("2");
         else
-            fmtr.format("%c", charVal);
+            fmtr.format("%s", woceVal);
 
         String repStr = fmtr.toString();
         fmtr.close();
@@ -1305,13 +1304,13 @@ public class SocatCruiseReporter {
      */
     private static final String GENERATE_DATA_FILE_FOR_GRIDS_HEADER =
             "data_id\t" +
-                    "latitude\t" +
-                    "longitude\t" +
-                    "datetime\t" +
-                    "expocode\t" +
-                    "fCO2rec\t" +
-                    "SST\t" +
-                    "salinity";
+            "latitude\t" +
+            "longitude\t" +
+            "datetime\t" +
+            "expocode\t" +
+            "fCO2rec\t" +
+            "SST\t" +
+            "salinity";
 
 
     /**
@@ -1360,7 +1359,7 @@ public class SocatCruiseReporter {
                     Double fco2rec = dataVals.getfCO2Rec();
                     if ( DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) )
                         continue;
-                    Character woceFlag = dataVals.getWoceCO2Water();
+                    String woceFlag = dataVals.getWoceCO2Water();
                     if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
                             woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
                         DataPoint datpt = new DataPoint(upperExpo, sectimes[j], dataVals.getLatitude(),
