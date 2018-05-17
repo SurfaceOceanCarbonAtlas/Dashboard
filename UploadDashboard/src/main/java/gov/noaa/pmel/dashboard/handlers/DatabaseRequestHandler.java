@@ -585,7 +585,6 @@ public class DatabaseRequestHandler {
      *
      * @throws SQLException
      *         if getting values from the ResultSet throws one
-     * @returns the created QC flag
      */
     private QCEvent createDatasetQCEvent(ResultSet results) throws SQLException {
         QCEvent qcEvent = new QCEvent();
@@ -738,7 +737,6 @@ public class DatabaseRequestHandler {
      *
      * @throws SQLException
      *         if getting values from the ResultSet throws one
-     * @returns the created WOCE event
      */
     private DataQCEvent createDataQCEvent(ResultSet results) throws SQLException {
         DataQCEvent woceEvent = new DataQCEvent();
@@ -768,8 +766,6 @@ public class DatabaseRequestHandler {
      *         latitude, data_time, and data_value.
      *
      * @return the created DataLocation
-     *
-     * @throws SQLException
      */
     private DataLocation createDataQCLocation(ResultSet results) throws SQLException {
         DataLocation location = new DataLocation();
@@ -800,7 +796,7 @@ public class DatabaseRequestHandler {
      *         order with the latest first?
      *
      * @return list of data QC events for the dataset, ordered by the dates of the events (either latest first or latest
-     * last); never null but may be empty
+     *         last); never null but may be empty
      *
      * @throws SQLException
      *         if accessing the database or reading the results throws one
@@ -919,7 +915,7 @@ public class DatabaseRequestHandler {
             modifyQcPrepStmt.executeUpdate();
             int updateCount = modifyQcPrepStmt.getUpdateCount();
             if ( updateCount < 0 )
-                throw new SQLException("Unexpected update count from renaming QC expocodes");
+                throw new SQLException("Unexpected update count from renaming QC datasetIds");
             if ( updateCount == 0 ) {
                 // If no QC flags with the old expocode, cruise has never been submitted
                 // or was already renamed; in either case, nothing to do.

@@ -8,6 +8,8 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
@@ -23,6 +25,7 @@ import ucar.nc2.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
@@ -405,7 +408,7 @@ public class DsgNcFile extends File {
      *         metadata file types to read
      *
      * @return variable names of the metadata fields not assigned from this netCDF file (will have its default/missing
-     * value)
+     *         value)
      *
      * @throws IllegalArgumentException
      *         if there are no metadata types given, or if an invalid type for metadata is encountered
@@ -694,7 +697,7 @@ public class DsgNcFile extends File {
      * changed to {@link DashboardUtils#FP_MISSING_VALUE}.
      *
      * @return the array { lons, lats, times } for this cruise, where lons are the array of longitudes, lats are the
-     * array of latitudes, times are the array of times.
+     *         array of latitudes, times are the array of times.
      *
      * @throws IOException
      *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
@@ -764,8 +767,9 @@ public class DsgNcFile extends File {
      * been processed by Ferret for the fCO2_recommended values to be meaningful.
      *
      * @return the array { lons, lats, times, ssts, fco2s } for this cruise, where lons are the array of longitudes,
-     * lats are the array of latitudes, times are the array of times, ssts are the array of SST values, and fco2s are
-     * the array of fCO2_recommended values.
+     *         lats are the array of latitudes, times are the array of times, ssts are the array of SST values, and
+     *         fco2s are
+     *         the array of fCO2_recommended values.
      *
      * @throws IOException
      *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
@@ -859,6 +863,283 @@ public class DsgNcFile extends File {
         }
 
         return new double[][] { lons, lats, times, ssts, fco2s };
+    }
+
+    /**
+     * @return the dataset QC flag contained in this DSG file
+     *
+     * @throws IllegalArgumentException
+     *         if this DSG file is not valid
+     * @throws IOException
+     *         if opening or reading from the DSG file throws one
+     */
+    public String getDatasetQCFlag() throws IllegalArgumentException, IOException {
+        String flag;
+        NetcdfFile ncfile = NetcdfFile.open(getPath());
+        try {
+            String varName = DashboardServerUtils.DATASET_QC_FLAG.getVarName();
+            Variable var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayChar.D2 flagArray = (ArrayChar.D2) var.read();
+            flag = flagArray.getString(0);
+        } finally {
+            ncfile.close();
+        }
+        return flag;
+    }
+
+    /**
+     * Updates this DSG file with the given QC flag and version number
+     *
+     * @param qcFlag
+     *         the QC flag to assign
+     * @param version
+     *         version to assign
+     *
+     * @throws IllegalArgumentException
+     *         if this DSG file is not valid
+     * @throws IOException
+     *         if opening or writing to the DSG file throws one
+     */
+    public void updateDatasetQCFlag(String qcFlag, String version)
+            throws IllegalArgumentException, IOException {
+        NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+        try {
+            String varName = DashboardServerUtils.DATASET_QC_FLAG.getVarName();
+            Variable var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
+            flagArray.setString(0, qcFlag);
+            try {
+                ncfile.write(var, flagArray);
+            } catch ( InvalidRangeException ex ) {
+                throw new IOException(ex);
+            }
+
+            varName = DashboardServerUtils.VERSION.getVarName();
+            var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayChar.D2 versionArray = new ArrayChar.D2(1, var.getShape(1));
+            versionArray.setString(0, version);
+            try {
+                ncfile.write(var, versionArray);
+            } catch ( InvalidRangeException ex ) {
+                throw new IOException(ex);
+            }
+        } finally {
+            ncfile.close();
+        }
+    }
+
+    /**
+     * Updates the all_region_ids metadata variable in this DSG file
+     * from the values in the region_id data variable in this DSG file.
+     *
+     * @throws IllegalArgumentException
+     *         if this DSG file is not valid
+     * @throws IOException
+     *         if opening or writing to the DSG file throws one
+     * @throws InvalidRangeException
+     *         if writing the updated QC flag to the DSG file throws one
+     */
+    public void updateAllRegionIDs() throws IllegalArgumentException, IOException, InvalidRangeException {
+        // Read the region IDs assigned by Ferret
+        String[] regionIDs = readStringVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
+        // Generate the String of sorted unique IDs
+        TreeSet<String> allRegionIDsSet = new TreeSet<String>();
+        for (String id : regionIDs) {
+            allRegionIDsSet.add(id.trim());
+        }
+        String allRegionIDs = "";
+        for (String id : allRegionIDsSet) {
+            allRegionIDs += id.toString();
+        }
+        // Write this String of all region IDs to the NetCDF file
+        NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+        try {
+            String varName = DashboardServerUtils.ALL_REGION_IDS.getVarName();
+            Variable var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            if ( var.getShape(1) < allRegionIDs.length() )
+                throw new IllegalArgumentException("Not enough space (max " + Integer.toString(var.getShape(1)) +
+                        ") for the string of all region IDs (" + allRegionIDs + ")");
+            ArrayChar.D2 allRegionIDsArray = new ArrayChar.D2(1, var.getShape(1));
+            allRegionIDsArray.setString(0, allRegionIDs);
+            ncfile.write(var, allRegionIDsArray);
+        } finally {
+            ncfile.close();
+        }
+    }
+
+    /**
+     * Updates this DSG file with the given data QC flags.
+     * Optionally, will also update the row number in the data QC flags from the data in this DSG file.
+     *
+     * @param woceEvent
+     *         data QC flags to set
+     * @param updateWoceEvent
+     *         if true, update the data QC flags from data in this DSG file
+     *
+     * @return list of the data QC event data locations not found in this DSG file; never null but may be empty
+     *
+     * @throws IllegalArgumentException
+     *         if the DSG file or the data QC flags are not valid
+     * @throws IOException
+     *         if opening, reading from, or writing to the DSG file throws one
+     */
+    public ArrayList<DataLocation> updateDataQCFlags(DataQCEvent woceEvent, boolean updateWoceEvent)
+            throws IllegalArgumentException, IOException {
+        ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
+        NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+        try {
+
+            String varName = DashboardServerUtils.LONGITUDE.getVarName();
+            Variable var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
+
+            varName = DashboardServerUtils.LATITUDE.getVarName();
+            var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
+
+            varName = DashboardServerUtils.TIME.getVarName();
+            var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
+
+            ArrayChar.D2 regionIDs;
+            if ( updateWoceEvent ) {
+                varName = DashboardServerUtils.REGION_ID.getVarName();
+                var = ncfile.findVariable(varName);
+                if ( var == null )
+                    throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+                regionIDs = (ArrayChar.D2) var.read();
+            }
+            else {
+                regionIDs = null;
+            }
+
+            String dataname = woceEvent.getVarName();
+            ArrayDouble.D1 datavalues;
+            if ( DashboardUtils.STRING_MISSING_VALUE.equals(dataname) ) {
+                // WOCE based on longitude/latitude/time
+                datavalues = null;
+            }
+            else {
+                var = ncfile.findVariable(dataname);
+                if ( var == null )
+                    throw new IllegalArgumentException("Unable to find variable '" + dataname + "' in " + getName());
+                datavalues = (ArrayDouble.D1) var.read();
+            }
+
+            varName = woceEvent.getFlagName();
+            Variable wocevar = ncfile.findVariable(varName);
+            if ( wocevar == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
+
+            String newFlag = woceEvent.getFlagValue();
+
+            // Identify the data points using a round-robin search
+            // just in case there is more than one matching point
+            int startIdx = 0;
+            int arraySize = (int) times.getSize();
+            HashSet<Integer> assignedRowIndices = new HashSet<Integer>();
+            for (DataLocation dataloc : woceEvent.getLocations()) {
+                boolean valueFound = false;
+                int idx;
+                for (idx = startIdx; idx < arraySize; idx++) {
+                    if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx) ) {
+                        if ( assignedRowIndices.add(idx) ) {
+                            valueFound = true;
+                            break;
+                        }
+                    }
+                }
+                if ( idx >= arraySize ) {
+                    for (idx = 0; idx < startIdx; idx++) {
+                        if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx) ) {
+                            if ( assignedRowIndices.add(idx) ) {
+                                valueFound = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if ( valueFound ) {
+                    wocevalues.setString(idx, newFlag);
+                    if ( updateWoceEvent ) {
+                        dataloc.setRowNumber(idx + 1);
+                    }
+                    // Start the next search from the next data point
+                    startIdx = idx + 1;
+                }
+                else {
+                    unidentified.add(dataloc);
+                }
+            }
+
+            // Save the updated WOCE flags to the DSG file
+            try {
+                ncfile.write(wocevar, wocevalues);
+            } catch ( InvalidRangeException ex ) {
+                throw new IOException(ex);
+            }
+        } finally {
+            ncfile.close();
+        }
+        return unidentified;
+    }
+
+    /**
+     * Compares the data location information given in a DataLocation with the longitude, latitude,
+     * time, and (if applicable) data value at a given index into arrays of these values.
+     *
+     * @param dataloc
+     *         data location to compare
+     * @param longitudes
+     *         array of longitudes to use
+     * @param latitudes
+     *         array of latitudes to use
+     * @param times
+     *         array of times (seconds since 1970-01-01 00:00:00) to use
+     * @param datavalues
+     *         if not null, array of data values to use
+     * @param idx
+     *         index into the arrays of the values to compare
+     *
+     * @return true if the data locations match
+     */
+    private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes, ArrayDouble.D1 latitudes,
+            ArrayDouble.D1 times, ArrayDouble.D1 datavalues, int idx) {
+        // Check if longitude is within 0.001 degrees of each other
+        if ( !DashboardUtils.longitudeCloseTo(dataloc.getLongitude(), longitudes.get(idx), 0.0, 0.001) )
+            return false;
+
+        // Check if latitude is within 0.0001 degrees of each other
+        if ( !DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), 0.0, 0.0001) )
+            return false;
+
+        // Check if times are within a second of each other
+        if ( !DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), 0.0, 1.0) )
+            return false;
+
+        // If given, check if data values are close to each other
+        if ( datavalues != null ) {
+            if ( !DashboardUtils.closeTo(dataloc.getDataValue(), datavalues.get(idx),
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                return false;
+        }
+
+        return true;
     }
 
 }

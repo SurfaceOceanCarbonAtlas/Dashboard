@@ -127,12 +127,6 @@ public class DashboardServerUtils {
      */
     public static final double MAX_LAT_DIFF = (MAX_CROSSOVER_DIST / EARTH_AUTHALIC_RADIUS) * (180.0 / Math.PI);
 
-    /**
-     * GEOPOSITION_VARNAME is a marker used in automated data checking to indicate an severe error in the combination of
-     * lon/lat/depth/time.
-     */
-    public static final String GEOPOSITION_VARNAME = "geoposition";
-
     // Some suggested categories
     public static final String BATHYMETRY_CATEGORY = "Bathymetry";
     public static final String IDENTIFIER_CATEGORY = "Identifier";
@@ -203,14 +197,17 @@ public class DashboardServerUtils {
             101.0, "platform name", "platform name", false,
             DashboardUtils.NO_UNITS, "platform_name", PLATFORM_CATEGORY, null,
             null, null, null, null);
+
     public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType("platform_type",
             102.0, "platform type", "platform type", false,
             DashboardUtils.NO_UNITS, "platform_type", PLATFORM_CATEGORY, null,
             null, null, null, null);
+
     public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
             103.0, "organization", "organization", false,
             DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
             null, null, null, null);
+
     public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType("investigators",
             104.0, "PI names", "investigators", false,
             DashboardUtils.NO_UNITS, "investigators", IDENTIFIER_CATEGORY, null,
@@ -220,39 +217,58 @@ public class DashboardServerUtils {
             110.0, "westmost lon", "westernmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_min", LOCATION_CATEGORY, "degrees_east",
             "-540.0", "-180.0", "360.0", "540.0");
+
     public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max",
             111.0, "eastmost lon", "easternmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_max", LOCATION_CATEGORY, "degrees_east",
             "-540.0", "-180.0", "360.0", "540.0");
+
     public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min",
             112.0, "southmost lat", "southernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_min", LOCATION_CATEGORY, "degrees_north",
             "-90.0", null, null, "90.0");
+
     public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max",
             113.0, "northmost lat", "northernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_max", LOCATION_CATEGORY, "degrees_north",
             "-90.0", null, null, "90.0");
+
     public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start",
             114.0, "start time", "starting time", false,
             TIME_UNITS, "time_coverage_start", LOCATION_CATEGORY, null,
             null, null, null, null);
+
     public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_coverage_end",
             115.0, "end time", "ending time", false,
             TIME_UNITS, "time_coverage_end", LOCATION_CATEGORY, null,
             null, null, null, null);
-    public static final StringDashDataType STATUS = new StringDashDataType("status",
-            120.0, "status", "status", false,
-            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
-    public static final StringDashDataType VERSION = new StringDashDataType("version",
-            121.0, "version", "version", false,
+
+    public static final StringDashDataType SOURCE_DOI = new StringDashDataType("source_doi",
+            120.0, "DOI", "DOI of the source dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
             null, null, null, null);
 
-    /**
-     * User-provided unique ID for a sample in a dataset (user data type only). Used when merging files of different
-     * data types measured for a sample.
-     */
+    public static final StringDashDataType ENHANCED_DOI = new StringDashDataType("socat_doi",
+            121.0, "SOCAT DOI", "DOI of the SOCAT-enhanced dataset", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
+
+    public static final StringDashDataType DATASET_QC_FLAG = new StringDashDataType("qc_flag",
+            122.0, "Dataset QC Flag", "QC assessment of the dataset", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
+
+    public static final StringDashDataType VERSION = new StringDashDataType("version",
+            123.0, "version", "version", false,
+            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
+            null, null, null, null);
+
+    public static final StringDashDataType ALL_REGION_IDS = new StringDashDataType("all_region_ids",
+            124.0, "all Region IDs", "Sorted unique region IDs", false,
+            DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
+            null, null, null, null);
+
+
     public static final StringDashDataType SAMPLE_ID = new StringDashDataType("sample_id",
             300.0, "sample ID", "unique ID for this sample in the dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
@@ -261,12 +277,19 @@ public class DashboardServerUtils {
     public static final DoubleDashDataType LONGITUDE = new DoubleDashDataType(DashboardUtils.LONGITUDE,
             "longitude", LOCATION_CATEGORY, "degrees_east",
             "-540.0", "-180.0", "360.0", "540.0");
+
     public static final DoubleDashDataType LATITUDE = new DoubleDashDataType(DashboardUtils.LATITUDE,
             "latitude", LOCATION_CATEGORY, "degrees_north",
             "-90.0", null, null, "90.0");
+
     public static final DoubleDashDataType SAMPLE_DEPTH = new DoubleDashDataType(DashboardUtils.SAMPLE_DEPTH,
             "depth", BATHYMETRY_CATEGORY, "meters",
             "0.0", null, null, "16000");
+
+    public static final StringDashDataType REGION_ID = new StringDashDataType("region_id",
+            304.0, "Region ID", "SOCAT region ID", false,
+            DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
+            null, null, null, null);
 
     /**
      * Date and time of the measurement
@@ -285,21 +308,27 @@ public class DashboardServerUtils {
     public static final IntDashDataType YEAR = new IntDashDataType(DashboardUtils.YEAR,
             "year", TIME_CATEGORY, null,
             "1900", "1950", "2050", "2100");
+
     public static final IntDashDataType MONTH_OF_YEAR = new IntDashDataType(DashboardUtils.MONTH_OF_YEAR,
             "month_of_year", TIME_CATEGORY, null,
             "1", null, null, "12");
+
     public static final IntDashDataType DAY_OF_MONTH = new IntDashDataType(DashboardUtils.DAY_OF_MONTH,
             "day_of_month", TIME_CATEGORY, null,
             "1", null, null, "31");
+
     public static final StringDashDataType TIME_OF_DAY = new StringDashDataType(DashboardUtils.TIME_OF_DAY,
             "time_of_day", TIME_CATEGORY, null,
             null, null, null, null);
+
     public static final IntDashDataType HOUR_OF_DAY = new IntDashDataType(DashboardUtils.HOUR_OF_DAY,
             "hour_of_day", TIME_CATEGORY, null,
             "0", null, null, "24");
+
     public static final IntDashDataType MINUTE_OF_HOUR = new IntDashDataType(DashboardUtils.MINUTE_OF_HOUR,
             "minute_of_hour", TIME_CATEGORY, null,
             "0", null, null, "60");
+
     public static final DoubleDashDataType SECOND_OF_MINUTE = new DoubleDashDataType(DashboardUtils.SECOND_OF_MINUTE,
             "second_of_minute", TIME_CATEGORY, null,
             "0.0", null, null, "60.0");
@@ -503,7 +532,7 @@ public class DashboardServerUtils {
      *         the encoded set of QCFlag objects
      *
      * @return the decoded TreeSet ofQCFlag objects; never null, but may be empty (if the encoded set does not specify
-     * any QCFlag objects)
+     *         any QCFlag objects)
      *
      * @throws IllegalArgumentException
      *         if qcFlagSetStr does not start with '[', does not end with ']', or contains an invalid encoded QCFlag.
@@ -574,7 +603,7 @@ public class DashboardServerUtils {
      *         find the minimum and maximum valid values of this data
      *
      * @return (minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or ({@link
-     * DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE}) if all data is missing.
+     *         DashboardUtils#FP_MISSING_VALUE}, {@link DashboardUtils#FP_MISSING_VALUE}) if all data is missing.
      */
     public static double[] getMinMaxValidData(double[] data) {
         double maxVal = DashboardUtils.FP_MISSING_VALUE;

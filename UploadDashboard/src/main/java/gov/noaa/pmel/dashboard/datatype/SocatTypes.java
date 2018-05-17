@@ -43,12 +43,6 @@ public class SocatTypes {
     public static final ArrayList<String> DISTANCE_UNITS =
             new ArrayList<String>(Arrays.asList("km"));
 
-    // Additional metadata
-    public static final StringDashDataType ALL_REGION_IDS = new StringDashDataType("all_region_ids",
-            201.0, "all Region IDs", "Sorted unique region IDs", false,
-            DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
-            null, null, null, null);
-
     // Additional data provided by the user
     public static final DoubleDashDataType SALINITY = new DoubleDashDataType("sal",
             600.0, "salinity", "salinity", false,
@@ -107,34 +101,21 @@ public class SocatTypes {
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0");
 
-    /**
-     * Data QC (WOCE) flag for aqueous CO2 values
-     */
     public static final StringDashDataType WOCE_CO2_WATER = new StringDashDataType("WOCE_CO2_water",
             650.0, "WOCE CO2_water", "WOCE flag for aqueous CO2", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.QUALITY_CATEGORY, null,
             "1", "2", "4", "9");
 
-    /**
-     * User-provided comment for WOCE_CO2_WATER; user type only, used for generating WOCE events from user-provided
-     * data.
-     */
     public static final StringDashDataType COMMENT_WOCE_CO2_WATER = new StringDashDataType("comment_WOCE_CO2_water",
             651.0, "comment WOCE CO2_water", "comment about WOCE_CO2_water flag", false,
             DashboardUtils.NO_UNITS, null, null, null,
             null, null, null, null);
 
-    /**
-     * Data QC (WOCE) flag for atmospheric CO2 values
-     */
     public static final StringDashDataType WOCE_CO2_ATM = new StringDashDataType("WOCE_CO2_atm",
             652.0, "WOCE_CO2_atm", "WOCE flag for atmospheric CO2", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.QUALITY_CATEGORY, null,
             "1", "2", "4", "9");
 
-    /**
-     * User-provided comment for WOCE_CO2_ATM; user type only, used for generating WOCE events from user-provided data.
-     */
     public static final StringDashDataType COMMENT_WOCE_CO2_ATM = new StringDashDataType("comment_WOCE_CO2_atm",
             653.0, "comment WOCE CO2_atm", "comment about WOCE_CO2_atm flag", false,
             DashboardUtils.NO_UNITS, null, null, null,
@@ -150,11 +131,6 @@ public class SocatTypes {
             701.0, "NCEP SLP", "sea level air pressure from NCEP/NCAR reanalysis", false,
             PRESSURE_UNITS, "air_pressure_at_sea_level", PRESSURE_CATEGORY, null,
             "750.0", "900.0", "1100.0", "1250.0");
-
-    public static final StringDashDataType REGION_ID = new StringDashDataType("region_id",
-            702.0, "Region ID", "SOCAT region ID", false,
-            DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
-            null, null, null, null);
 
     public static final DoubleDashDataType ETOPO2_DEPTH = new DoubleDashDataType("etopo2",
             705.0, "ETOPO2 depth", "bathymetry from ETOPO2", false,

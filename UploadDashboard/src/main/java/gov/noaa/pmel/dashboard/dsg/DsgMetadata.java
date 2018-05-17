@@ -6,7 +6,6 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -180,7 +179,7 @@ public class DsgMetadata {
 
     /**
      * @return the name of the organization/institution; never null but could be {@link
-     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     *         DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getOrganizationName() {
         String value = (String) valuesMap.get(DashboardServerUtils.ORGANIZATION_NAME);
@@ -205,7 +204,7 @@ public class DsgMetadata {
 
     /**
      * @return the investigator names; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
-     * assigned
+     *         assigned
      */
     public String getInvestigatorNames() {
         String value = (String) valuesMap.get(DashboardServerUtils.INVESTIGATOR_NAMES);
@@ -252,7 +251,7 @@ public class DsgMetadata {
 
     /**
      * @return the west-most longitude for the cruise; never null could be {@link DashboardUtils#FP_MISSING_VALUE} if
-     * not assigned.
+     *         not assigned.
      */
     public Double getWestmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.WESTERNMOST_LONGITUDE);
@@ -276,7 +275,7 @@ public class DsgMetadata {
 
     /**
      * @return the east-most longitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     * if not assigned.
+     *         if not assigned.
      */
     public Double getEastmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE);
@@ -300,7 +299,7 @@ public class DsgMetadata {
 
     /**
      * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     * if not assigned.
+     *         if not assigned.
      */
     public Double getSouthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
@@ -324,7 +323,7 @@ public class DsgMetadata {
 
     /**
      * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     * if not assigned.
+     *         if not assigned.
      */
     public Double getNorthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.NORTHERNMOST_LATITUDE);
@@ -348,7 +347,7 @@ public class DsgMetadata {
 
     /**
      * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could
-     * be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     *         be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getBeginTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_START);
@@ -373,7 +372,7 @@ public class DsgMetadata {
 
     /**
      * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could be
-     * {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     *         {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getEndTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_END);
@@ -397,32 +396,82 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the status associated with this instance; never null but could be {@link
-     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the DOI for source dataset;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
-    public String getStatus() {
-        String value = (String) valuesMap.get(DashboardServerUtils.STATUS);
+    public String getSourceDOI() {
+        String value = (String) valuesMap.get(DashboardServerUtils.SOURCE_DOI);
         if ( value == null )
             value = DashboardUtils.STRING_MISSING_VALUE;
         return value;
     }
 
     /**
-     * @param status
-     *         the status to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     * @param sourceDOI
+     *         the DOI for the source dataset;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
-    public void setStatus(String status) {
+    public void setSourceDOI(String sourceDOI) {
         String value;
-        if ( status != null )
-            value = status;
+        if ( sourceDOI != null )
+            value = sourceDOI;
         else
             value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(DashboardServerUtils.STATUS, value);
+        valuesMap.put(DashboardServerUtils.SOURCE_DOI, value);
+    }
+
+    /**
+     * @return the DOI for the enhanced dataset;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getEnhancedDOI() {
+        String value = (String) valuesMap.get(DashboardServerUtils.ENHANCED_DOI);
+        if ( value == null )
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        return value;
+    }
+
+    /**
+     * @param enhancedDOI
+     *         the DOI to set for the enhanced dataset
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setEnhancedDOI(String enhancedDOI) {
+        String value;
+        if ( enhancedDOI != null )
+            value = enhancedDOI;
+        else
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        valuesMap.put(DashboardServerUtils.ENHANCED_DOI, value);
+    }
+
+    /**
+     * @return the dataset QC flag;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getDatasetQCFlag() {
+        String value = (String) valuesMap.get(DashboardServerUtils.DATASET_QC_FLAG);
+        if ( value == null )
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        return value;
+    }
+
+    /**
+     * @param datasetQCFlag
+     *         the dataset QC flag to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setDatasetQCFlag(String datasetQCFlag) {
+        String value;
+        if ( datasetQCFlag != null )
+            value = datasetQCFlag;
+        else
+            value = DashboardUtils.STRING_MISSING_VALUE;
+        valuesMap.put(DashboardServerUtils.DATASET_QC_FLAG, value);
     }
 
     /**
      * @return the version associated with this instance; never null but could be {@link
-     * DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     *         DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getVersion() {
         String value = (String) valuesMap.get(DashboardServerUtils.VERSION);
@@ -444,14 +493,12 @@ public class DsgMetadata {
         valuesMap.put(DashboardServerUtils.VERSION, value);
     }
 
-    // Start of SOCAT-specific metadata
-
     /**
      * @return the String of all region IDs; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
-     * assigned
+     *         assigned
      */
     public String getAllRegionIDs() {
-        String value = (String) valuesMap.get(SocatTypes.ALL_REGION_IDS);
+        String value = (String) valuesMap.get(DashboardServerUtils.ALL_REGION_IDS);
         if ( value == null )
             value = DashboardUtils.STRING_MISSING_VALUE;
         return value;
@@ -467,37 +514,12 @@ public class DsgMetadata {
             value = allRegionIDs;
         else
             value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(SocatTypes.ALL_REGION_IDS, value);
+        valuesMap.put(DashboardServerUtils.ALL_REGION_IDS, value);
     }
-
-    /**
-     * @return the SOCAT DOI for this dataset; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if
-     * not assigned
-     */
-    public String getSocatDOI() {
-        String value = (String) valuesMap.get(SocatTypes.SOCAT_DOI);
-        if ( value == null )
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        return value;
-    }
-
-    /**
-     * @param socatDOI
-     *         the SOCAT DOI for this dataset to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-     */
-    public void setSocatDOI(String socatDOI) {
-        String value;
-        if ( socatDOI != null )
-            value = socatDOI;
-        else
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(SocatTypes.SOCAT_DOI, value);
-    }
-    // End of SOCAT-specific metadata
 
     /**
      * @return the maximum length of String values given in the fields of this instance, rounded up to the nearest
-     * multiple of 32 (and never less than 32).
+     *         multiple of 32 (and never less than 32).
      */
     public int getMaxStringLength() {
         int maxLength = 32;

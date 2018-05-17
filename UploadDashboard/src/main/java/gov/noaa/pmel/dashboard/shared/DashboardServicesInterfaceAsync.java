@@ -160,14 +160,14 @@ public interface DashboardServicesInterfaceAsync {
      * saving of the entered dataset column specifications to prevent loss of work.
      *
      * @param username
-     * 		username for validation
+     *         username for validation
      * @param newSpecs
-     * 		data column types to assign.  The dataset ID in this object specifies the dataset
-     * 		to update.  Any sample data in this object is ignored.
+     *         data column types to assign.  The dataset ID in this object specifies the dataset
+     *         to update.  Any sample data in this object is ignored.
      * @param callback
-     * 		callback to make when complete. The fail method is invoked
-     * 		if authentication fails, if dataset ID is invalid,
-     * 		or if the dataset does not exist.
+     *         callback to make when complete. The fail method is invoked
+     *         if authentication fails, if dataset ID is invalid,
+     *         or if the dataset does not exist.
      */
     void saveDataColumnSpecs(String username, DashboardDataset newSpecs, AsyncCallback<Void> callback);
 
@@ -186,7 +186,8 @@ public interface DashboardServicesInterfaceAsync {
      *         if authentication fails, if dataset ID is invalid, if the dataset does not exist, or if there are
      *         problems obtaining or evaluating the data for the dataset
      */
-    void updateDataColumnSpecs(String username, DashboardDataset newSpecs, AsyncCallback<DashboardDatasetData> callback);
+    void updateDataColumnSpecs(String username, DashboardDataset newSpecs,
+            AsyncCallback<DashboardDatasetData> callback);
 
     /**
      * Updates the data column specifications for the datasets with the given IDs.  Column types are assigned from

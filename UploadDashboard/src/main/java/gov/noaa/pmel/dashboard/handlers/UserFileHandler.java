@@ -127,7 +127,7 @@ public class UserFileHandler extends VersionedFileHandler {
      *         get cruises for this user
      *
      * @return the list of datasets for the user; will not be null, but may be empty (including if there is no saved
-     * listing)
+     *         listing)
      *
      * @throws IllegalArgumentException
      *         if username is invalid, if there was a problem reading an existing dataset listing, or if there was an
@@ -141,7 +141,7 @@ public class UserFileHandler extends VersionedFileHandler {
         File userDataFile = new File(filesDir, cleanUsername + USER_CRUISE_LIST_NAME_EXTENSION);
         boolean needsCommit = false;
         String commitMessage = "";
-        // Read the cruise expocodes from the cruise list file
+        // Read the cruise datasetIds from the cruise list file
         HashSet<String> dataIdsSet = new HashSet<String>();
         try {
             BufferedReader idsReader = new BufferedReader(new FileReader(userDataFile));
@@ -352,7 +352,7 @@ public class UserFileHandler extends VersionedFileHandler {
      * @return updated list of datasets for user
      *
      * @throws IllegalArgumentException
-     *         if username is invalid, if any of the expocodes are invalid, if the cruise information file does not
+     *         if username is invalid, if any of the datasetIds are invalid, if the cruise information file does not
      *         exist, if there was a problem saving the updated cruise listing, or if there was an error committing the
      *         updated cruise listing to version control
      */

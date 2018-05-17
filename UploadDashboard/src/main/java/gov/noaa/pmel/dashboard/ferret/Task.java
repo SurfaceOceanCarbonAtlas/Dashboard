@@ -290,8 +290,6 @@ public class Task {
 
     /**
      * Look for error information in an input stream. If there is an indication of error, an Exception will be thrown.
-     *
-     * @throws Exception
      */
     protected boolean findErrorsInStream(BufferedReader in) throws Exception {
         String line;

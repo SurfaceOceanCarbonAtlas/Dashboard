@@ -43,7 +43,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the two IDs of the crossover datasets; always an array of two Strings, but each String may be null. The
-     * actual array in this instance is returned.
+     *         actual array in this instance is returned.
      */
     public String[] getDatasetIds() {
         return datasetIds;
@@ -83,7 +83,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the data row numbers (starts with one) of the two datasets at the crossover; always an array of two
-     * Integers, but each Integer may be null. The actual array in this instance is returned.
+     *         Integers, but each Integer may be null. The actual array in this instance is returned.
      */
     public Integer[] getRowNumsAtMin() {
         return rowNumsAtMin;
@@ -109,7 +109,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the longitudes of the two datasets at the crossover; always an array of two Doubles, but each Double may
-     * be null. The actual array in this instance is returned.
+     *         be null. The actual array in this instance is returned.
      */
     public Double[] getLonsAtMin() {
         return lonsAtMin;
@@ -135,7 +135,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the latitudes of the two datasets at the crossover; always an array of two Doubles, but each Double may
-     * be null. The actual array in this instance is returned.
+     *         be null. The actual array in this instance is returned.
      */
     public Double[] getLatsAtMin() {
         return latsAtMin;
@@ -161,7 +161,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the times, in seconds with Jan 1, 1970 00:00:00, of the two datasets at the crossover; always an array of
-     * two Dates, but each Date may be null. The actual array in this instance is returned.
+     *         two Dates, but each Date may be null. The actual array in this instance is returned.
      */
     public Long[] getTimesAtMin() {
         return timesAtMin;
@@ -187,7 +187,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return the minimum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always an array of
-     * two Dates, but each Date may be null. The actual array in this instance is returned.
+     *         two Dates, but each Date may be null. The actual array in this instance is returned.
      */
     public Long[] getDatasetMinTimes() {
         return datasetMinTimes;
@@ -213,7 +213,7 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @return maximum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always an array of two
-     * Dates, but each Date may be null. The actual array in this instance is returned.
+     *         Dates, but each Date may be null. The actual array in this instance is returned.
      */
     public Long[] getDatasetMaxTimes() {
         return datasetMaxTimes;

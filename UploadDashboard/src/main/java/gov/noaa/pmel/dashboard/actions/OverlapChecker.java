@@ -6,8 +6,8 @@ package gov.noaa.pmel.dashboard.actions;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.Overlap;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.Overlap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class OverlapChecker {
      * @param expocode
      *         the expocode of the primary data set to examine
      * @param checkExpos
-     *         expocodes of data set to check for overlaps with the primary data set
+     *         datasetIds of data set to check for overlaps with the primary data set
      * @param progressPrinter
      *         if not null, progress messages with timings are printed using this PrintStream
      * @param progStartMilliTime
@@ -192,11 +192,11 @@ public class OverlapChecker {
     }
 
     /**
-     * Checks for overlaps between two datasets. If the two expocodes are the same, this detects overlaps within a
+     * Checks for overlaps between two datasets. If the two datasetIds are the same, this detects overlaps within a
      * dataset (excludes matching a data point with itself). Assumes the data points are ordered in increasing time.
      *
      * @param expocodes
-     *         expocodes of the two datasets
+     *         datasetIds of the two datasets
      * @param longitudes
      *         longitudes of the the data for the two datasets
      * @param latitudes
@@ -217,7 +217,7 @@ public class OverlapChecker {
             throws IllegalArgumentException {
         if ( (expocodes == null) || (expocodes.length != 2) ||
                 (expocodes[0] == null) || (expocodes[1] == null) )
-            throw new IllegalArgumentException("Invalid expocodes given to checkForOverlaps");
+            throw new IllegalArgumentException("Invalid datasetIds given to checkForOverlaps");
         if ( (longitudes == null) || (longitudes.length != 2) ||
                 (longitudes[0] == null) || (longitudes[1] == null) )
             throw new IllegalArgumentException("Invalid longitudes given to checkForOverlaps");
@@ -306,7 +306,7 @@ public class OverlapChecker {
                 if ( DashboardUtils.closeTo(times[0][j], times[1][k], 0.0, MIN_TIME_DIFF) &&
                         DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MIN_LONLAT_DIFF) &&
                         DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MIN_LONLAT_DIFF) ) {
-                    // order of row nums to match expocodes above
+                    // order of row nums to match datasetIds above
                     if ( swapped ) {
                         oerlap.addDuplicatePoint(k + 1, j + 1, longitudes[0][j], latitudes[0][j], times[0][j]);
                     }

@@ -278,11 +278,10 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     "\".  Data and WOCE flags were not changed.";
             qcEvent.setComment(comment);
             try {
-                // Add the 'U' QC flag
+                // Add the 'U' QC flag with the current upload version
                 configStore.getDatabaseRequestHandler().addDatasetQCEvent(qcEvent);
                 configStore.getDsgNcFileHandler().updateDatasetQCFlag(qcEvent);
-                // TODO: also need to update version in DSG file
-                // Update the dashboard status for the 'U' QC flag
+                // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 if ( dataset.isEditable() == null ) {
                     dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
@@ -293,8 +292,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 // Should not fail.  If does, record but otherwise ignore the failure.
                 LogManager.getLogger("DashboardServices").error("failed to update QC status for " +
                         datasetId + " after deleting metadata " + deleteFilename +
-                        " from " + datasetId + " for " + username + ": " + ex
-                        .getMessage());
+                        " from " + datasetId + " for " + username + ": " + ex.getMessage());
             }
         }
 
@@ -382,8 +380,35 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public void saveDataColumnSpecs(String username, DashboardDataset newSpecs) throws IllegalArgumentException {
+    public void saveDataColumnSpecs(String pageUsername, DashboardDataset newSpecs) throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
 
+        // Retrieve all the current cruise data
+        DashboardDatasetData dataset = configStore.getDataFileHandler()
+                                                  .getDatasetDataFromFiles(newSpecs.getDatasetId(), 0, -1);
+        if ( !dataset.isEditable() )
+            throw new IllegalArgumentException(newSpecs.getDatasetId() +
+                    " has been submitted for QC; data column types cannot be modified.");
+
+        // Revise the data column types and units
+        if ( newSpecs.getDataColTypes().size() != dataset.getDataColTypes().size() )
+            throw new IllegalArgumentException("Unexpected number of data columns (" +
+                    newSpecs.getDataColTypes().size() + " instead of " + dataset.getDataColTypes().size());
+        dataset.setDataColTypes(newSpecs.getDataColTypes());
+
+        // Save and commit the updated data columns
+        configStore.getDataFileHandler().saveDatasetInfoToFile(dataset,
+                "Data column types, units, and missing values for " + dataset
+                        .getDatasetId() + " updated by " + username);
+        // Update the user-specific data column names to types, units, and missing values
+        configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, username);
+        if ( !username.equals(dataset.getOwner()) )
+            configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, dataset.getOwner());
+
+        LogManager.getLogger("DashboardServices").info("data columns specs saved for " +
+                dataset.getDatasetId() + " by " + username);
     }
 
     @Override
@@ -403,8 +428,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Revise the data column types and units
         if ( newSpecs.getDataColTypes().size() != dataset.getDataColTypes().size() )
             throw new IllegalArgumentException("Unexpected number of data columns (" +
-                    newSpecs.getDataColTypes().size() + " instead of " +
-                    dataset.getDataColTypes().size());
+                    newSpecs.getDataColTypes().size() + " instead of " + dataset.getDataColTypes().size());
         dataset.setDataColTypes(newSpecs.getDataColTypes());
 
         // Run the automated data checker with the updated data types.
@@ -413,8 +437,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // Save and commit the updated data columns
         configStore.getDataFileHandler().saveDatasetInfoToFile(dataset,
-                "Data column types, units, and missing values for " +
-                        dataset.getDatasetId() + " updated by " + username);
+                "Data column types, units, and missing values for " + dataset
+                        .getDatasetId() + " updated by " + username);
         // Update the user-specific data column names to types, units, and missing values
         configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, username);
         if ( !username.equals(dataset.getOwner()) )
@@ -577,4 +601,5 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         LogManager.getLogger("DashboardServices").info("datasets " + idsSet.toString() +
                 " suspended by " + username);
     }
+
 }

@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.io.Serializable;
 
 /**
- * Represents a QC flag. Used for combining, ordering, and searching QC flags for a dataset.
+ * Represents a QC flag for either a dataset or data values.
  *
  * @author Karl Smith
  */
@@ -34,9 +34,14 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     protected Integer rowIndex;
 
     /**
-     * Create with a flagName of {@link DashboardUtils#STRING_MISSING_VALUE}, flagValue of {@link
-     * DashboardUtils#STRING_MISSING_VALUE}, severity of {@link Severity#UNASSIGNED}, column of {@link
-     * DashboardUtils#INT_MISSING_VALUE}, and row of {@link DashboardUtils#INT_MISSING_VALUE}
+     * Create with
+     * <ul>
+     * <li> flagName of {@link DashboardUtils#STRING_MISSING_VALUE}, </li>
+     * <li> flagValue of {@link DashboardUtils#STRING_MISSING_VALUE}, </li>
+     * <li> severity of {@link Severity#UNASSIGNED}, </li>
+     * <li> column of {@link DashboardUtils#INT_MISSING_VALUE}, and </li>
+     * <li> row of {@link DashboardUtils#INT_MISSING_VALUE} </li>
+     * </ul>
      */
     public QCFlag() {
         flagName = DashboardUtils.STRING_MISSING_VALUE;
@@ -47,12 +52,11 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * Create with given flag name, flag value, column index, and row index as described by {@link
-     * #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(QCFlag.Severity)}, {@link
-     * #setColumnIndex(Integer)}, and {@link #setRowIndex(Integer)}.
+     * Create with given values for flag name, flag value, column index, and row index as described by
+     * {@link #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(QCFlag.Severity)},
+     * {@link #setColumnIndex(Integer)}, and {@link #setRowIndex(Integer)}.
      */
-    public QCFlag(String flagName, String flagValue, Severity severity,
-            Integer columnIndex, Integer rowIndex) {
+    public QCFlag(String flagName, String flagValue, Severity severity, Integer columnIndex, Integer rowIndex) {
         setFlagName(flagName);
         setFlagValue(flagValue);
         setSeverity(severity);
@@ -115,8 +119,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the index of the column for this QC flag; never null, but may be {@link DashboardUtils#INT_MISSING_VALUE}
-     * if not assigned
+     * @return the index of the column for this QC flag;
+     *         never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
      */
     public Integer getColumnIndex() {
         return columnIndex;
@@ -124,8 +128,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param columnIndex
-     *         the index of the column to set for this QC flag; if null {@link DashboardUtils#INT_MISSING_VALUE} will be
-     *         assigned
+     *         the index of the column to set for this QC flag;
+     *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
      */
     public void setColumnIndex(Integer columnIndex) {
         if ( columnIndex != null )
@@ -135,8 +139,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the index of the row for this QC flag; never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if
-     * not assigned
+     * @return the index of the row for this QC flag;
+     *         never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
      */
     public Integer getRowIndex() {
         return rowIndex;
@@ -144,8 +148,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param rowIndex
-     *         the index of the row to set for this QC flag; if null {@link DashboardUtils#INT_MISSING_VALUE} will be
-     *         assigned
+     *         the index of the row to set for this QC flag;
+     *         if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
      */
     public void setRowIndex(Integer rowIndex) {
         if ( rowIndex != null )

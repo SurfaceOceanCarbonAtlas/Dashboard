@@ -48,7 +48,7 @@ public class DataFileHandler extends VersionedFileHandler {
     private static final String VERSION_ID = "version";
     private static final String UPLOAD_FILENAME_ID = "uploadfilename";
     private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
-    private static final String ORIG_DOI_ID = "origdoi";
+    private static final String SOURCE_DOI_ID = "sourcedoi";
     private static final String ENHANCED_DOI_ID = "enhanceddoi";
     private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
     private static final String OME_TIMESTAMP_ID = "ometimestamp";
@@ -137,7 +137,7 @@ public class DataFileHandler extends VersionedFileHandler {
      *         expression "[\p{javaUpperCase}\p{Digit}]{1}".
      *
      * @return list of dataset IDs of existing datasets that match the given wildcard dataset ID; never null, but may be
-     * empty
+     *         empty
      *
      * @throws IllegalArgumentException
      *         if wildDatasetId is not a valid dataset ID pattern
@@ -441,7 +441,7 @@ public class DataFileHandler extends VersionedFileHandler {
      *         ID of the dataset to read
      *
      * @return new DashboardDataset assigned from the information file, or null if the dataset information file does not
-     * exist
+     *         exist
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is not valid or if there are problems accessing the information file
@@ -552,8 +552,8 @@ public class DataFileHandler extends VersionedFileHandler {
         // Upload timestamp
         datasetProps.setProperty(UPLOAD_TIMESTAMP_ID, dataset.getUploadTimestamp());
         // DOIs
-        datasetProps.setProperty(ORIG_DOI_ID, dataset.getOrigDoi());
-        datasetProps.setProperty(ENHANCED_DOI_ID, dataset.getEnhancedDoi());
+        datasetProps.setProperty(SOURCE_DOI_ID, dataset.getSourceDOI());
+        datasetProps.setProperty(ENHANCED_DOI_ID, dataset.getEnhancedDOI());
         // Data-check status string
         datasetProps.setProperty(DATA_CHECK_STATUS_ID, dataset.getDataCheckStatus());
         // OME metadata timestamp
@@ -1013,16 +1013,16 @@ public class DataFileHandler extends VersionedFileHandler {
         dataset.setUploadTimestamp(value);
 
         // DOIs
-        value = cruiseProps.getProperty(ORIG_DOI_ID);
+        value = cruiseProps.getProperty(SOURCE_DOI_ID);
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
-                    ORIG_DOI_ID + " given in " + infoFile.getPath());
-        dataset.setOrigDoi(value);
+                    SOURCE_DOI_ID + " given in " + infoFile.getPath());
+        dataset.setSourceDOI(value);
         value = cruiseProps.getProperty(ENHANCED_DOI_ID);
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     ENHANCED_DOI_ID + " given in " + infoFile.getPath());
-        dataset.setEnhancedDoi(value);
+        dataset.setEnhancedDOI(value);
 
         // Data check status
         value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);

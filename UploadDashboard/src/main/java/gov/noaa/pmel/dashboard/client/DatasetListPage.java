@@ -521,7 +521,7 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Assigns datasetsSet with the selected cruises, and datasetIdsSet with the expocodes of these cruises.
+     * Assigns datasetsSet with the selected cruises, and datasetIdsSet with the datasetIds of these cruises.
      *
      * @param onlyEditable
      *         if true, fails if a submitted or published cruise is selected; if false, fails if a published cruise is
@@ -996,28 +996,17 @@ public class DatasetListPage extends CompositeWithUsername {
         ownerColumn.setSortable(true);
 
         // Add a column sorting handler for these columns
-        ListHandler<DashboardDataset> columnSortHandler =
-                new ListHandler<DashboardDataset>(listProvider.getList());
-        columnSortHandler.setComparator(expocodeColumn,
-                DashboardDataset.datasetIdComparator);
-        columnSortHandler.setComparator(timestampColumn,
-                DashboardDataset.timestampComparator);
-        columnSortHandler.setComparator(dataCheckColumn,
-                DashboardDataset.dataCheckComparator);
-        columnSortHandler.setComparator(omeMetadataColumn,
-                DashboardDataset.omeTimestampComparator);
-        columnSortHandler.setComparator(addlDocsColumn,
-                DashboardDataset.addlDocsComparator);
-        columnSortHandler.setComparator(versionColumn,
-                DashboardDataset.versionComparator);
-        columnSortHandler.setComparator(qcStatusColumn,
-                DashboardDataset.qcStatusComparator);
-        columnSortHandler.setComparator(archiveStatusColumn,
-                DashboardDataset.archiveStatusComparator);
-        columnSortHandler.setComparator(filenameColumn,
-                DashboardDataset.filenameComparator);
-        columnSortHandler.setComparator(ownerColumn,
-                DashboardDataset.ownerComparator);
+        ListHandler<DashboardDataset> columnSortHandler = new ListHandler<DashboardDataset>(listProvider.getList());
+        columnSortHandler.setComparator(expocodeColumn, DashboardUtils.dataDatasetIdComparator);
+        columnSortHandler.setComparator(timestampColumn, DashboardUtils.dataTimestampComparator);
+        columnSortHandler.setComparator(dataCheckColumn, DashboardUtils.dataCheckComparator);
+        columnSortHandler.setComparator(omeMetadataColumn, DashboardUtils.omeTimestampComparator);
+        columnSortHandler.setComparator(addlDocsColumn, DashboardUtils.addlDocsComparator);
+        columnSortHandler.setComparator(versionColumn, DashboardUtils.versionComparator);
+        columnSortHandler.setComparator(qcStatusColumn, DashboardUtils.submitStatusComparator);
+        columnSortHandler.setComparator(archiveStatusColumn, DashboardUtils.archiveStatusComparator);
+        columnSortHandler.setComparator(filenameColumn, DashboardUtils.dataFilenameComparator);
+        columnSortHandler.setComparator(ownerColumn, DashboardUtils.dataOwnerComparator);
 
         // Add the sort handler to the table, and set the default sort order
         datasetsGrid.addColumnSortHandler(columnSortHandler);
@@ -1043,7 +1032,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 List<DashboardDataset> cruiseList = listProvider.getList();
                 int k = 0;
                 while ( k < cruiseList.size() ) {
-                    // Only check expocodes since they should be unique
+                    // Only check datasetIds since they should be unique
                     if ( expocode.equals(cruiseList.get(k).getDatasetId()) )
                         break;
                     k++;

@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * A 2-D array of objects corresponding to the standardized values in a dataset, as well as 1-D arrays of information
- * describing each data column.
+ * A 2-D array of objects corresponding to the standardized values in a dataset,
+ * as well as 1-D arrays of information describing each data column.
  *
  * @author Karl Smith
  */
@@ -89,21 +89,22 @@ public class StdDataArray {
     }
 
     /**
-     * Create with the given data file data types for each column and the given standardized data objects for each data
-     * column value (second index) in each sample (first index).  The data types given must be known subclasses of
-     * DashDataType valid for data files: {@link StringDashDataType}, {@link IntDashDataType}, or {@link
-     * DoubleDashDataType}.
+     * Create with the given data file data types for each column and the given standardized data objects
+     * for each data column value (second index) in each sample (first index).  The data types given must
+     * be known subclasses of DashDataType valid for data files: {@link StringDashDataType}, {@link IntDashDataType},
+     * or {@link DoubleDashDataType}.
      *
      * @param dataColumnTypes
      *         types for the data columns in each sample
      * @param stdDataValues
-     *         standard values; the value at stdDataValues[j][k] is the appropriate object for the value of the k-th
-     *         data column in the j-th sample. Missing values correspond to null objects.
+     *         standard values; the value at stdDataValues[j][k] is the appropriate object for the value
+     *         of the k-th data column in the j-th sample. Missing values correspond to null objects.
      *
      * @throws IllegalArgumentException
-     *         if not data column types are given, if a data column type is not a known subclass type, if no data values
-     *         are given, if the number of data columns in the array of data values does not match the number of data
-     *         column types, or if a data value object is not an appropriate object for the data column type
+     *         if not data column types are given, if a data column type is not a known subclass type,
+     *         if no data values are given, if the number of data columns in the array of data values
+     *         does not match the number of data column types, or if a data value object is not an
+     *         appropriate object for the data column type
      */
     public StdDataArray(DashDataType<?>[] dataColumnTypes, Object[][] stdDataValues)
             throws IllegalArgumentException {
@@ -208,7 +209,7 @@ public class StdDataArray {
             throw new IllegalArgumentException("no data values given");
         int numUserColumns = userStdData.getNumDataCols();
 
-        // Check that sample longitude, latitude, depth, and time are present and all valid;
+        // Check that sample longitude, latitude, and time are present and all valid;
         // hang onto the time values for adding to this standardized data
         Double[] timeVals;
         try {
@@ -219,10 +220,6 @@ public class StdDataArray {
             for (Double value : userStdData.getSampleLatitudes()) {
                 if ( value == null )
                     throw new IllegalArgumentException("a latitude value is missing");
-            }
-            for (Double value : userStdData.getSampleDepths()) {
-                if ( value == null )
-                    throw new IllegalArgumentException("a sample depth value is missing");
             }
             timeVals = userStdData.getSampleTimes();
             for (Double value : timeVals) {
@@ -498,9 +495,10 @@ public class StdDataArray {
     }
 
     /**
-     * Computes the fully-specified time, in units of "seconds since 1970-01-01T00:00:00Z" from the standardized date
-     * and time data values that can be found in the data. One of the following combinations of date/time columns must
-     * be given; if more than one time specification is found, the first specification in this list is used.
+     * Computes the fully-specified time, in units of "seconds since 1970-01-01T00:00:00Z" from the standardized
+     * date and time data values that can be found in the data.  One of the following combinations of date/time
+     * columns must be given; if more than one time specification is found, the first specification in this list
+     * is used.
      * <ul>
      * <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE</li>
      * <li>YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
@@ -512,9 +510,10 @@ public class StdDataArray {
      * <li>DATE, HOUR_OF_DAY, MINUTE_OF_HOUR</li>
      * <li>YEAR, DAY_OF_YEAR</li>
      * </ul>
-     * In the formats without seconds, or TIME_OF_DAY values without seconds, the seconds are set to zero.  The logic in
-     * this ordering is the most likely mistake is with the interpretation of a date string (year-month-day,
-     * day-month-year, month-day-year), especially if the user gave years with only the last two digits.
+     * In the formats without seconds, or TIME_OF_DAY values without seconds, the seconds are set to zero.
+     * The logic in this ordering is the most likely mistake is with the interpretation of a date string
+     * (year-month-day, day-month-year, month-day-year), especially if the user gave years with only the
+     * last two digits.
      *
      * @return an array containing the sample times; missing values are null
      *
@@ -534,10 +533,10 @@ public class StdDataArray {
             boolean hasSec = isUsableIndex(secondOfMinuteIndex);
             if ( hasSec )
                 indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex,
-                       hourOfDayIndex, minuteOfHourIndex, secondOfMinuteIndex};
+                        hourOfDayIndex, minuteOfHourIndex, secondOfMinuteIndex };
             else
                 indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex,
-                        hourOfDayIndex, minuteOfHourIndex};
+                        hourOfDayIndex, minuteOfHourIndex };
             for (int j = 0; j < numSamples; j++) {
                 try {
                     int year = ((Integer) stdObjects[j][yearIndex]).intValue();
@@ -571,7 +570,7 @@ public class StdDataArray {
                 isUsableIndex(dayOfMonthIndex) && isUsableIndex(timeOfDayIndex) ) {
             // Use year, month, day, and time string
             // Standard format of time string is HH:mm:ss.SSS
-            indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex, timeOfDayIndex};
+            indicesForTime = new int[] { yearIndex, monthOfYearIndex, dayOfMonthIndex, timeOfDayIndex };
 
             for (int j = 0; j < numSamples; j++) {
                 try {

@@ -319,7 +319,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
             }
         }
 
-        // Create the intro using the ordered expocodes
+        // Create the intro using the ordered datasetIds
         String introMsg = INTRO_HTML_PROLOGUE;
         for (String introItem : cruiseIntros) {
             introMsg += introItem;

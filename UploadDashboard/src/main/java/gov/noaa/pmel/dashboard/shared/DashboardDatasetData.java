@@ -32,7 +32,7 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
 
     /**
      * @return the list of metadata preamble strings; may be empty, but never null. The actual list in this object is
-     * returned.
+     *         returned.
      */
     public ArrayList<String> getPreamble() {
         return preamble;

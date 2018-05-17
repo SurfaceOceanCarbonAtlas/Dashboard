@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * A simple pair of a list of known data column types and a DashboardDatasetData
+ * A simple pair of a list of known data column types and a dataset with its data
  *
  * @author Karl Smith
  */

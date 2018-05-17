@@ -18,8 +18,8 @@ import java.util.TreeSet;
 public class KnownDataTypes {
 
     /**
-     * Map whose keys are both variable name keys and display name keys (see {@link
-     * DashboardServerUtils#getKeyForName(String)} for a data type.
+     * Map whose keys are both variable name keys and display name keys
+     * (see {@link DashboardServerUtils#getKeyForName(String)}) for a data type.
      */
     private HashMap<String,DashDataType<?>> knownTypes;
 
@@ -32,8 +32,8 @@ public class KnownDataTypes {
     }
 
     /**
-     * Adds the given data type to this collection of known data types.  The given instance of the DashDataType is added
-     * to the internal collection of known data types.
+     * Adds the given data type to this collection of known data types.
+     * The given instance of the DashDataType is added to the internal collection of known data types.
      *
      * @param dtype
      *         new data type to add to the known list
@@ -57,9 +57,10 @@ public class KnownDataTypes {
     /**
      * Adds the default well-known data column types for users to select from:
      * <p>
-     * UNASSIGNED, OTHER, DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
-     * SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, TIME_OF_DAY,
-     * HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY
+     * UNASSIGNED, OTHER,
+     * DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
+     * SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
+     * TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY
      * <p>
      * This should be called before adding any custom types.
      *
@@ -96,8 +97,8 @@ public class KnownDataTypes {
      * Adds the default well-known metadata column types for generating the NetCDF DSG files:
      * <p>
      * DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
-     * WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, TIME_COVERAGE_START,
-     * TIME_COVERAGE_END, STATUS, VERSION
+     * WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE,
+     * TIME_COVERAGE_START, TIME_COVERAGE_END, DATASET_QC_FLAG, VERSION
      * <p>
      * This should be called before adding any custom types.
      *
@@ -116,7 +117,7 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.NORTHERNMOST_LATITUDE);
         addDataType(DashboardServerUtils.TIME_COVERAGE_START);
         addDataType(DashboardServerUtils.TIME_COVERAGE_END);
-        addDataType(DashboardServerUtils.STATUS);
+        addDataType(DashboardServerUtils.DATASET_QC_FLAG);
         addDataType(DashboardServerUtils.VERSION);
         return this;
     }
@@ -124,8 +125,8 @@ public class KnownDataTypes {
     /**
      * Adds the default well-known data column types for generating the NetCDF DSG files:
      * <p>
-     * SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY,
-     * MINUTE_OF_HOUR, SECOND_OF_MINUTE, WOCE_AUTOCHECK
+     * SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH, YEAR, MONTH_OF_YEAR,
+     * DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, WOCE_AUTOCHECK
      * <p>
      * This should be called before adding any custom types.
      *
@@ -201,7 +202,7 @@ public class KnownDataTypes {
      *         data column type to use
      *
      * @return data type matching the name in the given data column type, or null if the name does not match that of a
-     * known type
+     *         known type
      */
     public DashDataType<?> getDataType(DataColumnType dctype) {
         DashDataType<?> dtype = getDataType(dctype.getVarName());

@@ -3,7 +3,9 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
@@ -319,10 +321,10 @@ public class SocatCruiseReporter {
 
         // Get the original and SOCAT-enhanced data document DOIs for this cruise
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-        String origDOI = cruise.getOrigDoi();
+        String origDOI = cruise.getSourceDOI();
         if ( origDOI.isEmpty() )
             origDOI = NOT_AVAILABLE_TAG;
-        String socatDOI = cruise.getEnhancedDoi();
+        String socatDOI = cruise.getEnhancedDOI();
         if ( socatDOI.isEmpty() )
             socatDOI = SOCAT_ENHANCED_DOI_TAG;
 
@@ -338,9 +340,9 @@ public class SocatCruiseReporter {
             printDataTableHeader(report, false);
             StdDataArray dataArray = dsgFile.getStdDataArray();
             for (int j = 0; j < dataArray.getNumSamples(); j++) {
-                ArrayList<Object> dataVals = dataArray.get
+                // ArrayList<Object> dataVals =
                 // Reported WOCE-3 might be duplicates, so do not check for duplicates
-                String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo,
+                String tsvdat = dataReportString(dataArray, j, sectimes[j], upperExpo,
                         socatVersion, socatDOI, qcFlag, false, null);
                 if ( !tsvdat.isEmpty() ) {
                     report.println(tsvdat);
@@ -358,7 +360,7 @@ public class SocatCruiseReporter {
      * measurements). If successful, any warnings about the generated report are returned.
      *
      * @param expocodes
-     *         report the data for the cruises with these expocodes
+     *         report the data for the cruises with these datasetIds
      * @param regionID
      *         report only data in the region with this ID; if null, no region restriction is made on the data
      * @param reportFile
@@ -382,7 +384,7 @@ public class SocatCruiseReporter {
         ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
 
         for (String expo : expocodes) {
-            // Get the expocodes, SOCAT version, and QC flags
+            // Get the datasetIds, SOCAT version, and QC flags
             // of the datasets to report (checking region IDs, if appropriate)
             String upperExpo = DashboardServerUtils.checkDatasetID(expo);
             DsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
@@ -398,8 +400,18 @@ public class SocatCruiseReporter {
             if ( regionID != null ) {
                 inRegion = false;
                 dsgFile.readData(knownDataFileTypes);
-                for (StdDataArray dataVals : dsgFile.getStdDataArray()) {
-                    if ( regionID.equals(dataVals.getRegionID()) ) {
+                StdDataArray dataVals = dsgFile.getStdDataArray();
+                int regionIndex = 0;
+                for (DashDataType<?> dtype : dataVals.getDataTypes()) {
+                    if ( (dtype instanceof StringDashDataType) && DashboardServerUtils.REGION_ID.typeNameEquals(dtype) )
+                        break;
+                    regionIndex += 1;
+                }
+                if ( !dataVals.isUsableIndex(regionIndex) )
+                    throw new IOException(DashboardServerUtils.REGION_ID.getVarName() +
+                            " is not defined in the DSG file for " + upperExpo);
+                for (int j = 0; j < dataVals.getNumSamples(); j++) {
+                    if ( regionID.equals(dataVals.getStdVal(j, regionIndex)) ) {
                         Character woceFlag = dataVals.getWoceCO2Water();
                         // Ignore WOCE-3 and WOCE-4 as they are not reported
                         // and may be indicating invalid locations for this cruise
@@ -419,11 +431,11 @@ public class SocatCruiseReporter {
                 socatVersionList.add(socatMeta.getVersion());
                 qcFlagList.add(socatMeta.getQcFlag());
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-                String origDOI = cruise.getOrigDoi();
+                String origDOI = cruise.getSourceDOI();
                 if ( origDOI.isEmpty() )
                     origDOI = NOT_AVAILABLE_TAG;
                 origDOIList.add(origDOI);
-                String socatDOI = cruise.getSocatDoi();
+                String socatDOI = cruise.getEnhancedDOI();
                 if ( socatDOI.isEmpty() )
                     socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 socatDOIList.add(socatDOI);
@@ -454,7 +466,7 @@ public class SocatCruiseReporter {
 
         String regionName;
         if ( regionID != null )
-            regionName = DashboardUtils.REGION_NAMES.get(regionID);
+            regionName = DashboardServerUtils.REGION_NAMES.get(regionID);
         else
             regionName = null;
 
@@ -470,7 +482,7 @@ public class SocatCruiseReporter {
                 String upperExpo = upperExpoList.get(k);
                 String socatVersion = socatVersionList.get(k);
                 String qcFlag = qcFlagList.get(k);
-                String socatDOI = dataHandler.getDatasetFromInfoFile(upperExpo).getSocatDoi();
+                String socatDOI = dataHandler.getDatasetFromInfoFile(upperExpo).getEnhancedDOI();
                 if ( socatDOI.isEmpty() )
                     socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 DsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
@@ -496,7 +508,7 @@ public class SocatCruiseReporter {
                     Character woceFlag = dataVals.getWoceCO2Water();
                     if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
                             woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
-                        String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo,
+                        String tsvdat = dataReportString(dataVals, j, sectimes[j], upperExpo,
                                 socatVersion, socatDOI, qcFlag, true, prevDatPts);
                         if ( !tsvdat.isEmpty() ) {
                             report.println(tsvdat);
@@ -1054,7 +1066,9 @@ public class SocatCruiseReporter {
 
     /**
      * @param dataVals
-     *         data point values to report
+     *         data array of all standardized values
+     * @param rowIndex
+     *         index of the data row to report
      * @param sectime
      *         date/time of this data point in seconds since 01-JAN-1970 00:00:00 UTC
      * @param expocode
@@ -1068,15 +1082,15 @@ public class SocatCruiseReporter {
      * @param multicruise
      *         create the multi-cruise data string (no original-data CO2 measurements) ?
      * @param prevDatPts
-     *         if not null, a set of DataPoint objects for previous datapoints in this dataset.  This method will add
-     *         the current datapoint, if not a duplicate, to this set.
+     *         if not null, a set of DataPoint objects for previous datapoints in this dataset.
+     *         This method will add the current datapoint to this set, and if it duplicates a
+     *         datapoint already added, and empty string is returned.
      *
      * @return tab-separated data values for SOCAT data reporting, or an empty string if this lon/lat/time/fCO2_rec
-     * duplicates that for a previous datapoint.
+     *         duplicates that for a previous datapoint.
      */
-    private static String dataReportString(StdDataArray dataVals,
-            Double sectime, String expocode, String socatVersion,
-            String socatDOI, String cruiseQCFlag, boolean multicruise,
+    private static String dataReportString(StdDataArray dataVals, int rowIndex, Double sectime, String expocode,
+            String socatVersion, String socatDOI, String cruiseQCFlag, boolean multicruise,
             TreeSet<DataPoint> prevDatPts) throws IllegalArgumentException {
 
         if ( prevDatPts != null ) {
@@ -1302,12 +1316,12 @@ public class SocatCruiseReporter {
 
     /**
      * Print the data needed to generate the gridded-data NetCDF files. Only WOCE-2 data with valid fCO2rec values are
-     * printed for the given datasets.  Data is printed in order of expocodes as they are given and the in increasing
+     * printed for the given datasets.  Data is printed in order of datasetIds as they are given and the in increasing
      * time order.  Only one copy of any data points in a dataset with identical valid values for latitude, longitude,
      * time, fCO2rec, and WOCE flag are printed.
      *
      * @param expocodes
-     *         use the data for the datasets with these expocodes
+     *         use the data for the datasets with these datasetIds
      * @param outputFile
      *         print the data to this File
      *

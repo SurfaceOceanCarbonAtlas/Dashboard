@@ -92,7 +92,7 @@ public class DashboardUserInfo {
 
     /**
      * @return true is this user is an admin or a manager of a group (regardless of whether there is anyone else in the
-     * group)
+     *         group)
      */
     public boolean isManager() {
         if ( admin || (managerNums.size() > 0) )

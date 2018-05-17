@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Represents QC of a data variable, in general, for a dataset. Note that the id field is ignored in the hashCode and
- * equals methods.
+ * Represents QC of a data variable, in general, for a dataset.
+ * Note that the id field is ignored in the hashCode and equals methods.
  *
  * @author Karl Smith
  */
@@ -30,9 +30,9 @@ public class QCEvent implements Serializable, IsSerializable {
     protected String comment;
 
     /**
-     * Creates an empty QC event where id is zero, the flag date is {@link DashboardUtils#DATE_MISSING_VALUE}, the
-     * region ID is {@link DashboardUtils#GLOBAL_REGION_ID}, and all other values (strings) are {@link
-     * DashboardUtils#STRING_MISSING_VALUE}.
+     * Creates an empty QC event where id is zero, the flag date is {@link DashboardUtils#DATE_MISSING_VALUE},
+     * the region ID is {@link DashboardUtils#GLOBAL_REGION_ID}, and all other values (strings) are
+     * {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCEvent() {
         id = 0L;
@@ -66,7 +66,8 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the date of the QC flag; never null but may be {@link DashboardUtils#DATE_MISSING_VALUE}
+     * @return the date of the QC flag;
+     *         never null but may be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned
      */
     public Date getFlagDate() {
         return flagDate;
@@ -84,7 +85,7 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the QC flag name; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the QC flag name; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getFlagName() {
         return flagName;
@@ -102,7 +103,7 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the QC flag value; never null, but may be {@link DashboardUtils#CHAR_MISSING_VALUE}
+     * @return the QC flag value; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getFlagValue() {
         return flagValue;
@@ -110,7 +111,7 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * @param flagValue
-     *         the QC flag value to set; if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
+     *         the QC flag value to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setFlagValue(String flagValue) {
         if ( flagValue == null )
@@ -120,7 +121,8 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the ID of the dataset; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the ID of the dataset;
+     *         never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getDatasetId() {
         return datasetId;
@@ -128,7 +130,8 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * @param datasetId
-     *         the ID of the dataset to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the ID of the dataset to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDatasetId(String datasetId) {
         if ( datasetId == null )
@@ -156,7 +159,8 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the data collection version; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the data collection version;
+     *         never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getVersion() {
         return version;
@@ -164,7 +168,8 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * @param version
-     *         the data collection version to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the data collection version to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setVersion(String version) {
         if ( version == null )
@@ -174,7 +179,8 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the reviewer username; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the reviewer username;
+     *         never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getUsername() {
         return username;
@@ -182,7 +188,8 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * @param username
-     *         the reviewer username to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the reviewer username to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setUsername(String username) {
         if ( username == null )
@@ -192,7 +199,8 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the reviewer's actual name; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the reviewer's actual name;
+     *         never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getRealname() {
         return realname;
@@ -200,7 +208,8 @@ public class QCEvent implements Serializable, IsSerializable {
 
     /**
      * @param realname
-     *         the reviewer's actual name to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the reviewer's actual name to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setRealname(String realname) {
         if ( realname == null )
@@ -210,7 +219,7 @@ public class QCEvent implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the comment; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return the comment; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getComment() {
         return comment;

@@ -290,7 +290,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * Creates a new DashboardOmeMetadata from merging, where appropriate, the OME content of this instance with the OME
-     * content of other. The expocodes in other must be the same as in this instance. Fields derived from the data are
+     * content of other. The datasetIds in other must be the same as in this instance. Fields derived from the data are
      * the same as those in this instance.
      *
      * @param other
@@ -299,13 +299,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      * @return new DasboardOmeMetadata with merged content, where appropriate
      *
      * @throws IllegalArgumentException
-     *         if the expocodes in this instance and other do not match
+     *         if the datasetIds in this instance and other do not match
      */
     public DashboardOmeMetadata mergeModifiable(DashboardOmeMetadata other)
             throws IllegalArgumentException {
         OmeMetadata mergedOmeMData;
         try {
-            // Merge the OmeMetadata documents - requires the expocodes be the same
+            // Merge the OmeMetadata documents - requires the datasetIds be the same
             mergedOmeMData = OmeMetadata.merge(this.omeMData, other.omeMData);
 
             // Some fields should not have been merged; reset to the values in this instance

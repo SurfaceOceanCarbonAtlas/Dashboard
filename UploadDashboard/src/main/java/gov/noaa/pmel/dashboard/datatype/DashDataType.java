@@ -194,7 +194,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      *         standardized data from other data columns.
      *
      * @return a value converter, using the given missing value string, for converting the data value strings in the
-     * given units to data values in standard units
+     *         given units to data values in standard units
      *
      * @throws IllegalArgumentException
      *         if there is no converter for performing this conversion
@@ -207,8 +207,6 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     /**
      * Verifies that the values minQuestionVal, minAcceptVal, maxAcceptVal, and maxQuestionVal, for those values that
      * are not null, satisfies the relationship: minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal
-     *
-     * @throws IllegalArgumentException
      */
     protected void validateLimits() throws IllegalArgumentException {
         if ( minAcceptVal != null ) {
@@ -241,7 +239,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      *         standard value to check
      *
      * @return null if the given value is null (missing) or within the acceptable range; otherwise, an message giving
-     * the severity and describing the problem (both general comment and detailed comments are assigned).
+     *         the severity and describing the problem (both general comment and detailed comments are assigned).
      */
     public ADCMessage boundsCheckStandardValue(T stdVal) {
         // If the value is missing, make no comment
@@ -347,7 +345,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
     /**
      * @return a copy of the units associated with this data type; never null or empty, but may only contain {@link
-     * DashboardUtils#STRING_MISSING_VALUE}.
+     *         DashboardUtils#STRING_MISSING_VALUE}.
      */
     public ArrayList<String> getUnits() {
         return new ArrayList<String>(units);
@@ -355,7 +353,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
     /**
      * @return name of the standard unit (corresponding to the first unit in the unit array) to be used as the unit
-     * string in DSG files; never null
+     *         string in DSG files; never null
      */
     public String getFileStdUnit() {
         return fileStdUnit;

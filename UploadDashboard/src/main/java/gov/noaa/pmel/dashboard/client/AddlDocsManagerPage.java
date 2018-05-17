@@ -39,7 +39,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -458,14 +457,10 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         datasetIdColumn.setSortable(true);
 
         // Add a column sorting handler for these columns
-        ListHandler<DashboardMetadata> columnSortHandler =
-                new ListHandler<DashboardMetadata>(listProvider.getList());
-        columnSortHandler.setComparator(filenameColumn,
-                DashboardMetadata.filenameComparator);
-        columnSortHandler.setComparator(uploadTimeColumn,
-                DashboardMetadata.uploadTimestampComparator);
-        columnSortHandler.setComparator(datasetIdColumn,
-                DashboardMetadata.datasetIdComparator);
+        ListHandler<DashboardMetadata> columnSortHandler = new ListHandler<DashboardMetadata>(listProvider.getList());
+        columnSortHandler.setComparator(filenameColumn, DashboardUtils.metaFilenameComparator);
+        columnSortHandler.setComparator(uploadTimeColumn, DashboardUtils.metaTimestampComparator);
+        columnSortHandler.setComparator(datasetIdColumn, DashboardUtils.metaDatasetIdComparator);
 
         // Add the sort handler to the table, and sort by filename, then dataset by default
         addlDocsGrid.addColumnSortHandler(columnSortHandler);

@@ -74,7 +74,8 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * @return the longitude in the range [-180.0, 180.0) never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+     * @return the longitude in the range [-180.0, 180.0);
+     *         never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getLongitude() {
         return longitude;
@@ -82,8 +83,8 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
 
     /**
      * @param longitude
-     *         the longitude to set, which will be adjust the range [-180.0, 180.0); if null, {@link
-     *         DashboardUtils#FP_MISSING_VALUE} is assigned.
+     *         the longitude to set, which will be adjust the range [-180.0, 180.0);
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
      */
     public void setLongitude(Double longitude) {
         if ( longitude == null ) {
@@ -155,10 +156,19 @@ public class DataLocation implements Comparable<DataLocation>, Serializable, IsS
     }
 
     /**
-     * Compares in the order: (1) date (2) longitude (3) latitude (4) depth (5) data value (6) row number All
-     * comparisons are made using the compareTo method of each type (Date, Double, Integer), and as such do not account
-     * for longitude modulo or insignificant floating-point differences as is done in the {@link #equals(Object)}
-     * method.  Missing values are compared using their actual value (which should be low).
+     * Compares in the order:
+     * <ol>
+     * <li>date</li>
+     * <li>longitude</li>
+     * <li>latitude</li>
+     * <li>depth</li>
+     * <li>data value</li>
+     * <li>row number</li>
+     * </ol>
+     * All comparisons are made using the compareTo method of each type (Date, Double, Integer),
+     * and as such do not account for longitude modulo or insignificant floating-point differences
+     * as is done in the {@link #equals(Object)} method.  Missing values are compared using their
+     * actual value (which should be low).
      */
     @Override
     public int compareTo(DataLocation other) {

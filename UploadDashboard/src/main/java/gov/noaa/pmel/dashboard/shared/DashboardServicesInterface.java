@@ -234,7 +234,7 @@ public interface DashboardServicesInterface extends RemoteService {
      *         get data messages for this dataset
      *
      * @return list of data messages for the dataset; never null, but may be empty if the automated data checker did not
-     * generate any data messages.
+     *         generate any data messages.
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, or if the automated data checker has never been run on this cruise.

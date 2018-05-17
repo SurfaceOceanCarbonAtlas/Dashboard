@@ -96,7 +96,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the variable name for this data column type; never null but may be {@link
-     * DashboardUtils#STRING_MISSING_VALUE}
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getVarName() {
         return varName;
@@ -118,7 +118,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the sort order value for this data column type; never null but may be {@link
-     * DashboardUtils#FP_MISSING_VALUE}
+     *         DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getSortOrder() {
         return sortOrder;
@@ -140,7 +140,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the displayed name for this data column type; never null but may be {@link
-     * DashboardUtils#STRING_MISSING_VALUE}
+     *         DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDisplayName() {
         return displayName;
@@ -196,7 +196,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the units associated with this data column type; never null or empty, but may only contain {@link
-     * DashboardUtils#STRING_MISSING_VALUE}. The actual ArrayList in this object is returned.
+     *         DashboardUtils#STRING_MISSING_VALUE}. The actual ArrayList in this object is returned.
      */
     public ArrayList<String> getUnits() {
         return units;
@@ -218,7 +218,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the index in the units list of the selected unit; if the index is not valid for the current list of
-     * units, zero is returned
+     *         units, zero is returned
      */
     public Integer getSelectedUnitIndex() {
         if ( (selectedUnitIndex < 0) || (selectedUnitIndex >= units.size()) )
@@ -260,7 +260,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return the selected missing value, as a string. A value of {@link DashboardUtils#STRING_MISSING_VALUE} is to be
-     * interpreted as the default missing values.
+     *         interpreted as the default missing values.
      */
     public String getSelectedMissingValue() {
         return selectedMissingValue;
@@ -281,7 +281,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @return a deep of this data column type instance in which copies are made of any mutable data (namely, the list
-     * of units).
+     *         of units).
      */
     public DataColumnType duplicate() {
         DataColumnType dup = new DataColumnType(varName, sortOrder, displayName,

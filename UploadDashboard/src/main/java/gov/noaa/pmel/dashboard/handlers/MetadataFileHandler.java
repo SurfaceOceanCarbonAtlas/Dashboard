@@ -42,7 +42,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
     private static final String METADATA_OWNER_ID = "metadataowner";
     private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
     private static final String METADATA_VERSION_ID = "metadataversion";
-    private static final String METADATA_DOI_ID = "metadatadoi";
 
     private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
@@ -277,7 +276,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         IllegalArgumentException is raised
      *
      * @return a DashboardMetadata describing the new or updated metadata document copied from the another cruise; never
-     * null
+     *         null
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, if the metadata document to be copied does not exist, if there were
@@ -501,7 +500,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         name of the metadata document
      *
      * @return DashboardMetadata assigned from the properties file for the given metadata document.  If the properties
-     * file does not exist, null is returned.
+     *         file does not exist, null is returned.
      *
      * @throws IllegalArgumentException
      *         if dataset ID or metaname is invalid, or if there were problems reading from the properties file
@@ -537,8 +536,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
         metadata.setConflicted(Boolean.valueOf(value));
         value = metaProps.getProperty(METADATA_VERSION_ID);
         metadata.setVersion(value);
-        value = metaProps.getProperty(METADATA_DOI_ID);
-        metadata.setDOI(value);
 
         return metadata;
     }
@@ -585,7 +582,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
         metaProps.setProperty(METADATA_OWNER_ID, metadata.getOwner());
         metaProps.setProperty(METADATA_CONFLICTED_ID, Boolean.toString(metadata.isConflicted()));
         metaProps.setProperty(METADATA_VERSION_ID, metadata.getVersion());
-        metaProps.setProperty(METADATA_DOI_ID, metadata.getDOI());
         // Save the properties to the metadata properties file
         try {
             FileWriter propsWriter = new FileWriter(propsFile);

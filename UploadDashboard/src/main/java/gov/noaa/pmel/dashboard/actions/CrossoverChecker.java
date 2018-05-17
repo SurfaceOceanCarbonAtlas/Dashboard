@@ -15,8 +15,8 @@ import java.util.ArrayList;
 
 /**
  * Checks for high-quality crossovers between datasets.  High-quality crossovers are desirable coincidental
- * near-overlaps of location, time, and some other properties found in datasets from different platforms (different NODC
- * codes).
+ * near-overlaps of location, time, and some other properties found in datasets from different platforms
+ * (different NODC codes).
  *
  * @author Karl Smith
  */
@@ -35,17 +35,19 @@ public class CrossoverChecker {
     }
 
     /**
-     * Checks for high-quality crossovers between two cruises. Always reads the data for both cruises, so for a one-time
+     * Checks for high-quality crossovers between two cruises. Always reads the data for both cruises, so for a
+     * one-time
      * pair check.  If checking a cruise against many other cruises, use the {@link #getCrossovers(String, Iterable,
-     * PrintStream, long)} method with expocodes of cruises that potentially could have a crossover with the cruise from
+     * PrintStream, long)} method with datasetIds of cruises that potentially could have a crossover with the cruise
+     * from
      * the data time and latitude minimums and maximums, and assign the data time minimums and maximums to those
      * crossovers found.
      *
      * @param expocodes
-     *         the expocodes of the two cruises to examine
+     *         the datasetIds of the two cruises to examine
      *
      * @return null if no high-quality crossovers were found, or the closest high-quality crossover between the two
-     * cruises. The crossover returned will be fully assigned.
+     *         cruises. The crossover returned will be fully assigned.
      *
      * @throws IllegalArgumentException
      *         if either expocode is invalid
@@ -58,7 +60,7 @@ public class CrossoverChecker {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         if ( (expocodes == null) || (expocodes.length != 2) ||
                 (expocodes[0] == null) || (expocodes[1] == null) )
-            throw new IllegalArgumentException("Invalid expocodes given to checkForCrossover");
+            throw new IllegalArgumentException("Invalid datasetIds given to checkForCrossover");
         String[] upperExpos = new String[] { DashboardServerUtils.checkDatasetID(expocodes[0]),
                 DashboardServerUtils.checkDatasetID(expocodes[1]) };
         // Check that the NODC codes are different - crossovers must be between different instruments
@@ -118,7 +120,7 @@ public class CrossoverChecker {
         // Check for a crossover
         Crossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
         if ( crossover != null ) {
-            // crossover found; add the expocodes, dataMinTimes, and dataMaxTimes
+            // crossover found; add the datasetIds, dataMinTimes, and dataMaxTimes
             crossover.setDatasetIds(upperExpos);
             crossover.setDatasetMinTimes(dataMinTimes);
             crossover.setDatasetMaxTimes(dataMaxTimes);
@@ -137,7 +139,7 @@ public class CrossoverChecker {
      * @param expocode
      *         the expocode of the primary cruises to examine
      * @param checkExpos
-     *         expocodes of cruises to check for crossovers with the primary cruise
+     *         datasetIds of cruises to check for crossovers with the primary cruise
      * @param progressPrinter
      *         if not null, progress messages with timings are printed using this
      * @param progStartMilliTime
@@ -145,7 +147,7 @@ public class CrossoverChecker {
      *         if progressWriter is not null
      *
      * @return the list of crossovers found; never null but may empty. The crossovers in the list will not have the
-     * cruiseMinTimes and cruiseMaxTimes assigned.
+     *         cruiseMinTimes and cruiseMaxTimes assigned.
      *
      * @throws IllegalArgumentException
      *         if any expocode is invalid
@@ -210,7 +212,7 @@ public class CrossoverChecker {
             // Check for a crossover
             Crossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
             if ( crossover != null ) {
-                // crossover found; add the expocodes (only the values in the array are used)
+                // crossover found; add the datasetIds (only the values in the array are used)
                 crossover.setDatasetIds(upperExpos);
                 crossList.add(crossover);
                 if ( progressPrinter != null ) {
@@ -244,8 +246,8 @@ public class CrossoverChecker {
      *         the fCO2_recommended values of the data for the two cruises
      *
      * @return null if no high-quality crossovers were found, or the closest high-quality crossover between the two
-     * cruises; the expocodes, cruiseMinTimes, and cruiseMaxTimes will not have been assigned in the returned
-     * crossover.
+     *         cruises; the datasetIds, cruiseMinTimes, and cruiseMaxTimes will not have been assigned in the returned
+     *         crossover.
      *
      * @throws IllegalArgumentException
      *         if any of the arguments do not have length 2, if any of the arguments or argument array values are null,

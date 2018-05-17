@@ -910,7 +910,7 @@ public class DashboardConfigStore {
      *         name of the user
      *
      * @return true is this user is an admin or a manager of a group (regardless of whether there is anyone else in the
-     * group)
+     *         group)
      */
     public boolean isManager(String username) {
         DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));

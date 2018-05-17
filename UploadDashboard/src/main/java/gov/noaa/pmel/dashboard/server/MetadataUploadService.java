@@ -118,10 +118,9 @@ public class MetadataUploadService extends HttpServlet {
 
         // Verify page contents seem okay
         DashboardConfigStore configStore = DashboardConfigStore.get(true);
-        if ( (username == null) || (datasetIds == null) || (uploadTimestamp == null) ||
-                (omeIndicator == null) || (metadataItem == null) ||
-                (!(omeIndicator.equals("false") || omeIndicator.equals("true"))) ||
-                !configStore.validateUser(username) ) {
+        if ( (username == null) || (datasetIds == null) || (uploadTimestamp == null) || (omeIndicator == null) ||
+             (metadataItem == null) || ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) ||
+             ! configStore.validateUser(username) ) {
             if ( metadataItem != null )
                 metadataItem.delete();
             sendErrMsg(response, "Invalid request contents for this service.");
@@ -153,9 +152,9 @@ public class MetadataUploadService extends HttpServlet {
         else {
             uploadFilename = DashboardUtils.baseName(metadataItem.getName());
             if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
-                    uploadFilename.equals(DashboardUtils.OME_PDF_FILENAME) ||
-                    uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ||
-                    uploadFilename.equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
+                 uploadFilename.equals(DashboardUtils.OME_PDF_FILENAME) ||
+                 uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ||
+                 uploadFilename.equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
                 metadataItem.delete();
                 sendErrMsg(response, "Name of the uploaded file cannot be " +
                         DashboardUtils.OME_FILENAME +
@@ -171,9 +170,8 @@ public class MetadataUploadService extends HttpServlet {
             try {
                 // Save the metadata document for this cruise
                 if ( metadata == null ) {
-                    metadata = metadataHandler.saveMetadataFileItem(id,
-                            username, uploadTimestamp, uploadFilename, version,
-                            metadataItem);
+                    metadata = metadataHandler.saveMetadataFileItem(id, username, uploadTimestamp,
+                            uploadFilename, version, metadataItem);
                 }
                 else {
                     metadata = metadataHandler.copyMetadataFile(id, metadata, true);
@@ -194,8 +192,8 @@ public class MetadataUploadService extends HttpServlet {
                         // This is using the PI OME XML file at this time
                         omePdfGenerator.createPiOmePdf(id);
                     } catch ( Exception ex ) {
-                        throw new IllegalArgumentException(
-                                "Unable to create the PDF from the OME XML: " + ex.getMessage());
+                        throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " +
+                                ex.getMessage());
                     }
                 }
                 else {
@@ -217,8 +215,8 @@ public class MetadataUploadService extends HttpServlet {
     }
 
     /**
-     * Returns an error message in the given Response object. The response number is still 200 (SC_OK) so the message
-     * goes through cleanly.
+     * Returns an error message in the given Response object.
+     * The response number is still 200 (SC_OK) so the message goes through cleanly.
      *
      * @param response
      *         write the error message here

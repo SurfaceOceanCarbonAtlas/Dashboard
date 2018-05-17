@@ -251,24 +251,15 @@ public class DataMessagesPage extends CompositeWithUsername {
         explanationColumn.setSortable(true);
 
         // Add a column sorting handler for these columns
-        ListHandler<ADCMessage> columnSortHandler =
-                new ListHandler<ADCMessage>(listProvider.getList());
-        columnSortHandler.setComparator(severityColumn,
-                ADCMessage.severityComparator);
-        columnSortHandler.setComparator(colNumColumn,
-                ADCMessage.colNumComparator);
-        columnSortHandler.setComparator(colNameColumn,
-                ADCMessage.colNameComparator);
-        columnSortHandler.setComparator(rowNumColumn,
-                ADCMessage.rowNumComparator);
-        columnSortHandler.setComparator(timestampColumn,
-                ADCMessage.timestampComparator);
-        columnSortHandler.setComparator(longitudeColumn,
-                ADCMessage.longitudeComparator);
-        columnSortHandler.setComparator(latitudeColumn,
-                ADCMessage.latitudeComparator);
-        columnSortHandler.setComparator(explanationColumn,
-                ADCMessage.explanationComparator);
+        ListHandler<ADCMessage> columnSortHandler = new ListHandler<ADCMessage>(listProvider.getList());
+        columnSortHandler.setComparator(severityColumn, DashboardUtils.severityComparator);
+        columnSortHandler.setComparator(colNumColumn, DashboardUtils.colNumComparator);
+        columnSortHandler.setComparator(colNameColumn, DashboardUtils.colNameComparator);
+        columnSortHandler.setComparator(rowNumColumn, DashboardUtils.rowNumComparator);
+        columnSortHandler.setComparator(timestampColumn, DashboardUtils.timestampComparator);
+        columnSortHandler.setComparator(longitudeColumn, DashboardUtils.longitudeComparator);
+        columnSortHandler.setComparator(latitudeColumn, DashboardUtils.latitudeComparator);
+        columnSortHandler.setComparator(explanationColumn, DashboardUtils.explanationComparator);
 
         // Add the sort handler to the table, setting the default sorting
         // first by severity, then column number, and finally row number

@@ -66,7 +66,8 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
     }
 
     /**
-     * @return the summary messages; never null but may be empty. The actual list contained in this object is returned.
+     * @return the summary messages; never null but may be empty.
+     *         The actual list contained in this object is returned.
      */
     public ArrayList<String> getSummaries() {
         return summaries;
@@ -74,8 +75,8 @@ public class ADCMessageList extends HashSet<ADCMessage> implements Serializable,
 
     /**
      * @param summaries
-     *         the summary messages to assign.  The current list of summary messages is cleared, and then the contents
-     *         of this list, if not null, are added to the list.
+     *         the summary messages to assign.  The current list of summary messages is cleared,
+     *         and then the contents of this list, if not null, are added to the list.
      */
     public void setSummaries(ArrayList<String> summaries) {
         this.summaries.clear();

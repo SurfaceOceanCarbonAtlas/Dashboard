@@ -109,7 +109,7 @@ public abstract class ValueConverter<T> {
      *         the string representation of the data value in the input unit/format
      *
      * @return null if the string representation matches a missing value; otherwise, the data value convert to the
-     * output unit/format
+     *         output unit/format
      *
      * @throws IllegalArgumentException
      *         if the given value is null, or if the given string cannot be interpreted

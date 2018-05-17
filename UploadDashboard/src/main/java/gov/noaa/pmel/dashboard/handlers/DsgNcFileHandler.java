@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,12 +59,11 @@ public class DsgNcFileHandler {
      *         configuration document for running Ferret
      *
      * @throws IllegalArgumentException
-     *         if the specified DSG directories, or the parent directories of the ERDDAP flag files, do not exist or are
-     *         not directories
+     *         if the specified DSG directories, or the parent directories of the ERDDAP flag files,
+     *         do not exist or are not directories
      */
-    public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
-            String erddapDsgFlagFileName, String erddapDecDsgFlagFileName,
-            FerretConfig ferretConf, KnownDataTypes knownUserDataTypes,
+    public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName, String erddapDsgFlagFileName,
+            String erddapDecDsgFlagFileName, FerretConfig ferretConf, KnownDataTypes knownUserDataTypes,
             KnownDataTypes knownMetadataTypes, KnownDataTypes knownDataFileTypes) {
         dsgFilesDir = new File(dsgFilesDirName);
         if ( !dsgFilesDir.isDirectory() )
@@ -74,13 +74,13 @@ public class DsgNcFileHandler {
         erddapDsgFlagFile = new File(erddapDsgFlagFileName);
         File parentDir = erddapDsgFlagFile.getParentFile();
         if ( (parentDir == null) || !parentDir.isDirectory() )
-            throw new IllegalArgumentException("parent directory of " +
-                    erddapDsgFlagFile.getPath() + " is not valid");
+            throw new IllegalArgumentException("parent directory of " + erddapDsgFlagFile.getPath() +
+                    " is not valid");
         erddapDecDsgFlagFile = new File(erddapDecDsgFlagFileName);
         parentDir = erddapDecDsgFlagFile.getParentFile();
         if ( (parentDir == null) || !parentDir.isDirectory() )
-            throw new IllegalArgumentException("parent directory of " +
-                    erddapDecDsgFlagFile.getPath() + " is not valid");
+            throw new IllegalArgumentException("parent directory of " + erddapDecDsgFlagFile.getPath() +
+                    " is not valid");
         ferretConfig = ferretConf;
         this.knownUserDataTypes = knownUserDataTypes;
         this.knownMetadataTypes = knownMetadataTypes;
@@ -128,8 +128,8 @@ public class DsgNcFileHandler {
     }
 
     /**
-     * Generates the decimated NetCDF DSG abstract file for a dataset. Creates the parent subdirectory if it does not
-     * exist. The decimated NetCDF DSG file should only be created using {@link #decimateDatasetDsg(String)}.
+     * Generates the decimated NetCDF DSG abstract file for a dataset.  Creates the parent subdirectory if it does not
+     * exist.  The decimated NetCDF DSG file should only be created using {@link #decimateDatasetDsg(String)}.
      *
      * @param datasetId
      *         ID of the dataset
@@ -168,11 +168,10 @@ public class DsgNcFileHandler {
      *         dataset with data to save
      *
      * @throws IllegalArgumentException
-     *         if there are problems with the metadata or data given, or if there are problems creating or writing the
-     *         full-data DSG file
+     *         if there are problems with the metadata or data given, or
+     *         if there are problems creating or writing the full-data DSG file
      */
-    public void saveDatasetDsg(DsgMetadata metadata, DashboardDatasetData dataset)
-            throws IllegalArgumentException {
+    public void saveDatasetDsg(DsgMetadata metadata, DashboardDatasetData dataset) throws IllegalArgumentException {
         // Get the location and name for the NetCDF DSG file
         DsgNcFile dsgFile = getDsgNcFile(dataset.getDatasetId());
 
@@ -195,8 +194,7 @@ public class DsgNcFileHandler {
         tool.init(scriptArgs, dataset.getDatasetId(), FerretConfig.Action.COMPUTE);
         tool.run();
         if ( tool.hasError() )
-            throw new IllegalArgumentException("Failure adding computed variables: " +
-                    tool.getErrorMessage());
+            throw new IllegalArgumentException("Failure adding computed variables: " + tool.getErrorMessage());
     }
 
     /**
@@ -208,8 +206,8 @@ public class DsgNcFileHandler {
      *         generate the decimated-data DSG file for the dataset with this ID
      *
      * @throws IllegalArgumentException
-     *         if there are problems reading the full-data DSG file, or if there are problems creating or writing the
-     *         decimated-data DSG file
+     *         if there are problems reading the full-data DSG file, or
+     *         if there are problems creating or writing the decimated-data DSG file
      */
     public void decimateDatasetDsg(String datasetId) throws IllegalArgumentException {
         // Get the location and name of the full DSG file
@@ -229,13 +227,12 @@ public class DsgNcFileHandler {
         tool.init(scriptArgs, datasetId, FerretConfig.Action.DECIMATE);
         tool.run();
         if ( tool.hasError() )
-            throw new IllegalArgumentException("Failure decimating the full DSG file: " +
-                    tool.getErrorMessage());
+            throw new IllegalArgumentException("Failure decimating the full DSG file: " + tool.getErrorMessage());
     }
 
     /**
-     * Appropriately renames any DSG and decimated DSG files, if they exist, for a change in dataset ID.  Changes the
-     * dataset ID in the DSG files.
+     * Appropriately renames any DSG and decimated DSG files, if they exist, for a change in dataset ID.
+     * Changes the dataset ID in the DSG files.
      *
      * @param oldId
      *         standardized old ID for the dataset
@@ -243,22 +240,20 @@ public class DsgNcFileHandler {
      *         standardized new ID for the dataset
      *
      * @throws IllegalArgumentException
-     *         if a DSG or decimated DSG file for the new ID already exists, or if the contents of the old DSG file are
-     *         invalid
+     *         if a DSG or decimated DSG file for the new ID already exists, or
+     *         if the contents of the old DSG file are invalid
      * @throws IOException
-     *         if unable to regenerate the DSG or decimated DSG file with the new ID from the data and metadata in the
-     *         old DSG file, or if unable to delete the old DSG or decimated DSG file
+     *         if unable to regenerate the DSG or decimated DSG file with the new ID from the data
+     *         and metadata in the old DSG file, or if unable to delete the old DSG or decimated DSG file
      */
     public void renameDsgFiles(String oldId, String newId) throws IllegalArgumentException, IOException {
         DsgNcFile newDsgFile = getDsgNcFile(newId);
         if ( newDsgFile.exists() )
-            throw new IllegalArgumentException(
-                    "DSG file for " + oldId + " already exist");
+            throw new IllegalArgumentException("DSG file for " + oldId + " already exist");
 
         DsgNcFile newDecDsgFile = getDecDsgNcFile(newId);
         if ( newDecDsgFile.exists() )
-            throw new IllegalArgumentException(
-                    "Decimated DSG file for " + oldId + " already exist");
+            throw new IllegalArgumentException("Decimated DSG file for " + oldId + " already exist");
 
         DsgNcFile oldDsgFile = getDsgNcFile(oldId);
         if ( oldDsgFile.exists() ) {
@@ -281,8 +276,8 @@ public class DsgNcFileHandler {
                 tool.init(scriptArgs, newId, FerretConfig.Action.COMPUTE);
                 tool.run();
                 if ( tool.hasError() )
-                    throw new IllegalArgumentException(newId +
-                            ": Failure adding computed variables: " + tool.getErrorMessage());
+                    throw new IllegalArgumentException(newId + ": Failure adding computed variables: " +
+                            tool.getErrorMessage());
                 // Re-create the decimated-data DSG file
                 decimateDatasetDsg(newId);
                 // Delete the old DSG and decimated-data DSG files
@@ -299,9 +294,9 @@ public class DsgNcFileHandler {
     }
 
     /**
-     * Deletes the DSG and decimated DSG files, if they exist, for a dataset. If a file was deleted, true is returned
-     * and ERDDAP will need to be notified of changes to the DSG and decimated DSG files.  This notification is not done
-     * in this routine so that a single notification event can be made after multiple modifications.
+     * Deletes the DSG and decimated DSG files, if they exist, for a dataset.  If a file was deleted, true is returned
+     * and ERDDAP will need to be notified of changes to the DSG and decimated DSG files.  This notification is not
+     * done in this routine so that a single notification event can be made after multiple modifications.
      *
      * @param datasetId
      *         delete the DSG and decimated DSG files for the dataset with this ID
@@ -316,15 +311,13 @@ public class DsgNcFileHandler {
         File dsgFile = getDsgNcFile(datasetId);
         if ( dsgFile.exists() ) {
             if ( !dsgFile.delete() )
-                throw new IllegalArgumentException("Unable to delete the DSG file for " +
-                        datasetId);
+                throw new IllegalArgumentException("Unable to delete the DSG file for " + datasetId);
             fileDeleted = true;
         }
         File decDsgFile = getDecDsgNcFile(datasetId);
         if ( decDsgFile.exists() ) {
             if ( !decDsgFile.delete() )
-                throw new IllegalArgumentException("Unable to delete the decimated DSG file for " +
-                        datasetId);
+                throw new IllegalArgumentException("Unable to delete the decimated DSG file for " + datasetId);
             fileDeleted = true;
         }
         return fileDeleted;
@@ -357,9 +350,9 @@ public class DsgNcFileHandler {
     }
 
     /**
-     * Reads and returns the array of data values for the specified variable contained in the DSG file for the specified
-     * dataset.  The variable must be saved in the DSG file as Strings.  For some variables, the DSG file must have been
-     * processed by Ferret for the data values to be meaningful.
+     * Reads and returns the array of data values for the specified variable contained in the DSG file
+     * for the specified dataset.  The variable must be saved in the DSG file as Strings.  For some
+     * variables, the DSG file must have been processed by Ferret for the data values to be meaningful.
      *
      * @param datasetId
      *         get the data values for the dataset with this ID
@@ -379,15 +372,14 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " +
-                    datasetId + " does not exist");
+            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
         return dsgFile.readStringVarDataValues(varName);
     }
 
     /**
-     * Reads and returns the array of data values for the specified variable contained in the DSG file for the specified
-     * dataset.  The variable must be saved in the DSG file as integers.  For some variables, the DSG file must have
-     * been processed by Ferret for the data values to be meaningful.
+     * Reads and returns the array of data values for the specified variable contained in the DSG file
+     * for the specified dataset.  The variable must be saved in the DSG file as integers.  For some
+     * variables, the DSG file must have been processed by Ferret for the data values to be meaningful.
      *
      * @param datasetId
      *         get the data values for the dataset with this ID
@@ -407,16 +399,15 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " +
-                    datasetId + " does not exist");
+            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
         return dsgFile.readIntVarDataValues(varName);
     }
 
     /**
-     * Reads and returns the array of data values for the specified variable contained in the full-data DSG file for the
-     * specified dataset.  The variable must be saved in the DSG file as doubles.  NaN and infinite values are changed
-     * to {@link DashboardUtils#FP_MISSING_VALUE}.  For some variables, the DSG file must have been processed by Ferret
-     * for the data values to be meaningful.
+     * Reads and returns the array of data values for the specified variable contained in the full-data DSG file
+     * for the specified dataset.  The variable must be saved in the DSG file as doubles.  NaN and infinite values
+     * are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  For some variables, the DSG file must have been
+     * processed by Ferret for the data values to be meaningful.
      *
      * @param datasetId
      *         get the data values for the dataset with this ID
@@ -436,21 +427,21 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " +
-                    datasetId + " does not exist");
+            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
         return dsgFile.readDoubleVarDataValues(varName);
     }
 
     /**
-     * Reads and returns the longitudes, latitudes, and times contained in the
-     * full-data DSG file for the specified cruise.  NaN and infinite values
-     * are changed to {@link DashboardUtils#FP_MISSING_VALUE}.
+     * Reads and returns the longitudes, latitudes, and times contained in the full-data DSG file
+     * for the specified dataset.  NaN and infinite values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.
      *
-     * @param expocode
+     * @param datasetId
      *         get the data values for the cruise with this expocode
+     *
      * @return the array { lons, lats, times } from the full-data DSG file,
-     * where lons are the array of longitudes, lats are the array of latitudes,
-     * times are the array of times.
+     *         where lons are the array of longitudes, lats are the array of latitudes,
+     *         times are the array of times.
+     *
      * @throws IllegalArgumentException
      *         if the expocode is invalid
      * @throws FileNotFoundException
@@ -459,27 +450,28 @@ public class DsgNcFileHandler {
      *         if problems opening or reading from the DSG file, or
      *         if any of the data arrays are not given in the DSG file
      */
-    public double[][] readLonLatTimeDataValues(String expocode)
+    public double[][] readLonLatTimeDataValues(String datasetId)
             throws IllegalArgumentException, FileNotFoundException, IOException {
-        DsgNcFile dsgFile = getDsgNcFile(expocode);
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + expocode + " does not exist");
+            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
         return dsgFile.readLonLatTimeDataValues();
     }
 
     /**
-     * Reads and returns the longitudes, latitudes, times, SST values, and
-     * fCO2_recommended values contained in the full-data DSG file for the
-     * specified cruise.  NaN and infinite values are changed to
+     * Reads and returns the longitudes, latitudes, times, SST values, and fCO2_recommended values contained
+     * in the full-data DSG file for the specified dataset.  NaN and infinite values are changed to
      * {@link DashboardUtils#FP_MISSING_VALUE}.  The full-data DSG file must
      * have been processed by Ferret for the fCO2_recommended values to be meaningful.
      *
-     * @param expocode
+     * @param datasetId
      *         get the data values for the dataset with this ID
+     *
      * @return the array { lons, lats, times, ssts, fco2s } from the full-data DSG file,
-     * where lons are the array of longitudes, lats are the array of latitudes,
-     * times are the array of times, ssts are the array of SST values, and
-     * fco2s are the array of fCO2_recommended values.
+     *         where lons are the array of longitudes, lats are the array of latitudes,
+     *         times are the array of times, ssts are the array of SST values, and
+     *         fco2s are the array of fCO2_recommended values.
+     *
      * @throws IllegalArgumentException
      *         if the expocode is invalid
      * @throws FileNotFoundException
@@ -488,12 +480,38 @@ public class DsgNcFileHandler {
      *         if problems opening or reading from the DSG file, or
      *         if any of the data arrays are not given in the DSG file
      */
-    public double[][] readLonLatTimeSstFco2DataValues(String expocode)
+    public double[][] readLonLatTimeSstFco2DataValues(String datasetId)
             throws IllegalArgumentException, FileNotFoundException, IOException {
-        DsgNcFile dsgFile = getDsgNcFile(expocode);
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + expocode + " does not exist");
+            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
         return dsgFile.readLonLatTimeSstFco2DataValues();
+    }
+
+    /**
+     * Updates the dataset QC flag and version number in the full-data and decimated-data DSG files
+     * for a dataset.  Flags ERDDAP after making these updates.
+     *
+     * @param qcEvent
+     *         get the dataset ID, dataset QC flag, and version number to assign from this QC event
+     *
+     * @throws IllegalArgumentException
+     *         if the DSG files are not valid
+     * @throws IOException
+     *         if problems opening or writing to a DSG file
+     */
+    public void updateDatasetQCFlag(QCEvent qcEvent) throws IllegalArgumentException, IOException {
+        // Get the location and name for the NetCDF DSG file
+        String datasetId = qcEvent.getDatasetId();
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
+        if ( !dsgFile.exists() )
+            throw new IllegalArgumentException("DSG file for " + datasetId + " does not exist");
+        dsgFile.updateDatasetQCFlag(qcEvent.getFlagValue(), qcEvent.getVersion());
+        DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
+        if ( !decDsgFile.exists() )
+            throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
+        decDsgFile.updateDatasetQCFlag(qcEvent.getFlagValue(), qcEvent.getVersion());
+        flagErddap(true, true);
     }
 
 }

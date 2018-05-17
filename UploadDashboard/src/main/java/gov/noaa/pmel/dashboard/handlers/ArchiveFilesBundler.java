@@ -354,7 +354,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         get the error messages from this MessagingException
      *
      * @return all error messages concatenated together using a comma and a space; if no messages are present, an empty
-     * String is returned
+     *         String is returned
      */
     private String getMessageExceptionMsgs(MessagingException ex) {
         String fullErrMsg = null;

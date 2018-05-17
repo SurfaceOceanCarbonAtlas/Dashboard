@@ -5,7 +5,9 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -82,11 +84,6 @@ public class DashboardUtils {
      * Missing value for String variables - not null
      */
     public static final String STRING_MISSING_VALUE = "";
-
-    /**
-     * Missing value for Character variables - not null
-     */
-    public static final Character CHAR_MISSING_VALUE = ' ';
 
     /**
      * Date used as a missing value - not null; corresponds to Jan 2, 1800 00:00:00 UTC
@@ -182,7 +179,7 @@ public class DashboardUtils {
                     "deg E",
                     "deg min E",
                     "deg min sec E",
-                    "DD.MMSSss",
+                    "DDD.MMSSss",
                     "deg W",
                     "deg min W",
                     "deg min sec W"));
@@ -195,7 +192,7 @@ public class DashboardUtils {
                     "deg N",
                     "deg min N",
                     "deg min sec N",
-                    "DD.MMSSss",
+                    "DDD.MMSSss",
                     "deg S",
                     "deg min S",
                     "deg min sec S"));
@@ -220,7 +217,7 @@ public class DashboardUtils {
      * may have this type.
      */
     public static final DataColumnType OTHER = new DataColumnType("other",
-            1.0, "other", "unused and unchecked supplementary data",
+            1.0, "other", "unchecked supplementary data",
             false, NO_UNITS);
 
     public static final DataColumnType LONGITUDE = new DataColumnType("longitude",
@@ -293,9 +290,10 @@ public class DashboardUtils {
             false, NO_UNITS);
 
     /**
-     * Encodes an ArrayList of Strings suitable for decoding using {@link #decodeStringArrayList(String)}.  Characters
-     * within the strings are copied as-is, thus newline characters, or the character sequence double quote - comma -
-     * double quote, within a string will likely cause problems when reading or decoding the encoded string.
+     * Encodes an ArrayList of Strings suitable for decoding using {@link #decodeStringArrayList(String)}.
+     * Characters within the strings are copied as-is, thus newline characters, or the character sequence
+     * double quote - comma - double quote, within a string will likely cause problems when reading or
+     * decoding the encoded string.
      * <p>
      * ArrayList is used instead of Collection to simplify the JavaScript GWT creates.
      *
@@ -330,7 +328,7 @@ public class DashboardUtils {
      *         the encoded string array
      *
      * @return the decoded ArrayList of strings; never null, but may be empty (if the encoded string array contains no
-     * strings)
+     *         strings)
      *
      * @throws IllegalArgumentException
      *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
@@ -391,7 +389,7 @@ public class DashboardUtils {
      *         the encoded string set
      *
      * @return the decoded TreeSet of strings; never null, but may be empty (if the encoded string tree set contains no
-     * strings)
+     *         strings)
      *
      * @throws IllegalArgumentException
      *         if arrayStr does not start with '[', does not end with ']', or contains strings not enclosed within
@@ -414,7 +412,7 @@ public class DashboardUtils {
         return new TreeSet<String>(Arrays.asList(pieces));
     }
 
-   /**
+    /**
      * Returns the basename of a filename.  Does this by returning only the portion of the string after the last slash
      * or backslash character (either one if both present).
      * <p>
@@ -461,7 +459,7 @@ public class DashboardUtils {
      *         absolute tolerance of the difference
      *
      * @return true is first and second are both NaN, both Infinite (regardless of whether positive or negative), or
-     * have values whose difference is "negligible".
+     *         have values whose difference is "negligible".
      */
     public static boolean closeTo(Double first, Double second,
             double rtol, double atol) {
@@ -512,7 +510,7 @@ public class DashboardUtils {
      *         absolute tolerance of the difference
      *
      * @return true is first and second are both NaN, both Infinite (regardless of whether positive or negative), or
-     * have values whose difference is "negligible".
+     *         have values whose difference is "negligible".
      */
     public static boolean longitudeCloseTo(Double first, Double second,
             double rtol, double atol) {
@@ -525,5 +523,452 @@ public class DashboardUtils {
             return true;
         return false;
     }
+
+    /**
+     * Compare using the "selected" properties of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
+     */
+    public static Comparator<DashboardMetadata> metaSelectedComparator = new Comparator<DashboardMetadata>() {
+        @Override
+        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+            if ( m1 == m2 )
+                return 0;
+            if ( m1 == null )
+                return -1;
+            if ( m2 == null )
+                return 1;
+            Boolean s1 = m1.isSelected();
+            return s1.compareTo(m2.isSelected());
+        }
+    };
+
+    /**
+     * Compare using the dataset IDs associated with the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
+     */
+    public static Comparator<DashboardMetadata> metaDatasetIdComparator = new Comparator<DashboardMetadata>() {
+        @Override
+        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+            if ( m1 == m2 )
+                return 0;
+            if ( m1 == null )
+                return -1;
+            if ( m2 == null )
+                return 1;
+            return m1.getDatasetId().compareTo(m2.getDatasetId());
+        }
+    };
+
+    /**
+     * Compare using the filenames of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
+     */
+    public static Comparator<DashboardMetadata> metaFilenameComparator = new Comparator<DashboardMetadata>() {
+        @Override
+        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+            if ( m1 == m2 )
+                return 0;
+            if ( m1 == null )
+                return -1;
+            if ( m2 == null )
+                return 1;
+            return m1.getFilename().compareTo(m2.getFilename());
+        }
+    };
+
+    /**
+     * Compare using the upload timestamp strings of the metadata documents. Note that this is inconsistent with
+     * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
+     */
+    public static Comparator<DashboardMetadata> metaTimestampComparator = new Comparator<DashboardMetadata>() {
+        @Override
+        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+            if ( m1 == m2 )
+                return 0;
+            if ( m1 == null )
+                return -1;
+            if ( m2 == null )
+                return 1;
+            return m1.getUploadTimestamp().compareTo(m2.getUploadTimestamp());
+        }
+    };
+
+    /**
+     * Compare using the owners of the metadata documents. Note that this is inconsistent with DashboardMetadata.equals
+     * in that this is only examining one field of DashboardMetadata.
+     */
+    public static Comparator<DashboardMetadata> metaOwnerComparator = new Comparator<DashboardMetadata>() {
+        @Override
+        public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+            if ( m1 == m2 )
+                return 0;
+            if ( m1 == null )
+                return -1;
+            if ( m2 == null )
+                return 1;
+            return m1.getOwner().compareTo(m2.getOwner());
+        }
+    };
+
+    /**
+     * Compare using the "selected" properties of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataSelectedComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            Boolean s1 = d1.isSelected();
+            return s1.compareTo(d2.isSelected());
+        }
+    };
+
+    /**
+     * Compare using the IDs of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataDatasetIdComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getDatasetId().compareTo(d2.getDatasetId());
+        }
+    };
+
+    /**
+     * Compare using the upload filenames of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataFilenameComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getUploadFilename().compareTo(d2.getUploadFilename());
+        }
+    };
+
+    /**
+     * Compare using the upload timestamp strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataTimestampComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getUploadTimestamp().compareTo(d2.getUploadTimestamp());
+        }
+    };
+
+    /**
+     * Compare using the owners of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataOwnerComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getOwner().compareTo(d2.getOwner());
+        }
+    };
+
+    /**
+     * Compare using the data check status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> dataCheckComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getDataCheckStatus().compareTo(d2.getDataCheckStatus());
+        }
+    };
+
+    /**
+     * Compare using the OME metadata timestamp strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> omeTimestampComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getOmeTimestamp().compareTo(d2.getOmeTimestamp());
+        }
+    };
+
+    /**
+     * Compare using the additional document "filename ; timestamp" strings of the datasets. Note that this is
+     * inconsistent with {@link DashboardDataset#equals(Object)} in that this is only examining one field of
+     * DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> addlDocsComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            Iterator<String> iter1 = d1.getAddlDocs().iterator();
+            Iterator<String> iter2 = d2.getAddlDocs().iterator();
+            while ( iter1.hasNext() && iter2.hasNext() ) {
+                int result = iter1.next().compareTo(iter2.next());
+                if ( result != 0 )
+                    return result;
+            }
+            // The lists are the same up to the minimum number of strings given,
+            // so the list with more items is larger; or they are equal if they
+            // both have no more items
+            if ( iter1.hasNext() )
+                return 1;
+            if ( iter2.hasNext() )
+                return -1;
+            return 0;
+        }
+    };
+
+    /**
+     * Compare using the version strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> versionComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getVersion().compareTo(d2.getVersion());
+        }
+    };
+
+    /**
+     * Compare using the QC status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> submitStatusComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getSubmitStatus().compareTo(d2.getSubmitStatus());
+        }
+    };
+
+    /**
+     * Compare using the archive status strings of the datasets. Note that this is inconsistent with {@link
+     * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
+     */
+    public static Comparator<DashboardDataset> archiveStatusComparator = new Comparator<DashboardDataset>() {
+        @Override
+        public int compare(DashboardDataset d1, DashboardDataset d2) {
+            if ( d1 == d2 )
+                return 0;
+            if ( d1 == null )
+                return -1;
+            if ( d2 == null )
+                return 1;
+            return d1.getArchiveStatus().compareTo(d2.getArchiveStatus());
+        }
+    };
+
+
+    /**
+     * Compare using the severities of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> severityComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.severity.compareTo(msg2.severity);
+        }
+    };
+
+    /**
+     * Compare using the row numbers of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> rowNumComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.rowNumber.compareTo(msg2.rowNumber);
+        }
+    };
+
+    /**
+     * Compare using the longitudes of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     * This also does not allow some "slop" for two floating point values to be equal, nor
+     * does it take into account the modulo 360 nature of longitudes.
+     */
+    public static Comparator<ADCMessage> longitudeComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.longitude.compareTo(msg2.longitude);
+        }
+    };
+
+    /**
+     * Compare using the latitudes of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     * This also does not allow some "slop" for two floating point values to be equal.
+     */
+    public static Comparator<ADCMessage> latitudeComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.latitude.compareTo(msg2.latitude);
+        }
+    };
+
+    /**
+     * Compare using the depths of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     * This also does not allow some "slop" for two floating point values to be equal.
+     */
+    public static Comparator<ADCMessage> depthComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.depth.compareTo(msg2.depth);
+        }
+    };
+
+    /**
+     * Compare using the timestamp strings of the messages. Note that this is inconsistent
+     * with {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> timestampComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.timestamp.compareTo(msg2.timestamp);
+        }
+    };
+
+    /**
+     * Compare using the column numbers of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> colNumComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.colNumber.compareTo(msg2.colNumber);
+        }
+    };
+
+    /**
+     * Compare using the column names of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> colNameComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.colName.compareTo(msg2.colName);
+        }
+    };
+
+    /**
+     * Compare using the detailed comments of the messages. Note that this is inconsistent with
+     * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
+     */
+    public static Comparator<ADCMessage> explanationComparator = new Comparator<ADCMessage>() {
+        @Override
+        public int compare(ADCMessage msg1, ADCMessage msg2) {
+            if ( msg1 == msg2 )
+                return 0;
+            if ( msg1 == null )
+                return -1;
+            if ( msg2 == null )
+                return 1;
+            return msg1.detailedComment.compareTo(msg2.detailedComment);
+        }
+    };
 
 }

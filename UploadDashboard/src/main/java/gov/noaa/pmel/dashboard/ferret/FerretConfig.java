@@ -63,9 +63,9 @@ public class FerretConfig extends Document {
      *   </pre>
      *
      * @return HashMap containing the Ferret environment variables as keys and their values as values
+     *
      * @throws Exception
      *         if the base_dir is not a full path (i.e. does not start with a "/").
-     * @throws Exception
      */
     public RuntimeEnvironment getRuntimeEnvironment() throws Exception {
         HashMap<String,String> env = new HashMap<String,String>();
@@ -225,8 +225,6 @@ public class FerretConfig extends Document {
 
     /**
      * Gets the path to the command interpreter if the thing being run is something like a shell script.
-     *
-     * @return
      */
     public String getInterpreter() {
         Element invoker = this.getRootElement().getChild("invoker");
@@ -241,8 +239,6 @@ public class FerretConfig extends Document {
 
     /**
      * Gets the path to the executable
-     *
-     * @return
      */
     public String getExecutable() {
         Element invoker = this.getRootElement().getChild("invoker");

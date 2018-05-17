@@ -126,7 +126,7 @@ public class TimestampConverter extends ValueConverter<String> {
      *         timestamp to use
      *
      * @return array of two Strings, the first being the date part of the timestamp and the second being the time part
-     * of the timestamp
+     *         of the timestamp
      *
      * @throws IllegalArgumentException
      *         if the fromUnit format is not recognized, or if the value is not a valid timestamp (no space or 'T'

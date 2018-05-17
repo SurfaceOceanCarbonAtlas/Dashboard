@@ -219,7 +219,7 @@ public class StdUserDataArray extends StdDataArray {
      * that are added to the internal list of messages.
      *
      * @return the sample times for the data;  may be null if there was incomplete specification of sample time, or may
-     * contain null values if there were problems computing the sample time
+     *         contain null values if there were problems computing the sample time
      */
     public Double[] checkMissingLonLatTime() {
         try {
@@ -451,7 +451,7 @@ public class StdUserDataArray extends StdDataArray {
 
     /**
      * @return the list of automated data check messages describing problems detected in the data.  The messages that
-     * are in this list comes from the constructor as well as any check methods that were called.
+     *         are in this list comes from the constructor as well as any check methods that were called.
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;

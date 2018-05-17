@@ -388,7 +388,7 @@ public class CheckerMessageHandler {
      *         get messages for the dataset with this ID
      *
      * @return the automated data checker messages for the dataset; never null, but may be empty if there were no
-     * messages. The datasetId, but not the username, will be assigned in the returned ADCMessageList
+     *         messages. The datasetId, but not the username, will be assigned in the returned ADCMessageList
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, or if the messages file is invalid
