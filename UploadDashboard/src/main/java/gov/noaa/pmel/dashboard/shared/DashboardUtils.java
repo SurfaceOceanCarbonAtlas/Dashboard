@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -70,7 +71,7 @@ public class DashboardUtils {
     public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Owner to archive";
     public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
-    /**
+   /**
      * Missing value for floating-point variables - not null or NaN
      */
     public static final Double FP_MISSING_VALUE = -1.0E+34;
@@ -128,7 +129,7 @@ public class DashboardUtils {
     /**
      * Global region ID; the default region ID for QC events.
      */
-    public static final String GLOBAL_REGION_ID = "G";
+    public static final String REGION_ID_GLOBAL = "G";
 
 
     /**

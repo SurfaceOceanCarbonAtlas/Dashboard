@@ -249,7 +249,7 @@ public class StdDataArrayTest {
         // (still need to process the messages generated)
         idx = dataTypes.indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
         for (int j = 0; j < numRows; j++)
-            assertEquals(DashboardServerUtils.FLAG_ACCEPTABLE, (Character) stdData.getStdVal(j, idx));
+            assertEquals(DashboardServerUtils.WOCE_ACCEPTABLE, (Character) stdData.getStdVal(j, idx));
 
         ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
                 DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()) );

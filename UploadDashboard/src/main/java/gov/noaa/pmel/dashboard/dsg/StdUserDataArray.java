@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
- * A 2-D array of objects corresponding to the standardized values of string values provided by the user.  Also contains
- * 1-D arrays of information describing each data column.
+ * A 2-D array of objects corresponding to the standardized values of string values provided by the user.
+ * Also contains 1-D arrays of information describing each data column.
  *
  * @author Karl Smith
  */
@@ -43,13 +43,15 @@ public class StdUserDataArray extends StdDataArray {
     int woceAutocheckIndex;
 
     /**
-     * Create from the user's data column descriptions, data strings, data row numbers, and data check flags given for
-     * this dataset.  Any data columns types matching {@link DashboardServerUtils#UNKNOWN} or {@link
-     * DashboardServerUtils#OTHER} are ignored; {@link #isUsableIndex(int)} will return false, and {@link
-     * #getStdVal(int, int)} will throw an exception for data columns of these types.
+     * Create from the user's data column descriptions, data strings, data row numbers, and data check flags
+     * given for this dataset.  Any data columns types matching {@link DashboardServerUtils#UNKNOWN} or
+     * {@link DashboardServerUtils#OTHER} are ignored; {@link #isUsableIndex(int)} will return false, and
+     * {@link #getStdVal(int, int)} will throw an exception for data columns of these types.  Values that
+     * match a missing value for that data column are set to null.
+     *
      * <p>
-     * The list of automated data check messages describing problems (critical errors) encountered when standardizing
-     * the data can be retrieved using {@link #getStandardizationMessages()}.
+     * The list of automated data check messages describing problems (critical errors) encountered when
+     * standardizing the data can be retrieved using {@link #getStandardizationMessages()}.
      * <p>
      * No bounds checking of standardized data values is performed.
      *
@@ -59,11 +61,12 @@ public class StdUserDataArray extends StdDataArray {
      *         all known user data types
      *
      * @throws IllegalArgumentException
-     *         if there are no data values, if a data column description is not a known user data type, if a required
-     *         unit conversion is not supported, or if a standardizer for a given data type is not known
+     *         if there are no data values,
+     *         if a data column description is not a known user data type,
+     *         if a required unit conversion is not supported, or
+     *         if a standardizer for a given data type is not known
      */
-    public StdUserDataArray(DashboardDatasetData dataset, KnownDataTypes knownTypes)
-            throws IllegalArgumentException {
+    public StdUserDataArray(DashboardDatasetData dataset, KnownDataTypes knownTypes) throws IllegalArgumentException {
         super(dataset.getDataColTypes(), knownTypes);
 
         // Add the user's units, missing values, and user column names
@@ -74,9 +77,8 @@ public class StdUserDataArray extends StdDataArray {
         int numUserDataCols = dataColumnTypes.size();
         ArrayList<String> names = dataset.getUserColNames();
         if ( names.size() != numUserDataCols )
-            throw new IllegalArgumentException("number of user column names (" +
-                    names.size() + ") does not match the number of user column types (" +
-                    numUserDataCols + ")");
+            throw new IllegalArgumentException("number of user column names (" + names.size() +
+                    ") does not match the number of user column types (" + numUserDataCols + ")");
         for (int k = 0; k < numUserDataCols; k++) {
             DataColumnType dataColType = dataColumnTypes.get(k);
             userUnits[k] = dataColType.getUnits().get(dataColType.getSelectedUnitIndex());
@@ -113,9 +115,8 @@ public class StdUserDataArray extends StdDataArray {
 
         ArrayList<Integer> rowNums = dataset.getRowNums();
         if ( rowNums.size() != numSamples )
-            throw new IllegalArgumentException("number of row numbers (" +
-                    rowNums.size() + ") does not match the number of samples (" +
-                    numSamples + ")");
+            throw new IllegalArgumentException("number of row numbers (" + rowNums.size() +
+                    ") does not match the number of samples (" + numSamples + ")");
 
         stdObjects = new Object[numSamples][numDataCols];
         stdMsgList = new ArrayList<ADCMessage>();
@@ -150,7 +151,7 @@ public class StdUserDataArray extends StdDataArray {
                 }
                 else if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) ) {
                     // Default to acceptable; update afterwards
-                    strDataVals[j][k] = DashboardServerUtils.FLAG_ACCEPTABLE.toString();
+                    strDataVals[j][k] = DashboardServerUtils.WOCE_ACCEPTABLE.toString();
                     woceIdx = k;
                 }
                 else {
@@ -507,13 +508,13 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Reset all values in the WOCE_AUTOCHECK column to {@link DashboardServerUtils#FLAG_ACCEPTABLE}.
+     * Reset all values in the WOCE_AUTOCHECK column to {@link DashboardServerUtils#WOCE_ACCEPTABLE}.
      */
     public void resetWoceAutocheck() {
         if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
             return;
         for (int j = 0; j < numSamples; j++) {
-            stdObjects[j][woceAutocheckIndex] = DashboardServerUtils.FLAG_ACCEPTABLE;
+            stdObjects[j][woceAutocheckIndex] = DashboardServerUtils.WOCE_ACCEPTABLE;
         }
     }
 
@@ -534,7 +535,7 @@ public class StdUserDataArray extends StdDataArray {
             throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
         if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
             throw new IllegalArgumentException("no WOCE autocheck column");
-        if ( !(DashboardServerUtils.FLAG_ACCEPTABLE.equals(newFlag) ||
+        if ( !(DashboardServerUtils.WOCE_ACCEPTABLE.equals(newFlag) ||
                 DashboardServerUtils.WOCE_QUESTIONABLE.equals(newFlag) ||
                 DashboardServerUtils.WOCE_BAD.equals(newFlag)) )
             throw new IllegalArgumentException("invalid WOCE flag value");
@@ -583,10 +584,8 @@ public class StdUserDataArray extends StdDataArray {
 
     @Override
     public String toString() {
-        String repr = "StdUserDataArray[numSamples=" + numSamples +
-                ", numDataCols=" + numDataCols +
-                "' woceAutocheckIndex=" + woceAutocheckIndex;
-        repr += ",\n  stdMsgList=[";
+        String repr = "StdUserDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols +
+                ",\n  stdMsgList=[";
         boolean first = true;
         for (ADCMessage msg : stdMsgList) {
             if ( first )

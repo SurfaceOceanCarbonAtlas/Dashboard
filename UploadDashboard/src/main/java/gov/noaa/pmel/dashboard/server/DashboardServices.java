@@ -269,9 +269,9 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
             QCEvent qcEvent = new QCEvent();
             qcEvent.setDatasetId(datasetId);
-            qcEvent.setFlagValue(DashboardServerUtils.UPDATED_DATASET_QC_FLAG);
+            qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
             qcEvent.setFlagDate(new Date());
-            qcEvent.setRegionId(DashboardUtils.GLOBAL_REGION_ID);
+            qcEvent.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
             qcEvent.setVersion(configStore.getUploadVersion());
             qcEvent.setUsername(username);
             String comment = "Deleted metadata file \"" + deleteFilename +

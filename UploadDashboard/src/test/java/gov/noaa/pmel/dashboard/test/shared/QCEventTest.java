@@ -102,7 +102,7 @@ public class QCEventTest {
     @Test
     public void testGetSetRegionID() {
         QCEvent myflag = new QCEvent();
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setRegionID(MY_REGION_ID);
         assertEquals(MY_REGION_ID, myflag.getRegionID());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
@@ -110,7 +110,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.QC_COMMENT, myflag.getFlag());
         assertEquals(DEFAULT_QC_ID, myflag.getId());
         myflag.setRegionID(null);
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
     }
 
     /**
@@ -123,7 +123,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
         myflag.setFlagDate(MY_FLAG_DATE);
         assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
         assertEquals(DashboardUtils.QC_COMMENT, myflag.getFlag());
@@ -143,7 +143,7 @@ public class QCEventTest {
         myflag.setUsername(MY_USERNAME);
         assertEquals(MY_USERNAME, myflag.getUsername());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
         assertEquals(DashboardUtils.QC_COMMENT, myflag.getFlag());
@@ -164,7 +164,7 @@ public class QCEventTest {
         assertEquals(MY_REALNAME, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
         assertEquals(DashboardUtils.QC_COMMENT, myflag.getFlag());
@@ -186,7 +186,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
         assertEquals(DashboardUtils.QC_COMMENT, myflag.getFlag());

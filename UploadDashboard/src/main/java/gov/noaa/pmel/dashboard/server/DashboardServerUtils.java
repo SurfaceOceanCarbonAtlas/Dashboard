@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -22,75 +23,117 @@ import java.util.regex.Pattern;
  */
 public class DashboardServerUtils {
 
-    /**
-     * Minimum length for a valid dataset ID
-     */
     public static final int MIN_DATASET_ID_LENGTH = 12;
-
-    /**
-     * Maximum length for a valid dataset ID
-     */
     public static final int MAX_DATASET_ID_LENGTH = 14;
 
-    /**
-     * Automated data checker "username" for flags
-     */
     public static final String AUTOMATED_DATA_CHECKER_USERNAME = "automated.data.checker";
-
-    /**
-     * Automated data checker "realname" for flags
-     */
     public static final String AUTOMATED_DATA_CHECKER_REALNAME = "automated data checker";
 
-    /**
-     * Dataset QC flag name
-     */
-    public static final String DATASET_QC_FLAG_NAME = "dataset";
+    // QC flag name used for dataset QC flags
+    public static final String DATASET_QCFLAG_NAME = "dataset";
+
+    // All possible dataset QC flags
+    public static final String DATASET_QCFLAG_COMMENT = "H";
+    public static final String DATASET_QCFLAG_SUSPEND = "S";
+    public static final String DATASET_QCFLAG_EXCLUDE = "X";
+    public static final String DATASET_QCFLAG_NEW = "N";
+    public static final String DATASET_QCFLAG_UPDATED = "U";
+    public static final String DATASET_QCFLAG_A = "A";
+    public static final String DATASET_QCFLAG_B = "B";
+    public static final String DATASET_QCFLAG_C = "C";
+    public static final String DATASET_QCFLAG_D = "D";
+    public static final String DATASET_QCFLAG_E = "E";
+    public static final String DATASET_QCFLAG_CONFLICT = "Q";
+    // QCFLAG_RENAMED also used for data QC flags
+    public static final String QCFLAG_RENAMED = "R";
+
+    // Dataset QC strings - datasets that can be modified
+    public static final String DATASET_STATUS_NOT_SUBMITTED = "";
+    public static final String DATASET_STATUS_SUSPENDED = "Suspended";
+    public static final String DATASET_STATUS_EXCLUDED = "Excluded";
+    // Dataset QC strings - datasets that cannot be modified
+    public static final String DATASET_STATUS_SUBMITTED = "Submitted";
+    public static final String DATASET_STATUS_ACCEPTED_A = "Flag A";
+    public static final String DATASET_STATUS_ACCEPTED_B = "Flag B";
+    public static final String DATASET_STATUS_ACCEPTED_C = "Flag C";
+    public static final String DATASET_STATUS_ACCEPTED_D = "Flag D";
+    public static final String DATASET_STATUS_ACCEPTED_E = "Flag E";
+    public static final String DATASET_STATUS_CONFLICT = "Conflict";
+    public static final String DATASET_STATUS_RENAMED = "Renamed";
 
     /**
-     * Dataset QC flag value for a new dataset
+     * Map of dataset QC flag values to dataset status values.
+     * {@link #DATASET_QCFLAG_COMMENT} not included as it does not affect the status.
      */
-    public static final String NEW_DATASET_QC_FLAG = "N";
+    public static final HashMap<String,String> DATASET_FLAG_STATUS_MAP;
+    static {
+        DATASET_FLAG_STATUS_MAP = new HashMap<String,String>();
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_SUSPEND, DATASET_STATUS_SUSPENDED);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_EXCLUDE, DATASET_STATUS_EXCLUDED);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_NEW, DATASET_STATUS_SUBMITTED);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_UPDATED, DATASET_STATUS_SUBMITTED);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_A, DATASET_STATUS_ACCEPTED_A);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_B, DATASET_STATUS_ACCEPTED_B);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_C, DATASET_STATUS_ACCEPTED_C);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_D, DATASET_STATUS_ACCEPTED_D);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_E, DATASET_STATUS_ACCEPTED_E);
+        DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_CONFLICT, DATASET_STATUS_CONFLICT);
+        DATASET_FLAG_STATUS_MAP.put(QCFLAG_RENAMED, DATASET_STATUS_RENAMED);
+    }
 
     /**
-     * Dataset QC flag value for an updated dataset
+     * Map of dataset QC status values to dataset QC flag values.
+     * {@link #DATASET_STATUS_NOT_SUBMITTED} not included since there is no QC.
+     * {@link #DATASET_STATUS_SUBMITTED} is mapped to {@link #DATASET_QCFLAG_UPDATED}.
      */
-    public static final String UPDATED_DATASET_QC_FLAG = "U";
+    public static final HashMap<String,String> DATASET_STATUS_FLAG_MAP;
+    static {
+        DATASET_STATUS_FLAG_MAP = new HashMap<String,String>();
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_SUSPENDED, DATASET_QCFLAG_SUSPEND);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_EXCLUDED, DATASET_QCFLAG_EXCLUDE);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_SUBMITTED, DATASET_QCFLAG_UPDATED);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_ACCEPTED_A, DATASET_QCFLAG_A);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_ACCEPTED_B, DATASET_QCFLAG_B);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_ACCEPTED_C, DATASET_QCFLAG_C);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_ACCEPTED_D, DATASET_QCFLAG_D);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_ACCEPTED_E, DATASET_QCFLAG_E);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_CONFLICT, DATASET_QCFLAG_CONFLICT);
+        DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_RENAMED, QCFLAG_RENAMED);
+    }
 
-    /**
-     * Dataset QC flag value for a comment on a dataset
-     */
-    public static final String COMMENT_DATASET_QC_FLAG = "H";
-
-    /**
-     * Dataset QC flag value assigned when there is a conflict in regional dataset QC values.
-     */
-    public static final String CONFLICT_DATASET_QC_FLAG = "Q";
-
-    /**
-     * QC flag value for a renamed dataset
-     */
-    public static final String RENAMED_DATASET_QC_FLAG = "R";
-
-    /**
-     * General-purpose flag value for acceptable data
-     */
-    public static final String FLAG_ACCEPTABLE = "2";
-
-    /**
-     * WOCE-type flag value for questionable data
-     */
+    // WOCE-type data QC flag values
+    public static final String WOCE_ACCEPTABLE = "2";
     public static final String WOCE_QUESTIONABLE = "3";
-
-    /**
-     * WOCE-type flag value for bad data
-     */
     public static final String WOCE_BAD = "4";
 
-    // flags for QC/WOCE events of datasets that has been updated
-    public static final String OLD_FLAG_ACCEPTABLE = "G";
+    // replacement values for WOCE-type data QC flags for data being replaced in an update
+    public static final String OLD_WOCE_ACCEPTABLE = "G";
     public static final String OLD_WOCE_QUESTIONABLE = "Q";
     public static final String OLD_WOCE_BAD = "B";
+
+    // all possible region IDs except for Global, which is in DashboardUtils
+    public static final String REGION_ID_NORTH_PACIFIC = "N";
+    public static final String REGION_ID_TROPICAL_PACIFIC = "T";
+    public static final String REGION_ID_NORTH_ATLANTIC = "A";
+    public static final String REGION_ID_TROPICAL_ATLANTIC = "Z";
+    public static final String REGION_ID_INDIAN = "I";
+    public static final String REGION_ID_COASTAL = "C";
+    public static final String REGION_ID_SOUTHERN_OCEANS = "O";
+    public static final String REGION_ID_ARCTIC = "R";
+
+    public static final HashMap<String,String> REGION_NAMES;
+    static {
+        REGION_NAMES = new HashMap<String,String>();
+        REGION_NAMES.put(DashboardUtils.REGION_ID_GLOBAL, "Global");
+        REGION_NAMES.put(REGION_ID_NORTH_PACIFIC, "North Pacific");
+        REGION_NAMES.put(REGION_ID_TROPICAL_PACIFIC, "Tropical Pacific");
+        REGION_NAMES.put(REGION_ID_NORTH_ATLANTIC, "North Atlantic");
+        REGION_NAMES.put(REGION_ID_TROPICAL_ATLANTIC, "Tropical Atlantic");
+        REGION_NAMES.put(REGION_ID_INDIAN, "Indian");
+        REGION_NAMES.put(REGION_ID_COASTAL, "Coastal");
+        REGION_NAMES.put(REGION_ID_SOUTHERN_OCEANS, "Southern Oceans");
+        REGION_NAMES.put(REGION_ID_ARCTIC, "Arctic");
+    }
 
     /**
      * Authalic radius, in kilometers, of Earth
@@ -149,9 +192,9 @@ public class DashboardServerUtils {
             null, null, null, null);
 
     /**
-     * OTHER is for supplementary data in the user's original data file but otherwise not used.  A description of each
-     * column with this type must be part of the metadata, but the values are not validated or used. Multiple columns
-     * may have this type.
+     * OTHER is for supplementary data in the user's original data file but otherwise not used.
+     * A description of each column with this type must be part of the metadata, but the values
+     * are not validated or used. Multiple columns may have this type.
      */
     public static final StringDashDataType OTHER = new StringDashDataType(DashboardUtils.OTHER,
             null, null, null,
@@ -160,9 +203,9 @@ public class DashboardServerUtils {
     /**
      * Unique identifier for the dataset (metadata derived from user data column for the dataset name)
      * <p>
-     * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC is the ship code and YYYY-MM-DD is the start
-     * date for the cruise; possibly followed by -1 or -2 for non-ship platforms where NODC does not distinguish
-     * different platform names.
+     * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC is the ship code and YYYY-MM-DD
+     * is the start date for the cruise; possibly followed by -1 or -2 for non-ship platforms where NODC
+     * does not distinguish different platform names.
      */
     public static final StringDashDataType DATASET_ID = new StringDashDataType("expocode",
             50.0, "expocode", "expocode", false,
@@ -170,7 +213,7 @@ public class DashboardServerUtils {
             null, null, null, null);
 
     /**
-     * Consecutive numbering of the samples after merging and ordering.
+     * Consecutive numbering of the samples in a dataset
      */
     public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType("sample_number",
             51.0, "sample num", "sample number", false,
@@ -334,8 +377,8 @@ public class DashboardServerUtils {
             "0.0", null, null, "60.0");
 
     /**
-     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY, may be used to specify the date and time of the
-     * measurement.
+     * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
+     * may be used to specify the date and time of the measurement.
      */
     public static final DoubleDashDataType DAY_OF_YEAR = new DoubleDashDataType(DashboardUtils.DAY_OF_YEAR,
             "day_of_year", TIME_CATEGORY, null,
@@ -357,14 +400,14 @@ public class DashboardServerUtils {
             "1", "2", "4", "9");
 
     /**
-     * Value of userRealName to use to skip sending the email request in {@link ArchiveFilesBundler#sendOrigFilesBundle(String,
-     * String, String, String)}
+     * Value of userRealName to use to skip sending the email request in
+     * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
      */
     public static final String NOMAIL_USER_REAL_NAME = "nobody";
 
     /**
-     * Value of userEmail to use to skip sending the email request in {@link ArchiveFilesBundler#sendOrigFilesBundle(String,
-     * String, String, String)}
+     * Value of userEmail to use to skip sending the email request in
+     * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
      */
     public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
 
@@ -372,18 +415,15 @@ public class DashboardServerUtils {
      * NODC codes (all upper-case) for Moorings and Fixed Buoys
      */
     private static final HashSet<String> FIXED_PLATFORM_NODC_CODES =
-            new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F",
-                    "187F", "18FX", "247F", "24FS", "267F", "26FS", "297F",
-                    "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F",
-                    "48MB", "497F", "49FS", "747F", "74FS", "767F", "77FS",
-                    "907F", "91FS", "GH7F"));
+            new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F", "187F", "18FX", "247F", "24FS",
+                    "267F", "26FS", "297F", "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F", "48MB",
+                    "497F", "49FS", "747F", "74FS", "767F", "77FS", "907F", "91FS", "GH7F"));
 
     /**
      * NODC codes (all upper-case) for Drifting Buoys
      */
     private static final HashSet<String> DRIFTING_BUOY_NODC_CODES =
-            new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ",
-                    "61DB", "74DZ", "91DB", "99DB"));
+            new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ", "61DB", "74DZ", "91DB", "99DB"));
 
     /**
      * Guesses the platform type from the platform name or the expocode. If the platform name or NODC code from the
@@ -627,9 +667,9 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Returns the approximate distance between two locations.  Uses the haversine formula, and {@link
-     * #EARTH_AUTHALIC_RADIUS} for the radius of a spherical Earth, to compute the great circle distance between the two
-     * locations.
+     * Returns the approximate distance between two locations.  Uses the haversine formula, and
+     * {@link #EARTH_AUTHALIC_RADIUS} for the radius of a spherical Earth, to compute the great
+     * circle distance between the two locations.
      *
      * @param lon
      *         longitude, in decimal degrees east, of the first data location
@@ -664,9 +704,10 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Returns the location-time "distance" between two location-time point. Uses {@link #SEAWATER_SPEED} for converting
-     * differences in time into a "distance".  Uses the haversine formula, and {@link #EARTH_AUTHALIC_RADIUS} for the
-     * radius of a spherical Earth, to compute the great circle distance from the longitudes and latitudes.
+     * Returns the location-time "distance" between two location-time points.  Uses {@link #SEAWATER_SPEED} for
+     * converting differences in time into a "distance".  Uses {@link #distanceBetween(double, double, double, double)},
+     * which uses the haversine formula and {@link #EARTH_AUTHALIC_RADIUS} for the radius of a spherical Earth,
+     * to compute the great circle distance from the longitudes and latitudes.
      *
      * @param lon
      *         longitude, in decimal degrees east, of the first data location

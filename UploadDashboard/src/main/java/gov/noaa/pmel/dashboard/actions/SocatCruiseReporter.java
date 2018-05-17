@@ -3,9 +3,8 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
-import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
-import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
@@ -319,11 +318,8 @@ public class SocatCruiseReporter {
             }
         }
 
-        // Get the original and SOCAT-enhanced data document DOIs for this cruise
+        // Get the SOCAT-enhanced data document DOI for this cruise
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-        String origDOI = cruise.getSourceDOI();
-        if ( origDOI.isEmpty() )
-            origDOI = NOT_AVAILABLE_TAG;
         String socatDOI = cruise.getEnhancedDOI();
         if ( socatDOI.isEmpty() )
             socatDOI = SOCAT_ENHANCED_DOI_TAG;
@@ -334,20 +330,10 @@ public class SocatCruiseReporter {
         // Generate the report
         PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
         try {
-            ArrayList<String> msgs = printMetadataPreamble(omeMeta,
-                    socatVersion, origDOI, socatDOI, qcFlag, addlDocs, report);
+            ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion, socatDOI, qcFlag, addlDocs, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, false);
-            StdDataArray dataArray = dsgFile.getStdDataArray();
-            for (int j = 0; j < dataArray.getNumSamples(); j++) {
-                // ArrayList<Object> dataVals =
-                // Reported WOCE-3 might be duplicates, so do not check for duplicates
-                String tsvdat = dataReportString(dataArray, j, sectimes[j], upperExpo,
-                        socatVersion, socatDOI, qcFlag, false, null);
-                if ( !tsvdat.isEmpty() ) {
-                    report.println(tsvdat);
-                }
-            }
+            printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersion, socatDOI, qcFlag, null, false);
         } finally {
             report.close();
         }
@@ -369,19 +355,27 @@ public class SocatCruiseReporter {
      * @return list of warnings about the generated report; never null but may be empty
      *
      * @throws IllegalArgumentException
-     *         if an expocode is invalid,
+     *         if the region ID or a dataset ID is invalid,
      * @throws IOException
      *         if unable to read a DSG NC file, or if unable to create the cruise report file
      */
-    public ArrayList<String> generateReport(TreeSet<String> expocodes, String regionID,
-            File reportFile) throws IllegalArgumentException, IOException {
+    public ArrayList<String> generateReport(TreeSet<String> expocodes, String regionID, File reportFile)
+            throws IllegalArgumentException, IOException {
         int numDatasets = expocodes.size();
         ArrayList<String> upperExpoList = new ArrayList<String>(numDatasets);
         ArrayList<String> socatVersionList = new ArrayList<String>(numDatasets);
-        ArrayList<String> origDOIList = new ArrayList<String>(numDatasets);
         ArrayList<String> socatDOIList = new ArrayList<String>(numDatasets);
         ArrayList<String> qcFlagList = new ArrayList<String>(numDatasets);
         ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
+
+        String regionName;
+        if ( regionID != null ) {
+            regionName = DashboardServerUtils.REGION_NAMES.get(regionID);
+            if ( regionName == null )
+                throw new IllegalArgumentException("Unknown region ID of " + regionID);
+        }
+        else
+            regionName = null;
 
         for (String expo : expocodes) {
             // Get the datasetIds, SOCAT version, and QC flags
@@ -401,25 +395,21 @@ public class SocatCruiseReporter {
                 inRegion = false;
                 dsgFile.readData(knownDataFileTypes);
                 StdDataArray dataVals = dsgFile.getStdDataArray();
-                int regionIndex = 0;
-                for (DashDataType<?> dtype : dataVals.getDataTypes()) {
-                    if ( (dtype instanceof StringDashDataType) && DashboardServerUtils.REGION_ID.typeNameEquals(dtype) )
-                        break;
-                    regionIndex += 1;
-                }
-                if ( !dataVals.isUsableIndex(regionIndex) )
+                Integer regionColIdx = dataVals.getIndexOfType(DashboardServerUtils.REGION_ID);
+                if ( regionColIdx == null )
                     throw new IOException(DashboardServerUtils.REGION_ID.getVarName() +
                             " is not defined in the DSG file for " + upperExpo);
+                Integer woceColIdx = dataVals.getIndexOfType(SocatTypes.WOCE_CO2_WATER);
+                if ( woceColIdx == null )
+                    throw new IOException(SocatTypes.WOCE_CO2_WATER.getVarName() +
+                            " is not defined in the DSG file for " + upperExpo);
                 for (int j = 0; j < dataVals.getNumSamples(); j++) {
-                    if ( regionID.equals(dataVals.getStdVal(j, regionIndex)) ) {
-                        String woceFlag = dataVals.getWoceCO2Water();
-                        // Ignore WOCE-3 and WOCE-4 as they are not reported
-                        // and may be indicating invalid locations for this cruise
-                        if ( DashboardUtils.WOCE_GOOD.equals(woceFlag) ||
-                                DashboardUtils.WOCE_NOT_CHECKED.equals(woceFlag) ) {
-                            inRegion = true;
-                            break;
-                        }
+                    // Ignore WOCE-3 and WOCE-4 as they are not reported
+                    // and may be indicating invalid locations for this cruise
+                    if ( regionID.equals((String) dataVals.getStdVal(j, regionColIdx)) &&
+                            DashboardServerUtils.WOCE_ACCEPTABLE.equals((String) dataVals.getStdVal(j, woceColIdx)) ) {
+                        inRegion = true;
+                        break;
                     }
                 }
             }
@@ -431,12 +421,8 @@ public class SocatCruiseReporter {
                 socatVersionList.add(socatMeta.getVersion());
                 qcFlagList.add(socatMeta.getDatasetQCFlag());
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-                String origDOI = cruise.getSourceDOI();
-                if ( origDOI.isEmpty() )
-                    origDOI = NOT_AVAILABLE_TAG;
-                origDOIList.add(origDOI);
                 String socatDOI = cruise.getEnhancedDOI();
-                if ( socatDOI.isEmpty() )
+                if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDOI) )
                     socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 socatDOIList.add(socatDOI);
                 upperExpoList.add(upperExpo);
@@ -446,8 +432,7 @@ public class SocatCruiseReporter {
         // Get the rest of the metadata info from the OME XML
         ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
         for (String upperExpo : upperExpoList) {
-            DashboardMetadata metadata =
-                    metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
+            DashboardMetadata metadata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
             omeMetaList.add(new DashboardOmeMetadata(metadata, metadataHandler));
         }
 
@@ -457,6 +442,7 @@ public class SocatCruiseReporter {
         for (String upperExpo : upperExpoList) {
             TreeSet<String> addlDocs = new TreeSet<String>();
             for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo)) {
+                // Ignore the OME.xml stub at this time, but include any PI_OME.xml since that is what was uploaded
                 if ( !mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
                     addlDocs.add(mdata.getFilename());
                 }
@@ -464,27 +450,15 @@ public class SocatCruiseReporter {
             addlDocsList.add(addlDocs);
         }
 
-        String regionName;
-        if ( regionID != null )
-            regionName = DashboardServerUtils.REGION_NAMES.get(regionID);
-        else
-            regionName = null;
-
         PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
         try {
             ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList,
-                    socatVersionList, origDOIList, socatDOIList, qcFlagList,
-                    addlDocsList, report);
+                    socatVersionList, socatDOIList, qcFlagList, addlDocsList, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, true);
-            // Read and report the data for one cruise at a time
+            // Read and report the data for one dataset at a time
             for (int k = 0; k < upperExpoList.size(); k++) {
                 String upperExpo = upperExpoList.get(k);
-                String socatVersion = socatVersionList.get(k);
-                String qcFlag = qcFlagList.get(k);
-                String socatDOI = dataHandler.getDatasetFromInfoFile(upperExpo).getEnhancedDOI();
-                if ( socatDOI.isEmpty() )
-                    socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 DsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
                 ArrayList<String> unknownVars = dsgFile.readData(knownDataFileTypes);
                 if ( unknownVars.size() > 0 ) {
@@ -494,27 +468,8 @@ public class SocatCruiseReporter {
                     }
                     warnMsgs.add(msg);
                 }
-                // Get the computed values of time in seconds since 1970-01-01 00:00:00
-                double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
-                // Create the set for holding previous lon/lat/time/fCO2_rec data
-                TreeSet<DataPoint> prevDatPts = new TreeSet<DataPoint>();
-                int j = -1;
-                for (StdDataArray dataVals : dsgFile.getStdDataArray()) {
-                    j++;
-                    if ( (regionID != null) && !regionID.equals(dataVals.getRegionID()) )
-                        continue;
-                    if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
-                        continue;
-                    String woceFlag = dataVals.getWoceCO2Water();
-                    if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
-                            woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
-                        String tsvdat = dataReportString(dataVals, j, sectimes[j], upperExpo,
-                                socatVersion, socatDOI, qcFlag, true, prevDatPts);
-                        if ( !tsvdat.isEmpty() ) {
-                            report.println(tsvdat);
-                        }
-                    }
-                }
+                printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersionList.get(k),
+                        socatDOIList.get(k), qcFlagList.get(k), regionID, true);
             }
         } finally {
             report.close();
@@ -524,15 +479,13 @@ public class SocatCruiseReporter {
     }
 
     /**
-     * Prints the metadata preamble for a single-cruise report. If successful, any warnings about the generated preamble
-     * are returned.
+     * Prints the metadata preamble for a single-cruise report.
+     * If successful, any warnings about the generated preamble are returned.
      *
      * @param omeMeta
      *         OME XML document with metadata values to report in the preamble
      * @param socatVersion
      *         SOCAT version to report in the preamble
-     * @param origDOI
-     *         DOI for the original data file
      * @param socatDOI
      *         DOI for this SOCAT-enhanced data file
      * @param qcFlag
@@ -544,8 +497,8 @@ public class SocatCruiseReporter {
      *
      * @return list of warnings about the generated preamble; never null but may be empty
      */
-    private static ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, String socatVersion,
-            String origDOI, String socatDOI, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
+    private ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta,
+            String socatVersion, String socatDOI, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
         String upperExpo = omeMeta.getDatasetId();
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -555,7 +508,7 @@ public class SocatCruiseReporter {
         report.println("Dataset Name: " + omeMeta.getDatasetName());
         report.println("Platform Name: " + omeMeta.getPlatformName());
         report.println("Principal Investigator(s): " + omeMeta.getPINames());
-        report.println("DOI for the original data: " + origDOI);
+        report.println("DOI for the original data: " + omeMeta.origDOI());
         report.println("    or see: " + omeMeta.getOrigDataRef());
         report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
         report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
@@ -635,8 +588,8 @@ public class SocatCruiseReporter {
     }
 
     /**
-     * Prints the metadata preamble for a multi-cruise report. If successful, any warnings about the generated preamble
-     * are returned.
+     * Prints the metadata preamble for a multi-cruise report.
+     * If successful, any warnings about the generated preamble are returned.
      *
      * @param regionName
      *         name of the region being reported; use null for no region
@@ -644,8 +597,6 @@ public class SocatCruiseReporter {
      *         list of metadata values, one per dataset, to use for information to report
      * @param socatVersionList
      *         list of SOCAT version numbers, one per dataset, to report
-     * @param origDOIList
-     *         list of DOIs, one per dataset, for the original data files
      * @param socatDOIList
      *         list of DOIs, one per dataset, for the SOCAT-enhanced data files
      * @param qcFlagList
@@ -657,13 +608,9 @@ public class SocatCruiseReporter {
      *
      * @return list of warnings about the generated preamble; never null but may be empty
      */
-    private static ArrayList<String> printMetadataPreamble(String regionName,
-            ArrayList<DashboardOmeMetadata> omeMetaList,
-            ArrayList<String> socatVersionList,
-            ArrayList<String> origDOIList,
-            ArrayList<String> socatDOIList, ArrayList<String> qcFlagList,
-            ArrayList<TreeSet<String>> addlDocsList,
-            PrintWriter report) {
+    private ArrayList<String> printMetadataPreamble(String regionName, ArrayList<DashboardOmeMetadata> omeMetaList,
+            ArrayList<String> socatVersionList, ArrayList<String> socatDOIList, ArrayList<String> qcFlagList,
+            ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
         report.println("SOCAT data report created: " + TIMESTAMPER.format(new Date()));
@@ -694,26 +641,17 @@ public class SocatCruiseReporter {
         boolean needsFakeHoursMsg = false;
         for (int k = 0; k < omeMetaList.size(); k++) {
             DashboardOmeMetadata omeMeta = omeMetaList.get(k);
-            String upperExpo = omeMeta.getDatasetId();
-            String socatVersion = socatVersionList.get(k);
-            String cruiseName = omeMeta.getDatasetName();
-            if ( cruiseName.isEmpty() )
-                cruiseName = NOT_AVAILABLE_TAG;
-            String qcFlag = qcFlagList.get(k);
-            TreeSet<String> addlDocs = addlDocsList.get(k);
-            String origDOI = origDOIList.get(k);
-            String origHRef = omeMeta.getOrigDataRef();
-            if ( origHRef.isEmpty() )
-                origHRef = NOT_AVAILABLE_TAG;
-            String socatDOI = socatDOIList.get(k);
-            String socatHRef = SOCAT_ENHANCED_HREF_PREFIX + socatDOI;
 
+            String upperExpo = omeMeta.getDatasetId();
             report.print(upperExpo);
             report.print("\t");
 
-            report.print(socatVersion);
+            report.print(socatVersionList.get(k));
             report.print("\t");
 
+            String cruiseName = omeMeta.getDatasetName();
+            if ( cruiseName.isEmpty() )
+                cruiseName = NOT_AVAILABLE_TAG;
             report.print(cruiseName);
             report.print("\t");
 
@@ -723,15 +661,23 @@ public class SocatCruiseReporter {
             report.print(omeMeta.getPINames());
             report.print("\t");
 
+            String origDOI = omeMeta.origDOI();
+            if ( origDOI.isEmpty() )
+                origDOI = NOT_AVAILABLE_TAG;
             report.print(origDOI);
             report.print("\t");
 
+            String origHRef = omeMeta.getOrigDataRef();
+            if ( origHRef.isEmpty() )
+                origHRef = NOT_AVAILABLE_TAG;
             report.print(origHRef);
             report.print("\t");
 
+            String socatDOI = socatDOIList.get(k);
             report.print(socatDOI);
             report.print("\t");
 
+            String socatHRef = SOCAT_ENHANCED_HREF_PREFIX + socatDOI;
             report.print(socatHRef);
             report.print("\t");
 
@@ -792,8 +738,7 @@ public class SocatCruiseReporter {
             report.print("\t");
 
             try {
-                String beginDatestamp = omeMeta.getBeginDatestamp();
-                report.print(beginDatestamp);
+                report.print(omeMeta.getBeginDatestamp());
             } catch ( Exception ex ) {
                 // Leave blank
                 warnMsgs.add("Invalid beginning date for " + upperExpo);
@@ -801,27 +746,24 @@ public class SocatCruiseReporter {
             report.print("\t");
 
             try {
-                String endDatestamp = omeMeta.getEndDatestamp();
-                report.print(endDatestamp);
+                report.print(omeMeta.getEndDatestamp());
             } catch ( Exception ex ) {
                 // Leave blank
                 warnMsgs.add("Invalid ending date for " + upperExpo);
             }
             report.print("\t");
 
-            report.print(qcFlag);
+            report.print(qcFlagList.get(k));
             report.print("\t");
 
-            String docs = "";
             boolean isFirst = true;
-            for (String filename : addlDocs) {
+            for (String filename : addlDocsList.get(k)) {
                 if ( isFirst )
                     isFirst = false;
                 else
-                    docs += "; ";
-                docs += filename;
+                    report.print("; ");
+                report.print(filename);
             }
-            report.print(docs);
 
             report.println();
 
@@ -838,7 +780,7 @@ public class SocatCruiseReporter {
                     if ( isFirst )
                         isFirst = false;
                     else
-                        report.print("; ");
+                        report.print(", ");
                     report.print(upperExpo);
                     warnMsgs.add(upperExpo + " was marked as having artificial hours, minutes, and seconds");
                 }
@@ -862,7 +804,7 @@ public class SocatCruiseReporter {
      *         is this header for a multi-cruise report (only data with fCO2_rec given and WOCE-flag 2 or not given, do
      *         not include original-data CO2 measurement columns) ?
      */
-    private static void printDataTableHeader(PrintWriter report, boolean multicruise) {
+    private void printDataTableHeader(PrintWriter report, boolean multicruise) {
         report.println("Explanation of data columns:");
         if ( multicruise ) {
             for (int k = 0; k < MULTI_CRUISE_DATA_REPORT_EXPLANATIONS.length; k++) {
@@ -909,8 +851,8 @@ public class SocatCruiseReporter {
     }
 
     /**
-     * Explanation lines for the data columns given by the header string {@link #SINGLE_CRUISE_DATA_REPORT_HEADER} and
-     * data strings returned by the single-cruise version of {@link #dataReportString}
+     * Explanation lines for the data columns given by the header string {@link #SINGLE_CRUISE_DATA_REPORT_HEADER}
+     * and data strings returned by the single-cruise version of {@link #printDataStrings}
      */
     private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
@@ -954,46 +896,45 @@ public class SocatCruiseReporter {
     };
 
     /**
-     * Tab-separated data column names for the data Strings returned by the single-cruise version of {@link
-     * #dataReportString}
+     * Tab-separated data column names for the data Strings returned by the single-cruise version of
+     * {@link #printDataStrings}
      */
-    private static final String SINGLE_CRUISE_DATA_REPORT_HEADER =
-            "Expocode\t" +
-                    "version\t" +
-                    "SOCAT_DOI\t" +
-                    "QC_Flag\t" +
-                    "yr\t" +
-                    "mon\t" +
-                    "day\t" +
-                    "hh\t" +
-                    "mm\t" +
-                    "ss\t" +
-                    "longitude [dec.deg.E]\t" +
-                    "latitude [dec.deg.N]\t" +
-                    "sample_depth [m]\t" +
-                    "sal\t" +
-                    "SST [deg.C]\t" +
-                    "Tequ [deg.C]\t" +
-                    "PPPP [hPa]\t" +
-                    "Pequ [hPa]\t" +
-                    "WOA_SSS\t" +
-                    "NCEP_SLP [hPa]\t" +
-                    "ETOPO2_depth [m]\t" +
-                    "dist_to_land [km]\t" +
-                    "GVCO2 [umol/mol]\t" +
-                    "xCO2water_equ_dry [umol/mol]\t" +
-                    "xCO2water_SST_dry [umol/mol]\t" +
-                    "pCO2water_equ_wet [uatm]\t" +
-                    "pCO2water_SST_wet [uatm]\t" +
-                    "fCO2water_equ_wet [uatm]\t" +
-                    "fCO2water_SST_wet [uatm]\t" +
-                    "fCO2rec [uatm]\t" +
-                    "fCO2rec_src\t" +
-                    "fCO2rec_flag";
+    private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+            "version\t" +
+            "SOCAT_DOI\t" +
+            "QC_Flag\t" +
+            "yr\t" +
+            "mon\t" +
+            "day\t" +
+            "hh\t" +
+            "mm\t" +
+            "ss\t" +
+            "longitude [dec.deg.E]\t" +
+            "latitude [dec.deg.N]\t" +
+            "sample_depth [m]\t" +
+            "sal\t" +
+            "SST [deg.C]\t" +
+            "Tequ [deg.C]\t" +
+            "PPPP [hPa]\t" +
+            "Pequ [hPa]\t" +
+            "WOA_SSS\t" +
+            "NCEP_SLP [hPa]\t" +
+            "ETOPO2_depth [m]\t" +
+            "dist_to_land [km]\t" +
+            "GVCO2 [umol/mol]\t" +
+            "xCO2water_equ_dry [umol/mol]\t" +
+            "xCO2water_SST_dry [umol/mol]\t" +
+            "pCO2water_equ_wet [uatm]\t" +
+            "pCO2water_SST_wet [uatm]\t" +
+            "fCO2water_equ_wet [uatm]\t" +
+            "fCO2water_SST_wet [uatm]\t" +
+            "fCO2rec [uatm]\t" +
+            "fCO2rec_src\t" +
+            "fCO2rec_flag";
 
     /**
      * Explanation lines for the data columns given by the header string {@link #MULTI_CRUISE_DATA_REPORT_HEADER} and
-     * data strings returned by the multi-cruise version of {@link #dataReportString}
+     * data strings returned by the multi-cruise version of {@link #printDataStrings}
      */
     private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
@@ -1031,277 +972,463 @@ public class SocatCruiseReporter {
     };
 
     /**
-     * Tab-separated data column names for the data Strings returned by the multi-cruise version of {@link
-     * #dataReportString}
+     * Tab-separated data column names for the data Strings returned by the multi-cruise version of
+     * {@link #printDataStrings}
      */
-    private static final String MULTI_CRUISE_DATA_REPORT_HEADER =
-            "Expocode\t" +
-                    "version\t" +
-                    "SOCAT_DOI\t" +
-                    "QC_Flag\t" +
-                    "yr\t" +
-                    "mon\t" +
-                    "day\t" +
-                    "hh\t" +
-                    "mm\t" +
-                    "ss\t" +
-                    "longitude [dec.deg.E]\t" +
-                    "latitude [dec.deg.N]\t" +
-                    "sample_depth [m]\t" +
-                    "sal\t" +
-                    "SST [deg.C]\t" +
-                    "Tequ [deg.C]\t" +
-                    "PPPP [hPa]\t" +
-                    "Pequ [hPa]\t" +
-                    "WOA_SSS\t" +
-                    "NCEP_SLP [hPa]\t" +
-                    "ETOPO2_depth [m]\t" +
-                    "dist_to_land [km]\t" +
-                    "GVCO2 [umol/mol]\t" +
-                    "fCO2rec [uatm]\t" +
-                    "fCO2rec_src\t" +
-                    "fCO2rec_flag";
+    private static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+            "version\t" +
+            "SOCAT_DOI\t" +
+            "QC_Flag\t" +
+            "yr\t" +
+            "mon\t" +
+            "day\t" +
+            "hh\t" +
+            "mm\t" +
+            "ss\t" +
+            "longitude [dec.deg.E]\t" +
+            "latitude [dec.deg.N]\t" +
+            "sample_depth [m]\t" +
+            "sal\t" +
+            "SST [deg.C]\t" +
+            "Tequ [deg.C]\t" +
+            "PPPP [hPa]\t" +
+            "Pequ [hPa]\t" +
+            "WOA_SSS\t" +
+            "NCEP_SLP [hPa]\t" +
+            "ETOPO2_depth [m]\t" +
+            "dist_to_land [km]\t" +
+            "GVCO2 [umol/mol]\t" +
+            "fCO2rec [uatm]\t" +
+            "fCO2rec_src\t" +
+            "fCO2rec_flag";
 
     /**
+     * @param report
+     *         print the data strings here
      * @param dataVals
-     *         data array of all standardized values
-     * @param rowIndex
-     *         index of the data row to report
-     * @param sectime
-     *         date/time of this data point in seconds since 01-JAN-1970 00:00:00 UTC
+     *         all standardized values for this SOCAT-enhanced dataset
      * @param expocode
-     *         expocode for the cruise data report string
-     * @param socatVersion
-     *         SOCAT Version for the cruise data report string
+     *         ID for this dataset
+     * @param version
+     *         version for this SOCAT-enhanced dataset
      * @param socatDOI
-     *         SOCAT DOI for the cruise data report string
-     * @param cruiseQCFlag
-     *         cruise QC flag for the cruise
+     *         DOI for this SOCAT-enhanced dataset
+     * @param qcFlag
+     *         dataset QC flag value for this dataset
+     * @param regionID
+     *         if not null, restrict data reported to those in the region with this ID;
+     *         ignored if multicruise is false
      * @param multicruise
-     *         create the multi-cruise data string (no original-data CO2 measurements) ?
-     * @param prevDatPts
-     *         if not null, a set of DataPoint objects for previous datapoints in this dataset.
-     *         This method will add the current datapoint to this set, and if it duplicates a
-     *         datapoint already added, and empty string is returned.
-     *
-     * @return tab-separated data values for SOCAT data reporting, or an empty string if this lon/lat/time/fCO2_rec
-     *         duplicates that for a previous datapoint.
+     *         if true, print multi-cruise data strings (no original-data CO2 measurements,
+     *         only WOCE-2 data points, eliminate duplicate data points);
+     *         if false, print single-cruise data strings
      */
-    private static String dataReportString(StdDataArray dataVals, int rowIndex, Double sectime, String expocode,
-            String socatVersion, String socatDOI, String cruiseQCFlag, boolean multicruise,
-            TreeSet<DataPoint> prevDatPts) throws IllegalArgumentException {
+    private void printDataStrings(PrintWriter report, StdDataArray dataVals, String expocode, String version,
+            String socatDOI, String qcFlag, String regionID, boolean multicruise) throws IOException {
+        // Indices to data columns that will be reported
+        // All data columns should exist, although they may not have any valid values
+        Integer longitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LONGITUDE);
+        if ( longitudeIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.LONGITUDE.getVarName());
 
-        if ( prevDatPts != null ) {
-            // Add this lon/lat/time/sst/sal/fCO2_rec datapoint to the set; checking for duplicates
-            DataPoint datpt = new DataPoint(expocode, sectime, dataVals.getLatitude(), dataVals.getLongitude(),
-                    dataVals.getSst(), dataVals.getSalinity(), dataVals.getfCO2Rec());
-            if ( !prevDatPts.add(datpt) ) {
-                System.err.println("Ignored duplicate datapoint for " + expocode + ": " + datpt.toString());
-                return "";
+        Integer latitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LATITUDE);
+        if ( latitudeIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.LATITUDE.getVarName());
+
+        Integer yearIdx = dataVals.getIndexOfType(DashboardServerUtils.YEAR);
+        if ( yearIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.YEAR.getVarName());
+
+        Integer monthOfYearIdx = dataVals.getIndexOfType(DashboardServerUtils.MONTH_OF_YEAR);
+        if ( monthOfYearIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.MONTH_OF_YEAR.getVarName());
+
+        Integer dayOfMonthIdx = dataVals.getIndexOfType(DashboardServerUtils.DAY_OF_MONTH);
+        if ( dayOfMonthIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.DAY_OF_MONTH.getVarName());
+
+        Integer hourOfDayIdx = dataVals.getIndexOfType(DashboardServerUtils.HOUR_OF_DAY);
+        if ( hourOfDayIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.HOUR_OF_DAY.getVarName());
+
+        Integer minOfHourIdx = dataVals.getIndexOfType(DashboardServerUtils.MINUTE_OF_HOUR);
+        if ( minOfHourIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.MINUTE_OF_HOUR.getVarName());
+
+        Integer secOfMinIdx = dataVals.getIndexOfType(DashboardServerUtils.SECOND_OF_MINUTE);
+        if ( secOfMinIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.SECOND_OF_MINUTE.getVarName());
+
+        Integer salIdx = dataVals.getIndexOfType(SocatTypes.SALINITY);
+        if ( salIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.SALINITY.getVarName());
+
+        Integer woaSalIdx = dataVals.getIndexOfType(SocatTypes.WOA_SALINITY);
+        if ( woaSalIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.WOA_SALINITY.getVarName());
+
+        Integer tequIdx = dataVals.getIndexOfType(SocatTypes.TEQU);
+        if ( tequIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.TEQU.getVarName());
+
+        Integer sstIdx = dataVals.getIndexOfType(SocatTypes.SST);
+        if ( sstIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.SST.getVarName());
+
+        Integer pequIdx = dataVals.getIndexOfType(SocatTypes.PEQU);
+        if ( pequIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PEQU.getVarName());
+
+        Integer patmIdx = dataVals.getIndexOfType(SocatTypes.PATM);
+        if ( patmIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PATM.getVarName());
+
+        Integer ncepSLPIdx = dataVals.getIndexOfType(SocatTypes.NCEP_SLP);
+        if ( ncepSLPIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.NCEP_SLP.getVarName());
+
+        Integer depthIdx = dataVals.getIndexOfType(DashboardServerUtils.SAMPLE_DEPTH);
+        if ( depthIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + DashboardServerUtils.SAMPLE_DEPTH.getVarName());
+
+        Integer etopoDepthIdx = dataVals.getIndexOfType(SocatTypes.ETOPO2_DEPTH);
+        if ( etopoDepthIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.ETOPO2_DEPTH.getVarName());
+
+        Integer distToLandIdx = dataVals.getIndexOfType(SocatTypes.DIST_TO_LAND);
+        if ( distToLandIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.DIST_TO_LAND.getVarName());
+
+        Integer gvco2Idx = dataVals.getIndexOfType(SocatTypes.GVCO2);
+        if ( gvco2Idx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.GVCO2.getVarName());
+
+        Integer fco2RecIdx = dataVals.getIndexOfType(SocatTypes.FCO2_REC);
+        if ( fco2RecIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_REC.getVarName());
+
+        Integer fco2SrcIdx = dataVals.getIndexOfType(SocatTypes.FCO2_SOURCE);
+        if ( fco2SrcIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_SOURCE.getVarName());
+
+        Integer woceWaterIdx = dataVals.getIndexOfType(SocatTypes.WOCE_CO2_WATER);
+        if ( woceWaterIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.WOCE_CO2_WATER.getVarName());
+
+        // For multicruise reports, remove duplicate data points.
+        // Region restrictions, if any, only apply to multicruise reports.
+        Integer sectimeIdx;
+        Integer regionIdx;
+        Integer xco2WaterTEquIdx;
+        Integer xco2WaterSSTIdx;
+        Integer pco2WaterTEquIdx;
+        Integer pco2WaterSSTIdx;
+        Integer fco2WaterTEquIdx;
+        Integer fco2WaterSSTIdx;
+        TreeSet<DataPoint> prevDatPts;
+        if ( multicruise ) {
+            sectimeIdx = dataVals.getIndexOfType(DashboardServerUtils.TIME);
+            if ( sectimeIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + DashboardServerUtils.TIME.getVarName());
+
+            xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
+            if ( xco2WaterTEquIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName());
+
+            xco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_SST_DRY);
+            if ( xco2WaterSSTIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.XCO2_WATER_SST_DRY.getVarName());
+
+            pco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_TEQU_WET);
+            if ( pco2WaterTEquIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.PCO2_WATER_TEQU_WET.getVarName());
+
+            pco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_SST_WET);
+            if ( pco2WaterSSTIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.PCO2_WATER_SST_WET.getVarName());
+
+            fco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_TEQU_WET);
+            if ( fco2WaterTEquIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.FCO2_WATER_TEQU_WET.getVarName());
+
+            fco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_SST_WET);
+            if ( fco2WaterSSTIdx == null )
+                throw new IOException("The DSG file for " + expocode +
+                        " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
+
+            if ( regionID != null ) {
+                regionIdx = dataVals.getIndexOfType(DashboardServerUtils.REGION_ID);
+                if ( regionIdx == null )
+                    throw new IOException("The DSG file for " + expocode +
+                            " does not contain the variable " + DashboardServerUtils.REGION_ID.getVarName());
             }
-        }
+            else
+                regionIdx = null;
 
-        // Generate the string for this data point
-        Formatter fmtr = new Formatter();
-        fmtr.format("%s\t", expocode);
-        fmtr.format("%s\t", socatVersion);
-        fmtr.format("%s\t", socatDOI);
-        fmtr.format("%s\t", cruiseQCFlag);
-
-        Integer intVal = dataVals.getYear();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%04d\t", intVal);
-
-        intVal = dataVals.getMonth();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%02d\t", intVal);
-
-        intVal = dataVals.getDay();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%02d\t", intVal);
-
-        intVal = dataVals.getHour();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%02d\t", intVal);
-
-        intVal = dataVals.getMinute();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%02d\t", intVal);
-
-        Double dblVal = dataVals.getSecond();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#03.0f\t", dblVal);
-
-        dblVal = dataVals.getLongitude();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) ) {
-            fmtr.format("NaN\t");
+            prevDatPts = new TreeSet<DataPoint>();
         }
         else {
-            while ( dblVal < 0.0 ) {
-                dblVal += 360.0;
-            }
-            while ( dblVal >= 360.0 ) {
-                dblVal -= 360.0;
-            }
-            fmtr.format("%#.5f\t", dblVal);
+            sectimeIdx = null;
+            xco2WaterTEquIdx = null;
+            xco2WaterSSTIdx = null;
+            pco2WaterTEquIdx = null;
+            pco2WaterSSTIdx = null;
+            fco2WaterTEquIdx = null;
+            fco2WaterSSTIdx = null;
+            regionIdx = null;
+            prevDatPts = null;
         }
 
-        dblVal = dataVals.getLatitude();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.5f\t", dblVal);
+        for (int j = 0; j < dataVals.getNumSamples(); j++) {
+            if ( multicruise ) {
+                // First check if this data sample should even be considered
+                if ( (regionID != null) && !regionID.equals((String) dataVals.getStdVal(j, regionIdx)) )
+                    continue;
+                Double fco2Rec = (Double) dataVals.getStdVal(j, fco2RecIdx);
+                if ( fco2Rec == null )
+                    continue;
+                String woceValue = (String) dataVals.getStdVal(j, woceWaterIdx);
+                if ( !((woceValue == null) || woceValue.trim().isEmpty() ||
+                        DashboardServerUtils.WOCE_ACCEPTABLE.equals(woceValue)) )
+                    continue;
+                // Valid for multicruise report; now check that it is not a duplicate
+                DataPoint datpt = new DataPoint(expocode, (Double) dataVals.getStdVal(j, sectimeIdx),
+                        (Double) dataVals.getStdVal(j, latitudeIdx), (Double) dataVals.getStdVal(j, longitudeIdx),
+                        (Double) dataVals.getStdVal(j, sstIdx), (Double) dataVals.getStdVal(j, salIdx), fco2Rec);
+                if ( !prevDatPts.add(datpt) ) {
+                    System.err.println("Ignored duplicate datapoint for " + expocode + ": " + datpt.toString());
+                    continue;
+                }
+            }
 
-        dblVal = dataVals.getSampleDepth();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.0f\t", dblVal);
+            // Generate the string for this data point
+            Formatter fmtr = new Formatter();
+            fmtr.format("%s\t", expocode);
+            fmtr.format("%s\t", version);
+            fmtr.format("%s\t", socatDOI);
+            fmtr.format("%s\t", qcFlag);
 
-        dblVal = dataVals.getSalinity();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            Integer intVal = (Integer) dataVals.getStdVal(j, yearIdx);
+            if ( intVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%04d\t", intVal);
 
-        dblVal = dataVals.getSst();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            intVal = (Integer) dataVals.getStdVal(j, monthOfYearIdx);
+            if ( intVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%02d\t", intVal);
 
-        dblVal = dataVals.getTEqu();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            intVal = (Integer) dataVals.getStdVal(j, dayOfMonthIdx);
+            if ( intVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%02d\t", intVal);
 
-        dblVal = dataVals.getPAtm();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            intVal = (Integer) dataVals.getStdVal(j, hourOfDayIdx);
+            if ( intVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%02d\t", intVal);
 
-        dblVal = dataVals.getPEqu();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            intVal = (Integer) dataVals.getStdVal(j, minOfHourIdx);
+            if ( intVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%02d\t", intVal);
 
-        dblVal = dataVals.getWoaSalinity();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            Double dblVal = (Double) dataVals.getStdVal(j, secOfMinIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#03.0f\t", dblVal);
 
-        dblVal = dataVals.getNcepSlp();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
+            dblVal = (Double) dataVals.getStdVal(j, longitudeIdx);
+            if ( dblVal == null ) {
+                fmtr.format("NaN\t");
+            }
+            else {
+                while ( dblVal < 0.0 ) {
+                    dblVal += 360.0;
+                }
+                while ( dblVal >= 360.0 ) {
+                    dblVal -= 360.0;
+                }
+                fmtr.format("%#.5f\t", dblVal);
+            }
 
-        dblVal = dataVals.getEtopo2Depth();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.0f\t", dblVal);
+            dblVal = (Double) dataVals.getStdVal(j, latitudeIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.5f\t", dblVal);
 
-        dblVal = dataVals.getDistToLand();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.0f\t", dblVal);
+            dblVal = (Double) dataVals.getStdVal(j, depthIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.0f\t", dblVal);
 
-        dblVal = dataVals.getGvCO2();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
-
-        if ( !multicruise ) {
-            dblVal = dataVals.getXCO2WaterTEquDry();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, salIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
 
-            dblVal = dataVals.getXCO2WaterSstDry();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, sstIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
 
-            dblVal = dataVals.getPCO2WaterTEquWet();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, tequIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
 
-            dblVal = dataVals.getPCO2WaterSstWet();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, patmIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
 
-            dblVal = dataVals.getFCO2WaterTEquWet();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, pequIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
 
-            dblVal = dataVals.getFCO2WaterSstWet();
-            if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
+            dblVal = (Double) dataVals.getStdVal(j, woaSalIdx);
+            if ( dblVal == null )
                 fmtr.format("NaN\t");
             else
                 fmtr.format("%#.3f\t", dblVal);
+
+            dblVal = (Double) dataVals.getStdVal(j, ncepSLPIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", dblVal);
+
+            dblVal = (Double) dataVals.getStdVal(j, etopoDepthIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.0f\t", dblVal);
+
+            dblVal = (Double) dataVals.getStdVal(j, distToLandIdx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.0f\t", dblVal);
+
+            dblVal = (Double) dataVals.getStdVal(j, gvco2Idx);
+            if ( dblVal == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", dblVal);
+
+            if ( !multicruise ) {
+                dblVal = (Double) dataVals.getStdVal(j, xco2WaterTEquIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+
+                dblVal = (Double) dataVals.getStdVal(j, xco2WaterSSTIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+
+                dblVal = (Double) dataVals.getStdVal(j, pco2WaterTEquIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+
+                dblVal = (Double) dataVals.getStdVal(j, pco2WaterSSTIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+
+                dblVal = (Double) dataVals.getStdVal(j, fco2WaterTEquIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+
+                dblVal = (Double) dataVals.getStdVal(j, fco2WaterSSTIdx);
+                if ( dblVal == null )
+                    fmtr.format("NaN\t");
+                else
+                    fmtr.format("%#.3f\t", dblVal);
+            }
+
+            dblVal = (Double) dataVals.getStdVal(j, fco2RecIdx);
+            if ( dblVal == null ) {
+                fmtr.format("NaN\t");
+                // if fCO2_rec not given, always set source to zero
+                fmtr.format("0\t");
+                // if fCO2_rec not given, always set WOCE flag to nine ("bottle not sampled");
+                fmtr.format("9");
+            }
+            else {
+                fmtr.format("%#.3f\t", dblVal);
+
+                intVal = (Integer) dataVals.getStdVal(j, fco2SrcIdx);
+                if ( intVal == null )
+                    fmtr.format("0\t");
+                else
+                    fmtr.format("%d\t", intVal);
+
+                String woceVal = (String) dataVals.getStdVal(j, woceWaterIdx);
+                if ( (woceVal == null) || woceVal.isEmpty() )
+                    fmtr.format("2");
+                else
+                    fmtr.format(woceVal);
+            }
+
+            report.println(fmtr.toString());
+            fmtr.close();
         }
-
-        dblVal = dataVals.getfCO2Rec();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("NaN\t");
-        else
-            fmtr.format("%#.3f\t", dblVal);
-
-        // if fCO2_rec not given, always set source to zero
-        intVal = dataVals.getFCO2Source();
-        if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) ||
-                DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("0\t");
-        else
-            fmtr.format("%d\t", intVal);
-
-        // if fCO2_rec not given, always set to nine ("bottle not sampled");
-        // otherwise if missing or zero, it is presumed to be good (two)
-        String woceVal = dataVals.getWoceCO2Water();
-        if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
-            fmtr.format("9");
-        else if ( woceVal.equals(DashboardUtils.STRING_MISSING_VALUE) || woceVal.equals("0") )
-            fmtr.format("2");
-        else
-            fmtr.format("%s", woceVal);
-
-        String repStr = fmtr.toString();
-        fmtr.close();
-        return repStr;
     }
 
     /**
      * Tab-separated data column names for the data printed by {@link #generateDataFileForGrids(TreeSet, File)}
      */
-    private static final String GENERATE_DATA_FILE_FOR_GRIDS_HEADER =
-            "data_id\t" +
+    private static final String GENERATE_DATA_FILE_FOR_GRIDS_HEADER = "data_id\t" +
             "latitude\t" +
             "longitude\t" +
             "datetime\t" +
@@ -1318,14 +1445,15 @@ public class SocatCruiseReporter {
      * time, fCO2rec, and WOCE flag are printed.
      *
      * @param expocodes
-     *         use the data for the datasets with these datasetIds
+     *         report the data in the datasets with these IDs
      * @param outputFile
      *         print the data to this File
      *
      * @throws IllegalArgumentException
-     *         if an expocode is invalid, or if the full-data DSG file for a dataset is invalid
+     *         if an dataset ID is invalid, or if the full-data DSG file for a dataset is invalid
      * @throws IOException
-     *         if creating or writing to the output file throws one, or if reading from a DSG file throws one
+     *         if reading from a DSG file throws one, or
+     *         if creating or writing to the output file throws one
      */
     public void generateDataFileForGrids(TreeSet<String> expocodes, File outputFile)
             throws IllegalArgumentException, IOException {
@@ -1346,28 +1474,59 @@ public class SocatCruiseReporter {
                     }
                     throw new IllegalArgumentException(msg);
                 }
-                // Get the computed values of time in seconds since 1970-01-01 00:00:00
-                double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
+                StdDataArray dataVals = dsgFile.getStdDataArray();
+
+                Integer longitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LONGITUDE);
+                if ( longitudeIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + DashboardServerUtils.LONGITUDE.getVarName());
+
+                Integer latitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LATITUDE);
+                if ( latitudeIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + DashboardServerUtils.LATITUDE.getVarName());
+
+                Integer sectimeIdx = dataVals.getIndexOfType(DashboardServerUtils.TIME);
+                if ( sectimeIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + DashboardServerUtils.TIME.getVarName());
+
+                Integer fco2RecIdx = dataVals.getIndexOfType(SocatTypes.FCO2_REC);
+                if ( fco2RecIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + SocatTypes.FCO2_REC.getVarName());
+
+                Integer salIdx = dataVals.getIndexOfType(SocatTypes.SALINITY);
+                if ( salIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + SocatTypes.SALINITY.getVarName());
+
+                Integer sstIdx = dataVals.getIndexOfType(SocatTypes.SST);
+                if ( sstIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + SocatTypes.SST.getVarName());
+
+                Integer woceWaterIdx = dataVals.getIndexOfType(SocatTypes.WOCE_CO2_WATER);
+                if ( woceWaterIdx == null )
+                    throw new IOException("The DSG file for " + upperExpo +
+                            " does not contain the variable " + SocatTypes.WOCE_CO2_WATER.getVarName());
+
                 // Collect and sort the acceptable data for this cruise
                 // Any duplicates are eliminated in this process
                 TreeSet<DataPoint> datSet = new TreeSet<DataPoint>();
-                int j = -1;
-                for (StdDataArray dataVals : dsgFile.getStdDataArray()) {
-                    j++;
-                    Double fco2rec = dataVals.getfCO2Rec();
-                    if ( DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) )
+                for (int j = 0; j < dataVals.getNumSamples(); j++) {
+                    Double fco2rec = (Double) dataVals.getStdVal(j, fco2RecIdx);
+                    if ( fco2rec == null )
                         continue;
-                    String woceFlag = dataVals.getWoceCO2Water();
-                    if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) ||
-                            woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
-                        DataPoint datpt = new DataPoint(upperExpo, sectimes[j], dataVals.getLatitude(),
-                                dataVals.getLongitude(), dataVals.getSst(),
-                                dataVals.getSalinity(), fco2rec);
-                        if ( !datSet.add(datpt) ) {
-                            System.err.println(
-                                    "Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
-                        }
-                    }
+                    String woceFlag = (String) dataVals.getStdVal(j, woceWaterIdx);
+                    if ( !((woceFlag == null) || woceFlag.isEmpty() ||
+                            DashboardServerUtils.WOCE_ACCEPTABLE.equals(woceFlag)) )
+                        continue;
+                    DataPoint datpt = new DataPoint(upperExpo, (Double) dataVals.getStdVal(j, sectimeIdx),
+                            (Double) dataVals.getStdVal(j, latitudeIdx), (Double) dataVals.getStdVal(j, longitudeIdx),
+                            (Double) dataVals.getStdVal(j, sstIdx), (Double) dataVals.getStdVal(j, salIdx), fco2rec);
+                    if ( !datSet.add(datpt) )
+                        System.err.println("Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
                 }
                 // Print the sorted data for this cruise
                 for (DataPoint datPt : datSet) {

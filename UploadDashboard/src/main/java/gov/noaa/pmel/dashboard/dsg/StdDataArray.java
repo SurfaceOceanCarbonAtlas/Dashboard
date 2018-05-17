@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -31,6 +32,7 @@ public class StdDataArray {
     protected int numDataCols;
     protected DashDataType<?>[] dataTypes;
     protected Object[][] stdObjects;
+    // Often-used indices
     protected int longitudeIndex;
     protected int latitudeIndex;
     protected int sampleDepthIndex;
@@ -45,13 +47,15 @@ public class StdDataArray {
     protected int secondOfMinuteIndex;
     protected int dayOfYearIndex;
     protected int secondOfDayIndex;
+    // Indices of all types keyed on the variable name for the type
+    protected HashMap<String,Integer> typeNameIndexMap;
     // Indices used for compute sample time by getSampleTime; used for flagging data misordered in time
     protected int[] indicesForTime;
 
     /**
      * Create and assign the 1-D arrays of data column types from the given user's descriptions of the data column.
-     * Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and {@link
-     * DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D array of standard data objects is not created.
+     * Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and
+     * {@link DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D array of standard data objects is not created.
      *
      * @param dataColumnTypes
      *         user's description of the data columns in each sample
@@ -59,8 +63,9 @@ public class StdDataArray {
      *         all known user data types
      *
      * @throws IllegalArgumentException
-     *         if there are no user data column descriptions, if there are no known user data types, or if a data column
-     *         description is not a known user data type
+     *         if there are no user data column descriptions,
+     *         if there are no known user data types, or
+     *         if a data column description is not a known user data type
      */
     protected StdDataArray(List<DataColumnType> dataColumnTypes, KnownDataTypes knownTypes)
             throws IllegalArgumentException {
@@ -91,8 +96,8 @@ public class StdDataArray {
     /**
      * Create with the given data file data types for each column and the given standardized data objects
      * for each data column value (second index) in each sample (first index).  The data types given must
-     * be known subclasses of DashDataType valid for data files: {@link StringDashDataType}, {@link IntDashDataType},
-     * or {@link DoubleDashDataType}.
+     * be known subclasses of DashDataType valid for data files: {@link StringDashDataType},
+     * {@link IntDashDataType}, or {@link DoubleDashDataType}.
      *
      * @param dataColumnTypes
      *         types for the data columns in each sample
@@ -348,6 +353,7 @@ public class StdDataArray {
      * assigned types of the data columns.
      */
     private void assignColumnIndicesOfInterest() {
+        typeNameIndexMap = new HashMap<String,Integer>(64);
         longitudeIndex = DashboardUtils.INT_MISSING_VALUE;
         latitudeIndex = DashboardUtils.INT_MISSING_VALUE;
         sampleDepthIndex = DashboardUtils.INT_MISSING_VALUE;
@@ -363,6 +369,9 @@ public class StdDataArray {
         dayOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
         secondOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
         for (int k = 0; k < numDataCols; k++) {
+            if ( typeNameIndexMap.put(dataTypes[k].getVarName(), k) != null )
+                throw new IllegalArgumentException("Unexpected duplicate data column type variable name" +
+                        dataTypes[k].getVarName());
             if ( DashboardServerUtils.LONGITUDE.typeNameEquals(dataTypes[k]) )
                 longitudeIndex = k;
             else if ( DashboardServerUtils.LATITUDE.typeNameEquals(dataTypes[k]) )
@@ -846,86 +855,23 @@ public class StdDataArray {
     }
 
     /**
-     * Gets the String data values for the indicated data column type.
+     * Gets the index of the data array column whose type matches the given data column type.
+     * The data column type matching is performed using the data column variable name.
+     * The data class name of the matched data columns is verified to be the same.
      *
-     * @param dataType
-     *         get String data values for this data column type
+     * @param dtype
+     *         find the index of the data array column with this data type
      *
-     * @return an array of Strings with the values of the given data column type, or
-     *         null if no data column type in the array matches the given data column type.
+     * @return the index of the data array column with the matching type, or null if no match is found
      */
-    public String[] getDataColumnStrings(StringDashDataType dataType) {
-        int colidx = DashboardUtils.INT_MISSING_VALUE;
-        for (int k = 0; k < numDataCols; k++) {
-            DashDataType<?> dtype = dataTypes[k];
-            if ( (dtype instanceof StringDashDataType) && dtype.typeNameEquals(dataType) ) {
-                colidx = k;
-                break;
-            }
-        }
-        if ( !isUsableIndex(colidx) )
+    public Integer getIndexOfType(DashDataType<?> dtype) {
+        Integer colidx = typeNameIndexMap.get(dtype.getVarName());
+        if ( colidx == null )
             return null;
-        String[] dataCol = new String[numSamples];
-        for (int j = 0; j < numSamples; j++) {
-            dataCol[j] = (String) stdObjects[j][colidx];
-        }
-        return dataCol;
-    }
-
-    /**
-     * Gets the Integer data values for the indicated data column type.
-     *
-     * @param dataType
-     *         get Integer data values for this data column type
-     *
-     * @return an array of Integers with the values of the given data column type, or
-     *         null if no data column type in the array matches the given data column type.
-     */
-    public Integer[] getDataColumnIntegers(IntDashDataType dataType) {
-        int colidx = DashboardUtils.INT_MISSING_VALUE;
-        for (int k = 0; k < numDataCols; k++) {
-            DashDataType<?> dtype = dataTypes[k];
-            if ( (dtype instanceof IntDashDataType) && dtype.typeNameEquals(dataType) ) {
-                colidx = k;
-                break;
-            }
-        }
-        if ( !isUsableIndex(colidx) )
+        if ( !dtype.getDataClassName().equals(dataTypes[colidx].getDataClassName()) )
             return null;
-        Integer[] dataCol = new Integer[numSamples];
-        for (int j = 0; j < numSamples; j++) {
-            dataCol[j] = (Integer) stdObjects[j][colidx];
-        }
-        return dataCol;
+        return colidx;
     }
-
-    /**
-     * Gets the Double data values for the indicated data column type.
-     *
-     * @param dataType
-     *         get Double data values for this data column type
-     *
-     * @return an array of Double with the values of the given data column type, or
-     *         null if no data column type in the array matches the given data column type.
-     */
-    public Double[] getDataColumnDoubles(StringDashDataType dataType) {
-        int colidx = -1;
-        for (int k = 0; k < numDataCols; k++) {
-            DashDataType<?> dtype = dataTypes[k];
-            if ( (dtype instanceof DoubleDashDataType) && dtype.typeNameEquals(dataType) ) {
-                colidx = k;
-                break;
-            }
-        }
-        if ( !isUsableIndex(colidx) )
-            return null;
-        Double[] dataCol = new Double[numSamples];
-        for (int j = 0; j < numSamples; j++) {
-            dataCol[j] = (Double) stdObjects[j][colidx];
-        }
-        return dataCol;
-    }
-
 
     /**
      * Get the standard value object for the specified value (column index) of the specified sample (row index).
@@ -952,20 +898,6 @@ public class StdDataArray {
     public int hashCode() {
         final int prime = 37;
         int result = Arrays.deepHashCode(stdObjects);
-        result = prime * result + secondOfDayIndex;
-        result = prime * result + dayOfYearIndex;
-        result = prime * result + secondOfMinuteIndex;
-        result = prime * result + minuteOfHourIndex;
-        result = prime * result + hourOfDayIndex;
-        result = prime * result + timeOfDayIndex;
-        result = prime * result + dayOfMonthIndex;
-        result = prime * result + monthOfYearIndex;
-        result = prime * result + yearIndex;
-        result = prime * result + dateIndex;
-        result = prime * result + timestampIndex;
-        result = prime * result + sampleDepthIndex;
-        result = prime * result + latitudeIndex;
-        result = prime * result + longitudeIndex;
         result = prime * result + Arrays.hashCode(dataTypes);
         result = prime * result + numDataCols;
         result = prime * result + numSamples;
@@ -988,35 +920,6 @@ public class StdDataArray {
         if ( numSamples != other.numSamples )
             return false;
 
-        if ( longitudeIndex != other.longitudeIndex )
-            return false;
-        if ( latitudeIndex != other.latitudeIndex )
-            return false;
-        if ( sampleDepthIndex != other.sampleDepthIndex )
-            return false;
-        if ( timestampIndex != other.timestampIndex )
-            return false;
-        if ( dateIndex != other.dateIndex )
-            return false;
-        if ( yearIndex != other.yearIndex )
-            return false;
-        if ( monthOfYearIndex != other.monthOfYearIndex )
-            return false;
-        if ( dayOfMonthIndex != other.dayOfMonthIndex )
-            return false;
-        if ( timeOfDayIndex != other.timeOfDayIndex )
-            return false;
-        if ( hourOfDayIndex != other.hourOfDayIndex )
-            return false;
-        if ( minuteOfHourIndex != other.minuteOfHourIndex )
-            return false;
-        if ( secondOfMinuteIndex != other.secondOfMinuteIndex )
-            return false;
-        if ( dayOfYearIndex != other.dayOfYearIndex )
-            return false;
-        if ( secondOfDayIndex != other.secondOfDayIndex )
-            return false;
-
         if ( !Arrays.equals(dataTypes, other.dataTypes) )
             return false;
 
@@ -1028,36 +931,20 @@ public class StdDataArray {
 
     @Override
     public String toString() {
-        String repr = "StdDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols;
-        repr += ",\n  longitudeIndex=" + longitudeIndex;
-        repr += ", latitudeIndex=" + latitudeIndex;
-        repr += ", sampleDepthIndex=" + sampleDepthIndex;
-        repr += ", timestampIndex=" + timestampIndex;
-        repr += ", dateIndex=" + dateIndex;
-        repr += ", yearIndex=" + yearIndex;
-        repr += ", monthOfYearIndex=" + monthOfYearIndex;
-        repr += ", dayOfMonthIndex=" + dayOfMonthIndex;
-        repr += ", timeOfDayIndex=" + timeOfDayIndex;
-        repr += ", hourOfDayIndex=" + hourOfDayIndex;
-        repr += ", minuteOfHourIndex=" + minuteOfHourIndex;
-        repr += ", secondOfMinuteIndex=" + secondOfMinuteIndex;
-        repr += ", dayOfYearIndex=" + dayOfYearIndex;
-        repr += ", secondOfDayIndex=" + secondOfDayIndex;
-        repr += ",\n  dataTypes=[";
+        String repr = "StdDataArray[numSamples=" + numSamples + ", numDataCols=" + numDataCols +
+                ",\n dataTypes=[";
         for (int k = 0; k < numDataCols; k++) {
             if ( k > 0 )
                 repr += ",";
             repr += "\n    " + dataTypes[k].toString();
         }
-        repr += "\n  ]";
-        repr += ",\n  stdObjects=[";
+        repr += "\n  ],\n  stdObjects=[";
         for (int j = 0; j < numSamples; j++) {
             if ( j > 0 )
                 repr += ",";
             repr += "\n    " + Arrays.toString(stdObjects[j]);
         }
-        repr += "\n  ]";
-        repr += "\n]";
+        repr += "\n  ]\n]";
         return repr;
     }
 

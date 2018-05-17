@@ -325,7 +325,7 @@ public class DsgNcFile extends File {
                     if ( dvalue == null )
                         dvalue = DashboardUtils.STRING_MISSING_VALUE;
                     ArrayChar.D2 mvar = new ArrayChar.D2(1, maxMetaChar);
-                    mvar.setString(0, dvalue);
+                    mvar.setString(0, dvalue.trim());
                     ncfile.write(var, mvar);
                 }
                 else if ( dtype instanceof IntDashDataType ) {
@@ -365,7 +365,7 @@ public class DsgNcFile extends File {
                         String dvalue = (String) stddata.getStdVal(j, k);
                         if ( dvalue == null )
                             dvalue = DashboardUtils.STRING_MISSING_VALUE;
-                        dvar.setString(j, dvalue);
+                        dvar.setString(j, dvalue.trim());
                     }
                     ncfile.write(var, dvar);
                 }
@@ -436,7 +436,7 @@ public class DsgNcFile extends File {
                     throw new IOException("more than one value for a metadata type");
                 if ( dtype instanceof StringDashDataType ) {
                     ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
-                    String strval = mvar.getString(0);
+                    String strval = mvar.getString(0).trim();
                     if ( !DashboardUtils.STRING_MISSING_VALUE.equals(strval) )
                         metadata.setValue(dtype, strval);
                 }
@@ -528,7 +528,7 @@ public class DsgNcFile extends File {
                 if ( dtype instanceof StringDashDataType ) {
                     ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
                     for (int j = 0; j < numSamples; j++) {
-                        String strval = dvar.getString(j);
+                        String strval = dvar.getString(j).trim();
                         if ( DashboardUtils.STRING_MISSING_VALUE.equals(strval) )
                             dataArray[j][k] = null;
                         else
@@ -584,7 +584,7 @@ public class DsgNcFile extends File {
     /**
      * Reads and returns the array of data values for the specified variable contained in this DSG file.  The variable
      * must be saved in the DSG file as Strings.  For some variables, this DSG file must have been processed by Ferret
-     * for the data values to be meaningful.
+     * for the data values to be meaningful.  Missing values are left as in the DSG file.
      *
      * @param varName
      *         name of the variable to read
@@ -608,7 +608,7 @@ public class DsgNcFile extends File {
             int numVals = var.getShape(0);
             dataVals = new String[numVals];
             for (int k = 0; k < numVals; k++) {
-                dataVals[k] = cvar.getString(k);
+                dataVals[k] = cvar.getString(k).trim();
             }
         } finally {
             ncfile.close();
@@ -617,9 +617,9 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * Reads and returns the array of data values for the specified variable contained in this DSG file.  The variable
-     * must be saved in the DSG file as integers.  For some variables, this DSG file must have been processed by Ferret
-     * for the data values to be meaningful.
+     * Reads and returns the array of data values for the specified variable contained in this DSG file.
+     * The variable must be saved in the DSG file as integers.  For some variables, this DSG file must have been
+     * processed by Ferret for the data values to be meaningful.  Missing values are left as in the DSG file.
      *
      * @param varName
      *         name of the variable to read
@@ -653,10 +653,10 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * Reads and returns the array of data values for the specified variable contained in this DSG file.  The variable
-     * must be saved in the DSG file as doubles. NaN and infinite values are changed to {@link
-     * DashboardUtils#FP_MISSING_VALUE}. For some variables, this DSG file must have been processed by Ferret for the
-     * data values to be meaningful.
+     * Reads and returns the array of data values for the specified variable contained in this DSG file.
+     * The variable must be saved in the DSG file as doubles. NaN and infinite values are changed to
+     * {@link DashboardUtils#FP_MISSING_VALUE}, but otherwise missing values are left as in the DSG file.
+     * For some variables, this DSG file must have been processed by Ferret for the data values to be meaningful.
      *
      * @param varName
      *         name of the variable to read
@@ -694,14 +694,14 @@ public class DsgNcFile extends File {
 
     /**
      * Reads and returns the longitudes, latitudes, and times contained in this DSG file.  NaN and infinite values are
-     * changed to {@link DashboardUtils#FP_MISSING_VALUE}.
+     * changed to {@link DashboardUtils#FP_MISSING_VALUE} but otherwise missing values are left as in the DSG file.
      *
-     * @return the array { lons, lats, times } for this cruise, where lons are the array of longitudes, lats are the
-     *         array of latitudes, times are the array of times.
+     * @return the array { lons, lats, times } for this cruise, where lons are the array of longitudes,
+     *         lats are the array of latitudes, times are the array of times.
      *
      * @throws IOException
-     *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
-     *         file
+     *         if problems opening or reading from this DSG file, or
+     *         if any of the data arrays are not given in this DSG file
      */
     public double[][] readLonLatTimeDataValues() throws IOException {
         double[] lons;
@@ -762,18 +762,18 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * Reads and returns the longitudes, latitudes, times, SST values, and fCO2_recommended values contained in this DSG
-     * file.  NaN and infinite values are changed to {@link DashboardUtils#FP_MISSING_VALUE}.  This DSG file must have
-     * been processed by Ferret for the fCO2_recommended values to be meaningful.
+     * Reads and returns the longitudes, latitudes, times, SST values, and fCO2_recommended values contained in this
+     * DSG file.  NaN and infinite values are changed to {@link DashboardUtils#FP_MISSING_VALUE} but otherwise
+     * missing values are left as in the DSG file.  This DSG file must have been processed by Ferret for the
+     * fCO2_recommended values to be meaningful.
      *
      * @return the array { lons, lats, times, ssts, fco2s } for this cruise, where lons are the array of longitudes,
      *         lats are the array of latitudes, times are the array of times, ssts are the array of SST values, and
-     *         fco2s are
-     *         the array of fCO2_recommended values.
+     *         fco2s are the array of fCO2_recommended values.
      *
      * @throws IOException
-     *         if problems opening or reading from this DSG file, or if any of the data arrays are not given in this DSG
-     *         file
+     *         if problems opening or reading from this DSG file, or
+     *         if any of the data arrays are not given in this DSG file
      */
     public double[][] readLonLatTimeSstFco2DataValues() throws IOException {
         double[] lons;
@@ -882,7 +882,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 flagArray = (ArrayChar.D2) var.read();
-            flag = flagArray.getString(0);
+            flag = flagArray.getString(0).trim();
         } finally {
             ncfile.close();
         }
@@ -911,7 +911,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
-            flagArray.setString(0, qcFlag);
+            flagArray.setString(0, qcFlag.trim());
             try {
                 ncfile.write(var, flagArray);
             } catch ( InvalidRangeException ex ) {
@@ -923,7 +923,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 versionArray = new ArrayChar.D2(1, var.getShape(1));
-            versionArray.setString(0, version);
+            versionArray.setString(0, version.trim());
             try {
                 ncfile.write(var, versionArray);
             } catch ( InvalidRangeException ex ) {
@@ -968,7 +968,7 @@ public class DsgNcFile extends File {
                 throw new IllegalArgumentException("Not enough space (max " + Integer.toString(var.getShape(1)) +
                         ") for the string of all region IDs (" + allRegionIDs + ")");
             ArrayChar.D2 allRegionIDsArray = new ArrayChar.D2(1, var.getShape(1));
-            allRegionIDsArray.setString(0, allRegionIDs);
+            allRegionIDsArray.setString(0, allRegionIDs.trim());
             ncfile.write(var, allRegionIDsArray);
         } finally {
             ncfile.close();
@@ -1075,7 +1075,7 @@ public class DsgNcFile extends File {
                     }
                 }
                 if ( valueFound ) {
-                    wocevalues.setString(idx, newFlag);
+                    wocevalues.setString(idx, newFlag.trim());
                     if ( updateWoceEvent ) {
                         dataloc.setRowNumber(idx + 1);
                     }

@@ -36,11 +36,11 @@ public class DataLocationTest {
     @Test
     public void testGetSetRegionID() {
         DataLocation myflag = new DataLocation();
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setRegionID(MY_REGION_ID);
         assertEquals(MY_REGION_ID, myflag.getRegionID());
         myflag.setRegionID(null);
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
     }
 
     /**
@@ -53,7 +53,7 @@ public class DataLocationTest {
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
         myflag.setRowNumber(MY_ROW_NUMBER);
         assertEquals(MY_ROW_NUMBER, myflag.getRowNumber());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setRowNumber(null);
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
     }
@@ -69,7 +69,7 @@ public class DataLocationTest {
         myflag.setDataDate(MY_DATA_DATE);
         assertEquals(MY_DATA_DATE, myflag.getDataDate());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setDataDate(null);
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
     }
@@ -86,7 +86,7 @@ public class DataLocationTest {
         assertEquals(MY_LONGITUDE, myflag.getLongitude());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setLongitude(null);
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
     }
@@ -104,7 +104,7 @@ public class DataLocationTest {
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setLatitude(null);
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
     }
@@ -123,7 +123,7 @@ public class DataLocationTest {
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
-        assertEquals(DashboardUtils.GLOBAL_REGION_ID, myflag.getRegionID());
+        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionID());
         myflag.setDataValue(null);
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getDataValue());
     }
