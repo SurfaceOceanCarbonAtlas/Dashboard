@@ -429,7 +429,7 @@ public class SocatCruiseReporter {
             if ( inRegion ) {
                 DsgMetadata socatMeta = dsgFile.getMetadata();
                 socatVersionList.add(socatMeta.getVersion());
-                qcFlagList.add(socatMeta.getDatasetQCFlag();
+                qcFlagList.add(socatMeta.getDatasetQCFlag());
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
                 String origDOI = cruise.getSourceDOI();
                 if ( origDOI.isEmpty() )
@@ -544,10 +544,8 @@ public class SocatCruiseReporter {
      *
      * @return list of warnings about the generated preamble; never null but may be empty
      */
-    private static ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta,
-            String socatVersion, String origDOI, String socatDOI,
-            String qcFlag, TreeSet<String> addlDocs,
-            PrintWriter report) {
+    private static ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, String socatVersion,
+            String origDOI, String socatDOI, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
         String upperExpo = omeMeta.getDatasetId();
         ArrayList<String> warnMsgs = new ArrayList<String>();
 

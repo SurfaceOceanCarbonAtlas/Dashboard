@@ -846,6 +846,88 @@ public class StdDataArray {
     }
 
     /**
+     * Gets the String data values for the indicated data column type.
+     *
+     * @param dataType
+     *         get String data values for this data column type
+     *
+     * @return an array of Strings with the values of the given data column type, or
+     *         null if no data column type in the array matches the given data column type.
+     */
+    public String[] getDataColumnStrings(StringDashDataType dataType) {
+        int colidx = DashboardUtils.INT_MISSING_VALUE;
+        for (int k = 0; k < numDataCols; k++) {
+            DashDataType<?> dtype = dataTypes[k];
+            if ( (dtype instanceof StringDashDataType) && dtype.typeNameEquals(dataType) ) {
+                colidx = k;
+                break;
+            }
+        }
+        if ( !isUsableIndex(colidx) )
+            return null;
+        String[] dataCol = new String[numSamples];
+        for (int j = 0; j < numSamples; j++) {
+            dataCol[j] = (String) stdObjects[j][colidx];
+        }
+        return dataCol;
+    }
+
+    /**
+     * Gets the Integer data values for the indicated data column type.
+     *
+     * @param dataType
+     *         get Integer data values for this data column type
+     *
+     * @return an array of Integers with the values of the given data column type, or
+     *         null if no data column type in the array matches the given data column type.
+     */
+    public Integer[] getDataColumnIntegers(IntDashDataType dataType) {
+        int colidx = DashboardUtils.INT_MISSING_VALUE;
+        for (int k = 0; k < numDataCols; k++) {
+            DashDataType<?> dtype = dataTypes[k];
+            if ( (dtype instanceof IntDashDataType) && dtype.typeNameEquals(dataType) ) {
+                colidx = k;
+                break;
+            }
+        }
+        if ( !isUsableIndex(colidx) )
+            return null;
+        Integer[] dataCol = new Integer[numSamples];
+        for (int j = 0; j < numSamples; j++) {
+            dataCol[j] = (Integer) stdObjects[j][colidx];
+        }
+        return dataCol;
+    }
+
+    /**
+     * Gets the Double data values for the indicated data column type.
+     *
+     * @param dataType
+     *         get Double data values for this data column type
+     *
+     * @return an array of Double with the values of the given data column type, or
+     *         null if no data column type in the array matches the given data column type.
+     */
+    public Double[] getDataColumnDoubles(StringDashDataType dataType) {
+        int colidx = -1;
+        for (int k = 0; k < numDataCols; k++) {
+            DashDataType<?> dtype = dataTypes[k];
+            if ( (dtype instanceof DoubleDashDataType) && dtype.typeNameEquals(dataType) ) {
+                colidx = k;
+                break;
+            }
+        }
+        if ( !isUsableIndex(colidx) )
+            return null;
+        Double[] dataCol = new Double[numSamples];
+        for (int j = 0; j < numSamples; j++) {
+            dataCol[j] = (Double) stdObjects[j][colidx];
+        }
+        return dataCol;
+    }
+
+
+    /**
      * Get the standard value object for the specified value (column index) of the specified sample (row index).
      *
      * @param sampleIdx
