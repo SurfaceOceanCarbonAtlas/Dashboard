@@ -3,10 +3,9 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,16 +15,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Karl Smith
  */
-public class DashboardCruiseListTest {
+public class DashboardDatasetListTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#getUsername()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#setUsername(java.lang.String)}.
+     * Test method for {@link DashboardDatasetList#getUsername()} and {@link DashboardDatasetList#setUsername(String)}.
      */
     @Test
     public void testGetSetUsername() {
-        String myUsername = "SocatUser";
-        DashboardCruiseList cruiseList = new DashboardCruiseList();
+        String myUsername = "User";
+        DashboardDatasetList cruiseList = new DashboardDatasetList();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
         cruiseList.setUsername(myUsername);
         assertEquals(myUsername, cruiseList.getUsername());
@@ -35,60 +33,40 @@ public class DashboardCruiseListTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#getSocatVersion()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#setSocatVersion(java.lang.String)}.
-     */
-    @Test
-    public void testGetSetSocatVersion() {
-        String mySocatVersion = "4";
-        DashboardCruiseList cruiseList = new DashboardCruiseList();
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
-        cruiseList.setSocatVersion(mySocatVersion);
-        assertEquals(mySocatVersion, cruiseList.getSocatVersion());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
-        assertEquals(0, cruiseList.size());
-        cruiseList.setSocatVersion(null);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#isManager()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#setManager(boolean)}.
+     * Test method for {@link DashboardDatasetList#isManager()} and {@link DashboardDatasetList#setManager(boolean)}.
      */
     @Test
     public void testIsSetManager() {
-        DashboardCruiseList cruiseList = new DashboardCruiseList();
+        DashboardDatasetList cruiseList = new DashboardDatasetList();
         assertFalse(cruiseList.isManager());
         cruiseList.setManager(true);
         assertTrue(cruiseList.isManager());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
         assertEquals(0, cruiseList.size());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#hashCode()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseList#equals(java.lang.Object)}.
+     * Test method for {@link DashboardDatasetList#hashCode()} and {@link DashboardDatasetList#equals(Object)}.
      */
     @Test
     public void testHashCodeEquals() {
-        String myUsername = "SocatUser";
-        String mySocatVersion = "4";
+        String myUsername = "User";
+        String myVersion = "4";
         String myExpocode = "ABCD20050728";
-        DashboardCruise cruise = new DashboardCruise();
+        DashboardDataset cruise = new DashboardDataset();
         cruise.setOwner(myUsername);
-        cruise.setExpocode(myExpocode);
-        DashboardCruise sameCruise = new DashboardCruise();
-        sameCruise.setOwner(myUsername);
-        sameCruise.setExpocode(myExpocode);
-        DashboardCruise otherCruise = new DashboardCruise();
-        otherCruise.setOwner(myUsername);
-        otherCruise.setExpocode("XXXX20030918");
+        cruise.setDatasetId(myExpocode);
+        DashboardDataset sameDataset = new DashboardDataset();
+        sameDataset.setOwner(myUsername);
+        sameDataset.setDatasetId(myExpocode);
+        DashboardDataset otherDataset = new DashboardDataset();
+        otherDataset.setOwner(myUsername);
+        otherDataset.setDatasetId("XXXX20030918");
 
-        DashboardCruiseList firstList = new DashboardCruiseList();
+        DashboardDatasetList firstList = new DashboardDatasetList();
         assertFalse(firstList.equals(null));
         assertFalse(firstList.equals(cruise));
-        DashboardCruiseList secondList = new DashboardCruiseList();
+        DashboardDatasetList secondList = new DashboardDatasetList();
         assertTrue(firstList.hashCode() == secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
@@ -99,13 +77,6 @@ public class DashboardCruiseListTest {
         assertTrue(firstList.hashCode() == secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
-        firstList.setSocatVersion(mySocatVersion);
-        assertFalse(firstList.hashCode() == secondList.hashCode());
-        assertFalse(firstList.equals(secondList));
-        secondList.setSocatVersion(mySocatVersion);
-        assertTrue(firstList.hashCode() == secondList.hashCode());
-        assertTrue(firstList.equals(secondList));
-
         firstList.setManager(true);
         assertFalse(firstList.hashCode() == secondList.hashCode());
         assertFalse(firstList.equals(secondList));
@@ -113,17 +84,17 @@ public class DashboardCruiseListTest {
         assertTrue(firstList.hashCode() == secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
-        firstList.put(cruise.getExpocode(), cruise);
+        firstList.put(cruise.getDatasetId(), cruise);
         assertTrue(firstList.hashCode() != secondList.hashCode());
         assertFalse(firstList.equals(secondList));
-        secondList.put(sameCruise.getExpocode(), sameCruise);
+        secondList.put(sameDataset.getDatasetId(), sameDataset);
         assertTrue(firstList.hashCode() == secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
-        firstList.put(otherCruise.getExpocode(), otherCruise);
+        firstList.put(otherDataset.getDatasetId(), otherDataset);
         secondList.clear();
-        secondList.put(otherCruise.getExpocode(), otherCruise);
-        secondList.put(sameCruise.getExpocode(), sameCruise);
+        secondList.put(otherDataset.getDatasetId(), otherDataset);
+        secondList.put(sameDataset.getDatasetId(), sameDataset);
         assertTrue(firstList.hashCode() == secondList.hashCode());
         assertTrue(firstList.equals(secondList));
     }

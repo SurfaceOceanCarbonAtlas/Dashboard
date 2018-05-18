@@ -3,36 +3,34 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 /**
- * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata}.
+ * Test method for {@link DashboardMetadata}.
+ *
  * @author Karl Smith
  */
 public class DashboardMetadataTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#isSelected()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setSelected(boolean)}.
+     * Test method for {@link DashboardMetadata#isSelected()} and {@link DashboardMetadata#setSelected(boolean)}.
      */
     @Test
     public void testSetIsSelected() {
         DashboardMetadata mdata = new DashboardMetadata();
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setSelected(true);
-        assertTrue( mdata.isSelected() );
+        assertTrue(mdata.isSelected());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getDatasetId()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setDatasetId(java.lang.String)}.
+     * Test method for {@link DashboardMetadata#getDatasetId()} and {@link DashboardMetadata#setDatasetId(String)}.
      */
     @Test
     public void testGetSetExpocode() {
@@ -41,14 +39,13 @@ public class DashboardMetadataTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
         mdata.setDatasetId(myExpocode);
         assertEquals(myExpocode, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setDatasetId(null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getOwner()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setOwner(java.lang.String)}.
+     * Test method for {@link DashboardMetadata#getOwner()} and {@link DashboardMetadata#setOwner(String)}.
      */
     @Test
     public void testGetSetOwner() {
@@ -58,14 +55,13 @@ public class DashboardMetadataTest {
         mdata.setOwner(myOwner);
         assertEquals(myOwner, mdata.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setOwner(null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getFilename()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setFilename(java.lang.String)}.
+     * Test method for {@link DashboardMetadata#getFilename()} and {@link DashboardMetadata#setFilename(String)}.
      */
     @Test
     public void testGetSetFilename() {
@@ -76,14 +72,14 @@ public class DashboardMetadataTest {
         assertEquals(myFilename, mdata.getFilename());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setFilename(null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getFilename());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getUploadTimestamp()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setUploadTimestamp(java.lang.String)}.
+     * Test method for {@link DashboardMetadata#getUploadTimestamp()}
+     * and {@link DashboardMetadata#setUploadTimestamp(String)}.
      */
     @Test
     public void testGetSetUploadTimestamp() {
@@ -95,14 +91,13 @@ public class DashboardMetadataTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getFilename());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setUploadTimestamp(null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getUploadTimestamp());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#isConflicted()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setConflicted(boolean)}.
+     * Test method for {@link DashboardMetadata#isConflicted()} and {@link DashboardMetadata#setConflicted(boolean)}.
      */
     @Test
     public void testIsSetConflicted() {
@@ -114,14 +109,13 @@ public class DashboardMetadataTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getFilename());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setConflicted(false);
         assertEquals(false, mdata.isConflicted());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getVersion()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setVersion(String)}.
+     * Test method for {@link DashboardMetadata#getVersion()} and {@link DashboardMetadata#setVersion(String)}.
      */
     @Test
     public void testGetSetVersion() {
@@ -135,36 +129,13 @@ public class DashboardMetadataTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getFilename());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
+        assertFalse(mdata.isSelected());
         mdata.setVersion(null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getDOI()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#setDOI(String)}.
-     */
-    @Test
-    public void testGetSetDOI() {
-        String doi = "DOI12345";
-        DashboardMetadata mdata = new DashboardMetadata();
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDOI());
-        mdata.setDOI(doi);
-        assertEquals(doi, mdata.getDOI());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
-        assertEquals(false, mdata.isConflicted());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getUploadTimestamp());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getFilename());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOwner());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        assertFalse( mdata.isSelected() );
-        mdata.setDOI(null);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDOI());
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#hashCode()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#equals(java.lang.Object)}.
+     * Test method for {@link DashboardMetadata#hashCode()} and {@link DashboardMetadata#equals(Object)}.
      */
     @Test
     public void testHashCodeEqualsObject() {
@@ -176,72 +147,66 @@ public class DashboardMetadataTest {
         String myDOI = "DOI12345";
 
         DashboardMetadata firstMData = new DashboardMetadata();
-        assertFalse( firstMData.equals(null) );
-        assertFalse( firstMData.equals(myFilename) );
+        assertFalse(firstMData.equals(null));
+        assertFalse(firstMData.equals(myFilename));
         DashboardMetadata secondMData = new DashboardMetadata();
         assertEquals(firstMData.hashCode(), firstMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setSelected(true);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setSelected(true);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setDatasetId(myExpocode);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setDatasetId(myExpocode);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setOwner(myOwner);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setOwner(myOwner);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setFilename(myFilename);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setFilename(myFilename);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setUploadTimestamp(myTimestamp);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setUploadTimestamp(myTimestamp);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setConflicted(true);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setConflicted(true);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
         firstMData.setVersion(myVersion);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
+        assertTrue(firstMData.hashCode() != secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
         secondMData.setVersion(myVersion);
         assertEquals(firstMData.hashCode(), secondMData.hashCode());
         assertEquals(firstMData, secondMData);
 
-        firstMData.setDOI(myDOI);
-        assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-        assertFalse( firstMData.equals(secondMData) );
-        secondMData.setDOI(myDOI);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#getAddlDocsTitle()}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardMetadata#splitAddlDocsTitle(java.lang.String)}
+     * Test method for {@link DashboardMetadata#getAddlDocsTitle()}
+     * and {@link DashboardMetadata#splitAddlDocsTitle(String)}
      */
     @Test
     public void testGetAddnDocsTitle() {
@@ -262,7 +227,6 @@ public class DashboardMetadataTest {
         mdata.setDatasetId(myExpocode);
         mdata.setOwner(myOwner);
         mdata.setVersion(myVersion);
-        mdata.setDOI(myDOI);
         assertEquals("", mdata.getAddlDocsTitle());
         mdata.setFilename(myFilename);
         assertEquals(myFilename, mdata.getAddlDocsTitle());
