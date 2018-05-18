@@ -3,26 +3,24 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-
 /**
- * Unit tests for methods in {@link gov.noaa.pmel.dashboard.shared.ADCMessage}
+ * Unit tests for methods in {@link ADCMessage}
  *
  * @author Karl Smith
  */
 public class ADCMessageTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getSeverity()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setSeverity(gov.noaa.pmel.dashboard.shared.ADCMessage.Severity)}.
+     * Test method for {@link ADCMessage#getSeverity()} and {@link ADCMessage#setSeverity(Severity)}.
      */
     @Test
     public void testGetSetSeverity() {
@@ -36,8 +34,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getRowNumber()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setRowNumber(java.lang.Integer)}.
+     * Test method for {@link ADCMessage#getRowNumber()} and {@link ADCMessage#setRowNumber(Integer)}.
      */
     @Test
     public void testGetSetRowNumber() {
@@ -56,8 +53,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getLongitude()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setLongitude(java.lang.Double)}.
+     * Test method for {@link ADCMessage#getLongitude()} and {@link ADCMessage#setLongitude(Double)}.
      */
     @Test
     public void testGetSetLongitude() {
@@ -83,8 +79,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getLatitude()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setLatitude(java.lang.Double)}.
+     * Test method for {@link ADCMessage#getLatitude()} and {@link ADCMessage#setLatitude(Double)}.
      */
     @Test
     public void testGetSetLatitude() {
@@ -109,8 +104,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getDepth()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setDepth(java.lang.Double)}.
+     * Test method for {@link ADCMessage#getDepth()} and {@link ADCMessage#setDepth(Double)}.
      */
     @Test
     public void testGetSetDepth() {
@@ -136,8 +130,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getTimestamp()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setTimestamp(java.lang.String)}.
+     * Test method for {@link ADCMessage#getTimestamp()} and {@link ADCMessage#setTimestamp(String)}.
      */
     @Test
     public void testGetSetTimestamp() {
@@ -155,8 +148,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getColNumber()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setColNumber(java.lang.Integer)}.
+     * Test method for {@link ADCMessage#getColNumber()} and {@link ADCMessage#setColNumber(Integer)}.
      */
     @Test
     public void testGetSetColNumber() {
@@ -179,8 +171,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getColName()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setColName(java.lang.String)}.
+     * Test method for {@link ADCMessage#getColName()} and {@link ADCMessage#setColName(String)}.
      */
     @Test
     public void testGetSetColName() {
@@ -200,8 +191,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getGeneralComment()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setGeneralComment(java.lang.String)}.
+     * Test method for {@link ADCMessage#getGeneralComment()} and {@link ADCMessage#setGeneralComment(String)}.
      */
     @Test
     public void testGetSetGeneralComment() {
@@ -222,8 +212,7 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#getDetailedComment()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#setDetailedComment(java.lang.String)}.
+     * Test method for {@link ADCMessage#getDetailedComment()} and {@link ADCMessage#setDetailedComment(String)}.
      */
     @Test
     public void testGetSetDetailedComment() {
@@ -245,17 +234,16 @@ public class ADCMessageTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessage#hashCode()},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#equals(java.lang.Object)},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#woceTypeComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#severityComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#rowNumComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#timestampComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#longitudeComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#latitudeComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#colNumComparator},
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#colNameComparator}, and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessage#explanationComparator}.
+     * Test method for {@link ADCMessage#hashCode()}, {@link ADCMessage#equals(Object)},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#severityComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#rowNumComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#longitudeComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#latitudeComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#depthComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#timestampComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#colNumComparator},
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#colNameComparator}, and
+     * {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#explanationComparator}.
      */
     @Test
     public void testHashCodeEquals() {
@@ -271,321 +259,321 @@ public class ADCMessageTest {
         final String myExplanation = "Sea-level atmospheric pressure 1234.5 exceeds 1200.0";
 
         ADCMessage msg = new ADCMessage();
-        assertFalse( msg.equals(null) );
-        assertFalse( msg.equals(myExplanation) );
-        assertTrue( ADCMessage.severityComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.rowNumComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.longitudeComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.latitudeComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.depthComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.timestampComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.colNumComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.colNameComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.explanationComparator.compare(msg, null) > 0 );
-        assertTrue( ADCMessage.severityComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.rowNumComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.timestampComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.longitudeComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.latitudeComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.depthComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.colNumComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.colNameComparator.compare(null, msg) < 0 );
-        assertTrue( ADCMessage.explanationComparator.compare(null, msg) < 0 );
+        assertFalse(msg.equals(null));
+        assertFalse(msg.equals(myExplanation));
+        assertTrue(DashboardUtils.severityComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.rowNumComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.longitudeComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.latitudeComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.depthComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.timestampComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.colNumComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.colNameComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.explanationComparator.compare(msg, null) > 0);
+        assertTrue(DashboardUtils.severityComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.rowNumComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.timestampComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.longitudeComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.latitudeComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.depthComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.colNumComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.colNameComparator.compare(null, msg) < 0);
+        assertTrue(DashboardUtils.explanationComparator.compare(null, msg) < 0);
 
 
         ADCMessage other = new ADCMessage();
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setSeverity(mySeverity);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertTrue( ADCMessage.severityComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.severityComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertTrue(DashboardUtils.severityComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.severityComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setSeverity(mySeverity);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setRowNumber(myRowNum);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertTrue( ADCMessage.rowNumComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.rowNumComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertTrue(DashboardUtils.rowNumComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.rowNumComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setRowNumber(myRowNum);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setLongitude(myLongitude);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertTrue( ADCMessage.longitudeComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.longitudeComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertTrue(DashboardUtils.longitudeComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.longitudeComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setLongitude(myLongitude);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setLatitude(myLatitude);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertTrue( ADCMessage.latitudeComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.latitudeComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertTrue(DashboardUtils.latitudeComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.latitudeComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setLatitude(myLatitude);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setDepth(myDepth);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertTrue( ADCMessage.depthComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.depthComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertTrue(DashboardUtils.depthComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.depthComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setDepth(myDepth);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setTimestamp(myTimestamp);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertTrue( ADCMessage.timestampComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.timestampComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertTrue(DashboardUtils.timestampComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.timestampComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setTimestamp(myTimestamp);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setColNumber(myColNum);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertTrue( ADCMessage.colNumComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.colNumComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertTrue(DashboardUtils.colNumComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.colNumComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setColNumber(myColNum);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setColName(myColName);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertTrue( ADCMessage.colNameComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.colNameComparator.compare(other, msg) < 0 );
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertTrue(DashboardUtils.colNameComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.colNameComparator.compare(other, msg) < 0);
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setColName(myColName);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setGeneralComment(myGeneralComment);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
-        assertEquals(0,  ADCMessage.explanationComparator.compare(other, msg));
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(other, msg));
         other.setGeneralComment(myGeneralComment);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setDetailedComment(myExplanation);
-        assertFalse( msg.hashCode() == other.hashCode() );
-        assertFalse( msg.equals(other) );
-        assertFalse( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertTrue( ADCMessage.explanationComparator.compare(msg, other) > 0 );
-        assertTrue( ADCMessage.explanationComparator.compare(other, msg) < 0 );
+        assertFalse(msg.hashCode() == other.hashCode());
+        assertFalse(msg.equals(other));
+        assertFalse(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertTrue(DashboardUtils.explanationComparator.compare(msg, other) > 0);
+        assertTrue(DashboardUtils.explanationComparator.compare(other, msg) < 0);
         other.setDetailedComment(myExplanation);
-        assertTrue( msg.hashCode() == other.hashCode() );
-        assertTrue( msg.equals(other) );
-        assertTrue( other.equals(msg) );
-        assertEquals(0, ADCMessage.severityComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.rowNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.longitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.latitudeComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.depthComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.timestampComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNumComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.colNameComparator.compare(msg, other));
-        assertEquals(0, ADCMessage.explanationComparator.compare(msg, other));
+        assertTrue(msg.hashCode() == other.hashCode());
+        assertTrue(msg.equals(other));
+        assertTrue(other.equals(msg));
+        assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.rowNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.longitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.latitudeComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.depthComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.timestampComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNumComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
+        assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
     }
 
 }

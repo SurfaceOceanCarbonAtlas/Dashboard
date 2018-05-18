@@ -4,7 +4,6 @@
 package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.Crossover;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link gov.noaa.pmel.dashboard.shared.Crossover}
+ * Unit tests for {@link Crossover}
  *
  * @author Karl Smith
  */
@@ -25,44 +24,42 @@ public class CrossoverTest {
     private static final Double firstLon = 125.250;
     private static final Double firstLat = 45.320;
     private static final Long firstTime = Math.round(System.currentTimeMillis() / 1000.0);
-    private static final Long firstMinTime = firstTime - ( 20L * 24L * 60L * 60L );
-    private static final Long firstMaxTime = firstTime + ( 5L * 24L * 60L * 60L );
+    private static final Long firstMinTime = firstTime - (20L * 24L * 60L * 60L);
+    private static final Long firstMaxTime = firstTime + (5L * 24L * 60L * 60L);
     private static final String secondExpo = "BBBB19951207";
     private static final Integer secondRowNum = 123;
     private static final Double secondLon = 125.255;
     private static final Double secondLat = 45.315;
-    private static final Long secondTime = firstTime - ( 4L * 60L * 60L );
-    private static final Long secondMinTime = secondTime - ( 10L * 24L * 60L * 60L );
-    private static final Long secondMaxTime = secondTime + ( 15L * 24L * 60L * 60L );
+    private static final Long secondTime = firstTime - (4L * 60L * 60L);
+    private static final Long secondMinTime = secondTime - (10L * 24L * 60L * 60L);
+    private static final Long secondMaxTime = secondTime + (15L * 24L * 60L * 60L);
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getExpocodes()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setExpocodes(java.lang.String[])}.
+     * Test method for {@link Crossover#getDatasetIds()} and {@link Crossover#setDatasetIds(String[])}.
      */
     @Test
-    public void testGetSetExpocodes() {
+    public void testGetSetDatasetIds() {
         Crossover cross = new Crossover();
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
 
-        cross.setExpocodes(new String[] { firstExpo, secondExpo });
-        expos = cross.getExpocodes();
+        cross.setDatasetIds(new String[] { firstExpo, secondExpo });
+        expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertEquals(firstExpo, expos[0]);
         assertEquals(secondExpo, expos[1]);
 
-        cross.setExpocodes(null);
-        expos = cross.getExpocodes();
+        cross.setDatasetIds(null);
+        expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getMinDistance()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setMinDistance(java.lang.Double)}.
+     * Test method for {@link Crossover#getMinDistance()} and {@link Crossover#setMinDistance(Double)}.
      */
     @Test
     public void testGetSetMinDistance() {
@@ -72,7 +69,7 @@ public class CrossoverTest {
         cross.setMinDistance(minDist);
         assertEquals(cross.getMinDistance(), minDist, 1.0E-7);
 
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
@@ -82,8 +79,7 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getRowNumsAtMin()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setRowNumsAtMin(java.lang.Integer[])}.
+     * Test method for {@link Crossover#getRowNumsAtMin()} and {@link Crossover#setRowNumsAtMin(Integer[])}.
      */
     @Test
     public void testGetSetRowNumsAtMin() {
@@ -100,7 +96,7 @@ public class CrossoverTest {
         assertEquals(secondRowNum, rowNums[1]);
 
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
@@ -113,8 +109,7 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getLonsAtMin()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setLonsAtMin(java.lang.Double[])}.
+     * Test method for {@link Crossover#getLonsAtMin()} and {@link Crossover#setLonsAtMin(Double[])}.
      */
     @Test
     public void testGetSetLonsAtMin() {
@@ -135,7 +130,7 @@ public class CrossoverTest {
         assertNull(rowNums[0]);
         assertNull(rowNums[1]);
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
@@ -148,8 +143,7 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getLatsAtMin()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setLatsAtMin(java.lang.Double[])}.
+     * Test method for {@link Crossover#getLatsAtMin()} and {@link Crossover#setLatsAtMin(Double[])}.
      */
     @Test
     public void testGetSetLatsAtMin() {
@@ -174,7 +168,7 @@ public class CrossoverTest {
         assertNull(rowNums[0]);
         assertNull(rowNums[1]);
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
@@ -187,8 +181,7 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getTimesAtMin()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setTimesAtMin(Long[])}.
+     * Test method for {@link Crossover#getTimesAtMin()} and {@link Crossover#setTimesAtMin(Long[])}.
      */
     @Test
     public void testGetSetTimesAtMin() {
@@ -217,7 +210,7 @@ public class CrossoverTest {
         assertNull(rowNums[0]);
         assertNull(rowNums[1]);
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
@@ -230,19 +223,18 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getCruiseMinTimes()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMinTimes(Long[])}.
+     * Test method for {@link Crossover#getDatasetMinTimes()} and {@link Crossover#setDatasetMinTimes(Long[])}.
      */
     @Test
-    public void testGetCruiseMinTimes() {
+    public void testGetDatasetMinTimes() {
         Crossover cross = new Crossover();
-        Long[] minTimes = cross.getCruiseMinTimes();
+        Long[] minTimes = cross.getDatasetMinTimes();
         assertEquals(2, minTimes.length);
         assertNull(minTimes[0]);
         assertNull(minTimes[1]);
 
-        cross.setCruiseMinTimes(new Long[] { firstMinTime, secondMinTime });
-        minTimes = cross.getCruiseMinTimes();
+        cross.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
+        minTimes = cross.getDatasetMinTimes();
         assertEquals(2, minTimes.length);
         assertEquals(firstMinTime, minTimes[0]);
         assertEquals(secondMinTime, minTimes[1]);
@@ -264,37 +256,37 @@ public class CrossoverTest {
         assertNull(rowNums[0]);
         assertNull(rowNums[1]);
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
 
-        cross.setCruiseMinTimes(null);
-        minTimes = cross.getCruiseMinTimes();
+        cross.setDatasetMinTimes(null);
+        minTimes = cross.getDatasetMinTimes();
         assertEquals(2, minTimes.length);
         assertNull(minTimes[0]);
         assertNull(minTimes[1]);
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#getCruiseMaxTimes()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#setCruiseMaxTimes(Long[])}.
+     * Test method for {@link Crossover#getDatasetMaxTimes()}
+     * and {@link Crossover#setDatasetMaxTimes(Long[])}.
      */
     @Test
-    public void testGetCruiseMaxTimes() {
+    public void testGetDatasetMaxTimes() {
         Crossover cross = new Crossover();
-        Long[] maxTimes = cross.getCruiseMaxTimes();
+        Long[] maxTimes = cross.getDatasetMaxTimes();
         assertEquals(2, maxTimes.length);
         assertNull(maxTimes[0]);
         assertNull(maxTimes[1]);
 
-        cross.setCruiseMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
-        maxTimes = cross.getCruiseMaxTimes();
+        cross.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
+        maxTimes = cross.getDatasetMaxTimes();
         assertEquals(2, maxTimes.length);
         assertEquals(firstMaxTime, maxTimes[0]);
         assertEquals(secondMaxTime, maxTimes[1]);
 
-        Long[] minTimes = cross.getCruiseMinTimes();
+        Long[] minTimes = cross.getDatasetMinTimes();
         assertEquals(2, minTimes.length);
         assertNull(minTimes[0]);
         assertNull(minTimes[1]);
@@ -315,21 +307,21 @@ public class CrossoverTest {
         assertNull(rowNums[0]);
         assertNull(rowNums[1]);
         assertNull(cross.getMinDistance());
-        String[] expos = cross.getExpocodes();
+        String[] expos = cross.getDatasetIds();
         assertEquals(2, expos.length);
         assertNull(expos[0]);
         assertNull(expos[1]);
 
-        cross.setCruiseMaxTimes(null);
-        maxTimes = cross.getCruiseMaxTimes();
+        cross.setDatasetMaxTimes(null);
+        maxTimes = cross.getDatasetMaxTimes();
         assertEquals(2, maxTimes.length);
         assertNull(maxTimes[0]);
         assertNull(maxTimes[1]);
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.Crossover#hashCode()}
-     * and {@link gov.noaa.pmel.dashboard.shared.Crossover#equals(java.lang.Object)}.
+     * Test method for {@link Crossover#hashCode()}
+     * and {@link Crossover#equals(Object)}.
      */
     @Test
     public void testHashCodeEquals() {
@@ -341,10 +333,10 @@ public class CrossoverTest {
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setExpocodes(new String[] { firstExpo, secondExpo });
+        first.setDatasetIds(new String[] { firstExpo, secondExpo });
         assertFalse(first.hashCode() == second.hashCode());
         assertFalse(first.equals(second));
-        second.setExpocodes(new String[] { firstExpo, secondExpo });
+        second.setDatasetIds(new String[] { firstExpo, secondExpo });
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
 
@@ -386,17 +378,17 @@ public class CrossoverTest {
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setCruiseMinTimes(new Long[] { firstMinTime, secondMinTime });
+        first.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
         assertFalse(first.hashCode() == second.hashCode());
         assertFalse(first.equals(second));
-        second.setCruiseMinTimes(new Long[] { firstMinTime, secondMinTime });
+        second.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setCruiseMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
+        first.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
         assertFalse(first.hashCode() == second.hashCode());
         assertFalse(first.equals(second));
-        second.setCruiseMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
+        second.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
     }

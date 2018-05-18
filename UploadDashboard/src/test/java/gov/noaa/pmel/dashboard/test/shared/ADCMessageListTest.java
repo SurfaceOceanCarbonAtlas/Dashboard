@@ -3,30 +3,28 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
-import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.ADCMessageList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Tests of methods in {@link gov.noaa.pmel.dashboard.shared.ADCMessageList}.
+ * Tests of methods in {@link ADCMessageList}.
  *
  * @author Karl Smith
  */
 public class ADCMessageListTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getUsername()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setUsername(java.lang.String)}.
+     * Test method for {@link ADCMessageList#getUsername()} and {@link ADCMessageList#setUsername(String)}.
      */
     @Test
     public void testGetSetUsername() {
@@ -40,8 +38,7 @@ public class ADCMessageListTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getDatasetId()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setDatasetId(java.lang.String)}.
+     * Test method for {@link ADCMessageList#getDatasetId()} and {@link ADCMessageList#setDatasetId(String)}.
      */
     @Test
     public void testGetSetDatasetId() {
@@ -56,8 +53,7 @@ public class ADCMessageListTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#getSummaries()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#setSummaries(java.util.ArrayList)}.
+     * Test method for {@link ADCMessageList#getSummaries()} and {@link ADCMessageList#setSummaries(ArrayList)}.
      */
     @Test
     public void testGetSetSummaries() {
@@ -76,8 +72,7 @@ public class ADCMessageListTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#hashCode()} and
-     * {@link gov.noaa.pmel.dashboard.shared.ADCMessageList#equals(java.lang.Object)}.
+     * Test method for {@link ADCMessageList#hashCode()} and {@link ADCMessageList#equals(Object)}.
      */
     @Test
     public void testHashCodeEquals() {
@@ -111,43 +106,43 @@ public class ADCMessageListTest {
         assertEquals(myMsg, otherMsg);
 
         ADCMessageList msgList = new ADCMessageList();
-        assertFalse( msgList.equals(null) );
-        assertFalse( msgList.equals(myExpocode) );
+        assertFalse(msgList.equals(null));
+        assertFalse(msgList.equals(myExpocode));
 
         ADCMessageList other = new ADCMessageList();
-        assertTrue( msgList.hashCode() == other.hashCode() );
-        assertTrue( msgList.equals(other) );
+        assertTrue(msgList.hashCode() == other.hashCode());
+        assertTrue(msgList.equals(other));
 
         msgList.setUsername(myUsername);
-        assertFalse( msgList.hashCode() == other.hashCode() );
-        assertFalse( msgList.equals(other) );
+        assertFalse(msgList.hashCode() == other.hashCode());
+        assertFalse(msgList.equals(other));
         other.setUsername(myUsername);
-        assertTrue( msgList.hashCode() == other.hashCode() );
-        assertTrue( msgList.equals(other) );
+        assertTrue(msgList.hashCode() == other.hashCode());
+        assertTrue(msgList.equals(other));
 
         msgList.setDatasetId(myExpocode);
-        assertFalse( msgList.hashCode() == other.hashCode() );
-        assertFalse( msgList.equals(other) );
+        assertFalse(msgList.hashCode() == other.hashCode());
+        assertFalse(msgList.equals(other));
         other.setDatasetId(myExpocode);
-        assertTrue( msgList.hashCode() == other.hashCode() );
-        assertTrue( msgList.equals(other) );
+        assertTrue(msgList.hashCode() == other.hashCode());
+        assertTrue(msgList.equals(other));
 
         msgList.setSummaries(mySummaries);
-        assertFalse( msgList.hashCode() == other.hashCode() );
-        assertFalse( msgList.equals(other) );
+        assertFalse(msgList.hashCode() == other.hashCode());
+        assertFalse(msgList.equals(other));
         other.setSummaries(mySummaries);
-        assertTrue( msgList.hashCode() == other.hashCode() );
-        assertTrue( msgList.equals(other) );
+        assertTrue(msgList.hashCode() == other.hashCode());
+        assertTrue(msgList.equals(other));
 
         msgList.add(myMsg);
-        assertFalse( msgList.hashCode() == other.hashCode() );
-        assertFalse( msgList.equals(other) );
+        assertFalse(msgList.hashCode() == other.hashCode());
+        assertFalse(msgList.equals(other));
         other.add(otherMsg);
-        assertTrue( msgList.hashCode() == other.hashCode() );
-        assertTrue( msgList.equals(other) );
+        assertTrue(msgList.hashCode() == other.hashCode());
+        assertTrue(msgList.equals(other));
 
         // myMsg same as otherMsg
-        assertFalse( msgList.add(otherMsg) );
+        assertFalse(msgList.add(otherMsg));
     }
 
 }
