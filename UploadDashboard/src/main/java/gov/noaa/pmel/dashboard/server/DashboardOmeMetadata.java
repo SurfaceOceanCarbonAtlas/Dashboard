@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.jdom2.Document;
@@ -16,7 +17,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TimeZone;
 
@@ -52,17 +52,17 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      * Creates from the contents of the OME XML file specified in the DashboardMetadata given.
      *
      * @param mdata
-     *         OME XML file to read.  The dataset, upload timestamp, and owner are copied from this object, and the file
-     *         specified is read to populate the OmeMetadata member of this object.
+     *         OME XML file to read.  The dataset, upload timestamp, and owner are copied from this object,
+     *         and the file specified is read to populate the OmeMetadata member of this object.
      * @param mdataHandler
-     *         MetadataFileHandler to use get the given OME XML file
+     *         MetadataFileHandler to use to get the given OME XML file
      *
      * @throws IllegalArgumentException
-     *         if mdata is null, or if the information in the DashboardMetadata is invalid, or if the contents of the
-     *         metadata document are not valid
+     *         if mdata is null, if the information in the DashboardMetadata is invalid, or
+     *         if the contents of the metadata document are not valid
      */
-    public DashboardOmeMetadata(DashboardMetadata mdata,
-            MetadataFileHandler mdataHandler) throws IllegalArgumentException {
+    public DashboardOmeMetadata(DashboardMetadata mdata, MetadataFileHandler mdataHandler)
+            throws IllegalArgumentException {
         // Initialize to an empty OME metadata document with the standard OME filename
         super();
         this.filename = DashboardUtils.OME_FILENAME;
@@ -101,8 +101,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates with the given dataset and timestamp, and from the contents of the given OME XML document.  The owner and
-     * version is left empty.
+     * Creates with the given dataset and timestamp, and from the contents of the given OME XML document.
+     * The owner and version is left empty.
      *
      * @param expo
      *         dataset for this metadata
@@ -114,8 +114,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      * @throws IllegalArgumentException
      *         if dataset is invalid, or if the contents of the metadata document are not valid
      */
-    public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc)
-            throws IllegalArgumentException {
+    public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc) throws IllegalArgumentException {
         super();
         setFilename(DashboardUtils.OME_FILENAME);
         setDatasetId(DashboardServerUtils.checkDatasetID(expo));
@@ -165,10 +164,9 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      */
     public DsgMetadata createDsgMetadata() throws IllegalArgumentException {
 
-        // We cannot create a DsgMetadata object if there are conflicts
-        if ( isConflicted() ) {
+        // a DsgMetadata object cannot be created if there are conflicts
+        if ( isConflicted() )
             throw new IllegalArgumentException("The Metadata contains conflicts");
-        }
 
         DashboardConfigStore confStore;
         try {
@@ -183,7 +181,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
         // Anglicize the platform name for NetCDF/LAS
         String platformName = omeMData.getVesselName();
-        scMData.setPlatformName(anglicizeName(platformName));
+        scMData.setPlatformName(SpellingHandler.anglicizeName(platformName));
 
         // Set the platform type - could be missing
         String platformType;
@@ -240,7 +238,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             if ( piNames.length() > 0 )
                 piNames.append(NAMES_SEPARATOR);
             // Anglicize investigator names for NetCDF/LAS
-            piNames.append(anglicizeName(investigator));
+            piNames.append(SpellingHandler.anglicizeName(investigator));
         }
         scMData.setInvestigatorNames(piNames.toString());
 
@@ -256,7 +254,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
                 if ( orgGroup.length() > 0 )
                     orgGroup.append(NAMES_SEPARATOR);
                 // Anglicize organizations names for NetCDF/LAS
-                orgGroup.append(anglicizeName(org));
+                orgGroup.append(SpellingHandler.anglicizeName(org));
             }
         }
         String allOrgs = orgGroup.toString().trim();
@@ -289,9 +287,9 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates a new DashboardOmeMetadata from merging, where appropriate, the OME content of this instance with the OME
-     * content of other. The datasetIds in other must be the same as in this instance. Fields derived from the data are
-     * the same as those in this instance.
+     * Creates a new DashboardOmeMetadata from merging, where appropriate, the OME content of this instance
+     * with the OME content of other. The datasetIds in other must be the same as in this instance. Fields
+     * derived from the data are the same as those in this instance.
      *
      * @param other
      *         merge with this OME content
@@ -508,7 +506,16 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the original reference(s) for this dataset; never null but may be empty
+     * @return the DOI(s) for the source dataset; never null but may be empty
+     *         Currently this is stubbed and always returns an empty string.
+     */
+    public String getDatasetDOI() {
+        // TODO: add the source dataset DOI to the OME metadata
+        return "";
+    }
+
+    /**
+     * @return the reference(s) for the source dataset; never null but may be empty
      */
     public String getDatasetRefs() {
         String dataSetRefs;
@@ -521,244 +528,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             dataSetRefs = "";
         }
         return dataSetRefs;
-    }
-
-    // Use the Unicode code points to define these characters
-    // so we know exactly what value is being used in the String
-    public static final String acute = "\u00B4";
-    public static final String AGrave = "\u00C0";
-    public static final String AAcute = "\u00C1";
-    public static final String AHat = "\u00C2";
-    public static final String ATilde = "\u00C3";
-    public static final String AUmlaut = "\u00C4";
-    public static final String ARing = "\u00C5";
-    public static final String AEMerge = "\u00C6";
-    public static final String CCedilla = "\u00C7";
-    public static final String EGrave = "\u00C8";
-    public static final String EAcute = "\u00C9";
-    public static final String EHat = "\u00CA";
-    public static final String EUmlaut = "\u00CB";
-    public static final String IGrave = "\u00CC";
-    public static final String IAcute = "\u00CD";
-    public static final String IHat = "\u00CE";
-    public static final String IUmlaut = "\u00CF";
-    public static final String DBar = "\u00D0";
-    public static final String NTilde = "\u00D1";
-    public static final String OGrave = "\u00D2";
-    public static final String OAcute = "\u00D3";
-    public static final String OHat = "\u00D4";
-    public static final String OTilde = "\u00D5";
-    public static final String OUmlaut = "\u00D6";
-    public static final String OStroke = "\u00D8";
-    public static final String UGrave = "\u00D9";
-    public static final String UAcute = "\u00DA";
-    public static final String UHat = "\u00DB";
-    public static final String UUmlaut = "\u00DC";
-    public static final String YAcute = "\u00DD";
-    public static final String Thorn = "\u00DE";
-    public static final String eszett = "\u00DF";
-    public static final String aGrave = "\u00E0";
-    public static final String aAcute = "\u00E1";
-    public static final String aHat = "\u00E2";
-    public static final String aTilde = "\u00E3";
-    public static final String aUmlaut = "\u00E4";
-    public static final String aRing = "\u00E5";
-    public static final String aeMerge = "\u00E6";
-    public static final String cCedilla = "\u00E7";
-    public static final String eGrave = "\u00E8";
-    public static final String eAcute = "\u00E9";
-    public static final String eHat = "\u00EA";
-    public static final String eUmlaut = "\u00EB";
-    public static final String iGrave = "\u00EC";
-    public static final String iAcute = "\u00ED";
-    public static final String iHat = "\u00EE";
-    public static final String iUmlaut = "\u00EF";
-    public static final String dBar = "\u00F0";
-    public static final String nTilde = "\u00F1";
-    public static final String oGrave = "\u00F2";
-    public static final String oAcute = "\u00F3";
-    public static final String oHat = "\u00F4";
-    public static final String oTilde = "\u00F5";
-    public static final String oUmlaut = "\u00F6";
-    public static final String oStroke = "\u00F8";
-    public static final String uGrave = "\u00F9";
-    public static final String uAcute = "\u00FA";
-    public static final String uHat = "\u00FB";
-    public static final String uUmlaut = "\u00FC";
-    public static final String yAcute = "\u00FD";
-    public static final String thorn = "\u00FE";
-    public static final String yUmlaut = "\u00FF";
-
-    private static final HashMap<Character,String> ANGLICIZE_MAP;
-
-    static {
-        ANGLICIZE_MAP = new HashMap<Character,String>();
-        ANGLICIZE_MAP.put("'".charAt(0), " ");
-        ANGLICIZE_MAP.put("`".charAt(0), " ");
-        ANGLICIZE_MAP.put(acute.charAt(0), " ");
-        ANGLICIZE_MAP.put(AGrave.charAt(0), "A");
-        ANGLICIZE_MAP.put(AAcute.charAt(0), "A");
-        ANGLICIZE_MAP.put(AHat.charAt(0), "A");
-        ANGLICIZE_MAP.put(ATilde.charAt(0), "A");
-        ANGLICIZE_MAP.put(AUmlaut.charAt(0), "Ae");
-        ANGLICIZE_MAP.put(ARing.charAt(0), "Aa");
-        ANGLICIZE_MAP.put(AEMerge.charAt(0), "AE");
-        ANGLICIZE_MAP.put(CCedilla.charAt(0), "C");
-        ANGLICIZE_MAP.put(EGrave.charAt(0), "E");
-        ANGLICIZE_MAP.put(EAcute.charAt(0), "E");
-        ANGLICIZE_MAP.put(EHat.charAt(0), "E");
-        ANGLICIZE_MAP.put(EUmlaut.charAt(0), "E");
-        ANGLICIZE_MAP.put(IGrave.charAt(0), "I");
-        ANGLICIZE_MAP.put(IAcute.charAt(0), "I");
-        ANGLICIZE_MAP.put(IHat.charAt(0), "I");
-        ANGLICIZE_MAP.put(IUmlaut.charAt(0), "I");
-        ANGLICIZE_MAP.put(DBar.charAt(0), "Th");
-        ANGLICIZE_MAP.put(NTilde.charAt(0), "N");
-        ANGLICIZE_MAP.put(OGrave.charAt(0), "O");
-        ANGLICIZE_MAP.put(OAcute.charAt(0), "O");
-        ANGLICIZE_MAP.put(OHat.charAt(0), "O");
-        ANGLICIZE_MAP.put(OTilde.charAt(0), "O");
-        ANGLICIZE_MAP.put(OUmlaut.charAt(0), "Oe");
-        ANGLICIZE_MAP.put(OStroke.charAt(0), "O");
-        ANGLICIZE_MAP.put(UGrave.charAt(0), "U");
-        ANGLICIZE_MAP.put(UAcute.charAt(0), "U");
-        ANGLICIZE_MAP.put(UHat.charAt(0), "U");
-        ANGLICIZE_MAP.put(UUmlaut.charAt(0), "Ue");
-        ANGLICIZE_MAP.put(YAcute.charAt(0), "Y");
-        ANGLICIZE_MAP.put(Thorn.charAt(0), "Th");
-        ANGLICIZE_MAP.put(eszett.charAt(0), "ss");
-        ANGLICIZE_MAP.put(aGrave.charAt(0), "a");
-        ANGLICIZE_MAP.put(aAcute.charAt(0), "a");
-        ANGLICIZE_MAP.put(aHat.charAt(0), "a");
-        ANGLICIZE_MAP.put(aTilde.charAt(0), "a");
-        ANGLICIZE_MAP.put(aUmlaut.charAt(0), "ae");
-        ANGLICIZE_MAP.put(aRing.charAt(0), "aa");
-        ANGLICIZE_MAP.put(aeMerge.charAt(0), "ae");
-        ANGLICIZE_MAP.put(cCedilla.charAt(0), "c");
-        ANGLICIZE_MAP.put(eGrave.charAt(0), "e");
-        ANGLICIZE_MAP.put(eAcute.charAt(0), "e");
-        ANGLICIZE_MAP.put(eHat.charAt(0), "e");
-        ANGLICIZE_MAP.put(eUmlaut.charAt(0), "e");
-        ANGLICIZE_MAP.put(iGrave.charAt(0), "i");
-        ANGLICIZE_MAP.put(iAcute.charAt(0), "i");
-        ANGLICIZE_MAP.put(iHat.charAt(0), "i");
-        ANGLICIZE_MAP.put(iUmlaut.charAt(0), "i");
-        ANGLICIZE_MAP.put(dBar.charAt(0), "th");
-        ANGLICIZE_MAP.put(nTilde.charAt(0), "n");
-        ANGLICIZE_MAP.put(oGrave.charAt(0), "o");
-        ANGLICIZE_MAP.put(oAcute.charAt(0), "o");
-        ANGLICIZE_MAP.put(oHat.charAt(0), "o");
-        ANGLICIZE_MAP.put(oTilde.charAt(0), "o");
-        ANGLICIZE_MAP.put(oUmlaut.charAt(0), "oe");
-        ANGLICIZE_MAP.put(oStroke.charAt(0), "oe");
-        ANGLICIZE_MAP.put(uGrave.charAt(0), "u");
-        ANGLICIZE_MAP.put(uAcute.charAt(0), "u");
-        ANGLICIZE_MAP.put(uHat.charAt(0), "u");
-        ANGLICIZE_MAP.put(uUmlaut.charAt(0), "ue");
-        ANGLICIZE_MAP.put(yAcute.charAt(0), "y");
-        ANGLICIZE_MAP.put(thorn.charAt(0), "th");
-        ANGLICIZE_MAP.put(yUmlaut.charAt(0), "e");
-    }
-
-    /**
-     * Returns a new String with replacements for any extended characters, apostrophes, grave symbols, or acute symbols.
-     * Extended characters may be replaced by more than one character.  Apostrophes, grave symbols, and acute symbols
-     * are replaced by spaces.
-     *
-     * @param name
-     *         String to be copied; can be null
-     *
-     * @return copy of the String with character replacements, or null if the String was null
-     */
-    public static String anglicizeName(String name) {
-        if ( name == null )
-            return null;
-        StringBuilder builder = new StringBuilder();
-        for (char letter : name.toCharArray()) {
-            String replacement = ANGLICIZE_MAP.get(letter);
-            if ( replacement != null ) {
-                builder.append(replacement);
-            }
-            else {
-                builder.append(letter);
-            }
-        }
-        return builder.toString();
-    }
-
-    /**
-     * Correctly spelled "anglicized" PI names (that are currently known). Note that these are single PI names only;
-     * each name in a multiple-name science group needs to be checked individually. TODO: create from a configuration
-     * file
-     */
-    private static final HashMap<String,String> PI_NAME_CORRECTIONS;
-
-    static {
-        PI_NAME_CORRECTIONS = new HashMap<String,String>();
-        PI_NAME_CORRECTIONS.put("Begovic, M.", "B" + eAcute + "govic, M.");
-        PI_NAME_CORRECTIONS.put("Copin-Montegut, C.", "Copin-Mont" + eAcute + "gut, C.");
-        PI_NAME_CORRECTIONS.put("Diverres, D.", "Diverr" + eGrave + "s, D.");
-        PI_NAME_CORRECTIONS.put("Gonzalez-Davila, M.", "Gonz" + aAcute + "lez-D" + aAcute + "vila, M.");
-        PI_NAME_CORRECTIONS.put("Jutterstrom, S.", "Jutterstr" + oUmlaut + "m, S.");
-        PI_NAME_CORRECTIONS.put("Jutterstroem, S.", "Jutterstr" + oUmlaut + "m, S.");
-        PI_NAME_CORRECTIONS.put("Koertzinger, A.", "K" + oUmlaut + "rtzinger, A.");
-        PI_NAME_CORRECTIONS.put("Lefevre, N.", "Lef" + eGrave + "vre, N.");
-        PI_NAME_CORRECTIONS.put("Olafsdottir, S.", OAcute + "lafsd" + oAcute + "ttir, S.");
-        PI_NAME_CORRECTIONS.put("Olafsson, J.", OAcute + "lafsson, J.");
-        PI_NAME_CORRECTIONS.put("Perez, F.F.", "P" + eAcute + "rez, F.F.");
-        PI_NAME_CORRECTIONS.put("Rios, A.F.", "R" + iAcute + "os, A.F.");
-        PI_NAME_CORRECTIONS.put("Treguer, P.", "Tr" + eAcute + "guer, P.");
-    }
-
-    /**
-     * Corrects the spelling of "anglicized" PI names where known corrections exist. If the name is not recognized, the
-     * given string is returned. Note that these are single PI names only; each name in a multiple-name science group
-     * needs to be checked individually.
-     *
-     * @param anglicizedName
-     *         anglicized PI name to be corrected; can be null
-     *
-     * @return correctly spelled PI name, or null if the given String was null
-     */
-    public static String correctInvestigatorName(String anglicizedName) {
-        if ( anglicizedName == null )
-            return null;
-        String name = PI_NAME_CORRECTIONS.get(anglicizedName);
-        if ( name == null )
-            return anglicizedName;
-        return name;
-    }
-
-    /**
-     * Correctly spelled "anglicized" platform names (that are currently known). TODO: create from a configuration file
-     */
-    private static final HashMap<String,String> PLATFORM_NAME_CORRECTIONS =
-            new HashMap<String,String>();
-
-    static {
-        PLATFORM_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
-        PLATFORM_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
-        PLATFORM_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
-        PLATFORM_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
-        PLATFORM_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
-    }
-
-    /**
-     * Corrects the spelling of "anglicized" platform names where known corrections exist. If the name is not
-     * recognized, the given string is returned.
-     *
-     * @param anglicizedName
-     *         anglicized platform name to be corrected; can be null
-     *
-     * @return correctly spelled platform name, or null if the given String was null
-     */
-    public static String correctPlatformName(String anglicizedName) {
-        if ( anglicizedName == null )
-            return null;
-        String name = PLATFORM_NAME_CORRECTIONS.get(anglicizedName);
-        if ( name == null )
-            return anglicizedName;
-        return name;
     }
 
 }

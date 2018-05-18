@@ -508,8 +508,8 @@ public class SocatCruiseReporter {
         report.println("Dataset Name: " + omeMeta.getDatasetName());
         report.println("Platform Name: " + omeMeta.getPlatformName());
         report.println("Principal Investigator(s): " + omeMeta.getPINames());
-        report.println("DOI for the original data: " + omeMeta.origDOI());
-        report.println("    or see: " + omeMeta.getOrigDataRef());
+        report.println("DOI for the original data: " + omeMeta.getDatasetDOI());
+        report.println("    or see: " + omeMeta.getDatasetRefs());
         report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
         report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
         report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
@@ -661,13 +661,13 @@ public class SocatCruiseReporter {
             report.print(omeMeta.getPINames());
             report.print("\t");
 
-            String origDOI = omeMeta.origDOI();
+            String origDOI = omeMeta.getDatasetDOI();
             if ( origDOI.isEmpty() )
                 origDOI = NOT_AVAILABLE_TAG;
             report.print(origDOI);
             report.print("\t");
 
-            String origHRef = omeMeta.getOrigDataRef();
+            String origHRef = omeMeta.getDatasetRefs();
             if ( origHRef.isEmpty() )
                 origHRef = NOT_AVAILABLE_TAG;
             report.print(origHRef);

@@ -16,6 +16,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
+import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,6 +74,7 @@ public class DashboardConfigStore {
     private static final String COLUMN_NAME_TYPE_FILE_TAG = "ColumnNameTypeFile";
     private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
     private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
+    private static final String SPELLING_CONFIG_FILE_NAME_TAG = "SpellingConfigFile";
     private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
     private static final String CONFIG_FILE_INFO_MSG =
@@ -102,6 +104,7 @@ public class DashboardConfigStore {
                     COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
                     FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
                     DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" +
+                    SPELLING_CONFIG_FILE_NAME_TAG + "=/Path/To/SpellingConfig/TSVFile \n" +
                     USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
                     USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
                     USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
@@ -118,6 +121,7 @@ public class DashboardConfigStore {
     private DataFileHandler dataFileHandler;
     private CheckerMessageHandler checkerMsgHandler;
     private MetadataFileHandler metadataFileHandler;
+    private SpellingHandler spellingHandler;
     private ArchiveFilesBundler archiveFilesBundler;
     private DsgNcFileHandler dsgNcFileHandler;
     private FerretConfig ferretConf;
@@ -199,15 +203,20 @@ public class DashboardConfigStore {
         // Record configuration files that should be monitored for changes
         filesToWatch = new HashSet<File>();
 
-        // Read the properties from the standard configuration file
+        // Get the properties from the primary configuration file
         Properties configProps = new Properties();
         File configFile = new File(appConfigDir, serverAppName + ".properties");
         filesToWatch.add(configFile);
-        try (FileReader reader = new FileReader(configFile);) {
-            configProps.load(reader);
+        try {
+            FileReader reader = new FileReader(configFile);
+            try {
+                configProps.load(reader);
+            } finally {
+                reader.close();
+            }
         } catch ( Exception ex ) {
-            throw new IOException("Problems reading " + configFile.getPath() +
-                    "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Problems reading " + configFile.getPath() + "\n" +
+                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         String propVal;
 
@@ -221,9 +230,8 @@ public class DashboardConfigStore {
                 throw new IllegalArgumentException("blank value");
             uploadVersion = propVal;
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + UPLOAD_VERSION_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + UPLOAD_VERSION_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         try {
             propVal = configProps.getProperty(QC_VERSION_NAME_TAG);
@@ -234,9 +242,8 @@ public class DashboardConfigStore {
                 throw new IllegalArgumentException("blank value");
             qcVersion = propVal;
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + QC_VERSION_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + QC_VERSION_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
         // Read the SVN username
@@ -250,9 +257,8 @@ public class DashboardConfigStore {
                 throw new IllegalArgumentException("blank value");
             svnUsername = propVal;
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + SVN_USER_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + SVN_USER_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
         // Read the SVN password; can be blank or not given
@@ -261,19 +267,22 @@ public class DashboardConfigStore {
         if ( propVal != null )
             svnPassword = propVal.trim();
 
+        // Get the known user-provided data/metadata types
         try {
             propVal = getFilePathProperty(configProps, USER_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
-            try (FileReader propsReader = new FileReader(propVal);) {
+            FileReader propsReader = new FileReader(propVal);
+            try {
                 typeProps.load(propsReader);
+            } finally {
+                propsReader.close();
             }
             knownUserDataTypes = new KnownDataTypes();
             knownUserDataTypes.addStandardTypesForUsers();
             knownUserDataTypes.addTypesFromProperties(typeProps);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + USER_TYPES_PROPS_FILE_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + USER_TYPES_PROPS_FILE_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known user-provided data types: ");
@@ -283,22 +292,22 @@ public class DashboardConfigStore {
             }
         }
 
+        // Get the known DSG-file metadata types
         try {
-            propVal = configProps.getProperty(METADATA_TYPES_PROPS_FILE_TAG);
-            if ( propVal == null )
-                throw new IllegalArgumentException("value not defined");
-            propVal = propVal.trim();
+            propVal = getFilePathProperty(configProps, METADATA_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
-            try (FileReader propsReader = new FileReader(propVal);) {
+            FileReader propsReader = new FileReader(propVal);
+            try {
                 typeProps.load(propsReader);
+            } finally {
+                propsReader.close();
             }
             knownMetadataTypes = new KnownDataTypes();
             knownMetadataTypes.addStandardTypesForMetadataFiles();
             knownMetadataTypes.addTypesFromProperties(typeProps);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + METADATA_TYPES_PROPS_FILE_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + METADATA_TYPES_PROPS_FILE_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file metadata types: ");
@@ -308,19 +317,22 @@ public class DashboardConfigStore {
             }
         }
 
+        // Get the known DSG-file data types
         try {
             propVal = getFilePathProperty(configProps, DATA_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
-            try (FileReader propsReader = new FileReader(propVal);) {
+            FileReader propsReader = new FileReader(propVal);
+            try {
                 typeProps.load(propsReader);
+            } finally {
+                propsReader.close();
             }
             knownDataFileTypes = new KnownDataTypes();
             knownDataFileTypes.addStandardTypesForDataFiles();
             knownDataFileTypes.addTypesFromProperties(typeProps);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DATA_TYPES_PROPS_FILE_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + DATA_TYPES_PROPS_FILE_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file data types: ");
@@ -330,96 +342,89 @@ public class DashboardConfigStore {
             }
         }
 
-        // Read the default column names to types with units properties file
+        // Read the name of the default-column-names-to-types-with-units configuration file
         String colNamesToTypesFilename;
         try {
             colNamesToTypesFilename = getFilePathProperty(configProps, COLUMN_NAME_TYPE_FILE_TAG, appConfigDir);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + COLUMN_NAME_TYPE_FILE_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + COLUMN_NAME_TYPE_FILE_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the user files directory name
+        // Handler for user-specific configuration files
         try {
             propVal = getFilePathProperty(configProps, USER_FILES_DIR_NAME_TAG, appConfigDir);
-            userFileHandler = new UserFileHandler(propVal, svnUsername,
-                    svnPassword, colNamesToTypesFilename, knownUserDataTypes);
+            userFileHandler = new UserFileHandler(propVal, svnUsername, svnPassword,
+                    colNamesToTypesFilename, knownUserDataTypes);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the cruise files directory name
+        // Handler for dataset data files and handler for automated data checker messages
         try {
             propVal = getFilePathProperty(configProps, DATA_FILES_DIR_NAME_TAG, appConfigDir);
-            dataFileHandler = new DataFileHandler(propVal, svnUsername,
-                    svnPassword, knownUserDataTypes);
+            dataFileHandler = new DataFileHandler(propVal, svnUsername, svnPassword, knownUserDataTypes);
             // Put automated data checker message files in the same directory
             checkerMsgHandler = new CheckerMessageHandler(propVal);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the metadata files directory name
+        // Handler for dataset metadata files
         try {
             propVal = getFilePathProperty(configProps, METADATA_FILES_DIR_NAME_TAG, appConfigDir);
             metadataFileHandler = new MetadataFileHandler(propVal, svnUsername, svnPassword);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the email addresses to send archival bundles
+        // Handler for name corrections - primarly correcting anglicized names
+        try {
+            propVal = getFilePathProperty(configProps, SPELLING_CONFIG_FILE_NAME_TAG, appConfigDir);
+            spellingHandler = new SpellingHandler(propVal);
+        } catch ( Exception ex ) {
+            throw new IOException("Invalid " + SPELLING_CONFIG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+        }
+
+        // Handler for archival bundles
         propVal = configProps.getProperty(ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String[] toEmailAddresses = propVal.trim().split(",");
-        // Read the email addresses to be cc'd on the archival email
         propVal = configProps.getProperty(CC_BUNDLES_EMAIL_ADDRESS_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String[] ccEmailAddresses = propVal.trim().split(",");
-        // Read the SMTP server information
         propVal = configProps.getProperty(SMTP_HOST_ADDRESS_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + SMTP_HOST_ADDRESS_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + SMTP_HOST_ADDRESS_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String smtpHostAddress = propVal.trim();
         propVal = configProps.getProperty(SMTP_HOST_PORT_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + SMTP_HOST_PORT_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + SMTP_HOST_PORT_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String smtpHostPort = propVal.trim();
         propVal = configProps.getProperty(SMTP_USERNAME_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + SMTP_USERNAME_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + SMTP_USERNAME_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String smtpUsername = propVal.trim();
         propVal = configProps.getProperty(SMTP_PASSWORD_TAG);
         if ( propVal == null )
-            throw new IOException("Invalid " + SMTP_PASSWORD_TAG +
-                    " value specified in " + configFile.getPath() +
-                    "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + SMTP_PASSWORD_TAG + " value specified in " +
+                    configFile.getPath() + "\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
         String smtpPassword = propVal.trim();
-        // Read the CDIAC bundles directory name and create the CDIAC archival bundler
         try {
             propVal = getFilePathProperty(configProps, ARCHIVE_BUNDLES_DIR_NAME_TAG, appConfigDir);
-            archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername,
-                    svnPassword, toEmailAddresses, ccEmailAddresses,
-                    smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword,
-                    false);
+            archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, svnPassword, toEmailAddresses,
+                    ccEmailAddresses, smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
             itsLogger.info("Archive files bundler and mailer using:");
             itsLogger.info("    bundles directory: " + propVal);
             String emails = toEmailAddresses[0];
@@ -436,107 +441,99 @@ public class DashboardConfigStore {
             itsLogger.info("    SMTP port: " + smtpHostPort);
             itsLogger.info("    SMTP username: " + smtpUsername);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + ARCHIVE_BUNDLES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + ARCHIVE_BUNDLES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the Ferret configuration filename
+        // Ferret configuration
         try {
             propVal = getFilePathProperty(configProps, FERRET_CONFIG_FILE_NAME_TAG, appConfigDir);
-            // Read the Ferret configuration given in this file
             File ferretPropsFile = new File(propVal);
             filesToWatch.add(ferretPropsFile);
-            try (InputStream stream = new FileInputStream(ferretPropsFile);) {
+            InputStream stream = new FileInputStream(ferretPropsFile);
+            try {
                 SAXBuilder sb = new SAXBuilder();
                 Document jdom = sb.build(stream);
                 ferretConf = new FerretConfig();
                 ferretConf.setRootElement((Element) jdom.getRootElement().clone());
+            } finally {
+                stream.close();
             }
             itsLogger.info("read Ferret configuration file " + propVal);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // Read the DSG files directory names and ERDDAP flag file names
+        // Handler for DSG NC files
         String dsgFileDirName;
         try {
             dsgFileDirName = getFilePathProperty(configProps, DSG_NC_FILES_DIR_NAME_TAG, appConfigDir);
             itsLogger.info("DSG directory = " + dsgFileDirName);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         String decDsgFileDirName;
         try {
             decDsgFileDirName = getFilePathProperty(configProps, DEC_DSG_NC_FILES_DIR_NAME_TAG, appConfigDir);
             itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         String erddapDsgFlagFileName;
         try {
             erddapDsgFlagFileName = getFilePathProperty(configProps, ERDDAP_DSG_FLAG_FILE_NAME_TAG, appConfigDir);
             itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         String erddapDecDsgFlagFileName;
         try {
-            erddapDecDsgFlagFileName = getFilePathProperty(configProps, ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG,
-                    appConfigDir);
+            erddapDecDsgFlagFileName =
+                    getFilePathProperty(configProps, ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG, appConfigDir);
             itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         try {
-            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
-                    erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf,
-                    knownUserDataTypes, knownMetadataTypes, knownDataFileTypes);
+            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName, erddapDsgFlagFileName,
+                    erddapDecDsgFlagFileName, ferretConf, knownUserDataTypes, knownMetadataTypes, knownDataFileTypes);
         } catch ( Exception ex ) {
             throw new IOException(ex);
         }
 
-        // Read the Database configuration filename
+        // Handler for database interactions
         try {
             propVal = getFilePathProperty(configProps, DATABASE_CONFIG_FILE_NAME_TAG, appConfigDir);
             filesToWatch.add(new File(propVal));
             databaseRequestHandler = new DatabaseRequestHandler(propVal);
             itsLogger.info("read Database configuration file " + propVal);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DATABASE_CONFIG_FILE_NAME_TAG +
-                    " value specified in " + configFile.getPath() + "\n" +
-                    ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid " + DATABASE_CONFIG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
-        // automated data checker initialization from this same properties file
+        // Automated data checker
         datasetChecker = new DatasetChecker(knownUserDataTypes, checkerMsgHandler);
 
-        // The PreviewPlotsHandler uses the various handlers just created
+        // Handler for preview plots - uses various handlers just created
         plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles",
                 previewDirname + "plots", this);
 
-        // Create the OME XML to PDF generator
-        omePdfGenerator = new OmePdfGenerator(appConfigDir,
-                metadataFileHandler, dataFileHandler);
+        // OME XML to PDF generator
+        omePdfGenerator = new OmePdfGenerator(appConfigDir, metadataFileHandler, dataFileHandler);
 
-        // The DatasetSubmitter uses the various handlers just created
+        // Dataset submitter - uses various handlers just created
         datasetSubmitter = new DatasetSubmitter(this);
 
-        // Read and assign the authorized users
+        // Authorized users and their roles
         userInfoMap = new HashMap<String,DashboardUserInfo>();
         for (Entry<Object,Object> entry : configProps.entrySet()) {
-            if ( !((entry.getKey() instanceof String) &&
-                    (entry.getValue() instanceof String)) )
+            if ( !((entry.getKey() instanceof String) && (entry.getValue() instanceof String)) )
                 continue;
             String username = (String) entry.getKey();
             if ( !username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
@@ -547,16 +544,14 @@ public class DashboardConfigStore {
             try {
                 userInfo = new DashboardUserInfo(username);
             } catch ( IllegalArgumentException ex ) {
-                throw new IOException(ex.getMessage() + "\n" +
-                        "for " + username + " specified in " +
+                throw new IOException(ex.getMessage() + "\n" + "for " + username + " specified in " +
                         configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
             }
             String rolesString = (String) entry.getValue();
             try {
                 userInfo.addUserRoles(rolesString);
             } catch ( IllegalArgumentException ex ) {
-                throw new IOException(ex.getMessage() + "\n" +
-                        "for " + username + " specified in " +
+                throw new IOException(ex.getMessage() + "\n" + "for " + username + " specified in " +
                         configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
             }
             userInfoMap.put(username, userInfo);
@@ -564,6 +559,7 @@ public class DashboardConfigStore {
         for (DashboardUserInfo info : userInfoMap.values()) {
             itsLogger.info("    user info: " + info.toString());
         }
+
         itsLogger.info("read configuration file " + configFile.getPath());
         watcher = null;
         watcherThread = null;
@@ -574,33 +570,43 @@ public class DashboardConfigStore {
         }
     }
 
-    private static String getFilePathProperty(Properties configProps, String propKey, File baseDir) throws IOException {
+    /**
+     * Returns the full-path filename associated with the given key in the given properties.
+     * If the filename specified in the properties file is a relative pathname, the full-path
+     * filename returned is that relative to the given base directory.
+     *
+     * @param configProps
+     *         properties containing the filename associated with the given key
+     * @param propKey
+     *         key for the filename in the given properties
+     * @param baseDir
+     *         base directory to resolve relative filenames
+     *
+     * @return full-path filename; never null or empty
+     *
+     * @throws IllegalArgumentException
+     *         if the properties file does not contain the given key, or
+     *         if the value associated with the given key is empty
+     */
+    private static String getFilePathProperty(Properties configProps, String propKey, File baseDir)
+            throws IllegalArgumentException {
         String fPath = configProps.getProperty(propKey);
-        if ( fPath == null ) {
-            throw new IllegalArgumentException("Property value not defined for key: " + propKey);
-        }
-        return getFileProperty(fPath, baseDir);
-    }
-
-    private static String getFileProperty(String propVal, File baseDir) throws IOException {
-        if ( propVal == null || propVal.trim().length() == 0 ) {
-            throw new IllegalArgumentException("Empty or null file path specifier");
-        }
-        String path = propVal.trim();
-        if ( path.startsWith("/") ) {
+        if ( fPath == null )
+            throw new IllegalArgumentException("value not defined");
+        String path = fPath.trim();
+        if ( path.isEmpty() )
+            throw new IllegalArgumentException("blank value");
+        File propFile = new File(path);
+        if ( path.equals(propFile.getAbsolutePath()) )
             return path;
-        }
-        else {
-            File parentDir = baseDir;
-            File propFile = new File(parentDir, propVal);
-            return propFile.getCanonicalPath();
-        }
+        propFile = new File(baseDir, path);
+        return propFile.getAbsolutePath();
     }
 
     /**
      * @param startMonitors
-     *         start the file change monitors? (ignored if the singleton instance of the DashboardConfigStore already
-     *         exists)
+     *         start the file change monitors?
+     *         ignored if the singleton instance of the DashboardConfigStore already exists
      *
      * @return the singleton instance of the DashboardConfigStore
      *
@@ -770,7 +776,7 @@ public class DashboardConfigStore {
     }
 
     /**
-     * @return the handler for cruise data files
+     * @return the handler for dataset data files
      */
     public DataFileHandler getDataFileHandler() {
         return dataFileHandler;
@@ -784,10 +790,17 @@ public class DashboardConfigStore {
     }
 
     /**
-     * @return the handler for cruise metadata documents
+     * @return the handler for dataset metadata documents
      */
     public MetadataFileHandler getMetadataFileHandler() {
         return metadataFileHandler;
+    }
+
+    /**
+     * @return the handler for name corrections
+     */
+    public SpellingHandler getSpellingHandler() {
+        return spellingHandler;
     }
 
     /**
@@ -812,7 +825,7 @@ public class DashboardConfigStore {
     }
 
     /**
-     * @return the checker for dataset data and metadata
+     * @return the automated data checker
      */
     public DatasetChecker getDashboardDatasetChecker() {
         return datasetChecker;
@@ -887,14 +900,14 @@ public class DashboardConfigStore {
 
 
     /**
-     * Determines if username has manager privilege over othername. This can be from username being an administrator, a
-     * manager of a group othername belongs to, having the same username, or othername being invalid (most likely an
-     * unspecified user), so long as username is an authorized user.
+     * Determines if username has manager privilege over othername. This can be from username being an administrator,
+     * a manager of a group othername belongs to, having the same username, or othername being invalid (most likely
+     * an unspecified user), so long as username is an authorized user.
      *
      * @param username
      *         manager username to check; if not a valid user, returns false
      * @param othername
-     *         group member username to check; if not a valid user, returns true if username is a valid user
+     *         group member username to check; if not a valid user, returns true as long as username is a valid user
      *
      * @return true if username is an authorized user and has manager privileges over othername
      */
@@ -909,8 +922,8 @@ public class DashboardConfigStore {
      * @param username
      *         name of the user
      *
-     * @return true is this user is an admin or a manager of a group (regardless of whether there is anyone else in the
-     *         group)
+     * @return true is this user is an admin or a manager of a group,
+     *         regardless of whether there is anyone else in the group
      */
     public boolean isManager(String username) {
         DashboardUserInfo userInfo = userInfoMap.get(DashboardServerUtils.cleanUsername(username));
