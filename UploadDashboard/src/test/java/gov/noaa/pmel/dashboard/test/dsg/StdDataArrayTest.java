@@ -280,7 +280,7 @@ public class StdDataArrayTest {
         // (still need to process the messages generated)
         idx = dataTypes.indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
         for (int j = 0; j < numRows; j++) {
-            assertEquals(DashboardServerUtils.WOCE_ACCEPTABLE, (Character) stdData.getStdVal(j, idx));
+            assertEquals(DashboardServerUtils.WOCE_ACCEPTABLE, (String) stdData.getStdVal(j, idx));
         }
 
         ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
@@ -367,12 +367,18 @@ public class StdDataArrayTest {
      * and {@link StdUserDataArray#checkDataOrder(Double[])}
      */
     @Test
-    public void testReorderData() {
+    public void testCheckData() {
         DashboardDatasetData dataset = new DashboardDatasetData();
         dataset.setDatasetId(EXPOCODE);
         dataset.setUserColNames(USER_COLUMN_NAMES);
         dataset.setDataColTypes(DATA_COLUMN_TYPES);
         int numRows = DATA_VALUE_STRINGS.size();
+        dataset.setDataValues(DATA_VALUE_STRINGS);
+        ArrayList<Integer> rowNums = new ArrayList<Integer>(numRows);
+        for (int k = 1; k <= numRows; k++) {
+            rowNums.add(k);
+        }
+        dataset.setRowNums(rowNums);
 
         StdUserDataArray stdUserData = new StdUserDataArray(dataset, KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES);
         assertEquals(numRows, stdUserData.getNumSamples());
@@ -534,8 +540,6 @@ public class StdDataArrayTest {
         assertFalse(fileIdx >= 0);
 
         fileIdx = stdFileData.getDataTypes().indexOf(DashboardServerUtils.SAMPLE_NUMBER);
-        assertTrue(fileIdx >= 0);
-        fileIdx = stdFileData.getDataTypes().indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
         assertTrue(fileIdx >= 0);
 
         userIdx = stdUserData.getDataTypes().indexOf(SocatTypes.SST);

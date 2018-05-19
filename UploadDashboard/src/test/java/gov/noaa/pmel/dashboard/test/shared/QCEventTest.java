@@ -215,7 +215,7 @@ public class QCEventTest {
     public void testHashCodeEqualsObject() {
         QCEvent myflag = new QCEvent();
         assertFalse(myflag.equals(null));
-        assertFalse(myflag.equals(new QCEvent()));
+        assertFalse(myflag.equals(DashboardUtils.STRING_MISSING_VALUE));
 
         QCEvent otherflag = new QCEvent();
         assertEquals(myflag.hashCode(), otherflag.hashCode());

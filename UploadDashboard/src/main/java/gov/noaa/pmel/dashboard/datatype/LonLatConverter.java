@@ -25,19 +25,21 @@ public class LonLatConverter extends ValueConverter<Double> {
     static {
         SUPPORTED_FROM_UNITS = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         SUPPORTED_FROM_UNITS.add("from \"deg E\" to \"deg E\"");
-        SUPPORTED_FROM_UNITS.add("from \"deg W\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min E\" to \"deg E\"");
-        SUPPORTED_FROM_UNITS.add("from \"deg min W\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec E\" to \"deg E\"");
+        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSss E\" to \"deg E\"");
+        SUPPORTED_FROM_UNITS.add("from \"deg W\" to \"deg E\"");
+        SUPPORTED_FROM_UNITS.add("from \"deg min W\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec W\" to \"deg E\"");
-        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSsss\" to \"deg E\"");
+        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSss W\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg N\" to \"deg N\"");
-        SUPPORTED_FROM_UNITS.add("from \"deg S\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min N\" to \"deg N\"");
-        SUPPORTED_FROM_UNITS.add("from \"deg min S\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec N\" to \"deg N\"");
+        SUPPORTED_FROM_UNITS.add("from \"DD.MMSSss N\" to \"deg N\"");
+        SUPPORTED_FROM_UNITS.add("from \"deg S\" to \"deg N\"");
+        SUPPORTED_FROM_UNITS.add("from \"deg min S\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec S\" to \"deg N\"");
-        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSsss\" to \"deg N\"");
+        SUPPORTED_FROM_UNITS.add("from \"DD.MMSSss S\" to \"deg N\"");
     }
 
     private static final Pattern DEG_MIN_SPLIT_PATTERN = Pattern.compile("[ " + DEGREE_SYMBOL + "',]+");
@@ -97,20 +99,34 @@ public class LonLatConverter extends ValueConverter<Double> {
                 throw new IllegalArgumentException("not a degree minute second value");
             }
         }
-        else if ( "DDD.MMSSsss".equalsIgnoreCase(fromUnit) ) {
+        else if ( "DDD.MMSSss E".equalsIgnoreCase(fromUnit) || "DD.MMSSss N".equalsIgnoreCase(fromUnit) ||
+                  "DDD.MMSSss W".equalsIgnoreCase(fromUnit) || "DD.MMSSss S".equalsIgnoreCase(fromUnit) ) {
             try {
+                // Just verify the string is in the appropriate format - that of a floating-point value
+                // which happens to be the value only if minutes and seconds are not specified
                 value = Double.valueOf(valueString);
-                Double degrees = Math.floor(value);
-                value -= degrees;
-                value *= 100.0;
-                Double minutes = Math.floor(value);
-                value -= minutes;
-                value *= 100.0;
-                minutes += value / 60.0;
-                degrees += minutes / 60.0;
-                value = degrees;
+                int dot = valueString.indexOf('.');
+                if ( (dot >= 0) && (dot + 1 < valueString.length()) ) {
+                    // Append zeros just to make it easier to deal with partial specification
+                    String expanded = valueString + "0000000";
+                    if ( dot > 0 )
+                        value = Double.valueOf(valueString.substring(0, dot));
+                    else
+                        value = 0.0;
+                    double minval = Double.valueOf(expanded.substring(dot + 1, dot + 3));
+                    double secval = Double.valueOf(expanded.substring(dot + 3, dot + 5) +
+                            "." + expanded.substring(dot + 5));
+                    if ( value < 0.0 ) {
+                        value -= minval / 60.0;
+                        value -= secval / 3600.0;
+                    }
+                    else {
+                        value += minval / 60.0;
+                        value += secval / 3600.0;
+                    }
+                }
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException("not a DDD.MMSSsss value");
+                throw new IllegalArgumentException("not a DDD.MMSSss value");
             }
         }
         else {

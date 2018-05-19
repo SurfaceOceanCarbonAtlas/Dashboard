@@ -155,7 +155,7 @@ public class StringDashDataTypeTest {
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, false, null, null, null, null,
                 null, null, null, null);
-        assertNotEquals(dtype.hashCode(), other.hashCode());
+        assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 

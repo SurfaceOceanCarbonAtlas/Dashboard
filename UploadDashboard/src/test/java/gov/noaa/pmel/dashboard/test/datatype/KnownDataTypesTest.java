@@ -270,15 +270,15 @@ public class KnownDataTypesTest {
     @Test
     public void testGetDataType() {
         KnownDataTypes types = new KnownDataTypes();
-        assertNull(types.getDataType("DATASET_ID"));
+        assertNull(types.getDataType("EXPOCODE"));
         types.addStandardTypesForUsers();
-        assertEquals(DashboardServerUtils.DATASET_ID, types.getDataType("DATASET_ID"));
+        assertEquals(DashboardServerUtils.DATASET_ID, types.getDataType("EXPOCODE"));
         DataColumnType dctype = new DataColumnType("expocode", 5.0, "weird name",
                 "weird unique name", false, DashboardUtils.NO_UNITS);
         assertEquals(DashboardServerUtils.DATASET_ID, types.getDataType(dctype));
         dctype = new DataColumnType("weird name", 5.0, "expocode",
                 "weird unique name", false, DashboardUtils.NO_UNITS);
-        assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
+        assertEquals(DashboardServerUtils.DATASET_ID, types.getDataType(dctype));
         assertNull(types.getDataType(SHIP_SPEED.duplicate()));
     }
 

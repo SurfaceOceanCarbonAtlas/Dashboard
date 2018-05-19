@@ -106,7 +106,7 @@ public class DashboardUtilsTest {
         assertEquals(filename, DashboardUtils.baseName("relative/path/to/my///" + filename));
         assertEquals(filename, DashboardUtils.baseName("  " + filename + "\n"));
         assertEquals(filename, DashboardUtils.baseName("\\Some\\path\\to\\my\\" + filename));
-        assertEquals("", DashboardUtils.baseName("/Some/path\\to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("/Some/path\\to/my/" + filename));
         assertEquals(filename, DashboardUtils.baseName("relative/path/to/my\\ " + filename));
         assertEquals("my " + filename, DashboardUtils.baseName("relative/path/to/my " + filename));
         assertEquals("", DashboardUtils.baseName("/Some/path/to/my/"));

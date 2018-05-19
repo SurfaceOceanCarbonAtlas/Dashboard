@@ -25,21 +25,23 @@ public class LonLatConverterTest {
     public void testLonLatConverter() {
         String[] fromLonUnits = new String[] {
                 "deg E",
-                "deg W",
                 "deg min E",
-                "deg min W",
                 "deg min sec E",
+                "DDD.MMSSss E",
+                "deg W",
+                "deg min W",
                 "deg min sec W",
-                "DDD.MMSSsss"
+                "DDD.MMSSss W"
         };
         String[] fromLatUnits = new String[] {
                 "deg N",
-                "deg S",
                 "deg min N",
-                "deg min S",
                 "deg min sec N",
+                "DD.MMSSss N",
+                "deg S",
+                "deg min S",
                 "deg min sec S",
-                "DD.MMSSsss"
+                "DD.MMSSss S"
         };
         for (String str : fromLonUnits) {
             assertNotNull(new LonLatConverter(str, fromLonUnits[0], null));
@@ -60,8 +62,10 @@ public class LonLatConverterTest {
         assertEquals(45.855, converter.convertValueOf("45" + LonLatConverter.DEGREE_SYMBOL + " 51.3'"), 1.0E-6);
         converter = new LonLatConverter("deg min sec S", "deg N", null);
         assertEquals(-45.8365, converter.convertValueOf("45" + LonLatConverter.DEGREE_SYMBOL + " 50' 11.4\""), 1.0E-6);
-        converter = new LonLatConverter("DDD.MMSSsss", "deg N", null);
+        converter = new LonLatConverter("DD.MMSSss N", "deg N", null);
         assertEquals(45.8365, converter.convertValueOf("45.50114"), 1.0E-6);
+        converter = new LonLatConverter("DD.MMSSss S", "deg N", null);
+        assertEquals(-45.8365, converter.convertValueOf("45.50114"), 1.0E-6);
 
         converter = new LonLatConverter("deg E", "deg E", null);
         assertEquals(123.45, converter.convertValueOf("123.45"), 1.0E-6);
@@ -139,9 +143,11 @@ public class LonLatConverterTest {
         // °, ', and " are ignored - always taken as deg-min-sec
         assertEquals(-45.2325, converter.convertValueOf("45\" 13' 57" + LonLatConverter.DEGREE_SYMBOL), 1.0E-6);
 
-        converter = new LonLatConverter("DDD.MMSSsss", "deg E", null);
+        converter = new LonLatConverter("DDD.MMSSss E", "deg E", null);
         assertEquals(-45.25, converter.convertValueOf("314.45"), 1.0E-6);
-        assertEquals(45.855, converter.convertValueOf("45.513"), 1.0E-6);
+        assertEquals(45.855, converter.convertValueOf("45.5118"), 1.0E-6);
+        assertEquals(-45.7675, converter.convertValueOf("314.135700"), 1.0E-6);
+        converter = new LonLatConverter("DDD.MMSSss W", "deg E", null);
         assertEquals(45.7675, converter.convertValueOf("314.135700"), 1.0E-6);
     }
 

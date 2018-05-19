@@ -179,10 +179,12 @@ public class DashboardUtils {
                     "deg E",
                     "deg min E",
                     "deg min sec E",
-                    "DDD.MMSSss",
+                    "DDD.MMSSss E",
                     "deg W",
                     "deg min W",
-                    "deg min sec W"));
+                    "deg min sec W",
+                    "DDD.MMSSss W"
+            ));
 
     /**
      * Units of latitude
@@ -192,10 +194,12 @@ public class DashboardUtils {
                     "deg N",
                     "deg min N",
                     "deg min sec N",
-                    "DDD.MMSSss",
+                    "DD.MMSSss N",
                     "deg S",
                     "deg min S",
-                    "deg min sec S"));
+                    "deg min sec S",
+                    "DD.MMSSss S"
+            ));
 
     /**
      * Unit of depth
