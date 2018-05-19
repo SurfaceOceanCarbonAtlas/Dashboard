@@ -33,7 +33,7 @@ public class RegenerateDsgsTest {
         final String expocode = "PAT520151021";
 
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
-        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
+        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
         try {

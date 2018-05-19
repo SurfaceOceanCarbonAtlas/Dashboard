@@ -3,112 +3,42 @@
  */
 package gov.noaa.pmel.dashboard.test.dsg;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Properties;
-
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
-import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.test.datatype.KnownDataTypesTest;
+import org.junit.Test;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit tests of methods of {@link DsgNcFile}
+ *
  * @author Karl Smith
  */
 public class DsgNcFileTest {
-    DsgNcFile dsgNcFile = null;
 
-    public static final String CO2_CATEGORY = "CO2";
-    public static final String PRESSURE_CATEGORY = "Pressure";
-    public static final String SALINITY_CATEGORY = "Salinity";
-    public static final String TEMPERATURE_CATEGORY = "Temperature";
-
-    public static final ArrayList<String> PRESSURE_UNITS = new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
-    public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
-    public static final ArrayList<String> SALINITY_UNITS = new ArrayList<String>(Arrays.asList("PSU"));
-    public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
-    public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC", "K"));
-    public static final ArrayList<String> XCO2_UNITS = new ArrayList<String>(Arrays.asList("umol/mol"));
-
-    public static final DoubleDashDataType SALINITY = new DoubleDashDataType("sal",
-            700.0, "salinity", "salinity", false, SALINITY_UNITS, "sea_surface_salinity",
-            SALINITY_CATEGORY, null, "-0.1", "0.0", "40.0", "55.0");
-
-    public static final DoubleDashDataType SST = new DoubleDashDataType("temp",
-            701.0, "SST", "sea surface temperature", false,
-            TEMPERATURE_UNITS, "sea_surface_temperature",
-            TEMPERATURE_CATEGORY, "degrees C", "-10.0", "-5.0", "40.0", "55.0");
-
-    public static final DoubleDashDataType PATM = new DoubleDashDataType("Pressure_atm",
-            703.0, "P_atm", "sea-level air pressure", false,
-            PRESSURE_UNITS, "air_pressure_at_sea_level",
-            PRESSURE_CATEGORY, null, "750.0", "900.0", "1100.0", "1250.0");
-
-    public static final DoubleDashDataType XCO2_WATER_SST_DRY = new DoubleDashDataType("xCO2_water_sst_dry_ppm",
-            704.0, "xCO2_water_SST_dry", "water xCO2 dry using sst", false,
-            XCO2_UNITS, "mole_fraction_of_carbon_dioxide_in_sea_water",
-            CO2_CATEGORY, null, "0.0", "100.0", "5000.0", "50000.0");
-
-    public static final DoubleDashDataType PCO2_WATER_TEQU_WET = new DoubleDashDataType("pCO2_water_equi_temp",
-            705.0, "pCO2_water_Tequ_wet", "water pCO2 wet using equi temp", false,
-            PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water",
-            CO2_CATEGORY, null, "0.0", "100.0", "5000.0", "50000.0");
-
-    public static final DoubleDashDataType SHIP_SPEED = new DoubleDashDataType("ship_speed",
-            670.0, "ship speed", "measured ship speed", false,
-            SHIP_SPEED_UNITS, "platform_speed_wrt_ground",
-            DashboardServerUtils.PLATFORM_CATEGORY, null, "0.0", null, "50.0", "200.0");
-
-    /** Known data types for users */
-    static final KnownDataTypes KNOWN_USER_DATA_TYPES;
-
-    /** Known metadata types for files */
-    static final KnownDataTypes KNOWN_METADATA_FILE_TYPES;
-
-    /** Known data types for files */
-    static final KnownDataTypes KNOWN_DATA_FILE_TYPES;
-
-    static {
-        KNOWN_METADATA_FILE_TYPES = new KnownDataTypes();
-        KNOWN_METADATA_FILE_TYPES.addStandardTypesForMetadataFiles();
-
-        Properties typeProps = new Properties();
-        typeProps.setProperty(SALINITY.getVarName(), SALINITY.toPropertyValue());
-        typeProps.setProperty(SST.getVarName(), SST.toPropertyValue());
-        typeProps.setProperty(PATM.getVarName(), PATM.toPropertyValue());
-        typeProps.setProperty(XCO2_WATER_SST_DRY.getVarName(), XCO2_WATER_SST_DRY.toPropertyValue());
-        typeProps.setProperty(PCO2_WATER_TEQU_WET.getVarName(), PCO2_WATER_TEQU_WET.toPropertyValue());
-        typeProps.setProperty(SHIP_SPEED.getVarName(), SHIP_SPEED.toPropertyValue());
-
-        KNOWN_USER_DATA_TYPES = new KnownDataTypes();
-        KNOWN_USER_DATA_TYPES.addStandardTypesForUsers();
-        KNOWN_USER_DATA_TYPES.addTypesFromProperties(typeProps);
-
-        KNOWN_DATA_FILE_TYPES = new KnownDataTypes();
-        KNOWN_DATA_FILE_TYPES.addStandardTypesForDataFiles();
-        KNOWN_DATA_FILE_TYPES.addTypesFromProperties(typeProps);
-    }
+    public DsgNcFile dsgNcFile = null;
 
     /**
-     * Test method for successfully creating a DSG file using
-     * {@link gov.noaa.pmel.dashboard.dsg.DsgNcFile#create}.
+     * Test method for successfully creating a DSG file using {@link DsgNcFile#create}.
      */
     @Test
     public void testCreate() throws Exception {
         ArrayList<String> userColumnNames = new ArrayList<String>(Arrays.asList(
-                "depth,dataset,vessel,month,day,year,hour,minute,lat,lon,SST,sal,xCO2_SST,pCO2_Tequ,P_atm,speed".split(",")));
+                "depth,dataset,vessel,month,day,year,hour,minute,lat,lon,SST,sal,xCO2_SST,pCO2_Tequ,P_atm,speed"
+                        .split(",")));
         ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
                 DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
                 DashboardServerUtils.DATASET_NAME.duplicate(),
@@ -120,12 +50,12 @@ public class DsgNcFileTest {
                 DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
                 DashboardServerUtils.LATITUDE.duplicate(),
                 DashboardServerUtils.LONGITUDE.duplicate(),
-                SST.duplicate(),
-                SALINITY.duplicate(),
-                XCO2_WATER_SST_DRY.duplicate(),
-                PCO2_WATER_TEQU_WET.duplicate(),
-                PATM.duplicate(),
-                SHIP_SPEED.duplicate()));
+                SocatTypes.SST.duplicate(),
+                SocatTypes.SALINITY.duplicate(),
+                SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+                SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+                SocatTypes.PATM.duplicate(),
+                KnownDataTypesTest.SHIP_SPEED.duplicate()));
         String[] dataValueStrings = {
                 "5,31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3",
                 "5,31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3",
@@ -155,8 +85,8 @@ public class DsgNcFileTest {
         };
         String expocode = "31B520060606";
         ArrayList<ArrayList<String>> testValues = new ArrayList<ArrayList<String>>();
-        for ( String valsString : dataValueStrings ) {
-            ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
+        for (String valsString : dataValueStrings) {
+            ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",", -1)));
             testValues.add(dataVals);
         }
 
@@ -167,14 +97,15 @@ public class DsgNcFileTest {
         cruise.setDataColTypes(testTypes);
         cruise.setDataValues(testValues);
         ArrayList<Integer> rowNums = new ArrayList<Integer>(testValues.size());
-        for (int k = 1; k <= testValues.size(); k++)
+        for (int k = 1; k <= testValues.size(); k++) {
             rowNums.add(k);
+        }
         cruise.setRowNums(rowNums);
 
-        StdUserDataArray stdUserData = new StdUserDataArray(cruise, KNOWN_USER_DATA_TYPES);
+        StdUserDataArray stdUserData = new StdUserDataArray(cruise, KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES);
 
         // Create the DsgMetadata for this cruise
-        DsgMetadata metadata = new DsgMetadata(KNOWN_METADATA_FILE_TYPES);
+        DsgMetadata metadata = new DsgMetadata(KnownDataTypesTest.TEST_KNOWN_METADATA_FILE_TYPES);
         metadata.setDatasetId(expocode);
         metadata.setDatasetName(expocode);
         metadata.setPlatformName("GM0606");
@@ -189,23 +120,23 @@ public class DsgNcFileTest {
         metadata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC").getTime() / 1000.0);
 
         File parentDir = new File("/var/tmp/junit");
-        if ( ! parentDir.exists() )
+        if ( !parentDir.exists() )
             parentDir.mkdir();
         dsgNcFile = new DsgNcFile(parentDir, expocode + ".nc");
-        dsgNcFile.create(metadata, stdUserData, KNOWN_DATA_FILE_TYPES);
-        assertTrue( dsgNcFile.exists() );
+        dsgNcFile.create(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
+        assertTrue(dsgNcFile.exists());
         assertEquals(expocode, dsgNcFile.getMetadata().getDatasetId());
         assertEquals(dataValueStrings.length, dsgNcFile.getStdDataArray().getNumSamples());
     }
 
     /**
-     * Test method for checking expected failures to a DSG file using
-     * {@link gov.noaa.pmel.dashboard.dsg.DsgNcFile#create}.
+     * Test method for checking expected failures to a DSG file using {@link DsgNcFile#create}.
      */
     @Test
     public void testBadMissingValuesFail() throws Exception {
         ArrayList<String> userColumnNames = new ArrayList<String>(Arrays.asList(
-                "depth,dataset,vessel,month,day,year,hour,minute,lat,lon,SST,sal,xCO2_SST,pCO2_Tequ,P_atm,speed".split(",")));
+                "depth,dataset,vessel,month,day,year,hour,minute,lat,lon,SST,sal,xCO2_SST,pCO2_Tequ,P_atm,speed"
+                        .split(",")));
         ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
                 DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
                 DashboardServerUtils.DATASET_NAME.duplicate(),
@@ -217,29 +148,29 @@ public class DsgNcFileTest {
                 DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
                 DashboardServerUtils.LATITUDE.duplicate(),
                 DashboardServerUtils.LONGITUDE.duplicate(),
-                SST.duplicate(),
-                SALINITY.duplicate(),
-                XCO2_WATER_SST_DRY.duplicate(),
-                PCO2_WATER_TEQU_WET.duplicate(),
-                PATM.duplicate(),
-                SHIP_SPEED.duplicate()));
+                SocatTypes.SST.duplicate(),
+                SocatTypes.SALINITY.duplicate(),
+                SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+                SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+                SocatTypes.PATM.duplicate(),
+                KnownDataTypesTest.SHIP_SPEED.duplicate()));
         String[][] badTimeDataValueStringsSets = {
                 {
-                    "5,11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3",
-                    "5,11B520060606,GM0606,2,29,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3",
-                    "5,11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
+                        "5,11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3",
+                        "5,11B520060606,GM0606,2,29,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3",
+                        "5,11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
                 },
                 {
-                    "5,11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3",
-                    "5,11B520060606,GM0606,2,NaN,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3",
-                    "5,11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
+                        "5,11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3",
+                        "5,11B520060606,GM0606,2,NaN,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3",
+                        "5,11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
                 }
         };
         String expocode = "11B520060606";
-        for ( String[] dataValueStrings : badTimeDataValueStringsSets ) {
+        for (String[] dataValueStrings : badTimeDataValueStringsSets) {
             ArrayList<ArrayList<String>> testValues = new ArrayList<ArrayList<String>>();
-            for ( String valsString : dataValueStrings ) {
-                ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
+            for (String valsString : dataValueStrings) {
+                ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",", -1)));
                 testValues.add(dataVals);
             }
 
@@ -250,14 +181,15 @@ public class DsgNcFileTest {
             cruise.setDataColTypes(testTypes);
             cruise.setDataValues(testValues);
             ArrayList<Integer> rowNums = new ArrayList<Integer>(testValues.size());
-            for (int k = 1; k <= testValues.size(); k++)
+            for (int k = 1; k <= testValues.size(); k++) {
                 rowNums.add(k);
+            }
             cruise.setRowNums(rowNums);
 
-            StdUserDataArray stdUserData = new StdUserDataArray(cruise, KNOWN_USER_DATA_TYPES);
+            StdUserDataArray stdUserData = new StdUserDataArray(cruise, KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES);
 
             // Create the DsgMetadata for this cruise
-            DsgMetadata metadata = new DsgMetadata(KNOWN_METADATA_FILE_TYPES);
+            DsgMetadata metadata = new DsgMetadata(KnownDataTypesTest.TEST_KNOWN_METADATA_FILE_TYPES);
             metadata.setDatasetId(expocode);
             metadata.setDatasetName(expocode);
             metadata.setPlatformName("GM0606");
@@ -272,15 +204,16 @@ public class DsgNcFileTest {
             metadata.setEndTime(dateFmt.parse("2006-03-01 23:50 UTC").getTime() / 1000.0);
 
             File parentDir = new File("/var/tmp/junit");
-            if ( ! parentDir.exists() )
+            if ( !parentDir.exists() )
                 parentDir.mkdir();
             dsgNcFile = new DsgNcFile(parentDir, expocode + ".nc");
             try {
-                dsgNcFile.create(metadata, stdUserData, KNOWN_DATA_FILE_TYPES);
+                dsgNcFile.create(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
             } catch ( IllegalArgumentException ex ) {
                 dsgNcFile.delete();
             }
-            assertFalse( dsgNcFile.exists() );
+            assertFalse(dsgNcFile.exists());
         }
     }
+
 }

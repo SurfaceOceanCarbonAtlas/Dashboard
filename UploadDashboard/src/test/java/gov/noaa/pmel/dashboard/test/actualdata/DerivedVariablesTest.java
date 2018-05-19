@@ -1,10 +1,11 @@
-package gov.noaa.pmel.dashboard.test.dsg;
+package gov.noaa.pmel.dashboard.test.actualdata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 
+import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
 import org.junit.Test;
 
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
@@ -18,7 +19,7 @@ public class DerivedVariablesTest {
     @Test
     public void derivedVariablesTest() throws Exception {
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
-        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
+        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         FerretConfig ferret = confStore.getFerretConfig();
         DsgNcFileTest fileTest = new DsgNcFileTest();

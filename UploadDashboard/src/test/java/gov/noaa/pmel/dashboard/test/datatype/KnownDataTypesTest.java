@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -34,7 +35,61 @@ import static org.junit.Assert.assertTrue;
  */
 public class KnownDataTypesTest {
 
-    private static final TreeSet<DashDataType<?>> USERS_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
+    public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(
+            Arrays.asList("knots", "km/h", "m/s", "mph"));
+
+    public static final DoubleDashDataType SHIP_SPEED = new DoubleDashDataType("ship_speed",
+            670.0, "ship speed", "measured ship speed", false,
+            SHIP_SPEED_UNITS, "platform_speed_wrt_ground", DashboardServerUtils.PLATFORM_CATEGORY, null,
+            "0.0", null, "50.0", "200.0");
+
+    /**
+     * Known data types for users for unit tests
+     */
+    public static final KnownDataTypes TEST_KNOWN_USER_DATA_TYPES;
+
+    /**
+     * Known metadata types for files for unit tests
+     */
+    public static final KnownDataTypes TEST_KNOWN_METADATA_FILE_TYPES;
+
+    /**
+     * Known data types for files for unit tests
+     */
+    public static final KnownDataTypes TEST_KNOWN_DATA_FILE_TYPES;
+
+    static {
+        TEST_KNOWN_METADATA_FILE_TYPES = new KnownDataTypes();
+        TEST_KNOWN_METADATA_FILE_TYPES.addStandardTypesForMetadataFiles();
+
+        Properties typeProps = new Properties();
+        typeProps.setProperty(SocatTypes.SALINITY.getVarName(),
+                SocatTypes.SALINITY.toPropertyValue());
+        typeProps.setProperty(SocatTypes.SST.getVarName(),
+                SocatTypes.SST.toPropertyValue());
+        typeProps.setProperty(SocatTypes.PATM.getVarName(),
+                SocatTypes.PATM.toPropertyValue());
+        typeProps.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(),
+                SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
+        typeProps.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(),
+                SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
+        typeProps.setProperty(KnownDataTypesTest.SHIP_SPEED.getVarName(),
+                KnownDataTypesTest.SHIP_SPEED.toPropertyValue());
+
+        TEST_KNOWN_USER_DATA_TYPES = new KnownDataTypes();
+        TEST_KNOWN_USER_DATA_TYPES.addStandardTypesForUsers();
+        TEST_KNOWN_USER_DATA_TYPES.addTypesFromProperties(typeProps);
+
+        TEST_KNOWN_DATA_FILE_TYPES = new KnownDataTypes();
+        TEST_KNOWN_DATA_FILE_TYPES.addStandardTypesForDataFiles();
+        TEST_KNOWN_DATA_FILE_TYPES.addTypesFromProperties(typeProps);
+    }
+
+
+    /**
+     * The expected standard data types for users
+     */
+    private static final TreeSet<DashDataType<?>> STD_USERS_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
             DashboardServerUtils.UNKNOWN,
             DashboardServerUtils.OTHER,
             DashboardServerUtils.DATASET_ID,
@@ -60,7 +115,10 @@ public class KnownDataTypesTest {
             DashboardServerUtils.SECOND_OF_DAY
     ));
 
-    private static final TreeSet<DashDataType<?>> METADATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
+    /**
+     * The expected standard metadata types for DSG files
+     */
+    private static final TreeSet<DashDataType<?>> STD_METADATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
             DashboardServerUtils.DATASET_ID,
             DashboardServerUtils.DATASET_NAME,
             DashboardServerUtils.PLATFORM_NAME,
@@ -77,7 +135,10 @@ public class KnownDataTypesTest {
             DashboardServerUtils.VERSION
     ));
 
-    private static final TreeSet<DashDataType<?>> DATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
+    /**
+     * The expected standard data types for DSG files
+     */
+    private static final TreeSet<DashDataType<?>> STD_DATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
             DashboardServerUtils.SAMPLE_NUMBER,
             DashboardServerUtils.TIME,
             DashboardServerUtils.LONGITUDE,
@@ -91,22 +152,22 @@ public class KnownDataTypesTest {
             DashboardServerUtils.SECOND_OF_MINUTE
     ));
 
-    private static final HashSet<String> USERS_VARNAMES;
-    private static final HashSet<String> METADATA_FILES_VARNAMES;
-    private static final HashSet<String> DATA_FILES_VARNAMES;
+    private static final HashSet<String> STD_USERS_VARNAMES;
+    private static final HashSet<String> STD_METADATA_FILES_VARNAMES;
+    private static final HashSet<String> STD_DATA_FILES_VARNAMES;
 
     static {
-        USERS_VARNAMES = new HashSet<String>(USERS_TYPES.size());
-        for (DashDataType<?> dtype : USERS_TYPES) {
-            USERS_VARNAMES.add(dtype.getVarName());
+        STD_USERS_VARNAMES = new HashSet<String>(STD_USERS_TYPES.size());
+        for (DashDataType<?> dtype : STD_USERS_TYPES) {
+            STD_USERS_VARNAMES.add(dtype.getVarName());
         }
-        METADATA_FILES_VARNAMES = new HashSet<String>(METADATA_FILES_TYPES.size());
-        for (DashDataType<?> dtype : METADATA_FILES_TYPES) {
-            METADATA_FILES_VARNAMES.add(dtype.getVarName());
+        STD_METADATA_FILES_VARNAMES = new HashSet<String>(STD_METADATA_FILES_TYPES.size());
+        for (DashDataType<?> dtype : STD_METADATA_FILES_TYPES) {
+            STD_METADATA_FILES_VARNAMES.add(dtype.getVarName());
         }
-        DATA_FILES_VARNAMES = new HashSet<String>(DATA_FILES_TYPES.size());
-        for (DashDataType<?> dtype : DATA_FILES_TYPES) {
-            DATA_FILES_VARNAMES.add(dtype.getVarName());
+        STD_DATA_FILES_VARNAMES = new HashSet<String>(STD_DATA_FILES_TYPES.size());
+        for (DashDataType<?> dtype : STD_DATA_FILES_TYPES) {
+            STD_DATA_FILES_VARNAMES.add(dtype.getVarName());
         }
     }
 
@@ -152,8 +213,8 @@ public class KnownDataTypesTest {
         KnownDataTypes other = types.addStandardTypesForUsers();
         assertFalse(types.isEmpty());
         assertSame(types, other);
-        assertEquals(USERS_VARNAMES.size(), types.getKnownTypesSet().size());
-        for (String varName : USERS_VARNAMES) {
+        assertEquals(STD_USERS_VARNAMES.size(), types.getKnownTypesSet().size());
+        for (String varName : STD_USERS_VARNAMES) {
             assertTrue(types.containsTypeName(varName));
         }
     }
@@ -167,7 +228,7 @@ public class KnownDataTypesTest {
         KnownDataTypes types = new KnownDataTypes();
         KnownDataTypes other = types.addStandardTypesForMetadataFiles();
         assertSame(types, other);
-        for (String varName : METADATA_FILES_VARNAMES) {
+        for (String varName : STD_METADATA_FILES_VARNAMES) {
             assertTrue(types.containsTypeName(varName));
         }
         assertFalse(types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()));
@@ -183,7 +244,7 @@ public class KnownDataTypesTest {
         KnownDataTypes types = new KnownDataTypes();
         KnownDataTypes other = types.addStandardTypesForDataFiles();
         assertSame(types, other);
-        for (String varName : DATA_FILES_VARNAMES) {
+        for (String varName : STD_DATA_FILES_VARNAMES) {
             assertTrue(types.containsTypeName(varName));
         }
         assertFalse(types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()));
@@ -196,11 +257,11 @@ public class KnownDataTypesTest {
     @Test
     public void testGetKnownTypesSet() {
         KnownDataTypes types = new KnownDataTypes().addStandardTypesForUsers();
-        assertEquals(USERS_TYPES, types.getKnownTypesSet());
+        assertEquals(STD_USERS_TYPES, types.getKnownTypesSet());
         types = new KnownDataTypes().addStandardTypesForMetadataFiles();
-        assertEquals(METADATA_FILES_TYPES, types.getKnownTypesSet());
+        assertEquals(STD_METADATA_FILES_TYPES, types.getKnownTypesSet());
         types = new KnownDataTypes().addStandardTypesForDataFiles();
-        assertEquals(DATA_FILES_TYPES, types.getKnownTypesSet());
+        assertEquals(STD_DATA_FILES_TYPES, types.getKnownTypesSet());
     }
 
     /**
@@ -218,6 +279,7 @@ public class KnownDataTypesTest {
         dctype = new DataColumnType("weird name", 5.0, "expocode",
                 "weird unique name", false, DashboardUtils.NO_UNITS);
         assertEquals(DashboardServerUtils.DATASET_NAME, types.getDataType(dctype));
+        assertNull(types.getDataType(SHIP_SPEED.duplicate()));
     }
 
     /**
@@ -230,7 +292,7 @@ public class KnownDataTypesTest {
         assertEquals(0, knownSet.size());
         types.addStandardTypesForMetadataFiles();
         knownSet = types.getKnownTypesSet();
-        assertEquals(METADATA_FILES_TYPES, knownSet);
+        assertEquals(STD_METADATA_FILES_TYPES, knownSet);
     }
 
     /**
@@ -246,7 +308,7 @@ public class KnownDataTypesTest {
         assertEquals(new HashSet<String>(Arrays.asList(ADDN_TYPES_VAR_NAMES)), props.keySet());
         KnownDataTypes other = clientTypes.addTypesFromProperties(props);
         assertSame(clientTypes, other);
-        assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.getKnownTypesSet().size());
+        assertEquals(STD_USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.getKnownTypesSet().size());
         for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
             assertEquals(ADDN_DATA_TYPES[k], clientTypes.getDataType(ADDN_TYPES_VAR_NAMES[k]));
         }
