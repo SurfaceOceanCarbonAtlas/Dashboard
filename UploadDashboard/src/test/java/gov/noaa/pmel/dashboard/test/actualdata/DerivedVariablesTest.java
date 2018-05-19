@@ -1,18 +1,18 @@
 package gov.noaa.pmel.dashboard.test.actualdata;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
-import java.util.ArrayList;
-
-import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
-import org.junit.Test;
-
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.test.datatype.KnownDataTypesTest;
+import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
+import org.junit.Test;
+
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class DerivedVariablesTest {
 
@@ -41,9 +41,9 @@ public class DerivedVariablesTest {
         tool.run();
         assertFalse(tool.hasError());
 
-        ArrayList<String> unknownNames = dsgFile.readMetadata(DsgNcFileTest.KNOWN_METADATA_FILE_TYPES);
+        ArrayList<String> unknownNames = dsgFile.readMetadata(KnownDataTypesTest.TEST_KNOWN_METADATA_FILE_TYPES);
         assertEquals(0, unknownNames.size());
-        unknownNames = dsgFile.readData(DsgNcFileTest.KNOWN_DATA_FILE_TYPES);
+        unknownNames = dsgFile.readData(KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
         assertEquals(0, unknownNames.size());
         assertEquals(expocode, dsgFile.getMetadata().getDatasetId());
         StdDataArray calcData = dsgFile.getStdDataArray();
@@ -67,9 +67,9 @@ public class DerivedVariablesTest {
         assertFalse(tool.hasError());
 
         DsgNcFile decDsgFile = new DsgNcFile(decDataFilename);
-        unknownNames = decDsgFile.readMetadata(DsgNcFileTest.KNOWN_METADATA_FILE_TYPES);
+        unknownNames = decDsgFile.readMetadata(KnownDataTypesTest.TEST_KNOWN_METADATA_FILE_TYPES);
         assertEquals(0, unknownNames.size());
-        unknownNames = decDsgFile.readData(DsgNcFileTest.KNOWN_DATA_FILE_TYPES);
+        unknownNames = decDsgFile.readData(KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
         assertEquals(0, unknownNames.size());
         assertEquals(expocode, dsgFile.getMetadata().getDatasetId());
     }

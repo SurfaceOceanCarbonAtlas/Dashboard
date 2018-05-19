@@ -6,7 +6,6 @@ package gov.noaa.pmel.dashboard.test.actions;
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +18,8 @@ import static org.junit.Assert.assertNull;
 public class CrossoverCheckerTest {
 
     /**
-     * Test method for {@link CrossoverChecker#checkForCrossover(double[][], double[][], double[][], double[][], double[][])}.
+     * Test method for
+     * {@link CrossoverChecker#checkForCrossover(double[][], double[][], double[][], double[][], double[][])}.
      */
     @Test
     public void testCheckForCrossover() {
@@ -31,7 +31,7 @@ public class CrossoverCheckerTest {
 
         Crossover cross = CrossoverChecker.checkForCrossover(lons, lats, times, ssts, fco2s);
         assertNotNull(cross);
-        String[] expocodes = cross.getExpocodes();
+        String[] expocodes = cross.getDatasetIds();
         assertNotNull(expocodes);
         assertNull(expocodes[0]);
         assertNull(expocodes[1]);
@@ -52,11 +52,11 @@ public class CrossoverCheckerTest {
         assertNotNull(timesAtMin);
         assertEquals(1325807704L, timesAtMin[0].longValue());
         assertEquals(1325978045L, timesAtMin[1].longValue());
-        Long[] cruiseMinTimes = cross.getCruiseMinTimes();
+        Long[] cruiseMinTimes = cross.getDatasetMinTimes();
         assertNotNull(cruiseMinTimes);
         assertNull(cruiseMinTimes[0]);
         assertNull(cruiseMinTimes[1]);
-        Long[] cruiseMaxTimes = cross.getCruiseMaxTimes();
+        Long[] cruiseMaxTimes = cross.getDatasetMaxTimes();
         assertNotNull(cruiseMaxTimes);
         assertNull(cruiseMaxTimes[0]);
         assertNull(cruiseMaxTimes[1]);
@@ -343,7 +343,8 @@ public class CrossoverCheckerTest {
             396.932118882059, 387.636096850606, 386.579620783113, 379.958492999486,
             383.297288557805, 355.53971589125, 384.259878475391, 372.557220191664,
             377.896885537014, 373.049816204294, 368.580695866992, 363.539158790245,
-            352.936644065766, DashboardUtils.FP_MISSING_VALUE, 344.398084202867, 361.244027317772, DashboardUtils.FP_MISSING_VALUE,
+            352.936644065766, DashboardUtils.FP_MISSING_VALUE, 344.398084202867, 361.244027317772,
+            DashboardUtils.FP_MISSING_VALUE,
             318.109948589513, 322.261917441388, 313.278577144074, 314.470843334258,
             292.49523820962, 310.995384963485, 304.532654168374, 319.279637570998,
             307.251589647032, 302.531180284512, 303.640803362977, 298.155449750935,
@@ -359,7 +360,8 @@ public class CrossoverCheckerTest {
             386.541100305176, 391.332934327189, DashboardUtils.FP_MISSING_VALUE, 378.797685529626,
             378.488185209781, 372.221203366638, DashboardUtils.FP_MISSING_VALUE, 367.077293478595,
             365.182307831536, 357.61127972952, DashboardUtils.FP_MISSING_VALUE, 348.340359211622, 342.07328730745,
-            345.821710424799, 357.855842668733, 352.819063933469, DashboardUtils.FP_MISSING_VALUE, DashboardUtils.FP_MISSING_VALUE,
+            345.821710424799, 357.855842668733, 352.819063933469, DashboardUtils.FP_MISSING_VALUE,
+            DashboardUtils.FP_MISSING_VALUE,
             359.152754588387, 361.052605587672, 354.309356885953, 357.423871869684,
             352.329071314389, 336.362117313155, 334.950596654825, 351.783346429266,
             348.563610430927, 347.795621810318, 337.454591844882, 340.176194193696,
@@ -420,9 +422,11 @@ public class CrossoverCheckerTest {
             340.215060385161, 338.60108673904, 341.04194604536, 347.746126550073,
             339.613000040417, DashboardUtils.FP_MISSING_VALUE, 356.698922379513, 351.043314012183,
             348.885021386104, 353.092479423243, 363.608547595615, 361.604664466921,
-            DashboardUtils.FP_MISSING_VALUE, 370.15949545442, 378.127990322985, 387.469738780931, DashboardUtils.FP_MISSING_VALUE,
+            DashboardUtils.FP_MISSING_VALUE, 370.15949545442, 378.127990322985, 387.469738780931,
+            DashboardUtils.FP_MISSING_VALUE,
             380.874314596119, 378.506086707137, 376.837157353496, 384.919664163242,
-            DashboardUtils.FP_MISSING_VALUE, 367.966155139812, 368.000699431963, 350.778403187297, DashboardUtils.FP_MISSING_VALUE,
+            DashboardUtils.FP_MISSING_VALUE, 367.966155139812, 368.000699431963, 350.778403187297,
+            DashboardUtils.FP_MISSING_VALUE,
             368.338781682715, 358.249081384324, DashboardUtils.FP_MISSING_VALUE, 359.859678913034,
             364.893364508143, 354.720805231615
     };

@@ -14,7 +14,6 @@ import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 /**

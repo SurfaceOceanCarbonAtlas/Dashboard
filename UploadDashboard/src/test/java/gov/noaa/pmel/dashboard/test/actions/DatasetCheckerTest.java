@@ -210,7 +210,7 @@ public class DatasetCheckerTest {
             badCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
 
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
-        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
+        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // This actually tests the constructor, but need another one for this test
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         CheckerMessageHandler msgHandler = confStore.getCheckerMsgHandler();

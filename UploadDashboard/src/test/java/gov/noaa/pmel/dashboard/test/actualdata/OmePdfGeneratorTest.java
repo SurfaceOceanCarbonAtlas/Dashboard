@@ -1,13 +1,12 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.test.actions;
+package gov.noaa.pmel.dashboard.test.actualdata;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 import org.junit.Test;
 
 import java.io.File;

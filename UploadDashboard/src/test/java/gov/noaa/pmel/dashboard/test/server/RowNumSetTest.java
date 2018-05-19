@@ -4,7 +4,6 @@
 package gov.noaa.pmel.dashboard.test.server;
 
 import gov.noaa.pmel.dashboard.server.RowNumSet;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -17,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 public class RowNumSetTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.RowNumSet#toString()}.
+     * Test method for {@link RowNumSet#toString()}.
      */
     @Test
     public void testToString() {
