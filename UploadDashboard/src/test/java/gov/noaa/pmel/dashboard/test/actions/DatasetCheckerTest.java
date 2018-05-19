@@ -3,17 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.test.actions;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Properties;
-
-import org.junit.Test;
-
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
-import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -23,99 +16,85 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.test.dsg.DsgNcFileTest;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- * Test of the methods in {@link gov.noaa.pmel.dashboard.actions.DatasetChecker}
+ * Test of the methods in {@link DatasetChecker}
  *
  * @author Karl Smith
  */
 public class DatasetCheckerTest {
 
-    public static final DoubleDashDataType TEQU = new DoubleDashDataType("Temperature_equi",
-            310.0, "T_equ", "equilibrator chamber temperature", false, DsgNcFileTest.TEMPERATURE_UNITS,
-            null, DsgNcFileTest.TEMPERATURE_CATEGORY, null,
-            "-10.0", "-5.0", "40.0", "50.0");
-
-    public static final DoubleDashDataType PEQU = new DoubleDashDataType("Pressure_equi",
-            320.0, "P_equ", "equilibrator chamber pressure", false, DsgNcFileTest.PRESSURE_UNITS,
-            null, DsgNcFileTest.PRESSURE_CATEGORY, null,
-            "750.0", "900.0", "1100.0", "1250.0");
-
-    public static final DoubleDashDataType XCO2_WATER_TEQU_DRY = new DoubleDashDataType("xCO2_water_equi_temp_dry_ppm",
-            330.0, "xCO2_water_Tequ_dry", "water xCO2 dry using equi temp", false, DsgNcFileTest.XCO2_UNITS,
-            "mole_fraction_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, null,
-            "0.0", "100.0", "5000.0", "50000.0");
-
-    public static final DoubleDashDataType FCO2_WATER_SST_WET =  new DoubleDashDataType("fCO2_water_sst_100humidity_uatm",
-            340.0, "fCO2_water_SST_wet", "water fCO2 wet using sst", false, DsgNcFileTest.PCO2_UNITS,
-            "surface_partial_pressure_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, null,
-            "0.0", "100.0", "5000.0", "50000.0");
-
-    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm",
-            350.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", false, DsgNcFileTest.PCO2_UNITS,
-            "surface_partial_pressure_of_carbon_dioxide_in_sea_water", DsgNcFileTest.CO2_CATEGORY, null,
-            "0.0", "100.0", "5000.0", "50000.0");
-
     static final Properties ADDN_TYPE_PROPS;
+
     static {
         ADDN_TYPE_PROPS = new Properties();
-        ADDN_TYPE_PROPS.setProperty(DsgNcFileTest.SST.getVarName(), DsgNcFileTest.SST.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(DsgNcFileTest.PATM.getVarName(), DsgNcFileTest.PATM.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(DsgNcFileTest.XCO2_WATER_SST_DRY.getVarName(), DsgNcFileTest.XCO2_WATER_SST_DRY.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(DsgNcFileTest.PCO2_WATER_TEQU_WET.getVarName(), DsgNcFileTest.PCO2_WATER_TEQU_WET.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(DsgNcFileTest.SHIP_SPEED.getVarName(), DsgNcFileTest.SHIP_SPEED.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(TEQU.getVarName(), TEQU.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(PEQU.getVarName(), PEQU.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(XCO2_WATER_TEQU_DRY.getVarName(),XCO2_WATER_TEQU_DRY.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(FCO2_WATER_SST_WET.getVarName(), FCO2_WATER_SST_WET.toPropertyValue());
-        ADDN_TYPE_PROPS.setProperty(PCO2_WATER_SST_WET.getVarName(), PCO2_WATER_SST_WET.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.SST.getVarName(), SocatTypes.SST.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.PATM.getVarName(), SocatTypes.PATM.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(),
+                SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(),
+                SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.TEQU.getVarName(), SocatTypes.TEQU.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.PEQU.getVarName(), SocatTypes.PEQU.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(),
+                SocatTypes.XCO2_WATER_TEQU_DRY.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.FCO2_WATER_SST_WET.getVarName(),
+                SocatTypes.FCO2_WATER_SST_WET.toPropertyValue());
+        ADDN_TYPE_PROPS.setProperty(SocatTypes.PCO2_WATER_SST_WET.getVarName(),
+                SocatTypes.PCO2_WATER_SST_WET.toPropertyValue());
     }
 
     /**
-     * Test of {@link gov.noaa.pmel.dashboard.actions.DatasetChecker#DatasetChecker(
-     * gov.noaa.pmel.dashboard.datatype.KnownDataTypes, gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler)
-     * and {@link gov.noaa.pmel.dashboard.actions.DatasetChecker#standardizeDataset(
-     * gov.noaa.pmel.dashboard.shared.DashboardDatasetData, gov.noaa.pmel.dashboard.dsg.DsgMetadata)
+     * Test of {@link DatasetChecker#DatasetChecker(
+     *KnownDataTypes, CheckerMessageHandler)
+     * and {@link DatasetChecker#standardizeDataset(
+     *DashboardDatasetData, DsgMetadata)
      */
     @Test
     public void testDatasetChecker() throws Exception {
         String expocode = "33RO20030715";
 
         ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(
-            Arrays.asList(
-                DashboardServerUtils.DATASET_NAME.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.YEAR.duplicate(),
-                DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
-                DashboardServerUtils.DAY_OF_MONTH.duplicate(),
-                DashboardServerUtils.HOUR_OF_DAY.duplicate(),
-                DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
-                DashboardServerUtils.SECOND_OF_MINUTE.duplicate(),
-                DashboardServerUtils.LONGITUDE.duplicate(),
-                DashboardServerUtils.LATITUDE.duplicate(),
-                DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
-                DsgNcFileTest.SALINITY.duplicate(),
-                DsgNcFileTest.SST.duplicate(),
-                TEQU.duplicate(),
-                DsgNcFileTest.PATM.duplicate(),
-                PEQU.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                XCO2_WATER_TEQU_DRY.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                FCO2_WATER_SST_WET.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate()
-            )
+                Arrays.asList(
+                        DashboardServerUtils.DATASET_NAME.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.YEAR.duplicate(),
+                        DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
+                        DashboardServerUtils.DAY_OF_MONTH.duplicate(),
+                        DashboardServerUtils.HOUR_OF_DAY.duplicate(),
+                        DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
+                        DashboardServerUtils.SECOND_OF_MINUTE.duplicate(),
+                        DashboardServerUtils.LONGITUDE.duplicate(),
+                        DashboardServerUtils.LATITUDE.duplicate(),
+                        DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
+                        SocatTypes.SALINITY.duplicate(),
+                        SocatTypes.SST.duplicate(),
+                        SocatTypes.TEQU.duplicate(),
+                        SocatTypes.PATM.duplicate(),
+                        SocatTypes.PEQU.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        SocatTypes.XCO2_WATER_TEQU_DRY.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        SocatTypes.FCO2_WATER_SST_WET.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate()
+                )
         );
 
         String[] goodCruiseDataStrings = {
@@ -200,14 +179,18 @@ public class DatasetCheckerTest {
                 "33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t19\t15\t00\t2.03900\t32.19500\t5.\t36.830\t23.140\t23.350\t1017.970\t1017.920\t36.749\t1018.500\t4503.\t685.\t371.149\t412.220\tNaN\tNaN\tNaN\tNaN\t398.230\t397.819\t1\t2",
         };
         ArrayList<ArrayList<String>> goodCruiseData = new ArrayList<ArrayList<String>>(goodCruiseDataStrings.length);
-        for ( String dataString : goodCruiseDataStrings )
+        for (String dataString : goodCruiseDataStrings) {
             goodCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
-        ArrayList<ArrayList<String>> questionableCruiseData = new ArrayList<ArrayList<String>>(questionableCruiseDataStrings.length);
-        for ( String dataString : questionableCruiseDataStrings )
+        }
+        ArrayList<ArrayList<String>> questionableCruiseData = new ArrayList<ArrayList<String>>(
+                questionableCruiseDataStrings.length);
+        for (String dataString : questionableCruiseDataStrings) {
             questionableCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
+        }
         ArrayList<ArrayList<String>> badCruiseData = new ArrayList<ArrayList<String>>(badCruiseDataStrings.length);
-        for ( String dataString : badCruiseDataStrings )
+        for (String dataString : badCruiseDataStrings) {
             badCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
+        }
 
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
@@ -223,13 +206,15 @@ public class DatasetCheckerTest {
         dataset.setDatasetId(expocode);
         dataset.setDataColTypes(dataColTypes);
         ArrayList<String> userColNames = new ArrayList<String>(dataColTypes.size());
-        for (int k = 0; k < dataColTypes.size(); k++)
+        for (int k = 0; k < dataColTypes.size(); k++) {
             userColNames.add(dataColTypes.get(k).getDisplayName());
+        }
         dataset.setUserColNames(userColNames);
         dataset.setDataValues(goodCruiseData);
         ArrayList<Integer> rowNums = new ArrayList<Integer>(goodCruiseData.size());
-        for (int k = 1; k <= goodCruiseData.size(); k++)
+        for (int k = 1; k <= goodCruiseData.size(); k++) {
             rowNums.add(k);
+        }
         dataset.setRowNums(rowNums);
         dataset.setNumDataRows(rowNums.size());
 
@@ -239,8 +224,9 @@ public class DatasetCheckerTest {
 
         dataset.setDataValues(questionableCruiseData);
         rowNums = new ArrayList<Integer>(goodCruiseData.size());
-        for (int k = 1; k <= questionableCruiseData.size(); k++)
+        for (int k = 1; k <= questionableCruiseData.size(); k++) {
             rowNums.add(k);
+        }
         dataset.setRowNums(rowNums);
         dataset.setNumDataRows(rowNums.size());
 
@@ -250,15 +236,16 @@ public class DatasetCheckerTest {
         for (int k = 0; k < msgList.size(); k++) {
             ADCMessage msg = msgList.get(k);
             assertEquals(QCFlag.Severity.WARNING, msg.getSeverity());
-            assertEquals(Integer.valueOf(k+3), msg.getRowNumber());
+            assertEquals(Integer.valueOf(k + 3), msg.getRowNumber());
             assertEquals(Integer.valueOf(23), msg.getColNumber());
-            assertEquals(XCO2_WATER_TEQU_DRY.getDisplayName(), msg.getColName());
+            assertEquals(SocatTypes.XCO2_WATER_TEQU_DRY.getDisplayName(), msg.getColName());
         }
 
         dataset.setDataValues(badCruiseData);
         rowNums = new ArrayList<Integer>(goodCruiseData.size());
-        for (int k = 1; k <= badCruiseData.size(); k++)
+        for (int k = 1; k <= badCruiseData.size(); k++) {
             rowNums.add(k);
+        }
         dataset.setRowNums(rowNums);
         dataset.setNumDataRows(rowNums.size());
 
@@ -275,7 +262,7 @@ public class DatasetCheckerTest {
             }
             else {
                 // Invalid latitudes
-                assertEquals(Integer.valueOf(k+2), msg.getRowNumber());
+                assertEquals(Integer.valueOf(k + 2), msg.getRowNumber());
                 assertEquals(Integer.valueOf(11), msg.getColNumber());
             }
         }
@@ -291,19 +278,19 @@ public class DatasetCheckerTest {
         expocode = "320G20120508";
 
         dataColTypes = new ArrayList<DataColumnType>(
-            Arrays.asList(
-                DashboardServerUtils.DATASET_NAME.duplicate(),
-                DashboardServerUtils.DATE.duplicate(),
-                DashboardServerUtils.TIME_OF_DAY.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.OTHER.duplicate(),
-                DashboardServerUtils.LATITUDE.duplicate(),
-                DashboardServerUtils.LONGITUDE.duplicate(),
-                PCO2_WATER_SST_WET.duplicate(),
-                DsgNcFileTest.SST.duplicate(),
-                DsgNcFileTest.SALINITY.duplicate(),
-                DashboardServerUtils.SAMPLE_DEPTH.duplicate()
-            )
+                Arrays.asList(
+                        DashboardServerUtils.DATASET_NAME.duplicate(),
+                        DashboardServerUtils.DATE.duplicate(),
+                        DashboardServerUtils.TIME_OF_DAY.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.OTHER.duplicate(),
+                        DashboardServerUtils.LATITUDE.duplicate(),
+                        DashboardServerUtils.LONGITUDE.duplicate(),
+                        SocatTypes.PCO2_WATER_SST_WET.duplicate(),
+                        SocatTypes.SST.duplicate(),
+                        SocatTypes.SALINITY.duplicate(),
+                        DashboardServerUtils.SAMPLE_DEPTH.duplicate()
+                )
         );
 
         String[] cruiseDataStrings = {
@@ -723,29 +710,31 @@ public class DatasetCheckerTest {
         };
 
         ArrayList<ArrayList<String>> cruiseData = new ArrayList<ArrayList<String>>(cruiseDataStrings.length);
-        for ( String dataString : cruiseDataStrings )
+        for (String dataString : cruiseDataStrings) {
             cruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
+        }
 
         // TODO: need to add metadata to check
         dataset = new DashboardDatasetData();
         dataset.setDatasetId(expocode);
         dataset.setDataColTypes(dataColTypes);
         userColNames = new ArrayList<String>(dataColTypes.size());
-        for (int k = 0; k < dataColTypes.size(); k++)
-            userColNames.add(dataColTypes.get(k).getDisplayName());
+        for (DataColumnType dtype : dataColTypes) {
+            userColNames.add(dtype.getDisplayName());
+        }
         dataset.setUserColNames(userColNames);
         dataset.setDataValues(cruiseData);
         rowNums = new ArrayList<Integer>(cruiseData.size());
-        for (int k = 1; k <= cruiseData.size(); k++)
+        for (int k = 1; k <= cruiseData.size(); k++) {
             rowNums.add(k);
+        }
         dataset.setRowNums(rowNums);
         dataset.setNumDataRows(rowNums.size());
 
         stdUserData = dataChecker.standardizeDataset(dataset, null);
         msgList = stdUserData.getStandardizationMessages();
         assertEquals(1, msgList.size());
-        for (int k = 0; k < msgList.size(); k++) {
-            ADCMessage msg = msgList.get(k);
+        for (ADCMessage msg : msgList) {
             assertEquals(QCFlag.Severity.ERROR, msg.getSeverity());
         }
 /*
