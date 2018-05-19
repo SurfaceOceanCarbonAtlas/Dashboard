@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
@@ -26,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -231,13 +232,16 @@ public class DataUploadService extends HttpServlet {
         TreeSet<String> successes = new TreeSet<String>();
 
         for (FileItem item : datafiles) {
-            // Get the datasets from this file
-            TreeMap<String,DashboardDatasetData> datasetsMap;
+            // Create a DashboardDatasetData from the contents of the uploaded data file
+            DashboardDatasetData dsetData;
             String filename = item.getName();
-            try (BufferedReader cruiseReader = new BufferedReader(
-                    new InputStreamReader(item.getInputStream(), encoding));) {
-                datasetsMap = datasetHandler.createDatasetsFromInput(cruiseReader, dataFormat, username, filename,
-                        timestamp);
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(item.getInputStream(), encoding));
+                try {
+                    dsetData = datasetHandler.createDatasetFromInput(reader, dataFormat, username, filename, timestamp);
+                } finally {
+                    reader.close();
+                }
             } catch ( Exception ex ) {
                 // Mark as a failed file, and go on to the next
                 messages.add(DashboardUtils.INVALID_FILE_HEADER_TAG + " " + filename);
@@ -250,107 +254,234 @@ public class DataUploadService extends HttpServlet {
             // done with the uploaded data file
             item.delete();
 
-            // Process all the datasets created from this file
-            for (DashboardDatasetData datasetData : datasetsMap.values()) {
-                // Check if the dataset already exists
-                String datasetId = datasetData.getDatasetId();
-                boolean datasetExists = datasetHandler.dataFileExists(datasetId);
-                boolean appended = false;
-                if ( datasetExists ) {
-                    String owner = "";
-                    String status = "";
-                    try {
-                        // Read the original dataset info to get the current owner and submit status
-                        DashboardDataset oldDataset = datasetHandler.getDatasetFromInfoFile(datasetId);
-                        owner = oldDataset.getOwner();
-                        status = oldDataset.getSubmitStatus();
-                    } catch ( Exception ex ) {
-                        // Some problem with the properties file
-                        ;
-                    }
-                    // If only create new datasets, add error message and skip the dataset
-                    if ( DashboardUtils.NEW_DATASETS_REQUEST_TAG.equals(action) ) {
-                        messages.add(DashboardUtils.DATASET_EXISTS_HEADER_TAG + " " +
-                                filename + " ; " + datasetId + " ; " + owner + " ; " + status);
-                        continue;
-                    }
-                    // Make sure this user has permission to modify this dataset
-                    try {
-                        datasetHandler.verifyOkayToDeleteDataset(datasetId, username);
-                    } catch ( Exception ex ) {
-                        messages.add(DashboardUtils.DATASET_EXISTS_HEADER_TAG + " " +
-                                filename + " ; " + datasetId + " ; " + owner + " ; " + status);
-                        continue;
-                    }
-                }
-                // At this point, datasetData is the dataset to save, regardless of new or overwrite
-
-                // Create the OME XML stub file for this dataset
-                try {
-                    OmeMetadata omeMData = new OmeMetadata(datasetId);
-                    DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
-                            timestamp, username,
-                            datasetData.getVersion());
-                    String msg = "New OME XML document from data file for " +
-                            datasetId + " uploaded by " + username;
-                    MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-                    mdataHandler.saveMetadataInfo(mdata, msg, false);
-                    mdataHandler.saveAsOmeXmlDoc(mdata, msg);
-                } catch ( Exception ex ) {
-                    // should not happen
-                    messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " +
-                            filename + " ; " + datasetId);
-                    messages.add(ex.getMessage());
-                    messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
-                    continue;
-                }
-
-                // Add any existing documents for this cruise
-                ArrayList<DashboardMetadata> mdataList =
-                        configStore.getMetadataFileHandler().getMetadataFiles(datasetId);
-                TreeSet<String> addlDocs = new TreeSet<String>();
-                for (DashboardMetadata mdata : mdataList) {
-                    if ( DashboardUtils.OME_FILENAME.equals(mdata.getFilename()) ) {
-                        // Ignore the OME XML stub file
-                    }
-                    else if ( DashboardUtils.PI_OME_FILENAME.equals(mdata.getFilename()) ) {
-                        datasetData.setOmeTimestamp(mdata.getUploadTimestamp());
-                    }
-                    else {
-                        addlDocs.add(mdata.getAddlDocsTitle());
-                    }
-                }
-                datasetData.setAddlDocs(addlDocs);
-
-                // Save the cruise file and commit it to version control
-                try {
-                    String commitMsg;
-                    if ( appended )
-                        commitMsg = "file for " + datasetId + " appended to by " +
-                                username + " from uploaded file " + filename;
-                    else if ( datasetExists )
-                        commitMsg = "file for " + datasetId + " updated by " +
-                                username + " from uploaded file " + filename;
-                    else
-                        commitMsg = "file for " + datasetId + " created by " +
-                                username + " from uploaded file " + filename;
-                    datasetHandler.saveDatasetInfoToFile(datasetData, "Dataset info " + commitMsg);
-                    datasetHandler.saveDatasetDataToFile(datasetData, "Dataset data " + commitMsg);
-                } catch ( IllegalArgumentException ex ) {
-                    messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " +
-                            filename + " ; " + datasetId);
-                    messages.add(ex.getMessage());
-                    messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
-                    continue;
-                }
-
-                // Success
-                messages.add(DashboardUtils.SUCCESS_HEADER_TAG + " " + datasetId);
-                successes.add(datasetId);
+            // Check if the dataset file exists, and in the process
+            // check if a valid expocode was obtained from the file
+            String datasetId = dsetData.getDatasetId();
+            boolean dataExists;
+            try {
+                dataExists = datasetHandler.dataFileExists(datasetId);
+            } catch ( IllegalArgumentException ex ) {
+                messages.add(DashboardUtils.NO_DATASET_ID_HEADER_TAG + " " + filename);
+                continue;
             }
+
+            if ( dataExists ) {
+                // Read the original dataset info to get the current owner and QC status
+                DashboardDataset dset;
+                String owner;
+                String status;
+                try {
+                    dset = datasetHandler.getDatasetFromInfoFile(datasetId);
+                    owner = dset.getOwner();
+                    status = dset.getSubmitStatus();
+                } catch ( Exception ex ) {
+                    owner = "";
+                    status = "";
+                }
+                // Make sure this user has permission to overwrite this cruise,
+                // and the request was for an overwrite
+                try {
+                    dset = datasetHandler.verifyOkayToDeleteDataset(datasetId, username);
+                } catch ( Exception ex ) {
+                    dset = null;
+                }
+                if ( (dset == null) || (!DashboardUtils.OVERWRITE_DATASETS_REQUEST_TAG.equals(action)) ) {
+                    messages.add(DashboardUtils.DATASET_EXISTS_HEADER_TAG + " " +
+                            filename + " ; " + datasetId + " ; " + owner + " ; " + status);
+                    continue;
+                }
+
+                // Preserve the original owner of the data and the original QC status (for update)
+                if ( !owner.isEmpty() )
+                    dsetData.setOwner(owner);
+                dsetData.setSubmitStatus(status);
+            }
+            else {
+                // If the cruise file does not exist, make sure the request was for a new file
+                if ( !DashboardUtils.NEW_DATASETS_REQUEST_TAG.equals(action) ) {
+                    messages.add(DashboardUtils.DATASET_DOES_NOT_EXIST_HEADER_TAG + " " +
+                            filename + " ; " + datasetId);
+                    continue;
+                }
+            }
+
+            String platformName = null;
+            ArrayList<String> piNames = null;
+            String platformType = null;
+            // Get the ship name and PI names from the metadata preamble
+            for (String metaline : dsetData.getPreamble()) {
+                boolean lineMatched = false;
+                if ( platformName == null ) {
+                    for (Pattern pat : PLATFORM_NAME_PATTERNS) {
+                        Matcher mat = pat.matcher(metaline);
+                        if ( !mat.matches() )
+                            continue;
+                        lineMatched = true;
+                        platformName = mat.group(1);
+                        if ( (platformName != null) && !platformName.isEmpty() )
+                            break;
+                        platformName = null;
+                    }
+                }
+                if ( (piNames == null) && !lineMatched ) {
+                    for (Pattern pat : PI_NAMES_PATTERNS) {
+                        Matcher mat = pat.matcher(metaline);
+                        if ( !mat.matches() )
+                            continue;
+                        lineMatched = true;
+                        String allNames = mat.group(1);
+                        if ( allNames != null ) {
+                            piNames = new ArrayList<String>();
+                            for (String name : allNames.split(";")) {
+                                name = name.trim();
+                                if ( !name.isEmpty() )
+                                    piNames.add(name);
+                            }
+                            if ( !piNames.isEmpty() )
+                                break;
+                            piNames = null;
+                        }
+                    }
+                }
+                if ( (platformType == null) && !lineMatched ) {
+                    for (Pattern pat : PLATFORM_TYPE_PATTERNS) {
+                        Matcher mat = pat.matcher(metaline);
+                        if ( !mat.matches() )
+                            continue;
+                        lineMatched = true;
+                        platformType = mat.group(1);
+                        if ( (platformType != null) && !platformType.isEmpty() )
+                            break;
+                        platformType = null;
+                    }
+                }
+            }
+            // If platform name not found in preamble, check if there is a matching column type
+            if ( platformName == null ) {
+                int colIdx = -1;
+                int k = 0;
+                for (DataColumnType dtype : dsetData.getDataColTypes()) {
+                    if ( DashboardServerUtils.PLATFORM_NAME.typeNameEquals(dtype) ) {
+                        colIdx = k;
+                        break;
+                    }
+                    k++;
+                }
+                if ( colIdx >= 0 ) {
+                    platformName = dsetData.getDataValues().get(0).get(colIdx);
+                    if ( platformName.isEmpty() )
+                        platformName = null;
+                }
+            }
+            // If PI names not found in preamble, check if there is a matching column type
+            if ( piNames == null ) {
+                int colIdx = -1;
+                int k = 0;
+                for (DataColumnType dtype : dsetData.getDataColTypes()) {
+                    if ( DashboardServerUtils.INVESTIGATOR_NAMES.typeNameEquals(dtype) ) {
+                        colIdx = k;
+                        break;
+                    }
+                    k++;
+                }
+                if ( colIdx >= 0 ) {
+                    piNames = new ArrayList<String>();
+                    for (String name : dsetData.getDataValues().get(0).get(colIdx).split(";")) {
+                        name = name.trim();
+                        if ( !name.isEmpty() )
+                            piNames.add(name);
+                    }
+                    if ( piNames.isEmpty() )
+                        piNames = null;
+                }
+            }
+            // If platform type not found in preamble, check if there is a matching column type
+            if ( platformType == null ) {
+                int colIdx = -1;
+                int k = 0;
+                for (DataColumnType dtype : dsetData.getDataColTypes()) {
+                    if ( DashboardServerUtils.PLATFORM_TYPE.typeNameEquals(dtype) ) {
+                        colIdx = k;
+                        break;
+                    }
+                    k++;
+                }
+                if ( colIdx >= 0 ) {
+                    platformType = dsetData.getDataValues().get(0).get(colIdx);
+                    if ( platformType.isEmpty() )
+                        platformType = null;
+                }
+            }
+
+            // Verify there is a platform name and a PI name
+            if ( platformName == null ) {
+                messages.add(DashboardUtils.NO_PLATFORM_NAME_HEADER_TAG + " " + filename);
+                continue;
+            }
+            if ( piNames == null ) {
+                messages.add(DashboardUtils.NO_PI_NAMES_HEADER_TAG + " " + filename);
+                continue;
+            }
+            // If the platform type is not given, make an educated guess
+            if ( platformType == null ) {
+                platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
+            }
+
+            // Create the OME XML stub file for this dataset
+            try {
+                OmeMetadata omeMData = new OmeMetadata(datasetId);
+                DashboardOmeMetadata mdata =
+                        new DashboardOmeMetadata(omeMData, timestamp, username, dsetData.getVersion());
+                String msg = "New OME metadata created from data file for " + datasetId + " uploaded by " + username;
+                MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+                mdataHandler.saveMetadataInfo(mdata, msg, false);
+                mdataHandler.saveAsOmeXmlDoc(mdata, msg);
+            } catch ( Exception ex ) {
+                // should not happen
+                messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " + filename + " ; " + datasetId);
+                messages.add(ex.getMessage());
+                messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+                continue;
+            }
+
+            // Add any existing documents for this cruise
+            ArrayList<DashboardMetadata> mdataList = configStore.getMetadataFileHandler().getMetadataFiles(datasetId);
+            TreeSet<String> addlDocs = new TreeSet<String>();
+            for (DashboardMetadata mdata : mdataList) {
+                if ( DashboardUtils.OME_FILENAME.equals(mdata.getFilename()) ) {
+                    // Ignore the OME XML stub file
+                }
+                else if ( DashboardUtils.PI_OME_FILENAME.equals(mdata.getFilename()) ) {
+                    dsetData.setOmeTimestamp(mdata.getUploadTimestamp());
+                }
+                else {
+                    addlDocs.add(mdata.getAddlDocsTitle());
+                }
+            }
+            dsetData.setAddlDocs(addlDocs);
+
+            // Save the cruise file and commit it to version control
+            try {
+                String commitMsg;
+                if ( dataExists )
+                    commitMsg = "file for " + datasetId + " updated by " + username + " from uploaded file " + filename;
+                else
+                    commitMsg = "file for " + datasetId + " created by " + username + " from uploaded file " + filename;
+                datasetHandler.saveDatasetInfoToFile(dsetData, "Dataset info " + commitMsg);
+                datasetHandler.saveDatasetDataToFile(dsetData, "Dataset data " + commitMsg);
+            } catch ( IllegalArgumentException ex ) {
+                messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " + filename + " ; " + datasetId);
+                messages.add(ex.getMessage());
+                messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+                continue;
+            }
+
+            // Success
+            messages.add(DashboardUtils.SUCCESS_HEADER_TAG + " " + datasetId);
+            successes.add(datasetId);
         }
 
-        // Update the list of cruises for the user
+        // Update the list of datasets for the user
         try {
             configStore.getUserFileHandler().addDatasetsToListing(successes, username);
         } catch ( IllegalArgumentException ex ) {
@@ -369,8 +500,8 @@ public class DataUploadService extends HttpServlet {
     }
 
     /**
-     * Returns an error message in the given Response object. The response number is still 200 (SC_OK) so the message
-     * goes through cleanly.
+     * Returns an error message in the given Response object.
+     * The response number is still 200 (SC_OK) so the message goes through cleanly.
      *
      * @param response
      *         write the error message here

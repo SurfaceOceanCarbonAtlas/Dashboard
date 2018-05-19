@@ -25,6 +25,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class DataFileHandlerTest {
 
+    private static final String DATASET_OWNER = "Kevin Sullivan";
+    private static final String UPLOAD_FILENAME = "Atlantis April 2012.csv";
+    private static final String UPLOAD_TIMESTAMP = "2012-06-25 12:35+4";
     private static final String CSV_DATA = "Expocode: 00KS20120419 , , , , , , , , , , , , , , , , , , ,\n" +
             "Ship: Atlantis         , , , , , , , , , , , , , , , , , , ,\n" +
             "\"PI: Wanninkhof, R.\"     , , , , , , , , , , , , , , , , , , ,\n" +
@@ -95,8 +98,7 @@ public class DataFileHandlerTest {
     ;
 
     /**
-     * Test method for {@link DataFileHandler#assignDatasetDataFromInput(DashboardDatasetData,
-     * String, BufferedReader, int, int, boolean)}.
+     * Test method for {@link DataFileHandler#createDatasetFromInput(BufferedReader, String, String, String, String)}
      */
     @Test
     public void testAssignDatasetDataFromInput() throws IOException {
@@ -104,8 +106,9 @@ public class DataFileHandlerTest {
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
         BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA));
-        DashboardDatasetData cruiseData = new DashboardDatasetData();
-        dataHandler.assignDatasetDataFromInput(cruiseData, DashboardUtils.COMMA_FORMAT_TAG, cruiseReader, 0, -1, true);
+        DashboardDatasetData cruiseData =
+        dataHandler.createDatasetFromInput(cruiseReader, DashboardUtils.COMMA_FORMAT_TAG,
+                DATASET_OWNER, UPLOAD_FILENAME, UPLOAD_TIMESTAMP);
 
         assertEquals(META_PREAMBLE.size(), cruiseData.getPreamble().size());
         for (int k = 0; k < META_PREAMBLE.size(); k++) {

@@ -30,8 +30,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -68,7 +68,20 @@ public class DataFileHandler extends VersionedFileHandler {
 
     private static final int MIN_NUM_DATA_COLUMNS = 6;
 
+    // Patterns for getting the expocode from the metadata preamble
+    private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
+            Pattern.compile("Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+                    Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Cruise\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+                    Pattern.CASE_INSENSITIVE),
+            Pattern.compile("Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+                    Pattern.CASE_INSENSITIVE)
+    };
+
     private KnownDataTypes userTypes;
+    private UserFileHandler userFileHandler;
+    private String uploadVersion;
+
 
     /**
      * Handles storage and retrieval of dataset data in files under the given data files directory.
@@ -81,14 +94,20 @@ public class DataFileHandler extends VersionedFileHandler {
      *         password for SVN authentication
      * @param userTypes
      *         known user data column types
+     * @param userFileHandler
+     *         handler for user-specific configuraton files
+     * @param uploadVersion
+     *         version to assign to new and updated datasets
      *
      * @throws IllegalArgumentException
      *         if the specified directory does not exist, is not a directory, or is not under SVN version control
      */
-    public DataFileHandler(String dataFilesDirName, String svnUsername,
-            String svnPassword, KnownDataTypes userTypes) throws IllegalArgumentException {
+    public DataFileHandler(String dataFilesDirName, String svnUsername, String svnPassword, KnownDataTypes userTypes,
+            UserFileHandler userFileHandler, String uploadVersion) throws IllegalArgumentException {
         super(dataFilesDirName, svnUsername, svnPassword);
         this.userTypes = userTypes;
+        this.userFileHandler = userFileHandler;
+        this.uploadVersion = uploadVersion;
     }
 
     /**
@@ -128,16 +147,17 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Searches all existing datasets and returns the dataset IDs of those that match the given dataset ID containing
-     * wildcards and/or regular expressions.
+     * Searches all existing datasets and returns the dataset IDs of those that match
+     * the given dataset ID containing wildcards and/or regular expressions.
      *
      * @param wildDatasetId
-     *         dataset ID, possibly with wildcards * and ?, to use; any characters are converted to uppercase, "*" is
-     *         turned in the regular expression "[\p{javaUpperCase}\p{Digit}]+", and "?" is turned in the regular
-     *         expression "[\p{javaUpperCase}\p{Digit}]{1}".
+     *         dataset ID, possibly with wildcards * and ?, to use;
+     *         letters are converted to uppercase,
+     *         "*" is turned in the regular expression "[\p{javaUpperCase}\p{Digit}-]*", and
+     *         "?" is turned in the regular expression "[\p{javaUpperCase}\p{Digit}-]{1}".
      *
-     * @return list of dataset IDs of existing datasets that match the given wildcard dataset ID; never null, but may be
-     *         empty
+     * @return list of dataset IDs of existing datasets that match the given wildcard dataset ID;
+     *         never null, but may be empty
      *
      * @throws IllegalArgumentException
      *         if wildDatasetId is not a valid dataset ID pattern
@@ -148,8 +168,8 @@ public class DataFileHandler extends VersionedFileHandler {
         final Pattern filenamePattern;
         try {
             String filenameRegEx = wildDatasetId.toUpperCase();
-            filenameRegEx = filenameRegEx.replace("*", "[\\p{javaUpperCase}\\p{Digit}]+");
-            filenameRegEx = filenameRegEx.replace("?", "[\\p{javaUpperCase}\\p{Digit}]{1}");
+            filenameRegEx = filenameRegEx.replace("*", "[\\p{javaUpperCase}\\p{Digit}-]*");
+            filenameRegEx = filenameRegEx.replace("?", "[\\p{javaUpperCase}\\p{Digit}-]{1}");
             filenameRegEx += INFO_FILENAME_EXTENSION;
             filenamePattern = Pattern.compile(filenameRegEx);
         } catch ( PatternSyntaxException ex ) {
@@ -214,36 +234,42 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Creates dataset data object containing data read from the given reader. A map of the dataset data objects, keyed
-     * by the dataset IDs, is returned.
+     * Creates a DashboardDatasetData object with data read from the given BufferedReader.
      * <p>
-     * Data is read as String values in the format specified.  Blank lines and ines with all-blank values are ignored.
-     * The first line with no blank or pure-numeric values, and at least {@value #MIN_NUM_DATA_COLUMNS} values, is
-     * assumed to be the header of data column names, possibly with units. Optionally, the column names header line can
-     * be immediately followed by a line with no pure-numeric values, which will be used as units for the data columns.
-     * All remaining lines (that are not ignored) are considered data lines and should have the same number of values as
-     * in the column names.
+     * The data read should have a preamble of metadata containing the ID (expocode)
+     * for the dataset on a line such as one of the following (case and space insensitive):
+     * <pre>
+     * Expocode :
+     * Expocode =
+     * Cruise Expocode :
+     * Cruise Expocode =
+     * Dataset Expocode :
+     * Dataset Expocode =
+     * </pre>
+     * Alternatively, the dataset ID can be given in an appropriate data column.
+     * In this case, only the first ID in the column is used.
      * <p>
-     * One data column in the data read must be recognized as the dataset (cruise) name; the name for such a column
-     * include (case-insensitive) "Dataset", "Dataset ID", "Dataset Name", "Cruise", "Cruise ID", and "Cruise Name". The
-     * dataset ID for each sample will be constructed from the value in this column by converting any letters to
-     * uppercase and removing any character that is not a number or letter.  The data for this sample will be added to
-     * the dataset data object associated with that dataset ID.
+     * The first line containing at least {@value #MIN_NUM_DATA_COLUMNS} non-blank values will be taken to be the
+     * line of data column headers, possibly with units as part of their names.  No data column header can be blank.
+     * Optionally, the column headers line can be immediately followed by a line with no pure-numeric values, which
+     * will be interpreted as units for the data columns.  All remaining (non-blank) lines are considered data lines
+     * and should have the same number of values as in the column headers line.  All data values are read as Strings.
+     * Blank lines and ines with all-blank values are ignored.
      *
      * @param dataReader
-     *         read data from here;
+     *         read metadata preamble and data lines from here
      * @param dataFormat
-     *         format of the data read; one of {@link DashboardUtils#COMMA_FORMAT_TAG}. {@link
-     *         DashboardUtils#SEMICOLON_FORMAT_TAG}, or {@link DashboardUtils#TAB_FORMAT_TAG}.
+     *         format of the data lines read; one of {@link DashboardUtils#COMMA_FORMAT_TAG},
+     *         {@link DashboardUtils#SEMICOLON_FORMAT_TAG}, or {@link DashboardUtils#TAB_FORMAT_TAG}.
      * @param owner
-     *         name of the owner to record in the datasets created or appended to; also used to guess data column types
-     *         from column names
+     *         name of the owner to record in the datasets created or appended to;
+     *         also used to guess data column types from column names
      * @param filename
-     *         upload filename to record in the datasets created or appended to
+     *         upload filename to record in the dataset created
      * @param timestamp
-     *         upload timestamp to record in the datasets created or appended to
+     *         upload timestamp to record in the dataset created
      *
-     * @return map of dataset data objects, keyed on their dataset IDs
+     * @return the dataset data object created
      *
      * @throws IOException
      *         if reading from datasetsReader throws one, if the dataFormat string is not recognized if there is an
@@ -251,9 +277,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         not found, if a dataset ID derived from the dataset name is not valid (too short or too long), if there
      *         are too few data columns, or if no data samples (rows) were found.
      */
-    public TreeMap<String,DashboardDatasetData> createDatasetsFromInput(
-            BufferedReader dataReader, String dataFormat, String owner,
-            String filename, String timestamp) throws IOException {
+    public DashboardDatasetData createDatasetFromInput(BufferedReader dataReader, String dataFormat,
+            String owner, String filename, String timestamp) throws IOException {
         char spacer;
         if ( DashboardUtils.TAB_FORMAT_TAG.equals(dataFormat) ) {
             spacer = '\t';
@@ -267,28 +292,25 @@ public class DataFileHandler extends VersionedFileHandler {
         else
             throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
 
-        TreeMap<String,DashboardDatasetData> datasetsMap = new TreeMap<String,DashboardDatasetData>();
-        int numDataColumns = 0;
-
         CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
                                           .withIgnoreEmptyLines()
                                           .withDelimiter(spacer);
         CSVParser dataParser = new CSVParser(dataReader, format);
-        try {
 
-            ArrayList<String> columnNames = null;
+        String expocode = null;
+        ArrayList<String> preamble = new ArrayList<String>();
+        ArrayList<String> columnNames = null;
+        int numDataColumns = 0;
+        ArrayList<ArrayList<String>> allDataVals = new ArrayList<ArrayList<String>>();
+        try {
             boolean checkForUnits = false;
-            ArrayList<DataColumnType> columnTypes = null;
-            int datasetNameColIdx = -1;
-            String version = null;
 
             for (CSVRecord record : dataParser) {
 
                 // Still looking for headers?
                 if ( columnNames == null ) {
                     if ( record.size() >= MIN_NUM_DATA_COLUMNS ) {
-                        // These could be the column names headers
-                        // column names must not be blank or pure numeric
+                        // Check if these are the column names headers; column names must not be blank or pure numeric
                         boolean isHeader = true;
                         for (String val : record) {
                             if ( val.isEmpty() ) {
@@ -301,7 +323,6 @@ public class DataFileHandler extends VersionedFileHandler {
                                 break;
                             } catch ( Exception ex ) {
                                 // Expected result for a name
-                                ;
                             }
                         }
                         if ( isHeader ) {
@@ -311,24 +332,44 @@ public class DataFileHandler extends VersionedFileHandler {
                             for (String val : record) {
                                 columnNames.add(val);
                             }
+                            // Check for units in the next record
+                            checkForUnits = true;
+                            continue;
                         }
-                        // Check for units in the next record
-                        checkForUnits = true;
                     }
-                    // Ignore anything prior to the column headers
+                }
+
+                // Still reading metadata?
+                if ( columnNames == null ) {
+                    // Put this line of metadata back together using spacer
+                    String metaline = rebuildDataline(record, spacer);
+
+                    // Examine this metadata line for the expocode
+                    if ( (expocode == null) && !metaline.isEmpty() ) {
+                        for (Pattern pat : EXPOCODE_PATTERNS) {
+                            Matcher mat = pat.matcher(metaline);
+                            if ( !mat.matches() )
+                                continue;
+                            expocode = mat.group(1).toUpperCase();
+                            break;
+                        }
+                    }
+
+                    // Save this metadata line in the preamble for the cruise
+                    preamble.add(metaline);
                     continue;
                 }
 
                 // Check that the number of columns is consistent
                 if ( record.size() != numDataColumns )
-                    throw new IOException("Inconsistent number of data columns (" +
-                            record.size() + " instead of " + numDataColumns +
-                            ") for measurement " + dataParser.getRecordNumber() + ":\n    " +
-                            rebuildDataline(record, spacer));
+                    throw new IOException("Inconsistent number of data columns (" + record.size() +
+                            " instead of " + numDataColumns + ") for measurement " + dataParser.getRecordNumber() +
+                            ":\n    " + rebuildDataline(record, spacer));
 
                 if ( checkForUnits ) {
-                    // The line immediately following the data column names could be units
+                    // Check if the line immediately following the data column names are units
                     checkForUnits = false;
+
                     boolean isUnits = true;
                     // A unit specification cannot be pure numeric
                     for (String val : record) {
@@ -338,55 +379,26 @@ public class DataFileHandler extends VersionedFileHandler {
                             break;
                         } catch ( NumberFormatException ex ) {
                             // Expected result for a units specification
-                            ;
                         }
                     }
                     if ( isUnits ) {
                         // Add the units to the column header names
-                        ArrayList<String> namesWithUnits = new ArrayList<String>(numDataColumns);
                         int k = 0;
                         for (String units : record) {
-                            if ( units.isEmpty() )
-                                namesWithUnits.add(columnNames.get(k));
-                            else
-                                namesWithUnits.add(columnNames.get(k) + " [" + units + "]");
+                            if ( !units.isEmpty() ) {
+                                String name = columnNames.get(k);
+                                name += " [" + units + "]";
+                                columnNames.set(k, name);
+                            }
                             k++;
                         }
-                        columnNames = namesWithUnits;
-                    }
-
-                    // Assign the data column types from the column names (including customizations for this user)
-                    DashboardDataset fakeDataset = new DashboardDataset();
-                    fakeDataset.setOwner(owner);
-                    fakeDataset.setUserColNames(columnNames);
-                    DashboardConfigStore configStore;
-                    try {
-                        configStore = DashboardConfigStore.get(false);
-                    } catch ( IOException ex ) {
-                        throw new IOException("Unexpected failure to get the dashboard configuration");
-                    }
-                    configStore.getUserFileHandler().assignDataColumnTypes(fakeDataset);
-                    columnTypes = fakeDataset.getDataColTypes();
-                    int k = 0;
-                    for (DataColumnType dtype : columnTypes) {
-                        if ( DashboardServerUtils.DATASET_NAME.typeNameEquals(dtype) ) {
-                            datasetNameColIdx = k;
-                            break;
-                        }
-                        k++;
-                    }
-                    if ( datasetNameColIdx < 0 )
-                        throw new IOException("Dataset name column not found");
-
-                    // Get the version to record in the datasets
-                    version = configStore.getUploadVersion();
-
-                    // If this was indeed a line of units, go on to the next line;
-                    // otherwise this is the first line of data values to parse
-                    if ( isUnits )
+                        // the next line is the first line of data values to parse
                         continue;
+                    }
+                    // not units; this is the first line of data value to parse
                 }
 
+                // read the data in this line
                 ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
                 boolean allBlank = true;
                 for (String val : record) {
@@ -394,33 +406,9 @@ public class DataFileHandler extends VersionedFileHandler {
                     if ( allBlank && !val.isEmpty() )
                         allBlank = false;
                 }
-                if ( allBlank )
-                    continue;
-
-                // Actual data line with values
-                String datasetName = datavals.get(datasetNameColIdx);
-                String datasetId = DashboardServerUtils.getDatasetIDFromName(datasetName);
-                if ( (datasetId.length() < DashboardServerUtils.MIN_DATASET_ID_LENGTH) ||
-                        (datasetId.length() > DashboardServerUtils.MAX_DATASET_ID_LENGTH) )
-                    throw new IOException("Invalid dataset ID \"" + datasetId +
-                            "\" from dataset name \"" + datasetName + "\"");
-
-                DashboardDatasetData dataset = datasetsMap.get(datasetId);
-                if ( dataset == null ) {
-                    dataset = new DashboardDatasetData();
-                    dataset.setDatasetId(datasetId);
-                    dataset.setOwner(owner);
-                    dataset.setUploadFilename(filename);
-                    dataset.setUploadTimestamp(timestamp);
-                    dataset.setUserColNames(columnNames);
-                    dataset.setDataColTypes(columnTypes);
-                    dataset.setVersion(version);
+                if ( !allBlank ) {
+                    allDataVals.add(datavals);
                 }
-                int rowNum = dataset.getNumDataRows();
-                dataset.getDataValues().add(datavals);
-                dataset.getRowNums().add(rowNum);
-                dataset.setNumDataRows(rowNum + 1);
-                datasetsMap.put(datasetId, dataset);
             }
         } finally {
             dataParser.close();
@@ -428,9 +416,44 @@ public class DataFileHandler extends VersionedFileHandler {
 
         if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
             throw new IOException("No data columns found, possibly due to incorrect format");
-        if ( datasetsMap.isEmpty() )
-            throw new IOException("No data rows found");
-        return datasetsMap;
+        if ( allDataVals.isEmpty() )
+            throw new IOException("No data values found");
+
+        // Create the dataset with data to return
+        DashboardDatasetData datasetData = new DashboardDatasetData();
+        datasetData.setPreamble(preamble);
+        datasetData.setOwner(owner);
+        datasetData.setVersion(uploadVersion);
+        datasetData.setUserColNames(columnNames);
+        datasetData.setDataValues(allDataVals);
+
+        int numRows = allDataVals.size();
+        datasetData.setNumDataRows(numRows);
+        ArrayList<Integer> rowNums = new ArrayList<Integer>(numRows);
+        for (int k = 1; k <= numRows; k++) {
+            rowNums.add(k);
+        }
+        datasetData.setRowNums(rowNums);
+
+        // Assign the data column types from the column names (including customizations for this user)
+        userFileHandler.assignDataColumnTypes(datasetData);
+
+        // If no expocode found in the metadata preamble,
+        // try to get it from the first value of an appropriate data column
+        if ( expocode == null ) {
+            int k = 0;
+            for (DataColumnType dtype : datasetData.getDataColTypes()) {
+                if ( DashboardUtils.DATASET_ID.typeNameEquals(dtype) ) {
+                    expocode = allDataVals.get(0).get(k).trim().toUpperCase();
+                    break;
+                }
+                k++;
+            }
+        }
+        datasetData.setDatasetId(expocode);
+
+
+        return datasetData;
     }
 
     /**

@@ -436,8 +436,7 @@ public class UserFileHandler extends VersionedFileHandler {
      */
     public void updateUserDataColumnTypes(DashboardDataset dataset, String username) throws IllegalArgumentException {
         // Copy the default maps of data column names to types and units
-        HashMap<String,DataColumnType> userColNamesToTypes =
-                new HashMap<String,DataColumnType>(defaultColNamesToTypes);
+        HashMap<String,DataColumnType> userColNamesToTypes = new HashMap<String,DataColumnType>(defaultColNamesToTypes);
         // Add the user-customized map of column names to types
         File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
         if ( propsFile.exists() )
@@ -472,8 +471,8 @@ public class UserFileHandler extends VersionedFileHandler {
         for (String key : allKeys) {
             DataColumnType thisColType = userColNamesToTypes.get(key);
             colProps.setProperty(key, thisColType.getVarName() + "," +
-                    thisColType.getUnits().get(thisColType.getSelectedUnitIndex()) +
-                    "," + thisColType.getSelectedMissingValue());
+                    thisColType.getUnits().get(thisColType.getSelectedUnitIndex()) + "," +
+                    thisColType.getSelectedMissingValue());
         }
         // Save this Properties object to file
         try {

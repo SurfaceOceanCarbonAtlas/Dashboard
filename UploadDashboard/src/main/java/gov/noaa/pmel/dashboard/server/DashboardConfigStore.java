@@ -364,7 +364,8 @@ public class DashboardConfigStore {
         // Handler for dataset data files and handler for automated data checker messages
         try {
             propVal = getFilePathProperty(configProps, DATA_FILES_DIR_NAME_TAG, appConfigDir);
-            dataFileHandler = new DataFileHandler(propVal, svnUsername, svnPassword, knownUserDataTypes);
+            dataFileHandler = new DataFileHandler(propVal, svnUsername, svnPassword,
+                    knownUserDataTypes, userFileHandler, uploadVersion);
             // Put automated data checker message files in the same directory
             checkerMsgHandler = new CheckerMessageHandler(propVal);
         } catch ( Exception ex ) {
