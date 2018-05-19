@@ -12,10 +12,13 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit test for methods of {@link DashboardDatasetData}
+ *
  * @author Karl Smith
  */
 public class DashboardDatasetDataTest {
@@ -80,7 +83,7 @@ public class DashboardDatasetDataTest {
      * {@link DashboardDatasetData#setDatasetId(String)}.
      */
     @Test
-    public void testSetGetExpocode() {
+    public void testSetGetDatasetId() {
         String myExpocode = "AGSK20031205";
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getDatasetId());
@@ -155,8 +158,7 @@ public class DashboardDatasetDataTest {
                 { "2003-12-05 22:36", "337.14499", "64.05500", "28.750",
                         "5.710", "6.000", null, "1025.900", "370.480" }
         };
-        ArrayList<ArrayList<String>> dataValues =
-                new ArrayList<ArrayList<String>>(observations.length);
+        ArrayList<ArrayList<String>> dataValues = new ArrayList<ArrayList<String>>(observations.length);
         for (int k = 0; k < observations.length; k++) {
             dataValues.add(new ArrayList<String>(Arrays.asList(observations[k])));
         }
@@ -214,55 +216,55 @@ public class DashboardDatasetDataTest {
         assertFalse(firstData.equals(myPreamble));
         DashboardDatasetData secondData = new DashboardDatasetData();
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setOwner(myOwner);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setOwner(myOwner);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setUploadFilename(myFilename);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setUploadFilename(myFilename);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setVersion(myVersion);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setVersion(myVersion);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setDatasetId(myExpocode);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setDatasetId(myExpocode);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setPreamble(myPreamble);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setPreamble(myPreamble);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setRowNums(myRowNums);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setRowNums(myRowNums);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
 
         firstData.setDataValues(dataValues);
-        assertTrue(firstData.hashCode() != secondData.hashCode());
+        assertNotEquals(firstData.hashCode(), secondData.hashCode());
         assertFalse(firstData.equals(secondData));
         secondData.setDataValues(dataValues);
         assertEquals(firstData.hashCode(), secondData.hashCode());
-        assertEquals(firstData, secondData);
+        assertTrue(firstData.equals(secondData));
     }
 }

@@ -10,9 +10,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit tests for methods of {@link DashboardDatasetList}
+ *
  * @author Karl Smith
  */
 public class DashboardDatasetListTest {
@@ -67,35 +70,35 @@ public class DashboardDatasetListTest {
         assertFalse(firstList.equals(null));
         assertFalse(firstList.equals(cruise));
         DashboardDatasetList secondList = new DashboardDatasetList();
-        assertTrue(firstList.hashCode() == secondList.hashCode());
+        assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
         firstList.setUsername(myUsername);
-        assertFalse(firstList.hashCode() == secondList.hashCode());
+        assertNotEquals(firstList.hashCode(), secondList.hashCode());
         assertFalse(firstList.equals(secondList));
         secondList.setUsername(myUsername);
-        assertTrue(firstList.hashCode() == secondList.hashCode());
+        assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
         firstList.setManager(true);
-        assertFalse(firstList.hashCode() == secondList.hashCode());
+        assertNotEquals(firstList.hashCode(), secondList.hashCode());
         assertFalse(firstList.equals(secondList));
         secondList.setManager(true);
-        assertTrue(firstList.hashCode() == secondList.hashCode());
+        assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
         firstList.put(cruise.getDatasetId(), cruise);
-        assertTrue(firstList.hashCode() != secondList.hashCode());
+        assertNotEquals(firstList.hashCode(), secondList.hashCode());
         assertFalse(firstList.equals(secondList));
         secondList.put(sameDataset.getDatasetId(), sameDataset);
-        assertTrue(firstList.hashCode() == secondList.hashCode());
+        assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 
         firstList.put(otherDataset.getDatasetId(), otherDataset);
         secondList.clear();
         secondList.put(otherDataset.getDatasetId(), otherDataset);
         secondList.put(sameDataset.getDatasetId(), sameDataset);
-        assertTrue(firstList.hashCode() == secondList.hashCode());
+        assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
     }
 

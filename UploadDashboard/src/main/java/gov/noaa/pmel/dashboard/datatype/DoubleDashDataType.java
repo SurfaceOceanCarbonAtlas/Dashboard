@@ -176,16 +176,14 @@ public class DoubleDashDataType extends DashDataType<Double> {
 
         // longitude and latitude units
         try {
-            ValueConverter<Double> stdConverter = new LonLatConverter(inputUnit, outputUnit, missingValue);
-            return stdConverter;
+            return new LonLatConverter(inputUnit, outputUnit, missingValue);
         } catch ( IllegalArgumentException ex ) {
             // try another converter
         }
 
         // Simple (linear) unit conversions of ordinary floating-point representations
         try {
-            ValueConverter<Double> stdConverter = new LinearConverter(inputUnit, outputUnit, missingValue);
-            return stdConverter;
+            return new LinearConverter(inputUnit, outputUnit, missingValue);
         } catch ( IllegalArgumentException ex ) {
             // try another converter
         }

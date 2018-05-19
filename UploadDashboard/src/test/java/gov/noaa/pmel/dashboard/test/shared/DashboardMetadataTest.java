@@ -9,10 +9,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test method for {@link DashboardMetadata}.
+ * Unit tests for methods of {@link DashboardMetadata}.
  *
  * @author Karl Smith
  */
@@ -33,7 +34,7 @@ public class DashboardMetadataTest {
      * Test method for {@link DashboardMetadata#getDatasetId()} and {@link DashboardMetadata#setDatasetId(String)}.
      */
     @Test
-    public void testGetSetExpocode() {
+    public void testGetSetDatasetId() {
         String myExpocode = "CYNS20120124";
         DashboardMetadata mdata = new DashboardMetadata();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
@@ -135,76 +136,6 @@ public class DashboardMetadataTest {
     }
 
     /**
-     * Test method for {@link DashboardMetadata#hashCode()} and {@link DashboardMetadata#equals(Object)}.
-     */
-    @Test
-    public void testHashCodeEqualsObject() {
-        String myExpocode = "CYNS20120124";
-        String myOwner = "SocatUser";
-        String myFilename = "NatalieSchulte_2013.doc";
-        String myTimestamp = "2013-12-11 10:09";
-        String myVersion = "3.0";
-        String myDOI = "DOI12345";
-
-        DashboardMetadata firstMData = new DashboardMetadata();
-        assertFalse(firstMData.equals(null));
-        assertFalse(firstMData.equals(myFilename));
-        DashboardMetadata secondMData = new DashboardMetadata();
-        assertEquals(firstMData.hashCode(), firstMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setSelected(true);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setSelected(true);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setDatasetId(myExpocode);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setDatasetId(myExpocode);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setOwner(myOwner);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setOwner(myOwner);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setFilename(myFilename);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setFilename(myFilename);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setUploadTimestamp(myTimestamp);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setUploadTimestamp(myTimestamp);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setConflicted(true);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setConflicted(true);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-        firstMData.setVersion(myVersion);
-        assertTrue(firstMData.hashCode() != secondMData.hashCode());
-        assertFalse(firstMData.equals(secondMData));
-        secondMData.setVersion(myVersion);
-        assertEquals(firstMData.hashCode(), secondMData.hashCode());
-        assertEquals(firstMData, secondMData);
-
-    }
-
-    /**
      * Test method for {@link DashboardMetadata#getAddlDocsTitle()}
      * and {@link DashboardMetadata#splitAddlDocsTitle(String)}
      */
@@ -241,6 +172,75 @@ public class DashboardMetadataTest {
         assertEquals(myTimestamp, nameTimePair[1]);
         mdata.setFilename(null);
         assertEquals("", mdata.getAddlDocsTitle());
+    }
+
+    /**
+     * Test method for {@link DashboardMetadata#hashCode()} and {@link DashboardMetadata#equals(Object)}.
+     */
+    @Test
+    public void testHashCodeEqualsObject() {
+        String myExpocode = "CYNS20120124";
+        String myOwner = "SocatUser";
+        String myFilename = "NatalieSchulte_2013.doc";
+        String myTimestamp = "2013-12-11 10:09";
+        String myVersion = "3.0";
+        String myDOI = "DOI12345";
+
+        DashboardMetadata firstMData = new DashboardMetadata();
+        assertFalse(firstMData.equals(null));
+        assertFalse(firstMData.equals(myFilename));
+        DashboardMetadata secondMData = new DashboardMetadata();
+        assertEquals(firstMData.hashCode(), firstMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setSelected(true);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setSelected(true);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setDatasetId(myExpocode);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setDatasetId(myExpocode);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setOwner(myOwner);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setOwner(myOwner);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setFilename(myFilename);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setFilename(myFilename);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setUploadTimestamp(myTimestamp);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setUploadTimestamp(myTimestamp);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setConflicted(true);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setConflicted(true);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
+
+        firstMData.setVersion(myVersion);
+        assertNotEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertFalse(firstMData.equals(secondMData));
+        secondMData.setVersion(myVersion);
+        assertEquals(firstMData.hashCode(), secondMData.hashCode());
+        assertTrue(firstMData.equals(secondMData));
     }
 
 }

@@ -126,7 +126,7 @@ public class KnownDataTypes {
      * Adds the default well-known data column types for generating the NetCDF DSG files:
      * <p>
      * SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH, YEAR, MONTH_OF_YEAR,
-     * DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, WOCE_AUTOCHECK
+     * DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE
      * <p>
      * This should be called before adding any custom types.
      *
@@ -144,7 +144,6 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.HOUR_OF_DAY);
         addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
         addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
-        addDataType(DashboardServerUtils.WOCE_AUTOCHECK);
         return this;
     }
 

@@ -3,23 +3,22 @@
  */
 package gov.noaa.pmel.dashboard.test.datatype;
 
+import gov.noaa.pmel.dashboard.datatype.LinearConverter;
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.datatype.LinearConverter;
-
 /**
- * Unit tests for methods of {@link gov.noaa.pmel.dashboard.datatype.LinearConverter}
+ * Unit tests for methods of {@link LinearConverter}
  *
  * @author Karl Smith
  */
 public class LinearConverterTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.datatype.LinearConverter#convertValueOf(java.lang.String)}.
+     * Test method for {@link LinearConverter#convertValueOf(String)}.
      */
     @Test
     public void testConvertValueOfString() {
@@ -32,10 +31,10 @@ public class LinearConverterTest {
         LinearConverter converter = new LinearConverter(null, null, null);
         assertEquals(testVal, converter.convertValueOf(testStr), 1.0E-6);
 
-        for ( String str : defMissValStr ) {
-            assertNull( converter.convertValueOf(str) );
+        for (String str : defMissValStr) {
+            assertNull(converter.convertValueOf(str));
         }
-        assertNull( converter.convertValueOf(defMissValNumStr) );
+        assertNull(converter.convertValueOf(defMissValNumStr));
 
         boolean errCaught = false;
         try {
@@ -43,7 +42,7 @@ public class LinearConverterTest {
         } catch ( IllegalArgumentException ex ) {
             errCaught = true;
         }
-        assertTrue( errCaught );
+        assertTrue(errCaught);
 
         errCaught = false;
         try {
@@ -51,7 +50,7 @@ public class LinearConverterTest {
         } catch ( IllegalArgumentException ex ) {
             errCaught = true;
         }
-        assertTrue( errCaught );
+        assertTrue(errCaught);
 
         errCaught = false;
         try {
@@ -59,21 +58,21 @@ public class LinearConverterTest {
         } catch ( IllegalArgumentException ex ) {
             errCaught = true;
         }
-        assertTrue( errCaught );
+        assertTrue(errCaught);
 
         // unknown units, but acceptable because input unit same as output unit
         converter = new LinearConverter("widgets", "widgets", missValStr);
         assertEquals(testVal, converter.convertValueOf(testStr), 1.0E-6);
-        assertNull( converter.convertValueOf(missValStr) );
+        assertNull(converter.convertValueOf(missValStr));
 
-        for ( String str : defMissValStr ) {
+        for (String str : defMissValStr) {
             errCaught = false;
             try {
                 converter.convertValueOf(str);
             } catch ( IllegalArgumentException ex ) {
                 errCaught = true;
             }
-            assertTrue( errCaught );
+            assertTrue(errCaught);
         }
         assertEquals(Double.parseDouble(defMissValNumStr),
                 converter.convertValueOf(defMissValNumStr), 1.0E-6);
@@ -85,7 +84,7 @@ public class LinearConverterTest {
         } catch ( IllegalArgumentException ex ) {
             errCaught = true;
         }
-        assertTrue( errCaught );
+        assertTrue(errCaught);
 
         // Test some known units
         converter = new LinearConverter("K", "degC", null);

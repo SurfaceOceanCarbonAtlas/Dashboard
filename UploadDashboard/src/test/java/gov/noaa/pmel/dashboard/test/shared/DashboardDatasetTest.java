@@ -16,6 +16,7 @@ import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -73,7 +74,7 @@ public class DashboardDatasetTest {
      * Test method for {@link DashboardDataset#getDatasetId()} and {@link DashboardDataset#setDatasetId(String)}.
      */
     @Test
-    public void testSetGetExpocode() {
+    public void testSetGetDatasetId() {
         String myExpocode = "ABCD20050728";
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDatasetId());
@@ -129,9 +130,9 @@ public class DashboardDatasetTest {
     @Test
     public void testSetGetAddlDocNames() {
         TreeSet<String> myMetaNames = new TreeSet<String>(Arrays.asList(
-                "ABCD20050728.txt; 2014-02-21 9:23",
-                "ABCD20050728_2.doc; 2014-02-21 9:24",
-                "ABCD20050728_3.pdf; 2014-02-21 9:25"));
+                "ABCD20050728.txt ; 2014-02-21 9:23",
+                "ABCD20050728_2.doc ; 2014-02-21 9:24",
+                "ABCD20050728_3.pdf ; 2014-02-21 9:25"));
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(0, cruise.getAddlDocs().size());
         cruise.setAddlDocs(myMetaNames);
@@ -150,12 +151,12 @@ public class DashboardDatasetTest {
      * Test method for {@link DashboardDataset#getSubmitStatus()} and {@link DashboardDataset#setSubmitStatus(String)}.
      */
     @Test
-    public void testSetGetQCStatus() {
-        String myQCStatus = "Submitted";
+    public void testSetGetSubmitStatus() {
+        String mySumbitStatus = "Considering it";
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
-        cruise.setSubmitStatus(myQCStatus);
-        assertEquals(myQCStatus, cruise.getSubmitStatus());
+        cruise.setSubmitStatus(mySumbitStatus);
+        assertEquals(mySumbitStatus, cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -242,13 +243,12 @@ public class DashboardDatasetTest {
      */
     @Test
     public void testSetGetDataColTypes() {
-        ArrayList<DataColumnType> myDataTypes =
-                new ArrayList<DataColumnType>(Arrays.asList(
-                        DashboardUtils.TIMESTAMP,
-                        DashboardUtils.LONGITUDE,
-                        DashboardUtils.LATITUDE,
-                        DashboardUtils.SAMPLE_DEPTH
-                ));
+        ArrayList<DataColumnType> myDataTypes = new ArrayList<DataColumnType>(Arrays.asList(
+                DashboardUtils.TIMESTAMP,
+                DashboardUtils.LONGITUDE,
+                DashboardUtils.LATITUDE,
+                DashboardUtils.SAMPLE_DEPTH
+        ));
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(0, cruise.getDataColTypes().size());
         cruise.setDataColTypes(myDataTypes);
@@ -527,140 +527,140 @@ public class DashboardDatasetTest {
         assertFalse(firstCruise.equals(myDataStatus));
         DashboardDataset secondCruise = new DashboardDataset();
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setSelected(true);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setSelected(true);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setVersion(myVersion);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setVersion(myVersion);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setOwner(myOwner);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setOwner(myOwner);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setDatasetId(myExpocode);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setDatasetId(myExpocode);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setDataCheckStatus(myDataStatus);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setDataCheckStatus(myDataStatus);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setOmeTimestamp(myOmeTimestamp);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setOmeTimestamp(myOmeTimestamp);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setAddlDocs(myMetaNames);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setAddlDocs(myMetaNames);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setSubmitStatus(myQCStatus);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setSubmitStatus(myQCStatus);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setArchiveStatus(myArchiveStatus);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setArchiveStatus(myArchiveStatus);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setUploadFilename(myFilename);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setUploadFilename(myFilename);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setNumDataRows(myNumDataRows);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setNumDataRows(myNumDataRows);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setNumErrorRows(myNumErrorMsgs);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setNumErrorRows(myNumErrorMsgs);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setNumWarnRows(myNumWarnMsgs);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setNumWarnRows(myNumWarnMsgs);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setDataColTypes(myDataColTypes);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setDataColTypes(myDataColTypes);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setUserColNames(myUserColNames);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setUserColNames(myUserColNames);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setCheckerFlags(checkerFlags);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setCheckerFlags(checkerFlags);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setUserFlags(userFlags);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setUserFlags(userFlags);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setUploadTimestamp(myUploadTimestamp);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setUploadTimestamp(myUploadTimestamp);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
 
         firstCruise.setArchiveDate(myArchiveDate);
-        assertTrue(firstCruise.hashCode() != secondCruise.hashCode());
+        assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
         secondCruise.setArchiveDate(myArchiveDate);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-        assertEquals(firstCruise, secondCruise);
+        assertTrue(firstCruise.equals(secondCruise));
     }
 
     /**
@@ -670,7 +670,6 @@ public class DashboardDatasetTest {
     public void testSetIsEditable() {
         DashboardDataset cruise = new DashboardDataset();
         assertTrue(cruise.isEditable());
-
 
         cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 
@@ -701,7 +700,6 @@ public class DashboardDatasetTest {
         cruise.setSubmitStatus(DashboardUtils.STATUS_RENAMED);
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
-
 
         cruise.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
 

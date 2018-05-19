@@ -10,14 +10,13 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
- * For converting various timestamp, date, and time-of-day strings (various orderings of year, month, and day as well as
- * various separators to standard formats of yyyy-MM-dd HH:mm:ss.SSS for timestamps, yyyy-MM-dd for dates and
- * HH:mm:ss.SSS for times-of-day.
+ * For converting various timestamp, date, and time-of-day strings (various orderings of year, month, and day
+ * as well as various separators to standard formats of yyyy-MM-dd HH:mm:ss.SSS for timestamps,
+ * yyyy-MM-dd for dates and HH:mm:ss.SSS for times-of-day.
  *
  * @author Karl Smith
  */
 public class TimestampConverter extends ValueConverter<String> {
-
 
     // TreeSet and TreeMap so can do case insensitive comparisons
     private static final TreeSet<String> SUPPORTED_FROM_UNITS;

@@ -3,33 +3,31 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for methods of {@link gov.noaa.pmel.dashboard.shared.QCFlag}
+ * Unit tests for methods of {@link QCFlag}
  *
  * @author Karl Smith
  */
 public class QCFlagTest {
 
     private static final String MY_FLAG_NAME = "WOCE_CO2_atm";
-    private static final Character MY_FLAG_VALUE = '3';
+    private static final String MY_FLAG_VALUE = "3";
     private static final Severity MY_SEVERITY = Severity.WARNING;
     private static final Integer MY_COLUMN_INDEX = 5;
     private static final Integer MY_ROW_INDEX = 15;
-    private static final String MY_COMMENT = "my comment";
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getFlagName()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setFlagName(java.lang.String)}.
+     * Test method for {@link QCFlag#getFlagName()} and {@link QCFlag#setFlagName(String)}.
      */
     @Test
     public void testGetSetFlagName() {
@@ -42,23 +40,21 @@ public class QCFlagTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getFlagValue()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setFlagValue(java.lang.Character)}.
+     * Test method for {@link QCFlag#getFlagValue()} and {@link QCFlag#setFlagValue(String)}.
      */
     @Test
     public void testGetSetFlagValue() {
         QCFlag flag = new QCFlag();
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         flag.setFlagValue(MY_FLAG_VALUE);
         assertEquals(MY_FLAG_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setFlagValue(null);
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getSeverity()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setSeverity(gov.noaa.pmel.dashboard.shared.QCFlag.Severity)}.
+     * Test method for {@link QCFlag#getSeverity()} and {@link QCFlag#setSeverity(QCFlag.Severity)}.
      */
     @Test
     public void testGetSetSeverity() {
@@ -66,15 +62,14 @@ public class QCFlagTest {
         assertEquals(Severity.UNASSIGNED, flag.getSeverity());
         flag.setSeverity(MY_SEVERITY);
         assertEquals(MY_SEVERITY, flag.getSeverity());
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setSeverity(null);
         assertEquals(Severity.UNASSIGNED, flag.getSeverity());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getColumnIndex()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setColumnIndex(java.lang.Integer)}.
+     * Test method for {@link QCFlag#getColumnIndex()} and {@link QCFlag#setColumnIndex(Integer)}.
      */
     @Test
     public void testGetSetColumnIndex() {
@@ -83,15 +78,14 @@ public class QCFlagTest {
         flag.setColumnIndex(MY_COLUMN_INDEX);
         assertEquals(MY_COLUMN_INDEX, flag.getColumnIndex());
         assertEquals(Severity.UNASSIGNED, flag.getSeverity());
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setColumnIndex(null);
         assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getRowIndex()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setRowIndex(java.lang.Integer)}.
+     * Test method for {@link QCFlag#getRowIndex()} and {@link QCFlag#setRowIndex(Integer)}.
      */
     @Test
     public void testGetSetRowIndex() {
@@ -101,35 +95,14 @@ public class QCFlagTest {
         assertEquals(MY_ROW_INDEX, flag.getRowIndex());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
         assertEquals(Severity.UNASSIGNED, flag.getSeverity());
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setRowIndex(null);
         assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getRowIndex());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#getComment()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#setComment(java.lang.String)}.
-     */
-    @Test
-    public void testGetSetComment() {
-        QCFlag flag = new QCFlag();
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getComment());
-        flag.setComment(MY_COMMENT);
-        assertEquals(MY_COMMENT, flag.getComment());
-        assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getRowIndex());
-        assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
-        assertEquals(Severity.UNASSIGNED, flag.getSeverity());
-        assertEquals(DashboardUtils.CHAR_MISSING_VALUE, flag.getFlagValue());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
-        flag.setComment(null);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getComment());
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#QCFlag(
-     * java.lang.String, java.lang.Character, gov.noaa.pmel.dashboard.shared.QCFlag.Severity,
-     * java.lang.Integer, java.lang.Integer)}.
+     * Test method for {@link QCFlag#QCFlag(String, String, Severity, Integer, Integer)}
      */
     @Test
     public void testWoceFlagStringIntegerInteger() {
@@ -139,117 +112,99 @@ public class QCFlagTest {
         assertEquals(MY_SEVERITY, flag.getSeverity());
         assertEquals(MY_COLUMN_INDEX, flag.getColumnIndex());
         assertEquals(MY_ROW_INDEX, flag.getRowIndex());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getComment());
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#hashCode()} and
-     * {@link gov.noaa.pmel.dashboard.shared.QCFlag#equals(java.lang.Object)}.
+     * Test method for {@link QCFlag#hashCode()} and {@link QCFlag#equals(Object)}.
      */
     @Test
     public void testHashCodeEquals() {
         QCFlag first = new QCFlag();
-        assertFalse( first.equals(null) );
-        assertFalse( first.equals(MY_FLAG_NAME) );
+        assertFalse(first.equals(null));
+        assertFalse(first.equals(MY_FLAG_NAME));
 
         QCFlag second = new QCFlag();
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setFlagName(MY_FLAG_NAME);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
         second.setFlagName(MY_FLAG_NAME);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setFlagValue(MY_FLAG_VALUE);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
         second.setFlagValue(MY_FLAG_VALUE);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setSeverity(MY_SEVERITY);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
         second.setSeverity(MY_SEVERITY);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setColumnIndex(MY_COLUMN_INDEX);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
         second.setColumnIndex(MY_COLUMN_INDEX);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setRowIndex(MY_ROW_INDEX);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
         second.setRowIndex(MY_ROW_INDEX);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
-
-        first.setComment(MY_COMMENT);
-        assertFalse( first.hashCode() == second.hashCode() );
-        assertFalse( first.equals(second) );
-        second.setComment(MY_COMMENT);
-        assertTrue( first.hashCode() == second.hashCode() );
-        assertTrue( first.equals(second) );
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.QCFlag#compareTo(gov.noaa.pmel.dashboard.shared.QCFlag)}.
+     * Test method for {@link QCFlag#compareTo(QCFlag)}.
      */
     @Test
     public void testCompareTo() {
-        QCFlag first = new QCFlag("WOCE_CO2_atm", '3', Severity.WARNING, 5, 25);
-        first.setComment("BBBB");
+        QCFlag first = new QCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 5, 25);
+        QCFlag second = new QCFlag("WOCE_CO2_water", "2", Severity.ACCEPTABLE, 4, 15);
 
-        QCFlag second = new QCFlag("WOCE_CO2_water", '2', Severity.ACCEPTABLE, 4, 15);
-        second.setComment("AAAA");
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
+        assertTrue(first.compareTo(second) < 0);
+        assertTrue(second.compareTo(first) > 0);
 
         second.setFlagName("WOCE_CO2_atm");
-        assertTrue( first.compareTo(second) > 0 );
-        assertTrue( second.compareTo(first) < 0 );
-        second.setFlagValue('4');
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
+        second.setFlagValue("4");
+        assertTrue(first.compareTo(second) < 0);
+        assertTrue(second.compareTo(first) > 0);
 
-        second.setFlagValue('3');
-        assertTrue( first.compareTo(second) > 0 );
-        assertTrue( second.compareTo(first) < 0 );
+        second.setFlagValue("3");
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
         second.setSeverity(Severity.ERROR);
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
+        assertTrue(first.compareTo(second) < 0);
+        assertTrue(second.compareTo(first) > 0);
 
         second.setSeverity(Severity.WARNING);
-        assertTrue( first.compareTo(second) > 0 );
-        assertTrue( second.compareTo(first) < 0 );
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
         second.setColumnIndex(6);
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
+        assertTrue(first.compareTo(second) < 0);
+        assertTrue(second.compareTo(first) > 0);
 
         second.setColumnIndex(5);
-        assertTrue( first.compareTo(second) > 0 );
-        assertTrue( second.compareTo(first) < 0 );
-        second.setComment("CCCC");
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
-
-        second.setComment("BBBB");
-        assertTrue( first.compareTo(second) > 0 );
-        assertTrue( second.compareTo(first) < 0 );
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
         second.setRowIndex(35);
-        assertTrue( first.compareTo(second) < 0 );
-        assertTrue( second.compareTo(first) > 0 );
+        assertTrue(first.compareTo(second) < 0);
+        assertTrue(second.compareTo(first) > 0);
 
         second.setRowIndex(25);
-        assertTrue( first.compareTo(second) == 0 );
-        assertTrue( second.compareTo(first) == 0 );
+        assertEquals(0, first.compareTo(second));
+        assertEquals(0, second.compareTo(first));
     }
 
 }

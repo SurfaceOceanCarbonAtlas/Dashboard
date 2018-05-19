@@ -6,7 +6,11 @@ package gov.noaa.pmel.dashboard.test.server;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -152,6 +156,24 @@ public class DashboardServerUtilsTest {
                                             DashboardUtils.SEAWATER_SPEED * DashboardUtils.SEAWATER_SPEED);
         dist = DashboardServerUtils.distanceBetween(austin[0], austin[1], austin[2], dallas[0], dallas[1], dallas[2]);
         assertEquals(expected, dist, 1.0);
+    }
+
+    /**
+     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeQCFlagSet(java.lang.String)}
+     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeQCFlagSet(java.util.TreeSet)}.
+     */
+    @Test
+    public void testEncodeDecodeWoceTypeSet() {
+        TreeSet<QCFlag> mySet = new TreeSet<QCFlag>( Arrays.asList(
+                new QCFlag("WOCE_CO2_water", '4', QCFlag.Severity.ERROR, 3, 7),
+                new QCFlag("WOCE_CO2_atm", '3', QCFlag.Severity.WARNING, 9, 2) ) );
+        String encoded = DashboardUtils.encodeQCFlagSet(mySet);
+        TreeSet<QCFlag> decodedSet = DashboardUtils.decodeQCFlagSet(encoded);
+        assertEquals(mySet, decodedSet);
+        decodedSet = DashboardUtils.decodeQCFlagSet("[]");
+        assertEquals(0, decodedSet.size());
+        decodedSet = DashboardUtils.decodeQCFlagSet("[  ]");
+        assertEquals(0, decodedSet.size());
     }
 
 }

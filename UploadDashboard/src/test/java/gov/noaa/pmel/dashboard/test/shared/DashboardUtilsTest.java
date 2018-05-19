@@ -3,10 +3,8 @@
  */
 package gov.noaa.pmel.dashboard.test.shared;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,13 +12,14 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import org.junit.Test;
-
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit tests for method in {@link DashboardUtils}
+ * except for the various {@link java.util.Comparator} methods.
+ *
  * @author Karl Smith
  */
 public class DashboardUtilsTest {
@@ -59,44 +58,15 @@ public class DashboardUtilsTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#closeTo(Double, Double, double, double)}
-     */
-    @Test
-    public void testCloseToLongitudeCloseTo() {
-        double lon1 = -179.9999994;
-        double deltalon1 = lon1 - 1.2E-6;
-        double lon2 = deltalon1 + 360.0;
-
-        assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-5) );
-        assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-6) );
-        assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-8, 0.0) );
-        assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-9, 0.0) );
-        assertTrue( DashboardUtils.closeTo(Double.NaN, Double.NaN, 0.0, 0.0) );
-        assertFalse( DashboardUtils.closeTo(Double.NaN, lon1, 1.0, 1.0) );
-
-        assertFalse( DashboardUtils.closeTo(lon1, lon2, 0.0, 1.0E-3) );
-        assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-5) );
-        assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-6) );
-        assertFalse( DashboardUtils.closeTo(lon1, lon2, 1.0E-3, 0.0) );
-        assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-8, 0.0) );
-        assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0) );
-        assertTrue( DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0) );
-        assertFalse( DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0) );
-    }
-
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeStringArrayList(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeStringArrayList(java.util.ArrayList)}.
+     * Test method for {@link DashboardUtils#decodeStringArrayList(String)}
+     * and {@link DashboardUtils#encodeStringArrayList(ArrayList)}.
      */
     @Test
     public void testEncodeDecodeStringArrayList() {
         ArrayList<String> myList = new ArrayList<String>(
                 Arrays.asList("one", "two", "", "four, five, and six", "", ""));
         String encoded = DashboardUtils.encodeStringArrayList(myList);
-        ArrayList<String> decodedList =
-                DashboardUtils.decodeStringArrayList(encoded);
+        ArrayList<String> decodedList = DashboardUtils.decodeStringArrayList(encoded);
         assertEquals(myList, decodedList);
         decodedList = DashboardUtils.decodeStringArrayList("[]");
         assertEquals(0, decodedList.size());
@@ -107,21 +77,69 @@ public class DashboardUtilsTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeQCFlagSet(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeQCFlagSet(java.util.TreeSet)}.
+     * Test method for {@link DashboardUtils#decodeStringTreeSet(String)}
+     * and {@link DashboardUtils#encodeStringTreeSet(TreeSet)}.
      */
     @Test
-    public void testEncodeDecodeWoceTypeSet() {
-        TreeSet<QCFlag> mySet = new TreeSet<QCFlag>( Arrays.asList(
-                new QCFlag("WOCE_CO2_water", '4', Severity.ERROR, 3, 7),
-                new QCFlag("WOCE_CO2_atm", '3', Severity.WARNING, 9, 2) ) );
-        String encoded = DashboardUtils.encodeQCFlagSet(mySet);
-        TreeSet<QCFlag> decodedSet = DashboardUtils.decodeQCFlagSet(encoded);
+    public void testEncodeDecodeStringTreeSet() {
+        TreeSet<String> mySet = new TreeSet<String>(
+                Arrays.asList("one", "two", "", "four", "five and six"));
+        String encoded = DashboardUtils.encodeStringTreeSet(mySet);
+        TreeSet<String> decodedSet = DashboardUtils.decodeStringTreeSet(encoded);
         assertEquals(mySet, decodedSet);
-        decodedSet = DashboardUtils.decodeQCFlagSet("[]");
+        decodedSet = DashboardUtils.decodeStringTreeSet("[]");
         assertEquals(0, decodedSet.size());
-        decodedSet = DashboardUtils.decodeQCFlagSet("[  ]");
+        decodedSet = DashboardUtils.decodeStringTreeSet("[  ]");
         assertEquals(0, decodedSet.size());
+        decodedSet = DashboardUtils.decodeStringTreeSet("[\"\"]");
+        assertEquals(new TreeSet<String>(Arrays.asList("")), decodedSet);
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#baseName(String)}
+     */
+    @Test
+    public void testBaseName() {
+        String filename = "dataset.tsv";
+        assertEquals(filename, DashboardUtils.baseName("/Some/path/to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my///" + filename));
+        assertEquals(filename, DashboardUtils.baseName("  " + filename + "\n"));
+        assertEquals(filename, DashboardUtils.baseName("\\Some\\path\\to\\my\\" + filename));
+        assertEquals("", DashboardUtils.baseName("/Some/path\\to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my\\ " + filename));
+        assertEquals("my " + filename, DashboardUtils.baseName("relative/path/to/my " + filename));
+        assertEquals("", DashboardUtils.baseName("/Some/path/to/my/"));
+        assertEquals("", DashboardUtils.baseName(""));
+        assertEquals("", DashboardUtils.baseName("  "));
+        assertEquals("", DashboardUtils.baseName(null));
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
+     * and {@link DashboardUtils#closeTo(Double, Double, double, double)}
+     */
+    @Test
+    public void testCloseToLongitudeCloseTo() {
+        double lon1 = -179.9999994;
+        double deltalon1 = lon1 - 1.2E-6;
+        double lon2 = deltalon1 + 360.0;
+
+        assertTrue(DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-5));
+        assertFalse(DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-6));
+        assertTrue(DashboardUtils.closeTo(lon1, deltalon1, 1.0E-8, 0.0));
+        assertFalse(DashboardUtils.closeTo(lon1, deltalon1, 1.0E-9, 0.0));
+        assertTrue(DashboardUtils.closeTo(Double.NaN, Double.NaN, 0.0, 0.0));
+        assertFalse(DashboardUtils.closeTo(Double.NaN, lon1, 1.0, 1.0));
+
+        assertFalse(DashboardUtils.closeTo(lon1, lon2, 0.0, 1.0E-3));
+        assertTrue(DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-5));
+        assertFalse(DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-6));
+        assertFalse(DashboardUtils.closeTo(lon1, lon2, 1.0E-3, 0.0));
+        assertTrue(DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-8, 0.0));
+        assertFalse(DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0));
+        assertTrue(DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0));
+        assertFalse(DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0));
     }
 
 }

@@ -19,8 +19,6 @@ public class LonLatConverter extends ValueConverter<Double> {
 
     public static final String DEGREE_SYMBOL = "\u00B0";
 
-    // TODO: also support DDD.MMSSss format
-
     // TreeSet so can do case insensitive comparisons
     private static final TreeSet<String> SUPPORTED_FROM_UNITS;
 
@@ -32,12 +30,14 @@ public class LonLatConverter extends ValueConverter<Double> {
         SUPPORTED_FROM_UNITS.add("from \"deg min W\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec E\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec W\" to \"deg E\"");
+        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSsss\" to \"deg E\"");
         SUPPORTED_FROM_UNITS.add("from \"deg N\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg S\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min N\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min S\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec N\" to \"deg N\"");
         SUPPORTED_FROM_UNITS.add("from \"deg min sec S\" to \"deg N\"");
+        SUPPORTED_FROM_UNITS.add("from \"DDD.MMSSsss\" to \"deg N\"");
     }
 
     private static final Pattern DEG_MIN_SPLIT_PATTERN = Pattern.compile("[ " + DEGREE_SYMBOL + "',]+");
@@ -59,9 +59,10 @@ public class LonLatConverter extends ValueConverter<Double> {
         // Make sure nothing unexpected was added
         if ( !("deg E".equalsIgnoreCase(toUnit) || "deg N".equalsIgnoreCase(toUnit)) )
             throw new IllegalArgumentException("conversion to \"" + toUnit + "\" is not supported");
-        // can be given in decimal degrees, or
+        // Given value can be given in decimal degrees, or
         // degrees and decimal minutes, or
-        // degrees, minutes, and decimal seconds
+        // degrees, minutes, and decimal seconds, or
+        // as the DDD.MMSSsss floating point value.
         Double value;
         if ( "deg E".equalsIgnoreCase(fromUnit) || "deg W".equalsIgnoreCase(fromUnit) ||
                 "deg N".equalsIgnoreCase(fromUnit) || "deg S".equalsIgnoreCase(fromUnit) ) {
@@ -96,18 +97,32 @@ public class LonLatConverter extends ValueConverter<Double> {
                 throw new IllegalArgumentException("not a degree minute second value");
             }
         }
+        else if ( "DDD.MMSSsss".equalsIgnoreCase(fromUnit) ) {
+            try {
+                value = Double.valueOf(valueString);
+                Double degrees = Math.floor(value);
+                value -= degrees;
+                value *= 100.0;
+                Double minutes = Math.floor(value);
+                value -= minutes;
+                value *= 100.0;
+                minutes += value / 60.0;
+                degrees += minutes / 60.0;
+                value = degrees;
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("not a DDD.MMSSsss value");
+            }
+        }
         else {
             throw new IllegalArgumentException("conversion from \"" + fromUnit + "\" is not supported");
         }
         // check if it needs to be negated
-        if ( fromUnit.endsWith("W") || fromUnit.endsWith("S") ||
-                fromUnit.endsWith("w") || fromUnit.endsWith("s") ) {
+        if ( fromUnit.endsWith("W") || fromUnit.endsWith("S") || fromUnit.endsWith("w") || fromUnit.endsWith("s") ) {
             if ( value != null )
                 value *= -1.0;
         }
         // if longitude, if not an outrageous value, convert to (-180,180]
-        if ( fromUnit.endsWith("E") || fromUnit.endsWith("W") ||
-                fromUnit.endsWith("e") || fromUnit.endsWith("w") ) {
+        if ( toUnit.endsWith("E") || toUnit.endsWith("e") ) {
             ADCMessage msg = DashboardServerUtils.LONGITUDE.boundsCheckStandardValue(value);
             if ( (msg == null) || msg.getSeverity().equals(QCFlag.Severity.WARNING) ) {
                 while ( value <= -180.0 ) {

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -71,7 +70,7 @@ public class DashboardUtils {
     public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Owner to archive";
     public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
-   /**
+    /**
      * Missing value for floating-point variables - not null or NaN
      */
     public static final Double FP_MISSING_VALUE = -1.0E+34;
@@ -220,6 +219,17 @@ public class DashboardUtils {
     public static final DataColumnType OTHER = new DataColumnType("other",
             1.0, "other", "unchecked supplementary data",
             false, NO_UNITS);
+
+    /**
+     * Unique identifier for the dataset
+     * <p>
+     * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC is the ship code and YYYY-MM-DD
+     * is the start date for the cruise; possibly followed by -1 or -2 for non-ship platforms, such as
+     * moorings, where NODC does not distinguish different platform names.
+     */
+    public static final DataColumnType DATASET_ID = new DataColumnType("expocode",
+            50.0, "expocode", "unique identifier of a dataset",
+            false, DashboardUtils.NO_UNITS);
 
     public static final DataColumnType LONGITUDE = new DataColumnType("longitude",
             301.0, "longitude", "sample longitude",

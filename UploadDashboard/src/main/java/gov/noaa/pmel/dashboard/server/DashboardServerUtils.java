@@ -66,6 +66,7 @@ public class DashboardServerUtils {
      * {@link #DATASET_QCFLAG_COMMENT} not included as it does not affect the status.
      */
     public static final HashMap<String,String> DATASET_FLAG_STATUS_MAP;
+
     static {
         DATASET_FLAG_STATUS_MAP = new HashMap<String,String>();
         DATASET_FLAG_STATUS_MAP.put(DATASET_QCFLAG_SUSPEND, DATASET_STATUS_SUSPENDED);
@@ -87,6 +88,7 @@ public class DashboardServerUtils {
      * {@link #DATASET_STATUS_SUBMITTED} is mapped to {@link #DATASET_QCFLAG_UPDATED}.
      */
     public static final HashMap<String,String> DATASET_STATUS_FLAG_MAP;
+
     static {
         DATASET_STATUS_FLAG_MAP = new HashMap<String,String>();
         DATASET_STATUS_FLAG_MAP.put(DATASET_STATUS_SUSPENDED, DATASET_QCFLAG_SUSPEND);
@@ -122,6 +124,7 @@ public class DashboardServerUtils {
     public static final String REGION_ID_ARCTIC = "R";
 
     public static final HashMap<String,String> REGION_NAMES;
+
     static {
         REGION_NAMES = new HashMap<String,String>();
         REGION_NAMES.put(DashboardUtils.REGION_ID_GLOBAL, "Global");
@@ -201,15 +204,14 @@ public class DashboardServerUtils {
             null, null, null, null);
 
     /**
-     * Unique identifier for the dataset (metadata derived from user data column for the dataset name)
+     * Unique identifier for the dataset
      * <p>
      * For SOCAT, the dataset ID is NODCYYYYMMDD (the expocode) where NODC is the ship code and YYYY-MM-DD
-     * is the start date for the cruise; possibly followed by -1 or -2 for non-ship platforms where NODC
-     * does not distinguish different platform names.
+     * is the start date for the cruise; possibly followed by -1 or -2 for non-ship platforms, such as
+     * moorings, where NODC does not distinguish different platform names.
      */
-    public static final StringDashDataType DATASET_ID = new StringDashDataType("expocode",
-            50.0, "expocode", "expocode", false,
-            DashboardUtils.NO_UNITS, "expocode", IDENTIFIER_CATEGORY, null,
+    public static final StringDashDataType DATASET_ID = new StringDashDataType(DashboardUtils.DATASET_ID,
+            "expocode", IDENTIFIER_CATEGORY, null,
             null, null, null, null);
 
     /**

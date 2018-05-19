@@ -9,8 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Types of the data columns in a user-provided data file. Includes information about this data column type to present
- * and assign on the client side.
+ * Types of the data columns in a user-provided data file.
+ * Includes information about this data column type to present and assign on the client side.
  *
  * @author Karl Smith
  */
@@ -28,9 +28,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     protected String selectedMissingValue;
 
     /**
-     * Create an empty data column type; all strings are set to {@link DashboardUtils#STRING_MISSING_VALUE}, the sort
-     * order is set to {@link DashboardUtils#FP_MISSING_VALUE}, the units list is a copy of {@link
-     * DashboardUtils#NO_UNITS}, the index of the selected unit is zero, and is set to not critical.
+     * Create an empty data column type; all strings are set to {@link DashboardUtils#STRING_MISSING_VALUE},
+     * the sort order is set to {@link DashboardUtils#FP_MISSING_VALUE}, the units list is a copy of
+     * {@link DashboardUtils#NO_UNITS}, the index of the selected unit is zero, and is set to not critical.
      */
     public DataColumnType() {
         varName = DashboardUtils.STRING_MISSING_VALUE;
@@ -39,35 +39,36 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         description = DashboardUtils.STRING_MISSING_VALUE;
         isCritical = false;
         units = new ArrayList<String>(DashboardUtils.NO_UNITS);
-        selectedUnitIndex = Integer.valueOf(0);
+        selectedUnitIndex = 0;
         selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
     }
 
     /**
-     * Create a data column type with the given values.  A new ArrayList of units is created from the given collection
-     * of units.  The index of the selected unit is zero and the selected missing value is set to {@link
-     * DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values).
+     * Create a data column type with the given values.  A new ArrayList of units is created from the given
+     * ArrayList of units.  The index of the selected unit is zero and the selected missing value is set to
+     * {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values).
      *
      * @param varName
      *         name for a variable of this type; cannot be null or blank
      * @param sortOrder
-     *         value giving the sort order for this type; if null, NaN, or infinite, {@link
-     *         DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         value giving the sort order for this type;
+     *         if null, NaN, or infinite, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      * @param displayName
      *         displayed name for this types; if null or blank, varName is used
      * @param description
-     *         description of a variable of this type; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         description of a variable of this type;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      * @param isCritical
      *         if this type must be present and a valid value
      * @param units
-     *         unit strings associated with this type; if null or empty, {@link DashboardUtils#NO_UNITS} is used
+     *         unit strings associated with this type;
+     *         if null or empty, {@link DashboardUtils#NO_UNITS} is used
      *
      * @throws IllegalArgumentException
      *         if the variable name is null or blank
      */
-    public DataColumnType(String varName, Double sortOrder, String displayName,
-            String description, boolean isCritical, ArrayList<String> units)
-            throws IllegalArgumentException {
+    public DataColumnType(String varName, Double sortOrder, String displayName, String description,
+            boolean isCritical, ArrayList<String> units) throws IllegalArgumentException {
         if ( (varName == null) || varName.trim().isEmpty() )
             throw new IllegalArgumentException("data type variable name is invalid");
         this.varName = varName;
@@ -84,19 +85,17 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         else
             this.description = DashboardUtils.STRING_MISSING_VALUE;
         this.isCritical = isCritical;
-        if ( (units != null) && (units.size() > 0) ) {
+        if ( (units != null) && (units.size() > 0) )
             this.units = new ArrayList<String>(units);
-        }
-        else {
+        else
             this.units = new ArrayList<String>(DashboardUtils.NO_UNITS);
-        }
-        this.selectedUnitIndex = Integer.valueOf(0);
+        this.selectedUnitIndex = 0;
         this.selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
     }
 
     /**
-     * @return the variable name for this data column type; never null but may be {@link
-     *         DashboardUtils#STRING_MISSING_VALUE}
+     * @return the variable name for this data column type;
+     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getVarName() {
         return varName;
@@ -104,21 +103,19 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param varName
-     *         the variable name to set for this of this data column type; if null, {@link
-     *         DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the variable name to set for this of this data column type;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setVarName(String varName) {
-        if ( varName != null ) {
+        if ( varName != null )
             this.varName = varName;
-        }
-        else {
+        else
             this.varName = DashboardUtils.STRING_MISSING_VALUE;
-        }
     }
 
     /**
-     * @return the sort order value for this data column type; never null but may be {@link
-     *         DashboardUtils#FP_MISSING_VALUE}
+     * @return the sort order value for this data column type;
+     *         never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getSortOrder() {
         return sortOrder;
@@ -126,8 +123,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param sortOrder
-     *         the sort order value to set for this of this data column type; if null, {@link
-     *         DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the sort order value to set for this of this data column type;
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setSortOrder(Double sortOrder) {
         if ( sortOrder != null ) {
@@ -139,8 +136,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @return the displayed name for this data column type; never null but may be {@link
-     *         DashboardUtils#STRING_MISSING_VALUE}
+     * @return the displayed name for this data column type;
+     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDisplayName() {
         return displayName;
@@ -148,20 +145,19 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param displayName
-     *         the displayed name to set for this of this data column type; if null, {@link
-     *         DashboardUtils#STRING_MISSING_VALUE} is assigned
+     *         the displayed name to set for this of this data column type;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDisplayName(String displayName) {
-        if ( displayName != null ) {
+        if ( displayName != null )
             this.displayName = displayName;
-        }
-        else {
+        else
             this.displayName = DashboardUtils.STRING_MISSING_VALUE;
-        }
     }
 
     /**
-     * @return description of a variable of this type; never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+     * @return description of a variable of this type;
+     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     public String getDescription() {
         return description;
@@ -169,8 +165,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param description
-     *         description of a variable of this type to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
-     *         assigned
+     *         description of a variable of this type to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setDescription(String description) {
         if ( description != null )
@@ -195,8 +191,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @return the units associated with this data column type; never null or empty, but may only contain {@link
-     *         DashboardUtils#STRING_MISSING_VALUE}. The actual ArrayList in this object is returned.
+     * @return the units associated with this data column type;
+     *         never null or empty, but may only contain {@link DashboardUtils#STRING_MISSING_VALUE}.
+     *         The actual ArrayList in this object is returned.
      */
     public ArrayList<String> getUnits() {
         return units;
@@ -204,25 +201,23 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param units
-     *         the list of units to associate with this data column type (copied); if null or empty, a copy of {@link
-     *         DashboardUtils#NO_UNITS} is assigned.
+     *         the list of units to associate with this data column type (copied);
+     *         if null or empty, a copy of {@link DashboardUtils#NO_UNITS} is assigned.
      */
     public void setUnits(ArrayList<String> units) {
-        if ( (units != null) && (units.size() > 0) ) {
+        if ( (units != null) && (units.size() > 0) )
             this.units = new ArrayList<String>(units);
-        }
-        else {
+        else
             this.units = new ArrayList<String>(DashboardUtils.NO_UNITS);
-        }
     }
 
     /**
-     * @return the index in the units list of the selected unit; if the index is not valid for the current list of
-     *         units, zero is returned
+     * @return the index in the units list of the selected unit;
+     *         if the index is not valid for the current list of units, zero is returned
      */
     public Integer getSelectedUnitIndex() {
         if ( (selectedUnitIndex < 0) || (selectedUnitIndex >= units.size()) )
-            return Integer.valueOf(0);
+            return 0;
         return selectedUnitIndex;
     }
 
@@ -234,7 +229,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         if ( selectedUnitIndex != null )
             this.selectedUnitIndex = selectedUnitIndex;
         else
-            this.selectedUnitIndex = Integer.valueOf(0);
+            this.selectedUnitIndex = 0;
     }
 
     /**
@@ -259,8 +254,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @return the selected missing value, as a string. A value of {@link DashboardUtils#STRING_MISSING_VALUE} is to be
-     *         interpreted as the default missing values.
+     * @return the selected missing value, as a string. A value of {@link DashboardUtils#STRING_MISSING_VALUE}
+     *         is to be interpreted as the default missing values.
      */
     public String getSelectedMissingValue() {
         return selectedMissingValue;
@@ -268,9 +263,9 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     /**
      * @param selectedMissingValue
-     *         the selected missing value, as a string, to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
-     *         assigned. {@link DashboardUtils#STRING_MISSING_VALUE} is to be interpreted as the default missing
-     *         values.
+     *         the selected missing value, as a string, to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned.
+     *         {@link DashboardUtils#STRING_MISSING_VALUE} is to be interpreted as the default missing values.
      */
     public void setSelectedMissingValue(String selectedMissingValue) {
         if ( selectedMissingValue != null )
@@ -280,8 +275,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * @return a deep of this data column type instance in which copies are made of any mutable data (namely, the list
-     *         of units).
+     * @return a deep copy of this data column type instance.
+     *         Copies are made of any mutable data (namely, the list of units).
      */
     public DataColumnType duplicate() {
         DataColumnType dup = new DataColumnType(varName, sortOrder, displayName,
@@ -292,8 +287,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * Checks if the variable or displayed name of this data column type is equal, ignoring case and non-alphanumeric
-     * characters, to the given name.
+     * Checks if the variable or displayed name of this data column type is equal,
+     * ignoring case and non-alphanumeric characters, to the given name.
      *
      * @param name
      *         data column name to compare to
@@ -313,8 +308,8 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
     }
 
     /**
-     * Checks if the variable or displayed name of this data column type is equal, ignoring case and non-alphanumeric
-     * characters, to either of those of another data column type.
+     * Checks if the variable or displayed name of this data column type is equal, ignoring case and
+     * non-alphanumeric characters, to either of those of another data column type.
      *
      * @param other
      *         data column type to compare to
@@ -348,7 +343,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         result = description.compareTo(other.description);
         if ( result != 0 )
             return result;
-        result = Boolean.valueOf(isCritical).compareTo(Boolean.valueOf(other.isCritical));
+        result = Boolean.valueOf(isCritical).compareTo(other.isCritical);
         if ( result != 0 )
             return result;
         result = selectedMissingValue.compareTo(other.selectedMissingValue);
@@ -370,7 +365,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 
     @Override
     public int hashCode() {
-        // Ignore floating-point as they do not have to be exactly equal
+        // Ignore floating-point values as they do not have to be exactly equal
         final int prime = 37;
         int result = varName.hashCode();
         result = result * prime + displayName.hashCode();
@@ -408,7 +403,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
         if ( !units.equals(other.units) )
             return false;
         // Floating point only needs to be insignificantly different
-        if ( !DashboardUtils.closeTo(sortOrder, other.sortOrder, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+        if ( ! DashboardUtils.closeTo(sortOrder, other.sortOrder, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
         return true;
     }

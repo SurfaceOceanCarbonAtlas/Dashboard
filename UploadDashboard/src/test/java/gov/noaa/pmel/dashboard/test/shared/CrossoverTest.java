@@ -8,11 +8,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for {@link Crossover}
+ * Unit tests for method of {@link Crossover}
  *
  * @author Karl Smith
  */
@@ -330,66 +331,66 @@ public class CrossoverTest {
         assertFalse(first.equals(firstExpo));
 
         Crossover second = new Crossover();
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetIds(new String[] { firstExpo, secondExpo });
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetIds(new String[] { firstExpo, secondExpo });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setMinDistance(new Double(minDist));
         // hashCode ignores floating-point values
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setMinDistance(new Double(minDist));
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setRowNumsAtMin(new Integer[] { firstRowNum, secondRowNum });
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setRowNumsAtMin(new Integer[] { firstRowNum, secondRowNum });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setLonsAtMin(new Double[] { firstLon, secondLon });
         // hashCode ignores floating-point values
-        assertTrue(first.hashCode() == second.hashCode());
-        assertFalse(first.equals(second));
+        assertEquals(first.hashCode(), second.hashCode());
+        assertNotEquals(first, second);
         second.setLonsAtMin(new Double[] { firstLon, secondLon });
-        assertTrue(first.hashCode() == second.hashCode());
-        assertTrue(first.equals(second));
+        assertEquals(first.hashCode(), second.hashCode());
+        assertEquals(first, second);
 
         first.setLatsAtMin(new Double[] { firstLat, secondLat });
         // hashCode ignores floating-point values
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setLatsAtMin(new Double[] { firstLat, secondLat });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setTimesAtMin(new Long[] { firstTime, secondTime });
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setTimesAtMin(new Long[] { firstTime, secondTime });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 

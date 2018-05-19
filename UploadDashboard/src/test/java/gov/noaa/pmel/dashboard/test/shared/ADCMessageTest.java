@@ -10,10 +10,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for methods in {@link ADCMessage}
+ * Unit tests for methods of {@link ADCMessage} and
+ * {@link java.util.Comparator<ADCMessage>} methods in {@link DashboardUtils}.
  *
  * @author Karl Smith
  */
@@ -282,7 +284,7 @@ public class ADCMessageTest {
 
 
         ADCMessage other = new ADCMessage();
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -296,7 +298,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setSeverity(mySeverity);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertTrue(DashboardUtils.severityComparator.compare(msg, other) > 0);
@@ -310,7 +312,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setSeverity(mySeverity);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -324,7 +326,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setRowNumber(myRowNum);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -338,7 +340,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setRowNumber(myRowNum);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -352,7 +354,8 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setLongitude(myLongitude);
-        assertTrue(msg.hashCode() == other.hashCode());
+        // hashcode ignores floating point values
+        assertEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -366,7 +369,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setLongitude(myLongitude);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -380,7 +383,8 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setLatitude(myLatitude);
-        assertTrue(msg.hashCode() == other.hashCode());
+        // hashcode ignores floating point values
+        assertEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -394,7 +398,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setLatitude(myLatitude);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -408,7 +412,8 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setDepth(myDepth);
-        assertTrue(msg.hashCode() == other.hashCode());
+        // hashcode ignores floating point values
+        assertEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -422,7 +427,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setDepth(myDepth);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -436,7 +441,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setTimestamp(myTimestamp);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -450,7 +455,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setTimestamp(myTimestamp);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -464,7 +469,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setColNumber(myColNum);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -478,7 +483,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.colNameComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setColNumber(myColNum);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -492,7 +497,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setColName(myColName);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -506,7 +511,7 @@ public class ADCMessageTest {
         assertTrue(DashboardUtils.colNameComparator.compare(other, msg) < 0);
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         other.setColName(myColName);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -520,7 +525,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setGeneralComment(myGeneralComment);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -534,7 +539,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
         assertEquals(0, DashboardUtils.explanationComparator.compare(other, msg));
         other.setGeneralComment(myGeneralComment);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -548,7 +553,7 @@ public class ADCMessageTest {
         assertEquals(0, DashboardUtils.explanationComparator.compare(msg, other));
 
         msg.setDetailedComment(myExplanation);
-        assertFalse(msg.hashCode() == other.hashCode());
+        assertNotEquals(msg.hashCode(), other.hashCode());
         assertFalse(msg.equals(other));
         assertFalse(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
@@ -562,7 +567,7 @@ public class ADCMessageTest {
         assertTrue(DashboardUtils.explanationComparator.compare(msg, other) > 0);
         assertTrue(DashboardUtils.explanationComparator.compare(other, msg) < 0);
         other.setDetailedComment(myExplanation);
-        assertTrue(msg.hashCode() == other.hashCode());
+        assertEquals(msg.hashCode(), other.hashCode());
         assertTrue(msg.equals(other));
         assertTrue(other.equals(msg));
         assertEquals(0, DashboardUtils.severityComparator.compare(msg, other));
