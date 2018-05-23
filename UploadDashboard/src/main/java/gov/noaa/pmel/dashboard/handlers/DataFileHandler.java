@@ -1017,6 +1017,8 @@ public class DataFileHandler extends VersionedFileHandler {
         // version
         value = cruiseProps.getProperty(VERSION_ID);
         if ( value == null )
+            value = cruiseProps.getProperty("socatversion");
+        if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     VERSION_ID + " given in " + infoFile.getPath());
         dataset.setVersion(value);
@@ -1038,10 +1040,14 @@ public class DataFileHandler extends VersionedFileHandler {
         // DOIs
         value = cruiseProps.getProperty(SOURCE_DOI_ID);
         if ( value == null )
+            value = cruiseProps.getProperty("origdatadoi");
+        if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     SOURCE_DOI_ID + " given in " + infoFile.getPath());
         dataset.setSourceDOI(value);
         value = cruiseProps.getProperty(ENHANCED_DOI_ID);
+        if ( value == null )
+            value = cruiseProps.getProperty("socatdatadoi");
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     ENHANCED_DOI_ID + " given in " + infoFile.getPath());
@@ -1071,6 +1077,8 @@ public class DataFileHandler extends VersionedFileHandler {
         // Submit status
         value = cruiseProps.getProperty(SUBMIT_STATUS_ID);
         if ( value == null )
+            value = cruiseProps.getProperty("qcstatus");
+        if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     SUBMIT_STATUS_ID + " given in " + infoFile.getPath());
         dataset.setSubmitStatus(value);
@@ -1084,6 +1092,10 @@ public class DataFileHandler extends VersionedFileHandler {
 
         // Date of request to archive data and metadata
         value = cruiseProps.getProperty(ARCHIVAL_DATE_ID);
+        if ( value == null )
+            value = cruiseProps.getProperty("cdiacdate");
+        if ( value == null )
+            value = cruiseProps.getProperty("ocadsdate");
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     ARCHIVAL_DATE_ID + " given in " + infoFile.getPath());
@@ -1163,7 +1175,16 @@ public class DataFileHandler extends VersionedFileHandler {
             if ( dataType == null )
                 throw new IllegalArgumentException("unknown data type \"" + colTypeNames.get(k) + "\"");
             DataColumnType dctype = dataType.duplicate();
-            if ( !dctype.setSelectedUnit(colTypeUnits.get(k)) )
+            String colunit = colTypeUnits.get(k);
+            if ( "degrees_east".equals(colunit) )
+                colunit = "deg E";
+            else if ( "degrees_north".equals(colunit) )
+                colunit = "deg N";
+            else if ( "degrees_west".equals(colunit) )
+                colunit = "deg W";
+            else if ( "degrees_south".equals(colunit) )
+                colunit = "deg S";
+            if ( !dctype.setSelectedUnit(colunit) )
                 throw new IllegalArgumentException("unknown unit \"" + colTypeUnits.get(k) +
                         "\" for data type \"" + dctype.getVarName() + "\"");
             dctype.setSelectedMissingValue(colMissValues.get(k));
