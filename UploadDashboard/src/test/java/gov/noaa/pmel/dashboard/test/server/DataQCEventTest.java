@@ -1,12 +1,12 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.test.shared;
+package gov.noaa.pmel.dashboard.test.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.DataQCEvent;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
+import gov.noaa.pmel.dashboard.server.DataLocation;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
+import gov.noaa.pmel.dashboard.server.QCEvent;
 import org.junit.Test;
 
 import java.util.ArrayList;

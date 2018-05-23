@@ -14,7 +14,7 @@ import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.util.ArrayList;
@@ -429,7 +429,7 @@ public class StdUserDataArray extends StdDataArray {
 
     /**
      * @return the list of automated data check messages describing problems detected in the data.  The messages that
-     *         are in this list comes from the constructor as well as any check methods that were called.
+     *         are in this list comes from the constructor as well as any check methods that were called.  Never null.
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;

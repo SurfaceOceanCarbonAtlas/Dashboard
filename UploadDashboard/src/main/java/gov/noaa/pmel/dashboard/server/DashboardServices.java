@@ -19,7 +19,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

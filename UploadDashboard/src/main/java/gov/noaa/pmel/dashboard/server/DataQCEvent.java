@@ -1,11 +1,10 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.shared;
+package gov.noaa.pmel.dashboard.server;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -14,9 +13,7 @@ import java.util.ArrayList;
  *
  * @author Karl Smith
  */
-public class DataQCEvent extends QCEvent implements Serializable, IsSerializable {
-
-    private static final long serialVersionUID = 5186999389519204821L;
+public class DataQCEvent extends QCEvent {
 
     protected String varName;
     protected ArrayList<DataLocation> locations;

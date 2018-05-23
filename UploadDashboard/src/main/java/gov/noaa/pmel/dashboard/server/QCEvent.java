@@ -1,11 +1,10 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.shared;
+package gov.noaa.pmel.dashboard.server;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -14,9 +13,7 @@ import java.util.Date;
  *
  * @author Karl Smith
  */
-public class QCEvent implements Serializable, IsSerializable {
-
-    private static final long serialVersionUID = 3499225143460826432L;
+public class QCEvent {
 
     protected Long id;
     protected Date flagDate;

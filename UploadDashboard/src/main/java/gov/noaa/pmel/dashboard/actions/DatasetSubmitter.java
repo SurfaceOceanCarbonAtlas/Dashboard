@@ -17,15 +17,15 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
+import gov.noaa.pmel.dashboard.server.QCEvent;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.CommentedQCFlag;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.DataQCEvent;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -174,8 +174,6 @@ public class DatasetSubmitter {
                     // Transfer the automated data checker data QC flags to the appropriate data QC column
                     transferAutomaticDataQC(userStdData);
 
-                    boolean isNew = DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus());
-
                     // Generate the NetCDF DSG file, enhanced by Ferret
                     logger.debug("Generating the full-data DSG file for " + datasetId);
                     dsgHandler.saveDatasetDsg(dsgMData, userStdData);
@@ -188,8 +186,9 @@ public class DatasetSubmitter {
                     // region_id data variable in the full-data DSG file.
                     String allRegionIds = dsgHandler.updateAllRegionIds(datasetId);
 
+                    // Add new or update (regardless of version) dataset QC flags to the database
+                    // Uses the submitStatus from dataset to determine if new or updated
                     ArrayList<QCEvent> datasetQCEvents = generateDatasetQCEvents(dataset, allRegionIds);
-                    // Add new or update dataset QC new or update flags to the database
                     databaseHandler.addDatasetQCEvents(datasetQCEvents);
 
                     // Generate the set of data QC events for the data QC flags from standardization
@@ -205,7 +204,7 @@ public class DatasetSubmitter {
                     continue;
                 }
 
-                // Update dataset info with status values from the dataset data object
+                // Now mark the dataset as submitted in this version
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 dataset.setVersion(version);
 
@@ -297,13 +296,81 @@ public class DatasetSubmitter {
         }
     }
 
+    /**
+     * Adds data QC flags derived from the messages from standardization and automated data checking
+     * to appropriate data QC columns in userStdData.
+     *
+     * @param userStdData
+     * standardized user data with messages from standardization and automated data checking
+     */
     private void transferAutomaticDataQC(StdUserDataArray userStdData) {
+        ArrayList<ADCMessage> msgList = userStdData.getStandardizationMessages();
         createMe;
     }
 
+    /**
+     * Generate a list of dataset QC events associated with submitting this dataset for QC.
+     * Uses the submitStatus of dataset to determine if this is a new or updated dataset,
+     * regardless of version.  Creates an initial dataset QC flag for the global region and
+     * then each of the regions with IDs given in allRegionIds.  Finally adds a dataset QC
+     * comment remarking on the number of data rows with errors and warnings obtained from
+     * numErrors and numWarning of dataset.
+     *
+     * @param dataset
+     *         generate dataset QC events for this dataset
+     * @param allRegionIds
+     *         string of concatenated IDs of regions this dataset occupies;
+     *         this assumes region IDs are Strings of length one
+     *
+     * @return list of data QC events associated with submitting this dataset for QC
+     */
     private ArrayList<QCEvent> generateDatasetQCEvents(DashboardDatasetData dataset, String allRegionIds) {
-        ArrayList<QCEvent> qclist = new ArrayList<QCEvent>(allRegionIds.length() + 5);
-        createMe;
+        ArrayList<QCEvent> qclist = new ArrayList<QCEvent>(allRegionIds.length() + 2);
+        String expocode = dataset.getDatasetId();
+
+        // Start with the initial new/updated dataset QC flags
+        String flagValue;
+        String comment;
+        if ( DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus()) ) {
+            flagValue = DashboardServerUtils.DATASET_QCFLAG_NEW;
+            comment = "Initial QC flag for new dataset";
+        }
+        else {
+            flagValue = DashboardServerUtils.DATASET_QCFLAG_UPDATED;
+            comment = "Initial QC flag for updated dataset";
+        }
+        // First add a global flag, then flag for each region
+        ArrayList<String> regions = new ArrayList<String>(allRegionIds.length() + 1);
+        regions.add(DashboardUtils.REGION_ID_GLOBAL);
+        for (int k = 0; k < allRegionIds.length(); k++) {
+            regions.add(allRegionIds.substring(k, k + 1));
+        }
+        for (String regionId : regions) {
+            QCEvent initQC = new QCEvent();
+            initQC.setDatasetId(expocode);
+            initQC.setVersion(version);
+            initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
+            initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
+            initQC.setFlagDate(new Date());
+            initQC.setFlagValue(flagValue);
+            initQC.setRegionId(regionId);
+            initQC.setComment(comment);
+            qclist.add(initQC);
+        }
+
+        // Add a comment on the number of data rows with errors and warnings
+        QCEvent initQC = new QCEvent();
+        initQC.setDatasetId(expocode);
+        initQC.setVersion(version);
+        initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
+        initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
+        initQC.setFlagDate(new Date());
+        initQC.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_COMMENT);
+        initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+        initQC.setComment("Automated data check found " +
+                Integer.toString(dataset.getNumErrorRows()) + " data points with errors and " +
+                Integer.toString(dataset.getNumWarnRows()) + " data points with warnings.");
+        qclist.add(initQC);
 
         return qclist;
     }
