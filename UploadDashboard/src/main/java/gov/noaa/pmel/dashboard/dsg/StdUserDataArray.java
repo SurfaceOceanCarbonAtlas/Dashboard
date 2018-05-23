@@ -172,7 +172,10 @@ public class StdUserDataArray extends StdDataArray {
                             } catch ( IllegalArgumentException ex ) {
                                 stdObjects[j][k] = null;
                                 ADCMessage msg = new ADCMessage();
-                                msg.setSeverity(Severity.CRITICAL);
+                                if ( colType.isCritical() )
+                                    msg.setSeverity(Severity.CRITICAL);
+                                else
+                                    msg.setSeverity(Severity.ERROR);
                                 msg.setRowNumber(j + 1);
                                 msg.setColNumber(k + 1);
                                 msg.setColName(userColNames[k]);

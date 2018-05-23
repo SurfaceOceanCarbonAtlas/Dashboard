@@ -171,6 +171,8 @@ public class DatasetCheckerTest {
 
         assertEquals(1, dupsMsgList.size());
         for (ADCMessage msg : dupsMsgList) {
+            assertEquals(8, (int) msg.getColNumber());
+            assertEquals(220, (int) msg.getRowNumber());
             assertEquals(Severity.ERROR, msg.getSeverity());
         }
     }
@@ -464,6 +466,9 @@ public class DatasetCheckerTest {
             SocatTypes.SALINITY.duplicate(),
             DashboardServerUtils.SAMPLE_DEPTH.duplicate()
     ));
+    static {
+        dupsDataColTypes.get(1).setSelectedUnit("mm-dd-yyyy");
+    }
 
     private static final ArrayList<String> dupsUserColumnNames = new ArrayList<String>(Arrays.asList(
             "cruise name", "date (mm/dd/yyyy)", "time (hh:mm)", "date_local", "time_local",

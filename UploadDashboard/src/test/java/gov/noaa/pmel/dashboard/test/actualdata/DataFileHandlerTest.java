@@ -3,10 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.test.actualdata;
 
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.test.datatype.KnownDataTypesTest;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -24,6 +27,9 @@ import static org.junit.Assert.assertEquals;
  * @author Karl Smith
  */
 public class DataFileHandlerTest {
+
+    private static final String DEFAULT_USER_TYPES_PROPERTIES_FILENAME =
+            System.getenv("HOME") + "/content/SocatUploadDashboard/config/DefaultTypeKeys.properties";
 
     private static final String DATASET_OWNER = "Kevin Sullivan";
     private static final String UPLOAD_FILENAME = "Atlantis April 2012.csv";
@@ -102,9 +108,10 @@ public class DataFileHandlerTest {
      */
     @Test
     public void testAssignDatasetDataFromInput() throws IOException {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
-        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
-        DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
+        UserFileHandler userFileHandler = new UserFileHandler("/var/tmp/junit", null, null,
+                DEFAULT_USER_TYPES_PROPERTIES_FILENAME, KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES);
+        DataFileHandler dataHandler = new DataFileHandler("/var/tmp/junit", null, null,
+                KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, userFileHandler, "3.0");
         BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA));
         DashboardDatasetData cruiseData =
                 dataHandler.createDatasetFromInput(cruiseReader, DashboardUtils.COMMA_FORMAT_TAG,

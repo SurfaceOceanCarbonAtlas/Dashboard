@@ -245,7 +245,7 @@ public class DashboardUtils {
 
     public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth",
             303.0, "sample depth", "sample depth",
-            true, DEPTH_UNITS);
+            false, DEPTH_UNITS);
 
     /**
      * Date and time of the measurement

@@ -98,14 +98,14 @@ public class StdDataArrayTest {
 
         Integer lastUserDataColNum = DATA_COLUMN_TYPES.size();
         msg = msgList.get(2);
-        assertEquals(Severity.CRITICAL, msg.getSeverity());
+        assertEquals(Severity.ERROR, msg.getSeverity());
         assertEquals(Integer.valueOf(2), msg.getRowNumber());
         assertEquals(lastUserDataColNum, msg.getColNumber());
         assertEquals(NO_VALUE_ERRMSG, msg.getGeneralComment());
         assertEquals(NO_VALUE_ERRMSG, msg.getDetailedComment());
 
         msg = msgList.get(3);
-        assertEquals(Severity.CRITICAL, msg.getSeverity());
+        assertEquals(Severity.ERROR, msg.getSeverity());
         assertEquals(Integer.valueOf(3), msg.getRowNumber());
         assertEquals(lastUserDataColNum, msg.getColNumber());
         assertEquals(INVALID_FP_VALUE_ERRMSG, msg.getGeneralComment());

@@ -104,17 +104,16 @@ public class UserFileHandler extends VersionedFileHandler {
             String[] vals = propVal.split(",", -1);
             if ( vals.length != 3 )
                 throw new IllegalArgumentException("invalid type,unit,missing value \"" +
-                        propVal + "\" for key \"" + colName + "\" given in " +
-                        propFile.getPath());
+                        propVal + "\" for key \"" + colName + "\" given in " + propFile.getPath());
 
             DashDataType<?> dtype = userTypes.getDataType(vals[0]);
             if ( dtype == null )
                 throw new IllegalArgumentException("Unknown data type \"" +
                         vals[0] + "\" for tag \"" + colName + "\"");
             DataColumnType dctype = dtype.duplicate();
-            if ( !dctype.setSelectedUnit(vals[1]) )
-                throw new IllegalArgumentException("Unknown data unit \"" + vals[1] +
-                        "\" for data type \"" + vals[0] + "\"");
+            if ( !dctype.setSelectedUnit(vals[1]) ) {
+                throw new IllegalArgumentException("Unknown data unit \"" +
+                        vals[1] + "\" for data type \"" + vals[0] + "\"");
             dctype.setSelectedMissingValue(vals[2]);
             dataColNamesToTypes.put(colName, dctype);
         }
