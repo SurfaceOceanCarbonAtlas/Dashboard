@@ -111,7 +111,7 @@ public class UserFileHandler extends VersionedFileHandler {
                 throw new IllegalArgumentException("Unknown data type \"" +
                         vals[0] + "\" for tag \"" + colName + "\"");
             DataColumnType dctype = dtype.duplicate();
-            if ( !dctype.setSelectedUnit(vals[1]) ) {
+            if ( !dctype.setSelectedUnit(vals[1]) )
                 throw new IllegalArgumentException("Unknown data unit \"" +
                         vals[1] + "\" for data type \"" + vals[0] + "\"");
             dctype.setSelectedMissingValue(vals[2]);
