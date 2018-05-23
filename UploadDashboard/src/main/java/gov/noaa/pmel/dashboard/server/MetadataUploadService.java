@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -228,7 +229,7 @@ public class MetadataUploadService extends HttpServlet {
                     qcEvent.setComment(comment);
                     try {
                         // Add the 'U' QC flag
-                        databaseHandler.addDatasetQCEvent(qcEvent);
+                        databaseHandler.addDatasetQCEvents(Arrays.asList(qcEvent));
                         dsgHandler.updateDatasetQCFlag(qcEvent);
                         // Update the dashboard status for the 'U' QC flag
                         dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);

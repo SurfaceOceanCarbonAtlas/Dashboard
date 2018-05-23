@@ -54,8 +54,8 @@ public class StdDataArray {
 
     /**
      * Create and assign the 1-D arrays of data column types from the given user's descriptions
-     * of the data column.  Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and
-     * {@link DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D array of standard data objects is not created.
+     * of the data column.  Appends the non-user type {@link DashboardServerUtils#SAMPLE_NUMBER}.
+     * The 2-D array of standard data objects is not created.
      *
      * @param dataColumnTypes
      *         user's description of the data columns in each sample
@@ -86,8 +86,7 @@ public class StdDataArray {
                 throw new IllegalArgumentException("unknown data column type: " + dataColType.getDisplayName());
         }
         dataTypes[numDataCols] = DashboardServerUtils.SAMPLE_NUMBER;
-        dataTypes[numDataCols + 1] = DashboardServerUtils.WOCE_AUTOCHECK;
-        numDataCols += 2;
+        numDataCols++;
 
         // UNKNOWN and duplicates can be present so ignore the return value of the following method
         assignColumnIndicesOfInterest();
@@ -176,7 +175,7 @@ public class StdDataArray {
         }
 
         // Get column indices and check for UNKNOWN (return null) and duplicates (return true)
-        if ( ! Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
+        if ( !Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
             throw new IllegalArgumentException("unknown or duplicated data column type");
     }
 
@@ -351,7 +350,7 @@ public class StdDataArray {
         }
 
         // Get column indices and check for UNKNOWN (return null) and duplicates (return true)
-        if ( ! Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
+        if ( !Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
             throw new IllegalArgumentException("unknown or duplicated data column type");
     }
 

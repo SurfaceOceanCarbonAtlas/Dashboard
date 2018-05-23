@@ -23,7 +23,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.DataQCEvent;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
@@ -163,8 +162,7 @@ public class DatasetSubmitter {
 
                     // Standardize the data and perform the automated data checks.
                     // Saves the messages from the standardization and automated data checks.
-                    // Assigns the StdUserData WOCE_AUTOCHECK data column with the checker-generated data QC flags.
-                    // Assigns the DashboardDataset sets of checker-generated and user-provided data QC flags.
+                    // Assigns dataCheckStatus, numErrorRows, numWarnRows, checkerFlags, and userFlags in dataset
                     // TODO: update the metadata with data-derived values
                     StdUserDataArray userStdData = datasetChecker.standardizeDataset(dataset, null);
                     if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
@@ -300,11 +298,14 @@ public class DatasetSubmitter {
     }
 
     private void transferAutomaticDataQC(StdUserDataArray userStdData) {
-        create
+        createMe;
     }
 
     private ArrayList<QCEvent> generateDatasetQCEvents(DashboardDatasetData dataset, String allRegionIds) {
-        create
+        ArrayList<QCEvent> qclist = new ArrayList<QCEvent>(allRegionIds.length() + 5);
+        createMe;
+
+        return qclist;
     }
 
     /**
@@ -423,7 +424,7 @@ public class DatasetSubmitter {
         if ( dataqc.isEmpty() )
             return woceList;
 
-        // Get the longitudes, latitude, times, and regions IDs
+        // Get the longitudes, latitude, and times for the list of DataLocation objects
         double[][] lonlattimes = dsgHandler.readLonLatTimeDataValues(expocode);
         double[] longitudes = lonlattimes[0];
         double[] latitudes = lonlattimes[1];

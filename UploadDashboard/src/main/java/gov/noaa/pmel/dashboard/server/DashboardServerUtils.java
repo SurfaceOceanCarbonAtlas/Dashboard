@@ -394,14 +394,6 @@ public class DashboardServerUtils {
             "0.0", null, null, "86400.0");
 
     /**
-     * WOCE flag from the automated data checker.
-     */
-    public static final StringDashDataType WOCE_AUTOCHECK = new StringDashDataType("WOCE_autocheck",
-            500.0, "WOCE autocheck", "WOCE flag from automated data checking", false,
-            DashboardUtils.NO_UNITS, "WOCE_flag", QUALITY_CATEGORY, null,
-            "1", "2", "4", "9");
-
-    /**
      * Value of userRealName to use to skip sending the email request in
      * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
      */

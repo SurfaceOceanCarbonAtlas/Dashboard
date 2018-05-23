@@ -129,10 +129,9 @@ public class CheckerMessageHandler {
 
     /**
      * Save the list of automated data check messages given with a standardized user data array object.
-     * Using these messages, assigns the WOCE_AUTOCHECK data column values in the standardized data array
-     * as well as the set of automated data checker data QC flags in the dataset.  Also assigns the set of
-     * PI-provided data QC flags in the dataset.  This assumes PI-provided QC flags indicating issues have
-     * flag values that are integers in the range [3,9] (e.g., WOCE or bottle QC flags).
+     * Using these messages, assigns the set of automated data checker data QC flags in the dataset.
+     * Also assigns the set of PI-provided data QC flags in the dataset.  This assumes PI-provided QC flags
+     * indicating issues have flag values that are integers in the range [3,9] (e.g., WOCE or bottle QC flags).
      *
      * @param dataset
      *         save message for this dataset as well as the sets of data QC flags in this dataset
@@ -151,8 +150,6 @@ public class CheckerMessageHandler {
         if ( numStdCols <= 0 )
             throw new IllegalArgumentException("no standardized data columns");
         List<DashDataType<?>> stdDataTypes = stdUserData.getDataTypes();
-        if ( stdDataTypes.indexOf(DashboardServerUtils.WOCE_AUTOCHECK) < 0 )
-            throw new IllegalArgumentException("no WOCE_AUTOCHECK standardized data column");
 
         if ( dataset.getNumDataRows() != numSamples )
             throw new IllegalArgumentException("number of data rows recorded for this dataset (" +
@@ -174,7 +171,6 @@ public class CheckerMessageHandler {
         }
 
         ArrayList<ADCMessage> msgList = stdUserData.getStandardizationMessages();
-        stdUserData.resetWoceAutocheck();
 
         // Get the dataset messages file to be written
         File msgsFile = messagesFile(dataset.getDatasetId());
@@ -224,7 +220,6 @@ public class CheckerMessageHandler {
 
             // WOCE-type QC flags to assign from the automated data check
             TreeSet<QCFlag> woceFlags = new TreeSet<QCFlag>();
-            String woceFlagName = DashboardServerUtils.WOCE_AUTOCHECK.getVarName();
 
             for (ADCMessage msg : msgList) {
                 // Generate a list of key-value strings describing this message
@@ -269,24 +264,22 @@ public class CheckerMessageHandler {
                     if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
                         QCFlag flag;
                         if ( colNumber != null )
-                            flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD,
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
                                     QCFlag.Severity.ERROR, colNumber - 1, rowNum - 1);
                         else
-                            flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD,
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
                                     QCFlag.Severity.ERROR, null, rowNum - 1);
                         woceFlags.add(flag);
-                        stdUserData.setWoceAutocheck(rowNum - 1, DashboardServerUtils.WOCE_BAD);
                     }
                     else if ( QCFlag.Severity.WARNING.equals(severity) ) {
                         QCFlag flag;
                         if ( colNumber > 0 )
-                            flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE,
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
                                     QCFlag.Severity.WARNING, colNumber - 1, rowNum - 1);
                         else
-                            flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE,
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
                                     QCFlag.Severity.WARNING, null, rowNum - 1);
                         woceFlags.add(flag);
-                        stdUserData.setWoceAutocheck(rowNum - 1, DashboardServerUtils.WOCE_QUESTIONABLE);
                     }
                 }
             }

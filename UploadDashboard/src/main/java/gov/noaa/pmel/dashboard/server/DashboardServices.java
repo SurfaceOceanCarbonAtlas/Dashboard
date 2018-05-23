@@ -29,6 +29,7 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -279,7 +280,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             qcEvent.setComment(comment);
             try {
                 // Add the 'U' QC flag with the current upload version
-                configStore.getDatabaseRequestHandler().addDatasetQCEvent(qcEvent);
+                configStore.getDatabaseRequestHandler().addDatasetQCEvents(Arrays.asList(qcEvent));
                 configStore.getDsgNcFileHandler().updateDatasetQCFlag(qcEvent);
                 // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);

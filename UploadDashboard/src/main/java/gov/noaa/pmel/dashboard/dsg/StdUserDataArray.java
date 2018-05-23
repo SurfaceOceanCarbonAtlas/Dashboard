@@ -15,7 +15,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.util.ArrayList;
@@ -40,7 +39,6 @@ public class StdUserDataArray extends StdDataArray {
     private String[] userMissVals;
     private Boolean[] standardized;
     private ArrayList<ADCMessage> stdMsgList;
-    int woceAutocheckIndex;
 
     /**
      * Create from the user's data column descriptions, data strings, data row numbers, and data check flags
@@ -89,13 +87,8 @@ public class StdUserDataArray extends StdDataArray {
                 userMissVals[k] = null;
             userColNames[k] = names.get(k);
         }
-        // the StdDataArray constructor that was used adds SAMPLE_NUMBER and WOCE_AUTOCHECK
-        woceAutocheckIndex = -1;
+        // the StdDataArray constructor that was used adds SAMPLE_NUMBER
         for (int k = numUserDataCols; k < numDataCols; k++) {
-            if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) )
-                woceAutocheckIndex = k;
-            // use the standard unit, a default missing value string,
-            // and the type display name for these added types
             userUnits[k] = dataTypes[k].getUnits().get(0);
             if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
                 userUnits[k] = null;
@@ -149,24 +142,8 @@ public class StdUserDataArray extends StdDataArray {
                 if ( DashboardServerUtils.SAMPLE_NUMBER.typeNameEquals(dataTypes[k]) ) {
                     strDataVals[j][k] = rowNums.get(j).toString();
                 }
-                else if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) ) {
-                    // Default to acceptable; update afterwards
-                    strDataVals[j][k] = DashboardServerUtils.WOCE_ACCEPTABLE.toString();
-                    woceIdx = k;
-                }
                 else {
                     throw new IllegalArgumentException("unexpected unknown added data types");
-                }
-            }
-        }
-        // Add the automated data checker WOCE flags
-        if ( woceIdx >= 0 ) {
-            for (QCFlag flag : dataset.getCheckerFlags()) {
-                if ( DashboardServerUtils.WOCE_AUTOCHECK.getVarName().equals(flag.getFlagName()) ) {
-                    Integer j = flag.getRowIndex();
-                    if ( !DashboardUtils.INT_MISSING_VALUE.equals(j) ) {
-                        strDataVals[j][woceIdx] = flag.getFlagValue().toString();
-                    }
                 }
             }
         }
@@ -507,48 +484,11 @@ public class StdUserDataArray extends StdDataArray {
         return stdObjects[sampleIdx][columnIdx];
     }
 
-    /**
-     * Reset all values in the WOCE_AUTOCHECK column to {@link DashboardServerUtils#WOCE_ACCEPTABLE}.
-     */
-    public void resetWoceAutocheck() {
-        if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
-            return;
-        for (int j = 0; j < numSamples; j++) {
-            stdObjects[j][woceAutocheckIndex] = DashboardServerUtils.WOCE_ACCEPTABLE;
-        }
-    }
-
-    /**
-     * Set the WOCE_AUTOCHECK flag for a data sample (row).
-     *
-     * @param sampleIdx
-     *         index of the data sample (row) to set
-     * @param newFlag
-     *         WOCE flag to assign
-     *
-     * @throws IllegalArgumentException
-     *         if the sample index is invalid,
-     *         if there is not WOCE_AUTOCHECK column, or *
-     *         if the flag given is not a valid WOCE flag
-     */
-    public void setWoceAutocheck(int sampleIdx, String newFlag) throws IllegalArgumentException {
-        if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )
-            throw new IndexOutOfBoundsException("sample index is invalid: " + sampleIdx);
-        if ( (woceAutocheckIndex < 0) || (woceAutocheckIndex >= numDataCols) )
-            throw new IllegalArgumentException("no WOCE autocheck column");
-        if ( !(DashboardServerUtils.WOCE_ACCEPTABLE.equals(newFlag) ||
-                DashboardServerUtils.WOCE_QUESTIONABLE.equals(newFlag) ||
-                DashboardServerUtils.WOCE_BAD.equals(newFlag)) )
-            throw new IllegalArgumentException("invalid WOCE flag value");
-        stdObjects[sampleIdx][woceAutocheckIndex] = newFlag;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 37;
         int result = super.hashCode();
         result = prime * result + stdMsgList.hashCode();
-        result = prime * result + woceAutocheckIndex;
         result = prime * result + Arrays.hashCode(standardized);
         result = prime * result + Arrays.hashCode(userMissVals);
         result = prime * result + Arrays.hashCode(userUnits);
@@ -568,8 +508,6 @@ public class StdUserDataArray extends StdDataArray {
         StdUserDataArray other = (StdUserDataArray) obj;
 
         if ( !stdMsgList.equals(other.stdMsgList) )
-            return false;
-        if ( woceAutocheckIndex != other.woceAutocheckIndex )
             return false;
         if ( !Arrays.equals(standardized, other.standardized) )
             return false;
