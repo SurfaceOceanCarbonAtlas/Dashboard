@@ -55,7 +55,6 @@ public class DashboardConfigStore {
     private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
     private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
     private static final String DATA_FILES_DIR_NAME_TAG = "DataFilesDir";
-    private static final String RAW_UPLOAD_FILES_DIR_NAME_TAG = "UploadFilesDir";
     private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
     private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
     private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
@@ -71,7 +70,7 @@ public class DashboardConfigStore {
     private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
     private static final String METADATA_TYPES_PROPS_FILE_TAG = "MetadataTypesFile";
     private static final String DATA_TYPES_PROPS_FILE_TAG = "DataTypesFile";
-    private static final String COLUMN_NAME_TYPE_FILE_TAG = "ColumnNameTypeFile";
+    private static final String DEFAULT_TYPE_KEYS_FILE_TAG = "DefaultTypeKeysFile";
     private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
     private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
     private static final String SPELLING_CONFIG_FILE_NAME_TAG = "SpellingConfigFile";
@@ -101,7 +100,7 @@ public class DashboardConfigStore {
                     USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
                     METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
                     DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
-                    COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
+                    DEFAULT_TYPE_KEYS_FILE_TAG + "=/Path/To/To/TypeNameKeys/PropsFile \n" +
                     FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
                     DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" +
                     SPELLING_CONFIG_FILE_NAME_TAG + "=/Path/To/SpellingConfig/TSVFile \n" +
@@ -343,11 +342,11 @@ public class DashboardConfigStore {
         }
 
         // Read the name of the default-column-names-to-types-with-units configuration file
-        String colNamesToTypesFilename;
+        String nameKeysToColumnTypesFilename;
         try {
-            colNamesToTypesFilename = getFilePathProperty(configProps, COLUMN_NAME_TYPE_FILE_TAG, appConfigDir);
+            nameKeysToColumnTypesFilename = getFilePathProperty(configProps, DEFAULT_TYPE_KEYS_FILE_TAG, appConfigDir);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + COLUMN_NAME_TYPE_FILE_TAG + " value specified in " +
+            throw new IOException("Invalid " + DEFAULT_TYPE_KEYS_FILE_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
 
@@ -355,7 +354,7 @@ public class DashboardConfigStore {
         try {
             propVal = getFilePathProperty(configProps, USER_FILES_DIR_NAME_TAG, appConfigDir);
             userFileHandler = new UserFileHandler(propVal, svnUsername, svnPassword,
-                    colNamesToTypesFilename, knownUserDataTypes);
+                    nameKeysToColumnTypesFilename, knownUserDataTypes);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
