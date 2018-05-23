@@ -10,9 +10,9 @@ import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.RowColumn;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import gov.noaa.pmel.dashboard.test.datatype.KnownDataTypesTest;
@@ -20,8 +20,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test of the methods in {@link DatasetChecker}
@@ -37,7 +39,7 @@ public class DatasetCheckerTest {
      * and {@link DatasetChecker#standardizeDataset(DashboardDatasetData, DsgMetadata)
      */
     @Test
-    public void testDatasetChecker() throws Exception {
+    public void testDatasetChecker() {
         CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
@@ -110,20 +112,32 @@ public class DatasetCheckerTest {
         // TODO: add metadata - verify values assigned from data
         StdUserDataArray badStdUserData = dataChecker.standardizeDataset(badDataset, null);
         ArrayList<ADCMessage> badMsgList = badStdUserData.getStandardizationMessages();
-        assertEquals(8, badMsgList.size());
+        // Invalid time (Feb 31) in row 3, invalid latitudes (>90) in rows 3-9
+        HashSet<RowColumn> expected = new HashSet<RowColumn>(Arrays.asList(
+                new RowColumn(3, 4),
+                new RowColumn(3, 5),
+                new RowColumn(3, 6),
+                new RowColumn(3, 7),
+                new RowColumn(3, 8),
+                new RowColumn(3, 9),
+                new RowColumn(3, 11),
+                new RowColumn(4, 11),
+                new RowColumn(5, 11),
+                new RowColumn(6, 11),
+                new RowColumn(7, 11),
+                new RowColumn(8, 11),
+                new RowColumn(9, 11)
+        ));
+        // The invalid time gives both bad time and mis-ordered messages for each date/time column
+        // (not great, but okay for now)
+        assertEquals(expected.size() + 6, badMsgList.size());
         for (int k = 0; k < badMsgList.size(); k++) {
             ADCMessage msg = badMsgList.get(k);
             assertEquals(Severity.CRITICAL, msg.getSeverity());
-            if ( k == 0 ) {
-                // Invalid time (Feb 31)
-                assertEquals(Integer.valueOf(3), msg.getRowNumber());
-                assertEquals(DashboardUtils.INT_MISSING_VALUE, msg.getColNumber());
-            }
-            else {
-                // Invalid latitudes
-                assertEquals(Integer.valueOf(k + 2), msg.getRowNumber());
-                assertEquals(Integer.valueOf(11), msg.getColNumber());
-            }
+            Integer rownum = msg.getRowNumber();
+            Integer colnum = msg.getColNumber();
+            RowColumn rowcol = new RowColumn(rownum, colnum);
+            assertTrue(expected.contains(rowcol));
         }
 
 /*
@@ -154,11 +168,11 @@ public class DatasetCheckerTest {
         // TODO: add metadata - verify values assigned from data
         StdUserDataArray dupsStdUserData = dataChecker.standardizeDataset(dupsDataset, null);
         ArrayList<ADCMessage> dupsMsgList = dupsStdUserData.getStandardizationMessages();
+
         assertEquals(1, dupsMsgList.size());
         for (ADCMessage msg : dupsMsgList) {
             assertEquals(Severity.ERROR, msg.getSeverity());
         }
-
     }
 
     private static final ArrayList<DataColumnType> gqbDataColTypes = new ArrayList<DataColumnType>(Arrays.asList(

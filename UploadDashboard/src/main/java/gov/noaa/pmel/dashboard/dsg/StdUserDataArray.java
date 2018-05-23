@@ -261,7 +261,7 @@ public class StdUserDataArray extends StdDataArray {
                         msg.setRowNumber(j + 1);
                         msg.setColNumber(indicesForTime[k] + 1);
                         msg.setColName(userColNames[indicesForTime[k]]);
-                        String comment = "incomplete sample date/time specification";
+                        String comment = "invalid sample date/time specification";
                         msg.setGeneralComment(comment);
                         msg.setDetailedComment(comment);
                         stdMsgList.add(msg);
@@ -271,7 +271,7 @@ public class StdUserDataArray extends StdDataArray {
         } catch ( Exception ex ) {
             ADCMessage msg = new ADCMessage();
             msg.setSeverity(Severity.CRITICAL);
-            String comment = "incomplete columns specifying sample date/time";
+            String comment = "missing columns for sample date/time specification";
             msg.setGeneralComment(comment);
             msg.setDetailedComment(comment);
             stdMsgList.add(msg);
@@ -288,43 +288,16 @@ public class StdUserDataArray extends StdDataArray {
      *         sample times to be used for this data array
      */
     public void checkDataOrder(Double[] times) {
-        Double[] longitudes;
-        try {
-            longitudes = getSampleLongitudes();
-        } catch ( Exception ex ) {
-            longitudes = null;
-        }
-        Double[] latitudes;
-        try {
-            latitudes = getSampleLatitudes();
-        } catch ( Exception ex ) {
-            latitudes = null;
-        }
-        Double[] depths;
-        try {
-            depths = getSampleDepths();
-        } catch ( Exception ex ) {
-            depths = null;
-        }
-
         TreeSet<DataLocation> orderedSet = new TreeSet<DataLocation>();
         for (int rowIdx = 0; rowIdx < numSamples; rowIdx++) {
-            DataLocation dataLoc = new DataLocation();
-            if ( longitudes != null )
-                dataLoc.setLongitude(longitudes[rowIdx]);
-            if ( latitudes != null )
-                dataLoc.setLatitude(latitudes[rowIdx]);
-            if ( depths != null )
-                dataLoc.setDepth(depths[rowIdx]);
-            if ( times != null ) {
-                Double timeValSecs = times[rowIdx];
-                if ( timeValSecs != null )
-                    dataLoc.setDataDate(new Date(Math.round(timeValSecs * 1000.0)));
+            if ( times[rowIdx] != null ) {
+                // Using DataLocation just as a row number - time pair
+                DataLocation dataLoc = new DataLocation();
+                dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
+                dataLoc.setRowNumber(rowIdx + 1);
+                if ( !orderedSet.add(dataLoc) )
+                    throw new RuntimeException("Unexpected duplicate data location with row number");
             }
-            dataLoc.setRowNumber(rowIdx + 1);
-            // Leave dataValue as the missing value and add to the ordered set
-            if ( !orderedSet.add(dataLoc) )
-                throw new RuntimeException("Unexpected duplicate data location with row number");
         }
 
         // TODO: needs a better method of figuring out which rows are actually misordered
@@ -334,7 +307,8 @@ public class StdUserDataArray extends StdDataArray {
         // The following will say:
         // 4,5,6 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
         // 1,2 are misordered in 3,4,1,2,5,6
-        HashSet<Integer> forwardErrs = new HashSet<Integer>();
+        // 3 is misordered in 1,2,4,5
+        TreeSet<Integer> forwardErrs = new TreeSet<Integer>();
         int expectedRowNum = 1;
         for (DataLocation dataLoc : orderedSet) {
             int actualRowNum = dataLoc.getRowNumber();
@@ -349,11 +323,12 @@ public class StdUserDataArray extends StdDataArray {
         // The following will say:
         // 7,8,9 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
         // 3,4 are misordered in 3,4,1,2,5,6
-        HashSet<Integer> reverseErrs = new HashSet<Integer>();
+        // 3 is misordered in 1,2,4,5
+        TreeSet<Integer> reverseErrs = new TreeSet<Integer>();
         expectedRowNum = numSamples;
         for (DataLocation dataLoc : orderedSet.descendingSet()) {
             int actualRowNum = dataLoc.getRowNumber();
-            if ( expectedRowNum > actualRowNum ) {
+            while ( expectedRowNum > actualRowNum ) {
                 reverseErrs.add(expectedRowNum);
                 expectedRowNum -= 1;
             }
@@ -362,14 +337,14 @@ public class StdUserDataArray extends StdDataArray {
             }
         }
         // Guess that the set with fewer errors is the correct one
-        HashSet<Integer> errorRowsNums = (forwardErrs.size() <= reverseErrs.size()) ? forwardErrs : reverseErrs;
-        for (int j = 0; j < errorRowsNums.size(); j++) {
-            for (int k = 0; k < indicesForTime.length; k++) {
+        TreeSet<Integer> errorRowsNums = (forwardErrs.size() <= reverseErrs.size()) ? forwardErrs : reverseErrs;
+        for (Integer rowNum : errorRowsNums) {
+            for (Integer colIdx : indicesForTime) {
                 ADCMessage msg = new ADCMessage();
                 msg.setSeverity(Severity.CRITICAL);
-                msg.setRowNumber(j + 1);
-                msg.setColNumber(indicesForTime[k] + 1);
-                msg.setColName(userColNames[indicesForTime[k]]);
+                msg.setRowNumber(rowNum);
+                msg.setColNumber(colIdx + 1);
+                msg.setColName(userColNames[colIdx]);
                 String comment = "time-misordered data row";
                 msg.setGeneralComment(comment);
                 msg.setDetailedComment(comment);
