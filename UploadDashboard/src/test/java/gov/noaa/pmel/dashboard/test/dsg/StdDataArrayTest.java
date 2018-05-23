@@ -153,13 +153,6 @@ public class StdDataArrayTest {
             assertEquals(j + 1, ((Integer) stdData.getStdVal(j, idx)).intValue());
         }
 
-        // WOCE_AUTOCHECK values are still all default values despite errors
-        // (still need to process the messages generated)
-        idx = dataTypes.indexOf(DashboardServerUtils.WOCE_AUTOCHECK);
-        for (int j = 0; j < numRows; j++) {
-            assertEquals(DashboardServerUtils.WOCE_ACCEPTABLE, (String) stdData.getStdVal(j, idx));
-        }
-
         ArrayList<ArrayList<String>> subset = new ArrayList<ArrayList<String>>(
                 DATA_VALUE_STRINGS.subList(3, DATA_VALUE_STRINGS.size()));
         dataset.setDataValues(subset);
@@ -489,7 +482,7 @@ public class StdDataArrayTest {
         }
     }
 
-    // StdUserDataArray constructor adds SAMPLE_NUMBER and WOCE_AUTOCHECK
+    // StdUserDataArray constructor adds SAMPLE_NUMBER
     private static final ArrayList<DashDataType<?>> DATA_COLUMN_DASH_TYPES = new ArrayList<DashDataType<?>>(
             Arrays.asList(
                     DashboardServerUtils.SAMPLE_DEPTH,
@@ -508,8 +501,7 @@ public class StdDataArrayTest {
                     SocatTypes.PCO2_WATER_TEQU_WET,
                     SocatTypes.PATM,
                     KnownDataTypesTest.SHIP_SPEED,
-                    DashboardServerUtils.SAMPLE_NUMBER,
-                    DashboardServerUtils.WOCE_AUTOCHECK
+                    DashboardServerUtils.SAMPLE_NUMBER
             ));
 
     private static final ArrayList<DataColumnType> DATA_COLUMN_TYPES = new ArrayList<DataColumnType>(Arrays.asList(

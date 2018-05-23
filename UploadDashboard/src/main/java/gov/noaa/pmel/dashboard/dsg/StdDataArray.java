@@ -76,7 +76,7 @@ public class StdDataArray {
         numDataCols = dataColumnTypes.size();
         numSamples = 0;
 
-        dataTypes = new DashDataType<?>[numDataCols + 2];
+        dataTypes = new DashDataType<?>[numDataCols + 1];
         stdObjects = null;
 
         for (int k = 0; k < numDataCols; k++) {

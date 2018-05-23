@@ -172,36 +172,39 @@ public class QCFlagTest {
 
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-
+        second.setFlagName("QC_Patm");
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
         second.setFlagName("WOCE_CO2_atm");
+
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setFlagValue("4");
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-
         second.setFlagValue("3");
+
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setSeverity(QCFlag.Severity.ERROR);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-
         second.setSeverity(QCFlag.Severity.WARNING);
+
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setColumnIndex(6);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-
         second.setColumnIndex(5);
+
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setRowIndex(35);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-
         second.setRowIndex(25);
+
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
     }

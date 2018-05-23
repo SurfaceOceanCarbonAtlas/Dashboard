@@ -17,6 +17,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.server.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.QCEvent;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
@@ -25,7 +26,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -171,8 +171,8 @@ public class DatasetSubmitter {
                         continue;
                     }
 
-                    // Transfer the automated data checker data QC flags to the appropriate data QC column
-                    transferAutomaticDataQC(userStdData);
+                    // Add the automated data checker data QC flags to the appropriate data QC columns
+                    userStdData.addAutomatedDataQC();
 
                     // Generate the NetCDF DSG file, enhanced by Ferret
                     logger.debug("Generating the full-data DSG file for " + datasetId);
@@ -294,18 +294,6 @@ public class DatasetSubmitter {
             }
             throw new IllegalArgumentException(sb.toString());
         }
-    }
-
-    /**
-     * Adds data QC flags derived from the messages from standardization and automated data checking
-     * to appropriate data QC columns in userStdData.
-     *
-     * @param userStdData
-     * standardized user data with messages from standardization and automated data checking
-     */
-    private void transferAutomaticDataQC(StdUserDataArray userStdData) {
-        ArrayList<ADCMessage> msgList = userStdData.getStandardizationMessages();
-        createMe;
     }
 
     /**

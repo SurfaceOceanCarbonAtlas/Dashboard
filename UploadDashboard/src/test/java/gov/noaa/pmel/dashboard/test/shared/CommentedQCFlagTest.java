@@ -163,7 +163,7 @@ public class CommentedQCFlagTest {
         // flag name first comparison
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
-        second.setFlagName("WOCE_Patm");
+        second.setFlagName("QC_Patm");
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setFlagName(MY_FLAG_NAME);

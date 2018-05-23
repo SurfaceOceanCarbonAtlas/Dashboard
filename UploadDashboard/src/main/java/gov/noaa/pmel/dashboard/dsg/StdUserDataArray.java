@@ -7,14 +7,16 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.datatype.ValueConverter;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.server.DataLocation;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.util.ArrayList;
@@ -433,6 +435,58 @@ public class StdUserDataArray extends StdDataArray {
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;
+    }
+
+    /**
+     * Adds data QC flags derived from the messages from standardization and automated data checking
+     * to appropriate data QC columns in userStdData.
+     */
+    public void addAutomatedDataQC() {
+        for (ADCMessage msg : stdMsgList) {
+            // Data QC always has a positive row number.  Dataset QC as well as general and summaries
+            // QC messages have a negative row number (DashboardUtils.INT_MISSING_VALUE)
+            int rowNum = msg.getRowNumber();
+            if ( rowNum <= 0 )
+                continue;
+
+            // TODO: in the general case, get the correct data QC column and flag value
+            String flagValue;
+            QCFlag.Severity severity = msg.getSeverity();
+            switch ( severity ) {
+                case UNASSIGNED:
+                case ACCEPTABLE:
+                    flagValue = "";
+                    break;
+                case WARNING:
+                    // flagValue = DashboardServerUtils.WOCE_QUESTIONABLE;
+                    // Ignore automated data checker warnings as the are just pointing out
+                    // potential issues which may not be a problem or have any consequence
+                    flagValue = "";
+                    break;
+                case ERROR:
+                case CRITICAL:
+                    flagValue = DashboardServerUtils.WOCE_BAD;
+                    break;
+                default:
+                    throw new IllegalArgumentException("unexpected messages severity of " + severity);
+            }
+            if ( flagValue.isEmpty() )
+                continue;
+
+            // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
+            int qcColIdx = 0;
+            for (DashDataType<?> dtype : dataTypes) {
+                if ( dtype.typeNameEquals(SocatTypes.WOCE_CO2_WATER) ) {
+                    break;
+                }
+                qcColIdx++;
+            }
+            if ( qcColIdx >= dataTypes.length )
+                throw new RuntimeException("WOCE_CO2_water not found in StdUserDataArray.addAutomatedDataQC");
+
+            // Do not worry about any existing flags as this is always a WOCE-4, and thus, more severe
+            stdObjects[rowNum - 1][qcColIdx] = flagValue;
+        }
     }
 
     /**
