@@ -53,8 +53,8 @@ public class StdDataArray {
     protected int[] indicesForTime;
 
     /**
-     * Create and assign the 1-D arrays of data column types from the given user's descriptions of the data column.
-     * Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and
+     * Create and assign the 1-D arrays of data column types from the given user's descriptions
+     * of the data column.  Appends the non-user types {@link DashboardServerUtils#SAMPLE_NUMBER} and
      * {@link DashboardServerUtils#WOCE_AUTOCHECK}.  The 2-D array of standard data objects is not created.
      *
      * @param dataColumnTypes
@@ -83,13 +83,13 @@ public class StdDataArray {
             DataColumnType dataColType = dataColumnTypes.get(k);
             dataTypes[k] = knownTypes.getDataType(dataColType);
             if ( dataTypes[k] == null )
-                throw new IllegalArgumentException("unknown data column type: " +
-                        dataColType.getDisplayName());
+                throw new IllegalArgumentException("unknown data column type: " + dataColType.getDisplayName());
         }
         dataTypes[numDataCols] = DashboardServerUtils.SAMPLE_NUMBER;
         dataTypes[numDataCols + 1] = DashboardServerUtils.WOCE_AUTOCHECK;
         numDataCols += 2;
 
+        // UNKNOWN and duplicates can be present so ignore the return value of the following method
         assignColumnIndicesOfInterest();
     }
 
@@ -108,8 +108,9 @@ public class StdDataArray {
      * @throws IllegalArgumentException
      *         if not data column types are given, if a data column type is not a known subclass type,
      *         if no data values are given, if the number of data columns in the array of data values
-     *         does not match the number of data column types, or if a data value object is not an
-     *         appropriate object for the data column type
+     *         does not match the number of data column types, if a data value object is not an
+     *         appropriate object for the data column type, if a data column type is the "UNKNOWN"
+     *         type or occurs more that one.
      */
     public StdDataArray(DashDataType<?>[] dataColumnTypes, Object[][] stdDataValues)
             throws IllegalArgumentException {
@@ -174,16 +175,18 @@ public class StdDataArray {
             }
         }
 
-        assignColumnIndicesOfInterest();
+        // Get column indices and check for UNKNOWN (return null) and duplicates (return true)
+        if ( ! Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
+            throw new IllegalArgumentException("unknown or duplicated data column type");
     }
 
     /**
-     * Creates with the standardized data file types and values in the given user standard data array.  The methods
-     * {@link #getSampleLongitudes()}, {@link #getSampleLatitudes()}, {@link #getSampleDepths()}, and {@link
-     * #getSampleTimes()} on the standardized user data must succeed and return arrays with no null (missing) values. No
-     * data column can be the type {@link DashboardServerUtils#UNKNOWN}.  Only those data columns matching one of the
-     * given known data files types is copied from the standardized user data.  The following data columns will be added
-     * and assigned if not already present:
+     * Creates with the standardized data file types and values in the given user standard data array.
+     * The methods {@link #getSampleLongitudes()}, {@link #getSampleLatitudes()}, {@link #getSampleDepths()},
+     * and {@link #calcSampleTimes()} on the standardized user data must succeed and return arrays with no null
+     * (missing) values. No data column can be the type {@link DashboardServerUtils#UNKNOWN}.  Only those data
+     * columns matching one of the given known data files types is copied from the standardized user data.
+     * The following data columns will be added and assigned if not already present:
      * <ul>
      * <li>{@link DashboardServerUtils#YEAR}</li>
      * <li>{@link DashboardServerUtils#MONTH_OF_YEAR}</li>
@@ -193,8 +196,9 @@ public class StdDataArray {
      * <li>{@link DashboardServerUtils#SECOND_OF_MINUTE}</li>
      * <li>{@link DashboardServerUtils#TIME}</li>
      * </ul>
-     * (TIME should always added and assigned since it is not a user provided type.) If the time to the seconds is not
-     * provided, the seconds values are all set to zero and the added SECOND_OF_MINUTE column added will be all zeros.
+     * (TIME should always be added and assigned since it is not a user provided type.) If the time to the seconds
+     * is not provided, the seconds values are all set to zero and the added SECOND_OF_MINUTE column added will be
+     * all zeros.
      *
      * @param userStdData
      *         standardized user data values
@@ -202,9 +206,10 @@ public class StdDataArray {
      *         known data file column types
      *
      * @throws IllegalArgumentException
-     *         if no standard user data values are given, if any of the user data types is {@link
-     *         DashboardServerUtils#UNKNOWN} if any sample longitude, latitude, sample depth is missing, or if any
-     *         sample time cannot be computed.
+     *         if no standard user data values are given,
+     *         if any of the user data types is {@link DashboardServerUtils#UNKNOWN},
+     *         if any sample longitude or latitude is missing, or
+     *         if any sample time cannot be computed.
      */
     public StdDataArray(StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
             throws IllegalArgumentException {
@@ -226,7 +231,7 @@ public class StdDataArray {
                 if ( value == null )
                     throw new IllegalArgumentException("a latitude value is missing");
             }
-            timeVals = userStdData.getSampleTimes();
+            timeVals = userStdData.calcSampleTimes();
             for (Double value : timeVals) {
                 if ( value == null )
                     throw new IllegalArgumentException("a sample date/time value is missing");
@@ -345,64 +350,122 @@ public class StdDataArray {
             }
         }
 
-        assignColumnIndicesOfInterest();
+        // Get column indices and check for UNKNOWN (return null) and duplicates (return true)
+        if ( ! Boolean.FALSE.equals(assignColumnIndicesOfInterest()) )
+            throw new IllegalArgumentException("unknown or duplicated data column type");
     }
 
     /**
      * Assigns the data column indices of interest (longitude, latitude, sample depth, and various time types) from the
      * assigned types of the data columns.
+     *
+     * @return null if the data column type "UNKNOWN" is present; otherwise,
+     *         if there are any duplicate data column types other than "OTHER".
      */
-    private void assignColumnIndicesOfInterest() {
+    private Boolean assignColumnIndicesOfInterest() {
+        Boolean hasDups = false;
         typeNameIndexMap = new HashMap<String,Integer>(64);
-        longitudeIndex = DashboardUtils.INT_MISSING_VALUE;
-        latitudeIndex = DashboardUtils.INT_MISSING_VALUE;
-        sampleDepthIndex = DashboardUtils.INT_MISSING_VALUE;
-        timestampIndex = DashboardUtils.INT_MISSING_VALUE;
-        dateIndex = DashboardUtils.INT_MISSING_VALUE;
-        yearIndex = DashboardUtils.INT_MISSING_VALUE;
-        monthOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
-        dayOfMonthIndex = DashboardUtils.INT_MISSING_VALUE;
-        timeOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
-        hourOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
-        minuteOfHourIndex = DashboardUtils.INT_MISSING_VALUE;
-        secondOfMinuteIndex = DashboardUtils.INT_MISSING_VALUE;
-        dayOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
-        secondOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
         for (int k = 0; k < numDataCols; k++) {
+            // Ignore UNKNOWN type other that resetting the return value
+            if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dataTypes[k]) )
+                hasDups = null;
+            // Completely ignore datatype OTHER
+            if ( DashboardServerUtils.OTHER.typeNameEquals(dataTypes[k]) )
+                continue;
+            // Otherwise map the data type variable name to data column index
             if ( typeNameIndexMap.put(dataTypes[k].getVarName(), k) != null )
-                throw new IllegalArgumentException("Unexpected duplicate data column type variable name" +
-                        dataTypes[k].getVarName());
-            if ( DashboardServerUtils.LONGITUDE.typeNameEquals(dataTypes[k]) )
-                longitudeIndex = k;
-            else if ( DashboardServerUtils.LATITUDE.typeNameEquals(dataTypes[k]) )
-                latitudeIndex = k;
-            else if ( DashboardServerUtils.SAMPLE_DEPTH.typeNameEquals(dataTypes[k]) )
-                sampleDepthIndex = k;
-            else if ( DashboardServerUtils.TIMESTAMP.typeNameEquals(dataTypes[k]) )
-                timestampIndex = k;
-            else if ( DashboardServerUtils.DATE.typeNameEquals(dataTypes[k]) )
-                dateIndex = k;
-            else if ( DashboardServerUtils.YEAR.typeNameEquals(dataTypes[k]) )
-                yearIndex = k;
-            else if ( DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataTypes[k]) )
-                monthOfYearIndex = k;
-            else if ( DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataTypes[k]) )
-                dayOfMonthIndex = k;
-            else if ( DashboardServerUtils.TIME_OF_DAY.typeNameEquals(dataTypes[k]) )
-                timeOfDayIndex = k;
-            else if ( DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataTypes[k]) )
-                hourOfDayIndex = k;
-            else if ( DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataTypes[k]) )
-                minuteOfHourIndex = k;
-            else if ( DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataTypes[k]) )
-                secondOfMinuteIndex = k;
-            else if ( DashboardServerUtils.DAY_OF_YEAR.typeNameEquals(dataTypes[k]) )
-                dayOfYearIndex = k;
-            else if ( DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(dataTypes[k]) )
-                secondOfDayIndex = k;
+                hasDups = true;
         }
-        // indices for time assigned when getSampleTimes called
+
+        // explicitly save the indices of some commonly referenced data column types
+        Integer value = typeNameIndexMap.get(DashboardServerUtils.LONGITUDE.getVarName());
+        if ( value != null )
+            longitudeIndex = value;
+        else
+            longitudeIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.LATITUDE.getVarName());
+        if ( value != null )
+            latitudeIndex = value;
+        else
+            latitudeIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.SAMPLE_DEPTH.getVarName());
+        if ( value != null )
+            sampleDepthIndex = value;
+        else
+            sampleDepthIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.TIMESTAMP.getVarName());
+        if ( value != null )
+            timestampIndex = value;
+        else
+            timestampIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.DATE.getVarName());
+        if ( value != null )
+            dateIndex = value;
+        else
+            dateIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.YEAR.getVarName());
+        if ( value != null )
+            yearIndex = value;
+        else
+            yearIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.MONTH_OF_YEAR.getVarName());
+        if ( value != null )
+            monthOfYearIndex = value;
+        else
+            monthOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.DAY_OF_MONTH.getVarName());
+        if ( value != null )
+            dayOfMonthIndex = value;
+        else
+            dayOfMonthIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.TIME_OF_DAY.getVarName());
+        if ( value != null )
+            timeOfDayIndex = value;
+        else
+            timeOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.HOUR_OF_DAY.getVarName());
+        if ( value != null )
+            hourOfDayIndex = value;
+        else
+            hourOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.MINUTE_OF_HOUR.getVarName());
+        if ( value != null )
+            minuteOfHourIndex = value;
+        else
+            minuteOfHourIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.SECOND_OF_MINUTE.getVarName());
+        if ( value != null )
+            secondOfMinuteIndex = value;
+        else
+            secondOfMinuteIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.DAY_OF_YEAR.getVarName());
+        if ( value != null )
+            dayOfYearIndex = value;
+        else
+            dayOfYearIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        value = typeNameIndexMap.get(DashboardServerUtils.SECOND_OF_DAY.getVarName());
+        if ( value != null )
+            secondOfDayIndex = value;
+        else
+            secondOfDayIndex = DashboardUtils.INT_MISSING_VALUE;
+
+        // indices for time assigned when calcSampleTimes called
         indicesForTime = null;
+
+        return hasDups;
     }
 
     /**
@@ -529,7 +592,7 @@ public class StdDataArray {
      * @throws IllegalStateException
      *         if specification of the sample date and time is incomplete
      */
-    public Double[] getSampleTimes() throws IllegalStateException {
+    public Double[] calcSampleTimes() throws IllegalStateException {
         GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         cal.setLenient(false);
         Double[] sampleTimes = new Double[numSamples];

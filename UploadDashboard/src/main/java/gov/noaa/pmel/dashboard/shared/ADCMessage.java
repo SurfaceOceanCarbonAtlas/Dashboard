@@ -19,10 +19,6 @@ public class ADCMessage implements Serializable, IsSerializable {
 
     protected Severity severity;
     protected Integer rowNumber;
-    protected Double longitude;
-    protected Double latitude;
-    protected Double depth;
-    protected String timestamp;
     protected Integer colNumber;
     protected String colName;
     protected String generalComment;
@@ -34,10 +30,6 @@ public class ADCMessage implements Serializable, IsSerializable {
     public ADCMessage() {
         severity = Severity.UNASSIGNED;
         rowNumber = DashboardUtils.INT_MISSING_VALUE;
-        longitude = DashboardUtils.FP_MISSING_VALUE;
-        latitude = DashboardUtils.FP_MISSING_VALUE;
-        depth = DashboardUtils.FP_MISSING_VALUE;
-        timestamp = DashboardUtils.STRING_MISSING_VALUE;
         colNumber = DashboardUtils.INT_MISSING_VALUE;
         colName = DashboardUtils.STRING_MISSING_VALUE;
         generalComment = DashboardUtils.STRING_MISSING_VALUE;
@@ -79,84 +71,6 @@ public class ADCMessage implements Serializable, IsSerializable {
             this.rowNumber = DashboardUtils.INT_MISSING_VALUE;
         else
             this.rowNumber = rowNumber;
-    }
-
-    /**
-     * @return the longitude; never null, but may be {@link DashboardUtils#FP_MISSING_VALUE} if not available.
-     */
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    /**
-     * @param longitude
-     *         the longitude to set; if null or invalid (not in [-540,540]),
-     *         {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
-     */
-    public void setLongitude(Double longitude) {
-        if ( (longitude == null) || longitude.isInfinite() || longitude.isNaN() ||
-                (longitude < -540.0) || (longitude > 540.0) )
-            this.longitude = DashboardUtils.FP_MISSING_VALUE;
-        else
-            this.longitude = longitude;
-    }
-
-    /**
-     * @return the latitude; never null, but may be {@link DashboardUtils#FP_MISSING_VALUE} if not available.
-     */
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    /**
-     * @param latitude
-     *         the latitude to set; if null or invalid (not in [-90,90]),
-     *         {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
-     */
-    public void setLatitude(Double latitude) {
-        if ( (latitude == null) || latitude.isInfinite() || latitude.isNaN() ||
-                (latitude < -90.0) || (latitude > 90.0) )
-            this.latitude = DashboardUtils.FP_MISSING_VALUE;
-        else
-            this.latitude = latitude;
-    }
-
-    /**
-     * @return the sample depth; never null, but may be {@link DashboardUtils#FP_MISSING_VALUE} if not available.
-     */
-    public Double getDepth() {
-        return depth;
-    }
-
-    /**
-     * @param depth
-     *         the sample depth to set; if null or invalid (not in [0,16000]),
-     *         {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
-     */
-    public void setDepth(Double depth) {
-        if ( (depth == null) || depth.isInfinite() || depth.isNaN() ||
-                (depth < 0.0) || (depth > 16000) )
-            this.depth = DashboardUtils.FP_MISSING_VALUE;
-        else
-            this.depth = depth;
-    }
-
-    /**
-     * @return the timestamp; never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not available.
-     */
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * @param timestamp
-     *         the timestamp to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned.
-     */
-    public void setTimestamp(String timestamp) {
-        if ( timestamp == null )
-            this.timestamp = DashboardUtils.STRING_MISSING_VALUE;
-        else
-            this.timestamp = timestamp;
     }
 
     /**
@@ -243,7 +157,6 @@ public class ADCMessage implements Serializable, IsSerializable {
         final int prime = 37;
         int result = severity.hashCode();
         result = result * prime + rowNumber.hashCode();
-        result = result * prime + timestamp.hashCode();
         result = result * prime + colNumber.hashCode();
         result = result * prime + colName.hashCode();
         result = result * prime + generalComment.hashCode();
@@ -268,8 +181,6 @@ public class ADCMessage implements Serializable, IsSerializable {
             return false;
         if ( !rowNumber.equals(other.rowNumber) )
             return false;
-        if ( !timestamp.equals(other.timestamp) )
-            return false;
         if ( !colNumber.equals(other.colNumber) )
             return false;
         if ( !colName.equals(other.colName) )
@@ -277,12 +188,6 @@ public class ADCMessage implements Serializable, IsSerializable {
         if ( !generalComment.equals(other.generalComment) )
             return false;
         if ( !detailedComment.equals(other.detailedComment) )
-            return false;
-        if ( !DashboardUtils.closeTo(depth, other.depth, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-            return false;
-        if ( !DashboardUtils.closeTo(latitude, other.latitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-            return false;
-        if ( !DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
 
         return true;
@@ -292,10 +197,6 @@ public class ADCMessage implements Serializable, IsSerializable {
     public String toString() {
         return "ADCMessage[severity=" + severity.toString() +
                 ", rowNumber=" + rowNumber.toString() +
-                ", longitude=" + longitude.toString() +
-                ", latitude=" + latitude.toString() +
-                ", depth=" + depth.toString() +
-                ", timestamp=" + timestamp +
                 ", colNumber=" + colNumber.toString() +
                 ", colName=" + colName +
                 ", generalComment=" + generalComment +

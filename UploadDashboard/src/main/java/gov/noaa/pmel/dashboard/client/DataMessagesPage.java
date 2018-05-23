@@ -52,9 +52,6 @@ public class DataMessagesPage extends CompositeWithUsername {
     private static final String COLUMN_NUMBER_COLUMN_NAME = "Col.";
     private static final String COLUMN_NAME_COLUMN_NAME = "Column Name";
     private static final String ROW_NUMBER_COLUMN_NAME = "Row";
-    private static final String TIMESTAMP_COLUMN_NAME = "Time";
-    private static final String LONGITUDE_COLUMN_NAME = "Lon.";
-    private static final String LATITUDE_COLUMN_NAME = "Lat.";
     private static final String EXPLANATION_COLUMN_NAME = "Explanation";
 
     private static final String ERROR_SEVERITY_TEXT = "Error";
@@ -163,7 +160,7 @@ public class DataMessagesPage extends CompositeWithUsername {
     /**
      * Update the automated data checker messages with that given in the provided ADCMessageList.
      *
-     * @param msgList
+     * @param msgs
      *         cruise dataset and set of messages to show
      */
     private void updateMessages(ADCMessageList msgs) {
@@ -192,18 +189,12 @@ public class DataMessagesPage extends CompositeWithUsername {
         TextColumn<ADCMessage> colNumColumn = buildColNumColumn();
         TextColumn<ADCMessage> colNameColumn = buildColNameColumn();
         TextColumn<ADCMessage> rowNumColumn = buildRowNumColumn();
-        TextColumn<ADCMessage> timestampColumn = buildTimestampColumn();
-        TextColumn<ADCMessage> longitudeColumn = buildLongitudeColumn();
-        TextColumn<ADCMessage> latitudeColumn = buildLatitudeColumn();
         TextColumn<ADCMessage> explanationColumn = buildExplanationColumn();
 
         messagesGrid.addColumn(severityColumn, SEVERITY_COLUMN_NAME);
         messagesGrid.addColumn(colNumColumn, COLUMN_NUMBER_COLUMN_NAME);
         messagesGrid.addColumn(colNameColumn, COLUMN_NAME_COLUMN_NAME);
         messagesGrid.addColumn(rowNumColumn, ROW_NUMBER_COLUMN_NAME);
-        messagesGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
-        messagesGrid.addColumn(longitudeColumn, LONGITUDE_COLUMN_NAME);
-        messagesGrid.addColumn(latitudeColumn, LATITUDE_COLUMN_NAME);
         messagesGrid.addColumn(explanationColumn, EXPLANATION_COLUMN_NAME);
 
         // Set the minimum widths of the columns
@@ -218,15 +209,6 @@ public class DataMessagesPage extends CompositeWithUsername {
                 UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(rowNumColumn,
-                UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(timestampColumn,
-                UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(longitudeColumn,
-                UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(latitudeColumn,
                 UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(explanationColumn,
@@ -245,9 +227,6 @@ public class DataMessagesPage extends CompositeWithUsername {
         colNumColumn.setSortable(true);
         colNameColumn.setSortable(true);
         rowNumColumn.setSortable(true);
-        timestampColumn.setSortable(true);
-        longitudeColumn.setSortable(true);
-        latitudeColumn.setSortable(true);
         explanationColumn.setSortable(true);
 
         // Add a column sorting handler for these columns
@@ -256,9 +235,6 @@ public class DataMessagesPage extends CompositeWithUsername {
         columnSortHandler.setComparator(colNumColumn, DashboardUtils.colNumComparator);
         columnSortHandler.setComparator(colNameColumn, DashboardUtils.colNameComparator);
         columnSortHandler.setComparator(rowNumColumn, DashboardUtils.rowNumComparator);
-        columnSortHandler.setComparator(timestampColumn, DashboardUtils.timestampComparator);
-        columnSortHandler.setComparator(longitudeColumn, DashboardUtils.longitudeComparator);
-        columnSortHandler.setComparator(latitudeColumn, DashboardUtils.latitudeComparator);
         columnSortHandler.setComparator(explanationColumn, DashboardUtils.explanationComparator);
 
         // Add the sort handler to the table, setting the default sorting
@@ -279,8 +255,6 @@ public class DataMessagesPage extends CompositeWithUsername {
 
     private static final NumberFormat INT_NUMBER_FORMAT = NumberFormat.getFormat(
             NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(0);
-    private static final NumberFormat FLT_NUMBER_FORMAT = NumberFormat.getFormat(
-            NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(4);
 
     private TextColumn<ADCMessage> buildSeverityColumn() {
         return new TextColumn<ADCMessage>() {
@@ -327,39 +301,6 @@ public class DataMessagesPage extends CompositeWithUsername {
                 if ( (msg == null) || (msg.getRowNumber() <= 0) )
                     return "";
                 return INT_NUMBER_FORMAT.format(msg.getRowNumber());
-            }
-        };
-    }
-
-    private TextColumn<ADCMessage> buildTimestampColumn() {
-        return new TextColumn<ADCMessage>() {
-            @Override
-            public String getValue(ADCMessage msg) {
-                if ( msg == null )
-                    return "";
-                return msg.getTimestamp();
-            }
-        };
-    }
-
-    private TextColumn<ADCMessage> buildLongitudeColumn() {
-        return new TextColumn<ADCMessage>() {
-            @Override
-            public String getValue(ADCMessage msg) {
-                if ( (msg == null) || Double.isNaN(msg.getLongitude()) )
-                    return "";
-                return FLT_NUMBER_FORMAT.format(msg.getLongitude());
-            }
-        };
-    }
-
-    private TextColumn<ADCMessage> buildLatitudeColumn() {
-        return new TextColumn<ADCMessage>() {
-            @Override
-            public String getValue(ADCMessage msg) {
-                if ( (msg == null) || Double.isNaN(msg.getLatitude()) )
-                    return "";
-                return FLT_NUMBER_FORMAT.format(msg.getLatitude());
             }
         };
     }

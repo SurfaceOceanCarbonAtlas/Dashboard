@@ -186,8 +186,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
         int result = flagName.hashCode();
         result = prime * result + flagValue.hashCode();
         result = prime * result + severity.hashCode();
-        result = prime * result + rowIndex.hashCode();
         result = prime * result + columnIndex.hashCode();
+        result = prime * result + rowIndex.hashCode();
         return result;
     }
 

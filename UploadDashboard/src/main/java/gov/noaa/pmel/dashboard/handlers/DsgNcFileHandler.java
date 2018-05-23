@@ -164,19 +164,16 @@ public class DsgNcFileHandler {
      *
      * @param metadata
      *         metadata for the dataset
-     * @param dataset
-     *         dataset with data to save
+     * @param stdUserData
+     *         standardized user-provided data
      *
      * @throws IllegalArgumentException
      *         if there are problems with the metadata or data given, or
      *         if there are problems creating or writing the full-data DSG file
      */
-    public void saveDatasetDsg(DsgMetadata metadata, DashboardDatasetData dataset) throws IllegalArgumentException {
+    public void saveDatasetDsg(DsgMetadata metadata, StdUserDataArray stdUserData) throws IllegalArgumentException {
         // Get the location and name for the NetCDF DSG file
-        DsgNcFile dsgFile = getDsgNcFile(dataset.getDatasetId());
-
-        // Convert the data strings into the appropriate type
-        StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
+        DsgNcFile dsgFile = getDsgNcFile(metadata.getDatasetId());
 
         // Create the NetCDF DSG file
         try {
@@ -191,7 +188,7 @@ public class DsgNcFileHandler {
         SocatTool tool = new SocatTool(ferretConfig);
         ArrayList<String> scriptArgs = new ArrayList<String>(1);
         scriptArgs.add(dsgFile.getPath());
-        tool.init(scriptArgs, dataset.getDatasetId(), FerretConfig.Action.COMPUTE);
+        tool.init(scriptArgs, metadata.getDatasetId(), FerretConfig.Action.COMPUTE);
         tool.run();
         if ( tool.hasError() )
             throw new IllegalArgumentException("Failure adding computed variables: " + tool.getErrorMessage());
@@ -512,6 +509,41 @@ public class DsgNcFileHandler {
             throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
         decDsgFile.updateDatasetQCFlag(qcEvent.getFlagValue(), qcEvent.getVersion());
         flagErddap(true, true);
+    }
+
+    /**
+     * Updates the all_region_ids metadata variable in the DSG files for the indicated dataset
+     * using the values in the region_id data variable in the full-data DSG file.
+     * ERDDAP is NOT flagged about this change.
+     *
+     * @param datasetId
+     *         update the all_region_ids metadata variable in the DSG files of the dataset with this ID
+     *
+     * @return the all_region_ids value assigned
+     */
+    public String updateAllRegionIds(String datasetId) {
+        // Compute and assign the all_region_ids variable from the full-data DSG file
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
+        if ( !dsgFile.exists() )
+            throw new IllegalArgumentException("DSG file for " + datasetId + " does not exist");
+        String allRegionIds;
+        try {
+            allRegionIds = dsgFile.updateAllRegionIDs(null);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(
+                    "Problems resetting all_region_ids in the full-data DSG file for " + datasetId);
+        }
+        // Assign this all_region_ids value to the decimated-data DSG file
+        DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
+        if ( !decDsgFile.exists() )
+            throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
+        try {
+            dsgFile.updateAllRegionIDs(allRegionIds);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(
+                    "Problems resetting all_region_ids in the full-data DSG file for " + datasetId);
+        }
+        return allRegionIds;
     }
 
 }

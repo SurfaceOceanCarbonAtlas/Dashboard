@@ -37,133 +37,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class StdDataArrayTest {
 
-    static final String NO_VALUE_ERRMSG = "no value given";
-    static final String INVALID_FP_VALUE_ERRMSG = "not a valid floating-point value";
+    private static final String NO_VALUE_ERRMSG = "no value given";
+    private static final String INVALID_FP_VALUE_ERRMSG = "not a valid floating-point value";
 
-    // StdUserDataArray constructor adds SAMPLE_NUMBER and WOCE_AUTOCHECK
-    static final ArrayList<DashDataType<?>> DATA_COLUMN_DASH_TYPES = new ArrayList<DashDataType<?>>(Arrays.asList(
-            DashboardServerUtils.SAMPLE_DEPTH,
-            DashboardServerUtils.DATASET_NAME,
-            DashboardServerUtils.PLATFORM_NAME,
-            DashboardServerUtils.MONTH_OF_YEAR,
-            DashboardServerUtils.DAY_OF_MONTH,
-            DashboardServerUtils.YEAR,
-            DashboardServerUtils.HOUR_OF_DAY,
-            DashboardServerUtils.MINUTE_OF_HOUR,
-            DashboardServerUtils.LATITUDE,
-            DashboardServerUtils.LONGITUDE,
-            SocatTypes.SST,
-            SocatTypes.SALINITY,
-            SocatTypes.XCO2_WATER_SST_DRY,
-            SocatTypes.PCO2_WATER_TEQU_WET,
-            SocatTypes.PATM,
-            KnownDataTypesTest.SHIP_SPEED,
-            DashboardServerUtils.SAMPLE_NUMBER,
-            DashboardServerUtils.WOCE_AUTOCHECK
-    ));
-
-    static final ArrayList<DataColumnType> DATA_COLUMN_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
-            DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
-            DashboardServerUtils.DATASET_NAME.duplicate(),
-            DashboardServerUtils.PLATFORM_NAME.duplicate(),
-            DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
-            DashboardServerUtils.DAY_OF_MONTH.duplicate(),
-            DashboardServerUtils.YEAR.duplicate(),
-            DashboardServerUtils.HOUR_OF_DAY.duplicate(),
-            DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
-            DashboardServerUtils.LATITUDE.duplicate(),
-            DashboardServerUtils.LONGITUDE.duplicate(),
-            SocatTypes.SST.duplicate(),
-            SocatTypes.SALINITY.duplicate(),
-            SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
-            SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
-            SocatTypes.PATM.duplicate(),
-            KnownDataTypesTest.SHIP_SPEED.duplicate()));
-
-    static final ArrayList<String> USER_COLUMN_NAMES = new ArrayList<String>(
-            Arrays.asList(
-                    "Depth,Expocode,Cruise,Month,Day,Year,Hour,Minute,Latitude,Longitude,SST,Salinity,xCO2_water_SST,pCO2_water_Teq,P_atm,Speed"
-                            .split(","))
-    );
-    static final ArrayList<ArrayList<String>> DATA_VALUE_STRINGS = new ArrayList<ArrayList<String>>(Arrays.asList(
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,9009.281,-999,extra"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,garbage "
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,51,29.0517,-92.7592,28.99,33.44,399.7,382.7,1009.302,0.3"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,52,29.0516,-92.7592,28.9,33.39,397.9,381,1009.29,0.3"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,53,29.0516,-92.7593,28.93,33.38,397.1,380.3,1009.283,0.3"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,54,29.0515,-92.7593,28.96,33.38,395.8,379,1009.272,0.3"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,55,29.051,-92.76,28.88,33.38,395.7,378.9,1009.264,3"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,56,29.0502,-92.7597,29.08,33.4,395.3,378.3,1009.264,3.1"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,57,29.0494,-92.7593,29.35,33.3,392.1,375.1,1009.255,3.1"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,58,29.0486,-92.759,29.34,33.28,391,374,1009.246,3.1"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,10,2006,23,59,29.0478,-92.7587,29.29,33.28,390.5,373.6,1009.223,3.1"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,00,29.0478,-92.7538,29.29,33.32,390.9,374,1009.23,17.6"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,01,29.0492,-92.7522,29.35,33.41,390.3,373.3,1009.255,7.8"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,02,29.0506,-92.7505,29.39,33.47,393,375.9,1009.266,7.8"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,03,29.052,-92.7489,29.43,33.55,395.7,378.4,1009.28,7.8"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,04,29.0534,-92.7472,29.73,33.64,399.7,382,1009.3,7.8"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,05,29.0577,-92.7492,29.84,33.64,402.9,385,1009.302,16.9"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,06,29.0587,-92.7512,29.67,33.55,406.9,388.9,1009.305,8.2"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,07,29.0597,-92.7533,29.66,33.52,408.1,390.2,1009.308,8.2"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,08,29.0608,-92.7553,29.82,33.42,408.1,390,1009.306,8.2"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,09,29.0618,-92.7574,29.81,33.31,408.2,390,1009.31,8.2"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,10,29.0648,-92.7623,29.82,33.22,405.9,387.9,1009.304,20.8"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,1009.26,7.1"
-                            .split(","))),
-            new ArrayList<String>(Arrays.asList(
-                    "5,31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,1009.237,7.1"
-                            .split(",")))
-    ));
-
-    private static final String EXPOCODE = "31B520060606";
+    // data given at the end
 
     /**
      * Test method for {@link StdUserDataArray#StdUserDataArray(DashboardDatasetData, KnownDataTypes)}
@@ -303,7 +180,7 @@ public class StdDataArrayTest {
      * Test method for {@link StdDataArray#getSampleLongitudes()},
      * {@link StdDataArray#getSampleLatitudes()},
      * {@link StdDataArray#getSampleDepths()}, and
-     * {@link StdDataArray#getSampleTimes()}.
+     * {@link StdDataArray#calcSampleTimes()}.
      */
     @Test
     public void testGetSampleLonLatDepthTime() {
@@ -356,7 +233,7 @@ public class StdDataArrayTest {
         for (int j = 1; j < numSamples; j++) {
             times[j] = times[0] + j * 60.0;
         }
-        Double[] sampleTimes = stdData.getSampleTimes();
+        Double[] sampleTimes = stdData.calcSampleTimes();
         for (int j = 0; j < numSamples; j++) {
             assertEquals(times[j], sampleTimes[j], 1.0E-6);
         }
@@ -521,8 +398,8 @@ public class StdDataArrayTest {
             assertEquals(userVals[j], fileVals[j], 1.0E-6);
         }
 
-        userVals = stdUserData.getSampleTimes();
-        fileVals = stdFileData.getSampleTimes();
+        userVals = stdUserData.calcSampleTimes();
+        fileVals = stdFileData.calcSampleTimes();
         for (int j = 0; j < numSamples; j++) {
             assertEquals(userVals[j], fileVals[j], 1.0E-6);
         }
@@ -611,5 +488,131 @@ public class StdDataArrayTest {
             }
         }
     }
+
+    // StdUserDataArray constructor adds SAMPLE_NUMBER and WOCE_AUTOCHECK
+    private static final ArrayList<DashDataType<?>> DATA_COLUMN_DASH_TYPES = new ArrayList<DashDataType<?>>(
+            Arrays.asList(
+                    DashboardServerUtils.SAMPLE_DEPTH,
+                    DashboardServerUtils.DATASET_NAME,
+                    DashboardServerUtils.PLATFORM_NAME,
+                    DashboardServerUtils.MONTH_OF_YEAR,
+                    DashboardServerUtils.DAY_OF_MONTH,
+                    DashboardServerUtils.YEAR,
+                    DashboardServerUtils.HOUR_OF_DAY,
+                    DashboardServerUtils.MINUTE_OF_HOUR,
+                    DashboardServerUtils.LATITUDE,
+                    DashboardServerUtils.LONGITUDE,
+                    SocatTypes.SST,
+                    SocatTypes.SALINITY,
+                    SocatTypes.XCO2_WATER_SST_DRY,
+                    SocatTypes.PCO2_WATER_TEQU_WET,
+                    SocatTypes.PATM,
+                    KnownDataTypesTest.SHIP_SPEED,
+                    DashboardServerUtils.SAMPLE_NUMBER,
+                    DashboardServerUtils.WOCE_AUTOCHECK
+            ));
+
+    private static final ArrayList<DataColumnType> DATA_COLUMN_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
+            DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
+            DashboardServerUtils.DATASET_NAME.duplicate(),
+            DashboardServerUtils.PLATFORM_NAME.duplicate(),
+            DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
+            DashboardServerUtils.DAY_OF_MONTH.duplicate(),
+            DashboardServerUtils.YEAR.duplicate(),
+            DashboardServerUtils.HOUR_OF_DAY.duplicate(),
+            DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
+            DashboardServerUtils.LATITUDE.duplicate(),
+            DashboardServerUtils.LONGITUDE.duplicate(),
+            SocatTypes.SST.duplicate(),
+            SocatTypes.SALINITY.duplicate(),
+            SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+            SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+            SocatTypes.PATM.duplicate(),
+            KnownDataTypesTest.SHIP_SPEED.duplicate()));
+
+    private static final String EXPOCODE = "31B520060606";
+
+    private static final ArrayList<String> USER_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
+            "Depth,Expocode,Cruise,Month,Day,Year,Hour,Minute,Latitude,Longitude,SST,Salinity,xCO2_water_SST,pCO2_water_Teq,P_atm,Speed"
+                    .split(","))
+    );
+
+    private static final ArrayList<ArrayList<String>> DATA_VALUE_STRINGS = new ArrayList<ArrayList<String>>(Arrays.asList(
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,9009.281,-999,extra"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,garbage "
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,51,29.0517,-92.7592,28.99,33.44,399.7,382.7,1009.302,0.3"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,52,29.0516,-92.7592,28.9,33.39,397.9,381,1009.29,0.3"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,53,29.0516,-92.7593,28.93,33.38,397.1,380.3,1009.283,0.3"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,54,29.0515,-92.7593,28.96,33.38,395.8,379,1009.272,0.3"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,55,29.051,-92.76,28.88,33.38,395.7,378.9,1009.264,3"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,56,29.0502,-92.7597,29.08,33.4,395.3,378.3,1009.264,3.1"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,57,29.0494,-92.7593,29.35,33.3,392.1,375.1,1009.255,3.1"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,58,29.0486,-92.759,29.34,33.28,391,374,1009.246,3.1"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,10,2006,23,59,29.0478,-92.7587,29.29,33.28,390.5,373.6,1009.223,3.1"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,00,29.0478,-92.7538,29.29,33.32,390.9,374,1009.23,17.6"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,01,29.0492,-92.7522,29.35,33.41,390.3,373.3,1009.255,7.8"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,02,29.0506,-92.7505,29.39,33.47,393,375.9,1009.266,7.8"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,03,29.052,-92.7489,29.43,33.55,395.7,378.4,1009.28,7.8"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,04,29.0534,-92.7472,29.73,33.64,399.7,382,1009.3,7.8"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,05,29.0577,-92.7492,29.84,33.64,402.9,385,1009.302,16.9"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,06,29.0587,-92.7512,29.67,33.55,406.9,388.9,1009.305,8.2"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,07,29.0597,-92.7533,29.66,33.52,408.1,390.2,1009.308,8.2"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,08,29.0608,-92.7553,29.82,33.42,408.1,390,1009.306,8.2"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,09,29.0618,-92.7574,29.81,33.31,408.2,390,1009.31,8.2"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,10,29.0648,-92.7623,29.82,33.22,405.9,387.9,1009.304,20.8"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,1009.26,7.1"
+                            .split(","))),
+            new ArrayList<String>(Arrays.asList(
+                    "5,31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,1009.237,7.1"
+                            .split(",")))
+    ));
 
 }

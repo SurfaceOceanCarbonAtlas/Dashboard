@@ -3,24 +3,43 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.CommentedQCFlag;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.shared.DataQCEvent;
+import gov.noaa.pmel.dashboard.shared.QCEvent;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Submits a dataset.  At this time this just means creating the DSG and decimated DSG files for the dataset.
@@ -29,12 +48,17 @@ import java.util.HashSet;
  */
 public class DatasetSubmitter {
 
+    public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE ";
+    public static final String PI_PROVIDED_BOTTLEQC_COMMENT_START = "PI provided data QC ";
+
     DataFileHandler dataHandler;
     MetadataFileHandler metadataHandler;
     DatasetChecker datasetChecker;
+    CheckerMessageHandler messageHandler;
     DsgNcFileHandler dsgHandler;
     DatabaseRequestHandler databaseHandler;
     ArchiveFilesBundler filesBundler;
+    KnownDataTypes dataFileTypes;
     String version;
     Logger logger;
 
@@ -46,21 +70,23 @@ public class DatasetSubmitter {
         dataHandler = configStore.getDataFileHandler();
         metadataHandler = configStore.getMetadataFileHandler();
         datasetChecker = configStore.getDashboardDatasetChecker();
+        messageHandler = configStore.getCheckerMsgHandler();
         dsgHandler = configStore.getDsgNcFileHandler();
         databaseHandler = configStore.getDatabaseRequestHandler();
         filesBundler = configStore.getArchiveFilesBundler();
+        dataFileTypes = configStore.getKnownDataFileTypes();
         version = configStore.getUploadVersion();
         logger = LogManager.getLogger(getClass());
     }
 
     /**
      * Submit a dataset.  This standardized the data using the automated data checker and generates DSG and decimated
-     * DSG files for datasets which are editable (have a QC status of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED},
-     * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE}, {@link DashboardUtils#QC_STATUS_SUSPENDED}, or {@link
-     * DashboardUtils#QC_STATUS_EXCLUDED}. For all datasets, the archive status is updated to the given value.
+     * DSG files for datasets which are editable (have a QC status of {@link DashboardUtils#STATUS_NOT_SUBMITTED},
+     * {@link DashboardUtils#STATUS_SUSPENDED}, or {@link DashboardUtils#STATUS_EXCLUDED}.  For all datasets, the
+     * archive status is updated to the given value.
      * <p>
-     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARHCIVAL}, the archive request is sent for
-     * dataset which have not already been sent, or for all datasets if repeatSend is true.
+     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARCHIVAL}, the archive request
+     * is sent for dataset which have not already been sent, or for all datasets if repeatSend is true.
      *
      * @param idsSet
      *         IDs of the datasets to submit
@@ -103,25 +129,79 @@ public class DatasetSubmitter {
                     }
                     DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
                     DsgMetadata dsgMData = omeMData.createDsgMetadata();
-                    dsgMData.setVersion(version);
 
-                    // Standardize the data
+                    // For SOCAT, the version string in the DsgMetadata is the submit version number plus an 'N' or 'U'
+                    // depending on whether this dataset is new to this version of SOCAT or an update from a previous
+                    // version of SOCAT.  An update within the same version of SOCAT does not change 'N' to 'U'.
+                    String versionStatus = databaseHandler.getVersionStatus(datasetId);
+                    if ( versionStatus.isEmpty() ) {
+                        versionStatus = version + "N";
+                    }
+                    else if ( "U".equals(versionStatus.substring(versionStatus.length() - 1)) ) {
+                        versionStatus = version + "U";
+                    }
+                    else {
+                        long newVersion;
+                        try {
+                            newVersion = Math.round(Double.parseDouble(version) * 10.0);
+                        } catch ( NumberFormatException ex ) {
+                            throw new RuntimeException("Unexpected non-numeric new version number '" + version + "'");
+                        }
+                        String oldNum = versionStatus.substring(0, versionStatus.length() - 1);
+                        long oldVersion;
+                        try {
+                            oldVersion = Math.round(Double.parseDouble(oldNum) * 10.0);
+                        } catch ( NumberFormatException ex ) {
+                            throw new RuntimeException("Unexpected non-numeric old version number '" + oldNum + "'");
+                        }
+                        if ( newVersion > oldVersion )
+                            versionStatus = version + "U";
+                        else
+                            versionStatus = version + "N";
+                    }
+                    dsgMData.setVersion(versionStatus);
+
+                    // Standardize the data and perform the automated data checks.
+                    // Saves the messages from the standardization and automated data checks.
+                    // Assigns the StdUserData WOCE_AUTOCHECK data column with the checker-generated data QC flags.
+                    // Assigns the DashboardDataset sets of checker-generated and user-provided data QC flags.
                     // TODO: update the metadata with data-derived values
-                    datasetChecker.standardizeDataset(dataset, null);
+                    StdUserDataArray userStdData = datasetChecker.standardizeDataset(dataset, null);
                     if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
                         errorMsgs.add(datasetId + ": unacceptable; check data check error messages " +
-                                "(missing lon/lat/depth/time or uninterpretable values)");
+                                "(missing lon/lat/time or uninterpretable values)");
                         continue;
                     }
 
+                    // Transfer the automated data checker data QC flags to the appropriate data QC column
+                    transferAutomaticDataQC(userStdData);
+
+                    boolean isNew = DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus());
+
                     // Generate the NetCDF DSG file, enhanced by Ferret
                     logger.debug("Generating the full-data DSG file for " + datasetId);
-                    dsgHandler.saveDatasetDsg(dsgMData, dataset);
+                    dsgHandler.saveDatasetDsg(dsgMData, userStdData);
 
                     // Generate the decimated-data DSG file from the full-data DSG file
                     logger.debug("Generating the decimated-data DSG file for " + datasetId);
                     dsgHandler.decimateDatasetDsg(datasetId);
-                    //TODO: need to submit QC and WOCE events to database
+
+                    // Update the all_region_ids metadata variable from the Ferret-generated
+                    // region_id data variable in the full-data DSG file.
+                    String allRegionIds = dsgHandler.updateAllRegionIds(datasetId);
+
+                    ArrayList<QCEvent> datasetQCEvents = generateDatasetQCEvents(dataset, allRegionIds);
+                    // Add new or update dataset QC new or update flags to the database
+                    databaseHandler.addDatasetQCEvents(datasetQCEvents);
+
+                    // Generate the set of data QC events for the data QC flags from standardization
+                    // and automated data checking as well as for user-provided data QC flags
+                    ArrayList<DataQCEvent> dataQCEvents = generateDataQCEvents(dataset, userStdData);
+
+                    // Update the data QC flags to those for this data
+                    databaseHandler.resetDataQCEvents(datasetId);
+                    databaseHandler.addDataQCEvent(dataQCEvents);
+
                 } catch ( Exception ex ) {
                     errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
                     continue;
@@ -217,6 +297,209 @@ public class DatasetSubmitter {
             }
             throw new IllegalArgumentException(sb.toString());
         }
+    }
+
+    private void transferAutomaticDataQC(StdUserDataArray userStdData) {
+        create
+    }
+
+    private ArrayList<QCEvent> generateDatasetQCEvents(DashboardDatasetData dataset, String allRegionIds) {
+        create
+    }
+
+    /**
+     * Generates a list of DataQCEvent objects from the saved automated data checker messages
+     * as well as the PI-provided WOCE flags.  The dataset ID, version, column types, and
+     * PI-provided data QC flags and associated comments are obtained from the given DatasetData.
+     * The automated data checker flags and messages are read from the saved messages files for
+     * the dataset.  Values for the DataLocation objects are read from the saved full-data DSG file.
+     * Warning messages from the automated data checker are ignored at this time.
+     *
+     * @param dataset
+     *         generate DataQCEvents for this dataset.
+     *
+     * @return the list of DataQCEvents for the dataset; never null but may be empty
+     *
+     * @throws IllegalArgumentException
+     *         if either argument is null or invalid
+     * @throws FileNotFoundException
+     *         if the full-data DSG file for this dataset is not found
+     * @throws IOException
+     *         if reading from the full-data DSG file for this dataset throws one
+     */
+    public ArrayList<DataQCEvent> generateDataQCEvents(DashboardDatasetData dataset, StdUserDataArray stdUserData)
+            throws IllegalArgumentException, FileNotFoundException, IOException {
+        if ( dataset == null )
+            throw new IllegalArgumentException("dataset is null");
+        if ( stdUserData == null )
+            throw new IllegalArgumentException("stdUserData is null");
+
+        String expocode = dataset.getDatasetId();
+        List<DashDataType<?>> columnTypes = stdUserData.getDataTypes();
+
+        // Add the automated-data-checker data QC flags from the saved messages
+        TreeSet<CommentedQCFlag> dataqc = new TreeSet<CommentedQCFlag>();
+        for (ADCMessage msg : stdUserData.getStandardizationMessages()) {
+
+            // Data QC always has a positive row number.  Dataset QC as well as general and summaries
+            // QC messages have a negative row number (DashboardUtils.INT_MISSING_VALUE)
+            int rowNum = msg.getRowNumber();
+            if ( rowNum <= 0 )
+                continue;
+
+            // TODO: in the general case, get the correct data QC flag variable name and value
+            // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
+            String flagName = SocatTypes.WOCE_CO2_WATER.getVarName();
+
+            String flagValue;
+            QCFlag.Severity severity = msg.getSeverity();
+            switch ( severity ) {
+                case UNASSIGNED:
+                case ACCEPTABLE:
+                    flagValue = "";
+                    break;
+                case WARNING:
+                    // flagValue = DashboardServerUtils.WOCE_QUESTIONABLE;
+                    // Ignore automated data checker warnings as the are just pointing out
+                    // potential issues which may not be a problem or have any consequence
+                    flagValue = "";
+                    break;
+                case ERROR:
+                case CRITICAL:
+                    flagValue = DashboardServerUtils.WOCE_BAD;
+                    break;
+                default:
+                    throw new IllegalArgumentException("unexpected messages severity of " + severity);
+            }
+            if ( flagValue.isEmpty() )
+                continue;
+
+            String comment = msg.getGeneralComment();
+            if ( comment.isEmpty() )
+                comment = msg.getDetailedComment();
+
+            int colNum = msg.getColNumber();
+            Integer colIdx = (colNum > 0) ? (colNum - 1) : null;
+            CommentedQCFlag info = new CommentedQCFlag(flagName, flagValue, severity, colIdx, rowNum - 1, comment);
+            dataqc.add(info);
+        }
+
+        // Add the PI-provided data QC flags from values in the dataset
+        TreeSet<QCFlag> userFlags = dataset.getUserFlags();
+        if ( userFlags.size() > 0 ) {
+            // Map any QC comment columns to their QC flag names
+            // Note that the column index in the QCFlag should be for the data value being QC'ed
+            HashMap<String,Integer> flagCommentIndex = new HashMap<String,Integer>();
+            for (int qcIdx = 0; qcIdx < columnTypes.size(); qcIdx++) {
+                DashDataType<?> colType = columnTypes.get(qcIdx);
+                if ( colType.isQCType() ) {
+                    for (int commIdx = 0; commIdx < columnTypes.size(); commIdx++) {
+                        if ( columnTypes.get(commIdx).isQCTypeFor(colType) ) {
+                            flagCommentIndex.put(colType.getVarName(), commIdx);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // PI-provided comments are in the datavals stored in dataset
+            ArrayList<ArrayList<String>> dataVals = dataset.getDataValues();
+            for (QCFlag uflag : userFlags) {
+                String comment;
+                if ( uflag.getFlagName().toUpperCase().contains("WOCE)") )
+                    comment = PI_PROVIDED_WOCE_COMMENT_START + uflag.getFlagValue() + " flag";
+                else
+                    comment = PI_PROVIDED_BOTTLEQC_COMMENT_START + uflag.getFlagValue() + " flag";
+                Integer idx = flagCommentIndex.get(uflag.getFlagName());
+                if ( idx != null ) {
+                    comment += " with comment/subflag: " + dataVals.get(uflag.getRowIndex()).get(idx);
+                }
+                dataqc.add(new CommentedQCFlag(uflag, comment));
+            }
+        }
+
+        ArrayList<DataQCEvent> woceList = new ArrayList<DataQCEvent>();
+        // If no WOCE flags, return now before we read data from the DSG file
+        if ( dataqc.isEmpty() )
+            return woceList;
+
+        // Get the longitudes, latitude, times, and regions IDs
+        double[][] lonlattimes = dsgHandler.readLonLatTimeDataValues(expocode);
+        double[] longitudes = lonlattimes[0];
+        double[] latitudes = lonlattimes[1];
+        double[] times = lonlattimes[2];
+        Date now = new Date();
+
+        String lastFlagName = null;
+        String lastFlagValue = null;
+        Integer lastColIdx = null;
+        String lastComment = null;
+        double[] dataValues = null;
+        String lastDataVarName = null;
+        String dataVarName = null;
+        ArrayList<DataLocation> locations = null;
+        for (CommentedQCFlag info : dataqc) {
+
+            // Check if a new DataQCEvent is needed
+            String flagName = info.getFlagName();
+            String flagValue = info.getFlagValue();
+            Integer colIdx = info.getColumnIndex();
+            String comment = info.getComment();
+            if ( !(flagName.equals(lastFlagName) && flagValue.equals(lastFlagValue) &&
+                    colIdx.equals(lastColIdx) && comment.equals(lastComment)) ) {
+                lastFlagName = flagName;
+                lastFlagValue = flagValue;
+                lastColIdx = colIdx;
+                lastComment = comment;
+
+                DataQCEvent woceEvent = new DataQCEvent();
+                woceEvent.setFlagName(flagName);
+                woceEvent.setDatasetId(expocode);
+                woceEvent.setVersion(version);
+                woceEvent.setFlagValue(flagValue);
+                woceEvent.setFlagDate(now);
+                woceEvent.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
+                woceEvent.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
+                woceEvent.setComment(comment);
+
+                // If a column can be identified, assign its name and
+                // get its values if we do not already have them
+                try {
+                    DashDataType<?> dataType = columnTypes.get(colIdx);
+                    dataVarName = dataType.getVarName();
+                    // Check if this type is known in the data file types
+                    if ( !dataFileTypes.containsTypeName(dataVarName) )
+                        throw new IllegalArgumentException("unknown");
+                    if ( !dataVarName.equals(lastDataVarName) ) {
+                        dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
+                        lastDataVarName = dataVarName;
+                    }
+                    woceEvent.setVarName(dataVarName);
+                } catch ( Exception ex ) {
+                    // Invalid data column index or unknown data column
+                    dataVarName = null;
+                    // leave varName unassigned in woceEvent; leave lastDataVarName and dataValues unchanged
+                    // just in case the next woceEvent uses that data again
+                }
+
+                // Directly modify the locations ArrayList in this object
+                locations = woceEvent.getLocations();
+                woceList.add(woceEvent);
+            }
+
+            // Add a location for the current WOCE event
+            DataLocation dataLoc = new DataLocation();
+            int rowIdx = info.getRowIndex();
+            dataLoc.setRowNumber(rowIdx + 1);
+            dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
+            dataLoc.setLatitude(latitudes[rowIdx]);
+            dataLoc.setLongitude(longitudes[rowIdx]);
+            if ( dataVarName != null )
+                dataLoc.setDataValue(dataValues[rowIdx]);
+            locations.add(dataLoc);
+        }
+
+        return woceList;
     }
 
 }

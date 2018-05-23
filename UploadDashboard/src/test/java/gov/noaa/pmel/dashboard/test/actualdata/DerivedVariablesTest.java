@@ -31,7 +31,7 @@ public class DerivedVariablesTest {
         Double[] longitudes = stdData.getSampleLongitudes();
         Double[] latitudes = stdData.getSampleLatitudes();
         Double[] depths = stdData.getSampleDepths();
-        Double[] times = stdData.getSampleTimes();
+        Double[] times = stdData.calcSampleTimes();
 
         SocatTool tool = new SocatTool(ferret);
         String fullDataFilename = dsgFile.getPath();
@@ -51,7 +51,7 @@ public class DerivedVariablesTest {
         Double[] calcLons = calcData.getSampleLongitudes();
         Double[] calcLats = calcData.getSampleLatitudes();
         Double[] calcDepths = calcData.getSampleDepths();
-        Double[] calcTimes = calcData.getSampleTimes();
+        Double[] calcTimes = calcData.calcSampleTimes();
         for (int j = 0; j < numData; j++) {
             assertEquals(longitudes[j], calcLons[j]);
             assertEquals(latitudes[j], calcLats[j]);

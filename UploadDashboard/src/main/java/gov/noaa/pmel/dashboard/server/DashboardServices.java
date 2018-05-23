@@ -265,7 +265,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         dataHandler.saveDatasetInfoToFile(dataset, "Removed metadata document " +
                 deleteFilename + " from dataset " + datasetId);
 
-        // If the dataset has been submitted, add QC update ('U') global flag about removal of metadata
+        // If the dataset is submitted (possibly even archived), add dataset QC indicating the change
         if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
             QCEvent qcEvent = new QCEvent();
             qcEvent.setDatasetId(datasetId);
@@ -290,9 +290,9 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 LogManager.getLogger("DashboardServices").info("updated QC status for " + datasetId);
             } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
-                LogManager.getLogger("DashboardServices").error("failed to update QC status for " +
-                        datasetId + " after deleting metadata " + deleteFilename +
-                        " from " + datasetId + " for " + username + ": " + ex.getMessage());
+                LogManager.getLogger("DashboardServices").error(
+                        "failed to update QC status after deleting metadata " + deleteFilename +
+                                " from " + datasetId + " for " + username + ": " + ex.getMessage());
             }
         }
 

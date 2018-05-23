@@ -89,7 +89,7 @@ public class StdUserDataArray extends StdDataArray {
                 userMissVals[k] = null;
             userColNames[k] = names.get(k);
         }
-        // the StdDataArray constructor used adds SAMPLE_NUMBER and WOCE_AUTOCHECK
+        // the StdDataArray constructor that was used adds SAMPLE_NUMBER and WOCE_AUTOCHECK
         woceAutocheckIndex = -1;
         for (int k = numUserDataCols; k < numDataCols; k++) {
             if ( DashboardServerUtils.WOCE_AUTOCHECK.typeNameEquals(dataTypes[k]) )
@@ -159,7 +159,7 @@ public class StdUserDataArray extends StdDataArray {
                 }
             }
         }
-        // Add the automatic data checker WOCE flags
+        // Add the automated data checker WOCE flags
         if ( woceIdx >= 0 ) {
             for (QCFlag flag : dataset.getCheckerFlags()) {
                 if ( DashboardServerUtils.WOCE_AUTOCHECK.getVarName().equals(flag.getFlagName()) ) {
@@ -273,7 +273,7 @@ public class StdUserDataArray extends StdDataArray {
 
         Double[] times = null;
         try {
-            times = getSampleTimes();
+            times = calcSampleTimes();
             for (int j = 0; j < numSamples; j++) {
                 if ( times[j] == null ) {
                     for (int k = 0; k < indicesForTime.length; k++) {
@@ -527,8 +527,9 @@ public class StdUserDataArray extends StdDataArray {
      *         WOCE flag to assign
      *
      * @throws IllegalArgumentException
-     *         if the sample index is invalid, if there is not WOCE_AUTOCHECK column, or if the flag given is not a
-     *         valid WOCE flag
+     *         if the sample index is invalid,
+     *         if there is not WOCE_AUTOCHECK column, or *
+     *         if the flag given is not a valid WOCE flag
      */
     public void setWoceAutocheck(int sampleIdx, String newFlag) throws IllegalArgumentException {
         if ( (sampleIdx < 0) || (sampleIdx >= numSamples) )

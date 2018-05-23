@@ -107,8 +107,8 @@ public class DataFileHandlerTest {
         DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
         BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA));
         DashboardDatasetData cruiseData =
-        dataHandler.createDatasetFromInput(cruiseReader, DashboardUtils.COMMA_FORMAT_TAG,
-                DATASET_OWNER, UPLOAD_FILENAME, UPLOAD_TIMESTAMP);
+                dataHandler.createDatasetFromInput(cruiseReader, DashboardUtils.COMMA_FORMAT_TAG,
+                        DATASET_OWNER, UPLOAD_FILENAME, UPLOAD_TIMESTAMP);
 
         assertEquals(META_PREAMBLE.size(), cruiseData.getPreamble().size());
         for (int k = 0; k < META_PREAMBLE.size(); k++) {

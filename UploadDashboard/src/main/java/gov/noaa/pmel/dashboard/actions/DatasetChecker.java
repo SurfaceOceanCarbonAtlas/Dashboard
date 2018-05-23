@@ -75,8 +75,8 @@ public class DatasetChecker {
      * @throws IllegalArgumentException
      *         if either argument is null, or if there are no user data types given
      */
-    public DatasetChecker(KnownDataTypes userDataTypes,
-            CheckerMessageHandler checkerMessageHandler) throws IllegalArgumentException {
+    public DatasetChecker(KnownDataTypes userDataTypes, CheckerMessageHandler checkerMessageHandler)
+            throws IllegalArgumentException {
         if ( (userDataTypes == null) || userDataTypes.isEmpty() )
             throw new IllegalArgumentException("no known user data types");
         if ( checkerMessageHandler == null )
@@ -109,8 +109,8 @@ public class DatasetChecker {
      *         if there are no data values, if a data column description is not a known user data type, if a required
      *         unit conversion is not supported, if a standardizer for a given data type is not known, if ....
      */
-    public StdUserDataArray standardizeDataset(DashboardDatasetData dataset,
-            DsgMetadata metadata) throws IllegalArgumentException {
+    public StdUserDataArray standardizeDataset(DashboardDatasetData dataset, DsgMetadata metadata)
+            throws IllegalArgumentException {
         // Generate array of standardized data objects
         StdUserDataArray stdUserData = new StdUserDataArray(dataset, knownUserDataTypes);
 
@@ -126,8 +126,9 @@ public class DatasetChecker {
         // Perform any other data checks
         // TODO: check calculated ship speed
 
-        // Save the messages accumulated in stdUserData for this dataset.
-        // Assigns the sets of checker-generated QC flags and user-provided QC flags
+        // Save the messages accumulated in stdUserData.
+        // Assigns the StdUserData WOCE_AUTOCHECK data column with the checker-generated data QC flags.
+        // Assigns the DashboardDataset sets of checker-generated and user-provided data QC flags.
         msgHandler.processCheckerMessages(dataset, stdUserData);
 
         // Get the indices values the PI marked as bad or questionable.

@@ -116,35 +116,32 @@ public class DsgNcFile extends File {
      *         known data types for data files
      *
      * @throws IllegalArgumentException
-     *         if any argument is null, if any of the data types in userStdData is {@link DashboardServerUtils#UNKNOWN}
+     *         if any argument is null,
+     *         if any of the data types in userStdData is {@link DashboardServerUtils#UNKNOWN},
      *         if any sample longitude, latitude, sample depth is missing, if any sample time cannot be computed
      * @throws IOException
      *         if creating the NetCDF file throws one
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
-     * @throws IllegalAccessException
-     *         if creating the NetCDF file throws one
      */
     public void create(DsgMetadata metaData, StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
-            throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
+            throws IllegalArgumentException, IOException, InvalidRangeException {
         if ( metaData == null )
             throw new IllegalArgumentException("no metadata given");
         metadata = metaData;
         if ( userStdData == null )
             throw new IllegalArgumentException("no data given");
 
-        // The following verifies lon, lat, depth, and time
-        // Adds time and, if not already present, year, month, day, hour, minute, and second.
+        // The following verifies lon and lat, computes and adds time, and adds,
+        // if not already present, year, month, day, hour, minute, and second.
         stddata = new StdDataArray(userStdData, dataFileTypes);
 
         create(metadata, stddata);
     }
 
     /**
-     * Creates this NetCDF DSG file with the given metadata and standardized data for data files.  The internal metadata
-     * and stddata references are updated to the given DsgMetadata and StdDataArray object.  Every data sample should
-     * have a valid longitude, latitude, sample depth, year, month of year, day of month, hour of day, minute of hour,
-     * second of minute, time, sample number, and WOCE autocheck value, although this is not fully verified.
+     * Creates this NetCDF DSG file with the given metadata and standardized data for data files.
+     * The internal metadata and stddata references are updated to the given DsgMetadata and StdDataArray object.
      *
      * @param metaData
      *         metadata for the dataset
@@ -152,42 +149,20 @@ public class DsgNcFile extends File {
      *         standardized data appropriate for data files
      *
      * @throws IllegalArgumentException
-     *         if any argument is null, or if there is no longitude, latitude, sample depth, year, month of year, day of
-     *         month, hour of day, minute of hour, or second of minute, or time data column
+     *         if either argument is null or invalid
      * @throws IOException
      *         if creating the NetCDF file throws one
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
-     * @throws IllegalAccessException
-     *         if creating the NetCDF file throws one
      */
     public void create(DsgMetadata metaData, StdDataArray fileData)
-            throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
+            throws IllegalArgumentException, IOException, InvalidRangeException {
         if ( metaData == null )
             throw new IllegalArgumentException("no metadata given");
         metadata = metaData;
         if ( fileData == null )
             throw new IllegalArgumentException("no data given");
         stddata = fileData;
-        // Quick check of data column indices already assigned in StdDataArray
-        if ( !stddata.hasLongitude() )
-            throw new IllegalArgumentException("no longitude data column");
-        if ( !stddata.hasLatitude() )
-            throw new IllegalArgumentException("no latitude data column");
-        if ( !stddata.hasSampleDepth() )
-            throw new IllegalArgumentException("no sample depth data column");
-        if ( !stddata.hasYear() )
-            throw new IllegalArgumentException("no year data column");
-        if ( !stddata.hasMonthOfYear() )
-            throw new IllegalArgumentException("no month of year data column");
-        if ( !stddata.hasDayOfMonth() )
-            throw new IllegalArgumentException("no day of month data column");
-        if ( !stddata.hasHourOfDay() )
-            throw new IllegalArgumentException("no hour of day data column");
-        if ( !stddata.hasMinuteOfHour() )
-            throw new IllegalArgumentException("no minute of hour data column");
-        if ( !stddata.hasSecondOfMinute() )
-            throw new IllegalArgumentException("no second of minute data column");
 
         NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
         try {
@@ -260,11 +235,10 @@ public class DsgNcFile extends File {
                     }
                 }
                 else {
-                    throw new IllegalArgumentException("unexpected unknown metadata type: " + dtype.toString());
+                    throw new IllegalArgumentException("unknown metadata type: " + dtype.toString());
                 }
             }
 
-            boolean timeFound = false;
             List<DashDataType<?>> dataTypes = stddata.getDataTypes();
             for (DashDataType<?> dtype : dataTypes) {
                 varName = dtype.getVarName();
@@ -289,18 +263,15 @@ public class DsgNcFile extends File {
                     if ( DashboardServerUtils.TIME.typeNameEquals(dtype) ) {
                         // Additional attribute giving the time origin (although also mentioned in the units)
                         ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
-                        timeFound = true;
                     }
                     if ( dtype.getStandardName().endsWith("depth") ) {
                         ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
                     }
                 }
                 else {
-                    throw new IllegalArgumentException("unexpected unknown data type: " + dtype.toString());
+                    throw new IllegalArgumentException("unknown data type: " + dtype.toString());
                 }
             }
-            if ( !timeFound )
-                throw new IllegalArgumentException("no time data column");
 
             ncfile.create();
 
@@ -347,7 +318,8 @@ public class DsgNcFile extends File {
                     ncfile.write(var, mvar);
                 }
                 else {
-                    throw new IllegalArgumentException("unexpected unknown metadata type: " + dtype.toString());
+                    // Should have been caught above
+                    throw new RuntimeException("Unexpected unknown metadata type: " + dtype.toString());
                 }
             }
 
@@ -392,7 +364,8 @@ public class DsgNcFile extends File {
                     ncfile.write(var, dvar);
                 }
                 else {
-                    throw new IllegalArgumentException("unexpected unknown data type: " + dtype.toString());
+                    // Should have been caught above
+                    throw new RuntimeException("Unexpected unknown data type: " + dtype.toString());
                 }
             }
 
@@ -415,8 +388,7 @@ public class DsgNcFile extends File {
      * @throws IOException
      *         if there are problems opening or reading from the netCDF file
      */
-    public ArrayList<String> readMetadata(KnownDataTypes metadataTypes)
-            throws IllegalArgumentException, IOException {
+    public ArrayList<String> readMetadata(KnownDataTypes metadataTypes) throws IllegalArgumentException, IOException {
         if ( (metadataTypes == null) || metadataTypes.isEmpty() )
             throw new IllegalArgumentException("no metadata file types given");
         ArrayList<String> namesNotFound = new ArrayList<String>();
@@ -478,8 +450,7 @@ public class DsgNcFile extends File {
      *         number of values as the 'time' variable, or if there are problems opening or reading from the netCDF
      *         file
      */
-    public ArrayList<String> readData(KnownDataTypes dataTypes)
-            throws IllegalArgumentException, IOException {
+    public ArrayList<String> readData(KnownDataTypes dataTypes) throws IllegalArgumentException, IOException {
         if ( (dataTypes == null) || dataTypes.isEmpty() )
             throw new IllegalArgumentException("no data file types given");
         int numColumns;
@@ -935,8 +906,13 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * Updates the all_region_ids metadata variable in this DSG file
-     * from the values in the region_id data variable in this DSG file.
+     * Updates the all_region_ids metadata variable in this DSG file.
+     *
+     * @param newValue
+     *         the all_region_ids value to assign; if null, the all_region_ids value is obtained
+     *         from the values of the region_id data variable in this DSG file.
+     *
+     * @return the all_region_ids value assigned
      *
      * @throws IllegalArgumentException
      *         if this DSG file is not valid
@@ -945,18 +921,24 @@ public class DsgNcFile extends File {
      * @throws InvalidRangeException
      *         if writing the updated QC flag to the DSG file throws one
      */
-    public void updateAllRegionIDs() throws IllegalArgumentException, IOException, InvalidRangeException {
-        // Read the region IDs assigned by Ferret
-        String[] regionIDs = readStringVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
-        // Generate the String of sorted unique IDs
-        TreeSet<String> allRegionIDsSet = new TreeSet<String>();
-        for (String id : regionIDs) {
-            allRegionIDsSet.add(id.trim());
+    public String updateAllRegionIDs(String newValue)
+            throws IllegalArgumentException, IOException, InvalidRangeException {
+        String allRegionIDs;
+        if ( newValue == null ) {
+            // Generate the String of sorted unique IDs
+            String[] regionIDs = readStringVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
+            TreeSet<String> allRegionIDsSet = new TreeSet<String>();
+            for (String id : regionIDs) {
+                allRegionIDsSet.add(id.trim());
+            }
+            allRegionIDs = "";
+            for (String id : allRegionIDsSet) {
+                allRegionIDs += id.toString();
+            }
         }
-        String allRegionIDs = "";
-        for (String id : allRegionIDsSet) {
-            allRegionIDs += id.toString();
-        }
+        else
+            allRegionIDs = newValue;
+
         // Write this String of all region IDs to the NetCDF file
         NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
         try {
@@ -973,6 +955,7 @@ public class DsgNcFile extends File {
         } finally {
             ncfile.close();
         }
+        return allRegionIDs;
     }
 
     /**

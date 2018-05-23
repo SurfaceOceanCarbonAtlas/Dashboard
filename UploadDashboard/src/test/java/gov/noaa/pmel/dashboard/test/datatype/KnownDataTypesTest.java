@@ -67,12 +67,24 @@ public class KnownDataTypesTest {
                 SocatTypes.SALINITY.toPropertyValue());
         typeProps.setProperty(SocatTypes.SST.getVarName(),
                 SocatTypes.SST.toPropertyValue());
+        typeProps.setProperty(SocatTypes.TEQU.getVarName(),
+                SocatTypes.TEQU.toPropertyValue());
         typeProps.setProperty(SocatTypes.PATM.getVarName(),
                 SocatTypes.PATM.toPropertyValue());
+        typeProps.setProperty(SocatTypes.PEQU.getVarName(),
+                SocatTypes.PEQU.toPropertyValue());
+        typeProps.setProperty(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(),
+                SocatTypes.XCO2_WATER_TEQU_DRY.toPropertyValue());
         typeProps.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(),
                 SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
         typeProps.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(),
                 SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
+        typeProps.setProperty(SocatTypes.PCO2_WATER_SST_WET.getVarName(),
+                SocatTypes.PCO2_WATER_SST_WET.toPropertyValue());
+        typeProps.setProperty(SocatTypes.FCO2_WATER_TEQU_WET.getVarName(),
+                SocatTypes.FCO2_WATER_TEQU_WET.toPropertyValue());
+        typeProps.setProperty(SocatTypes.FCO2_WATER_SST_WET.getVarName(),
+                SocatTypes.FCO2_WATER_SST_WET.toPropertyValue());
         typeProps.setProperty(KnownDataTypesTest.SHIP_SPEED.getVarName(),
                 KnownDataTypesTest.SHIP_SPEED.toPropertyValue());
 

@@ -19,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -370,26 +371,28 @@ public class DatabaseRequestHandler {
      *         if accessing or updating the database throws one, or if the reviewer cannot be found in the reviewers
      *         table.
      */
-    public void addDatasetQCEvent(QCEvent qcEvent) throws SQLException {
+    public void addDatasetQCEvents(Collection<QCEvent> qcEvents) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            int reviewerId = getReviewerId(catConn, qcEvent.getUsername(), qcEvent.getRealname());
             PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" +
                     QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
                     "`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?);");
-            addPrepStmt.setString(1, qcEvent.getFlagValue());
-            Date flagDate = qcEvent.getFlagDate();
-            if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
-                addPrepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
-            else
-                addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
-            addPrepStmt.setString(3, qcEvent.getDatasetId());
-            addPrepStmt.setString(4, qcEvent.getVersion());
-            addPrepStmt.setString(5, qcEvent.getRegionId());
-            addPrepStmt.setInt(6, reviewerId);
-            addPrepStmt.setString(7, qcEvent.getComment());
-            addPrepStmt.executeUpdate();
+            for ( QCEvent event : qcEvents ) {
+                int reviewerId = getReviewerId(catConn, event.getUsername(), event.getRealname());
+                addPrepStmt.setString(1, event.getFlagValue());
+                Date flagDate = event.getFlagDate();
+                if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
+                    addPrepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
+                else
+                    addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
+                addPrepStmt.setString(3, event.getDatasetId());
+                addPrepStmt.setString(4, event.getVersion());
+                addPrepStmt.setString(5, event.getRegionId());
+                addPrepStmt.setInt(6, reviewerId);
+                addPrepStmt.setString(7, event.getComment());
+                addPrepStmt.executeUpdate();
+            }
         } finally {
             catConn.close();
         }
@@ -446,7 +449,7 @@ public class DatabaseRequestHandler {
                         continue;
                     if ( DashboardUtils.REGION_ID_GLOBAL.equals(regionID) &&
                             (DashboardServerUtils.DATASET_QCFLAG_NEW.equals(flagValue) ||
-                             DashboardServerUtils.DATASET_QCFLAG_UPDATED.equals(flagValue)) ) {
+                                    DashboardServerUtils.DATASET_QCFLAG_UPDATED.equals(flagValue)) ) {
                         lastUpdateTime = time;
                     }
                     QCEvent qcFlag = new QCEvent();
@@ -645,83 +648,90 @@ public class DatabaseRequestHandler {
     /**
      * Adds a new data QC event for a dataset.  This includes assigning the DataLocations to the WOCELocations table.
      *
-     * @param woceEvent
-     *         the data QC event to add; the ID for the data QC event will be assigned on normal return
+     * @param woceEvents
+     *         the data QC events to add; the ID in each data QC event will be assigned for those successfully added
      *
      * @throws SQLException
-     *         if accessing or updating the database throws one, or if the reviewer cannot be found in the reviewers
-     *         table, or if a problem occurs adding the data QC event
+     *         if accessing or updating the database throws one,
+     *         if the reviewer cannot be found in the reviewers table, or
+     *         if a problem occurs adding the data QC event
      */
-    public void addDataQCEvent(DataQCEvent woceEvent) throws SQLException {
+    public void addDataQCEvent(Collection<DataQCEvent> woceEvents) throws SQLException {
         Connection catConn = makeConnection(true);
         try {
-            int reviewerId = getReviewerId(catConn, woceEvent.getUsername(), woceEvent.getRealname());
-            // Add the WOCE event
-            PreparedStatement prepStmt = catConn.prepareStatement("INSERT INTO `" +
+            PreparedStatement eventPrepStmt = catConn.prepareStatement("INSERT INTO `" +
                     WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
                     "`expocode`, `socat_version`, `data_name`, `reviewer_id`, " +
                     "`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
-            prepStmt.setString(1, woceEvent.getFlagName());
-            prepStmt.setString(2, woceEvent.getFlagValue());
-            Date flagDate = woceEvent.getFlagDate();
-            if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
-                prepStmt.setLong(3, Math.round(System.currentTimeMillis() / 1000.0));
-            else
-                prepStmt.setLong(3, Math.round(flagDate.getTime() / 1000.0));
-            prepStmt.setString(4, woceEvent.getDatasetId());
-            prepStmt.setString(5, woceEvent.getVersion());
-            prepStmt.setString(6, woceEvent.getVarName());
-            prepStmt.setInt(7, reviewerId);
-            prepStmt.setString(8, woceEvent.getComment());
-            if ( prepStmt.executeUpdate() != 1 )
-                throw new SQLException("Adding the data QC event was unsuccessful");
-            // Get the woce_id for the added WOCE event
-            long woceId;
-            ResultSet results = catConn.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
-            try {
-                if ( !results.first() )
-                    throw new SQLException("Unexpected failure to get the woce_id for an added data QC event");
-                woceId = results.getLong(1);
-                if ( woceId <= 0 )
-                    throw new SQLException("Unexpected invalid woce_id for an added data QC event");
-            } finally {
-                results.close();
-            }
-            woceEvent.setId(woceId);
-            // Add the DataLocations to the WOCELocations table
-            prepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME +
+            PreparedStatement locPrepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME +
                     "` (`woce_id`, `row_num`, `longitude`, `latitude`, `data_time`, `data_value`) " +
                     "VALUES (?, ?, ?, ?, ?, ?);");
-            for (DataLocation location : woceEvent.getLocations()) {
-                prepStmt.setLong(1, woceId);
-                Integer intVal = location.getRowNumber();
-                if ( intVal.equals(DashboardUtils.INT_MISSING_VALUE) )
-                    prepStmt.setNull(2, java.sql.Types.INTEGER);
+            for (DataQCEvent event : woceEvents) {
+                int reviewerId = getReviewerId(catConn, event.getUsername(), event.getRealname());
+                // Add the WOCE event
+                eventPrepStmt.setString(1, event.getFlagName());
+                eventPrepStmt.setString(2, event.getFlagValue());
+                Date flagDate = event.getFlagDate();
+                if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
+                    eventPrepStmt.setLong(3, Math.round(System.currentTimeMillis() / 1000.0));
                 else
-                    prepStmt.setInt(2, intVal);
-                Double dblVal = location.getLongitude();
-                if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
-                    prepStmt.setNull(3, java.sql.Types.DOUBLE);
-                else
-                    prepStmt.setDouble(3, dblVal);
-                dblVal = location.getLatitude();
-                if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
-                    prepStmt.setNull(4, java.sql.Types.DOUBLE);
-                else
-                    prepStmt.setDouble(4, dblVal);
-                Date dateVal = location.getDataDate();
-                if ( dateVal.equals(DashboardUtils.DATE_MISSING_VALUE) )
-                    prepStmt.setNull(5, java.sql.Types.BIGINT);
-                else
-                    prepStmt.setLong(5, Math.round(dateVal.getTime() / 1000.0));
-                dblVal = location.getDataValue();
-                if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
-                    prepStmt.setNull(6, java.sql.Types.DOUBLE);
-                else
-                    prepStmt.setDouble(6, dblVal);
-                prepStmt.executeUpdate();
-                if ( prepStmt.getUpdateCount() != 1 )
-                    throw new SQLException("Adding a data QC location was unsuccessful");
+                    eventPrepStmt.setLong(3, Math.round(flagDate.getTime() / 1000.0));
+                eventPrepStmt.setString(4, event.getDatasetId());
+                eventPrepStmt.setString(5, event.getVersion());
+                eventPrepStmt.setString(6, event.getVarName());
+                eventPrepStmt.setInt(7, reviewerId);
+                eventPrepStmt.setString(8, event.getComment());
+                if ( eventPrepStmt.executeUpdate() != 1 )
+                    throw new SQLException("Adding the data QC event was unsuccessful");
+
+                // Get the woce_id for the added WOCE event
+                long woceId;
+                ResultSet results = catConn.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
+                try {
+                    if ( !results.first() )
+                        throw new SQLException("Unexpected failure to get the woce_id for an added data QC event");
+                    woceId = results.getLong(1);
+                    if ( woceId <= 0 )
+                        throw new SQLException("Unexpected invalid woce_id for an added data QC event");
+                } finally {
+                    results.close();
+                }
+
+                // Add the DataLocations to the WOCELocations table
+                for (DataLocation location : event.getLocations()) {
+                    locPrepStmt.setLong(1, woceId);
+                    Integer intVal = location.getRowNumber();
+                    if ( intVal.equals(DashboardUtils.INT_MISSING_VALUE) )
+                        locPrepStmt.setNull(2, java.sql.Types.INTEGER);
+                    else
+                        locPrepStmt.setInt(2, intVal);
+                    Double dblVal = location.getLongitude();
+                    if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
+                        locPrepStmt.setNull(3, java.sql.Types.DOUBLE);
+                    else
+                        locPrepStmt.setDouble(3, dblVal);
+                    dblVal = location.getLatitude();
+                    if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
+                        locPrepStmt.setNull(4, java.sql.Types.DOUBLE);
+                    else
+                        locPrepStmt.setDouble(4, dblVal);
+                    Date dateVal = location.getDataDate();
+                    if ( dateVal.equals(DashboardUtils.DATE_MISSING_VALUE) )
+                        locPrepStmt.setNull(5, java.sql.Types.BIGINT);
+                    else
+                        locPrepStmt.setLong(5, Math.round(dateVal.getTime() / 1000.0));
+                    dblVal = location.getDataValue();
+                    if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
+                        locPrepStmt.setNull(6, java.sql.Types.DOUBLE);
+                    else
+                        locPrepStmt.setDouble(6, dblVal);
+                    locPrepStmt.executeUpdate();
+                    if ( locPrepStmt.getUpdateCount() != 1 )
+                        throw new SQLException("Adding a data QC location was unsuccessful");
+                }
+
+                // Success - assign the ID
+                event.setId(woceId);
             }
         } finally {
             catConn.close();

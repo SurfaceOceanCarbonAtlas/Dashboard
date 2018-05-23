@@ -12,7 +12,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,10 +37,6 @@ public class CheckerMessageHandler {
     private static final String MSG_KEY_VALUE_SEP = ":";
     private static final String MSG_SEVERITY_KEY = "MsgSeverity";
     private static final String MSG_ROW_NUMBER_KEY = "MsgRowNumber";
-    private static final String MSG_LONGITUDE_KEY = "MsgLongitude";
-    private static final String MSG_LATITUDE_KEY = "MsgLatitude";
-    private static final String MSG_DEPTH_KEY = "MsgDepth";
-    private static final String MSG_TIMESTAMP_KEY = "MsgTimestamp";
     private static final String MSG_COLUMN_NUMBER_KEY = "MsgColumnNumber";
     private static final String MSG_COLUMN_NAME_KEY = "MsgColumnName";
     private static final String MSG_GENERAL_MSG_KEY = "MsgGeneralMessage";
@@ -133,13 +128,14 @@ public class CheckerMessageHandler {
     }
 
     /**
-     * Save the list of automated data check messages given with a standardized user data array object.  Using these
-     * messages, assigns the WOCE_AUTOCHECK data column values in the standardized data array as well as the set of
-     * automated data check flags in the dataset.  Also assigns the set of PI-provided QC flags in the dataset.  This
-     * assumes PI-provided QC flags indicating problems have flag values that are integers in the range [3,9].
+     * Save the list of automated data check messages given with a standardized user data array object.
+     * Using these messages, assigns the WOCE_AUTOCHECK data column values in the standardized data array
+     * as well as the set of automated data checker data QC flags in the dataset.  Also assigns the set of
+     * PI-provided data QC flags in the dataset.  This assumes PI-provided QC flags indicating issues have
+     * flag values that are integers in the range [3,9] (e.g., WOCE or bottle QC flags).
      *
      * @param dataset
-     *         save message for, and assign QC flag sets in, this dataset
+     *         save message for this dataset as well as the sets of data QC flags in this dataset
      * @param stdUserData
      *         standardized user data for this dataset containing automated data check messages
      *
@@ -198,9 +194,9 @@ public class CheckerMessageHandler {
             TreeMap<String,Integer> warnCnt = new TreeMap<String,Integer>();
             for (ADCMessage msg : msgList) {
                 // Start with a summary giving the counts of each general message/severity
-                Severity severity = msg.getSeverity();
+                QCFlag.Severity severity = msg.getSeverity();
                 String summary = msg.getGeneralComment();
-                if ( Severity.CRITICAL.equals(severity) || Severity.ERROR.equals(severity) ) {
+                if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
                     Integer cnt = errorCnt.get(summary);
                     if ( cnt == null )
                         cnt = 1;
@@ -208,7 +204,7 @@ public class CheckerMessageHandler {
                         cnt += 1;
                     errorCnt.put(summary, cnt);
                 }
-                else if ( Severity.WARNING.equals(severity) ) {
+                else if ( QCFlag.Severity.WARNING.equals(severity) ) {
                     Integer cnt = warnCnt.get(summary);
                     if ( cnt == null )
                         cnt = 1;
@@ -234,7 +230,7 @@ public class CheckerMessageHandler {
                 // Generate a list of key-value strings describing this message
                 ArrayList<String> mappings = new ArrayList<String>();
 
-                Severity severity = msg.getSeverity();
+                QCFlag.Severity severity = msg.getSeverity();
                 mappings.add(MSG_SEVERITY_KEY + MSG_KEY_VALUE_SEP + severity.name());
 
                 Integer rowNum = msg.getRowNumber();
@@ -243,33 +239,6 @@ public class CheckerMessageHandler {
                     mappings.add(MSG_ROW_NUMBER_KEY + MSG_KEY_VALUE_SEP + rowNum);
                 else
                     rowNum = null;
-
-                Double longitude = msg.getLongitude();
-                if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitude,
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-                    mappings.add(MSG_LONGITUDE_KEY + MSG_KEY_VALUE_SEP + longitude);
-                else
-                    longitude = null;
-
-                Double latitude = msg.getLatitude();
-                if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitude,
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-                    mappings.add(MSG_LATITUDE_KEY + MSG_KEY_VALUE_SEP + latitude);
-                else
-                    latitude = null;
-
-                Double depth = msg.getDepth();
-                if ( !DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, depth,
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-                    mappings.add(MSG_DEPTH_KEY + MSG_KEY_VALUE_SEP + depth);
-                else
-                    depth = null;
-
-                String timestamp = msg.getTimestamp();
-                if ( !DashboardUtils.STRING_MISSING_VALUE.equals(timestamp) )
-                    mappings.add(MSG_TIMESTAMP_KEY + MSG_KEY_VALUE_SEP + timestamp);
-                else
-                    timestamp = null;
 
                 Integer colNumber = msg.getColNumber();
                 if ( (colNumber > 0) && (colNumber <= numUserCols) &&
@@ -281,47 +250,41 @@ public class CheckerMessageHandler {
                 String colName = msg.getColName();
                 if ( !DashboardUtils.STRING_MISSING_VALUE.equals(colName) )
                     mappings.add(MSG_COLUMN_NAME_KEY + MSG_KEY_VALUE_SEP + colName);
-                else
-                    colName = null;
 
                 // Assign the general message - escape newlines
                 String summary = msg.getGeneralComment().replace("\n", "\\n");
                 if ( !DashboardUtils.STRING_MISSING_VALUE.equals(summary) )
                     mappings.add(MSG_GENERAL_MSG_KEY + MSG_KEY_VALUE_SEP + summary);
-                else
-                    summary = null;
 
                 // Assign the detailed message - escape newlines
                 String details = msg.getDetailedComment().replace("\n", "\\n");
                 if ( !DashboardUtils.STRING_MISSING_VALUE.equals(details) )
                     mappings.add(MSG_DETAILED_MSG_KEY + MSG_KEY_VALUE_SEP + details);
-                else
-                    details = null;
 
                 // Write this array list of key-value strings to file
                 msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 
                 // Create the QC flag for this message.
                 if ( rowNum != null ) {
-                    if ( Severity.CRITICAL.equals(severity) || Severity.ERROR.equals(severity) ) {
+                    if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
                         QCFlag flag;
                         if ( colNumber != null )
                             flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD,
-                                    Severity.ERROR, colNumber - 1, rowNum - 1);
+                                    QCFlag.Severity.ERROR, colNumber - 1, rowNum - 1);
                         else
                             flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_BAD,
-                                    Severity.ERROR, null, rowNum - 1);
+                                    QCFlag.Severity.ERROR, null, rowNum - 1);
                         woceFlags.add(flag);
                         stdUserData.setWoceAutocheck(rowNum - 1, DashboardServerUtils.WOCE_BAD);
                     }
-                    else if ( Severity.WARNING.equals(severity) ) {
+                    else if ( QCFlag.Severity.WARNING.equals(severity) ) {
                         QCFlag flag;
                         if ( colNumber > 0 )
                             flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE,
-                                    Severity.WARNING, colNumber - 1, rowNum - 1);
+                                    QCFlag.Severity.WARNING, colNumber - 1, rowNum - 1);
                         else
                             flag = new QCFlag(woceFlagName, DashboardServerUtils.WOCE_QUESTIONABLE,
-                                    Severity.WARNING, null, rowNum - 1);
+                                    QCFlag.Severity.WARNING, null, rowNum - 1);
                         woceFlags.add(flag);
                         stdUserData.setWoceAutocheck(rowNum - 1, DashboardServerUtils.WOCE_QUESTIONABLE);
                     }
@@ -352,24 +315,24 @@ public class CheckerMessageHandler {
                     break;
                 }
             }
-            Severity severityOfThree = Severity.ERROR;
+            QCFlag.Severity severityOfThree = QCFlag.Severity.ERROR;
             if ( colType.getDescription().toUpperCase().contains("WOCE") )
-                severityOfThree = Severity.WARNING;
+                severityOfThree = QCFlag.Severity.WARNING;
             for (int j = 0; j < numSamples; j++) {
                 try {
                     String flagVal = (String) stdUserData.getStdVal(j, k);
                     int value = Integer.parseInt(flagVal);
                     if ( (value >= 3) && (value <= 9) ) {
-                        Severity severity;
+                        QCFlag.Severity severity;
                         if ( value == 3 )
                             severity = severityOfThree;
                         else
-                            severity = Severity.ERROR;
+                            severity = QCFlag.Severity.ERROR;
                         QCFlag flag;
                         if ( qcDataIdx >= 0 )
-                            flag = new QCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, k);
+                            flag = new QCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, j);
                         else
-                            flag = new QCFlag(colType.getVarName(), flagVal, severity, null, k);
+                            flag = new QCFlag(colType.getVarName(), flagVal, severity, null, j);
                         qcFlags.add(flag);
                     }
                 } catch ( NumberFormatException ex ) {
@@ -381,22 +344,22 @@ public class CheckerMessageHandler {
     }
 
     /**
-     * Reads the list of messages from the messages file written by {@link #processCheckerMessages(DashboardDataset,
-     * StdUserDataArray)}.
+     * Reads the list of messages from the messages file written by
+     * {@link #processCheckerMessages(DashboardDataset, StdUserDataArray)}.
      *
      * @param datasetId
      *         get messages for the dataset with this ID
      *
-     * @return the automated data checker messages for the dataset; never null, but may be empty if there were no
-     *         messages. The datasetId, but not the username, will be assigned in the returned ADCMessageList
+     * @return the automated data checker messages for the dataset;
+     *         never null, but may be empty if there were no messages.
+     *         The datasetId, but not the username, will be assigned in the returned ADCMessageList
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, or if the messages file is invalid
      * @throws FileNotFoundException
      *         if there is no messages file for the dateset
      */
-    public ADCMessageList getCheckerMessages(String datasetId)
-            throws IllegalArgumentException, FileNotFoundException {
+    public ADCMessageList getCheckerMessages(String datasetId) throws IllegalArgumentException, FileNotFoundException {
         // Create the list of messages to be returned
         ADCMessageList msgList = new ADCMessageList();
         msgList.setDatasetId(datasetId);
@@ -431,7 +394,7 @@ public class CheckerMessageHandler {
 
                         String propVal = msgProps.getProperty(MSG_SEVERITY_KEY);
                         try {
-                            msg.setSeverity(Severity.valueOf(propVal));
+                            msg.setSeverity(QCFlag.Severity.valueOf(propVal));
                         } catch ( Exception ex ) {
                             // leave as the default
                         }
@@ -441,39 +404,6 @@ public class CheckerMessageHandler {
                             msg.setRowNumber(Integer.parseInt(propVal));
                         } catch ( Exception ex ) {
                             // leave as the default
-                        }
-
-                        propVal = msgProps.getProperty(MSG_LONGITUDE_KEY);
-                        try {
-                            msg.setLongitude(Double.valueOf(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
-
-                        propVal = msgProps.getProperty(MSG_LATITUDE_KEY);
-                        try {
-                            msg.setLatitude(Double.valueOf(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
-
-                        propVal = msgProps.getProperty(MSG_LATITUDE_KEY);
-                        try {
-                            msg.setLatitude(Double.valueOf(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
-
-                        propVal = msgProps.getProperty(MSG_DEPTH_KEY);
-                        try {
-                            msg.setDepth(Double.valueOf(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
-
-                        propVal = msgProps.getProperty(MSG_TIMESTAMP_KEY);
-                        if ( propVal != null ) {
-                            msg.setTimestamp(propVal);
                         }
 
                         propVal = msgProps.getProperty(MSG_COLUMN_NUMBER_KEY);

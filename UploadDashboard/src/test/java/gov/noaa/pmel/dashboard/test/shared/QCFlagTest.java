@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +21,7 @@ public class QCFlagTest {
 
     private static final String MY_FLAG_NAME = "WOCE_CO2_atm";
     private static final String MY_FLAG_VALUE = "3";
-    private static final Severity MY_SEVERITY = Severity.WARNING;
+    private static final QCFlag.Severity MY_SEVERITY = QCFlag.Severity.WARNING;
     private static final Integer MY_COLUMN_INDEX = 5;
     private static final Integer MY_ROW_INDEX = 15;
 
@@ -59,13 +58,13 @@ public class QCFlagTest {
     @Test
     public void testGetSetSeverity() {
         QCFlag flag = new QCFlag();
-        assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+        assertEquals(QCFlag.Severity.UNASSIGNED, flag.getSeverity());
         flag.setSeverity(MY_SEVERITY);
         assertEquals(MY_SEVERITY, flag.getSeverity());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setSeverity(null);
-        assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+        assertEquals(QCFlag.Severity.UNASSIGNED, flag.getSeverity());
     }
 
     /**
@@ -77,7 +76,7 @@ public class QCFlagTest {
         assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
         flag.setColumnIndex(MY_COLUMN_INDEX);
         assertEquals(MY_COLUMN_INDEX, flag.getColumnIndex());
-        assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+        assertEquals(QCFlag.Severity.UNASSIGNED, flag.getSeverity());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setColumnIndex(null);
@@ -94,7 +93,7 @@ public class QCFlagTest {
         flag.setRowIndex(MY_ROW_INDEX);
         assertEquals(MY_ROW_INDEX, flag.getRowIndex());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, flag.getColumnIndex());
-        assertEquals(Severity.UNASSIGNED, flag.getSeverity());
+        assertEquals(QCFlag.Severity.UNASSIGNED, flag.getSeverity());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, flag.getFlagName());
         flag.setRowIndex(null);
@@ -102,7 +101,7 @@ public class QCFlagTest {
     }
 
     /**
-     * Test method for {@link QCFlag#QCFlag(String, String, Severity, Integer, Integer)}
+     * Test method for {@link QCFlag#QCFlag(String, String, QCFlag.Severity, Integer, Integer)}
      */
     @Test
     public void testWoceFlagStringIntegerInteger() {
@@ -121,7 +120,7 @@ public class QCFlagTest {
     public void testHashCodeEquals() {
         QCFlag first = new QCFlag();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(MY_FLAG_NAME));
+        assertFalse(first.equals(DashboardUtils.STRING_MISSING_VALUE));
 
         QCFlag second = new QCFlag();
         assertEquals(first.hashCode(), second.hashCode());
@@ -168,8 +167,8 @@ public class QCFlagTest {
      */
     @Test
     public void testCompareTo() {
-        QCFlag first = new QCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 5, 25);
-        QCFlag second = new QCFlag("WOCE_CO2_water", "2", Severity.ACCEPTABLE, 4, 15);
+        QCFlag first = new QCFlag("WOCE_CO2_atm", "3", QCFlag.Severity.WARNING, 5, 25);
+        QCFlag second = new QCFlag("WOCE_CO2_water", "2", QCFlag.Severity.ACCEPTABLE, 4, 15);
 
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
@@ -184,11 +183,11 @@ public class QCFlagTest {
         second.setFlagValue("3");
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
-        second.setSeverity(Severity.ERROR);
+        second.setSeverity(QCFlag.Severity.ERROR);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
 
-        second.setSeverity(Severity.WARNING);
+        second.setSeverity(QCFlag.Severity.WARNING);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.setColumnIndex(6);
