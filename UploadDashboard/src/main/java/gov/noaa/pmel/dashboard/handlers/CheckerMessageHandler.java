@@ -364,71 +364,99 @@ public class CheckerMessageHandler {
         msgReader = new BufferedReader(new FileReader(msgsFile));
         try {
             try {
-                String msgline = msgReader.readLine();
-                while ( msgline != null ) {
-                    if ( !msgline.trim().isEmpty() ) {
+                String summmaryStart = MSG_SUMMARY_MSG_KEY + MSG_KEY_VALUE_SEP;
+                String altSummmaryStart = "SC" + summmaryStart;
+                for (String msgline = msgReader.readLine(); msgline != null; msgline = msgReader.readLine()) {
+                    if ( msgline.trim().isEmpty() )
+                        continue;
 
-                        if ( msgline.startsWith(MSG_SUMMARY_MSG_KEY + MSG_KEY_VALUE_SEP) ) {
-                            summaryMsgs.add(msgline.substring(MSG_SUMMARY_MSG_KEY.length() +
-                                    MSG_KEY_VALUE_SEP.length()).trim());
-                            msgline = msgReader.readLine();
-                            continue;
-                        }
+                    if ( msgline.startsWith(summmaryStart) ) {
+                        summaryMsgs.add(msgline.substring(summmaryStart.length()).trim());
+                        continue;
+                    }
+                    // For backwards compatibility
+                    if ( msgline.startsWith(altSummmaryStart) ) {
+                        summaryMsgs.add(msgline.substring(altSummmaryStart.length()).trim());
+                        continue;
+                    }
 
-                        Properties msgProps = new Properties();
+                    Properties msgProps = new Properties();
+                    try {
                         for (String msgPart : DashboardUtils.decodeStringArrayList(msgline)) {
                             String[] keyValue = msgPart.split(MSG_KEY_VALUE_SEP, 2);
                             if ( keyValue.length != 2 )
                                 throw new IOException("Invalid key:value pair '" + msgPart + "'");
                             msgProps.setProperty(keyValue[0], keyValue[1]);
                         }
+                    } catch ( IllegalArgumentException ex ) {
+                        throw new IOException("Invalid saved checker message: " + msgline);
+                    }
 
-                        ADCMessage msg = new ADCMessage();
+                    ADCMessage msg = new ADCMessage();
 
+                    try {
                         String propVal = msgProps.getProperty(MSG_SEVERITY_KEY);
-                        try {
-                            msg.setSeverity(QCFlag.Severity.valueOf(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_SEVERITY_KEY);
+                        msg.setSeverity(QCFlag.Severity.valueOf(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
 
-                        propVal = msgProps.getProperty(MSG_ROW_NUMBER_KEY);
-                        try {
-                            msg.setRowNumber(Integer.parseInt(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
+                    try {
+                        String propVal = msgProps.getProperty(MSG_ROW_NUMBER_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_ROW_NUMBER_KEY);
+                        msg.setRowNumber(Integer.parseInt(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
 
-                        propVal = msgProps.getProperty(MSG_COLUMN_NUMBER_KEY);
-                        try {
-                            msg.setColNumber(Integer.parseInt(propVal));
-                        } catch ( Exception ex ) {
-                            // leave as the default
-                        }
+                    try {
+                        String propVal = msgProps.getProperty(MSG_COLUMN_NUMBER_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_COLUMN_NUMBER_KEY);
+                        msg.setColNumber(Integer.parseInt(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
 
-                        propVal = msgProps.getProperty(MSG_COLUMN_NAME_KEY);
+                    try {
+                        String propVal = msgProps.getProperty(MSG_COLUMN_NAME_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_COLUMN_NAME_KEY);
+                        msg.setColName(propVal);
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
+
+                    try {
+                        String propVal = msgProps.getProperty(MSG_GENERAL_MSG_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_GENERAL_MSG_KEY);
+                        // Replace all escaped newlines in the message string
                         if ( propVal != null ) {
-                            msg.setColName(propVal);
-                        }
-
-                        propVal = msgProps.getProperty(MSG_GENERAL_MSG_KEY);
-                        if ( propVal != null ) {
-                            // Replace all escaped newlines in the message string
                             propVal = propVal.replace("\\n", "\n");
                             msg.setGeneralComment(propVal);
                         }
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
 
-                        propVal = msgProps.getProperty(MSG_DETAILED_MSG_KEY);
+                    try {
+                        String propVal = msgProps.getProperty(MSG_DETAILED_MSG_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_DETAILED_MSG_KEY);
                         if ( propVal != null ) {
                             // Replace all escaped newlines in the message string
                             propVal = propVal.replace("\\n", "\n");
                             msg.setDetailedComment(propVal);
                         }
-
-                        msgList.add(msg);
-
-                        msgline = msgReader.readLine();
+                    } catch ( Exception ex ) {
+                        // leave as the default
                     }
+
+                    msgList.add(msg);
                 }
             } finally {
                 msgReader.close();

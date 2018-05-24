@@ -345,6 +345,8 @@ public class DashboardConfigStore {
         String nameKeysToColumnTypesFilename;
         try {
             nameKeysToColumnTypesFilename = getFilePathProperty(configProps, DEFAULT_TYPE_KEYS_FILE_TAG, appConfigDir);
+            if ( !(new File(nameKeysToColumnTypesFilename).exists()) )
+                throw new IOException("file does not exist");
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DEFAULT_TYPE_KEYS_FILE_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -446,11 +448,17 @@ public class DashboardConfigStore {
         }
 
         // Ferret configuration
+        InputStream stream;
         try {
             propVal = getFilePathProperty(configProps, FERRET_CONFIG_FILE_NAME_TAG, appConfigDir);
             File ferretPropsFile = new File(propVal);
             filesToWatch.add(ferretPropsFile);
-            InputStream stream = new FileInputStream(ferretPropsFile);
+            stream = new FileInputStream(ferretPropsFile);
+        } catch ( Exception ex ) {
+            throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + " value specified in " +
+                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+        }
+        try {
             try {
                 SAXBuilder sb = new SAXBuilder();
                 Document jdom = sb.build(stream);
@@ -461,8 +469,8 @@ public class DashboardConfigStore {
             }
             itsLogger.info("read Ferret configuration file " + propVal);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + " value specified in " +
-                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+            throw new IOException("Invalid value in the Ferret configuration file specified by the " +
+                    FERRET_CONFIG_FILE_NAME_TAG + " value given in " + configFile.getPath() + "\n" + ex.getMessage());
         }
 
         // Handler for DSG NC files
