@@ -100,7 +100,7 @@ public class LonLatConverter extends ValueConverter<Double> {
             }
         }
         else if ( "DDD.MMSSss E".equalsIgnoreCase(fromUnit) || "DD.MMSSss N".equalsIgnoreCase(fromUnit) ||
-                  "DDD.MMSSss W".equalsIgnoreCase(fromUnit) || "DD.MMSSss S".equalsIgnoreCase(fromUnit) ) {
+                "DDD.MMSSss W".equalsIgnoreCase(fromUnit) || "DD.MMSSss S".equalsIgnoreCase(fromUnit) ) {
             try {
                 // Just verify the string is in the appropriate format - that of a floating-point value
                 // which happens to be the value only if minutes and seconds are not specified

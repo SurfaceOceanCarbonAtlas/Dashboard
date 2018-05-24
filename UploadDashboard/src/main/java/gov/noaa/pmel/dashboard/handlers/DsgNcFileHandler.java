@@ -11,8 +11,8 @@ import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.server.QCEvent;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -176,7 +176,7 @@ public class DsgNcFileHandler {
 
         // Create the NetCDF DSG file
         try {
-            dsgFile.create(metadata, stdUserData, knownDataFileTypes);
+            dsgFile.createFromUserData(metadata, stdUserData, knownDataFileTypes);
         } catch ( Exception ex ) {
             dsgFile.delete();
             throw new IllegalArgumentException("Problems creating the DSG file " +
@@ -264,7 +264,7 @@ public class DsgNcFileHandler {
                 StdDataArray dataVals = oldDsgFile.getStdDataArray();
                 DsgMetadata updatedMeta = oldDsgFile.getMetadata();
                 updatedMeta.setDatasetId(newId);
-                newDsgFile.create(updatedMeta, dataVals);
+                newDsgFile.createFromFileData(updatedMeta, dataVals, knownDataFileTypes);
                 // Call Ferret to add lon360 and tmonth (calculated data should be the same)
                 SocatTool tool = new SocatTool(ferretConfig);
                 ArrayList<String> scriptArgs = new ArrayList<String>(1);

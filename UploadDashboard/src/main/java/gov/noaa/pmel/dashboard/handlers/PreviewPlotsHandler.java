@@ -158,7 +158,7 @@ public class PreviewPlotsHandler {
 
         // Create the preview NetCDF DSG file
         try {
-            dsgFile.create(dsgMData, stdUserData, knownDataFileTypes);
+            dsgFile.createFromUserData(dsgMData, stdUserData, knownDataFileTypes);
         } catch ( Exception ex ) {
             dsgFile.delete();
             throw new IllegalArgumentException("Problems creating the preview DSG file for " +

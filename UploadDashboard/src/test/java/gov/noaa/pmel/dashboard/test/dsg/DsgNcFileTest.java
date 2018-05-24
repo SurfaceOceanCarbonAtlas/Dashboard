@@ -32,7 +32,7 @@ public class DsgNcFileTest {
     public DsgNcFile dsgNcFile = null;
 
     /**
-     * Test method for successfully creating a DSG file using {@link DsgNcFile#create}.
+     * Test method for successfully creating a DSG file using {@link DsgNcFile#createFromUserData}.
      */
     @Test
     public void testCreate() throws Exception {
@@ -123,14 +123,14 @@ public class DsgNcFileTest {
         if ( !parentDir.exists() )
             parentDir.mkdir();
         dsgNcFile = new DsgNcFile(parentDir, expocode + ".nc");
-        dsgNcFile.create(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
+        dsgNcFile.createFromUserData(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
         assertTrue(dsgNcFile.exists());
         assertEquals(expocode, dsgNcFile.getMetadata().getDatasetId());
         assertEquals(dataValueStrings.length, dsgNcFile.getStdDataArray().getNumSamples());
     }
 
     /**
-     * Test method for checking expected failures to a DSG file using {@link DsgNcFile#create}.
+     * Test method for checking expected failures to a DSG file using {@link DsgNcFile#createFromUserData}.
      */
     @Test
     public void testBadMissingValuesFail() throws Exception {
@@ -208,7 +208,7 @@ public class DsgNcFileTest {
                 parentDir.mkdir();
             dsgNcFile = new DsgNcFile(parentDir, expocode + ".nc");
             try {
-                dsgNcFile.create(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
+                dsgNcFile.createFromUserData(metadata, stdUserData, KnownDataTypesTest.TEST_KNOWN_DATA_FILE_TYPES);
             } catch ( IllegalArgumentException ex ) {
                 dsgNcFile.delete();
             }

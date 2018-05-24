@@ -5,10 +5,10 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.server.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.QCEvent;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -378,7 +378,7 @@ public class DatabaseRequestHandler {
                     QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
                     "`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?);");
-            for ( QCEvent event : qcEvents ) {
+            for (QCEvent event : qcEvents) {
                 int reviewerId = getReviewerId(catConn, event.getUsername(), event.getRealname());
                 addPrepStmt.setString(1, event.getFlagValue());
                 Date flagDate = event.getFlagDate();

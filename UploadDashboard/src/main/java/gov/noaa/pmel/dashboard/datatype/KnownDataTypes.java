@@ -107,6 +107,7 @@ public class KnownDataTypes {
     public KnownDataTypes addStandardTypesForMetadataFiles() {
         addDataType(DashboardServerUtils.DATASET_ID);
         addDataType(DashboardServerUtils.DATASET_NAME);
+        addDataType(DashboardServerUtils.ENHANCED_DOI);
         addDataType(DashboardServerUtils.PLATFORM_NAME);
         addDataType(DashboardServerUtils.PLATFORM_TYPE);
         addDataType(DashboardServerUtils.ORGANIZATION_NAME);
@@ -118,6 +119,7 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.TIME_COVERAGE_START);
         addDataType(DashboardServerUtils.TIME_COVERAGE_END);
         addDataType(DashboardServerUtils.DATASET_QC_FLAG);
+        addDataType(DashboardServerUtils.ALL_REGION_IDS);
         addDataType(DashboardServerUtils.VERSION);
         return this;
     }
@@ -144,6 +146,7 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.HOUR_OF_DAY);
         addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
         addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
+        addDataType(DashboardServerUtils.REGION_ID);
         return this;
     }
 

@@ -133,6 +133,7 @@ public class KnownDataTypesTest {
     private static final TreeSet<DashDataType<?>> STD_METADATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
             DashboardServerUtils.DATASET_ID,
             DashboardServerUtils.DATASET_NAME,
+            DashboardServerUtils.ENHANCED_DOI,
             DashboardServerUtils.PLATFORM_NAME,
             DashboardServerUtils.PLATFORM_TYPE,
             DashboardServerUtils.ORGANIZATION_NAME,
@@ -144,6 +145,7 @@ public class KnownDataTypesTest {
             DashboardServerUtils.TIME_COVERAGE_START,
             DashboardServerUtils.TIME_COVERAGE_END,
             DashboardServerUtils.DATASET_QC_FLAG,
+            DashboardServerUtils.ALL_REGION_IDS,
             DashboardServerUtils.VERSION
     ));
 
@@ -161,7 +163,8 @@ public class KnownDataTypesTest {
             DashboardServerUtils.DAY_OF_MONTH,
             DashboardServerUtils.HOUR_OF_DAY,
             DashboardServerUtils.MINUTE_OF_HOUR,
-            DashboardServerUtils.SECOND_OF_MINUTE
+            DashboardServerUtils.SECOND_OF_MINUTE,
+            DashboardServerUtils.REGION_ID
     ));
 
     private static final HashSet<String> STD_USERS_VARNAMES;

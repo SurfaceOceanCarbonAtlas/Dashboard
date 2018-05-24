@@ -7,9 +7,9 @@ import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.server.DataQCEvent;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
@@ -124,7 +124,7 @@ public class DsgNcFile extends File {
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
      */
-    public void create(DsgMetadata metaData, StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
+    public void createFromUserData(DsgMetadata metaData, StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
             throws IllegalArgumentException, IOException, InvalidRangeException {
         if ( metaData == null )
             throw new IllegalArgumentException("no metadata given");
@@ -136,7 +136,7 @@ public class DsgNcFile extends File {
         // if not already present, year, month, day, hour, minute, and second.
         stddata = new StdDataArray(userStdData, dataFileTypes);
 
-        create(metadata, stddata);
+        createFromFileData(metadata, stddata, dataFileTypes);
     }
 
     /**
@@ -144,9 +144,12 @@ public class DsgNcFile extends File {
      * The internal metadata and stddata references are updated to the given DsgMetadata and StdDataArray object.
      *
      * @param metaData
-     *         metadata for the dataset
+     *         metadata for the dataset; the DSG file will be created with exactly the metadata types it contains
      * @param fileData
      *         standardized data appropriate for data files
+     * @param dataFileTypes
+     *         all known data types for file data variables; the DSG file will be created with all these data types.
+     *         Any types not given in fileData will filled with appropriate missing values.
      *
      * @throws IllegalArgumentException
      *         if either argument is null or invalid
@@ -155,7 +158,7 @@ public class DsgNcFile extends File {
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
      */
-    public void create(DsgMetadata metaData, StdDataArray fileData)
+    public void createFromFileData(DsgMetadata metaData, StdDataArray fileData, KnownDataTypes dataFileTypes)
             throws IllegalArgumentException, IOException, InvalidRangeException {
         if ( metaData == null )
             throw new IllegalArgumentException("no metadata given");
@@ -163,6 +166,11 @@ public class DsgNcFile extends File {
         if ( fileData == null )
             throw new IllegalArgumentException("no data given");
         stddata = fileData;
+        if ( dataFileTypes == null )
+            throw new IllegalArgumentException("dataFileTypes is null");
+        TreeSet<DashDataType<?>> knownDataTypes = dataFileTypes.getKnownTypesSet();
+        if ( knownDataTypes.isEmpty() )
+            throw new IllegalArgumentException("no data file types given");
 
         NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
         try {
@@ -239,8 +247,7 @@ public class DsgNcFile extends File {
                 }
             }
 
-            List<DashDataType<?>> dataTypes = stddata.getDataTypes();
-            for (DashDataType<?> dtype : dataTypes) {
+            for (DashDataType<?> dtype : knownDataTypes) {
                 varName = dtype.getVarName();
                 if ( dtype instanceof StringDashDataType ) {
                     // Data Strings
@@ -323,43 +330,66 @@ public class DsgNcFile extends File {
                 }
             }
 
-            for (int k = 0; k < stddata.getNumDataCols(); k++) {
-                DashDataType<?> dtype = dataTypes.get(k);
+            List<DashDataType<?>> dataTypes = stddata.getDataTypes();
+            // for (int k = 0; k < stddata.getNumDataCols(); k++) {
+            for (DashDataType<?> dtype : knownDataTypes) {
                 varName = dtype.getVarName();
                 var = ncfile.findVariable(varName);
                 if ( var == null )
                     throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+                int k = dataTypes.indexOf(dtype);
 
                 if ( dtype instanceof StringDashDataType ) {
                     // Data Stings
                     ArrayChar.D2 dvar = new ArrayChar.D2(numSamples, maxDataChar);
-                    for (int j = 0; j < numSamples; j++) {
-                        String dvalue = (String) stddata.getStdVal(j, k);
-                        if ( dvalue == null )
-                            dvalue = DashboardUtils.STRING_MISSING_VALUE;
-                        dvar.setString(j, dvalue.trim());
+                    if ( k >= 0 ) {
+                        for (int j = 0; j < numSamples; j++) {
+                            String dvalue = (String) stddata.getStdVal(j, k);
+                            if ( dvalue == null )
+                                dvalue = DashboardUtils.STRING_MISSING_VALUE;
+                            dvar.setString(j, dvalue.trim());
+                        }
+                    }
+                    else {
+                        for (int j = 0; j < numSamples; j++) {
+                            dvar.setString(j, DashboardUtils.STRING_MISSING_VALUE);
+                        }
                     }
                     ncfile.write(var, dvar);
                 }
                 else if ( dtype instanceof IntDashDataType ) {
                     // Data Integers
                     ArrayInt.D1 dvar = new ArrayInt.D1(numSamples);
-                    for (int j = 0; j < numSamples; j++) {
-                        Integer dvalue = (Integer) stddata.getStdVal(j, k);
-                        if ( dvalue == null )
-                            dvalue = DashboardUtils.INT_MISSING_VALUE;
-                        dvar.set(j, dvalue);
+                    if ( k >= 0 ) {
+                        for (int j = 0; j < numSamples; j++) {
+                            Integer dvalue = (Integer) stddata.getStdVal(j, k);
+                            if ( dvalue == null )
+                                dvalue = DashboardUtils.INT_MISSING_VALUE;
+                            dvar.set(j, dvalue);
+                        }
+                    }
+                    else {
+                        for (int j = 0; j < numSamples; j++) {
+                            dvar.set(j, DashboardUtils.INT_MISSING_VALUE);
+                        }
                     }
                     ncfile.write(var, dvar);
                 }
                 else if ( dtype instanceof DoubleDashDataType ) {
                     // Data Doubles
                     ArrayDouble.D1 dvar = new ArrayDouble.D1(numSamples);
-                    for (int j = 0; j < numSamples; j++) {
-                        Double dvalue = (Double) stddata.getStdVal(j, k);
-                        if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
-                            dvalue = DashboardUtils.FP_MISSING_VALUE;
-                        dvar.set(j, dvalue);
+                    if ( k >= 0 ) {
+                        for (int j = 0; j < numSamples; j++) {
+                            Double dvalue = (Double) stddata.getStdVal(j, k);
+                            if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+                                dvalue = DashboardUtils.FP_MISSING_VALUE;
+                            dvar.set(j, dvalue);
+                        }
+                    }
+                    else {
+                        for (int j = 0; j < numSamples; j++) {
+                            dvar.set(j, DashboardUtils.FP_MISSING_VALUE);
+                        }
                     }
                     ncfile.write(var, dvar);
                 }
@@ -738,9 +768,9 @@ public class DsgNcFile extends File {
      * missing values are left as in the DSG file.  This DSG file must have been processed by Ferret for the
      * fCO2_recommended values to be meaningful.
      *
-     * @return the array { lons, lats, times, ssts, fco2s } for this cruise, where lons are the array of longitudes,
-     *         lats are the array of latitudes, times are the array of times, ssts are the array of SST values, and
-     *         fco2s are the array of fCO2_recommended values.
+     * @return the array { lons, lats, times, SSTs, fCO2s } for this cruise, where lons are the array of longitudes,
+     *         lats are the array of latitudes, times are the array of times, SSTs are the array of SST values, and
+     *         fCO2s are the array of fCO2_recommended values.
      *
      * @throws IOException
      *         if problems opening or reading from this DSG file, or

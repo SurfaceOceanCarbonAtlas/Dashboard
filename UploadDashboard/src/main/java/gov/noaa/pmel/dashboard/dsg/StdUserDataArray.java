@@ -22,7 +22,6 @@ import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 /**

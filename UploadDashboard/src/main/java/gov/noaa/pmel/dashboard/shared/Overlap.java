@@ -13,7 +13,7 @@ import java.util.Arrays;
  * Overlaps are duplications of location and time values either within a dataset or between any two datasets.
  * Extensive overlaps are very likely to be erroneous duplication of data, although there is the rare possibility
  * of two instruments on the same platform.
- *
+ * <p>
  * (This is in the shared package for future enhancements where the dashboard reports overlaps.)
  *
  * @author Karl Smith

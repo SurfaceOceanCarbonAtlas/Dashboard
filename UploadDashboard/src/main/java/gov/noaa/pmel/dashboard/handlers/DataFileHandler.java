@@ -272,10 +272,11 @@ public class DataFileHandler extends VersionedFileHandler {
      * @return the dataset data object created
      *
      * @throws IOException
-     *         if reading from datasetsReader throws one, if the dataFormat string is not recognized if there is an
-     *         inconsistent number of data values (columns) in a data sample (row) if a dataset/cruise name column was
-     *         not found, if a dataset ID derived from the dataset name is not valid (too short or too long), if there
-     *         are too few data columns, or if no data samples (rows) were found.
+     *         if reading from dataReader throws one,
+     *         if the dataFormat string is not recognized,
+     *         if there is an inconsistent number of data values (columns) in a data sample (row),
+     *         if no (or too few) data columns were found,
+     *         if no data samples (rows) were found.
      */
     public DashboardDatasetData createDatasetFromInput(BufferedReader dataReader, String dataFormat,
             String owner, String filename, String timestamp) throws IOException {
@@ -424,6 +425,8 @@ public class DataFileHandler extends VersionedFileHandler {
         datasetData.setPreamble(preamble);
         datasetData.setOwner(owner);
         datasetData.setVersion(uploadVersion);
+        datasetData.setUploadFilename(filename);
+        datasetData.setUploadTimestamp(timestamp);
         datasetData.setUserColNames(columnNames);
         datasetData.setDataValues(allDataVals);
 
@@ -452,19 +455,18 @@ public class DataFileHandler extends VersionedFileHandler {
         }
         datasetData.setDatasetId(expocode);
 
-
         return datasetData;
     }
 
     /**
-     * Returns a new DashboardDataset assigned from the dataset information file without reading any of the data in
-     * dataset data file.
+     * Returns a new DashboardDataset assigned from the dataset information file
+     * without reading any of the data in dataset data file.
      *
      * @param datasetId
      *         ID of the dataset to read
      *
-     * @return new DashboardDataset assigned from the information file, or null if the dataset information file does not
-     *         exist
+     * @return new DashboardDataset assigned from the information file, or
+     *         null if the dataset information file does not exist
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is not valid or if there are problems accessing the information file
@@ -499,8 +501,8 @@ public class DataFileHandler extends VersionedFileHandler {
      * @throws IllegalArgumentException
      *         if the dataset is invalid or if there was a error reading information or data for this cruise
      */
-    public DashboardDatasetData getDatasetDataFromFiles(String datasetId,
-            int firstDataRow, int numDataRows) throws IllegalArgumentException {
+    public DashboardDatasetData getDatasetDataFromFiles(String datasetId, int firstDataRow, int numDataRows)
+            throws IllegalArgumentException {
         // Create the cruise and assign the dataset
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         cruiseData.setDatasetId(datasetId);
@@ -533,9 +535,9 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Saves and commits only the dataset properties to the information file. This does not save the dataset data of a
-     * DashboardDatasetData. This first checks the currently saved properties for the cruise, and writes and commits a
-     * new properties file only if there are changes.
+     * Saves and commits only the dataset properties to the information file.  This does not save the dataset data
+     * of a DashboardDatasetData.  This first checks the currently saved properties for the cruise, then writes and
+     * commits a new properties file only if there are changes.
      *
      * @param dataset
      *         save properties of this dataset
@@ -543,8 +545,9 @@ public class DataFileHandler extends VersionedFileHandler {
      *         version control commit message; if null or blank, the commit will not be performed
      *
      * @throws IllegalArgumentException
-     *         if the ID of the dataset is not valid, if there was an error writing information for this dataset to
-     *         file, or if there was an error committing the updated file to version control
+     *         if the ID of the dataset is not valid,
+     *         if there was an error writing information for this dataset to file, or
+     *         if there was an error committing the updated file to version control
      */
     public void saveDatasetInfoToFile(DashboardDataset dataset, String message)
             throws IllegalArgumentException {
@@ -644,8 +647,8 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Saves and commits the dataset data to the data file. The dataset information file needs to be saved using {@link
-     * #saveDatasetInfoToFile(DashboardDataset, String)}.
+     * Saves and commits the dataset data to the data file.
+     * The dataset information file needs to be saved using {@link #saveDatasetInfoToFile(DashboardDataset, String)}.
      *
      * @param dataset
      *         dataset data to save
@@ -653,7 +656,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         version control commit message; if null or blank, the commit will not be performed
      *
      * @throws IllegalArgumentException
-     *         if the ID for the dataset is  not valid, if there was an error writing data for this dataset to file, or
+     *         if the ID for the dataset is  not valid,
+     *         if there was an error writing data for this dataset to file, or
      *         if there was an error committing the updated file to version control
      */
     public void saveDatasetDataToFile(DashboardDatasetData dataset, String message) throws IllegalArgumentException {
@@ -725,8 +729,8 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Adds the title of an OME metadata document or a supplemental document to the documents list associated with a
-     * dataset.
+     * Adds the title of an OME metadata document or a supplemental document
+     * to the documents list associated with a dataset.
      *
      * @param datasetId
      *         add the document to the dataset with this ID
@@ -739,9 +743,10 @@ public class DataFileHandler extends VersionedFileHandler {
      * @return the updated dataset information
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if there are problems accessing the information file for the dataset, if
-     *         there are problems updating and committing the dataset information, if the filename of the document is
-     *         the OME filename but the document is not an instance of OmeMetadata
+     *         if the dataset ID is invalid,
+     *         if there are problems accessing the information file for the dataset,
+     *         if there are problems updating and committing the dataset information,
+     *         if the filename of the document is the OME filename but the document is not an instance of OmeMetadata
      */
     public DashboardDataset addAddlDocTitleToDataset(String datasetId, DashboardMetadata addlDoc)
             throws IllegalArgumentException {
@@ -799,9 +804,9 @@ public class DataFileHandler extends VersionedFileHandler {
      *         new cruise/dataset name
      *
      * @throws IllegalArgumentException
-     *         if the data or info file for the old name does not exist, if a data or info file for the new name already
-     *         exists, if the data file has no column associated with the cruise/dataset name, or if unable to rename or
-     *         update the data or info files
+     *         if the data or info file for the old name does not exist,
+     *         if a data or info file for the new name already exists, or
+     *         if unable to rename or update the data or info files
      */
     public void renameDatasetFiles(String oldName, String newName) throws IllegalArgumentException {
         // Get the dataset IDs for the given names
@@ -834,16 +839,15 @@ public class DataFileHandler extends VersionedFileHandler {
         int nameIdx = -1;
         for (DataColumnType type : datasetData.getDataColTypes()) {
             k++;
-            if ( DashboardServerUtils.DATASET_NAME.typeNameEquals(type) ) {
+            if ( DashboardServerUtils.DATASET_ID.typeNameEquals(type) ) {
                 nameIdx = k;
                 break;
             }
         }
-        if ( nameIdx < 0 )
-            throw new IllegalArgumentException("Unexpected error: no column associated with the cruise/dataset name");
-        for (ArrayList<String> dataVals : datasetData.getDataValues()) {
-            dataVals.set(k, newName);
-        }
+        if ( nameIdx >= 0 )
+            for (ArrayList<String> dataVals : datasetData.getDataValues()) {
+                dataVals.set(k, newName);
+            }
 
         // Move the old dataset files to the new location and name
         String commitMsg = "Rename from " + oldName + " to " + newName;
@@ -862,7 +866,7 @@ public class DataFileHandler extends VersionedFileHandler {
 
     /**
      * Verify a user can overwrite or delete a dataset.  This checks the submission state of the dataset as well as
-     * ownership of the dataset. If not permitted, an IllegalArgumentException is thrown with reason for the failure.
+     * ownership of the dataset.  If not permitted, an IllegalArgumentException is thrown with reason for the failure.
      *
      * @param datasetId
      *         ID of the data to check
@@ -872,7 +876,9 @@ public class DataFileHandler extends VersionedFileHandler {
      * @return the dataset being overwritten or deleted; never null
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if there are problems reading the dataset properties file
+     *         if the dataset ID is invalid,
+     *         if there are problems reading the dataset properties file, or
+     *         if the user is not permitted to delete the dataset
      */
     public DashboardDataset verifyOkayToDeleteDataset(String datasetId, String username)
             throws IllegalArgumentException {
@@ -893,8 +899,8 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Deletes the information and data files for a dataset after verifying the user is permitted to delete this
-     * dataset.
+     * Deletes the information and data files for a dataset
+     * after verifying the user is permitted to delete this dataset.
      *
      * @param datasetId
      *         ID of the dataset to delete
@@ -904,9 +910,10 @@ public class DataFileHandler extends VersionedFileHandler {
      *         also delete metadata and additional documents?
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is not valid, if there were problems access the dataset files, if the user is not
-     *         permitted to delete the dataset, or if there were problems deleting a file or committing the deletion in
-     *         version control
+     *         if the dataset ID is not valid,
+     *         if there were problems access the dataset files,
+     *         if the user is not permitted to delete the dataset, or
+     *         if there were problems deleting a file or committing the deletion in version control
      */
     public void deleteDatasetFiles(String datasetId, String username,
             Boolean deleteMetadata) throws IllegalArgumentException {
@@ -979,8 +986,8 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Assigns a DashboardDataset (or DashboardDatasetData) from the dataset properties file.  The ID of the dataset is
-     * obtained from the DashboardDataset.
+     * Assigns a DashboardDataset (or DashboardDatasetData) from the dataset properties file.
+     * The ID of the dataset is obtained from the DashboardDataset.
      *
      * @param dataset
      *         assign dataset information here
@@ -1193,18 +1200,96 @@ public class DataFileHandler extends VersionedFileHandler {
         dataset.setDataColTypes(dataColTypes);
 
         value = cruiseProps.getProperty(CHECKER_FLAGS);
-        if ( value == null )
-            throw new IllegalArgumentException("No property value for " +
-                    CHECKER_FLAGS + " given in " + infoFile.getPath());
-        TreeSet<QCFlag> checkerFlags = DashboardServerUtils.decodeQCFlagSet(value);
-        dataset.setCheckerFlags(checkerFlags);
+        if ( value != null ) {
+            TreeSet<QCFlag> checkerFlags = DashboardServerUtils.decodeQCFlagSet(value);
+            dataset.setCheckerFlags(checkerFlags);
+        }
+        else {
+            String wocefours = cruiseProps.getProperty("checkerwocefours");
+            String wocethrees = cruiseProps.getProperty("checkerwocethrees");
+            if ( (wocefours == null) || (wocethrees == null) )
+                throw new IllegalArgumentException("No property value for " +
+                        CHECKER_FLAGS + " given in " + infoFile.getPath());
+            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(wocefours,
+                    DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            qcflags.addAll(decodeWoceTypeSet(wocethrees,
+                    DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
+            dataset.setCheckerFlags(qcflags);
+        }
 
         value = cruiseProps.getProperty(USER_FLAGS);
-        if ( value == null )
-            throw new IllegalArgumentException("No property value for " +
-                    USER_FLAGS + " given in " + infoFile.getPath());
-        TreeSet<QCFlag> userFlags = DashboardServerUtils.decodeQCFlagSet(value);
-        dataset.setUserFlags(userFlags);
+        if ( value != null ) {
+            TreeSet<QCFlag> userFlags = DashboardServerUtils.decodeQCFlagSet(value);
+            dataset.setUserFlags(userFlags);
+        }
+        else {
+            String wocefours = cruiseProps.getProperty("userwocefours");
+            String wocethrees = cruiseProps.getProperty("userwocethrees");
+            if ( (wocefours == null) || (wocethrees == null) )
+                throw new IllegalArgumentException("No property value for " +
+                        USER_FLAGS + " given in " + infoFile.getPath());
+            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(wocefours,
+                    DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            qcflags.addAll(decodeWoceTypeSet(wocethrees,
+                    DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
+            dataset.setUserFlags(qcflags);
+        }
+    }
+
+    /**
+     * Decodes the WOCE-type property value string from previous versions of the dashboard
+     * to generate QC flags with the given flag value and severity.
+     *
+     * @param woceSetStr
+     *         WOCE-type property value string from previous versions of the dashboard
+     * @param flagValue
+     *         flag value to assign to the QC flags generated
+     * @param severity
+     *         severity to assign to the QC flags generated
+     *
+     * @return set of QC flags generated; never null
+     *
+     * @throws IllegalArgumentException
+     *         is the WOCE-type property value string is invalid
+     */
+    private TreeSet<QCFlag> decodeWoceTypeSet(String woceSetStr, String flagValue, QCFlag.Severity severity)
+            throws IllegalArgumentException {
+        if ( !(woceSetStr.startsWith("[") && woceSetStr.endsWith("]")) )
+            throw new IllegalArgumentException("Encoded WoceType set not enclosed in brackets");
+        String contents = woceSetStr.substring(1, woceSetStr.length() - 1);
+        if ( contents.trim().isEmpty() )
+            return new TreeSet<QCFlag>();
+        int firstIndex = contents.indexOf("[");
+        int lastIndex = contents.lastIndexOf("]");
+        if ( (firstIndex < 0) || (lastIndex < 0) ||
+                (!contents.substring(0, firstIndex).trim().isEmpty()) ||
+                (!contents.substring(lastIndex + 1).trim().isEmpty()) )
+            throw new IllegalArgumentException(
+                    "Invalid encoding of a set of WoceTypes: a WoceType not enclosed in brackets");
+        String[] pieces = contents.substring(firstIndex + 1, lastIndex)
+                                  .split("\\]\\s*,\\s*\\[", -1);
+        TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
+        for (String encWoce : pieces) {
+            String[] woceParts = encWoce.split(",", 3);
+            try {
+                if ( woceParts.length != 3 )
+                    throw new IllegalArgumentException("incomplete WoceType description");
+                Integer colIndex = Integer.parseInt(woceParts[0].trim());
+                Integer rowIndex = Integer.parseInt(woceParts[1].trim());
+                firstIndex = woceParts[2].indexOf("\"");
+                lastIndex = woceParts[2].lastIndexOf("\"");
+                if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
+                        (!woceParts[2].substring(0, firstIndex).trim().isEmpty()) ||
+                        (!woceParts[2].substring(lastIndex + 1).trim().isEmpty()) )
+                    throw new IllegalArgumentException("WOCE name not enclosed in double quotes");
+                String woceName = woceParts[2].substring(firstIndex + 1, lastIndex);
+                woceSet.add(new QCFlag(woceName, flagValue, severity, colIndex, rowIndex));
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("Invalid encoding of a set of WoceTypes: " +
+                        ex.getMessage(), ex);
+            }
+        }
+        return woceSet;
     }
 
     /**
@@ -1224,8 +1309,10 @@ public class DataFileHandler extends VersionedFileHandler {
      *         returned)
      *
      * @throws IOException
-     *         if reading from datasetReader throws one, if there is a blank data column name with units, if there is an
-     *         inconsistent number of data values, if there are too few data columns read
+     *         if reading from datasetReader throws one,
+     *         if there is a blank data column name with units,
+     *         if there is an inconsistent number of data values, or
+     *         if there are too few data columns read
      */
     private void assignDataFromInput(DashboardDatasetData datasetData, BufferedReader datasetReader,
             int firstDataRow, int numDataRows) throws IOException {
@@ -1283,8 +1370,8 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Returns a version of the string that was parsed to create the given record but using the given spacer between the
-     * entries in the record.
+     * Returns a version of the string that was parsed to create the given record
+     * but using the given spacer between the entries in the record.
      *
      * @param record
      *         record to use

@@ -1,6 +1,5 @@
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 /**
@@ -13,9 +12,9 @@ public class RowColumn implements Comparable<RowColumn> {
 
     /**
      * @param rowIndex
-     *  row index to use; if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+     *         row index to use; if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
      * @param columnIndex
-     *  column index to use; if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+     *         column index to use; if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
      */
     public RowColumn(Integer rowIndex, Integer columnIndex) {
         if ( rowIndex == null )
@@ -56,9 +55,9 @@ public class RowColumn implements Comparable<RowColumn> {
         if ( !(obj instanceof RowColumn) )
             return false;
         RowColumn other = (RowColumn) obj;
-        if ( ! column.equals(other.column) )
+        if ( !column.equals(other.column) )
             return false;
-        if ( ! row.equals(other.row) )
+        if ( !row.equals(other.row) )
             return false;
         return true;
     }

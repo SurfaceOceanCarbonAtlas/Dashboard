@@ -303,8 +303,8 @@ public class DashboardServerUtils {
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
             null, null, null, null);
 
-    public static final StringDashDataType VERSION = new StringDashDataType("version",
-            123.0, "version", "version", false,
+    public static final StringDashDataType VERSION = new StringDashDataType("socat_version",
+            123.0, "socat_version", "SOCAT version", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
             null, null, null, null);
 
