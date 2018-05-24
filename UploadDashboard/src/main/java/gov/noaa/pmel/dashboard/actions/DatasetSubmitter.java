@@ -214,9 +214,10 @@ public class DatasetSubmitter {
                 ingestIds.add(datasetId);
             }
 
-            if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) &&
+            if ( archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) &&
                     (repeatSend || dataset.getArchiveDate().isEmpty()) ) {
-                // Queue the request to send (or re-send) the data and metadata for archival
+                // Queue the request to send (or re-send) the data and metadata for archival.
+                // In the future there might be more than one place to send for archival.
                 archiveIds.add(datasetId);
             }
             else if ( !archiveStatus.equals(dataset.getArchiveStatus()) ) {

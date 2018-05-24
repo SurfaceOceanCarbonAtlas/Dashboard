@@ -282,8 +282,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
                 // Archive with next release
                 numDelay++;
             }
-            else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ) {
-                // Archive now
+            else if ( archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) ) {
+                // Archive now - in future there might be more than one place
                 numCdiac++;
             }
             else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) {
@@ -465,8 +465,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
             archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE;
         }
         else if ( nowRadio.getValue() ) {
-            // Archive now
-            archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL;
+            // Archive now - in future there might be more than one place
+            archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_TO_START + "OCADS";
         }
         else if ( ownerRadio.getValue() ) {
             // Owner will archive

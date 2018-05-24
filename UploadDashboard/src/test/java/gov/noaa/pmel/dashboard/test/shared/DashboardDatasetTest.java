@@ -711,7 +711,7 @@ public class DashboardDatasetTest {
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 
-        cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL);
+        cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START + "PANGAEA");
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 

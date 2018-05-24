@@ -76,21 +76,18 @@ public class DashboardDataset implements Serializable, IsSerializable {
      *         null if the dataset is (acceptable and) published.
      */
     public Boolean isEditable() {
-        // true for datasets that are not submitted, suspended, or excluded
+        // true for datasets that are suspended, excluded, or not yet submitted
         String status = getSubmitStatus();
         if ( status.equals(DashboardUtils.STATUS_NOT_SUBMITTED) ||
                 status.equals(DashboardUtils.STATUS_SUSPENDED) ||
                 status.equals(DashboardUtils.STATUS_EXCLUDED) )
             return Boolean.TRUE;
-        // false for submitted or acceptable unpublished datasets
+        // null for published datasets
         status = getArchiveStatus();
-        if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-                status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
-                status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARCHIVAL) ||
-                status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) )
-            return Boolean.FALSE;
-        // null for acceptable published datasets
-        return null;
+        if ( status.equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
+            return null;
+        // false for submitted or QC-ed but not published
+        return Boolean.FALSE;
     }
 
     /**
