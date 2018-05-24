@@ -180,11 +180,11 @@ public class SpellingHandler {
 
     /**
      * Corrects names as specified in the given corrections file.
-     * Static methods associated with this
      *
      * @param correctionsFilename
-     *         file of tab-separated pairs of name, where the first value is the misspelled name
-     *         and the second value is the correctly spelling of that name
+     *         file of lines of tab-separated value pairs, where the first value is the misspelled name
+     *         and the second value is the correct spelling of that name.  Blank lines or lines starting
+     *         with # are ignored.
      *
      * @throws FileNotFoundException
      *         if the file specified in correctionsFilename does not exist
@@ -198,6 +198,8 @@ public class SpellingHandler {
         BufferedReader reader = new BufferedReader(new FileReader(correctionsFilename));
         try {
             for (String dataline = reader.readLine(); dataline != null; dataline = reader.readLine()) {
+                if ( dataline.startsWith("#") || dataline.trim().isEmpty() )
+                    continue;
                 String[] parts = dataline.split("\t");
                 if ( parts.length != 2 )
                     throw new IOException("entry not a pair of tab-separated values: " + dataline);
