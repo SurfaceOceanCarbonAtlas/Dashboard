@@ -20,9 +20,6 @@
     <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
     <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
 
-    <!-- Other module inherits -->
-    <inherits name='com.googlecode.gwt.crypto.Crypto'/>
-
     <!-- Specify the app entry point class. -->
     <entry-point class='gov.noaa.pmel.dashboard.client.UploadDashboard'/>
 
