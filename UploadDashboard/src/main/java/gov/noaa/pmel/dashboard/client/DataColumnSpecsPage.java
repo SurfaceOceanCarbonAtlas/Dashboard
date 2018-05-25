@@ -441,6 +441,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         }
         // Set the minimum table width
         dataGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
+        dataProvider.updateRowCount(cruiseSpecs.getNumDataRows(), true);
         // Just insert the row numbers into each data row (modifying cruiseSpecs)
         ArrayList<ArrayList<String>> dataWithRowNums = cruiseSpecs.getDataValues();
         ArrayList<Integer> rowNums = cruiseSpecs.getRowNums();
@@ -451,7 +452,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
             k++;
         }
         // Update the data provider with the data in the DatasetDataColumnSpecs
-        dataProvider.updateRowCount(k, true);
         dataProvider.updateRowData(0, cruiseSpecs.getDataValues());
         // Reset shown rows to the start of the data
         dataGrid.setPageStart(0);

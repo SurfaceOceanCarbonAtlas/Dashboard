@@ -3,6 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -1077,17 +1081,17 @@ public class DataFileHandler extends VersionedFileHandler {
         value = cruiseProps.getProperty(SOURCE_DOI_ID);
         if ( value == null )
             value = cruiseProps.getProperty("origdatadoi");
-        if ( value == null )
-            throw new IllegalArgumentException("No property value for " +
-                    SOURCE_DOI_ID + " given in " + infoFile.getPath());
-        dataset.setSourceDOI(value);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setSourceDOI(value);
+        }
         value = cruiseProps.getProperty(ENHANCED_DOI_ID);
         if ( value == null )
             value = cruiseProps.getProperty("socatdatadoi");
-        if ( value == null )
-            throw new IllegalArgumentException("No property value for " +
-                    ENHANCED_DOI_ID + " given in " + infoFile.getPath());
-        dataset.setEnhancedDOI(value);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setEnhancedDOI(value);
+        }
 
         // Data check status
         value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);
@@ -1129,9 +1133,9 @@ public class DataFileHandler extends VersionedFileHandler {
         // Date of request to archive data and metadata
         value = cruiseProps.getProperty(ARCHIVAL_DATE_ID);
         if ( value == null )
-            value = cruiseProps.getProperty("cdiacdate");
-        if ( value == null )
             value = cruiseProps.getProperty("ocadsdate");
+        if ( value == null )
+            value = cruiseProps.getProperty("cdiacdate");
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     ARCHIVAL_DATE_ID + " given in " + infoFile.getPath());
@@ -1228,41 +1232,90 @@ public class DataFileHandler extends VersionedFileHandler {
         }
         dataset.setDataColTypes(dataColTypes);
 
+        // Try the latest version's encodings of the automated data checker and PI-provided data QC flags
         value = cruiseProps.getProperty(CHECKER_FLAGS);
         if ( value != null ) {
-            TreeSet<QCFlag> checkerFlags = DashboardServerUtils.decodeQCFlagSet(value);
-            dataset.setCheckerFlags(checkerFlags);
-        }
-        else {
-            String wocefours = cruiseProps.getProperty("checkerwocefours");
-            String wocethrees = cruiseProps.getProperty("checkerwocethrees");
-            if ( (wocefours == null) || (wocethrees == null) )
-                throw new IllegalArgumentException("No property value for " +
-                        CHECKER_FLAGS + " given in " + infoFile.getPath());
-            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(wocefours,
-                    DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
-            qcflags.addAll(decodeWoceTypeSet(wocethrees,
-                    DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
-            dataset.setCheckerFlags(qcflags);
-        }
-
-        value = cruiseProps.getProperty(USER_FLAGS);
-        if ( value != null ) {
-            TreeSet<QCFlag> userFlags = DashboardServerUtils.decodeQCFlagSet(value);
-            dataset.setUserFlags(userFlags);
-        }
-        else {
-            String wocefours = cruiseProps.getProperty("userwocefours");
-            String wocethrees = cruiseProps.getProperty("userwocethrees");
-            if ( (wocefours == null) || (wocethrees == null) )
+            // Automated data checker flags
+            dataset.setCheckerFlags(DashboardServerUtils.decodeQCFlagSet(value));
+            // PI-provided data QC flags
+            value = cruiseProps.getProperty(USER_FLAGS);
+            if ( value == null )
                 throw new IllegalArgumentException("No property value for " +
                         USER_FLAGS + " given in " + infoFile.getPath());
-            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(wocefours,
-                    DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
-            qcflags.addAll(decodeWoceTypeSet(wocethrees,
+            dataset.setUserFlags(DashboardServerUtils.decodeQCFlagSet(value));
+            return;
+        }
+
+        // Try the previous version's encodings of the automated data check and PI-provided WOCE flags
+        value = cruiseProps.getProperty("checkerwocefours");
+        if ( value != null ) {
+            // Automated data checker flags
+            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            value = cruiseProps.getProperty("checkerwocethrees");
+            if ( value == null )
+                throw new IllegalArgumentException(
+                        "No property value checkerwocethrees to go along with checkerwocefours");
+            qcflags.addAll(decodeWoceTypeSet(value, DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
+            dataset.setCheckerFlags(qcflags);
+            // PI-provided data QC flags
+            value = cruiseProps.getProperty("userwocefours");
+            if ( value == null )
+                throw new IllegalArgumentException(
+                        "No property value userwocefours to go along with checkerwocefours");
+            qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            value = cruiseProps.getProperty("userwocethrees");
+            if ( value == null )
+                throw new IllegalArgumentException(
+                        "No property value userwocethrees to go along with userwocefours");
+            qcflags.addAll(decodeWoceTypeSet(value,
                     DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
             dataset.setUserFlags(qcflags);
+            return;
         }
+
+        // Try earlier version's encoding of automated data checker WOCE flags
+        value = cruiseProps.getProperty("wocefourrows");
+        if ( value != null ) {
+            TreeSet<QCFlag> qcflags = new TreeSet<QCFlag>();
+            try {
+                int colIdx = 0;
+                for (JsonElement colElem : (JsonArray) (new JsonParser().parse(value))) {
+                    for (JsonElement rowElem : (JsonArray) colElem) {
+                        int rowIdx = ((JsonPrimitive) rowElem).getAsInt();
+                        qcflags.add(new QCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                QCFlag.Severity.ERROR, colIdx, rowIdx));
+                    }
+                    colIdx++;
+                }
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("Invalid value for wocefourrows");
+            }
+            value = cruiseProps.getProperty("wocethreerows");
+            if ( value == null )
+                throw new IllegalArgumentException("No property value wocethreerows to go with wocefourrows");
+            try {
+                int colIdx = 0;
+                for (JsonElement colElem : (JsonArray) (new JsonParser().parse(value))) {
+                    for (JsonElement rowElem : (JsonArray) colElem) {
+                        int rowIdx = ((JsonPrimitive) rowElem).getAsInt();
+                        qcflags.add(new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                QCFlag.Severity.WARNING, colIdx, rowIdx));
+                    }
+                    colIdx++;
+                }
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("Invalid value for wocefourrows");
+            }
+            dataset.setCheckerFlags(qcflags);
+            // No recorded list of PI-provided QC flags
+            dataset.setUserFlags(null);
+            // TODO: maybe ? - go through data to record PI-provided data QC flags and update
+            return;
+        }
+
+        // Nothing found describing the automated data checker WOCE flags - an error
+        throw new IllegalArgumentException("No property value for " +
+                CHECKER_FLAGS + " given in " + infoFile.getPath());
     }
 
     /**
