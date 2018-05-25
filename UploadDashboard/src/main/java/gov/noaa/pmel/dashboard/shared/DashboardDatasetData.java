@@ -51,6 +51,8 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
 
     /**
      * @return the list of row numbers; may be empty, but never null. The actual list in this object is returned.
+     * If size of this list may be less than number returned by {@link DashboardDataset#getNumDataRows()} if not
+     * all the data in the dataset was read.
      */
     public ArrayList<Integer> getRowNums() {
         return rowNums;
@@ -58,8 +60,8 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
 
     /**
      * @param rowNums
-     *         the row numbers to assign.  The list in this object is cleared and all the contents of the given list, if
-     *         not null, are added.
+     *         the row numbers to assign.  The list in this object is cleared and all the contents of the given list,
+     *         if not null, are added.
      */
     public void setRowNums(ArrayList<Integer> rowNums) {
         this.rowNums.clear();
@@ -72,6 +74,8 @@ public class DashboardDatasetData extends DashboardDataset implements Serializab
      * iterates over each particular data value for that sample; an entry in the column of a table of data.
      *
      * @return the list of data string lists; may be empty but never null. The actual list in this object is returned.
+     * If size of the outer list may be less than number returned by {@link DashboardDataset#getNumDataRows()} if not
+     * all the data in the dataset was read.
      */
     public ArrayList<ArrayList<String>> getDataValues() {
         return dataValues;

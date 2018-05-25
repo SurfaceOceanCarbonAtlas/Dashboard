@@ -238,7 +238,9 @@ public class DataUploadService extends HttpServlet {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(item.getInputStream(), encoding));
                 try {
-                    dsetData = datasetHandler.createDatasetFromInput(reader, dataFormat, username, filename, timestamp);
+                    dsetData = datasetHandler.assignDatasetDataFromInput(null, reader, dataFormat, username, 0, -1);
+                    dsetData.setUploadFilename(filename);
+                    dsetData.setUploadTimestamp(timestamp);
                 } finally {
                     reader.close();
                 }

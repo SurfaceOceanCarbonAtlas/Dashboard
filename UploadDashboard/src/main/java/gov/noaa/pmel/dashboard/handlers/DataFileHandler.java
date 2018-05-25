@@ -234,7 +234,7 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Creates a DashboardDatasetData object with data read from the given BufferedReader.
+     * Assigns or creates a DashboardDatasetData object with data read from the given BufferedReader.
      * <p>
      * The data read should have a preamble of metadata containing the ID (expocode)
      * for the dataset on a line such as one of the following (case and space insensitive):
@@ -256,20 +256,27 @@ public class DataFileHandler extends VersionedFileHandler {
      * and should have the same number of values as in the column headers line.  All data values are read as Strings.
      * Blank lines and ines with all-blank values are ignored.
      *
+     * @param datasetData
+     *         dataset to assign with the dataset data and check that the dataset ID in the metadata preamble or
+     *         data matches that given in this object.
+     *         If null, the data, as well as the owner, version, and the dataset ID found in the input is assigned
+     *         to a new DashboardDatasetData, then the data types are guessed from the column names using the
+     *         customizations for the given owner.
      * @param dataReader
-     *         read metadata preamble and data lines from here
+     *         read the metadata preamble and data lines from here
      * @param dataFormat
      *         format of the data lines read; one of {@link DashboardUtils#COMMA_FORMAT_TAG},
      *         {@link DashboardUtils#SEMICOLON_FORMAT_TAG}, or {@link DashboardUtils#TAB_FORMAT_TAG}.
      * @param owner
-     *         name of the owner to record in the datasets created or appended to;
-     *         also used to guess data column types from column names
-     * @param filename
-     *         upload filename to record in the dataset created
-     * @param timestamp
-     *         upload timestamp to record in the dataset created
+     *         if datasetData is null, owner of the new dataset to assign;
+     *         if datasetData is not null, this value is ignored.
+     * @param firstRowIdx
+     *         index of the first data row to return
+     * @param numDataRows
+     *         maximum number of data rows to return;
+     *         if negative, no limit is applied (all remaining data rows are returned)
      *
-     * @return the dataset data object created
+     * @return the DashboardDatasetData assigned the data (which will be datasetData if it is not null)
      *
      * @throws IOException
      *         if reading from dataReader throws one,
@@ -278,8 +285,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         if no (or too few) data columns were found,
      *         if no data samples (rows) were found.
      */
-    public DashboardDatasetData createDatasetFromInput(BufferedReader dataReader, String dataFormat,
-            String owner, String filename, String timestamp) throws IOException {
+    public DashboardDatasetData assignDatasetDataFromInput(DashboardDatasetData datasetData, BufferedReader dataReader,
+            String dataFormat, String owner, int firstRowIdx, int numDataRows) throws IOException {
         char spacer;
         if ( DashboardUtils.TAB_FORMAT_TAG.equals(dataFormat) ) {
             spacer = '\t';
@@ -302,7 +309,9 @@ public class DataFileHandler extends VersionedFileHandler {
         ArrayList<String> preamble = new ArrayList<String>();
         ArrayList<String> columnNames = null;
         int numDataColumns = 0;
-        ArrayList<ArrayList<String>> allDataVals = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> dataVals = new ArrayList<ArrayList<String>>();
+        ArrayList<Integer> rowNums = new ArrayList<Integer>();
+        int dataRowNum = 0;
         try {
             boolean checkForUnits = false;
 
@@ -399,6 +408,10 @@ public class DataFileHandler extends VersionedFileHandler {
                     // not units; this is the first line of data value to parse
                 }
 
+                // check if need to add more rows of data
+                if ( (numDataRows >= 0) && (dataVals.size() >= numDataRows) )
+                    break;
+
                 // read the data in this line
                 ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
                 boolean allBlank = true;
@@ -408,7 +421,12 @@ public class DataFileHandler extends VersionedFileHandler {
                         allBlank = false;
                 }
                 if ( !allBlank ) {
-                    allDataVals.add(datavals);
+                    // actual data found - add to the list, if appropriate
+                    dataRowNum++;
+                    if ( dataRowNum > firstRowIdx ) {
+                        rowNums.add(dataRowNum);
+                        dataVals.add(datavals);
+                    }
                 }
             }
         } finally {
@@ -417,45 +435,55 @@ public class DataFileHandler extends VersionedFileHandler {
 
         if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
             throw new IOException("No data columns found, possibly due to incorrect format");
-        if ( allDataVals.isEmpty() )
-            throw new IOException("No data values found");
 
-        // Create the dataset with data to return
-        DashboardDatasetData datasetData = new DashboardDatasetData();
-        datasetData.setPreamble(preamble);
-        datasetData.setOwner(owner);
-        datasetData.setVersion(uploadVersion);
-        datasetData.setUploadFilename(filename);
-        datasetData.setUploadTimestamp(timestamp);
-        datasetData.setUserColNames(columnNames);
-        datasetData.setDataValues(allDataVals);
-
-        int numRows = allDataVals.size();
-        datasetData.setNumDataRows(numRows);
-        ArrayList<Integer> rowNums = new ArrayList<Integer>(numRows);
-        for (int k = 1; k <= numRows; k++) {
-            rowNums.add(k);
+        DashboardDatasetData datasetToUpdate;
+        if ( datasetData == null ) {
+            // Create the dataset to assign
+            datasetToUpdate = new DashboardDatasetData();
+            datasetToUpdate.setVersion(uploadVersion);
+            datasetToUpdate.setOwner(owner);
+            datasetToUpdate.setPreamble(preamble);
+            datasetToUpdate.setUserColNames(columnNames);
+            datasetToUpdate.setDataValues(dataVals);
+            datasetToUpdate.setRowNums(rowNums);
+            // Only assign numDataRows if this was a read of all data
+            if ( (numDataRows < 0) && (firstRowIdx <= 0) )
+                datasetToUpdate.setNumDataRows(rowNums.size());
+            userFileHandler.assignDataColumnTypes(datasetToUpdate);
         }
-        datasetData.setRowNums(rowNums);
+        else {
+            // Assign to the given dataset
+            // DashboardDataset value should already be assigned, so only assign values new in DashboardDatasetData
+            datasetToUpdate = datasetData;
+            datasetToUpdate.setPreamble(preamble);
+            datasetToUpdate.setDataValues(dataVals);
+            datasetToUpdate.setRowNums(rowNums);
+        }
 
-        // Assign the data column types from the column names (including customizations for this user)
-        userFileHandler.assignDataColumnTypes(datasetData);
-
-        // If no expocode found in the metadata preamble,
+        // If no expocode found in the metadata preamble;
         // try to get it from the first value of an appropriate data column
-        if ( expocode == null ) {
+        if ( (expocode == null) && (dataVals.size() > 0) ) {
             int k = 0;
-            for (DataColumnType dtype : datasetData.getDataColTypes()) {
+            for (DataColumnType dtype : datasetToUpdate.getDataColTypes()) {
                 if ( DashboardUtils.DATASET_ID.typeNameEquals(dtype) ) {
-                    expocode = allDataVals.get(0).get(k).trim().toUpperCase();
+                    try {
+                        expocode = dataVals.get(0).get(k).trim().toUpperCase();
+                    } catch ( Exception ex ) {
+                        // Might be missing if not reading from the beginning
+                    }
                     break;
                 }
                 k++;
             }
         }
-        datasetData.setDatasetId(expocode);
+        // Assign the expocode if creating the dataset; otherwise check that it, if
+        // it was found, against what was already recorded in the dataset info
+        if ( datasetData == null )
+            datasetToUpdate.setDatasetId(expocode);
+        else if ( (expocode != null) && !datasetData.getDatasetId().equals(expocode) )
+            throw new IOException("Dataset ID/Expocode does not match that given in the data");
 
-        return datasetData;
+        return datasetToUpdate;
     }
 
     /**
@@ -521,14 +549,15 @@ public class DataFileHandler extends VersionedFileHandler {
             BufferedReader cruiseReader = new BufferedReader(new FileReader(dataFile));
             try {
                 // Assign values from the cruise data file
-                assignDataFromInput(cruiseData, cruiseReader, firstDataRow, numDataRows);
+                assignDatasetDataFromInput(cruiseData, cruiseReader, DashboardUtils.TAB_FORMAT_TAG,
+                        null, firstDataRow, numDataRows);
             } finally {
                 cruiseReader.close();
             }
         } catch ( FileNotFoundException ex ) {
             return null;
         } catch ( IOException ex ) {
-            throw new IllegalArgumentException("Problems reading cruise data for " +
+            throw new IllegalArgumentException("Problems reading data for " +
                     datasetId + ": " + ex.getMessage());
         }
         return cruiseData;
@@ -736,8 +765,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         add the document to the dataset with this ID
      * @param addlDoc
      *         document to add to the dataset; if an instance of OmeMetadata, this will be added as the OME metadata
-     *         document for the dataset (just updates omeTimestamp for the dataset), otherwise adds the document as an
-     *         supplemental document to the dataset (adds the upload filename and timestamp to addnDocs for the
+     *         document for the dataset (just updates omeTimestamp for the dataset), otherwise adds the document as
+     *         an supplemental document to the dataset (adds the upload filename and timestamp to addnDocs for the
      *         dataset)
      *
      * @return the updated dataset information
@@ -915,8 +944,8 @@ public class DataFileHandler extends VersionedFileHandler {
      *         if the user is not permitted to delete the dataset, or
      *         if there were problems deleting a file or committing the deletion in version control
      */
-    public void deleteDatasetFiles(String datasetId, String username,
-            Boolean deleteMetadata) throws IllegalArgumentException {
+    public void deleteDatasetFiles(String datasetId, String username, Boolean deleteMetadata)
+            throws IllegalArgumentException {
         // Verify this cruise can be deleted
         DashboardDataset dataset;
         try {
@@ -1290,83 +1319,6 @@ public class DataFileHandler extends VersionedFileHandler {
             }
         }
         return woceSet;
-    }
-
-    /**
-     * Assigns a DashboardDatasetData with data read from the given buffered reader.  The data should be tab-separated
-     * values.  Empty lines are ignored.  The first (non-empty) line should be a header line of data column names with
-     * units.  The expected number of data columns is determined from this line but otherwise is ignored.  The remaining
-     * (non-empty) lines should be data lines with exactly the same number of values as there are column names.
-     *
-     * @param datasetData
-     *         assign column names with units and data to this object
-     * @param datasetReader
-     *         read data from here
-     * @param firstDataRow
-     *         index of the first data row to return; to return all data for this dataset, set to zero
-     * @param numDataRows
-     *         maximum number of data rows to return; if negative, no limit is applied (all remaining data rows are
-     *         returned)
-     *
-     * @throws IOException
-     *         if reading from datasetReader throws one,
-     *         if there is a blank data column name with units,
-     *         if there is an inconsistent number of data values, or
-     *         if there are too few data columns read
-     */
-    private void assignDataFromInput(DashboardDatasetData datasetData, BufferedReader datasetReader,
-            int firstDataRow, int numDataRows) throws IOException {
-        // data row numbers
-        ArrayList<Integer> rowNums = new ArrayList<Integer>();
-        // data values
-        ArrayList<ArrayList<String>> dataValues = new ArrayList<ArrayList<String>>();
-        // Create the parser for the data lines
-        CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
-                                          .withIgnoreEmptyLines()
-                                          .withDelimiter('\t');
-        CSVParser dataParser = new CSVParser(datasetReader, format);
-        try {
-            int numDataColumns = 0;
-            boolean firstLine = true;
-            int dataRowNum = 0;
-            for (CSVRecord record : dataParser) {
-                if ( firstLine ) {
-                    // Column headers
-                    numDataColumns = record.size();
-                    if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
-                        throw new IOException("Too few data column (" + numDataColumns + ") read");
-                    if ( numDataRows == 0 ) {
-                        // No reading of the data requested - done
-                        break;
-                    }
-                    firstLine = false;
-                    continue;
-                }
-
-                // Data line
-                if ( record.size() != numDataColumns )
-                    throw new IOException("Inconsistent number of data columns (" + record.size() + " instead of " +
-                            numDataColumns + ") for measurement " + dataParser.getRecordNumber() + ":\n    " +
-                            rebuildDataline(record, '\t'));
-
-                dataRowNum++;
-                if ( dataRowNum > firstDataRow ) {
-                    ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
-                    for (String val : record) {
-                        datavals.add(val);
-                    }
-                    rowNums.add(dataRowNum);
-                    dataValues.add(datavals);
-                    if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
-                        break;
-                }
-            }
-        } finally {
-            dataParser.close();
-        }
-
-        datasetData.setRowNums(rowNums);
-        datasetData.setDataValues(dataValues);
     }
 
     /**
