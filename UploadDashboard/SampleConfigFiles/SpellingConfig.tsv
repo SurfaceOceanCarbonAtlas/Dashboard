@@ -1,5 +1,6 @@
 # UTF-8 tab-separated pairs of names for correcting “anglicized” names.
-# Includes adding apostrophes (such as ‘ and ’) and fixing letters (such as á, é, í, ó, è, ö, å).
+# Includes adding or replacing apostrophes (such as ', ‘, and ’) and
+# fixing letters (such as á, é, í, ó, è, ö, å).
 # Incorrect<tab>Correct
 Begovic, M.	Bégovic, M.
 Copin-Montegut, C.	Copin-Montégut, C.
