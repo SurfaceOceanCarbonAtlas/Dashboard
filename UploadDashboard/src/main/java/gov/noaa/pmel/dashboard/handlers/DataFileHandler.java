@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +73,9 @@ public class DataFileHandler extends VersionedFileHandler {
 
     private static final int MIN_NUM_DATA_COLUMNS = 6;
 
-    // Patterns for getting the expocode from the metadata preamble
+    /**
+     * Patterns for getting the expocode from the metadata preamble
+     */
     private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
             Pattern.compile("Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE),
@@ -81,6 +84,43 @@ public class DataFileHandler extends VersionedFileHandler {
             Pattern.compile("Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE)
     };
+
+    /**
+     * Map of older user-provided SOCAT column type names to latest SOCAT column type names.
+     * NOTE: TIME -> time_of_day because this is for user-provided data column types.
+     */
+    private static final TreeMap<String,String> OLD_NEW_COL_TYPE_NAMES_MAP = new TreeMap<String,String>(
+            String.CASE_INSENSITIVE_ORDER);
+
+    static {
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("ATMOSPHERIC_TEMPERATURE", "Temperature_atm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("CRUISE_NAME", "dataset_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("EQUILIBRATOR_PRESSURE", "Pressure_equi");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("EQUILIBRATOR_TEMPERATURE", "Temperature_equi");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("FCO2_WATER_SST_WET", "fCO2_water_sst_100humidity_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("FCO2_WATER_TEQU_WET", "fCO2_water_equi_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("INVESTIGATOR_NAMES", "investigators");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("PCO2_WATER_SST_WET", "pCO2_water_sst_100humidity_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("PCO2_WATER_TEQU_WET", "pCO2_water_equi_temp");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SALINITY", "sal");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SEA_LEVEL_PRESSURE", "Pressure_atm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SEA_SURFACE_TEMPERATURE", "temp");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SECOND_OF_DAY", "sec_of_day");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("sec", "second");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SHIP_DIRECTION", "ship_dir");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SHIP_NAME", "platform_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("TIME", "time_of_day");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("TIMESTAMP", "date_time");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("vessel_name", "platform_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_DIRECTION_RELATIVE", "wind_dir_rel");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_DIRECTION_TRUE", "wind_dir_true");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_SPEED_RELATIVE", "wind_speed_rel");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_TEQU_DRY", "xCO2_water_equi_temp_dry_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_TEQU_WET", "xCO2_water_equi_temp_wet_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_SST_DRY", "xCO2_water_sst_dry_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_SST_WET", "xCO2_water_sst_wet_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XH2O_EQU", "xH2O_equi");
+    }
 
     private KnownDataTypes userTypes;
     private UserFileHandler userFileHandler;
@@ -1211,9 +1251,14 @@ public class DataFileHandler extends VersionedFileHandler {
         // Assign the data column types
         ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(numCols);
         for (int k = 0; k < numCols; k++) {
-            DashDataType<?> dataType = userTypes.getDataType(colTypeNames.get(k));
+            String colName = colTypeNames.get(k);
+            // Check if there is a translation from old to new so TIME -> time_of_day
+            String newColName = OLD_NEW_COL_TYPE_NAMES_MAP.get(colName);
+            if ( newColName != null )
+                colName = newColName;
+            DashDataType<?> dataType = userTypes.getDataType(colName);
             if ( dataType == null )
-                throw new IllegalArgumentException("unknown data type \"" + colTypeNames.get(k) + "\"");
+                throw new IllegalArgumentException("unknown data type \"" + colName + "\"");
             DataColumnType dctype = dataType.duplicate();
             String colunit = colTypeUnits.get(k);
             if ( "degrees_east".equals(colunit) )
@@ -1310,6 +1355,7 @@ public class DataFileHandler extends VersionedFileHandler {
             // No recorded list of PI-provided QC flags
             dataset.setUserFlags(null);
             // TODO: maybe ? - go through data to record PI-provided data QC flags and update
+            // however, there might not be any in these early versions (especially if from v1 and v2)
             return;
         }
 
