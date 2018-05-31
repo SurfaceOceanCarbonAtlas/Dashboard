@@ -144,6 +144,18 @@ public class DashboardServerUtils {
     public static final double EARTH_AUTHALIC_RADIUS = 6371.007;
 
     /**
+     * Maximum acceptable calculated speed, in km/h, between measurements.
+     * This is intentionally quite large as various approximations make this difficult to calculate accurately.
+     */
+    public static final double MAX_ACCEPT_CALC_SPEED = 150.0;
+
+    /**
+     * Maximum questionable calculated speed, in km/h, between measurements.
+     * This is intentionally quite large as various approximations make this difficult to calculate accurately.
+     */
+    public static final double MAX_QUESTION_CALC_SPEED = 750.0;
+
+    /**
      * "Distance" contribution, in kilometers, for every 24h time difference
      */
     public static final double SEAWATER_SPEED = 30.0;

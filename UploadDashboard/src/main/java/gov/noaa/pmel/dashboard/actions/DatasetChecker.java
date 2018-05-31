@@ -76,15 +76,14 @@ public class DatasetChecker {
         // Check for missing lon/lat/time
         Double[] sampleTimes = stdUserData.checkMissingLonLatTime();
 
-        // Check that the data is ordered in time - generate errors if not.
+        // Check that the data is ordered in time and speeds not excessive - generate errors if not.
         if ( sampleTimes != null )
             stdUserData.checkDataOrder(sampleTimes);
 
         // Bounds check the standardized data values
         stdUserData.checkBounds();
 
-        // Perform any other data checks
-        // TODO: check calculated ship speed
+        // TODO: Perform any other data checks?
 
         // Save the messages accumulated in stdUserData.
         // Assigns the StdUserData WOCE_AUTOCHECK data column with the checker-generated data QC flags.

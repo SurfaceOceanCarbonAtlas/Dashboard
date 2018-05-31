@@ -283,19 +283,33 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Verifies data samples are ascending in time (oldest to newest). Any misorderings detected generate error messages
-     * that are added to the internal list of automated data checker messages.
+     * Verifies data samples are ascending in time (oldest to newest).  Also checks for excessive
+     * speed between two data points.  Any misorderings or excessive speeds detected generate error
+     * messages that are added to the internal list of automated data checker messages.
      *
      * @param times
      *         sample times to be used for this data array
      */
     public void checkDataOrder(Double[] times) {
+        Double longitudes[];
+        Double latitudes[];
+        try {
+            longitudes = getSampleLongitudes();
+            latitudes = getSampleLatitudes();
+        } catch ( Exception ex ) {
+            // Messages about problems getting the longitudes or latitudes should already have been generated
+            return;
+        }
         TreeSet<DataLocation> orderedSet = new TreeSet<DataLocation>();
         for (int rowIdx = 0; rowIdx < numSamples; rowIdx++) {
             if ( times[rowIdx] != null ) {
-                // Using DataLocation just as a row number - time pair
                 DataLocation dataLoc = new DataLocation();
+                // Messages about missing longitude, latitude, or times should already have been generated
+                if ( (times[rowIdx] == null) || (longitudes[rowIdx] == null) || (latitudes[rowIdx] == null) )
+                    continue;
                 dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
+                dataLoc.setLongitude(longitudes[rowIdx]);
+                dataLoc.setLatitude(latitudes[rowIdx]);
                 dataLoc.setRowNumber(rowIdx + 1);
                 if ( !orderedSet.add(dataLoc) )
                     throw new RuntimeException("Unexpected duplicate data location with row number");
@@ -311,6 +325,8 @@ public class StdUserDataArray extends StdDataArray {
         // 1,2 are misordered in 3,4,1,2,5,6
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> forwardErrs = new TreeSet<Integer>();
+        ArrayList<ADCMessage> forwardSpeedMsgs = new ArrayList<ADCMessage>();
+        int lastRowNum = 0;
         int expectedRowNum = 1;
         for (DataLocation dataLoc : orderedSet) {
             int actualRowNum = dataLoc.getRowNumber();
@@ -319,6 +335,39 @@ public class StdUserDataArray extends StdDataArray {
                 expectedRowNum += 1;
             }
             if ( expectedRowNum == actualRowNum ) {
+                if ( lastRowNum > 0 ) {
+                    double kmdelta = DashboardServerUtils.distanceBetween(longitudes[actualRowNum - 1],
+                            latitudes[actualRowNum - 1], longitudes[lastRowNum - 1], latitudes[lastRowNum - 1]);
+                    double hourdelta = times[actualRowNum - 1] - times[lastRowNum - 1] / 3600.0;
+                    double speed = kmdelta / hourdelta;
+                    if ( speed > DashboardServerUtils.MAX_QUESTION_CALC_SPEED ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment("calculated speed exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                        forwardSpeedMsgs.add(msg);
+                    }
+                    else if ( speed > DashboardServerUtils.MAX_ACCEPT_CALC_SPEED ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment("calculated speed exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                        forwardSpeedMsgs.add(msg);
+                    }
+                    else if ( speed < 0.0 ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed obtained");
+                    }
+                }
+                lastRowNum = actualRowNum;
                 expectedRowNum += 1;
             }
         }
@@ -327,6 +376,8 @@ public class StdUserDataArray extends StdDataArray {
         // 3,4 are misordered in 3,4,1,2,5,6
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> reverseErrs = new TreeSet<Integer>();
+        ArrayList<ADCMessage> reverseSpeedMsgs = new ArrayList<ADCMessage>();
+        lastRowNum = 0;
         expectedRowNum = numSamples;
         for (DataLocation dataLoc : orderedSet.descendingSet()) {
             int actualRowNum = dataLoc.getRowNumber();
@@ -335,11 +386,53 @@ public class StdUserDataArray extends StdDataArray {
                 expectedRowNum -= 1;
             }
             if ( expectedRowNum == actualRowNum ) {
+                if ( lastRowNum > 0 ) {
+                    double kmdelta = DashboardServerUtils.distanceBetween(longitudes[lastRowNum - 1],
+                            latitudes[lastRowNum - 1], longitudes[actualRowNum - 1], latitudes[actualRowNum - 1]);
+                    double hourdelta = times[lastRowNum - 1] - times[actualRowNum - 1] / 3600.0;
+                    double speed = kmdelta / hourdelta;
+                    if ( speed > DashboardServerUtils.MAX_QUESTION_CALC_SPEED ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment("calculated speed exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                        reverseSpeedMsgs.add(msg);
+                    }
+                    else if ( speed > DashboardServerUtils.MAX_ACCEPT_CALC_SPEED ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment("calculated speed exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
+                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                        reverseSpeedMsgs.add(msg);
+                    }
+                    else if ( speed < 0.0 ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed obtained");
+                    }
+                }
+                lastRowNum = actualRowNum;
                 expectedRowNum -= 1;
             }
         }
         // Guess that the set with fewer errors is the correct one
-        TreeSet<Integer> errorRowsNums = (forwardErrs.size() <= reverseErrs.size()) ? forwardErrs : reverseErrs;
+        TreeSet<Integer> errorRowsNums;
+        ArrayList<ADCMessage> speedMsgs;
+        if ( (forwardErrs.size() + forwardSpeedMsgs.size()) <= (reverseErrs.size() + reverseSpeedMsgs.size()) ) {
+            errorRowsNums = forwardErrs;
+            speedMsgs = forwardSpeedMsgs;
+        }
+        else {
+            errorRowsNums = reverseErrs;
+            speedMsgs = reverseSpeedMsgs;
+        }
         for (Integer rowNum : errorRowsNums) {
             for (Integer colIdx : indicesForTime) {
                 ADCMessage msg = new ADCMessage();
@@ -350,6 +443,37 @@ public class StdUserDataArray extends StdDataArray {
                 String comment = "time-misordered data row";
                 msg.setGeneralComment(comment);
                 msg.setDetailedComment(comment);
+                stdMsgList.add(msg);
+            }
+        }
+        for (ADCMessage spdmsg : speedMsgs) {
+            // Speed problems could be in longitude ...
+            ADCMessage msg = new ADCMessage();
+            msg.setSeverity(spdmsg.getSeverity());
+            msg.setRowNumber(spdmsg.getRowNumber());
+            msg.setColNumber(longitudeIndex + 1);
+            msg.setColName(userColNames[longitudeIndex]);
+            msg.setGeneralComment(spdmsg.getGeneralComment());
+            msg.setDetailedComment(spdmsg.getDetailedComment());
+            stdMsgList.add(msg);
+            // ... or latitude ...
+            msg = new ADCMessage();
+            msg.setSeverity(spdmsg.getSeverity());
+            msg.setRowNumber(spdmsg.getRowNumber());
+            msg.setColNumber(longitudeIndex + 1);
+            msg.setColName(userColNames[longitudeIndex]);
+            msg.setGeneralComment(spdmsg.getGeneralComment());
+            msg.setDetailedComment(spdmsg.getDetailedComment());
+            stdMsgList.add(msg);
+            // ... or time
+            for (Integer colIdx : indicesForTime) {
+                msg = new ADCMessage();
+                msg.setSeverity(spdmsg.getSeverity());
+                msg.setRowNumber(spdmsg.getRowNumber());
+                msg.setColNumber(colIdx + 1);
+                msg.setColName(userColNames[colIdx]);
+                msg.setGeneralComment(spdmsg.getGeneralComment());
+                msg.setDetailedComment(spdmsg.getDetailedComment());
                 stdMsgList.add(msg);
             }
         }
