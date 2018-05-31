@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  * SOCAT standard types required in various classes.
@@ -26,7 +27,7 @@ public class SocatTypes {
             new ArrayList<String>(Arrays.asList("PSU"));
 
     public static final ArrayList<String> TEMPERATURE_UNITS =
-            new ArrayList<String>(Arrays.asList("degrees C"));
+            new ArrayList<String>(Arrays.asList("deg C"));
 
     public static final ArrayList<String> PRESSURE_UNITS =
             new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
@@ -84,8 +85,7 @@ public class SocatTypes {
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0");
 
-    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType(
-            "pCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm",
             633.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", false,
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0");
@@ -95,8 +95,7 @@ public class SocatTypes {
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0");
 
-    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType(
-            "fCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType("fCO2_water_sst_100humidity_uatm",
             635.0, "fCO2_water_SST_wet", "water fCO2 wet using sst", false,
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0");
@@ -156,5 +155,62 @@ public class SocatTypes {
             711.0, "fCO2 src", "Algorithm number for recommended fCO2", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.IDENTIFIER_CATEGORY, null,
             "1", null, null, "14");
+
+    /**
+     * Case-insensitive map of user-provided column type names used in older versions to those in the latest version.
+     * NOTE: TIME is mapped to TIME_OF_DAY because this is for user-provided data column types.
+     */
+    public static final TreeMap<String,String> OLD_NEW_COL_TYPE_NAMES_MAP =
+            new TreeMap<String,String>(String.CASE_INSENSITIVE_ORDER);
+
+    /**
+     * Case-insensitive map of user-provided column unit names used in older versions to those in the latest version.
+     */
+    public static final TreeMap<String,String> OLD_NEW_COL_UNIT_NAMES_MAP =
+            new TreeMap<String,String>(String.CASE_INSENSITIVE_ORDER);
+
+    static {
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("ATMOSPHERIC_TEMPERATURE", "Temperature_atm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("CRUISE_NAME", "dataset_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("EQUILIBRATOR_PRESSURE", "Pressure_equi");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("EQUILIBRATOR_TEMPERATURE", "Temperature_equi");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("FCO2_WATER_SST_WET", "fCO2_water_sst_100humidity_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("FCO2_WATER_TEQU_WET", "fCO2_water_equi_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("INVESTIGATOR_NAMES", "investigators");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("PCO2_WATER_SST_WET", "pCO2_water_sst_100humidity_uatm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("PCO2_WATER_TEQU_WET", "pCO2_water_equi_temp");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SALINITY", "sal");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SEA_LEVEL_PRESSURE", "Pressure_atm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SEA_SURFACE_TEMPERATURE", "temp");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SECOND_OF_DAY", "sec_of_day");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("sec", "second");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SHIP_DIRECTION", "ship_dir");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("SHIP_NAME", "platform_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("TIME", "time_of_day");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("TIMESTAMP", "date_time");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("vessel_name", "platform_name");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_DIRECTION_RELATIVE", "wind_dir_rel");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_DIRECTION_TRUE", "wind_dir_true");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("WIND_SPEED_RELATIVE", "wind_speed_rel");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_TEQU_DRY", "xCO2_water_equi_temp_dry_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_TEQU_WET", "xCO2_water_equi_temp_wet_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_SST_DRY", "xCO2_water_sst_dry_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XCO2_WATER_SST_WET", "xCO2_water_sst_wet_ppm");
+        OLD_NEW_COL_TYPE_NAMES_MAP.put("XH2O_EQU", "xH2O_equi");
+
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees_east", "deg E");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.E", "deg E");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees_north", "deg N");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.N", "deg N");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees_west", "deg W");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.W", "deg W");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees_south", "deg S");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.S", "deg S");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees C", "deg C");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.C", "deg C");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("degrees", "deg clk N");
+        OLD_NEW_COL_UNIT_NAMES_MAP.put("deg.clk.N", "deg clk N");
+
+    }
 
 }

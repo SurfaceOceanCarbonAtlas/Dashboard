@@ -90,6 +90,24 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
         addDataType(DashboardServerUtils.DAY_OF_YEAR);
         addDataType(DashboardServerUtils.SECOND_OF_DAY);
+
+        // Add the types from SocatTypes
+        addDataType(SocatTypes.SALINITY);
+        addDataType(SocatTypes.TEQU);
+        addDataType(SocatTypes.SST);
+        addDataType(SocatTypes.PEQU);
+        addDataType(SocatTypes.PATM);
+        addDataType(SocatTypes.XCO2_WATER_TEQU_DRY);
+        addDataType(SocatTypes.XCO2_WATER_SST_DRY);
+        addDataType(SocatTypes.PCO2_WATER_TEQU_WET);
+        addDataType(SocatTypes.PCO2_WATER_SST_WET);
+        addDataType(SocatTypes.FCO2_WATER_TEQU_WET);
+        addDataType(SocatTypes.FCO2_WATER_SST_WET);
+        addDataType(SocatTypes.WOCE_CO2_WATER);
+        addDataType(SocatTypes.COMMENT_WOCE_CO2_WATER);
+        addDataType(SocatTypes.WOCE_CO2_ATM);
+        addDataType(SocatTypes.COMMENT_WOCE_CO2_ATM);
+
         return this;
     }
 
@@ -147,6 +165,29 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
         addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
         addDataType(DashboardServerUtils.REGION_ID);
+
+        // Add the types from SocatTypes
+        addDataType(SocatTypes.SALINITY);
+        addDataType(SocatTypes.TEQU);
+        addDataType(SocatTypes.SST);
+        addDataType(SocatTypes.PEQU);
+        addDataType(SocatTypes.PATM);
+        addDataType(SocatTypes.XCO2_WATER_TEQU_DRY);
+        addDataType(SocatTypes.XCO2_WATER_SST_DRY);
+        addDataType(SocatTypes.PCO2_WATER_TEQU_WET);
+        addDataType(SocatTypes.PCO2_WATER_SST_WET);
+        addDataType(SocatTypes.FCO2_WATER_TEQU_WET);
+        addDataType(SocatTypes.FCO2_WATER_SST_WET);
+        addDataType(SocatTypes.WOCE_CO2_WATER);
+        addDataType(SocatTypes.WOCE_CO2_ATM);
+        addDataType(SocatTypes.WOA_SALINITY);
+        addDataType(SocatTypes.NCEP_SLP);
+        addDataType(SocatTypes.ETOPO2_DEPTH);
+        addDataType(SocatTypes.GVCO2);
+        addDataType(SocatTypes.DIST_TO_LAND);
+        addDataType(SocatTypes.FCO2_REC);
+        addDataType(SocatTypes.FCO2_SOURCE);
+
         return this;
     }
 

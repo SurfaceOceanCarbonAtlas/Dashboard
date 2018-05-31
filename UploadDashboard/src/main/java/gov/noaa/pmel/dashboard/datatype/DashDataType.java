@@ -801,8 +801,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      * <li>tag {@link #UNITS_TAG} gives the units array,</li>
      * <li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
      * <li>tag {@link #CATEGORY_NAME_TAG} gives the category name,</li>
-     * <li>tag {@link #FILE_STD_UNIT_TAG} gives name of the standard unit (first unit in units array) for DSG
-     * files,</li>
+     * <li>tag {@link #FILE_STD_UNIT_TAG} gives the standard unit (the first unit in units array)
+     *         name to be used in DSG files (if not given, the first unit in the units array is used)</li>
      * <li>tag {@link #MIN_QUESTIONABLE_VALUE_TAG} gives the minimum questionable value,</li>
      * <li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
      * <li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>

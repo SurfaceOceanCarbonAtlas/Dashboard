@@ -63,28 +63,6 @@ public class KnownDataTypesTest {
         TEST_KNOWN_METADATA_FILE_TYPES.addStandardTypesForMetadataFiles();
 
         Properties typeProps = new Properties();
-        typeProps.setProperty(SocatTypes.SALINITY.getVarName(),
-                SocatTypes.SALINITY.toPropertyValue());
-        typeProps.setProperty(SocatTypes.SST.getVarName(),
-                SocatTypes.SST.toPropertyValue());
-        typeProps.setProperty(SocatTypes.TEQU.getVarName(),
-                SocatTypes.TEQU.toPropertyValue());
-        typeProps.setProperty(SocatTypes.PATM.getVarName(),
-                SocatTypes.PATM.toPropertyValue());
-        typeProps.setProperty(SocatTypes.PEQU.getVarName(),
-                SocatTypes.PEQU.toPropertyValue());
-        typeProps.setProperty(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(),
-                SocatTypes.XCO2_WATER_TEQU_DRY.toPropertyValue());
-        typeProps.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(),
-                SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
-        typeProps.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(),
-                SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
-        typeProps.setProperty(SocatTypes.PCO2_WATER_SST_WET.getVarName(),
-                SocatTypes.PCO2_WATER_SST_WET.toPropertyValue());
-        typeProps.setProperty(SocatTypes.FCO2_WATER_TEQU_WET.getVarName(),
-                SocatTypes.FCO2_WATER_TEQU_WET.toPropertyValue());
-        typeProps.setProperty(SocatTypes.FCO2_WATER_SST_WET.getVarName(),
-                SocatTypes.FCO2_WATER_SST_WET.toPropertyValue());
         typeProps.setProperty(KnownDataTypesTest.SHIP_SPEED.getVarName(),
                 KnownDataTypesTest.SHIP_SPEED.toPropertyValue());
 
@@ -124,7 +102,23 @@ public class KnownDataTypesTest {
             DashboardServerUtils.MINUTE_OF_HOUR,
             DashboardServerUtils.SECOND_OF_MINUTE,
             DashboardServerUtils.DAY_OF_YEAR,
-            DashboardServerUtils.SECOND_OF_DAY
+            DashboardServerUtils.SECOND_OF_DAY,
+
+            SocatTypes.SALINITY,
+            SocatTypes.TEQU,
+            SocatTypes.SST,
+            SocatTypes.PEQU,
+            SocatTypes.PATM,
+            SocatTypes.XCO2_WATER_TEQU_DRY,
+            SocatTypes.XCO2_WATER_SST_DRY,
+            SocatTypes.PCO2_WATER_TEQU_WET,
+            SocatTypes.PCO2_WATER_SST_WET,
+            SocatTypes.FCO2_WATER_TEQU_WET,
+            SocatTypes.FCO2_WATER_SST_WET,
+            SocatTypes.WOCE_CO2_WATER,
+            SocatTypes.COMMENT_WOCE_CO2_WATER,
+            SocatTypes.WOCE_CO2_ATM,
+            SocatTypes.COMMENT_WOCE_CO2_ATM
     ));
 
     /**
@@ -164,7 +158,28 @@ public class KnownDataTypesTest {
             DashboardServerUtils.HOUR_OF_DAY,
             DashboardServerUtils.MINUTE_OF_HOUR,
             DashboardServerUtils.SECOND_OF_MINUTE,
-            DashboardServerUtils.REGION_ID
+            DashboardServerUtils.REGION_ID,
+
+            SocatTypes.SALINITY,
+            SocatTypes.TEQU,
+            SocatTypes.SST,
+            SocatTypes.PEQU,
+            SocatTypes.PATM,
+            SocatTypes.XCO2_WATER_TEQU_DRY,
+            SocatTypes.XCO2_WATER_SST_DRY,
+            SocatTypes.PCO2_WATER_TEQU_WET,
+            SocatTypes.PCO2_WATER_SST_WET,
+            SocatTypes.FCO2_WATER_TEQU_WET,
+            SocatTypes.FCO2_WATER_SST_WET,
+            SocatTypes.WOCE_CO2_WATER,
+            SocatTypes.WOCE_CO2_ATM,
+            SocatTypes.WOA_SALINITY,
+            SocatTypes.NCEP_SLP,
+            SocatTypes.ETOPO2_DEPTH,
+            SocatTypes.GVCO2,
+            SocatTypes.DIST_TO_LAND,
+            SocatTypes.FCO2_REC,
+            SocatTypes.FCO2_SOURCE
     ));
 
     private static final HashSet<String> STD_USERS_VARNAMES;

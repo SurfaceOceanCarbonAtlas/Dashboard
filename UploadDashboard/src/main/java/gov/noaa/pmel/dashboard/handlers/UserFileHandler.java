@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -106,14 +107,20 @@ public class UserFileHandler extends VersionedFileHandler {
                 throw new IllegalArgumentException("invalid type,unit,missing value \"" +
                         propVal + "\" for key \"" + colName + "\" given in " + propFile.getPath());
 
-            DashDataType<?> dtype = userTypes.getDataType(vals[0]);
+            String colTypeName = SocatTypes.OLD_NEW_COL_TYPE_NAMES_MAP.get(vals[0]);
+            if ( colTypeName == null )
+                colTypeName = vals[0];
+            DashDataType<?> dtype = userTypes.getDataType(colTypeName);
             if ( dtype == null )
                 throw new IllegalArgumentException("Unknown data type \"" +
-                        vals[0] + "\" for tag \"" + colName + "\"");
+                        colTypeName + "\" for tag \"" + colName + "\"");
             DataColumnType dctype = dtype.duplicate();
-            if ( !dctype.setSelectedUnit(vals[1]) )
+            String colUnit = SocatTypes.OLD_NEW_COL_UNIT_NAMES_MAP.get(vals[1]);
+            if ( colUnit == null )
+                colUnit = vals[1];
+            if ( !dctype.setSelectedUnit(colUnit) )
                 throw new IllegalArgumentException("Unknown data unit \"" +
-                        vals[1] + "\" for data type \"" + vals[0] + "\"");
+                        colUnit + "\" for data type \"" + colTypeName + "\"");
             dctype.setSelectedMissingValue(vals[2]);
             dataColNamesToTypes.put(colName, dctype);
         }
