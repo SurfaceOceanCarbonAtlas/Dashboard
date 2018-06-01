@@ -62,6 +62,10 @@ public class KnownDataTypes {
      * SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
      * TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY
      * <p>
+     * SALINITY, TEQU, SST, PEQU, PATM, XCO2_WATER_TEQU_DRY, XCO2_WATER_SST_DRY, PCO2_WATER_TEQU_WET,
+     * PCO2_WATER_SST_WET, FCO2_WATER_TEQU_WET, FCO2_WATER_SST_WET, WOCE_CO2_WATER, COMMENT_WOCE_CO2_WATER,
+     * WOCE_CO2_ATM, COMMENT_WOCE_CO2_ATM
+     * <p>
      * This should be called before adding any custom types.
      *
      * @return this instance (as a convenience for chaining)
@@ -114,9 +118,9 @@ public class KnownDataTypes {
     /**
      * Adds the default well-known metadata column types for generating the NetCDF DSG files:
      * <p>
-     * DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
+     * DATASET_ID, DATASET_NAME, ENHANCED_DOI, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
      * WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE,
-     * TIME_COVERAGE_START, TIME_COVERAGE_END, DATASET_QC_FLAG, VERSION
+     * TIME_COVERAGE_START, TIME_COVERAGE_END, DATASET_QC_FLAG, ALL_REGION_IDS, VERSION
      * <p>
      * This should be called before adding any custom types.
      *
@@ -146,7 +150,11 @@ public class KnownDataTypes {
      * Adds the default well-known data column types for generating the NetCDF DSG files:
      * <p>
      * SAMPLE_NUMBER, TIME, LONGITUDE, LATITUDE, SAMPLE_DEPTH, YEAR, MONTH_OF_YEAR,
-     * DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE
+     * DAY_OF_MONTH, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, REGION_ID
+     * <p>
+     * SALINITY, TEQU, SST, PEQU, PATM, XCO2_WATER_TEQU_DRY, XCO2_WATER_SST_DRY, PCO2_WATER_TEQU_WET,
+     * PCO2_WATER_SST_WET, FCO2_WATER_TEQU_WET, FCO2_WATER_SST_WET, WOCE_CO2_WATER, WOCE_CO2_ATM,
+     * WOA_SALINITY, NCEP_SLP, ETOPO2_DEPTH, GVCO2, DIST_TO_LAND, FCO2_REC, FCO2_SOURCE
      * <p>
      * This should be called before adding any custom types.
      *

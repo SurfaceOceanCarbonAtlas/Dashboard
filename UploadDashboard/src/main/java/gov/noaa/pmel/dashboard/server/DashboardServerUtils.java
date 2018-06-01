@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
@@ -11,10 +12,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -196,15 +197,45 @@ public class DashboardServerUtils {
     /**
      * Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z")
      */
-    public static final ArrayList<String> TIME_UNITS =
-            new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
+    public static final List<String> TIME_UNITS =
+            Arrays.asList("seconds since 1970-01-01T00:00:00Z");
+
+    /**
+     * Data type is only user-provided data; not used in DSG files.
+     */
+    public static final List<DashDataType.Role> USER_ONLY_ROLES =
+            Arrays.asList(DashDataType.Role.USER_DATA);
+
+    /**
+     * Data type is only data in DSG files; not (directly) provided by the user.
+     */
+    public static final List<DashDataType.Role> FILE_DATA_ONLY_ROLES =
+            Arrays.asList(DashDataType.Role.FILE_DATA);
+
+    /**
+     * Data type is only metadata in DSG files; not (directly) provided by the user.
+     */
+    public static final List<DashDataType.Role> FILE_METADATA_ONLY_ROLES =
+            Arrays.asList(DashDataType.Role.FILE_METADATA);
+
+    /**
+     * Data type is user-provided data also in DSG files.
+     */
+    public static final List<DashDataType.Role> USER_FILE_DATA_ROLES =
+            Arrays.asList(DashDataType.Role.USER_DATA, DashDataType.Role.FILE_DATA);
+
+    /**
+     * Data type is user-provided metadata also in DSG files.
+     */
+    public static final List<DashDataType.Role> USER_FILE_METADATA_ROLES =
+            Arrays.asList(DashDataType.Role.USER_DATA, DashDataType.Role.FILE_METADATA);
 
     /**
      * UNASSIGNED needs to be respecified as one of the (other) data column types.
      */
     public static final StringDashDataType UNKNOWN = new StringDashDataType(DashboardUtils.UNKNOWN,
             null, null, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     /**
      * OTHER is for supplementary data in the user's original data file but otherwise not used.
@@ -213,7 +244,7 @@ public class DashboardServerUtils {
      */
     public static final StringDashDataType OTHER = new StringDashDataType(DashboardUtils.OTHER,
             null, null, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     /**
      * Unique identifier for the dataset
@@ -224,7 +255,7 @@ public class DashboardServerUtils {
      */
     public static final StringDashDataType DATASET_ID = new StringDashDataType(DashboardUtils.DATASET_ID,
             "expocode", IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     /**
      * Consecutive numbering of the samples in a dataset
@@ -232,7 +263,7 @@ public class DashboardServerUtils {
     public static final IntDashDataType SAMPLE_NUMBER = new IntDashDataType("sample_number",
             51.0, "sample num", "sample number", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            "1", null, null, null);
+            "1", null, null, null, FILE_DATA_ONLY_ROLES);
 
     /**
      * Completely specified sampling time (seconds since 1970-01-01T00:00:00Z) used in file data; computed value.
@@ -240,7 +271,7 @@ public class DashboardServerUtils {
     public static final DoubleDashDataType TIME = new DoubleDashDataType("time",
             52.0, "time", "sample time", false,
             TIME_UNITS, "time", TIME_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_DATA_ONLY_ROLES);
 
     /**
      * User-provided name for the dataset
@@ -248,147 +279,147 @@ public class DashboardServerUtils {
     public static final StringDashDataType DATASET_NAME = new StringDashDataType("dataset_name",
             100.0, "cruise/dataset name", "unique name for this dataset", false,
             DashboardUtils.NO_UNITS, "dataset_name", IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final StringDashDataType PLATFORM_NAME = new StringDashDataType("platform_name",
             101.0, "platform name", "platform name", false,
             DashboardUtils.NO_UNITS, "platform_name", PLATFORM_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final StringDashDataType PLATFORM_TYPE = new StringDashDataType("platform_type",
             102.0, "platform type", "platform type", false,
             DashboardUtils.NO_UNITS, "platform_type", PLATFORM_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
             103.0, "organization", "organization", false,
             DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType("investigators",
             104.0, "PI names", "investigators", false,
             DashboardUtils.NO_UNITS, "investigators", IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_min",
             110.0, "westmost lon", "westernmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_min", LOCATION_CATEGORY, "degrees_east",
-            "-540.0", "-180.0", "360.0", "540.0");
+            "-540.0", "-180.0", "360.0", "540.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max",
             111.0, "eastmost lon", "easternmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_max", LOCATION_CATEGORY, "degrees_east",
-            "-540.0", "-180.0", "360.0", "540.0");
+            "-540.0", "-180.0", "360.0", "540.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min",
             112.0, "southmost lat", "southernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_min", LOCATION_CATEGORY, "degrees_north",
-            "-90.0", null, null, "90.0");
+            "-90.0", null, null, "90.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max",
             113.0, "northmost lat", "northernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_max", LOCATION_CATEGORY, "degrees_north",
-            "-90.0", null, null, "90.0");
+            "-90.0", null, null, "90.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType TIME_COVERAGE_START = new DoubleDashDataType("time_coverage_start",
             114.0, "start time", "starting time", false,
             TIME_UNITS, "time_coverage_start", LOCATION_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType TIME_COVERAGE_END = new DoubleDashDataType("time_coverage_end",
             115.0, "end time", "ending time", false,
             TIME_UNITS, "time_coverage_end", LOCATION_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final StringDashDataType SOURCE_DOI = new StringDashDataType("source_doi",
             120.0, "DOI", "DOI of the source dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     public static final StringDashDataType ENHANCED_DOI = new StringDashDataType("socat_doi",
             121.0, "SOCAT DOI", "DOI of the SOCAT-enhanced dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final StringDashDataType DATASET_QC_FLAG = new StringDashDataType("qc_flag",
             122.0, "Dataset QC Flag", "QC assessment of the dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final StringDashDataType VERSION = new StringDashDataType("socat_version",
             123.0, "socat_version", "SOCAT version", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final StringDashDataType ALL_REGION_IDS = new StringDashDataType("all_region_ids",
             124.0, "all Region IDs", "Sorted unique region IDs", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
 
     public static final StringDashDataType SAMPLE_ID = new StringDashDataType("sample_id",
             300.0, "sample ID", "unique ID for this sample in the dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     public static final DoubleDashDataType LONGITUDE = new DoubleDashDataType(DashboardUtils.LONGITUDE,
             "longitude", LOCATION_CATEGORY, "degrees_east",
-            "-540.0", "-180.0", "360.0", "540.0");
+            "-540.0", "-180.0", "360.0", "540.0", USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType LATITUDE = new DoubleDashDataType(DashboardUtils.LATITUDE,
             "latitude", LOCATION_CATEGORY, "degrees_north",
-            "-90.0", null, null, "90.0");
+            "-90.0", null, null, "90.0", USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType SAMPLE_DEPTH = new DoubleDashDataType(DashboardUtils.SAMPLE_DEPTH,
             "depth", BATHYMETRY_CATEGORY, "meters",
-            "0.0", null, null, "16000");
+            "0.0", null, null, "16000", USER_FILE_DATA_ROLES);
 
     public static final StringDashDataType REGION_ID = new StringDashDataType("region_id",
             304.0, "Region ID", "SOCAT region ID", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, FILE_DATA_ONLY_ROLES);
 
     /**
      * Date and time of the measurement
      */
     public static final StringDashDataType TIMESTAMP = new StringDashDataType(DashboardUtils.TIMESTAMP,
             "timestamp", TIME_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     /**
      * Date of the measurement - no time.
      */
     public static final StringDashDataType DATE = new StringDashDataType(DashboardUtils.DATE,
             "date", TIME_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     public static final IntDashDataType YEAR = new IntDashDataType(DashboardUtils.YEAR,
             "year", TIME_CATEGORY, null,
-            "1900", "1950", "2050", "2100");
+            "1900", "1950", "2050", "2100", USER_FILE_DATA_ROLES);
 
     public static final IntDashDataType MONTH_OF_YEAR = new IntDashDataType(DashboardUtils.MONTH_OF_YEAR,
             "month_of_year", TIME_CATEGORY, null,
-            "1", null, null, "12");
+            "1", null, null, "12", USER_FILE_DATA_ROLES);
 
     public static final IntDashDataType DAY_OF_MONTH = new IntDashDataType(DashboardUtils.DAY_OF_MONTH,
             "day_of_month", TIME_CATEGORY, null,
-            "1", null, null, "31");
+            "1", null, null, "31", USER_FILE_DATA_ROLES);
 
     public static final StringDashDataType TIME_OF_DAY = new StringDashDataType(DashboardUtils.TIME_OF_DAY,
             "time_of_day", TIME_CATEGORY, null,
-            null, null, null, null);
+            null, null, null, null, USER_ONLY_ROLES);
 
     public static final IntDashDataType HOUR_OF_DAY = new IntDashDataType(DashboardUtils.HOUR_OF_DAY,
             "hour_of_day", TIME_CATEGORY, null,
-            "0", null, null, "24");
+            "0", null, null, "24", USER_FILE_DATA_ROLES);
 
     public static final IntDashDataType MINUTE_OF_HOUR = new IntDashDataType(DashboardUtils.MINUTE_OF_HOUR,
             "minute_of_hour", TIME_CATEGORY, null,
-            "0", null, null, "60");
+            "0", null, null, "60", USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType SECOND_OF_MINUTE = new DoubleDashDataType(DashboardUtils.SECOND_OF_MINUTE,
             "second_of_minute", TIME_CATEGORY, null,
-            "0.0", null, null, "60.0");
+            "0.0", null, null, "60.0", USER_FILE_DATA_ROLES);
 
     /**
      * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
@@ -396,14 +427,14 @@ public class DashboardServerUtils {
      */
     public static final DoubleDashDataType DAY_OF_YEAR = new DoubleDashDataType(DashboardUtils.DAY_OF_YEAR,
             "day_of_year", TIME_CATEGORY, null,
-            "1.0", null, null, "367.0");
+            "1.0", null, null, "367.0", USER_ONLY_ROLES);
 
     /**
      * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may be used to specify date and time of the measurement
      */
     public static final DoubleDashDataType SECOND_OF_DAY = new DoubleDashDataType(DashboardUtils.SECOND_OF_DAY,
             "second_of_day", TIME_CATEGORY, null,
-            "0.0", null, null, "86400.0");
+            "0.0", null, null, "86400.0", USER_ONLY_ROLES);
 
     /**
      * Value of userRealName to use to skip sending the email request in

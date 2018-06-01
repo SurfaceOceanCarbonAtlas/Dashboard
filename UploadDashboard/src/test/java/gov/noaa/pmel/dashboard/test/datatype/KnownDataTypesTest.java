@@ -41,7 +41,7 @@ public class KnownDataTypesTest {
     public static final DoubleDashDataType SHIP_SPEED = new DoubleDashDataType("ship_speed",
             670.0, "ship speed", "measured ship speed", false,
             SHIP_SPEED_UNITS, "platform_speed_wrt_ground", DashboardServerUtils.PLATFORM_CATEGORY, null,
-            "0.0", null, "50.0", "200.0");
+            "0.0", null, "50.0", "200.0", DashboardServerUtils.USER_ONLY_ROLES);
 
     /**
      * Known data types for users for unit tests
@@ -218,13 +218,16 @@ public class KnownDataTypesTest {
     private static final DashDataType<?>[] ADDN_DATA_TYPES = new DashDataType<?>[] {
             new DoubleDashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_SORT_ORDERS[0], ADDN_TYPES_DISPLAY_NAMES[0],
                     ADDN_TYPES_DESCRIPTIONS[0], false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[0],
-                    ADDN_TYPES_CATEGORY_NAMES[0], null, null, null, null, null),
+                    ADDN_TYPES_CATEGORY_NAMES[0], null, null, null, null, null,
+                    DashboardServerUtils.USER_ONLY_ROLES),
             new IntDashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_SORT_ORDERS[1], ADDN_TYPES_DISPLAY_NAMES[1],
                     ADDN_TYPES_DESCRIPTIONS[1], false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[1],
-                    ADDN_TYPES_CATEGORY_NAMES[1], null, null, null, null, null),
+                    ADDN_TYPES_CATEGORY_NAMES[1], null, null, null, null, null,
+                    DashboardServerUtils.USER_ONLY_ROLES),
             new StringDashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_SORT_ORDERS[2], ADDN_TYPES_DISPLAY_NAMES[2],
                     ADDN_TYPES_DESCRIPTIONS[2], false, MOL_FRACTION_UNITS, ADDN_TYPES_STANDARD_NAMES[2],
-                    ADDN_TYPES_CATEGORY_NAMES[2], null, null, null, null, null),
+                    ADDN_TYPES_CATEGORY_NAMES[2], null, null, null, null, null,
+                    DashboardServerUtils.USER_ONLY_ROLES),
     };
 
     private static final String ADDN_TYPES_PROPERTIES_STRING =

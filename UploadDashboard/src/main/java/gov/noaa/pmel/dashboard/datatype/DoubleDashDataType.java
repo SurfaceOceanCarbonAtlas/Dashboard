@@ -58,18 +58,20 @@ public class DoubleDashDataType extends DashDataType<Double> {
      * @param maxQuestionStrVal
      *         string representation of the maximum questionable value for standardized values of this data column type
      *         (larger than this value is bad); if null, there is no maximum questionable value
+     * @param roles
+     *         the roles for this data type; cannot be null or empty
      *
      * @throws IllegalArgumentException
-     *         if the variable name, sort order, or display name is invalid; if the relationship: minQuestionVal <=
-     *         minAcceptVal <= maxAcceptVal <= maxQuestionVal, for those values that are not null, is violated
+     *         if the variable name, sort order, display name, or roles is invalid;
+     *         if the relationship: minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal,
+     *         for those values that are not null, is violated
      */
-    public DoubleDashDataType(String varName, Double sortOrder, String displayName,
-            String description, boolean isCritical, Collection<String> units,
-            String standardName, String categoryName, String fileStdUnit,
-            String minQuestionStrVal, String minAcceptStrVal,
-            String maxAcceptStrVal, String maxQuestionStrVal) throws IllegalArgumentException {
-        super(varName, sortOrder, displayName, description, isCritical,
-                units, standardName, categoryName, fileStdUnit);
+    public DoubleDashDataType(String varName, Double sortOrder, String displayName, String description,
+            boolean isCritical, Collection<String> units, String standardName, String categoryName, String fileStdUnit,
+            String minQuestionStrVal, String minAcceptStrVal, String maxAcceptStrVal, String maxQuestionStrVal,
+            Collection<Role> roles) throws IllegalArgumentException {
+        super(varName, sortOrder, displayName, description,
+                isCritical, units, standardName, categoryName, fileStdUnit, roles);
         if ( minQuestionStrVal != null ) {
             try {
                 minQuestionVal = dataValueOf(minQuestionStrVal);
@@ -134,18 +136,20 @@ public class DoubleDashDataType extends DashDataType<Double> {
      * @param maxQuestionStrVal
      *         string representation of the maximum questionable value for standardized values of this data column type
      *         (larger than this value is bad); if null, there is no maximum questionable value
+     * @param roles
+     *         the roles for this data type; cannot be null or empty
      *
      * @throws IllegalArgumentException
-     *         if the variable name, sort order, or display name is invalid; if the relationship: minQuestionVal <=
-     *         minAcceptVal <= maxAcceptVal <= maxQuestionVal, for those values that are not null, is violated
+     *         if the variable name, sort order, display name, or roles is invalid;
+     *         if the relationship: minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal,
+     *         for those values that are not null, is violated
      */
-    public DoubleDashDataType(DataColumnType dtype, String standardName, String categoryName,
-            String fileStdUnit, String minQuestionStrVal, String minAcceptStrVal,
-            String maxAcceptStrVal, String maxQuestionStrVal) throws IllegalArgumentException {
-        this(dtype.getVarName(), dtype.getSortOrder(), dtype.getDisplayName(),
-                dtype.getDescription(), dtype.isCritical(), dtype.getUnits(),
-                standardName, categoryName, fileStdUnit, minQuestionStrVal,
-                minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
+    public DoubleDashDataType(DataColumnType dtype, String standardName, String categoryName, String fileStdUnit,
+            String minQuestionStrVal, String minAcceptStrVal, String maxAcceptStrVal, String maxQuestionStrVal,
+            Collection<Role> roles) throws IllegalArgumentException {
+        this(dtype.getVarName(), dtype.getSortOrder(), dtype.getDisplayName(), dtype.getDescription(),
+                dtype.isCritical(), dtype.getUnits(), standardName, categoryName, fileStdUnit,
+                minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal, roles);
     }
 
     @Override

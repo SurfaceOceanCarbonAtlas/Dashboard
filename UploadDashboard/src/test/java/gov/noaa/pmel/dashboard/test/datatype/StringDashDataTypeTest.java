@@ -45,7 +45,8 @@ public class StringDashDataTypeTest {
     public void testGetDataClassName() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(String.class.getSimpleName(), dtype.getDataClassName());
     }
 
@@ -56,7 +57,8 @@ public class StringDashDataTypeTest {
     public void testDataValueOfString() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         String testVal = " my dataset ID ";
         assertEquals(testVal.trim(), dtype.dataValueOf(testVal));
         boolean caught;
@@ -76,7 +78,8 @@ public class StringDashDataTypeTest {
     public void testBoundsCheckStandardValue() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
 
         ADCMessage msg = dtype.boundsCheckStandardValue(null);
         assertNull(msg);
@@ -101,7 +104,8 @@ public class StringDashDataTypeTest {
     public void testGetVarName() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(VAR_NAME, dtype.getVarName());
         assertEquals(SORT_ORDER, dtype.getSortOrder());
         assertEquals(DISPLAY_NAME, dtype.getDisplayName());
@@ -119,102 +123,119 @@ public class StringDashDataTypeTest {
     public void testHashCodeEqualsObject() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertFalse(dtype.equals(null));
         assertFalse(dtype.equals(VAR_NAME));
         StringDashDataType other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         other = new StringDashDataType("blob", SORT_ORDER, DISPLAY_NAME,
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
 
         other = new StringDashDataType(VAR_NAME, SORT_ORDER + 1.0, DISPLAY_NAME,
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
 
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, "blob",
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
 
         dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertNotEquals(dtype.hashCode(), other.hashCode());
         assertFalse(dtype.equals(other));
         other = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype.hashCode(), other.hashCode());
         assertTrue(dtype.equals(other));
         assertNotSame(dtype, other);
@@ -234,52 +255,61 @@ public class StringDashDataTypeTest {
 
         StringDashDataType dtype = new StringDashDataType(EQUAL_VARNAME, SORT_ORDER, EQUAL_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
 
         StringDashDataType other = new StringDashDataType(EQUAL_VARNAME, SORT_ORDER, EQUAL_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(0, dtype.compareTo(other));
 
         DoubleDashDataType another = new DoubleDashDataType(LESS_VARNAME, SORT_ORDER + 1.0, LESS_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) < 0);
         assertTrue(another.compareTo(dtype) > 0);
 
         another = new DoubleDashDataType(GREATER_VARNAME, SORT_ORDER - 1.0, GREATER_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) > 0);
         assertTrue(another.compareTo(dtype) < 0);
 
         another = new DoubleDashDataType(LESS_VARNAME, SORT_ORDER, GREATER_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) < 0);
         assertTrue(another.compareTo(dtype) > 0);
 
         another = new DoubleDashDataType(GREATER_VARNAME, SORT_ORDER, LESS_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) > 0);
         assertTrue(another.compareTo(dtype) < 0);
 
         another = new DoubleDashDataType(GREATER_VARNAME, SORT_ORDER, EQUAL_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) < 0);
         assertTrue(another.compareTo(dtype) > 0);
 
         another = new DoubleDashDataType(LESS_VARNAME, SORT_ORDER, EQUAL_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) > 0);
         assertTrue(another.compareTo(dtype) < 0);
 
         another = new DoubleDashDataType(EQUAL_VARNAME, SORT_ORDER, EQUAL_DISPLAYNAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.compareTo(another) > 0);
         assertTrue(another.compareTo(dtype) < 0);
     }
@@ -287,17 +317,19 @@ public class StringDashDataTypeTest {
     /**
      * Test method for {@link DashDataType#duplicate()} and
      * {@link StringDashDataType#StringDashDataType(DataColumnType,
-     * String, String, String, String, String, String, String)}
+     * String, String, String, String, String, String, String, java.util.Collection)}
      */
     @Test
     public void testDuplicateStringDashDataType() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         DataColumnType colType = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, DESCRIPTION, true, UNITS);
         assertEquals(colType, dtype.duplicate());
         StringDashDataType other = new StringDashDataType(colType, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertEquals(dtype, other);
     }
 
@@ -310,7 +342,8 @@ public class StringDashDataTypeTest {
     public void testTypeNameEquals() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.typeNameEquals(VAR_NAME));
         assertTrue(dtype.typeNameEquals(VAR_NAME.toUpperCase()));
         assertTrue(dtype.typeNameEquals(VAR_NAME.toLowerCase()));
@@ -321,7 +354,8 @@ public class StringDashDataTypeTest {
 
         DoubleDashDataType other = new DoubleDashDataType(DISPLAY_NAME, SORT_ORDER, VAR_NAME,
                 null, false, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.typeNameEquals(other));
         assertTrue(other.typeNameEquals(dtype));
         assertFalse(dtype.typeNameEquals((DashDataType<?>) null));
@@ -339,31 +373,38 @@ public class StringDashDataTypeTest {
     public void testIsQCType() {
         StringDashDataType dtype = new StringDashDataType("WOCE", 1.0, "WOCE flag",
                 "WOCE flag", false, DashboardUtils.NO_UNITS, "WOCE_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         dtype = new StringDashDataType("WOCE_xCO2", 1.0, "WOCE xCO2",
                 "WOCE flag for xCO2", false, DashboardUtils.NO_UNITS, "WOCE_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         dtype = new StringDashDataType("xCO2_woce", 1.0, "xCO2 WOCE flag",
                 "WOCE flag for xCO2", false, DashboardUtils.NO_UNITS, "WOCE_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         dtype = new StringDashDataType("QC_xCO2", 1.0, "QC xCO2",
                 "QC flag for xCO2", false, DashboardUtils.NO_UNITS, "QC_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         dtype = new StringDashDataType("xCO2_qc", 1.0, "xCO2 QC flag",
                 "QC flag for xCO2", false, DashboardUtils.NO_UNITS, "QC_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         dtype = new StringDashDataType("QC", 1.0, "QC flag",
                 "QC flag", false, DashboardUtils.NO_UNITS, "QC_flag",
-                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null);
+                DashboardServerUtils.QUALITY_CATEGORY, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(dtype.isQCType());
         StringDashDataType other = new StringDashDataType("QC_Comment", 1.0, "QC flag comment",
                 "Comment for QC flag", false, DashboardUtils.NO_UNITS, "Comment",
-                null, null, null, null, null, null);
+                null, null, null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
         assertTrue(other.isCommentType());
         assertTrue(other.isCommentTypeFor(dtype));
     }
@@ -376,7 +417,8 @@ public class StringDashDataTypeTest {
     public void testToFromPropertyValue() {
         StringDashDataType dtype = new StringDashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME,
                 DESCRIPTION, true, UNITS, STANDARD_NAME, CATEGORY_NAME, FILE_UNIT,
-                null, null, null, null);
+                null, null, null, null,
+                DashboardServerUtils.USER_FILE_DATA_ROLES);
 
         String propValStr = dtype.toPropertyValue();
         assertFalse(propValStr.contains(VAR_NAME));
@@ -394,6 +436,9 @@ public class StringDashDataTypeTest {
         assertFalse(propValStr.contains(DashDataType.MIN_ACCEPTABLE_VALUE_TAG));
         assertFalse(propValStr.contains(DashDataType.MAX_ACCEPTABLE_VALUE_TAG));
         assertFalse(propValStr.contains(DashDataType.MAX_QUESTIONABLE_VALUE_TAG));
+        for (DashDataType.Role datarole : DashboardServerUtils.USER_FILE_DATA_ROLES) {
+            assertTrue(propValStr.contains(datarole.name()));
+        }
 
         DashDataType<?> other = DashDataType.fromPropertyValue(VAR_NAME, propValStr);
         assertEquals(dtype, other);

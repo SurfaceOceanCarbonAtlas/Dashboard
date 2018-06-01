@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+import java.util.TreeSet;
 
 /**
  * Base class for defining immutable standard data types.  Includes information for converting string representations,
@@ -41,10 +42,17 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     public static final String CATEGORY_NAME_TAG = "category_name";
     public static final String FILE_STD_UNIT_TAG = "file_std_unit";
     public static final String UNITS_TAG = "units";
+    public static final String ROLES_TAG = "roles";
     public static final String MIN_QUESTIONABLE_VALUE_TAG = "min_question_value";
     public static final String MIN_ACCEPTABLE_VALUE_TAG = "min_accept_value";
     public static final String MAX_ACCEPTABLE_VALUE_TAG = "max_accept_value";
     public static final String MAX_QUESTIONABLE_VALUE_TAG = "max_question_value";
+
+    public enum Role {
+        USER_DATA,
+        FILE_METADATA,
+        FILE_DATA
+    }
 
     protected String varName;
     protected Double sortOrder;
@@ -55,6 +63,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     protected String standardName;
     protected String categoryName;
     protected String fileStdUnit;
+    protected TreeSet<Role> roles;
     protected T minQuestionVal;
     protected T minAcceptVal;
     protected T maxAcceptVal;
@@ -107,16 +116,17 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      * @param fileStdUnit
      *         name of the standard unit (corresponding to the first unit of the units array) to be used in the DSG
      *         files; if null, the first unit string will be used
+     * @param roles
+     *         the roles for this data type; cannot be null or empty
      *
      * @throws IllegalArgumentException
-     *         if the variable name, sort order, or display name is invalid; if (in subclasses) the relationship
-     *         minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal, for those values that are not null, is
-     *         violated.
+     *         if the variable name, sort order, display name, or roles is invalid;
+     *         if (in subclasses) the relationship minQuestionVal <= minAcceptVal <= maxAcceptVal <= maxQuestionVal,
+     *         for those values that are not null, is violated.
      */
-    protected DashDataType(String varName, Double sortOrder, String displayName,
-            String description, boolean isCritical, Collection<String> units,
-            String standardName, String categoryName, String fileStdUnit)
-            throws IllegalArgumentException {
+    protected DashDataType(String varName, Double sortOrder, String displayName, String description,
+            boolean isCritical, Collection<String> units, String standardName, String categoryName,
+            String fileStdUnit, Collection<Role> roles) throws IllegalArgumentException {
         if ( (varName == null) || varName.trim().isEmpty() )
             throw new IllegalArgumentException("data type variable name is invalid");
         this.varName = varName.trim();
@@ -155,6 +165,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             this.fileStdUnit = this.units.get(0);
         else
             this.fileStdUnit = fileStdUnit;
+
+        if ( (roles == null) || roles.isEmpty() )
+            throw new IllegalArgumentException("roles for the datatype is not given");
+        this.roles = new TreeSet<Role>(roles);
 
         this.minQuestionVal = null;
         this.minAcceptVal = null;
@@ -359,12 +373,19 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         return fileStdUnit;
     }
 
+    /**
+     * @return a sorted list of the roles associated with this data type; never null or empty
+     */
+    public ArrayList<Role> getRoles() {
+        // Since roles is a TreeSet, the list will be sorted
+        return new ArrayList<Role>(roles);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 37;
         int result = 0;
 
-        // Most significant items last (in case there is overflow)
         if ( minQuestionVal != null )
             result += minQuestionVal.hashCode();
 
@@ -380,15 +401,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         if ( maxQuestionVal != null )
             result += maxQuestionVal.hashCode();
 
-        for (String val : units) {
-            result = prime * result + val.hashCode();
-        }
-        result = prime * result + Integer.hashCode(units.size());
-
-        result = result * prime + fileStdUnit.hashCode();
+        result = prime * result + roles.hashCode();
+        result = prime * result + units.hashCode();
+        result = prime * result + fileStdUnit.hashCode();
         result = prime * result + categoryName.hashCode();
         result = prime * result + standardName.hashCode();
-        result = result * prime + Boolean.valueOf(isCritical).hashCode();
+        result = prime * result + Boolean.valueOf(isCritical).hashCode();
         result = prime * result + description.hashCode();
         result = prime * result + getDataClassName().hashCode();
         result = prime * result + varName.hashCode();
@@ -427,8 +445,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             return false;
         if ( !fileStdUnit.equals(other.fileStdUnit) )
             return false;
-
         if ( !units.equals(other.units) )
+            return false;
+        if ( !roles.equals(other.roles) )
             return false;
 
         if ( minQuestionVal == null ) {
@@ -506,6 +525,18 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
                 return result;
         }
 
+        result = Integer.compare(roles.size(), other.roles.size());
+        if ( result != 0 )
+            return result;
+        // compare the sorted lists of roles
+        ArrayList<Role> myroles = getRoles();
+        ArrayList<Role> otherroles = other.getRoles();
+        for (int k = 0; k < roles.size(); k++) {
+            result = myroles.get(k).compareTo(otherroles.get(k));
+            if ( result != 0 )
+                return result;
+        }
+
         if ( minQuestionVal == null ) {
             if ( other.minQuestionVal != null )
                 return -1;
@@ -568,10 +599,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
                 ", displayName=" + displayName +
                 ", description=" + description +
                 ", isCritical=" + isCritical +
-                ", units=" + units +
+                ", units=" + units.toString() +
                 ", standardName=" + standardName +
                 ", categoryName=" + categoryName +
                 ", fileStdUnit=" + fileStdUnit +
+                ", roles=" + roles.toString() +
                 ", minQuestionVal=" + minQuestionVal +
                 ", minAcceptVal=" + minAcceptVal +
                 ", maxAcceptVal=" + maxAcceptVal +
@@ -669,10 +701,10 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     }
 
     /**
-     * A QC flag type for another data type is a {@link StringDashDataType} with a category name of {@link
-     * DashboardServerUtils#QUALITY_CATEGORY} and a variable name that is (case insensitive): "WOCE_" or "QC_" followed
-     * by the other data variable name, the other data variable name followed by "_WOCE" or "_QC", or is the other data
-     * variable name with "_WOCE_" or "_QC_" inserted.
+     * A QC flag type for another data type is a {@link StringDashDataType} with a category name of
+     * {@link DashboardServerUtils#QUALITY_CATEGORY} and a variable name that is (case insensitive): "WOCE_" or "QC_"
+     * followed by the other data variable name, the other data variable name followed by "_WOCE" or "_QC", or
+     * the other data variable name with "_WOCE_" or "_QC_" inserted.
      *
      * @param dtype
      *         given data type; cannot be null
@@ -786,6 +818,11 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             jsonObj.addProperty(MAX_ACCEPTABLE_VALUE_TAG, maxAcceptVal.toString());
         if ( maxQuestionVal != null )
             jsonObj.addProperty(MAX_QUESTIONABLE_VALUE_TAG, maxQuestionVal.toString());
+        JsonArray jsonArr = new JsonArray();
+        for (Role typerole : roles) {
+            jsonArr.add(typerole.name());
+        }
+        jsonObj.add(ROLES_TAG, jsonArr);
         return jsonObj.toString();
     }
 
@@ -802,11 +839,12 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      * <li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
      * <li>tag {@link #CATEGORY_NAME_TAG} gives the category name,</li>
      * <li>tag {@link #FILE_STD_UNIT_TAG} gives the standard unit (the first unit in units array)
-     *         name to be used in DSG files (if not given, the first unit in the units array is used)</li>
+     * name to be used in DSG files (if not given, the first unit in the units array is used)</li>
      * <li>tag {@link #MIN_QUESTIONABLE_VALUE_TAG} gives the minimum questionable value,</li>
      * <li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
      * <li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>
-     * <li>tag {@link #MAX_QUESTIONABLE_VALUE_TAG} gives the maximum questionable value,</li>
+     * <li>tag {@link #MAX_QUESTIONABLE_VALUE_TAG} gives the maximum questionable value, and</li>
+     * <li>tag {@link #ROLES_TAG} gives the array of role names.</li>
      * </ul>
      * The data class name tag, sort order tag, and display name tag must all be given with valid values.  Other tags
      * can be omitted, in which case null is passed for that parameter to the constructor of the appropriate subclass
@@ -840,6 +878,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             String minAcceptStrVal = null;
             String maxAcceptStrVal = null;
             String maxQuestionStrVal = null;
+            ArrayList<Role> roles = null;
 
             JsonParser parser = new JsonParser();
             JsonObject jsonObj = parser.parse(jsonDesc).getAsJsonObject();
@@ -908,22 +947,33 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
                         identified = true;
                     } catch ( Exception ex ) {
                         throw new IllegalArgumentException("value of \"" + UNITS_TAG +
-                                "\" is not an JSON string array of strings", ex);
+                                "\" is not an JSON array of strings", ex);
+                    }
+                }
+                if ( (!identified) && ROLES_TAG.equals(tag) ) {
+                    try {
+                        roles = new ArrayList<Role>();
+                        for (JsonElement jsonElem : prop.getValue().getAsJsonArray()) {
+                            roles.add(Role.valueOf(jsonElem.getAsString()));
+                        }
+                        identified = true;
+                    } catch ( Exception ex ) {
+                        throw new IllegalArgumentException("value of \"" + ROLES_TAG +
+                                "\" is not an JSON array of role names", ex);
                     }
                 }
                 if ( !identified )
                     throw new IllegalArgumentException("unrecognized tag \"" + tag + "\"");
             }
 
+            if ( roles == null )
+                throw new IllegalArgumentException("role name tag \"" + ROLES_TAG + "\" is not given");
             if ( dataClassName == null )
-                throw new IllegalArgumentException("data class name tag \"" +
-                        DATA_CLASS_NAME_TAG + "\" is not given");
+                throw new IllegalArgumentException("data class name tag \"" + DATA_CLASS_NAME_TAG + "\" is not given");
             if ( displayName == null )
-                throw new IllegalArgumentException("display name tag \"" +
-                        DISPLAY_NAME_TAG + "\" is not given");
+                throw new IllegalArgumentException("display name tag \"" + DISPLAY_NAME_TAG + "\" is not given");
             if ( sortOrderStr == null )
-                throw new IllegalArgumentException("sort order tag \"" +
-                        SORT_ORDER_TAG + "\" is not given");
+                throw new IllegalArgumentException("sort order tag \"" + SORT_ORDER_TAG + "\" is not given");
             Double sortOrder;
             try {
                 sortOrder = Double.valueOf(sortOrderStr);
@@ -935,19 +985,19 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             if ( dataClassName.equals(String.class.getSimpleName()) ) {
                 return new StringDashDataType(varName, sortOrder, displayName, description,
                         isCritical, units, standardName, categoryName, fileStdUnit,
-                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
+                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal, roles);
             }
 
             if ( dataClassName.equals(Integer.class.getSimpleName()) ) {
                 return new IntDashDataType(varName, sortOrder, displayName, description,
                         isCritical, units, standardName, categoryName, fileStdUnit,
-                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
+                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal, roles);
             }
 
             if ( dataClassName.equals(Double.class.getSimpleName()) ) {
                 return new DoubleDashDataType(varName, sortOrder, displayName, description,
                         isCritical, units, standardName, categoryName, fileStdUnit,
-                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal);
+                        minQuestionStrVal, minAcceptStrVal, maxAcceptStrVal, maxQuestionStrVal, roles);
             }
 
             throw new IllegalArgumentException("Unknown data class name \"" + dataClassName + "\"");
