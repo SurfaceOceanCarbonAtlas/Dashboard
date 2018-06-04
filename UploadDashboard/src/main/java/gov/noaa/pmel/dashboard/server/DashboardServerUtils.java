@@ -145,18 +145,6 @@ public class DashboardServerUtils {
     public static final double EARTH_AUTHALIC_RADIUS = 6371.007;
 
     /**
-     * Maximum acceptable calculated speed, in km/h, between measurements.
-     * This is intentionally quite large as various approximations make this difficult to calculate accurately.
-     */
-    public static final double MAX_ACCEPT_CALC_SPEED = 150.0;
-
-    /**
-     * Maximum questionable calculated speed, in km/h, between measurements.
-     * This is intentionally quite large as various approximations make this difficult to calculate accurately.
-     */
-    public static final double MAX_QUESTION_CALC_SPEED = 750.0;
-
-    /**
      * "Distance" contribution, in kilometers, for every 24h time difference
      */
     public static final double SEAWATER_SPEED = 30.0;
@@ -371,7 +359,7 @@ public class DashboardServerUtils {
             "-90.0", null, null, "90.0", USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType SAMPLE_DEPTH = new DoubleDashDataType(DashboardUtils.SAMPLE_DEPTH,
-            "depth", BATHYMETRY_CATEGORY, "meters",
+            "depth", BATHYMETRY_CATEGORY, null,
             "0.0", null, null, "16000", USER_FILE_DATA_ROLES);
 
     public static final StringDashDataType REGION_ID = new StringDashDataType("region_id",

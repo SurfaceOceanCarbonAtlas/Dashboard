@@ -114,8 +114,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      *         category name for this data column type; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
      *         assigned
      * @param fileStdUnit
-     *         name of the standard unit (corresponding to the first unit of the units array) to be used in the DSG
-     *         files; if null, the first unit string will be used
+     *         special name of the standard unit (corresponding to the first unit of the units array) to be used
+     *         in the DSG files; if null, no special name will be used
      * @param roles
      *         the roles for this data type; cannot be null or empty
      *
@@ -161,10 +161,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         else
             this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
 
-        if ( fileStdUnit == null )
-            this.fileStdUnit = this.units.get(0);
-        else
-            this.fileStdUnit = fileStdUnit;
+        this.fileStdUnit = fileStdUnit;
 
         if ( (roles == null) || roles.isEmpty() )
             throw new IllegalArgumentException("roles for the datatype is not given");
@@ -370,6 +367,8 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      *         string in DSG files; never null
      */
     public String getFileStdUnit() {
+        if ( fileStdUnit == null )
+            return units.get(0);
         return fileStdUnit;
     }
 
@@ -379,6 +378,37 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
     public ArrayList<Role> getRoles() {
         // Since roles is a TreeSet, the list will be sorted
         return new ArrayList<Role>(roles);
+    }
+
+    /**
+     * Checks if this type has a given role.  If the given role is null, true is returned.
+     *
+     * @param role
+     *         role to check
+     *
+     * @return if this type has the given role
+     */
+    public boolean hasRole(Role role) {
+        if ( role == null )
+            return true;
+        return roles.contains(role);
+    }
+
+    /**
+     * @return the maximum value that is still considered an acceptable value;
+     *         may be null if there is no upper limit on acceptable values
+     */
+    public T getMaxGoodValue() {
+        // If there is no maxAcceptVal, everything up to maxQuestionVal is acceptable (and above that is bad)
+        return (maxAcceptVal != null) ? maxAcceptVal : maxQuestionVal;
+    }
+
+    /**
+     * @return the maximum value above which is considered bad;
+     *         may be null if there is no upper limit on acceptable or questionable values
+     */
+    public T getMaxMaybeValue() {
+        return maxQuestionVal;
     }
 
     @Override
@@ -403,7 +433,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
 
         result = prime * result + roles.hashCode();
         result = prime * result + units.hashCode();
-        result = prime * result + fileStdUnit.hashCode();
+        result = prime * result + getFileStdUnit().hashCode();
         result = prime * result + categoryName.hashCode();
         result = prime * result + standardName.hashCode();
         result = prime * result + Boolean.valueOf(isCritical).hashCode();
@@ -443,7 +473,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             return false;
         if ( !categoryName.equals(other.categoryName) )
             return false;
-        if ( !fileStdUnit.equals(other.fileStdUnit) )
+        if ( !getFileStdUnit().equals(other.getFileStdUnit()) )
             return false;
         if ( !units.equals(other.units) )
             return false;
@@ -514,7 +544,9 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
         result = categoryName.compareTo(other.categoryName);
         if ( result != 0 )
             return result;
-        result = fileStdUnit.compareTo(other.fileStdUnit);
+        result = getFileStdUnit().compareTo(other.getFileStdUnit());
+        if ( result != 0 )
+            return result;
 
         result = Integer.compare(units.size(), other.units.size());
         if ( result != 0 )
@@ -797,7 +829,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
             jsonObj.addProperty(DESCRIPTION_TAG, description);
         if ( isCritical )
             jsonObj.addProperty(IS_CRITICAL_TAG, Boolean.valueOf(isCritical).toString());
-        if ( !DashboardUtils.STRING_MISSING_VALUE.equals(fileStdUnit) )
+        if ( fileStdUnit != null )
             jsonObj.addProperty(FILE_STD_UNIT_TAG, fileStdUnit);
         if ( !DashboardUtils.NO_UNITS.equals(units) ) {
             JsonArray jsonArr = new JsonArray();
@@ -844,7 +876,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
      * <li>tag {@link #MIN_ACCEPTABLE_VALUE_TAG} gives the minimum acceptable value,</li>
      * <li>tag {@link #MAX_ACCEPTABLE_VALUE_TAG} gives the maximum acceptable value, and</li>
      * <li>tag {@link #MAX_QUESTIONABLE_VALUE_TAG} gives the maximum questionable value, and</li>
-     * <li>tag {@link #ROLES_TAG} gives the array of role names.</li>
+     * <li>tag {@link #ROLES_TAG} gives the array of role names (case-insensitive).</li>
      * </ul>
      * The data class name tag, sort order tag, and display name tag must all be given with valid values.  Other tags
      * can be omitted, in which case null is passed for that parameter to the constructor of the appropriate subclass
@@ -954,7 +986,7 @@ public abstract class DashDataType<T extends Comparable<T>> implements Comparabl
                     try {
                         roles = new ArrayList<Role>();
                         for (JsonElement jsonElem : prop.getValue().getAsJsonArray()) {
-                            roles.add(Role.valueOf(jsonElem.getAsString()));
+                            roles.add(Role.valueOf(jsonElem.getAsString().toUpperCase()));
                         }
                         identified = true;
                     } catch ( Exception ex ) {

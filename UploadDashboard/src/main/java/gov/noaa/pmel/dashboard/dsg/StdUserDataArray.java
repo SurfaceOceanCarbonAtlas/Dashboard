@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.datatype.ValueConverter;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
@@ -320,6 +321,8 @@ public class StdUserDataArray extends StdDataArray {
         // the following works okay if there is only one block of misordered data
         // or if multiple blocks are consistent in the "direction" they are misordered.
 
+        double[] maxSpeeds = DashboardConfigStore.getMaxCalcSpeedsKnots();
+
         // The following will say:
         // 4,5,6 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
         // 1,2 are misordered in 3,4,1,2,5,6
@@ -339,27 +342,27 @@ public class StdUserDataArray extends StdDataArray {
                     double kmdelta = DashboardServerUtils.distanceBetween(longitudes[actualRowNum - 1],
                             latitudes[actualRowNum - 1], longitudes[lastRowNum - 1], latitudes[lastRowNum - 1]);
                     double hourdelta = times[actualRowNum - 1] - times[lastRowNum - 1] / 3600.0;
-                    double speed = kmdelta / hourdelta;
-                    if ( speed > DashboardServerUtils.MAX_QUESTION_CALC_SPEED ) {
+                    double speed = 0.539957 * kmdelta / hourdelta;
+                    if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
                         msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                                Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
+                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
                         forwardSpeedMsgs.add(msg);
                     }
-                    else if ( speed > DashboardServerUtils.MAX_ACCEPT_CALC_SPEED ) {
+                    else if ( speed > maxSpeeds[0] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
                         msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                                Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
+                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
                         forwardSpeedMsgs.add(msg);
                     }
                     else if ( speed < 0.0 ) {
@@ -390,27 +393,27 @@ public class StdUserDataArray extends StdDataArray {
                     double kmdelta = DashboardServerUtils.distanceBetween(longitudes[lastRowNum - 1],
                             latitudes[lastRowNum - 1], longitudes[actualRowNum - 1], latitudes[actualRowNum - 1]);
                     double hourdelta = times[lastRowNum - 1] - times[actualRowNum - 1] / 3600.0;
-                    double speed = kmdelta / hourdelta;
-                    if ( speed > DashboardServerUtils.MAX_QUESTION_CALC_SPEED ) {
+                    double speed = 0.539957 * kmdelta / hourdelta;
+                    if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
                         msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_QUESTION_CALC_SPEED));
+                                Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
+                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
                         reverseSpeedMsgs.add(msg);
                     }
-                    else if ( speed > DashboardServerUtils.MAX_ACCEPT_CALC_SPEED ) {
+                    else if ( speed > maxSpeeds[0] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
                         msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) + " exceeds " +
-                                Double.toString(DashboardServerUtils.MAX_ACCEPT_CALC_SPEED));
+                                Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
+                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
                         reverseSpeedMsgs.add(msg);
                     }
                     else if ( speed < 0.0 ) {

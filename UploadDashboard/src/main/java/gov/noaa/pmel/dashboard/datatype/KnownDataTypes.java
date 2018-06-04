@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.datatype;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Properties;
@@ -33,25 +34,30 @@ public class KnownDataTypes {
 
     /**
      * Adds the given data type to this collection of known data types.
-     * The given instance of the DashDataType is added to the internal collection of known data types.
      *
      * @param dtype
-     *         new data type to add to the known list
+     *         new data type to add to the known list;
+     *         the given instance is added to the internal collection of known data types.
      *
      * @throws IllegalArgumentException
-     *         if the data type already is a known type
+     *         if the display name of the given type matches the display name of another type in the set
      */
-    private void addDataType(DashDataType<?> dtype) throws IllegalArgumentException {
+    private DashDataType<?> addDataType(DashDataType<?> dtype) throws IllegalArgumentException {
         String varKey = DashboardServerUtils.getKeyForName(dtype.getVarName());
-        DashDataType<?> oldVal = knownTypes.put(varKey, dtype);
-        if ( oldVal != null )
-            throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
+        DashDataType<?> oldType = knownTypes.put(varKey, dtype);
+        if ( oldType != null ) {
+            // If a replacement, make sure the display name keyed entry is also replaced
+            String displayKey = DashboardServerUtils.getKeyForName(oldType.getDisplayName());
+            if ( !displayKey.equals(varKey) )
+                knownTypes.remove(displayKey);
+        }
         String displayKey = DashboardServerUtils.getKeyForName(dtype.getDisplayName());
         if ( !displayKey.equals(varKey) ) {
-            oldVal = knownTypes.put(displayKey, dtype);
-            if ( oldVal != null )
-                throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
+            DashDataType<?> otherOldType = knownTypes.put(displayKey, dtype);
+            if ( otherOldType != null )
+                throw new IllegalArgumentException("Two variable names have the same display name");
         }
+        return oldType;
     }
 
     /**
@@ -154,7 +160,7 @@ public class KnownDataTypes {
      * <p>
      * SALINITY, TEQU, SST, PEQU, PATM, XCO2_WATER_TEQU_DRY, XCO2_WATER_SST_DRY, PCO2_WATER_TEQU_WET,
      * PCO2_WATER_SST_WET, FCO2_WATER_TEQU_WET, FCO2_WATER_SST_WET, WOCE_CO2_WATER, WOCE_CO2_ATM,
-     * WOA_SALINITY, NCEP_SLP, ETOPO2_DEPTH, GVCO2, DIST_TO_LAND, FCO2_REC, FCO2_SOURCE
+     * WOA_SALINITY, NCEP_SLP, DELTA_TEMP, CALC_SPEED, ETOPO2_DEPTH, GVCO2, DIST_TO_LAND, FCO2_REC, FCO2_SOURCE
      * <p>
      * This should be called before adding any custom types.
      *
@@ -189,6 +195,8 @@ public class KnownDataTypes {
         addDataType(SocatTypes.WOCE_CO2_WATER);
         addDataType(SocatTypes.WOCE_CO2_ATM);
         addDataType(SocatTypes.WOA_SALINITY);
+        addDataType(SocatTypes.DELTA_TEMP);
+        addDataType(SocatTypes.CALC_SPEED);
         addDataType(SocatTypes.NCEP_SLP);
         addDataType(SocatTypes.ETOPO2_DEPTH);
         addDataType(SocatTypes.GVCO2);
@@ -206,18 +214,28 @@ public class KnownDataTypes {
      *         data types properties to add to the known list; uses the simple line format: varName={JSON description}
      *         where varName is the variable name of the type and {JSON description} is a JSON string describing the
      *         type as documented by {@link DashDataType#fromPropertyValue(String, String)}
+     * @param role
+     *         only add data types that have this role; if null, add all data types, regardless of role
+     * @param logger
+     *         if not null, log any replacement warnings here
      *
      * @return this instance (as a convenience for chaining)
      *
      * @throws IllegalArgumentException
-     *         if the data type to add is already known, if the JSON description cannot be parsed.
+     *         if the JSON description cannot be parsed
      */
-    public KnownDataTypes addTypesFromProperties(Properties typeProps) throws IllegalArgumentException {
+    public KnownDataTypes addTypesFromProperties(Properties typeProps, DashDataType.Role role, Logger logger)
+            throws IllegalArgumentException {
         for (String name : typeProps.stringPropertyNames()) {
-            if ( containsTypeName(name) )
-                throw new IllegalArgumentException("Duplicate user-known data type \"" + name + "\"");
             String value = typeProps.getProperty(name);
-            addDataType(DashDataType.fromPropertyValue(name, value));
+            DashDataType<?> dtype = DashDataType.fromPropertyValue(name, value);
+            if ( dtype.hasRole(role) ) {
+                DashDataType<?> oldType = addDataType(dtype);
+                if ( (logger != null) && (oldType != null) && !oldType.equals(dtype) ) {
+                    logger.warn("Data type: " + dtype.toString());
+                    logger.warn("replacing data type: " + oldType.toString());
+                }
+            }
         }
         return this;
     }

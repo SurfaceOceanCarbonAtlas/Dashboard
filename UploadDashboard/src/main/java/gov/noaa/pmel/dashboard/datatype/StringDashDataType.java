@@ -120,8 +120,8 @@ public class StringDashDataType extends DashDataType<String> {
      *         category name for this data column type; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
      *         assigned
      * @param fileStdUnit
-     *         name of the standard unit (corresponding to the first unit of the units array) to be used in the DSG
-     *         files; if null, the first unit string will be used
+     *         special name of the standard unit (corresponding to the first unit of the units array) to be used
+     *         in the DSG files; if null, no special name will be used
      * @param minQuestionStrVal
      *         string representation of the minimum questionable value for standardized values of this data column type
      *         (less than this value is bad); if null, there is no minimum questionable value

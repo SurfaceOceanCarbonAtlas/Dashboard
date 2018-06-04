@@ -7,7 +7,9 @@ import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
@@ -40,7 +42,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.TreeSet;
 
 /**
  * Reads and holds the Dashboard configuration details
@@ -67,9 +68,7 @@ public class DashboardConfigStore {
     private static final String SMTP_PASSWORD_TAG = "SMTPPassword";
     private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
     private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile";
-    private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
-    private static final String METADATA_TYPES_PROPS_FILE_TAG = "MetadataTypesFile";
-    private static final String DATA_TYPES_PROPS_FILE_TAG = "DataTypesFile";
+    private static final String KNOWN_TYPES_PROPS_FILE_TAG = "KnownTypesFile";
     private static final String DEFAULT_TYPE_KEYS_FILE_TAG = "DefaultTypeKeysFile";
     private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
     private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
@@ -97,9 +96,7 @@ public class DashboardConfigStore {
                     SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
                     ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
                     ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DecDSG/Update \n" +
-                    USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
-                    METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
-                    DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
+                    KNOWN_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Known/Types/PropsFile \n" +
                     DEFAULT_TYPE_KEYS_FILE_TAG + "=/Path/To/To/TypeNameKeys/PropsFile \n" +
                     FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
                     DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" +
@@ -108,6 +105,9 @@ public class DashboardConfigStore {
                     USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
                     USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
                     "# ------------------------------ \n";
+
+    private static final double DEFAULT_MAX_GOOD_CALC_SPEED_KNOTS = 80;
+    private static final double DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS = 400;
 
     private static final Object SINGLETON_SYNC_OBJECT = new Object();
     private static DashboardConfigStore singleton = null;
@@ -132,6 +132,8 @@ public class DashboardConfigStore {
     private KnownDataTypes knownUserDataTypes;
     private KnownDataTypes knownMetadataTypes;
     private KnownDataTypes knownDataFileTypes;
+    private double maxGoodCalcSpeedKnots;
+    private double maxMaybeCalcSpeedKnots;
 
     private HashSet<File> filesToWatch;
     private Thread watcherThread;
@@ -266,9 +268,9 @@ public class DashboardConfigStore {
         if ( propVal != null )
             svnPassword = propVal.trim();
 
-        // Get the known user-provided data/metadata types
+        // Get the known user-provided, file metadata, and file data types
         try {
-            propVal = getFilePathProperty(configProps, USER_TYPES_PROPS_FILE_TAG, appConfigDir);
+            propVal = getFilePathProperty(configProps, KNOWN_TYPES_PROPS_FILE_TAG, appConfigDir);
             Properties typeProps = new Properties();
             FileReader propsReader = new FileReader(propVal);
             try {
@@ -278,67 +280,39 @@ public class DashboardConfigStore {
             }
             knownUserDataTypes = new KnownDataTypes();
             knownUserDataTypes.addStandardTypesForUsers();
-            knownUserDataTypes.addTypesFromProperties(typeProps);
+            knownUserDataTypes.addTypesFromProperties(typeProps, DashDataType.Role.USER_DATA, itsLogger);
+            knownMetadataTypes = new KnownDataTypes();
+            knownMetadataTypes.addStandardTypesForMetadataFiles();
+            knownMetadataTypes.addTypesFromProperties(typeProps, DashDataType.Role.FILE_METADATA, itsLogger);
+            knownDataFileTypes = new KnownDataTypes();
+            knownDataFileTypes.addStandardTypesForDataFiles();
+            knownDataFileTypes.addTypesFromProperties(typeProps, DashDataType.Role.FILE_DATA, itsLogger);
         } catch ( Exception ex ) {
-            throw new IOException("Invalid " + USER_TYPES_PROPS_FILE_TAG + " value specified in " +
+            throw new IOException("Invalid " + KNOWN_TYPES_PROPS_FILE_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known user-provided data types: ");
-            TreeSet<DashDataType<?>> knownTypes = knownUserDataTypes.getKnownTypesSet();
-            for (DashDataType<?> dtype : knownTypes) {
+            for (DashDataType<?> dtype : knownUserDataTypes.getKnownTypesSet()) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
             }
-        }
-
-        // Get the known DSG-file metadata types
-        try {
-            propVal = getFilePathProperty(configProps, METADATA_TYPES_PROPS_FILE_TAG, appConfigDir);
-            Properties typeProps = new Properties();
-            FileReader propsReader = new FileReader(propVal);
-            try {
-                typeProps.load(propsReader);
-            } finally {
-                propsReader.close();
-            }
-            knownMetadataTypes = new KnownDataTypes();
-            knownMetadataTypes.addStandardTypesForMetadataFiles();
-            knownMetadataTypes.addTypesFromProperties(typeProps);
-        } catch ( Exception ex ) {
-            throw new IOException("Invalid " + METADATA_TYPES_PROPS_FILE_TAG + " value specified in " +
-                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-        }
-        if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file metadata types: ");
-            TreeSet<DashDataType<?>> knownTypes = knownMetadataTypes.getKnownTypesSet();
-            for (DashDataType<?> dtype : knownTypes) {
+            for (DashDataType<?> dtype : knownMetadataTypes.getKnownTypesSet()) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
             }
-        }
-
-        // Get the known DSG-file data types
-        try {
-            propVal = getFilePathProperty(configProps, DATA_TYPES_PROPS_FILE_TAG, appConfigDir);
-            Properties typeProps = new Properties();
-            FileReader propsReader = new FileReader(propVal);
-            try {
-                typeProps.load(propsReader);
-            } finally {
-                propsReader.close();
-            }
-            knownDataFileTypes = new KnownDataTypes();
-            knownDataFileTypes.addStandardTypesForDataFiles();
-            knownDataFileTypes.addTypesFromProperties(typeProps);
-        } catch ( Exception ex ) {
-            throw new IOException("Invalid " + DATA_TYPES_PROPS_FILE_TAG + " value specified in " +
-                    configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-        }
-        if ( itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known file data types: ");
-            TreeSet<DashDataType<?>> knownTypes = knownDataFileTypes.getKnownTypesSet();
-            for (DashDataType<?> dtype : knownTypes) {
+            for (DashDataType<?> dtype : knownDataFileTypes.getKnownTypesSet()) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
             }
+        }
+        try {
+            DoubleDashDataType calcSpeed =
+                    (DoubleDashDataType) knownDataFileTypes.getDataType(SocatTypes.CALC_SPEED.getVarName());
+            maxGoodCalcSpeedKnots = (double) calcSpeed.getMaxGoodValue();
+            maxMaybeCalcSpeedKnots = (double) calcSpeed.getMaxMaybeValue();
+        } catch ( Exception ex ) {
+            maxGoodCalcSpeedKnots = 80;
+            maxMaybeCalcSpeedKnots = 400;
         }
 
         // Read the name of the default-column-names-to-types-with-units configuration file
@@ -886,6 +860,27 @@ public class DashboardConfigStore {
      */
     public KnownDataTypes getKnownDataFileTypes() {
         return this.knownDataFileTypes;
+    }
+
+    /**
+     * @return the maximum good and questionable calculated ship speed in knots.
+     *         The values returned are the the maximum good and questionable values,
+     *         if given, by the CALC_SPEED data type.  If not given, or if the
+     *         upload dashboard has not been started, default values are returned.
+     */
+    public static double[] getMaxCalcSpeedsKnots() {
+        double[] values = new double[2];
+        synchronized(SINGLETON_SYNC_OBJECT) {
+            if ( singleton != null ) {
+                values[0] = singleton.maxGoodCalcSpeedKnots;
+                values[1] = singleton.maxMaybeCalcSpeedKnots;
+            }
+            else {
+                values[0] = DEFAULT_MAX_GOOD_CALC_SPEED_KNOTS;
+                values[1] = DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS;
+            }
+        }
+        return values;
     }
 
     /**

@@ -29,6 +29,7 @@ public class SocatTypes {
     public static final List<String> PCO2_UNITS = Arrays.asList("uatm");
     public static final List<String> FCO2_UNITS = Arrays.asList("uatm");
     public static final List<String> DISTANCE_UNITS = Arrays.asList("km");
+    public static final List<String> SPEED_UNITS = Arrays.asList("knots", "km/h", "m/s", "mph");
 
     // Additional data provided by the user
     public static final DoubleDashDataType SALINITY = new DoubleDashDataType("sal",
@@ -71,8 +72,7 @@ public class SocatTypes {
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
-    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType(
-            "pCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm",
             633.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", false,
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
@@ -82,8 +82,7 @@ public class SocatTypes {
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
-    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType(
-            "fCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType("fCO2_water_sst_100humidity_uatm",
             635.0, "fCO2_water_SST_wet", "water fCO2 wet using sst", false,
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
@@ -112,37 +111,49 @@ public class SocatTypes {
     public static final DoubleDashDataType WOA_SALINITY = new DoubleDashDataType("woa_sss",
             700.0, "WOA SSS", "salinity from World Ocean Atlas", false,
             SALINITY_UNITS, "sea_surface_salinity", SALINITY_CATEGORY, null,
-            "-0.1", "0.0", "42.0", "50.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     public static final DoubleDashDataType NCEP_SLP = new DoubleDashDataType("pressure_ncep_slp",
             701.0, "NCEP SLP", "sea level air pressure from NCEP/NCAR reanalysis", false,
             PRESSURE_UNITS, "air_pressure_at_sea_level", PRESSURE_CATEGORY, null,
-            "750.0", "900.0", "1100.0", "1250.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+
+    public static final DoubleDashDataType DELTA_TEMP = new DoubleDashDataType("delta_temp",
+            703.0, "delta_temp", "Equilibrator Temp - SST", false,
+            TEMPERATURE_UNITS, null, TEMPERATURE_CATEGORY, "degrees_C",
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+
+    // The limits on CALC_SPEED (in knots) are used to check time/location values
+    public static final DoubleDashDataType CALC_SPEED = new DoubleDashDataType("calc_speed",
+            704.0, "calc ship speed", "calculated ship speed", false,
+            SPEED_UNITS, null, DashboardServerUtils.PLATFORM_CATEGORY, null,
+            "0.0", null, "80.0", "400.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+
 
     public static final DoubleDashDataType ETOPO2_DEPTH = new DoubleDashDataType("etopo2",
             705.0, "ETOPO2 depth", "bathymetry from ETOPO2", false,
             DashboardUtils.DEPTH_UNITS, "sea_floor_depth", DashboardServerUtils.BATHYMETRY_CATEGORY, null,
-            "0.0", null, null, "16000", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     public static final DoubleDashDataType GVCO2 = new DoubleDashDataType("gvCO2",
             706.0, "GlobalView CO2", "GlobalView xCO2", false,
             XCO2_UNITS, "mole_fraction_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
-            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     public static final DoubleDashDataType DIST_TO_LAND = new DoubleDashDataType("dist_to_land",
             707.0, "dist to land", "distance to major land mass", false,
             DISTANCE_UNITS, null, DashboardServerUtils.LOCATION_CATEGORY, null,
-            "0.0", null, null, "5000.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     public static final DoubleDashDataType FCO2_REC = new DoubleDashDataType("fCO2_recommended",
             710.0, "fCO2_rec", "fCO2 recommended", false,
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
-            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     public static final IntDashDataType FCO2_SOURCE = new IntDashDataType("fCO2_source",
             711.0, "fCO2 src", "Algorithm number for recommended fCO2", false,
             DashboardUtils.NO_UNITS, null, DashboardServerUtils.IDENTIFIER_CATEGORY, null,
-            "1", null, null, "14", DashboardServerUtils.FILE_DATA_ONLY_ROLES);
+            null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     /**
      * Case-insensitive map of user-provided column type names used in older versions to those in the latest version.

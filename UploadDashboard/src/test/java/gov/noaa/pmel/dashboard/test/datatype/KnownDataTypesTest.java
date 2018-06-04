@@ -14,13 +14,16 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,7 +44,7 @@ public class KnownDataTypesTest {
     public static final DoubleDashDataType SHIP_SPEED = new DoubleDashDataType("ship_speed",
             670.0, "ship speed", "measured ship speed", false,
             SHIP_SPEED_UNITS, "platform_speed_wrt_ground", DashboardServerUtils.PLATFORM_CATEGORY, null,
-            "0.0", null, "50.0", "200.0", DashboardServerUtils.USER_ONLY_ROLES);
+            "0.0", null, "50.0", "200.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
     /**
      * Known data types for users for unit tests
@@ -68,11 +71,11 @@ public class KnownDataTypesTest {
 
         TEST_KNOWN_USER_DATA_TYPES = new KnownDataTypes();
         TEST_KNOWN_USER_DATA_TYPES.addStandardTypesForUsers();
-        TEST_KNOWN_USER_DATA_TYPES.addTypesFromProperties(typeProps);
+        TEST_KNOWN_USER_DATA_TYPES.addTypesFromProperties(typeProps, DashDataType.Role.USER_DATA, null);
 
         TEST_KNOWN_DATA_FILE_TYPES = new KnownDataTypes();
         TEST_KNOWN_DATA_FILE_TYPES.addStandardTypesForDataFiles();
-        TEST_KNOWN_DATA_FILE_TYPES.addTypesFromProperties(typeProps);
+        TEST_KNOWN_DATA_FILE_TYPES.addTypesFromProperties(typeProps, DashDataType.Role.FILE_DATA, null);
     }
 
 
@@ -175,6 +178,8 @@ public class KnownDataTypesTest {
             SocatTypes.WOCE_CO2_ATM,
             SocatTypes.WOA_SALINITY,
             SocatTypes.NCEP_SLP,
+            SocatTypes.DELTA_TEMP,
+            SocatTypes.CALC_SPEED,
             SocatTypes.ETOPO2_DEPTH,
             SocatTypes.GVCO2,
             SocatTypes.DIST_TO_LAND,
@@ -329,7 +334,7 @@ public class KnownDataTypesTest {
     }
 
     /**
-     * Test method for {@link KnownDataTypes#addTypesFromProperties(Properties)}.
+     * Test method for {@link KnownDataTypes#addTypesFromProperties(Properties, DashDataType.Role, Logger)}
      */
     @Test
     public void testAddTypesFromProperties() throws IOException {
@@ -339,7 +344,7 @@ public class KnownDataTypesTest {
         Properties props = new Properties();
         props.load(reader);
         assertEquals(new HashSet<String>(Arrays.asList(ADDN_TYPES_VAR_NAMES)), props.keySet());
-        KnownDataTypes other = clientTypes.addTypesFromProperties(props);
+        KnownDataTypes other = clientTypes.addTypesFromProperties(props, DashDataType.Role.USER_DATA, null);
         assertSame(clientTypes, other);
         assertEquals(STD_USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.getKnownTypesSet().size());
         for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
@@ -347,4 +352,29 @@ public class KnownDataTypesTest {
         }
     }
 
+    /**
+     * Test method to produce the properties file of default known data types
+     */
+    @Test
+    public void testCreateKnownTypesPropertiesFile() throws IOException {
+        KnownDataTypes usertypes = (new KnownDataTypes()).addStandardTypesForUsers();
+        KnownDataTypes metatypes = (new KnownDataTypes()).addStandardTypesForMetadataFiles();
+        KnownDataTypes dataTypes = (new KnownDataTypes()).addStandardTypesForDataFiles();
+        TreeSet<DashDataType<?>> typesSet = usertypes.getKnownTypesSet();
+        typesSet.addAll(metatypes.getKnownTypesSet());
+        typesSet.addAll(dataTypes.getKnownTypesSet());
+        File propsfile = new File("/var/tmp/junit/KnownTypes.properties");
+        PrintWriter propWriter = new PrintWriter(propsfile);
+        try {
+            propWriter.println("# All known data types");
+            propWriter.println("# Standard types are present for reference but have been commented out");
+            for (DashDataType<?> dtype : typesSet) {
+                String propval = dtype.toPropertyValue().replaceAll(":", "\\\\:").replaceAll("=", "\\\\=");
+                propWriter.println("# " + dtype.getVarName() + "=" + propval);
+            }
+        } finally {
+            propWriter.close();
+        }
+        assertTrue(propsfile.exists());
+    }
 }
