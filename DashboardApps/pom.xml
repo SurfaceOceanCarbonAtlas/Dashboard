@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
@@ -12,18 +12,18 @@
         <skipTests>true</skipTests>
     </properties>
 
-    <groupId>uk.ac.uea.socat</groupId>
-    <artifactId>omemetadata</artifactId>
+    <groupId>gov.noaa.pmel.dashboard</groupId>
+    <artifactId>DashboardApps</artifactId>
     <version>7.0.0</version>
     <packaging>jar</packaging>
 
-    <name>OmeMetadata</name>
-    <description>Java library for working with the OME XML for SOCAT metadata</description>
+    <name>DashboardApps</name>
+    <description>Java apps to go with the SOCAT Upload Dashboard</description>
 
     <build>
         <defaultGoal>package</defaultGoal>
         <directory>${basedir}/target</directory>
-        <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>SocatDashboardApps</finalName>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
         <outputDirectory>${basedir}/target/classes</outputDirectory>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
@@ -32,11 +32,16 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>[2.0,)</version>
+            <groupId>uk.ac.uea.socat</groupId>
+            <artifactId>omemetadata</artifactId>
+            <version>7.0.0</version>
             <type>jar</type>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>gov.noaa.pmel.dashboard</groupId>
+            <artifactId>UploadDashboard</artifactId>
+            <version>7.0.0</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -45,6 +50,11 @@
             <type>jar</type>
             <scope>test</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>[2.0,)</version>
         </dependency>
     </dependencies>
 
