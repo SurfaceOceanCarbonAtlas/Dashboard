@@ -3,18 +3,19 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import java.util.ArrayList;
-import java.util.Date;
-
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.Overlap;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
+import gov.noaa.pmel.dashboard.server.DataLocation;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.Overlap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * Assigns WOCE-4 flags to the tail duplicate data points in an overlap between two datasets.
@@ -48,13 +49,13 @@ public class WoceOverlapTail {
             System.err.println();
             System.exit(1);
         }
-        String firstExpo = DashboardServerUtils.checkExpocode(args[0]);
-        String secondExpo = DashboardServerUtils.checkExpocode(args[1]);
+        String firstExpo = DashboardServerUtils.checkDatasetID(args[0]);
+        String secondExpo = DashboardServerUtils.checkDatasetID(args[1]);
 
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -73,11 +74,11 @@ public class WoceOverlapTail {
                     throw new IllegalArgumentException("no overlap found");
                 if ( overlapList.size() != 1 )
                     throw new RuntimeException("unexpected overlap list size of " +
-                                                       Integer.toString(overlapList.size()));
+                            Integer.toString(overlapList.size()));
                 oerlap = overlapList.get(0);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Problems getting the overlap between " + firstExpo +
-                                           " and " + secondExpo + ": " + ex.getMessage());
+                        " and " + secondExpo + ": " + ex.getMessage());
                 System.exit(1);
             }
 
@@ -89,9 +90,9 @@ public class WoceOverlapTail {
                 if ( firstRowNums.size() != secondRowNums.size() )
                     throw new RuntimeException("unexpected different number of data row numbers");
                 int delta = firstRowNums.get(0) - secondRowNums.get(0);
-                String[] expocodes = oerlap.getExpocodes();
-                if ( ( firstExpo.equals(expocodes[0]) && ( delta < 0 ) ) ||
-                        ( firstExpo.equals(expocodes[1]) && ( delta > 0 ) ) )
+                String[] expocodes = oerlap.getDatasetIds();
+                if ( (firstExpo.equals(expocodes[0]) && (delta < 0)) ||
+                        (firstExpo.equals(expocodes[1]) && (delta > 0)) )
                     throw new IllegalArgumentException(
                             "delta in row numbers between datasets is negative (switch order of datasets)");
                 for (int k = 1; k < firstRowNums.size(); k++) {
@@ -111,14 +112,14 @@ public class WoceOverlapTail {
                 }
                 for (int k = 0; k < firstOverlapFCO2.size(); k++) {
                     if ( !DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0,
-                                                 MIN_FCO2_DIFF) ) {
+                            MIN_FCO2_DIFF) ) {
                         System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
                         System.err.println("           " + secondOverlapFCO2.toString());
                         throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() +
-                                                                   " versus " + secondOverlapFCO2.get(k).toString());
+                                " versus " + secondOverlapFCO2.get(k).toString());
                     }
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println(
                         "Invalid overlap between " + firstExpo + " and " + secondExpo + ": " + ex.getMessage());
                 System.exit(1);
@@ -131,7 +132,8 @@ public class WoceOverlapTail {
                 double[] longitudes = datavals[0];
                 double[] latitudes = datavals[1];
                 double[] times = datavals[2];
-                char[] regionIDs = dsgHandler.readCharVarDataValues(firstExpo, SocatTypes.REGION_ID.getVarName());
+                String[] regionIDs = dsgHandler
+                        .readStringVarDataValues(firstExpo, DashboardServerUtils.REGION_ID.getVarName());
                 ArrayList<DataLocation> locations = new ArrayList<DataLocation>(firstRowNums.size());
                 for (Integer num : firstRowNums) {
                     int k = num - 1;
@@ -140,38 +142,37 @@ public class WoceOverlapTail {
                     loc.setDataValue(firstFCO2[k]);
                     loc.setLatitude(latitudes[k]);
                     loc.setLongitude(longitudes[k]);
-                    loc.setRegionID(regionIDs[k]);
                     loc.setRowNumber(num);
                     locations.add(loc);
                 }
-                WoceEvent woceEvent = new WoceEvent();
-                woceEvent.setExpocode(firstExpo);
+                DataQCEvent woceEvent = new DataQCEvent();
+                woceEvent.setDatasetId(firstExpo);
                 woceEvent.setVersion(configStore.getQCVersion());
-                woceEvent.setWoceName(SocatTypes.WOCE_CO2_WATER.getVarName());
-                woceEvent.setFlag(DashboardUtils.WOCE_BAD);
+                woceEvent.setFlagName(SocatTypes.WOCE_CO2_WATER.getVarName());
+                woceEvent.setFlagValue(DashboardServerUtils.WOCE_BAD);
                 woceEvent.setFlagDate(new Date());
                 woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points with " +
-                                             secondExpo + " detected by automation");
-                woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-                woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+                        secondExpo + " detected by automation");
+                woceEvent.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
+                woceEvent.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
                 woceEvent.setVarName(SocatTypes.FCO2_REC.getVarName());
                 woceEvent.setLocations(locations);
 
                 // Add the WOCE event to the database
-                configStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
+                configStore.getDatabaseRequestHandler().addDataQCEvent(Arrays.asList(woceEvent));
                 // Assign the WOCE-4 flags in the full-data DSG file
-                ArrayList<String> issues = dsgHandler.getDsgNcFile(firstExpo).assignWoceFlags(woceEvent);
+                ArrayList<String> issues = dsgHandler.getDsgNcFile(firstExpo).assignDataQCFlags(woceEvent);
                 if ( !issues.isEmpty() ) {
                     for (String msg : issues) {
                         System.err.println(msg);
                     }
                     throw new RuntimeException("unexpected error");
                 }
-                configStore.getDsgNcFileHandler().decimateCruise(firstExpo);
+                configStore.getDsgNcFileHandler().decimateDatasetDsg(firstExpo);
                 // Report WOCE-4 of duplicates
                 System.out.println(
                         "WOCE-4 assigned to duplicate datapoints in " + firstExpo + ": " + firstRowNums.toString());
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Problems assigning WOCE flags to " + firstExpo + ": " + ex.getMessage());
             }
         } finally {

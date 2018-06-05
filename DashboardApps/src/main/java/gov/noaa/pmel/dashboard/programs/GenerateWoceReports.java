@@ -50,9 +50,9 @@ public class GenerateWoceReports {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the file of expocodes '" +
-                                       exposFilename + "': " + ex.getMessage());
+                    exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -60,9 +60,9 @@ public class GenerateWoceReports {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems obtaining the default dashboard " +
-                                       "configuration: " + ex.getMessage());
+                    "configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -75,7 +75,7 @@ public class GenerateWoceReports {
                 // Generate the WOCE flags report file from the summary messages and current WOCE flags
                 try {
                     flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error - " + expo + " - problems getting WOCE flags");
                     retVal = 1;
                     continue;

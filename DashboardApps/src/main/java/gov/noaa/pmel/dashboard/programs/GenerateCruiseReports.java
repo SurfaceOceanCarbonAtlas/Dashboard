@@ -39,7 +39,7 @@ public class GenerateCruiseReports {
      *         empty string '' for this argument.
      */
     public static void main(String[] args) {
-        if ( ( args.length < 2 ) || ( args.length > 3 ) ) {
+        if ( (args.length < 2) || (args.length > 3) ) {
             System.err.println("Arguments:  ExpocodesFile  Destination  [ RegionID ]");
             System.err.println();
             System.err.println("ExpocodesFile");
@@ -57,13 +57,13 @@ public class GenerateCruiseReports {
         String exposFilename = args[0];
         String destName = args[1];
         boolean multicruise;
-        Character regionID;
+        String regionID;
         if ( args.length > 2 ) {
             multicruise = true;
             if ( args[2].trim().isEmpty() )
                 regionID = null;
             else
-                regionID = args[2].charAt(0);
+                regionID = args[2];
         }
         else {
             multicruise = false;
@@ -72,8 +72,7 @@ public class GenerateCruiseReports {
 
         TreeSet<String> expocodes = new TreeSet<String>();
         try {
-            BufferedReader reader =
-                    new BufferedReader(new FileReader(exposFilename));
+            BufferedReader reader = new BufferedReader(new FileReader(exposFilename));
             try {
                 String dataline = reader.readLine();
                 while ( dataline != null ) {
@@ -85,9 +84,8 @@ public class GenerateCruiseReports {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
-            System.err.println("Problems reading the file of expocodes '" +
-                                       exposFilename + "': " + ex.getMessage());
+        } catch ( Exception ex ) {
+            System.err.println("Problems reading the file of expocodes '" + exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -95,9 +93,8 @@ public class GenerateCruiseReports {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
-            System.err.println("Problems obtaining the default dashboard " +
-                                       "configuration: " + ex.getMessage());
+        } catch ( Exception ex ) {
+            System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -105,38 +102,36 @@ public class GenerateCruiseReports {
             if ( multicruise ) {
                 SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
                 try {
-                    ArrayList<String> warnMsgs =
-                            reporter.generateReport(expocodes, regionID, new File(destName));
+                    ArrayList<String> warnMsgs = reporter.generateReport(expocodes, regionID, new File(destName));
                     if ( warnMsgs.size() > 0 ) {
                         System.err.println("Warnings: ");
                         for (String msg : warnMsgs) {
                             System.err.println(msg);
                         }
                     }
-                } catch (Exception ex) {
-                    System.err.println("Problems generating the multi-cruise report: " +
-                                               ex.getMessage());
+                } catch ( Exception ex ) {
+                    System.err.println("Problems generating the multi-cruise report: " + ex.getMessage());
                     ex.printStackTrace();
                     System.exit(1);
                 }
             }
             else {
-                ArchiveFilesBundler bundler =
-                        new ArchiveFilesBundler(destName, null, null, null, null, null, null, null, null, false);
+                ArchiveFilesBundler bundler = new ArchiveFilesBundler(destName, null, null,
+                        null, null, null, null, null, null, false);
                 for (String expo : expocodes) {
                     try {
                         ArrayList<String> warnMsgs = bundler.createSocatEnhancedFilesBundle(expo);
                         System.err.println("Created single-cruise enhanced-data files bundle " +
-                                                   bundler.getBundleFile(expo).getPath());
+                                bundler.getBundleFile(expo).getPath());
                         if ( warnMsgs.size() > 0 ) {
                             System.err.println("Warnings for " + expo + ": ");
                             for (String msg : warnMsgs) {
                                 System.err.println(expo + ": " + msg);
                             }
                         }
-                    } catch (Exception ex) {
+                    } catch ( Exception ex ) {
                         System.err.println("Problems generating the single-cruise enhanced-data " +
-                                                   "files bundle for " + expo + ": " + ex.getMessage());
+                                "files bundle for " + expo + ": " + ex.getMessage());
                         ex.printStackTrace();
                         System.exit(1);
                     }

@@ -3,13 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.datatype.SocatTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataQCEvent;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,9 +47,9 @@ public class UpdateWOCEFlags {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard " +
-                                       "configuration file: " + ex.getMessage());
+                    "configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -63,16 +63,16 @@ public class UpdateWOCEFlags {
                     String dataline = expoReader.readLine();
                     while ( dataline != null ) {
                         dataline = dataline.trim();
-                        if ( !( dataline.isEmpty() || dataline.startsWith("#") ) )
+                        if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                             allExpocodes.add(dataline);
                         dataline = expoReader.readLine();
                     }
                 } finally {
                     expoReader.close();
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Error getting expocodes from " +
-                                           expocodesFilename + ": " + ex.getMessage());
+                        expocodesFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
             }
@@ -84,55 +84,53 @@ public class UpdateWOCEFlags {
             for (String expocode : allExpocodes) {
                 System.err.println(expocode + " start");
 
-                CruiseDsgNcFile dsgFile = null;
+                DsgNcFile dsgFile = null;
                 // Clear all the WOCE flags in the DSG file
-                char[] currentWaterWoceFlags = null;
-                char[] currentAtmWoceFlags = null;
+                String[] currentWaterWoceFlags = null;
+                String[] currentAtmWoceFlags = null;
                 try {
                     dsgFile = dsgHandler.getDsgNcFile(expocode);
-                    currentWaterWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
-                    currentAtmWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName());
-                } catch (Exception ex) {
+                    currentWaterWoceFlags = dsgFile.readStringVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
+                    currentAtmWoceFlags = dsgFile.readStringVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName());
+                } catch ( Exception ex ) {
                     System.err.println("Error reading the WOCE flags from the full-data DSG file for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 for (int k = 0; k < currentWaterWoceFlags.length; k++) {
-                    currentWaterWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
+                    currentWaterWoceFlags[k] = DashboardServerUtils.WOCE_ACCEPTABLE;
                 }
                 for (int k = 0; k < currentAtmWoceFlags.length; k++) {
-                    currentAtmWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
+                    currentAtmWoceFlags[k] = DashboardServerUtils.WOCE_ACCEPTABLE;
                 }
                 try {
-                    dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), currentWaterWoceFlags);
-                    dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName(), currentWaterWoceFlags);
-                } catch (Exception ex) {
+                    dsgFile.writeStringVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), currentWaterWoceFlags);
+                    dsgFile.writeStringVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName(), currentWaterWoceFlags);
+                } catch ( Exception ex ) {
                     System.err.println("Error clearing all the WOCE flags in the full-data DSG file for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     continue;
                 }
 
                 // Assign the applicable WOCE flags given in the database in the time order they were assigned
-                ArrayList<WoceEvent> woceList = null;
+                ArrayList<DataQCEvent> woceList = null;
                 try {
-                    woceList = dbHandler.getWoceEvents(expocode, false);
-                } catch (Exception ex) {
+                    woceList = dbHandler.getDataQCEvents(expocode, false);
+                } catch ( Exception ex ) {
                     System.err.println("Error reading the database WOCE flags for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 try {
-                    for (WoceEvent woce : woceList) {
+                    for (DataQCEvent woce : woceList) {
                         // Check if this is an applicable (not old) WOCE flag
-                        Character flag = woce.getFlag();
-                        if ( flag.equals(DashboardUtils.WOCE_GOOD) ||
-                                flag.equals(DashboardUtils.WOCE_NOT_CHECKED) ||
-                                flag.equals(DashboardUtils.WOCE_QUESTIONABLE) ||
-                                flag.equals(DashboardUtils.WOCE_BAD) ||
-                                flag.equals(DashboardUtils.WOCE_NO_DATA) ) {
-                            ArrayList<String> issues = dsgFile.assignWoceFlags(woce);
+                        String flag = woce.getFlagValue();
+                        if ( flag.equals(DashboardServerUtils.WOCE_ACCEPTABLE) ||
+                                flag.equals(DashboardServerUtils.WOCE_QUESTIONABLE) ||
+                                flag.equals(DashboardServerUtils.WOCE_BAD) ) {
+                            ArrayList<String> issues = dsgFile.assignDataQCFlags(woce);
                             for (String msg : issues) {
                                 System.err.println(msg);
                             }
@@ -140,19 +138,19 @@ public class UpdateWOCEFlags {
                                 throw new IllegalArgumentException("Mismatch of WOCE location data");
                         }
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error reassigning WOCE flags in the full-data DSG file for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
 
                 // Re-create the decimated-data DSG file
                 try {
-                    dsgHandler.decimateCruise(expocode);
-                } catch (Exception ex) {
+                    dsgHandler.decimateDatasetDsg(expocode);
+                } catch ( Exception ex ) {
                     System.err.println("Error regenerating the decimated-data DSG file for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }

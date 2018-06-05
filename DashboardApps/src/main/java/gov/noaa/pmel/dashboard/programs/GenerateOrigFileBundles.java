@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.TreeSet;
-
-import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
 /**
  * Generates the original data file bundles for the specified dataset IDs
@@ -27,8 +27,8 @@ public class GenerateOrigFileBundles {
      *
      * @param args
      *         IDsFile
-     *
-     * where IDsFile is a file of IDs of datasets to generating original data file bundles for.
+     *         <p>
+     *         where IDsFile is a file of IDs of datasets to generating original data file bundles for.
      */
     public static void main(String[] args) {
         if ( args.length != 1 ) {
@@ -50,14 +50,14 @@ public class GenerateOrigFileBundles {
                 String dataline = reader.readLine();
                 while ( dataline != null ) {
                     dataline = dataline.trim();
-                    if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                         idsSet.add(dataline);
                     dataline = reader.readLine();
                 }
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -66,7 +66,7 @@ public class GenerateOrigFileBundles {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -75,7 +75,7 @@ public class GenerateOrigFileBundles {
         try {
 
             ArchiveFilesBundler filesBundler = configStore.getArchiveFilesBundler();
-            for ( String datasetId : idsSet ) {
+            for (String datasetId : idsSet) {
                 String commitMsg = "Automated generation of the original data files bundle for " + datasetId;
                 try {
                     String resultMsg = filesBundler.sendOrigFilesBundle(datasetId, commitMsg,
@@ -91,7 +91,7 @@ public class GenerateOrigFileBundles {
             DashboardConfigStore.shutdown();
         }
 
-        if ( ! success )
+        if ( !success )
             System.exit(1);
         System.exit(0);
     }

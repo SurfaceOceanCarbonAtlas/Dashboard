@@ -52,9 +52,9 @@ public class GenerateDataForGridding {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the file of expocodes '" +
-                                       exposFilename + "': " + ex.getMessage());
+                    exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -62,9 +62,9 @@ public class GenerateDataForGridding {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems obtaining the default dashboard " +
-                                       "configuration: " + ex.getMessage());
+                    "configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -72,7 +72,7 @@ public class GenerateDataForGridding {
             SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
             try {
                 reporter.generateDataFileForGrids(expocodes, new File(destName));
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Problems generating the data file: " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);

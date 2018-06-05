@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.TreeSet;
 
 /**
  * Rechecks datasets with the automated data checker and regenerates the messages files.
@@ -42,14 +42,14 @@ public class RecheckDatasets {
                 String dataline = idsReader.readLine();
                 while ( dataline != null ) {
                     dataline = dataline.trim();
-                    if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                         idsSet.add(dataline);
                     dataline = idsReader.readLine();
                 }
             } finally {
                 idsReader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -58,7 +58,7 @@ public class RecheckDatasets {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -69,7 +69,7 @@ public class RecheckDatasets {
             DataFileHandler dataHandler = configStore.getDataFileHandler();
             DatasetChecker dataChecker = configStore.getDashboardDatasetChecker();
 
-            for ( String datasetId : idsSet ) {
+            for (String datasetId : idsSet) {
                 // Get all the data for this dataset
                 DashboardDatasetData dataset;
                 try {

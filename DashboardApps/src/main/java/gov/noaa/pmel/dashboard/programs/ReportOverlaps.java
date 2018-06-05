@@ -3,6 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.actions.OverlapChecker;
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.Overlap;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
@@ -14,13 +21,6 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import gov.noaa.pmel.dashboard.actions.OverlapChecker;
-import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.Overlap;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
 /**
  * Finds overlaps within and between datasets
  *
@@ -31,16 +31,15 @@ public class ReportOverlaps {
     /**
      * QC flags of datasets to report any overlaps
      */
-    static final TreeSet<Character> ACCEPTABLE_FLAGS_SET = new TreeSet<Character>(
-            Arrays.asList(
-                    DashboardUtils.QC_A_FLAG,
-                    DashboardUtils.QC_B_FLAG,
-                    DashboardUtils.QC_C_FLAG,
-                    DashboardUtils.QC_D_FLAG,
-                    DashboardUtils.QC_E_FLAG,
-                    DashboardUtils.QC_NEW_FLAG,
-                    DashboardUtils.QC_CONFLICT_FLAG,
-                    DashboardUtils.QC_UPDATED_FLAG));
+    static final TreeSet<String> ACCEPTABLE_FLAGS_SET = new TreeSet<String>(Arrays.asList(
+            DashboardServerUtils.DATASET_QCFLAG_A,
+            DashboardServerUtils.DATASET_QCFLAG_B,
+            DashboardServerUtils.DATASET_QCFLAG_C,
+            DashboardServerUtils.DATASET_QCFLAG_D,
+            DashboardServerUtils.DATASET_QCFLAG_E,
+            DashboardServerUtils.DATASET_QCFLAG_NEW,
+            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
+            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
 
     /**
      * @param args
@@ -73,9 +72,9 @@ public class ReportOverlaps {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the file of expocodes '" +
-                                       exposFilename + "': " + ex.getMessage());
+                    exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -88,7 +87,7 @@ public class ReportOverlaps {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -101,19 +100,19 @@ public class ReportOverlaps {
             long startTime = System.currentTimeMillis();
 
             // Get the QC flags for the cruises from the DSG files
-            double timeDiff = ( System.currentTimeMillis() - startTime ) / ( 60.0 * 1000.0 );
+            double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
             System.err.format("%.2fm - getting QC flags for the datasets\n", timeDiff);
             TreeSet<String> expoSet = new TreeSet<String>();
             for (String expo : givenExpocodes) {
                 try {
-                    Character qcFlag = dsgHandler.getQCFlag(expo);
+                    Character qcFlag = dsgHandler.getDatasetQCFlag(expo);
                     if ( ACCEPTABLE_FLAGS_SET.contains(qcFlag) ) {
                         expoSet.add(expo);
                     }
                     else {
                         throw new Exception("QC flag is " + qcFlag);
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());
                 }
             }
@@ -123,25 +122,25 @@ public class ReportOverlaps {
             TreeMap<String,double[]> timeMinMaxMap = new TreeMap<String,double[]>();
             TreeMap<String,double[]> latMinMaxMap = new TreeMap<String,double[]>();
             for (String expo : expoSet) {
-                timeDiff = ( System.currentTimeMillis() - startTime ) / ( 60.0 * 1000.0 );
+                timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
                 System.err.format("%.2fm - getting data limits for %s\n", timeDiff, expo);
                 double[][] dataVals = null;
                 try {
                     dataVals = oerlapChecker.getMaskedLonLatTimeSstFco2Vals(expo);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Unexpected error rereading " + expo + ": " + ex.getMessage());
                     System.exit(1);
                 }
                 double[] timeMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[2]);
-                if ( ( timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE ) ||
-                        ( timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE ) ) {
+                if ( (timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+                        (timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
                     System.err.println("No valid times for " + expo);
                     System.exit(1);
                 }
                 timeMinMaxMap.put(expo, timeMinMaxVals);
                 double[] latMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[1]);
-                if ( ( latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE ) ||
-                        ( latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE ) ) {
+                if ( (latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+                        (latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
                     System.err.println("No valid latitudes for " + expo);
                     System.exit(1);
                 }
@@ -162,13 +161,13 @@ public class ReportOverlaps {
                     }
                     // Check that there is some overlap in time
                     double[] secondTimeMinMax = timeMinMaxMap.get(secondExpo);
-                    if ( ( firstTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < secondTimeMinMax[0] ) ||
-                            ( secondTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < firstTimeMinMax[0] ) )
+                    if ( (firstTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
+                            (secondTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < firstTimeMinMax[0]) )
                         continue;
                     // Check that there is some overlap in latitude
                     double[] secondLatMinMax = latMinMaxMap.get(secondExpo);
-                    if ( ( firstLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < secondLatMinMax[0] ) ||
-                            ( secondLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < firstLatMinMax[0] ) )
+                    if ( (firstLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < secondLatMinMax[0]) ||
+                            (secondLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < firstLatMinMax[0]) )
                         continue;
                     checkExpos.add(secondExpo);
                 }
@@ -176,7 +175,7 @@ public class ReportOverlaps {
                 // Find any overlaps with this data set with the selected set of data sets
                 try {
                     orderedOverlaps.addAll(oerlapChecker.getOverlaps(firstExpo, checkExpos, System.err, startTime));
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     ex.printStackTrace();
                     System.exit(1);
                 }
@@ -190,7 +189,7 @@ public class ReportOverlaps {
         while ( revIter.hasNext() ) {
             Overlap oerlap = revIter.next();
 
-            String[] expos = oerlap.getExpocodes();
+            String[] expos = oerlap.getDatasetIds();
             if ( expos[0].equals(expos[1]) ) {
                 System.out.println("InternalOverlap[ expocode=" + expos[0] + ",");
             }

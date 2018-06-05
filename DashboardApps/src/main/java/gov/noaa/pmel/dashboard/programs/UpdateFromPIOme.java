@@ -3,23 +3,22 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Pattern;
-
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Updates dashboard's OME.xml from values given in the PI-provided OME.xml
@@ -35,11 +34,11 @@ public class UpdateFromPIOme {
     public static void main(String[] args) {
         String expocode;
         try {
-            expocode = DashboardServerUtils.checkExpocode(args[0]);
-        } catch (Exception ex) {
+            expocode = DashboardServerUtils.checkDatasetID(args[0]);
+        } catch ( Exception ex ) {
             expocode = null;
         }
-        if ( ( args.length != 1 ) || ( expocode == null ) ) {
+        if ( (args.length != 1) || (expocode == null) ) {
             if ( args.length == 1 ) {
                 System.err.println("");
                 System.err.println("expocode not valid: " + args[0]);
@@ -73,7 +72,7 @@ public class UpdateFromPIOme {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -87,14 +86,14 @@ public class UpdateFromPIOme {
             ArrayList<String> piOrgs = null;
             try {
                 File piOmeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.PI_OME_FILENAME);
-                Document omeDoc = ( new SAXBuilder() ).build(piOmeFile);
+                Document omeDoc = (new SAXBuilder()).build(piOmeFile);
                 OmeMetadata piOme = new OmeMetadata(expocode);
                 piOme.assignFromOmeXmlDoc(omeDoc);
                 platformName = piOme.getVesselName();
                 platformType = piOme.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
                 piNames = piOme.getInvestigators();
                 piOrgs = piOme.getOrganizations();
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Problems reading the PI-provided OME file: " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
@@ -123,7 +122,7 @@ public class UpdateFromPIOme {
             File dashOmeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
             OmeMetadata dashOme = new OmeMetadata(expocode);
             try {
-                Document omeDoc = ( new SAXBuilder() ).build(dashOmeFile);
+                Document omeDoc = (new SAXBuilder()).build(dashOmeFile);
                 dashOme.assignFromOmeXmlDoc(omeDoc);
                 if ( !platformName.isEmpty() ) {
                     System.err.println("Platform name = '" + platformName + "'");
@@ -148,9 +147,9 @@ public class UpdateFromPIOme {
                     else {
                         firsts = spdotPat.split(pieces[0].trim());
                         numFirsts = firsts.length - 1;
-                        if ( ( numFirsts > 1 ) &&
-                                ( "van".equalsIgnoreCase(firsts[numFirsts - 1]) ||
-                                        "von".equalsIgnoreCase(firsts[numFirsts - 1]) ) ) {
+                        if ( (numFirsts > 1) &&
+                                ("van".equalsIgnoreCase(firsts[numFirsts - 1]) ||
+                                        "von".equalsIgnoreCase(firsts[numFirsts - 1])) ) {
                             numFirsts--;
                             last = firsts[numFirsts] + " " + firsts[numFirsts + 1];
 
@@ -216,7 +215,7 @@ public class UpdateFromPIOme {
                     props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, org);
                     dashOme.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Problems reading (or updating) the dashboard OME file: " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
@@ -226,11 +225,11 @@ public class UpdateFromPIOme {
                 Document dashDoc = dashOme.createOmeXmlDoc();
                 FileOutputStream out = new FileOutputStream(dashOmeFile);
                 try {
-                    ( new XMLOutputter(Format.getPrettyFormat()) ).output(dashDoc, out);
+                    (new XMLOutputter(Format.getPrettyFormat())).output(dashDoc, out);
                 } finally {
                     out.close();
                 }
-            } catch (IOException ex) {
+            } catch ( IOException ex ) {
                 throw new IllegalArgumentException("Problems writing the updated dashboard OME: " + ex.getMessage());
             }
 

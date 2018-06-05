@@ -44,9 +44,9 @@ public class UpdateQCFlags {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard " +
-                                       "configuration file: " + ex.getMessage());
+                    "configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -60,16 +60,16 @@ public class UpdateQCFlags {
                     String dataline = expoReader.readLine();
                     while ( dataline != null ) {
                         dataline = dataline.trim();
-                        if ( !( dataline.isEmpty() || dataline.startsWith("#") ) )
+                        if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                             allExpocodes.add(dataline);
                         dataline = expoReader.readLine();
                     }
                 } finally {
                     expoReader.close();
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Error getting expocodes from " +
-                                           expocodesFilename + ": " + ex.getMessage());
+                        expocodesFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
             }
@@ -82,18 +82,18 @@ public class UpdateQCFlags {
                 Character qcFlag;
                 try {
                     qcFlag = dbHandler.getQCFlag(expocode);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error getting the database QC flag for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 char oldFlag;
                 try {
                     oldFlag = dsgHandler.getQCFlag(expocode);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error reading the current DSG QC flag for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
@@ -103,12 +103,12 @@ public class UpdateQCFlags {
                         dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
                         dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);
                         System.out.println("Updated QC flag for " +
-                                                   expocode + " from '" + oldFlag + "' to '" + qcFlag + "'");
+                                expocode + " from '" + oldFlag + "' to '" + qcFlag + "'");
                         updated = true;
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error updating the QC flag in the DSG files for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                 }
             }

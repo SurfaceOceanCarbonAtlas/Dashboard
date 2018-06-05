@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.actions.CruiseModifier;
+import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
@@ -24,11 +24,11 @@ public class WoceDuplicates {
     public static void main(String[] args) {
         String expocode;
         try {
-            expocode = DashboardServerUtils.checkExpocode(args[0]);
-        } catch (Exception ex) {
+            expocode = DashboardServerUtils.checkDatasetID(args[0]);
+        } catch ( Exception ex ) {
             expocode = null;
         }
-        if ( ( args.length != 1 ) || ( expocode == null ) ) {
+        if ( (args.length != 1) || (expocode == null) ) {
             if ( args.length == 1 ) {
                 System.err.println("");
                 System.err.println("expocode not valid: " + args[0]);
@@ -51,23 +51,23 @@ public class WoceDuplicates {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
         boolean success = true;
         try {
-            CruiseModifier modifier = new CruiseModifier(configStore);
+            DatasetModifier modifier = new DatasetModifier(configStore);
             // Assign any duplicate data points to
             try {
                 ArrayList<String> duplicates = modifier.woceDuplicateDatapoints(expocode);
                 for (String msg : duplicates) {
                     System.err.println(expocode + ": " + msg);
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Unable to WOCE-4 duplicate lon/lat/time/fCO2_rec data points for " +
-                                           expocode + ": " + ex.getMessage());
+                        expocode + ": " + ex.getMessage());
                 success = false;
             }
         } finally {

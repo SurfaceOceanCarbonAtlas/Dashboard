@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
@@ -42,9 +42,9 @@ public class UpdateDashboardStatuses {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard " +
-                                       "configuration file: " + ex.getMessage());
+                    "configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -58,42 +58,42 @@ public class UpdateDashboardStatuses {
                     String dataline = expoReader.readLine();
                     while ( dataline != null ) {
                         dataline = dataline.trim();
-                        if ( !( dataline.isEmpty() || dataline.startsWith("#") ) )
+                        if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                             allExpocodes.add(dataline);
                         dataline = expoReader.readLine();
                     }
                 } finally {
                     expoReader.close();
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Error getting expocodes from " +
-                                           expocodesFilename + ": " + ex.getMessage());
+                        expocodesFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
             }
 
             DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
-            CruiseFileHandler fileHandler = configStore.getCruiseFileHandler();
+            DataFileHandler fileHandler = configStore.getDataFileHandler();
 
             // update each of these cruises
             for (String expocode : allExpocodes) {
-                char qcFlag;
+                String qcFlag;
                 try {
-                    qcFlag = dsgHandler.getDsgNcFile(expocode).getQCFlag();
-                } catch (Exception ex) {
+                    qcFlag = dsgHandler.getDsgNcFile(expocode).getDatasetQCFlag();
+                } catch ( Exception ex ) {
                     System.err.println("Error reading the QC flag for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 try {
-                    if ( fileHandler.updateCruiseDashboardStatus(expocode, qcFlag) ) {
+                    if ( fileHandler.updateDashboardStatus(expocode, qcFlag) ) {
                         System.err.println("Updated dashboard status for " +
-                                                   expocode + " to that for QC flag '" + qcFlag + "'");
+                                expocode + " to that for QC flag '" + qcFlag + "'");
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error updating the dashboard status for " +
-                                               expocode + " : " + ex.getMessage());
+                            expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }

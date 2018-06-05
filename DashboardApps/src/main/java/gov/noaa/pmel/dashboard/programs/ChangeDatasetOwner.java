@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.actions.DatasetModifier;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Map;
 import java.util.TreeMap;
-
-import gov.noaa.pmel.dashboard.actions.DatasetModifier;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
 /**
  * Changes the owner of data and metadata files for datasets.
@@ -30,7 +30,8 @@ public class ChangeDatasetOwner {
             System.err.println();
             System.err.println("Each line of IDsOwnersFile is a space-separated dataset ID and dashboard username. ");
             System.err.println("For each, changes the owner of the data and metadata files for the dataset to the ");
-            System.err.println("specified user.  The datasets are added to the listing of the new owner.  The dataset ");
+            System.err
+                    .println("specified user.  The datasets are added to the listing of the new owner.  The dataset ");
             System.err.println("will be removed from old owners list, if appropriate, by the automatic update when ");
             System.err.println("the old owners list is next read. ");
             System.err.println("The default dashboard configuration is used for this process. ");
@@ -46,7 +47,7 @@ public class ChangeDatasetOwner {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -68,7 +69,7 @@ public class ChangeDatasetOwner {
                             System.err.println("Unable to get dataset ID and new owner from: " + dataline);
                             System.exit(1);
                         }
-                        if ( ! configStore.validateUser(tokens[1]) ) {
+                        if ( !configStore.validateUser(tokens[1]) ) {
                             System.err.println("Invalid dashboard username given in: " + dataline);
                             System.exit(1);
                         }
@@ -78,7 +79,7 @@ public class ChangeDatasetOwner {
                                 System.err.println("More than one owner specified for " + stdId);
                                 System.exit(1);
                             }
-                        } catch (Exception ex) {
+                        } catch ( Exception ex ) {
                             System.err.println("Invalid dataset ID given in: " + dataline);
                             System.exit(1);
                         }
@@ -87,7 +88,7 @@ public class ChangeDatasetOwner {
                 } finally {
                     idOwnerReader.close();
                 }
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 System.err.println("Error getting dataset IDs and new owners from " +
                         idOwnerFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
@@ -95,12 +96,12 @@ public class ChangeDatasetOwner {
             }
 
             DatasetModifier modifier = new DatasetModifier(configStore);
-            for ( Map.Entry<String,String> idOwner : idOwnerMap.entrySet() ) {
+            for (Map.Entry<String,String> idOwner : idOwnerMap.entrySet()) {
                 String datasetId = idOwner.getKey();
                 String newOwner = idOwner.getValue();
                 try {
                     modifier.changeDatasetOwner(datasetId, newOwner);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems changing the owner of " + datasetId +
                             " to " + newOwner + ": " + ex.getMessage());
                     success = false;
@@ -110,7 +111,7 @@ public class ChangeDatasetOwner {
             DashboardConfigStore.shutdown();
         }
 
-        if ( ! success )
+        if ( !success )
             System.exit(1);
         System.exit(0);
     }

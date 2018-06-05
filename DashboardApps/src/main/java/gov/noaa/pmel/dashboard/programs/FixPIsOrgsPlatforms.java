@@ -3,6 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,18 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.TreeSet;
-
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Updates dashboard's OME.xml from PI name corrections and organization names
@@ -49,6 +47,7 @@ public class FixPIsOrgsPlatforms {
      * @param platformNameFixesFile
      *         TSV file of erroneous and correct platform names;
      *         each line consists of the erroneous platform name, a tab, and the correct platform name
+     *
      * @throws IllegalArgumentException
      *         if problems reading either of the files
      */
@@ -85,9 +84,9 @@ public class FixPIsOrgsPlatforms {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems with " + piNameFixesFile.getPath() +
-                                                       ": " + ex.getMessage(), ex);
+                    ": " + ex.getMessage(), ex);
         }
 
         piNameOrgMap = new HashMap<String,String>();
@@ -114,9 +113,9 @@ public class FixPIsOrgsPlatforms {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems with " + piNameOrgFile.getPath() +
-                                                       ": " + ex.getMessage(), ex);
+                    ": " + ex.getMessage(), ex);
         }
 
         platformNameFixMap = new HashMap<String,String>();
@@ -143,9 +142,9 @@ public class FixPIsOrgsPlatforms {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems with " + platformNameFixesFile.getPath() +
-                                                       ": " + ex.getMessage(), ex);
+                    ": " + ex.getMessage(), ex);
         }
 
     }
@@ -155,7 +154,9 @@ public class FixPIsOrgsPlatforms {
      *
      * @param omeMData
      *         OME metadata to correct
+     *
      * @return if any values were changed
+     *
      * @throws IllegalArgumentException
      *         if assigning a value throws an exception
      */
@@ -219,7 +220,7 @@ public class FixPIsOrgsPlatforms {
                     omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
                 }
                 omeMData.replaceValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
-            } catch (Exception ex) {
+            } catch ( Exception ex ) {
                 throw new IllegalArgumentException("problems updating names: " + ex.getMessage(), ex);
             }
         }
@@ -232,7 +233,8 @@ public class FixPIsOrgsPlatforms {
      */
     public static void main(String[] args) {
         if ( args.length != 4 ) {
-            System.err.println("Arguments:  ExpocodesFile  PINameCorrections.tsv  PINameOrganization.tsv PlatformNameCorrections.tsv");
+            System.err.println(
+                    "Arguments:  ExpocodesFile  PINameCorrections.tsv  PINameOrganization.tsv PlatformNameCorrections.tsv");
             System.err.println();
             System.err.println("Corrects PI and platform names, and adds organization names, in the OME.xml ");
             System.err.println("files for datasets whose expocodes are given in ExpocodesFile.txt, one expocode ");
@@ -251,8 +253,9 @@ public class FixPIsOrgsPlatforms {
 
         FixPIsOrgsPlatforms fixer = null;
         try {
-            fixer = new FixPIsOrgsPlatforms(new File(piNameFixesFilename), new File(piNameOrgFilename), new File(platformNameFixesFilename));
-        } catch (Exception ex) {
+            fixer = new FixPIsOrgsPlatforms(new File(piNameFixesFilename), new File(piNameOrgFilename),
+                    new File(platformNameFixesFilename));
+        } catch ( Exception ex ) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -267,8 +270,8 @@ public class FixPIsOrgsPlatforms {
                 while ( dataline != null ) {
 
                     dataline = dataline.trim();
-                    if ( !( dataline.isEmpty() || dataline.startsWith("#") ) ) {
-                        String expocode = DashboardServerUtils.checkExpocode(dataline);
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) ) {
+                        String expocode = DashboardServerUtils.checkDatasetID(dataline);
                         allExpocodes.add(expocode);
                     }
 
@@ -277,7 +280,7 @@ public class FixPIsOrgsPlatforms {
             } finally {
                 expoReader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -287,7 +290,7 @@ public class FixPIsOrgsPlatforms {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -299,10 +302,10 @@ public class FixPIsOrgsPlatforms {
                 OmeMetadata omeMData = null;
                 File omeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
                 try {
-                    Document omeDoc = ( new SAXBuilder() ).build(omeFile);
+                    Document omeDoc = (new SAXBuilder()).build(omeFile);
                     omeMData = new OmeMetadata(expocode);
                     omeMData.assignFromOmeXmlDoc(omeDoc);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems reading the OME file for " + expocode + ": " + ex.getMessage());
                     ex.printStackTrace();
                     System.exit(1);
@@ -311,7 +314,7 @@ public class FixPIsOrgsPlatforms {
                 boolean changed = false;
                 try {
                     changed = fixer.fixNamesAndOrganizations(omeMData);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems correcting the OME file for " + expocode + ": " + ex.getMessage());
                     ex.printStackTrace();
                     System.exit(1);
@@ -322,11 +325,11 @@ public class FixPIsOrgsPlatforms {
                         Document dashDoc = omeMData.createOmeXmlDoc();
                         FileOutputStream out = new FileOutputStream(omeFile);
                         try {
-                            ( new XMLOutputter(Format.getPrettyFormat()) ).output(dashDoc, out);
+                            (new XMLOutputter(Format.getPrettyFormat())).output(dashDoc, out);
                         } finally {
                             out.close();
                         }
-                    } catch (Exception ex) {
+                    } catch ( Exception ex ) {
                         throw new IllegalArgumentException("Problems writing the updated OME file: " + ex.getMessage());
                     }
                     System.err.println(expocode + ": updated");

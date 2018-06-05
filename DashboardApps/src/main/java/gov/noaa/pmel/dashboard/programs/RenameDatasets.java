@@ -3,15 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.actions.DatasetModifier;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import gov.noaa.pmel.dashboard.actions.DatasetModifier;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 /**
  * Renames datasets (changes the dataset IDs).  All files will be moved to the
@@ -62,7 +62,7 @@ public class RenameDatasets {
             }
             if ( oldNewIdsMap.isEmpty() )
                 throw new IOException("file is empty");
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the old and new dataset IDs from " + idsFile.getPath());
             System.exit(1);
         }
@@ -71,24 +71,24 @@ public class RenameDatasets {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
         try {
 
-            if ( ! configStore.isAdmin(username) ) {
+            if ( !configStore.isAdmin(username) ) {
                 System.err.println(username + " is not an admin for the dashboard");
                 System.exit(1);
             }
             DatasetModifier renamer = new DatasetModifier(configStore);
-            for ( Entry<String, String> idsEntry: oldNewIdsMap.entrySet() ) {
+            for (Entry<String,String> idsEntry : oldNewIdsMap.entrySet()) {
                 String oldId = idsEntry.getKey();
                 String newId = idsEntry.getValue();
                 try {
                     renamer.renameDataset(oldId, newId, username);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Error renaming " + oldId + " to " + newId);
                     ex.printStackTrace();
                 }

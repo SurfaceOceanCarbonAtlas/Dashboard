@@ -3,11 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
@@ -22,6 +17,11 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.TreeSet;
 
 /**
  * Regenerates the full-data DSG files with the current data values
@@ -65,8 +65,9 @@ public class RegenerateDsgs {
      * @param forceIt
      *         if true, always regenerate the DSG files;
      *         if false, regenerate the DSG files only if the metadata has changed
-     * @return
-     *         if the DSG files were regenerated
+     *
+     * @return if the DSG files were regenerated
+     *
      * @throws IllegalArgumentException
      *         if there was a problem regenerating the DSG files
      */
@@ -81,10 +82,10 @@ public class RegenerateDsgs {
             // Read the current metadata in the full-data DSG file
             fullDataDsg = dsgHandler.getDsgNcFile(stdId);
             ArrayList<String> missing = fullDataDsg.readMetadata(knownMetadataTypes);
-            if ( ! missing.isEmpty() )
+            if ( !missing.isEmpty() )
                 throw new IllegalArgumentException("Unexpected metadata fields missing from the DSG file: " + missing);
             missing = fullDataDsg.readData(knownDataFileTypes);
-            if ( ! missing.isEmpty() )
+            if ( !missing.isEmpty() )
                 throw new IllegalArgumentException("Unexpected data fields missing from the DSG file: " + missing);
             DsgMetadata fullDataMeta = fullDataDsg.getMetadata();
             dataVals = fullDataDsg.getStdDataArray();
@@ -94,16 +95,16 @@ public class RegenerateDsgs {
                     metaHandler.getMetadataInfo(stdId, DashboardUtils.OME_FILENAME), metaHandler);
             updatedMeta = omeMData.createDsgMetadata();
 
-            if ( ! fullDataMeta.equals(updatedMeta) )
+            if ( !fullDataMeta.equals(updatedMeta) )
                 updateIt = true;
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems reading the dataset " + stdId + ": " + ex.getMessage());
         }
 
         if ( updateIt ) {
             try {
                 // Regenerate the DSG file with the updated metadata
-                fullDataDsg.create(updatedMeta, dataVals);
+                fullDataDsg.createFromFileData(updatedMeta, dataVals, knownDataFileTypes);
                 // Call Ferret to add data variables
                 SocatTool tool = new SocatTool(ferretConfig);
                 ArrayList<String> scriptArgs = new ArrayList<String>(1);
@@ -116,7 +117,7 @@ public class RegenerateDsgs {
 
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " +
-                            stdId + ": " + ex.getMessage());
+                        stdId + ": " + ex.getMessage());
             }
 
             // Pause a bit to make sure the OS is done with the full-data DSG file.
@@ -132,7 +133,7 @@ public class RegenerateDsgs {
                 dsgHandler.decimateDatasetDsg(stdId);
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Problems regenerating the decimated-data DSG files for " +
-                            stdId + ": " + ex.getMessage());
+                        stdId + ": " + ex.getMessage());
             }
         }
         return updateIt;
@@ -176,14 +177,14 @@ public class RegenerateDsgs {
                 String dataline = idsReader.readLine();
                 while ( dataline != null ) {
                     dataline = dataline.trim();
-                    if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                         idsSet.add(dataline);
                     dataline = idsReader.readLine();
                 }
             } finally {
                 idsReader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -193,7 +194,7 @@ public class RegenerateDsgs {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -204,13 +205,13 @@ public class RegenerateDsgs {
         boolean success = true;
         try {
             // update each of the datasets
-            for ( String datasetId : idsSet ) {
+            for (String datasetId : idsSet) {
                 try {
                     if ( regenerator.regenerateDsgFiles(datasetId, always) ) {
                         System.err.println("Regenerated the DSG files for " + datasetId);
                         changed = true;
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println(ex.getMessage());
                     success = false;
                 }
@@ -222,7 +223,7 @@ public class RegenerateDsgs {
             DashboardConfigStore.shutdown();
         }
 
-        if ( ! success )
+        if ( !success )
             System.exit(1);
         System.exit(0);
     }

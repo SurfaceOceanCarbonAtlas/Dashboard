@@ -3,19 +3,19 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Finds high-quality crossovers within sets of cruises
@@ -27,30 +27,28 @@ public class GetCruiseCrossovers {
     /**
      * QC flags of cruises to report any crossovers
      */
-    static final TreeSet<Character> reportFlagsSet = new TreeSet<Character>(
-            Arrays.asList(
-                    DashboardUtils.QC_A_FLAG,
-                    DashboardUtils.QC_B_FLAG,
-                    DashboardUtils.QC_C_FLAG,
-                    DashboardUtils.QC_D_FLAG,
-                    DashboardUtils.QC_E_FLAG,
-                    DashboardUtils.QC_NEW_FLAG,
-                    DashboardUtils.QC_CONFLICT_FLAG,
-                    DashboardUtils.QC_UPDATED_FLAG));
+    static final TreeSet<String> reportFlagsSet = new TreeSet<String>(Arrays.asList(
+            DashboardServerUtils.DATASET_QCFLAG_A,
+            DashboardServerUtils.DATASET_QCFLAG_B,
+            DashboardServerUtils.DATASET_QCFLAG_C,
+            DashboardServerUtils.DATASET_QCFLAG_D,
+            DashboardServerUtils.DATASET_QCFLAG_E,
+            DashboardServerUtils.DATASET_QCFLAG_NEW,
+            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
+            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
 
     /**
      * QC flags of cruises that can be involved in crossovers
      */
-    static final TreeSet<Character> acceptableFlagsSet = new TreeSet<Character>(
-            Arrays.asList(
-                    DashboardUtils.QC_A_FLAG,
-                    DashboardUtils.QC_B_FLAG,
-                    DashboardUtils.QC_C_FLAG,
-                    DashboardUtils.QC_D_FLAG,
-                    DashboardUtils.QC_E_FLAG,
-                    DashboardUtils.QC_NEW_FLAG,
-                    DashboardUtils.QC_CONFLICT_FLAG,
-                    DashboardUtils.QC_UPDATED_FLAG));
+    static final TreeSet<String> acceptableFlagsSet = new TreeSet<String>(Arrays.asList(
+            DashboardServerUtils.DATASET_QCFLAG_A,
+            DashboardServerUtils.DATASET_QCFLAG_B,
+            DashboardServerUtils.DATASET_QCFLAG_C,
+            DashboardServerUtils.DATASET_QCFLAG_D,
+            DashboardServerUtils.DATASET_QCFLAG_E,
+            DashboardServerUtils.DATASET_QCFLAG_NEW,
+            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
+            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
 
     /**
      * @param args
@@ -83,9 +81,9 @@ public class GetCruiseCrossovers {
             } finally {
                 reader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the file of expocodes '" +
-                                       exposFilename + "': " + ex.getMessage());
+                    exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -93,9 +91,9 @@ public class GetCruiseCrossovers {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems obtaining the default dashboard " +
-                                       "configuration: " + ex.getMessage());
+                    "configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -106,19 +104,19 @@ public class GetCruiseCrossovers {
             long startTime = System.currentTimeMillis();
 
             // Get the QC flags for the cruises from the DSG files
-            double timeDiff = ( System.currentTimeMillis() - startTime ) / ( 60.0 * 1000.0 );
+            double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
             System.err.format("%.2fm - getting QC flags for the cruises\n", timeDiff);
-            TreeMap<String,Character> cruiseFlagsMap = new TreeMap<String,Character>();
+            TreeMap<String,String> cruiseFlagsMap = new TreeMap<String,String>();
             for (String expo : givenExpocodes) {
                 try {
-                    Character qcFlag = dsgHandler.getQCFlag(expo);
+                    String qcFlag = dsgHandler.getDatasetQCFlag(expo);
                     if ( acceptableFlagsSet.contains(qcFlag) ) {
                         cruiseFlagsMap.put(expo, qcFlag);
                     }
                     else {
                         throw new Exception("QC flag is " + qcFlag);
                     }
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());
                 }
             }
@@ -128,25 +126,25 @@ public class GetCruiseCrossovers {
             TreeMap<String,double[]> cruiseTimeMinMaxMap = new TreeMap<String,double[]>();
             TreeMap<String,double[]> cruiseLatMinMaxMap = new TreeMap<String,double[]>();
             for (String expo : cruiseFlagsMap.keySet()) {
-                timeDiff = ( System.currentTimeMillis() - startTime ) / ( 60.0 * 1000.0 );
+                timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
                 System.err.format("%.2fm - getting data limits for %s\n", timeDiff, expo);
                 double[][] dataVals = null;
                 try {
                     dataVals = dsgHandler.readLonLatTimeDataValues(expo);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Unexpected error rereading " + expo + ": " + ex.getMessage());
                     System.exit(1);
                 }
                 double[] timeMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[2]);
-                if ( ( timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE ) ||
-                        ( timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE ) ) {
+                if ( (timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+                        (timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
                     System.err.println("No valid times for " + expo);
                     System.exit(1);
                 }
                 cruiseTimeMinMaxMap.put(expo, timeMinMaxVals);
                 double[] latMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[1]);
-                if ( ( latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE ) ||
-                        ( latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE ) ) {
+                if ( (latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+                        (latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
                     System.err.println("No valid latitudes for " + expo);
                     System.exit(1);
                 }
@@ -168,18 +166,18 @@ public class GetCruiseCrossovers {
                     if ( firstExpo.substring(0, 4).equals(secondExpo.substring(0, 4)) )
                         continue;
                     // One of the cruises must be from the report set
-                    if ( !( reportFlagsSet.contains(cruiseFlagsMap.get(firstExpo)) ||
-                            reportFlagsSet.contains(cruiseFlagsMap.get(secondExpo)) ) )
+                    if ( !(reportFlagsSet.contains(cruiseFlagsMap.get(firstExpo)) ||
+                            reportFlagsSet.contains(cruiseFlagsMap.get(secondExpo))) )
                         continue;
                     // Check that there is some overlap in time
                     double[] secondTimeMinMax = cruiseTimeMinMaxMap.get(secondExpo);
-                    if ( ( firstTimeMinMax[1] + DashboardUtils.MAX_TIME_DIFF < secondTimeMinMax[0] ) ||
-                            ( secondTimeMinMax[1] + DashboardUtils.MAX_TIME_DIFF < firstTimeMinMax[0] ) )
+                    if ( (firstTimeMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
+                            (secondTimeMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < firstTimeMinMax[0]) )
                         continue;
                     // Check that there is some overlap in latitude
                     double[] secondLatMinMax = cruiseLatMinMaxMap.get(secondExpo);
-                    if ( ( firstLatMinMax[1] + DashboardUtils.MAX_TIME_DIFF < secondLatMinMax[0] ) ||
-                            ( secondLatMinMax[1] + DashboardUtils.MAX_TIME_DIFF < firstLatMinMax[0] ) )
+                    if ( (firstLatMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < secondLatMinMax[0]) ||
+                            (secondLatMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < firstLatMinMax[0]) )
                         continue;
                     checkExpos.add(secondExpo);
                 }
@@ -189,7 +187,7 @@ public class GetCruiseCrossovers {
                         ArrayList<Crossover> crossList =
                                 crossChecker.getCrossovers(firstExpo, checkExpos, System.err, startTime);
                         for (Crossover cross : crossList) {
-                            String[] expos = cross.getExpocodes();
+                            String[] expos = cross.getDatasetIds();
                             Long[] cruiseMinTimes = new Long[2];
                             Long[] cruiseMaxTimes = new Long[2];
                             for (int q = 0; q < 2; q++) {
@@ -197,11 +195,11 @@ public class GetCruiseCrossovers {
                                 cruiseMinTimes[q] = Math.round(timeMinMax[0]);
                                 cruiseMaxTimes[q] = Math.round(timeMinMax[1]);
                             }
-                            cross.setCruiseMinTimes(cruiseMinTimes);
-                            cross.setCruiseMaxTimes(cruiseMaxTimes);
+                            cross.setDatasetMinTimes(cruiseMinTimes);
+                            cross.setDatasetMaxTimes(cruiseMaxTimes);
                             crossoversMap.put(expos[0] + " and " + expos[1], cross);
                         }
-                    } catch (Exception ex) {
+                    } catch ( Exception ex ) {
                         ex.printStackTrace();
                         System.exit(1);
                     }
@@ -210,25 +208,25 @@ public class GetCruiseCrossovers {
 
             // Report crossovers found for each QC flag to report on
             TreeSet<String> reportStrings = new TreeSet<String>();
-            for (Character reportFlag : reportFlagsSet) {
+            for (String reportFlag : reportFlagsSet) {
                 for (String expocodePair : crossoversMap.keySet()) {
                     String[] expocodes = expocodePair.split(" and ");
-                    Character[] qcFlags = new Character[] { cruiseFlagsMap.get(expocodes[0]),
-                            cruiseFlagsMap.get(expocodes[1]) };
+                    String[] qcFlags = new String[] {
+                            cruiseFlagsMap.get(expocodes[0]), cruiseFlagsMap.get(expocodes[1]) };
                     if ( reportFlag.equals(qcFlags[0]) ) {
                         reportStrings.add("    " +
-                                                  expocodes[0] + " (" + qcFlags[0] + ") high-quality cross-over with " +
-                                                  expocodes[1] + " (" + qcFlags[1] + ")");
+                                expocodes[0] + " (" + qcFlags[0] + ") high-quality cross-over with " +
+                                expocodes[1] + " (" + qcFlags[1] + ")");
                     }
                     if ( reportFlag.equals(qcFlags[1]) ) {
                         reportStrings.add("    " +
-                                                  expocodes[1] + " (" + qcFlags[1] + ") high-quality cross-over with " +
-                                                  expocodes[0] + " (" + qcFlags[0] + ")");
+                                expocodes[1] + " (" + qcFlags[1] + ") high-quality cross-over with " +
+                                expocodes[0] + " (" + qcFlags[0] + ")");
                     }
                 }
 
                 System.out.println(Integer.toString(reportStrings.size()) +
-                                           " crossovers of cruises with a QC flag of " + reportFlag + ": ");
+                        " crossovers of cruises with a QC flag of " + reportFlag + ": ");
                 for (String report : reportStrings) {
                     System.out.println(report);
                 }
@@ -238,7 +236,7 @@ public class GetCruiseCrossovers {
 
             // Check for 'A' cruises without high-quality crossovers
             for (String expo : cruiseFlagsMap.keySet()) {
-                if ( !DashboardUtils.QC_A_FLAG.equals(cruiseFlagsMap.get(expo)) )
+                if ( !DashboardServerUtils.DATASET_QCFLAG_A.equals(cruiseFlagsMap.get(expo)) )
                     continue;
                 boolean found = false;
                 for (String expocodePair : crossoversMap.keySet()) {
@@ -253,8 +251,8 @@ public class GetCruiseCrossovers {
                 }
             }
             System.out.println(Integer.toString(reportStrings.size()) +
-                                       " cruises with a QC flag of " + DashboardUtils.QC_A_FLAG +
-                                       " with no high-quality crossovers: ");
+                    " cruises with a QC flag of " + DashboardServerUtils.DATASET_QCFLAG_A +
+                    " with no high-quality crossovers: ");
             for (String report : reportStrings) {
                 System.out.println(report);
             }

@@ -3,16 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.TreeSet;
 
 /**
  * Updates the metadata and additional documents for datasets
@@ -48,14 +48,14 @@ public class AddAllMetadata {
                 String dataline = idsReader.readLine();
                 while ( dataline != null ) {
                     dataline = dataline.trim();
-                    if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
                         idsSet.add(dataline);
                     dataline = idsReader.readLine();
                 }
             } finally {
                 idsReader.close();
             }
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Error reading dataset IDs from " + idsFilename + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -65,7 +65,7 @@ public class AddAllMetadata {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -75,7 +75,7 @@ public class AddAllMetadata {
 
             DataFileHandler dataHandler = configStore.getDataFileHandler();
             MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
-            for ( String datasetId : idsSet ) {
+            for (String datasetId : idsSet) {
                 try {
                     DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
                     if ( dataset == null ) {
@@ -87,7 +87,7 @@ public class AddAllMetadata {
                     dataset.setOmeTimestamp(null);
                     TreeSet<String> addlDocs = new TreeSet<String>();
                     // Add all existing metadata documents for this dataset
-                    for ( DashboardMetadata mdata : metaHandler.getMetadataFiles(datasetId) ) {
+                    for (DashboardMetadata mdata : metaHandler.getMetadataFiles(datasetId)) {
                         if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
                             // Ignore the OME.xml stub
                             ;
@@ -106,7 +106,7 @@ public class AddAllMetadata {
                     // but do not commit the change - to be done manually
                     dataHandler.saveDatasetInfoToFile(dataset, null);
                     System.err.println("Documents updated for " + datasetId);
-                } catch (Exception ex) {
+                } catch ( Exception ex ) {
                     System.err.println("Problems working with " + datasetId + ": " + ex.getMessage());
                     ex.printStackTrace();
                     success = false;
@@ -118,7 +118,7 @@ public class AddAllMetadata {
             DashboardConfigStore.shutdown();
         }
 
-        if ( ! success )
+        if ( !success )
             System.exit(1);
         System.exit(0);
     }
