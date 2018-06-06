@@ -132,8 +132,6 @@ public class WoceOverlapTail {
                 double[] longitudes = datavals[0];
                 double[] latitudes = datavals[1];
                 double[] times = datavals[2];
-                String[] regionIDs = dsgHandler
-                        .readStringVarDataValues(firstExpo, DashboardServerUtils.REGION_ID.getVarName());
                 ArrayList<DataLocation> locations = new ArrayList<DataLocation>(firstRowNums.size());
                 for (Integer num : firstRowNums) {
                     int k = num - 1;
@@ -161,10 +159,10 @@ public class WoceOverlapTail {
                 // Add the WOCE event to the database
                 configStore.getDatabaseRequestHandler().addDataQCEvent(Arrays.asList(woceEvent));
                 // Assign the WOCE-4 flags in the full-data DSG file
-                ArrayList<String> issues = dsgHandler.getDsgNcFile(firstExpo).assignDataQCFlags(woceEvent);
-                if ( !issues.isEmpty() ) {
-                    for (String msg : issues) {
-                        System.err.println(msg);
+                ArrayList<DataLocation> unidentified = dsgHandler.updateDataQCFlags(woceEvent, false);
+                if ( !unidentified.isEmpty() ) {
+                    for (DataLocation loc : unidentified) {
+                        System.err.println("unknown data location: " + loc.toString());
                     }
                     throw new RuntimeException("unexpected error");
                 }

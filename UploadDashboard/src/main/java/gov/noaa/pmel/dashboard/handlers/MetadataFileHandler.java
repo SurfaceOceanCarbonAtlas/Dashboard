@@ -342,8 +342,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
         try {
             link = new URL(urlString);
         } catch ( MalformedURLException ex ) {
-            throw new IllegalArgumentException("Invalid document link: " +
-                    urlString + "\n    " + ex.getMessage());
+            throw new IllegalArgumentException("Invalid document link: " + urlString +
+                    "\n    " + ex.getMessage());
         }
         String origName = (new File(link.getPath())).getName();
         if ( (origName == null) || origName.trim().isEmpty() )
@@ -358,14 +358,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
         InputStream src = link.openStream();
         try {
             try {
-                mdata = saveMetadataInputStream(datasetId, owner, origName,
-                        timestamp, version, src, allowOverwrite);
+                mdata = saveMetadataInputStream(datasetId, owner, origName, timestamp, version, src, allowOverwrite);
             } finally {
                 src.close();
             }
         } catch ( IOException ex ) {
-            throw new IllegalArgumentException("Unable to read from the URL: " +
-                    urlString + "\n    " + ex.getMessage());
+            throw new IllegalArgumentException("Unable to read from the URL: " + urlString +
+                    "\n    " + ex.getMessage());
         }
         return mdata;
     }
@@ -777,4 +776,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
     }
 
+    public void generateWoceFlagMsgsFile(String datasetId, DatabaseRequestHandler databaseHandler) {
+        ImplementMe;
+    }
 }

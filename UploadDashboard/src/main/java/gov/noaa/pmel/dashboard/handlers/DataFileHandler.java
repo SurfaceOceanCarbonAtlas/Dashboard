@@ -35,7 +35,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -972,7 +971,7 @@ public class DataFileHandler extends VersionedFileHandler {
 
         // If they exist, delete the DSG files and notify ERDDAP
         DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
-        if ( dsgHandler.deleteCruise(datasetId) )
+        if ( dsgHandler.deleteDsgNcFiles(datasetId) )
             dsgHandler.flagErddap(true, true);
 
         // If it exists, delete the messages file
@@ -1321,6 +1320,44 @@ public class DataFileHandler extends VersionedFileHandler {
         // Nothing found describing the automated data checker WOCE flags - an error
         throw new IllegalArgumentException("No property value for " +
                 CHECKER_FLAGS + " given in " + infoFile.getPath());
+    }
+
+    /**
+     * Updates the submit status of a dataset based on the dataset QC flag.
+     *
+     * @param expocode
+     *         update the status of the dataset with this ID
+     * @param datasetQCFlag
+     *         data QC flag assigned to this dataset; if null or blank, the status assigned will be "not submitted"
+     *
+     * @return true if the status was modified; false if no changed were needed
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid,
+     *         if there are problems accessing the dataset info file, or
+     *         if the dataset QC flag is invalid
+     */
+    public boolean updateDatasetDashboardStatus(String expocode, String datasetQCFlag)
+            throws IllegalArgumentException {
+        DashboardDataset dset = getDatasetFromInfoFile(expocode);
+        String oldStatus = dset.getSubmitStatus();
+        String newStatus;
+        // Special check for nul or blank QC flag == no submitted
+        if ( (datasetQCFlag == null) || datasetQCFlag.trim().isEmpty() ) {
+            newStatus = DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED;
+        }
+        else {
+            newStatus = DashboardServerUtils.DATASET_FLAG_STATUS_MAP.get(datasetQCFlag);
+            if ( newStatus == null )
+                throw new IllegalArgumentException("Unexpected dataset QC flag of '" +
+                        datasetQCFlag + "' given to updateDatasetDashboardStatus");
+        }
+        if ( oldStatus.equals(newStatus) )
+            return false;
+        dset.setSubmitStatus(newStatus);
+        saveDatasetInfoToFile(dset, "Update dataset dashboard status for " + expocode +
+                "from '" + oldStatus + "' to '" + newStatus + "'");
+        return true;
     }
 
     /**

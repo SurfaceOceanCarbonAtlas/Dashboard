@@ -280,7 +280,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             try {
                 // Add the 'U' QC flag with the current upload version
                 configStore.getDatabaseRequestHandler().addDatasetQCEvents(Arrays.asList(qcEvent));
-                configStore.getDsgNcFileHandler().updateDatasetQCFlag(qcEvent);
+                configStore.getDsgNcFileHandler().updateDatasetQCFlagAndVersion(qcEvent);
                 // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 if ( dataset.isEditable() == null ) {

@@ -11,6 +11,8 @@ import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -209,8 +211,7 @@ public class DsgNcFileHandler {
         // Get the location and name of the full DSG file
         File dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.canRead() )
-            throw new IllegalArgumentException(
-                    "Full DSG file for " + datasetId + " is not readable");
+            throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " is not readable");
 
         // Get the location and name for the decimated DSG file
         File decDsgFile = getDecDsgNcFile(datasetId);
@@ -223,7 +224,7 @@ public class DsgNcFileHandler {
         tool.init(scriptArgs, datasetId, FerretConfig.Action.DECIMATE);
         tool.run();
         if ( tool.hasError() )
-            throw new IllegalArgumentException("Failure decimating the full DSG file: " + tool.getErrorMessage());
+            throw new IllegalArgumentException("Failure decimating the full-data DSG file: " + tool.getErrorMessage());
     }
 
     /**
@@ -245,11 +246,11 @@ public class DsgNcFileHandler {
     public void renameDsgFiles(String oldId, String newId) throws IllegalArgumentException, IOException {
         DsgNcFile newDsgFile = getDsgNcFile(newId);
         if ( newDsgFile.exists() )
-            throw new IllegalArgumentException("DSG file for " + oldId + " already exist");
+            throw new IllegalArgumentException("Full-data DSG file for " + newId + " already exist");
 
         DsgNcFile newDecDsgFile = getDecDsgNcFile(newId);
         if ( newDecDsgFile.exists() )
-            throw new IllegalArgumentException("Decimated DSG file for " + oldId + " already exist");
+            throw new IllegalArgumentException("Decimated DSG file for " + newId + " already exist");
 
         DsgNcFile oldDsgFile = getDsgNcFile(oldId);
         if ( oldDsgFile.exists() ) {
@@ -302,12 +303,12 @@ public class DsgNcFileHandler {
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, or if unable to delete one of the files
      */
-    public boolean deleteCruise(String datasetId) throws IllegalArgumentException {
+    public boolean deleteDsgNcFiles(String datasetId) throws IllegalArgumentException {
         boolean fileDeleted = false;
         File dsgFile = getDsgNcFile(datasetId);
         if ( dsgFile.exists() ) {
             if ( !dsgFile.delete() )
-                throw new IllegalArgumentException("Unable to delete the DSG file for " + datasetId);
+                throw new IllegalArgumentException("Unable to delete the full-data DSG file for " + datasetId);
             fileDeleted = true;
         }
         File decDsgFile = getDecDsgNcFile(datasetId);
@@ -368,7 +369,7 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
+            throw new FileNotFoundException("Full-data DSG file for " + datasetId + " does not exist");
         return dsgFile.readStringVarDataValues(varName);
     }
 
@@ -395,7 +396,7 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
+            throw new FileNotFoundException("Full-data DSG file for " + datasetId + " does not exist");
         return dsgFile.readIntVarDataValues(varName);
     }
 
@@ -423,7 +424,7 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
+            throw new FileNotFoundException("Full-data DSG file for " + datasetId + " does not exist");
         return dsgFile.readDoubleVarDataValues(varName);
     }
 
@@ -450,7 +451,7 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
+            throw new FileNotFoundException("Full-data DSG file for " + datasetId + " does not exist");
         return dsgFile.readLonLatTimeDataValues();
     }
 
@@ -480,8 +481,27 @@ public class DsgNcFileHandler {
             throws IllegalArgumentException, FileNotFoundException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new FileNotFoundException("Full data DSG file for " + datasetId + " does not exist");
+            throw new FileNotFoundException("Full-data DSG file for " + datasetId + " does not exist");
         return dsgFile.readLonLatTimeSstFco2DataValues();
+    }
+
+    /**
+     * @param datasetId
+     *         get the dataset QC flag and version for the dataset with this ID
+     *
+     * @return the dataset QC flag (first element) and version (second element) for the indicated dataset
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid or if the full-data DSG file does not exist or is invalid
+     * @throws IOException
+     *         if opening or reading from the full-data DSG file throws one
+     */
+    public String[] getDatasetQCFlagAndVersion(String datasetId) throws IllegalArgumentException, IOException {
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
+        if ( !dsgFile.exists() )
+            throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
+        String[] flagVersion = dsgFile.getDatasetQCFlagAndVersion();
+        return flagVersion;
     }
 
     /**
@@ -496,17 +516,17 @@ public class DsgNcFileHandler {
      * @throws IOException
      *         if problems opening or writing to a DSG file
      */
-    public void updateDatasetQCFlag(QCEvent qcEvent) throws IllegalArgumentException, IOException {
+    public void updateDatasetQCFlagAndVersion(QCEvent qcEvent) throws IllegalArgumentException, IOException {
         // Get the location and name for the NetCDF DSG file
         String datasetId = qcEvent.getDatasetId();
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new IllegalArgumentException("DSG file for " + datasetId + " does not exist");
-        dsgFile.updateDatasetQCFlag(qcEvent.getFlagValue(), qcEvent.getVersion());
+            throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
+        dsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
         DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
         if ( !decDsgFile.exists() )
             throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
-        decDsgFile.updateDatasetQCFlag(qcEvent.getFlagValue(), qcEvent.getVersion());
+        decDsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
         flagErddap(true, true);
     }
 
@@ -524,7 +544,7 @@ public class DsgNcFileHandler {
         // Compute and assign the all_region_ids variable from the full-data DSG file
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
-            throw new IllegalArgumentException("DSG file for " + datasetId + " does not exist");
+            throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
         String allRegionIds;
         try {
             allRegionIds = dsgFile.updateAllRegionIDs(null);
@@ -543,6 +563,36 @@ public class DsgNcFileHandler {
                     "Problems resetting all_region_ids in the full-data DSG file for " + datasetId);
         }
         return allRegionIds;
+    }
+
+    /**
+     * Updates the full-data DSG file with the given data QC flags, then regenerates the decimated DSG file.
+     * Optionally, will also update the row number in the data QC flags from the data in the full-data DSG file.
+     *
+     * @param woceEvent
+     *         data QC flags to set; the recorded dataset ID that of the dataset to update
+     * @param updateWoceEvent
+     *         if true, update the row numbers in the data QC flags from this DSG file
+     *
+     * @return list of the data QC event data locations not found in the full-data DSG file;
+     *         never null but may be empty
+     *
+     * @throws IllegalArgumentException
+     *         if the data QC flags are not valid,
+     *         if the full-data DSG file does not exist or is invalid, or
+     *         if there are problem creating the decimated DSG file from the update full-data DSG file
+     * @throws IOException
+     *         if opening, reading from, or writing to the full-data DSG file throws one
+     */
+    public ArrayList<DataLocation> updateDataQCFlags(DataQCEvent woceEvent, boolean updateWoceEvent)
+            throws IllegalArgumentException, IOException {
+        String datasetId = woceEvent.getDatasetId();
+        DsgNcFile dsgFile = getDsgNcFile(datasetId);
+        if ( !dsgFile.exists() )
+            throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
+        ArrayList<DataLocation> unidentified = dsgFile.updateDataQCFlags(woceEvent, updateWoceEvent);
+        decimateDatasetDsg(datasetId);
+        return unidentified;
     }
 
 }

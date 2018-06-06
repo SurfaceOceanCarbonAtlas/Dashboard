@@ -79,7 +79,8 @@ public class UpdateDashboardStatuses {
             for (String expocode : allExpocodes) {
                 String qcFlag;
                 try {
-                    qcFlag = dsgHandler.getDsgNcFile(expocode).getDatasetQCFlag();
+                    String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expocode);
+                    qcFlag = flagVersion[0];
                 } catch ( Exception ex ) {
                     System.err.println("Error reading the QC flag for " +
                             expocode + " : " + ex.getMessage());
@@ -87,7 +88,7 @@ public class UpdateDashboardStatuses {
                     continue;
                 }
                 try {
-                    if ( fileHandler.updateDashboardStatus(expocode, qcFlag) ) {
+                    if ( fileHandler.updateDatasetDashboardStatus(expocode, qcFlag) ) {
                         System.err.println("Updated dashboard status for " +
                                 expocode + " to that for QC flag '" + qcFlag + "'");
                     }

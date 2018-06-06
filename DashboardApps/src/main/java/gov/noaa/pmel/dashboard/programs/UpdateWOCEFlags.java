@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 import gov.noaa.pmel.dashboard.server.DataQCEvent;
 
 import java.io.BufferedReader;
@@ -130,12 +131,13 @@ public class UpdateWOCEFlags {
                         if ( flag.equals(DashboardServerUtils.WOCE_ACCEPTABLE) ||
                                 flag.equals(DashboardServerUtils.WOCE_QUESTIONABLE) ||
                                 flag.equals(DashboardServerUtils.WOCE_BAD) ) {
-                            ArrayList<String> issues = dsgFile.assignDataQCFlags(woce);
-                            for (String msg : issues) {
-                                System.err.println(msg);
-                            }
-                            if ( issues.size() > 0 )
+                            ArrayList<DataLocation> unidentified = dsgFile.updateDataQCFlags(woce, false);
+                            if ( unidentified.size() > 0 ) {
+                                for (DataLocation loc : unidentified) {
+                                    System.err.println("unknown data location: " + loc.toString());
+                                }
                                 throw new IllegalArgumentException("Mismatch of WOCE location data");
+                            }
                         }
                     }
                 } catch ( Exception ex ) {

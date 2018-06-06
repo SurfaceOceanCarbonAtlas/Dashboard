@@ -346,6 +346,12 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         return infoMsg;
     }
 
+    ArrayList<String> createEnhancedFilesBundle(String datasetId) {
+        ArrayList<String> warnMsgs = new ArrayList<String>();
+        ImplementMe;
+        return warnMsgs;
+    }
+
     /**
      * Returns all messages in a possibly-nested MessagingException. The messages are returned as a single String by
      * joining all the Exception messages together using a comma and space.

@@ -109,12 +109,12 @@ public class GetCruiseCrossovers {
             TreeMap<String,String> cruiseFlagsMap = new TreeMap<String,String>();
             for (String expo : givenExpocodes) {
                 try {
-                    String qcFlag = dsgHandler.getDatasetQCFlag(expo);
-                    if ( acceptableFlagsSet.contains(qcFlag) ) {
-                        cruiseFlagsMap.put(expo, qcFlag);
+                    String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expo);
+                    if ( acceptableFlagsSet.contains(flagVersion[0]) ) {
+                        cruiseFlagsMap.put(expo, flagVersion[0]);
                     }
                     else {
-                        throw new Exception("QC flag is " + qcFlag);
+                        throw new Exception("QC flag is " + flagVersion[0]);
                     }
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());

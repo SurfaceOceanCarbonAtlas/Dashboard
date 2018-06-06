@@ -105,12 +105,12 @@ public class ReportOverlaps {
             TreeSet<String> expoSet = new TreeSet<String>();
             for (String expo : givenExpocodes) {
                 try {
-                    Character qcFlag = dsgHandler.getDatasetQCFlag(expo);
-                    if ( ACCEPTABLE_FLAGS_SET.contains(qcFlag) ) {
+                    String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expo);
+                    if ( ACCEPTABLE_FLAGS_SET.contains(flagVersion[0]) ) {
                         expoSet.add(expo);
                     }
                     else {
-                        throw new Exception("QC flag is " + qcFlag);
+                        throw new Exception("QC flag is " + flagVersion[0]);
                     }
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());

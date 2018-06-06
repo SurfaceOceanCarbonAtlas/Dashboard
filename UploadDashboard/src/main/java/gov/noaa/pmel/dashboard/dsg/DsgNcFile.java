@@ -597,8 +597,7 @@ public class DsgNcFile extends File {
      * @throws IllegalArgumentException
      *         if the variable name is invalid, or if the variable is not a String array variable
      */
-    public String[] readStringVarDataValues(String varName)
-            throws IOException, IllegalArgumentException {
+    public String[] readStringVarDataValues(String varName) throws IOException, IllegalArgumentException {
         String[] dataVals;
         NetcdfFile ncfile = NetcdfFile.open(getPath());
         try {
@@ -618,6 +617,54 @@ public class DsgNcFile extends File {
     }
 
     /**
+     * Write the given array of strings as the values for the given string data variable.
+     *
+     * @param varName
+     *         string data variable name
+     * @param dataVals
+     *         string values to assign
+     *
+     * @throws IOException
+     *         if read from or writing to the DSG file throws one
+     * @throws IllegalArgumentException
+     *         if the variable name is invalid,
+     *         if the number of replacement strings is incorrect for this DSG file, or
+     *         if the length of a replacement string is too long for this DSG file,
+     */
+    public void writeStringVarDataValues(String varName, String[] dataVals)
+            throws IOException, IllegalArgumentException {
+        int maxlen = 0;
+        for (String val : dataVals) {
+            if ( maxlen < val.length() )
+                maxlen = val.length();
+        }
+        NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+        try {
+            Variable var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            int numVals = var.getShape(0);
+            if ( numVals != dataVals.length )
+                throw new IllegalArgumentException("invalid number of replacement strings for this DSG file");
+            if ( maxlen > var.getShape(1) )
+                throw new IOException("a replacement string too long for this DSG file");
+            // Data Stings
+            ArrayChar.D2 dvar = new ArrayChar.D2(numVals, var.getShape(1));
+            for (int j = 0; j < numVals; j++) {
+                dvar.setString(j, dataVals[j]);
+            }
+            try {
+                ncfile.write(var, dvar);
+            } catch ( InvalidRangeException ex ) {
+                // Should not happen given the checks above
+                throw new IllegalArgumentException(ex);
+            }
+        } finally {
+            ncfile.close();
+        }
+    }
+
+    /**
      * Reads and returns the array of data values for the specified variable contained in this DSG file.
      * The variable must be saved in the DSG file as integers.  For some variables, this DSG file must have been
      * processed by Ferret for the data values to be meaningful.  Missing values are left as in the DSG file.
@@ -632,15 +679,13 @@ public class DsgNcFile extends File {
      * @throws IllegalArgumentException
      *         if the variable name is invalid
      */
-    public int[] readIntVarDataValues(String varName)
-            throws IOException, IllegalArgumentException {
+    public int[] readIntVarDataValues(String varName) throws IOException, IllegalArgumentException {
         int[] dataVals;
         NetcdfFile ncfile = NetcdfFile.open(getPath());
         try {
             Variable var = ncfile.findVariable(varName);
             if ( var == null )
-                throw new IllegalArgumentException("Unable to find variable '" +
-                        varName + "' in " + getName());
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
             int numVals = var.getShape(0);
             dataVals = new int[numVals];
@@ -669,15 +714,13 @@ public class DsgNcFile extends File {
      * @throws IllegalArgumentException
      *         if the variable name is invalid
      */
-    public double[] readDoubleVarDataValues(String varName)
-            throws IOException, IllegalArgumentException {
+    public double[] readDoubleVarDataValues(String varName) throws IOException, IllegalArgumentException {
         double[] dataVals;
         NetcdfFile ncfile = NetcdfFile.open(getPath());
         try {
             Variable var = ncfile.findVariable(varName);
             if ( var == null )
-                throw new IllegalArgumentException("Unable to find variable '" +
-                        varName + "' in " + getName());
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
             int numVals = var.getShape(0);
             dataVals = new double[numVals];
@@ -867,15 +910,16 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * @return the dataset QC flag contained in this DSG file
+     * @return the dataset QC flag (first element) and the version (second element) contained in this DSG file
      *
      * @throws IllegalArgumentException
      *         if this DSG file is not valid
      * @throws IOException
      *         if opening or reading from the DSG file throws one
      */
-    public String getDatasetQCFlag() throws IllegalArgumentException, IOException {
+    public String[] getDatasetQCFlagAndVersion() throws IllegalArgumentException, IOException {
         String flag;
+        String version;
         NetcdfFile ncfile = NetcdfFile.open(getPath());
         try {
             String varName = DashboardServerUtils.DATASET_QC_FLAG.getVarName();
@@ -884,10 +928,16 @@ public class DsgNcFile extends File {
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 flagArray = (ArrayChar.D2) var.read();
             flag = flagArray.getString(0).trim();
+            varName = DashboardServerUtils.VERSION.getVarName();
+            var = ncfile.findVariable(varName);
+            if ( var == null )
+                throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
+            ArrayChar.D2 versionArray = (ArrayChar.D2) var.read();
+            version = flagArray.getString(0).trim();
         } finally {
             ncfile.close();
         }
-        return flag;
+        return new String[] { flag, version };
     }
 
     /**
@@ -903,7 +953,7 @@ public class DsgNcFile extends File {
      * @throws IOException
      *         if opening or writing to the DSG file throws one
      */
-    public void updateDatasetQCFlag(String qcFlag, String version)
+    public void updateDatasetQCFlagAndVersion(String qcFlag, String version)
             throws IllegalArgumentException, IOException {
         NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
         try {
@@ -995,7 +1045,7 @@ public class DsgNcFile extends File {
      * @param woceEvent
      *         data QC flags to set
      * @param updateWoceEvent
-     *         if true, update the data QC flags from data in this DSG file
+     *         if true, update the row numbers in the data QC flags from this DSG file
      *
      * @return list of the data QC event data locations not found in this DSG file; never null but may be empty
      *
@@ -1027,18 +1077,6 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
-
-            ArrayChar.D2 regionIDs;
-            if ( updateWoceEvent ) {
-                varName = DashboardServerUtils.REGION_ID.getVarName();
-                var = ncfile.findVariable(varName);
-                if ( var == null )
-                    throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
-                regionIDs = (ArrayChar.D2) var.read();
-            }
-            else {
-                regionIDs = null;
-            }
 
             String dataname = woceEvent.getVarName();
             ArrayDouble.D1 datavalues;

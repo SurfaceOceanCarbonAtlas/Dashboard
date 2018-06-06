@@ -229,7 +229,7 @@ public class MetadataUploadService extends HttpServlet {
                     try {
                         // Add the 'U' QC flag
                         databaseHandler.addDatasetQCEvents(Arrays.asList(qcEvent));
-                        dsgHandler.updateDatasetQCFlag(qcEvent);
+                        dsgHandler.updateDatasetQCFlagAndVersion(qcEvent);
                         // Update the dashboard status for the 'U' QC flag
                         dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);
                         // If archived, reset the archived status so the updated metadata will be archived

@@ -127,6 +127,10 @@ public class DatasetModifier {
         configStore.getDsgNcFileHandler().renameDsgFiles(oldStdId, newStdId);
     }
 
-    // TODO: re-add any methods that might still be needed
+    public ArrayList<String> woceDuplicateDatapoints(String datasetId) {
+        ArrayList<String> duplicates = new ArrayList<String>();
+        ImplementMe;
+        return duplicates;
+    }
 
 }
