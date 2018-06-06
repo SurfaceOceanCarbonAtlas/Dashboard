@@ -57,7 +57,8 @@ public class DatasetSubmitter {
     DsgNcFileHandler dsgHandler;
     DatabaseRequestHandler databaseHandler;
     ArchiveFilesBundler filesBundler;
-    KnownDataTypes dataFileTypes;
+    KnownDataTypes fileMetadataTypes;
+    KnownDataTypes fileDataTypes;
     String version;
     Logger logger;
 
@@ -73,7 +74,8 @@ public class DatasetSubmitter {
         dsgHandler = configStore.getDsgNcFileHandler();
         databaseHandler = configStore.getDatabaseRequestHandler();
         filesBundler = configStore.getArchiveFilesBundler();
-        dataFileTypes = configStore.getKnownDataFileTypes();
+        fileMetadataTypes = configStore.getKnownMetadataTypes();
+        fileDataTypes = configStore.getKnownDataFileTypes();
         version = configStore.getUploadVersion();
         logger = LogManager.getLogger(getClass());
     }
@@ -84,7 +86,7 @@ public class DatasetSubmitter {
      * {@link DashboardUtils#STATUS_SUSPENDED}, or {@link DashboardUtils#STATUS_EXCLUDED}.  For all datasets, the
      * archive status is updated to the given value.
      * <p>
-     * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARCHIVAL}, the archive request
+     * If the archive status begins with {@link DashboardUtils#ARCHIVE_STATUS_SENT_TO_START}, the archive request
      * is sent for dataset which have not already been sent, or for all datasets if repeatSend is true.
      *
      * @param idsSet
@@ -127,7 +129,7 @@ public class DatasetSubmitter {
                                 version + " with submission of " + datasetId, false);
                     }
                     DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
-                    DsgMetadata dsgMData = omeMData.createDsgMetadata();
+                    DsgMetadata dsgMData = omeMData.createDsgMetadata(fileMetadataTypes);
 
                     // For SOCAT, the version string in the DsgMetadata is the submit version number plus an 'N' or 'U'
                     // depending on whether this dataset is new to this version of SOCAT or an update from a previous
@@ -525,7 +527,7 @@ public class DatasetSubmitter {
                     DashDataType<?> dataType = columnTypes.get(colIdx);
                     dataVarName = dataType.getVarName();
                     // Check if this type is known in the data file types
-                    if ( !dataFileTypes.containsTypeName(dataVarName) )
+                    if ( !fileDataTypes.containsTypeName(dataVarName) )
                         throw new IllegalArgumentException("unknown");
                     if ( !dataVarName.equals(lastDataVarName) ) {
                         dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);

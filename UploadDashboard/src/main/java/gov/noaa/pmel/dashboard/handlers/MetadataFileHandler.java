@@ -516,8 +516,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Read the properties associated with this metadata document
         Properties metaProps = new Properties();
         try {
-            FileReader propsReader = new FileReader(
-                    new File(metadataFile.getPath() + INFOFILE_SUFFIX));
+            FileReader propsReader = new FileReader(new File(metadataFile.getPath() + INFOFILE_SUFFIX));
             try {
                 metaProps.load(propsReader);
             } finally {

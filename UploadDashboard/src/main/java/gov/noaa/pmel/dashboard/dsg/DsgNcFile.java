@@ -108,7 +108,7 @@ public class DsgNcFile extends File {
      * valid longitude, latitude, sample depth, and complete date and time specification, to at least the minute.  If
      * the seconds of the time is not provided, zero seconds will be used.
      *
-     * @param metaData
+     * @param metadata
      *         metadata for the dataset
      * @param userStdData
      *         standardized user-provided data
@@ -124,15 +124,15 @@ public class DsgNcFile extends File {
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
      */
-    public void createFromUserData(DsgMetadata metaData, StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
+    public void createFromUserData(DsgMetadata metadata, StdUserDataArray userStdData, KnownDataTypes dataFileTypes)
             throws IllegalArgumentException, IOException, InvalidRangeException {
-        if ( metaData == null )
+        if ( metadata == null )
             throw new IllegalArgumentException("no metadata given");
-        metadata = metaData;
+        this.metadata = metadata;
         if ( userStdData == null )
             throw new IllegalArgumentException("no data given");
 
-        // The following verifies lon and lat, computes and adds time, and adds,
+        // The following verifies lon and lat, computes and adds time, and
         // if not already present, year, month, day, hour, minute, and second.
         stddata = new StdDataArray(userStdData, dataFileTypes);
 
@@ -143,9 +143,9 @@ public class DsgNcFile extends File {
      * Creates this NetCDF DSG file with the given metadata and standardized data for data files.
      * The internal metadata and stddata references are updated to the given DsgMetadata and StdDataArray object.
      *
-     * @param metaData
+     * @param metadata
      *         metadata for the dataset; the DSG file will be created with exactly the metadata types it contains
-     * @param fileData
+     * @param filedata
      *         standardized data appropriate for data files
      * @param dataFileTypes
      *         all known data types for file data variables; the DSG file will be created with all these data types.
@@ -158,14 +158,14 @@ public class DsgNcFile extends File {
      * @throws InvalidRangeException
      *         if creating the NetCDF file throws one
      */
-    public void createFromFileData(DsgMetadata metaData, StdDataArray fileData, KnownDataTypes dataFileTypes)
+    public void createFromFileData(DsgMetadata metadata, StdDataArray filedata, KnownDataTypes dataFileTypes)
             throws IllegalArgumentException, IOException, InvalidRangeException {
-        if ( metaData == null )
+        if ( metadata == null )
             throw new IllegalArgumentException("no metadata given");
-        metadata = metaData;
-        if ( fileData == null )
+        this.metadata = metadata;
+        if ( filedata == null )
             throw new IllegalArgumentException("no data given");
-        stddata = fileData;
+        this.stddata = filedata;
         if ( dataFileTypes == null )
             throw new IllegalArgumentException("dataFileTypes is null");
         TreeSet<DashDataType<?>> knownDataTypes = dataFileTypes.getKnownTypesSet();

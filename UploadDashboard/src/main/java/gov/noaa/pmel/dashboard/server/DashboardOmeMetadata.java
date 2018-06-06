@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
@@ -101,38 +102,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates with the given dataset and timestamp, and from the contents of the given OME XML document.
-     * The owner and version is left empty.
-     *
-     * @param expo
-     *         dataset for this metadata
-     * @param timestamp
-     *         upload timestamp for this metadata
-     * @param omeDoc
-     *         document containing the metadata contents
-     *
-     * @throws IllegalArgumentException
-     *         if dataset is invalid, or if the contents of the metadata document are not valid
-     */
-    public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc) throws IllegalArgumentException {
-        super();
-        setFilename(DashboardUtils.OME_FILENAME);
-        setDatasetId(DashboardServerUtils.checkDatasetID(expo));
-        setUploadTimestamp(timestamp);
-
-        // Read the document to create the OmeMetadata member of this object
-        try {
-            omeMData = new OmeMetadata(this.datasetId);
-            omeMData.assignFromOmeXmlDoc(omeDoc);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems with the provided XML document:" +
-                    "\n    " + ex.getMessage(), ex);
-        }
-        // If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
-        setConflicted(!omeMData.isAcceptable());
-    }
-
-    /**
      * Creates using the given OmeMetadata.  The dataset is obtained from the OmeMetadata.
      *
      * @param omeMeta
@@ -157,24 +126,21 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Create a DsgMetadata object from the data in this object. Any PI or platform names will be anglicized. The
-     * version status and QC flag are not assigned.
+     * Create a DsgMetadata object from the data in this object. Any PI or platform names will be anglicized.
+     * The version status, QC flag, enhanced DOI, and string of all region IDs are not assigned.
+     *
+     * @param metadataTypes
+     *         known DSG file metadata types
      *
      * @return created DsgMetadata object
      */
-    public DsgMetadata createDsgMetadata() throws IllegalArgumentException {
+    public DsgMetadata createDsgMetadata(KnownDataTypes metadataTypes) throws IllegalArgumentException {
 
         // a DsgMetadata object cannot be created if there are conflicts
         if ( isConflicted() )
-            throw new IllegalArgumentException("The Metadata contains conflicts");
+            throw new IllegalArgumentException("The metadata contains conflicts");
 
-        DashboardConfigStore confStore;
-        try {
-            confStore = DashboardConfigStore.get(false);
-        } catch ( Exception ex ) {
-            throw new RuntimeException("Unexpected failure to get the configuration information");
-        }
-        DsgMetadata scMData = new DsgMetadata(confStore.getKnownMetadataTypes());
+        DsgMetadata scMData = new DsgMetadata(metadataTypes);
 
         scMData.setDatasetId(this.datasetId);
         scMData.setDatasetName(omeMData.getExperimentName());

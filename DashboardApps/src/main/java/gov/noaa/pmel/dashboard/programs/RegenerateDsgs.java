@@ -16,6 +16,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -91,9 +92,14 @@ public class RegenerateDsgs {
             dataVals = fullDataDsg.getStdDataArray();
 
             // Get the metadata in the OME XML file
-            DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-                    metaHandler.getMetadataInfo(stdId, DashboardUtils.OME_FILENAME), metaHandler);
-            updatedMeta = omeMData.createDsgMetadata();
+            DashboardMetadata omeMetadoc = metaHandler.getMetadataInfo(stdId, DashboardUtils.OME_FILENAME);
+            DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeMetadoc, metaHandler);
+            updatedMeta = omeMData.createDsgMetadata(knownMetadataTypes);
+            // Copy over metadata not contained in the XML file
+            updatedMeta.setEnhancedDOI(fullDataMeta.getEnhancedDOI());
+            updatedMeta.setDatasetQCFlag(fullDataMeta.getDatasetQCFlag());
+            updatedMeta.setVersion(fullDataMeta.getVersion());
+            updatedMeta.setAllRegionIDs(fullDataMeta.getAllRegionIDs());
 
             if ( !fullDataMeta.equals(updatedMeta) )
                 updateIt = true;

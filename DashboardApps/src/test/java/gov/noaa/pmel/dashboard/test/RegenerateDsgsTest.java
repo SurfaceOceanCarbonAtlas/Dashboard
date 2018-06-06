@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -65,6 +66,7 @@ public class RegenerateDsgsTest {
 
         // Test that nothing has changed
         assertEquals(origMeta, updatedMeta);
+        assertNotSame(origMeta, updatedMeta);
         // Check some pieces (to easier see differences) before checking the whole thing
         assertEquals(origData.getNumDataCols(), updatedData.getNumDataCols());
         assertEquals(origData.getNumSamples(), updatedData.getNumSamples());
@@ -74,6 +76,7 @@ public class RegenerateDsgsTest {
             }
         }
         assertEquals(origData, updatedData);
+        assertNotSame(origData, updatedData);
 
     }
 
