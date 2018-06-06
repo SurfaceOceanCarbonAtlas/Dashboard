@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
 
 import java.util.ArrayList;
 
@@ -61,9 +62,10 @@ public class WoceDuplicates {
             DatasetModifier modifier = new DatasetModifier(configStore);
             // Assign any duplicate data points to
             try {
-                ArrayList<String> duplicates = modifier.woceDuplicateDatapoints(expocode);
-                for (String msg : duplicates) {
-                    System.err.println(expocode + ": " + msg);
+                ArrayList<DataLocation> duplicates = modifier.woceDuplicateDatapoints(expocode);
+                for (DataLocation loc : duplicates) {
+                    System.err.println(expocode +
+                            ": WOCE-4 applied to lon/lat/depth/time/fCO2_rec duplicate data point " + loc.toString());
                 }
             } catch ( Exception ex ) {
                 System.err.println("Unable to WOCE-4 duplicate lon/lat/time/fCO2_rec data points for " +

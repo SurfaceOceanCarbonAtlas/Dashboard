@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -38,17 +39,17 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
     private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
     private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
+    private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
-    private static final String EMAIL_SUBJECT_MSG_START =
-            "Request for OCADS archival of dataset ";
-    private static final String EMAIL_SUBJECT_MSG_MIDDLE =
-            " from SOCAT dashboard user ";
+    private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
+    private static final String EMAIL_SUBJECT_MSG_MIDDLE = " from SOCAT dashboard user ";
     private static final String EMAIL_MSG_START =
             "Dear OCADS Archival Team, \n" +
                     "\n" +
                     "As part of submitting dataset ";
     private static final String EMAIL_MSG_MIDDLE =
-            " to SOCAT for QC, \nthe SOCAT Upload Dashboard user ";
+            " to SOCAT for QC, \n" +
+                    "the SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END =
             " \nhas requested immediate OCADS archival of the attached data and metadata. \n" +
                     "The attached file is a ZIP file of the data and metadata, but \"" +
@@ -66,14 +67,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private boolean debugIt;
 
     /**
-     * A file bundler that saves the file bundles under the given directory and sends an email with the bundle to the
-     * given email addresses.
+     * A file bundler that saves the file bundles under the given directory and sends an email with the bundle
+     * to the given email addresses.
      *
      * @param outputDirname
      *         save the file bundles under this directory
      * @param svnUsername
-     *         username for SVN authentication; if null, the directory is not checked for version control and no version
-     *         control is performed
+     *         username for SVN authentication;
+     *         if null, the directory is not checked for version control and no version control is performed
      * @param svnPassword
      *         password for SVN authentication
      * @param toEmailAddresses
@@ -120,8 +121,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * The bundle virtual File for the given dataset. Creates the parent subdirectory, if it does not already exist, for
-     * this File.
+     * The bundle virtual File for the given dataset.
+     * Creates the parent subdirectory, if it does not already exist, for this File.
      *
      * @param datasetId
      *         return the virtual File for the dataset with this ID
@@ -138,11 +139,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         File parentFile = new File(filesDir, stdId.substring(0, 4));
         if ( !parentFile.isDirectory() ) {
             if ( parentFile.exists() )
-                throw new IllegalArgumentException(
-                        "File exists but is not a directory: " + parentFile.getPath());
+                throw new IllegalArgumentException("File exists but is not a directory: " + parentFile.getPath());
             if ( !parentFile.mkdir() )
-                throw new IllegalArgumentException(
-                        "Problems creating the directory: " + parentFile.getPath());
+                throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
         }
         // Generate the full path filename for this cruise metadata
         File bundleFile = new File(parentFile, stdId + BUNDLE_NAME_EXTENSION);
@@ -150,30 +149,32 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Creates the file bundle of original data and metadata, and emails this bundle, if appropriate, for archival. This
-     * bundle is also committed to version control using the given message.
+     * Creates the file bundle of original data and metadata, and emails this bundle, if appropriate, for archival.
+     * This bundle is also committed to version control using the given message.
      * <p>
-     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME} and the value of userEmail is
-     * {@link DashboardServerUtils#NOMAIL_USER_EMAIL}, then the bundle is created but not emailed.
+     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME} and the value of userEmail
+     * is {@link DashboardServerUtils#NOMAIL_USER_EMAIL}, then the bundle is created but not emailed.
      *
      * @param datasetId
      *         create the bundle for the dataset with this ID
      * @param message
-     *         version control commit message for the bundle file; if null or empty, the bundle file is not committed to
-     *         version control
+     *         version control commit message for the bundle file;
+     *         if null or empty, the bundle file is not committed to version control
      * @param userRealName
      *         real name of the user make this archival request, or {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
      * @param userEmail
-     *         email address of the user making this archival request (and this address will be cc'd on the bundle email
-     *         sent for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
+     *         email address of the user making this archival request (and this address will be cc'd
+     *         on the bundle email sent for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
      *
      * @return an message indicating what was sent and to whom
      *
      * @throws IllegalArgumentException
      *         if the dataset is not valid, or if there is a problem sending the archival request email
      * @throws IOException
-     *         if unable to read the default DashboardConfigStore, if the dataset is has no data or metadata files, if
-     *         unable to create the bundle file, or if unable to commit the bundle to version control
+     *         if unable to read the default DashboardConfigStore,
+     *         if the dataset is has no data or metadata files,
+     *         if unable to create the bundle file, or
+     *         if unable to commit the bundle to version control
      */
     public String sendOrigFilesBundle(String datasetId, String message, String userRealName,
             String userEmail) throws IllegalArgumentException, IOException {
@@ -296,8 +297,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         MimeMessage msg = new MimeMessage(sessn);
         try {
             msg.setHeader("X-Mailer", "ArchiveFilesBundler");
-            msg.setSubject(EMAIL_SUBJECT_MSG_START + stdId +
-                    EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
+            msg.setSubject(EMAIL_SUBJECT_MSG_START + stdId + EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
             msg.setSentDate(new Date());
             // Set the addresses
             // Mark as sent from the second cc'd address (the dashboard's);
@@ -346,21 +346,66 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         return infoMsg;
     }
 
-    ArrayList<String> createEnhancedFilesBundle(String datasetId) {
-        ArrayList<String> warnMsgs = new ArrayList<String>();
-        ImplementMe;
-        return warnMsgs;
+    /**
+     * Generates a single-cruise enhanced data file, then bundles that report with all the metadata documents
+     * for that dataset.  Use {@link #getBundleFile(String)} to get the virtual File of the created bundle.
+     *
+     * @param expocode
+     *         create the bundle for the dataset with this ID
+     *
+     * @return the warning messages from generating the single-cruise enhanced data file
+     *
+     * @throws IllegalArgumentException
+     *         if the expoocode is invalid
+     * @throws IOException
+     *         if unable to read the default DashboardConfigStore,
+     *         if unable to create the enhanced data file, or
+     *         in unable to create the bundle file
+     */
+    public ArrayList<String> createEnhancedFilesBundle(String expocode) throws IllegalArgumentException, IOException {
+        File bundleFile = getBundleFile(expocode);
+        DashboardConfigStore configStore = DashboardConfigStore.get(false);
+
+        // Generate the single-cruise SOCAT-enhanced data file
+        SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
+        File reportFile = new File(bundleFile.getParent(), expocode + ENHANCED_REPORT_NAME_EXTENSION);
+        ArrayList<String> warnings = reporter.generateReport(expocode, reportFile);
+
+        // Get the list of metadata documents to be bundled with this data file
+        ArrayList<File> addlDocs = new ArrayList<File>();
+        MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+        for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(expocode)) {
+            // Exclude the (expocode)/OME.xml document at this time;
+            // do include the (expocode)/PI_OME.xml
+            String filename = mdata.getFilename();
+            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+                addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
+            }
+        }
+
+        // Generate the bundle as a zip file
+        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
+        try {
+            copyFileToBundle(zipOut, reportFile);
+            for (File metaFile : addlDocs) {
+                copyFileToBundle(zipOut, metaFile);
+            }
+        } finally {
+            zipOut.close();
+        }
+
+        return warnings;
     }
 
     /**
-     * Returns all messages in a possibly-nested MessagingException. The messages are returned as a single String by
-     * joining all the Exception messages together using a comma and space.
+     * Returns all messages in a possibly-nested MessagingException.  The messages are returned as a single String
+     * by joining all the Exception messages together using a comma and space.
      *
      * @param ex
      *         get the error messages from this MessagingException
      *
-     * @return all error messages concatenated together using a comma and a space; if no messages are present, an empty
-     *         String is returned
+     * @return all error messages concatenated together using a comma and a space;
+     *         if no messages are present, an empty String is returned
      */
     private String getMessageExceptionMsgs(MessagingException ex) {
         String fullErrMsg = null;

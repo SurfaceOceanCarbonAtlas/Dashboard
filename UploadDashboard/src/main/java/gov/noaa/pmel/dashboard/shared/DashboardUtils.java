@@ -543,7 +543,7 @@ public class DashboardUtils {
      * Compare using the "selected" properties of the metadata documents. Note that this is inconsistent with
      * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
-    public static Comparator<DashboardMetadata> metaSelectedComparator = new Comparator<DashboardMetadata>() {
+    public static final Comparator<DashboardMetadata> metaSelectedComparator = new Comparator<DashboardMetadata>() {
         @Override
         public int compare(DashboardMetadata m1, DashboardMetadata m2) {
             if ( m1 == m2 )
@@ -561,7 +561,7 @@ public class DashboardUtils {
      * Compare using the dataset IDs associated with the metadata documents. Note that this is inconsistent with
      * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
-    public static Comparator<DashboardMetadata> metaDatasetIdComparator = new Comparator<DashboardMetadata>() {
+    public static final Comparator<DashboardMetadata> metaDatasetIdComparator = new Comparator<DashboardMetadata>() {
         @Override
         public int compare(DashboardMetadata m1, DashboardMetadata m2) {
             if ( m1 == m2 )
@@ -578,7 +578,7 @@ public class DashboardUtils {
      * Compare using the filenames of the metadata documents. Note that this is inconsistent with
      * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
-    public static Comparator<DashboardMetadata> metaFilenameComparator = new Comparator<DashboardMetadata>() {
+    public static final Comparator<DashboardMetadata> metaFilenameComparator = new Comparator<DashboardMetadata>() {
         @Override
         public int compare(DashboardMetadata m1, DashboardMetadata m2) {
             if ( m1 == m2 )
@@ -595,7 +595,7 @@ public class DashboardUtils {
      * Compare using the upload timestamp strings of the metadata documents. Note that this is inconsistent with
      * DashboardMetadata.equals in that this is only examining one field of DashboardMetadata.
      */
-    public static Comparator<DashboardMetadata> metaTimestampComparator = new Comparator<DashboardMetadata>() {
+    public static final Comparator<DashboardMetadata> metaTimestampComparator = new Comparator<DashboardMetadata>() {
         @Override
         public int compare(DashboardMetadata m1, DashboardMetadata m2) {
             if ( m1 == m2 )
@@ -612,7 +612,7 @@ public class DashboardUtils {
      * Compare using the owners of the metadata documents. Note that this is inconsistent with DashboardMetadata.equals
      * in that this is only examining one field of DashboardMetadata.
      */
-    public static Comparator<DashboardMetadata> metaOwnerComparator = new Comparator<DashboardMetadata>() {
+    public static final Comparator<DashboardMetadata> metaOwnerComparator = new Comparator<DashboardMetadata>() {
         @Override
         public int compare(DashboardMetadata m1, DashboardMetadata m2) {
             if ( m1 == m2 )
@@ -629,7 +629,7 @@ public class DashboardUtils {
      * Compare using the "selected" properties of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataSelectedComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataSelectedComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -647,7 +647,7 @@ public class DashboardUtils {
      * Compare using the IDs of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataDatasetIdComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataDatasetIdComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -664,7 +664,7 @@ public class DashboardUtils {
      * Compare using the upload filenames of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataFilenameComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataFilenameComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -681,7 +681,7 @@ public class DashboardUtils {
      * Compare using the upload timestamp strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataTimestampComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataTimestampComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -698,7 +698,7 @@ public class DashboardUtils {
      * Compare using the owners of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataOwnerComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataOwnerComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -715,7 +715,7 @@ public class DashboardUtils {
      * Compare using the data check status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> dataCheckComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> dataCheckComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -732,7 +732,7 @@ public class DashboardUtils {
      * Compare using the OME metadata timestamp strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> omeTimestampComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> omeTimestampComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -750,7 +750,7 @@ public class DashboardUtils {
      * inconsistent with {@link DashboardDataset#equals(Object)} in that this is only examining one field of
      * DashboardDataset.
      */
-    public static Comparator<DashboardDataset> addlDocsComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> addlDocsComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -781,7 +781,7 @@ public class DashboardUtils {
      * Compare using the version strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> versionComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> versionComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -798,7 +798,7 @@ public class DashboardUtils {
      * Compare using the QC status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> submitStatusComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> submitStatusComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -815,7 +815,7 @@ public class DashboardUtils {
      * Compare using the archive status strings of the datasets. Note that this is inconsistent with {@link
      * DashboardDataset#equals(Object)} in that this is only examining one field of DashboardDataset.
      */
-    public static Comparator<DashboardDataset> archiveStatusComparator = new Comparator<DashboardDataset>() {
+    public static final Comparator<DashboardDataset> archiveStatusComparator = new Comparator<DashboardDataset>() {
         @Override
         public int compare(DashboardDataset d1, DashboardDataset d2) {
             if ( d1 == d2 )
@@ -833,7 +833,7 @@ public class DashboardUtils {
      * Compare using the severities of the messages. Note that this is inconsistent with
      * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
      */
-    public static Comparator<ADCMessage> severityComparator = new Comparator<ADCMessage>() {
+    public static final Comparator<ADCMessage> severityComparator = new Comparator<ADCMessage>() {
         @Override
         public int compare(ADCMessage msg1, ADCMessage msg2) {
             if ( msg1 == msg2 )
@@ -850,7 +850,7 @@ public class DashboardUtils {
      * Compare using the row numbers of the messages. Note that this is inconsistent with
      * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
      */
-    public static Comparator<ADCMessage> rowNumComparator = new Comparator<ADCMessage>() {
+    public static final Comparator<ADCMessage> rowNumComparator = new Comparator<ADCMessage>() {
         @Override
         public int compare(ADCMessage msg1, ADCMessage msg2) {
             if ( msg1 == msg2 )
@@ -867,7 +867,7 @@ public class DashboardUtils {
      * Compare using the column numbers of the messages. Note that this is inconsistent with
      * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
      */
-    public static Comparator<ADCMessage> colNumComparator = new Comparator<ADCMessage>() {
+    public static final Comparator<ADCMessage> colNumComparator = new Comparator<ADCMessage>() {
         @Override
         public int compare(ADCMessage msg1, ADCMessage msg2) {
             if ( msg1 == msg2 )
@@ -884,7 +884,7 @@ public class DashboardUtils {
      * Compare using the column names of the messages. Note that this is inconsistent with
      * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
      */
-    public static Comparator<ADCMessage> colNameComparator = new Comparator<ADCMessage>() {
+    public static final Comparator<ADCMessage> colNameComparator = new Comparator<ADCMessage>() {
         @Override
         public int compare(ADCMessage msg1, ADCMessage msg2) {
             if ( msg1 == msg2 )
@@ -901,7 +901,7 @@ public class DashboardUtils {
      * Compare using the detailed comments of the messages. Note that this is inconsistent with
      * {@link ADCMessage#equals(Object)} in that this is only examining one field of ADCMessage.
      */
-    public static Comparator<ADCMessage> explanationComparator = new Comparator<ADCMessage>() {
+    public static final Comparator<ADCMessage> explanationComparator = new Comparator<ADCMessage>() {
         @Override
         public int compare(ADCMessage msg1, ADCMessage msg2) {
             if ( msg1 == msg2 )

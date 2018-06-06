@@ -120,7 +120,7 @@ public class GenerateCruiseReports {
                         null, null, null, null, null, null, false);
                 for (String expo : expocodes) {
                     try {
-                        ArrayList<String> warnMsgs = bundler.createSocatEnhancedFilesBundle(expo);
+                        ArrayList<String> warnMsgs = bundler.createEnhancedFilesBundle(expo);
                         System.err.println("Created single-cruise enhanced-data files bundle " +
                                 bundler.getBundleFile(expo).getPath());
                         if ( warnMsgs.size() > 0 ) {

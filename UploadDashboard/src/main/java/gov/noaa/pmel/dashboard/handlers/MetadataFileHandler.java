@@ -6,6 +6,9 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.DataLocation;
+import gov.noaa.pmel.dashboard.server.DataQCEvent;
+import gov.noaa.pmel.dashboard.server.RowNumSet;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -23,8 +26,10 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +49,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
     private static final String METADATA_VERSION_ID = "metadataversion";
 
     private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
+    private static final String FLAG_MSGS_FILENAME = "WOCE_flags.tsv";
 
     /**
      * Handles storage and retrieval of metadata files under the given metadata files directory.
@@ -776,7 +782,67 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
     }
 
-    public void generateWoceFlagMsgsFile(String datasetId, DatabaseRequestHandler databaseHandler) {
-        ImplementMe;
+    /**
+     * Create the WOCE flags messages file from the WOCE flags in the database.
+     * This file is NOT added as a metadata document or committed to version control.
+     *
+     * @param expocode
+     *         create the WOCE flags messages files for the dataset with this ID
+     * @param dbHandler
+     *         get the WOCE flags from the database using this handler
+     *
+     * @throws IllegalArgumentException
+     *         if the expocode is invalid or if unable to create the WOCE flags messages file
+     * @throws SQLException
+     *         if there are problems getting the WOCE flags from the database
+     */
+    public void generateWoceFlagMsgsFile(String expocode, DatabaseRequestHandler dbHandler)
+            throws IllegalArgumentException, SQLException {
+        File msgsFile = getMetadataFile(expocode, FLAG_MSGS_FILENAME);
+        PrintWriter msgsWriter;
+        try {
+            msgsWriter = new PrintWriter(msgsFile);
+        } catch ( FileNotFoundException ex ) {
+            throw new IllegalArgumentException("Unexpected error opening WOCE flag messages file " +
+                    msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
+        }
+        try {
+            RowNumSet rowNums = new RowNumSet();
+            // Get the current WOCE flags for this cruise and print them to file
+            msgsWriter.println("Expocode: " + expocode);
+            msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " +
+                    (new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
+            msgsWriter.println("WOCE Name\tWOCE Flag\tData Name\tNum Rows\tMessage\tRows");
+            ArrayList<DataQCEvent> woceEventsList = dbHandler.getDataQCEvents(expocode, true);
+            for (DataQCEvent woceEvent : woceEventsList) {
+                // Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
+                String woceFlag = woceEvent.getFlagValue();
+                if ( !(woceFlag.equals(DashboardServerUtils.WOCE_QUESTIONABLE) ||
+                        woceFlag.equals(DashboardServerUtils.WOCE_BAD)) )
+                    continue;
+                rowNums.clear();
+                for (DataLocation dloc : woceEvent.getLocations()) {
+                    rowNums.add(dloc.getRowNumber());
+                }
+                msgsWriter.print(woceEvent.getFlagName());
+                msgsWriter.print('\t');
+                msgsWriter.print(woceFlag);
+                msgsWriter.print('\t');
+                String dataColName = woceEvent.getVarName();
+                if ( dataColName.trim().isEmpty() )
+                    dataColName = "(none)";
+                msgsWriter.print(dataColName);
+                msgsWriter.print('\t');
+                msgsWriter.print(rowNums.size());
+                msgsWriter.print('\t');
+                msgsWriter.print(woceEvent.getComment().replaceAll("\n", "  ").replaceAll("\t", " "));
+                msgsWriter.print('\t');
+                msgsWriter.print(rowNums.toString());
+                msgsWriter.println();
+            }
+        } finally {
+            msgsWriter.close();
+        }
+
     }
 }

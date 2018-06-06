@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -239,5 +240,33 @@ public class DataLocation implements Comparable<DataLocation> {
                 ", dataValue=" + dataValue.toString() +
                 "]";
     }
+
+    /**
+     * Comparator that ignores the row numbers when comparing.  Note that this is inconsistent with
+     * {@link #compareTo(DataLocation)} in that row numbers are ignored.  This is also inconsistent with
+     * {@link #equals(Object)} in that row numbers are ignored, longitude modulo is not considered,
+     * and negligible differences in floating point values are not ignored.
+     */
+    public static final Comparator<DataLocation> IGNORE_ROW_NUM_COMPARATOR = new Comparator<DataLocation>() {
+        @Override
+        public int compare(DataLocation first, DataLocation second) {
+            int result = first.dataDate.compareTo(second.dataDate);
+            if ( result != 0 )
+                return result;
+            result = first.longitude.compareTo(second.longitude);
+            if ( result != 0 )
+                return result;
+            result = first.latitude.compareTo(second.latitude);
+            if ( result != 0 )
+                return result;
+            result = first.depth.compareTo(second.depth);
+            if ( result != 0 )
+                return result;
+            result = first.dataValue.compareTo(second.dataValue);
+            if ( result != 0 )
+                return result;
+            return 0;
+        }
+    };
 
 }

@@ -24,9 +24,9 @@ public class DsgMetadata {
     TreeMap<DashDataType<?>,Object> valuesMap;
 
     /**
-     * Create with the given data types.  Sets all values for these types to the appropriate missing value for each
-     * type.  The data types given must be known subclasses of DashDataType valid for metadata files: {@link
-     * StringDashDataType}, {@link IntDashDataType}, or {@link DoubleDashDataType}.
+     * Create with the given data types.  Sets all values for these types to the appropriate missing value
+     * for each type.  The data types given must be known subclasses of DashDataType valid for metadata files:
+     * {@link StringDashDataType}, {@link IntDashDataType}, or {@link DoubleDashDataType}.
      *
      * @param knownTypes
      *         all known metadata types; cannot be null or empty
@@ -69,8 +69,8 @@ public class DsgMetadata {
      *         the value to assign; if null, the appropriate missing value is assigned
      *
      * @throws IllegalArgumentException
-     *         if the data type is not a known data type in this metadata, or if the value is not an appropriate object
-     *         for this data type
+     *         if the data type is not a known data type in this metadata, or
+     *         if the value is not an appropriate object for this data type
      */
     public void setValue(DashDataType<?> dtype, Object value) throws IllegalArgumentException {
         if ( !valuesMap.containsKey(dtype) )
@@ -178,8 +178,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the name of the organization/institution; never null but could be {@link
-     *         DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the name of the organization/institution;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getOrganizationName() {
         String value = (String) valuesMap.get(DashboardServerUtils.ORGANIZATION_NAME);
@@ -190,8 +190,8 @@ public class DsgMetadata {
 
     /**
      * @param organizationName
-     *         the name of the organization/institution to set; if null, {@link DashboardUtils#STRING_MISSING_VALUE} is
-     *         assigned
+     *         the name of the organization/institution to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
      */
     public void setOrganizationName(String organizationName) {
         String value;
@@ -203,8 +203,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the investigator names; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
-     *         assigned
+     * @return the investigator names;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getInvestigatorNames() {
         String value = (String) valuesMap.get(DashboardServerUtils.INVESTIGATOR_NAMES);
@@ -250,8 +250,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the west-most longitude for the cruise; never null could be {@link DashboardUtils#FP_MISSING_VALUE} if
-     *         not assigned.
+     * @return the west-most longitude for the cruise;
+     *         never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getWestmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.WESTERNMOST_LONGITUDE);
@@ -274,8 +274,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the east-most longitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     *         if not assigned.
+     * @return the east-most longitude for the cruise;
+     *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getEastmostLongitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE);
@@ -298,8 +298,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     *         if not assigned.
+     * @return the south-most latitude for the cruise;
+     *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getSouthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
@@ -322,8 +322,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the south-most latitude for the cruise; never null but could be {@link DashboardUtils#FP_MISSING_VALUE}
-     *         if not assigned.
+     * @return the south-most latitude for the cruise;
+     *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getNorthmostLatitude() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.NORTHERNMOST_LATITUDE);
@@ -346,8 +346,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could
-     *         be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+     *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getBeginTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_START);
@@ -358,8 +358,8 @@ public class DsgMetadata {
 
     /**
      * @param beginTime
-     *         the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00"; if null,
-     *         {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setBeginTime(Double beginTime) {
         Double value;
@@ -371,8 +371,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00"; never null but could be
-     *         {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
+     * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+     *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getEndTime() {
         Double value = (Double) valuesMap.get(DashboardServerUtils.TIME_COVERAGE_END);
@@ -383,8 +383,8 @@ public class DsgMetadata {
 
     /**
      * @param endTime
-     *         the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00"; if null, {@link
-     *         DashboardUtils#FP_MISSING_VALUE} is assigned
+     *         the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+     *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setEndTime(Double endTime) {
         Double value;
@@ -470,8 +470,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the version associated with this instance; never null but could be {@link
-     *         DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the version associated with this instance;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getVersion() {
         String value = (String) valuesMap.get(DashboardServerUtils.VERSION);
@@ -494,8 +494,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the String of all region IDs; never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not
-     *         assigned
+     * @return the String of all region IDs;
+     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
     public String getAllRegionIDs() {
         String value = (String) valuesMap.get(DashboardServerUtils.ALL_REGION_IDS);
@@ -518,8 +518,8 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the maximum length of String values given in the fields of this instance, rounded up to the nearest
-     *         multiple of 32 (and never less than 32).
+     * @return the maximum length of String values given in the fields of this instance,
+     *         rounded up to the nearest multiple of 32 (and never less than 32).
      */
     public int getMaxStringLength() {
         int maxLength = 32;

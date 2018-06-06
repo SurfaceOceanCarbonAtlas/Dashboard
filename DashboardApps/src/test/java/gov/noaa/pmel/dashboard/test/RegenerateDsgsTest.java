@@ -1,30 +1,30 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.test.actualdata;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
-import org.junit.Test;
+package gov.noaa.pmel.dashboard.test;
 
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Tests of method in {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs}
+ * Tests of method in {@link RegenerateDsgs}
  *
  * @author Karl Smith
  */
 public class RegenerateDsgsTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.programs.RegenerateDsgs#regenerateDsgFiles(java.lang.String, boolean)}.
+     * Test method for {@link RegenerateDsgs#regenerateDsgFiles(String, boolean)}.
      * Uses the full-data DSG file in an existing dashboard installation.
      */
     @Test
@@ -37,7 +37,7 @@ public class RegenerateDsgsTest {
         DashboardConfigStore configStore = null;
         try {
             configStore = DashboardConfigStore.get(false);
-        } catch (Exception ex) {
+        } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
@@ -54,8 +54,8 @@ public class RegenerateDsgsTest {
 
         // Regenerate the DSG files
         RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
-        assertTrue( "regenerateDsgFiles returned false when 'always' set to true",
-                regenerator.regenerateDsgFiles(expocode, true) );
+        assertTrue("regenerateDsgFiles returned false when 'always' set to true",
+                regenerator.regenerateDsgFiles(expocode, true));
 
         // Re-read the data and metadata
         fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
