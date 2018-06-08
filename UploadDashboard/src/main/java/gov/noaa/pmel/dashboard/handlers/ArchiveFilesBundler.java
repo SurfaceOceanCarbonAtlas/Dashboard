@@ -25,13 +25,13 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,8 +47,6 @@ import java.util.zip.ZipOutputStream;
  */
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
-    private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
-    private static final String BAGIT_DIRNAME_EXTENSION = "_bagit";
     private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
@@ -76,6 +74,12 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private String smtpPort;
     private PasswordAuthentication auth;
     private boolean debugIt;
+
+    public enum BundleType {
+        ORIG_FILE_PLAIN_ZIP,
+        ORIG_FILE_BAGIT_ZIP,
+        ENHANCED_FILE_PLAIN_ZIP
+    }
 
     /**
      * A file bundler that saves the file bundles under the given directory and sends an email with the bundle
@@ -132,11 +136,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * The zip bundle virtual File for the given dataset.
+     * The zip bundle virtual File for the given dataset of the given type.
      * Creates the parent subdirectory, if it does not already exist, for this File.
      *
      * @param datasetId
      *         return the zip virtual File for the dataset with this ID
+     * @param bundleType
+     *         type of zip bundle
      *
      * @return the zip bundle virtual File for the dataset
      *
@@ -144,7 +150,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if the dataset is invalid, or
      *         if unable to generate the parent subdirectory if it does not already exist
      */
-    public File getZipBundleFile(String datasetId) throws IllegalArgumentException {
+    public File getZipBundleFile(String datasetId, BundleType bundleType) throws IllegalArgumentException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         File parentFile = new File(filesDir, stdId.substring(0, 4));
         if ( !parentFile.isDirectory() ) {
@@ -153,42 +159,21 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             if ( !parentFile.mkdir() )
                 throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
         }
-        // Generate the full path filename for this dataset's archive bundle
-        File bundleFile = new File(parentFile, stdId + BUNDLE_NAME_EXTENSION);
+        File bundleFile;
+        switch ( bundleType ) {
+            case ORIG_FILE_PLAIN_ZIP:
+                bundleFile = new File(parentFile, stdId + "_bundle.zip");
+                break;
+            case ORIG_FILE_BAGIT_ZIP:
+                bundleFile = new File(parentFile, stdId + "_bagit.zip");
+                break;
+            case ENHANCED_FILE_PLAIN_ZIP:
+                bundleFile = new File(parentFile, stdId + "_enhanced.zip");
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown bundle type of " + bundleType);
+        }
         return bundleFile;
-    }
-
-    /**
-     * The bagit bundle directory for the given dataset.
-     * Creates the bundle and parent subdirectories, if they do not alread exist
-     *
-     * @param datasetId
-     *         return the bagit directory for the dataset with this ID
-     *
-     * @return the bagit directory for the dataset
-     *
-     * @throws IllegalArgumentException
-     *         if the dataset is invalid, or
-     *         if unable to generate the parent subdirectory if it does not already exist
-     */
-    public File getBagitBundleDir(String datasetId) throws IllegalArgumentException {
-        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
-        File parentFile = new File(filesDir, stdId.substring(0, 4));
-        if ( !parentFile.isDirectory() ) {
-            if ( parentFile.exists() )
-                throw new IllegalArgumentException("File exists but is not a directory: " + parentFile.getPath());
-            if ( !parentFile.mkdir() )
-                throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
-        }
-        // Generate the full path filename for this dataset's bagit bundle
-        File bundleDir = new File(parentFile, stdId + BAGIT_DIRNAME_EXTENSION);
-        if ( !bundleDir.isDirectory() ) {
-            if ( bundleDir.exists() )
-                throw new IllegalArgumentException("File exists but is not a directory: " + bundleDir.getPath());
-            if ( !bundleDir.mkdir() )
-                throw new IllegalArgumentException("Problems creating the directory: " + bundleDir.getPath());
-        }
-        return bundleDir;
     }
 
     /**
@@ -252,7 +237,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             throw new IOException("No metadata/supplemental documents for " + stdId);
 
         // Generate the bundle as a zip file
-        File bundleFile = getZipBundleFile(stdId);
+        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_PLAIN_ZIP);
         String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
@@ -389,20 +374,19 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Creates the bagit directory for this dataset, then copies data and metadata files to this directory
-     * and finally creates a zip file of this directory.
+     * Creates the bagit zip file of the original data and metadata for a given dataset.
      *
      * @param expocode
-     *         create the bagit bundle directory and zip file for the dataset with this ID
+     *         create the bagit zip file for the dataset with this ID
      * @param commitMsg
      *         message associated with the subversion commit of the bagit zip file;
      *         if null, the file is not committed to subversion
      *
-     * @return the bagit zip file created
+     * @return the bagit zip file that was created
      *
      * @throws IllegalArgumentException
      *         if the expocode is invalid, or
-     *         if unable to create the bagit bundle directory
+     *         if unable to create the bagit bundle directory used for creating the bagit zip file
      * @throws IOException
      *         if there is not data or metadata files for this dataset,
      *         if there were problems copying files to the bagit bundle directory, or
@@ -411,7 +395,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     public File createBagitFilesBundle(String expocode, String commitMsg)
             throws IllegalArgumentException, IOException {
         String stdId = DashboardServerUtils.checkDatasetID(expocode);
-        File bundleDir = getBagitBundleDir(stdId);
+        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // Get the original data file for this dataset
@@ -433,33 +417,44 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         if ( addlDocs.isEmpty() )
             throw new IOException("No metadata/supplemental documents for " + stdId);
 
+        // Create the bagit bundle directory
+        String dirname = bundleFile.getName();
+        if ( !dirname.endsWith(".zip") )
+            throw new RuntimeException("Unexpected bagit bundle filename does not end with \".zip\"");
+        dirname = dirname.substring(0, dirname.length() - 4);
+        File bundleDir = new File(bundleFile.getParent(), dirname);
+        if ( !bundleDir.isDirectory() ) {
+            if ( bundleDir.exists() )
+                throw new IllegalArgumentException("File exists but is not a directory: " + bundleDir.getPath());
+            if ( !bundleDir.mkdir() )
+                throw new IllegalArgumentException("Problems creating the directory: " + bundleDir.getPath());
+        }
+
         // Copy all the files to the bagit bundle directory
         try {
             File dest = new File(bundleDir, dataFile.getName());
-            Files.copy(dataFile.toPath(), dest.toPath());
+            Files.copy(dataFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             for (File metaFile : addlDocs) {
                 dest = new File(bundleDir, metaFile.getName());
-                Files.copy(dataFile.toPath(), dest.toPath());
+                Files.copy(dataFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
         }
 
-        // Create the bagit directory in-place (restructures and add files) in the bagit bundles directory
-        File bagitFile;
+        // Create the bagit directory tree in-place (restructures and adds files) from the bagit bundles directory
         try {
             Bag bag = BagCreator.bagInPlace(bundleDir.toPath(), Arrays.asList(StandardSupportedAlgorithms.MD5), false);
             BagVerifier verifier = new BagVerifier();
             verifier.isComplete(bag, true);
             verifier.isValid(bag, true);
-            bagitFile = new File(bundleDir.getParent(), bundleDir.getName() + ".zip");
         } catch ( Exception ex ) {
             throw new IOException("Problems creating the bagit files: " + ex.getMessage(), ex);
         }
 
-        // Create a zip file of the bagit bundles directory
+        // Create a zip file of the bagit directory tree
         final Path bundleDirPath = bundleDir.toPath();
-        final ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bagitFile));
+        final ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
             Files.walkFileTree(bundleDirPath, new SimpleFileVisitor<Path>() {
                 @Override
@@ -477,7 +472,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             zipOut.close();
         }
 
-        // No longer need the bagit bundle directory
+        // No longer need the bagit directory tree
         Files.walkFileTree(bundleDirPath, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
@@ -496,17 +491,18 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Commit the bagit zip file, if requested
         if ( (commitMsg != null) && !commitMsg.trim().isEmpty() ) {
             try {
-                commitVersion(bagitFile, commitMsg);
+                commitVersion(bundleFile, commitMsg);
             } catch ( Exception ex ) {
                 throw new IOException("Problems commiting the bagit file to subversion: " + ex.getMessage(), ex);
             }
         }
-        return bagitFile;
+        return bundleFile;
     }
 
     /**
      * Generates a single-cruise enhanced data file, then bundles that report with all the metadata documents
-     * for that dataset.  Use {@link #getZipBundleFile(String)} to get the virtual File of the created bundle.
+     * for that dataset.  Use {@link #getZipBundleFile(String, BundleType)} with
+     * {@link BundleType#ENHANCED_FILE_PLAIN_ZIP} bundle type to get the virtual File of the created bundle.
      *
      * @param expocode
      *         create the bundle for the dataset with this ID
@@ -522,13 +518,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      */
     public ArrayList<String> createEnhancedFilesBundle(String expocode) throws
             IllegalArgumentException, IOException {
-        File bundleFile = getZipBundleFile(expocode);
+        File bundleFile = getZipBundleFile(expocode, BundleType.ENHANCED_FILE_PLAIN_ZIP);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // Generate the single-cruise SOCAT-enhanced data file
         SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
-        File reportFile = new File(bundleFile.getParent(), expocode + ENHANCED_REPORT_NAME_EXTENSION);
-        ArrayList<String> warnings = reporter.generateReport(expocode, reportFile);
+        File enhancedDataFile = new File(bundleFile.getParent(), expocode + ENHANCED_REPORT_NAME_EXTENSION);
+        ArrayList<String> warnings = reporter.generateReport(expocode, enhancedDataFile);
 
         // Get the list of metadata documents to be bundled with this data file
         ArrayList<File> addlDocs = new ArrayList<File>();
@@ -545,13 +541,15 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Generate the bundle as a zip file
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
-            copyFileToBundle(zipOut, reportFile);
+            copyFileToBundle(zipOut, enhancedDataFile);
             for (File metaFile : addlDocs) {
                 copyFileToBundle(zipOut, metaFile);
             }
         } finally {
             zipOut.close();
         }
+        // No longer need the SOCAT-enhanced data file
+        enhancedDataFile.delete();
 
         return warnings;
     }
@@ -592,7 +590,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Copies the contents of the given data file to the bundle file.
+     * Copies the contents of the given data file to the zip file.
+     * Note that only the file name, and not any path component, is recorded in the zip file.
+     * The timestamp recorded in the zip file is the last modified time of the file.
      *
      * @param zipOut
      *         copy the contents of the given file to here
@@ -600,30 +600,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         copy the contents of this file
      *
      * @throws IOException
-     *         if reading from the data files throws one, or if writing to the bundle file throws one
+     *         if reading from the data files throws one, or
+     *         if writing to the zip file throws one
      */
     private void copyFileToBundle(ZipOutputStream zipOut, File dataFile) throws IOException {
-        // Create the entry in the zip file
         ZipEntry entry = new ZipEntry(dataFile.getName());
         entry.setTime(dataFile.lastModified());
         zipOut.putNextEntry(entry);
-
-        // Copy the contents of the data file to the zip file
-        FileInputStream dataIn = new FileInputStream(dataFile);
-        try {
-            byte[] data = new byte[4096];
-            int numRead;
-            while ( true ) {
-                numRead = dataIn.read(data);
-                if ( numRead < 0 )
-                    break;
-                zipOut.write(data, 0, numRead);
-            }
-        } finally {
-            dataIn.close();
-        }
-
-        // End this entry
+        Files.copy(dataFile.toPath(), zipOut);
         zipOut.closeEntry();
     }
 

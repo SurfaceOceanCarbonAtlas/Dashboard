@@ -1149,11 +1149,26 @@ public class SocatCruiseReporter {
         Integer fco2WaterSSTIdx;
         TreeSet<DataPoint> prevDatPts;
         if ( multicruise ) {
+            // Need time to tests for duplicates in multicruise reports
             sectimeIdx = dataVals.getIndexOfType(DashboardServerUtils.TIME);
             if ( sectimeIdx == null )
                 throw new IOException("The DSG file for " + expocode +
                         " does not contain the variable " + DashboardServerUtils.TIME.getVarName());
+            // These values are not reported in multicruise reports
+            xco2WaterTEquIdx = null;
+            xco2WaterSSTIdx = null;
+            pco2WaterTEquIdx = null;
+            pco2WaterSSTIdx = null;
+            fco2WaterTEquIdx = null;
+            fco2WaterSSTIdx = null;
+            regionIdx = null;
+            prevDatPts = null;
 
+        }
+        else {
+            // Duplicates not checked in single-cruise reports
+            sectimeIdx = null;
+            // These values are reported in single-cruise reports
             xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
             if ( xco2WaterTEquIdx == null )
                 throw new IOException("The DSG file for " + expocode +
@@ -1195,17 +1210,6 @@ public class SocatCruiseReporter {
 
             prevDatPts = new TreeSet<DataPoint>();
         }
-        else {
-            sectimeIdx = null;
-            xco2WaterTEquIdx = null;
-            xco2WaterSSTIdx = null;
-            pco2WaterTEquIdx = null;
-            pco2WaterSSTIdx = null;
-            fco2WaterTEquIdx = null;
-            fco2WaterSSTIdx = null;
-            regionIdx = null;
-            prevDatPts = null;
-        }
 
         for (int j = 0; j < dataVals.getNumSamples(); j++) {
             if ( multicruise ) {
@@ -1236,47 +1240,50 @@ public class SocatCruiseReporter {
             fmtr.format("%s\t", socatDOI);
             fmtr.format("%s\t", qcFlag);
 
-            Integer intVal = (Integer) dataVals.getStdVal(j, yearIdx);
-            if ( intVal == null )
+            Object value;
+
+            value = dataVals.getStdVal(j, yearIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%04d\t", intVal);
+                fmtr.format("%04d\t", (Integer) value);
 
-            intVal = (Integer) dataVals.getStdVal(j, monthOfYearIdx);
-            if ( intVal == null )
+            value = dataVals.getStdVal(j, monthOfYearIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%02d\t", intVal);
+                fmtr.format("%02d\t", (Integer) value);
 
-            intVal = (Integer) dataVals.getStdVal(j, dayOfMonthIdx);
-            if ( intVal == null )
+            value = dataVals.getStdVal(j, dayOfMonthIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%02d\t", intVal);
+                fmtr.format("%02d\t", (Integer) value);
 
-            intVal = (Integer) dataVals.getStdVal(j, hourOfDayIdx);
-            if ( intVal == null )
+            value = dataVals.getStdVal(j, hourOfDayIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%02d\t", intVal);
+                fmtr.format("%02d\t", (Integer) value);
 
-            intVal = (Integer) dataVals.getStdVal(j, minOfHourIdx);
-            if ( intVal == null )
+            value = dataVals.getStdVal(j, minOfHourIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%02d\t", intVal);
+                fmtr.format("%02d\t", (Integer) value);
 
-            Double dblVal = (Double) dataVals.getStdVal(j, secOfMinIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, secOfMinIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#03.0f\t", dblVal);
+                fmtr.format("%#03.0f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, longitudeIdx);
-            if ( dblVal == null ) {
+            value = dataVals.getStdVal(j, longitudeIdx);
+            if ( value == null ) {
                 fmtr.format("NaN\t");
             }
             else {
+                Double dblVal = (Double) value;
                 while ( dblVal < 0.0 ) {
                     dblVal += 360.0;
                 }
@@ -1286,118 +1293,118 @@ public class SocatCruiseReporter {
                 fmtr.format("%#.5f\t", dblVal);
             }
 
-            dblVal = (Double) dataVals.getStdVal(j, latitudeIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, latitudeIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.5f\t", dblVal);
+                fmtr.format("%#.5f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, depthIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, depthIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.0f\t", dblVal);
+                fmtr.format("%#.0f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, salIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, salIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, sstIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, sstIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, tequIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, tequIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, patmIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, patmIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, pequIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, pequIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, woaSalIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, woaSalIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, ncepSLPIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, ncepSLPIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, etopoDepthIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, etopoDepthIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.0f\t", dblVal);
+                fmtr.format("%#.0f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, distToLandIdx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, distToLandIdx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.0f\t", dblVal);
+                fmtr.format("%#.0f\t", (Double) value);
 
-            dblVal = (Double) dataVals.getStdVal(j, gvco2Idx);
-            if ( dblVal == null )
+            value = dataVals.getStdVal(j, gvco2Idx);
+            if ( value == null )
                 fmtr.format("NaN\t");
             else
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
             if ( !multicruise ) {
-                dblVal = (Double) dataVals.getStdVal(j, xco2WaterTEquIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, xco2WaterTEquIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
 
-                dblVal = (Double) dataVals.getStdVal(j, xco2WaterSSTIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, xco2WaterSSTIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
 
-                dblVal = (Double) dataVals.getStdVal(j, pco2WaterTEquIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, pco2WaterTEquIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
 
-                dblVal = (Double) dataVals.getStdVal(j, pco2WaterSSTIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, pco2WaterSSTIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
 
-                dblVal = (Double) dataVals.getStdVal(j, fco2WaterTEquIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, fco2WaterTEquIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
 
-                dblVal = (Double) dataVals.getStdVal(j, fco2WaterSSTIdx);
-                if ( dblVal == null )
+                value = dataVals.getStdVal(j, fco2WaterSSTIdx);
+                if ( value == null )
                     fmtr.format("NaN\t");
                 else
-                    fmtr.format("%#.3f\t", dblVal);
+                    fmtr.format("%#.3f\t", (Double) value);
             }
 
-            dblVal = (Double) dataVals.getStdVal(j, fco2RecIdx);
-            if ( dblVal == null ) {
+            value = dataVals.getStdVal(j, fco2RecIdx);
+            if ( value == null ) {
                 fmtr.format("NaN\t");
                 // if fCO2_rec not given, always set source to zero
                 fmtr.format("0\t");
@@ -1405,22 +1412,28 @@ public class SocatCruiseReporter {
                 fmtr.format("9");
             }
             else {
-                fmtr.format("%#.3f\t", dblVal);
+                fmtr.format("%#.3f\t", (Double) value);
 
-                intVal = (Integer) dataVals.getStdVal(j, fco2SrcIdx);
-                if ( intVal == null )
+                value = dataVals.getStdVal(j, fco2SrcIdx);
+                if ( value == null )
                     fmtr.format("0\t");
                 else
-                    fmtr.format("%d\t", intVal);
+                    fmtr.format("%d\t", (Integer) value);
 
-                String woceVal = (String) dataVals.getStdVal(j, woceWaterIdx);
-                if ( (woceVal == null) || woceVal.isEmpty() )
+                value = dataVals.getStdVal(j, woceWaterIdx);
+                if ( value == null ) {
                     fmtr.format("2");
-                else
-                    fmtr.format(woceVal);
-            }
+                }
+                else {
+                    String woceVal = (String) value;
+                    if ( woceVal.isEmpty() )
+                        fmtr.format("2");
+                    else
+                        fmtr.format(woceVal);
+                }
 
-            report.println(fmtr.toString());
+                report.println(fmtr.toString());
+            }
             fmtr.close();
         }
     }
@@ -1523,10 +1536,13 @@ public class SocatCruiseReporter {
                             DashboardServerUtils.WOCE_ACCEPTABLE.equals(woceFlag)) )
                         continue;
                     DataPoint datpt = new DataPoint(upperExpo, (Double) dataVals.getStdVal(j, sectimeIdx),
-                            (Double) dataVals.getStdVal(j, latitudeIdx), (Double) dataVals.getStdVal(j, longitudeIdx),
-                            (Double) dataVals.getStdVal(j, sstIdx), (Double) dataVals.getStdVal(j, salIdx), fco2rec);
+                            (Double) dataVals.getStdVal(j, latitudeIdx),
+                            (Double) dataVals.getStdVal(j, longitudeIdx),
+                            (Double) dataVals.getStdVal(j, sstIdx), (Double) dataVals.getStdVal(j, salIdx),
+                            fco2rec);
                     if ( !datSet.add(datpt) )
-                        System.err.println("Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
+                        System.err
+                                .println("Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
                 }
                 // Print the sorted data for this cruise
                 for (DataPoint datPt : datSet) {

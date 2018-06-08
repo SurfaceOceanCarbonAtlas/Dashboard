@@ -121,8 +121,10 @@ public class GenerateCruiseReports {
                 for (String expo : expocodes) {
                     try {
                         ArrayList<String> warnMsgs = bundler.createEnhancedFilesBundle(expo);
+                        File enhancedZipFile =
+                                bundler.getZipBundleFile(expo, ArchiveFilesBundler.BundleType.ENHANCED_FILE_PLAIN_ZIP);
                         System.err.println("Created single-cruise enhanced-data files bundle " +
-                                bundler.getZipBundleFile(expo).getPath());
+                                enhancedZipFile.getPath());
                         if ( warnMsgs.size() > 0 ) {
                             System.err.println("Warnings for " + expo + ": ");
                             for (String msg : warnMsgs) {
