@@ -120,8 +120,8 @@ public class WoceOverlapTail {
                     }
                 }
             } catch ( Exception ex ) {
-                System.err.println(
-                        "Invalid overlap between " + firstExpo + " and " + secondExpo + ": " + ex.getMessage());
+                System.err.println("Invalid overlap between " + firstExpo +
+                        " and " + secondExpo + ": " + ex.getMessage());
                 System.exit(1);
             }
 
@@ -168,8 +168,8 @@ public class WoceOverlapTail {
                 }
                 configStore.getDsgNcFileHandler().decimateDatasetDsg(firstExpo);
                 // Report WOCE-4 of duplicates
-                System.out.println(
-                        "WOCE-4 assigned to duplicate datapoints in " + firstExpo + ": " + firstRowNums.toString());
+                System.out.println("WOCE-4 assigned to duplicate datapoints in " +
+                        firstExpo + ": " + firstRowNums.toString());
             } catch ( Exception ex ) {
                 System.err.println("Problems assigning WOCE flags to " + firstExpo + ": " + ex.getMessage());
             }

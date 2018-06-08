@@ -43,8 +43,7 @@ public class UpdateDashboardStatuses {
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( Exception ex ) {
-            System.err.println("Problems reading the default dashboard " +
-                    "configuration file: " + ex.getMessage());
+            System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -66,8 +65,7 @@ public class UpdateDashboardStatuses {
                     expoReader.close();
                 }
             } catch ( Exception ex ) {
-                System.err.println("Error getting expocodes from " +
-                        expocodesFilename + ": " + ex.getMessage());
+                System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
             }
@@ -82,19 +80,17 @@ public class UpdateDashboardStatuses {
                     String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expocode);
                     qcFlag = flagVersion[0];
                 } catch ( Exception ex ) {
-                    System.err.println("Error reading the QC flag for " +
-                            expocode + " : " + ex.getMessage());
+                    System.err.println("Error reading the QC flag for " + expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 try {
                     if ( fileHandler.updateDatasetDashboardStatus(expocode, qcFlag) ) {
-                        System.err.println("Updated dashboard status for " +
-                                expocode + " to that for QC flag '" + qcFlag + "'");
+                        System.err.println("Updated dashboard status for " + expocode +
+                                " to that for QC flag '" + qcFlag + "'");
                     }
                 } catch ( Exception ex ) {
-                    System.err.println("Error updating the dashboard status for " +
-                            expocode + " : " + ex.getMessage());
+                    System.err.println("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }

@@ -53,8 +53,7 @@ public class GenerateDataForGridding {
                 reader.close();
             }
         } catch ( Exception ex ) {
-            System.err.println("Problems reading the file of expocodes '" +
-                    exposFilename + "': " + ex.getMessage());
+            System.err.println("Problems reading the file of expocodes '" + exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -63,8 +62,7 @@ public class GenerateDataForGridding {
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( Exception ex ) {
-            System.err.println("Problems obtaining the default dashboard " +
-                    "configuration: " + ex.getMessage());
+            System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }

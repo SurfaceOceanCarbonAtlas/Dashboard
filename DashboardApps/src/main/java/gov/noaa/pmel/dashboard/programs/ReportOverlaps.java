@@ -73,8 +73,7 @@ public class ReportOverlaps {
                 reader.close();
             }
         } catch ( Exception ex ) {
-            System.err.println("Problems reading the file of expocodes '" +
-                    exposFilename + "': " + ex.getMessage());
+            System.err.println("Problems reading the file of expocodes '" + exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }

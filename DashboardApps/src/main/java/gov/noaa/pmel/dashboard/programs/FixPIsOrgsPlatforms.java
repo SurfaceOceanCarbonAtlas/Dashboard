@@ -233,28 +233,26 @@ public class FixPIsOrgsPlatforms {
      */
     public static void main(String[] args) {
         if ( args.length != 4 ) {
-            System.err.println(
-                    "Arguments:  ExpocodesFile  PINameCorrections.tsv  PINameOrganization.tsv PlatformNameCorrections.tsv");
+            System.err.println("Arguments:  Expocodes.txt  PINameFixes.tsv  PINameOrgs.tsv PlatformNameFixes.tsv");
             System.err.println();
             System.err.println("Corrects PI and platform names, and adds organization names, in the OME.xml ");
-            System.err.println("files for datasets whose expocodes are given in ExpocodesFile.txt, one expocode ");
-            System.err.println("per line.  Each line of PINameCorrections.tsv contains the misspelled PI 'name', ");
+            System.err.println("files for datasets whose expocodes are given in Expocodes.txt, one expocode ");
+            System.err.println("per line.  Each line of PINameFixes.tsv contains the misspelled PI 'name', ");
             System.err.println("a tab, and the correct name(s), where multiple correct names are be separated ");
-            System.err.println("by semicolons.  Each line of PINameOrganization.tsv contains the (correct) PI ");
-            System.err.println("name, a tab, and the organization name.  Each line of PlatformNameCorrections.tsv ");
+            System.err.println("by semicolons.  Each line of PINameOrgs.tsv contains the (correct) PI name, ");
+            System.err.println("a tab, and the organization name.  Each line of PlatformNameFixes.tsv ");
             System.err.println("contains the misspelled platform name, a tab, and the correct platform name. ");
             System.err.println();
             System.exit(1);
         }
-        String expocodesFilename = args[0];
-        String piNameFixesFilename = args[1];
-        String piNameOrgFilename = args[2];
-        String platformNameFixesFilename = args[3];
+        File expocodesFile = new File(args[0]);
+        File piNameFixesFile = new File(args[1]);
+        File piNameOrgFile = new File(args[2]);
+        File platformNameFixesFile = new File(args[3]);
 
         FixPIsOrgsPlatforms fixer = null;
         try {
-            fixer = new FixPIsOrgsPlatforms(new File(piNameFixesFilename), new File(piNameOrgFilename),
-                    new File(platformNameFixesFilename));
+            fixer = new FixPIsOrgsPlatforms(piNameFixesFile, piNameOrgFile, platformNameFixesFile);
         } catch ( Exception ex ) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
@@ -264,7 +262,7 @@ public class FixPIsOrgsPlatforms {
         // Get the expocodes of the datasets to update
         TreeSet<String> allExpocodes = new TreeSet<String>();
         try {
-            BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
+            BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFile));
             try {
                 String dataline = expoReader.readLine();
                 while ( dataline != null ) {
@@ -281,7 +279,7 @@ public class FixPIsOrgsPlatforms {
                 expoReader.close();
             }
         } catch ( Exception ex ) {
-            System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
+            System.err.println("Error getting expocodes from " + expocodesFile.getPath() + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }

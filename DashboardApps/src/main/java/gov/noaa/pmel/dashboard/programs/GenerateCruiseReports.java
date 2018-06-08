@@ -132,8 +132,8 @@ public class GenerateCruiseReports {
                             }
                         }
                     } catch ( Exception ex ) {
-                        System.err.println("Problems generating the single-cruise enhanced-data " +
-                                "files bundle for " + expo + ": " + ex.getMessage());
+                        System.err.println("Problems generating the single-cruise enhanced-data files bundle for " +
+                                expo + ": " + ex.getMessage());
                         ex.printStackTrace();
                         System.exit(1);
                     }

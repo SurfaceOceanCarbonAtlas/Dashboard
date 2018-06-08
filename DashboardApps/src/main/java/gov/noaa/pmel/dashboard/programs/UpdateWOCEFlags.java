@@ -49,8 +49,7 @@ public class UpdateWOCEFlags {
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( Exception ex ) {
-            System.err.println("Problems reading the default dashboard " +
-                    "configuration file: " + ex.getMessage());
+            System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -72,8 +71,7 @@ public class UpdateWOCEFlags {
                     expoReader.close();
                 }
             } catch ( Exception ex ) {
-                System.err.println("Error getting expocodes from " +
-                        expocodesFilename + ": " + ex.getMessage());
+                System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
                 ex.printStackTrace();
                 System.exit(1);
             }

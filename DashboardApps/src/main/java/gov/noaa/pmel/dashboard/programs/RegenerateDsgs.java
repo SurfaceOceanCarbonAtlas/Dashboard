@@ -9,8 +9,6 @@ import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
@@ -34,13 +32,11 @@ import java.util.TreeSet;
  */
 public class RegenerateDsgs {
 
-    DataFileHandler dataHandler;
-    DsgNcFileHandler dsgHandler;
-    MetadataFileHandler metaHandler;
-    KnownDataTypes knownMetadataTypes;
-    KnownDataTypes knownDataFileTypes;
-    DatabaseRequestHandler dbHandler;
-    FerretConfig ferretConfig;
+    private DsgNcFileHandler dsgHandler;
+    private MetadataFileHandler metaHandler;
+    private KnownDataTypes knownMetadataTypes;
+    private KnownDataTypes knownDataFileTypes;
+    private FerretConfig ferretConfig;
 
     /**
      * Regenerate DSG files using the given configuration data.
@@ -49,12 +45,10 @@ public class RegenerateDsgs {
      *         configuration data to use
      */
     public RegenerateDsgs(DashboardConfigStore configStore) {
-        dataHandler = configStore.getDataFileHandler();
         dsgHandler = configStore.getDsgNcFileHandler();
         metaHandler = configStore.getMetadataFileHandler();
         knownMetadataTypes = configStore.getKnownMetadataTypes();
         knownDataFileTypes = configStore.getKnownDataFileTypes();
-        dbHandler = configStore.getDatabaseRequestHandler();
         ferretConfig = configStore.getFerretConfig();
     }
 
@@ -148,7 +142,7 @@ public class RegenerateDsgs {
     /**
      * Flag ERDDAP that the full-data and decimated-data DSG files have changed
      */
-    public void flagErddap() {
+    private void flagErddap() {
         dsgHandler.flagErddap(true, true);
     }
 
@@ -171,9 +165,11 @@ public class RegenerateDsgs {
         }
 
         String idsFilename = args[0];
-        boolean always = false;
+        boolean always;
         if ( "T".equals(args[1]) || "True".equals(args[1]) )
             always = true;
+        else
+            always = false;
 
         // Get the IDs of the datasets to update
         TreeSet<String> idsSet = new TreeSet<String>();

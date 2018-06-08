@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
+import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -118,7 +119,7 @@ public class AddDOIs {
 
         boolean success = true;
         try {
-            gov.noaa.pmel.dashboard.handlers.DataFileHandler cruiseHandler = configStore.getDataFileHandler();
+            DataFileHandler cruiseHandler = configStore.getDataFileHandler();
             for (String expocode : exposSet) {
                 gov.noaa.pmel.dashboard.shared.DashboardDataset cruise = null;
                 try {
@@ -140,8 +141,8 @@ public class AddDOIs {
                 if ( doi != null ) {
                     cruise.setSourceDOI(doi);
                     cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
-                    System.out.println(
-                            "Updating the original-data DOI for " + expocode + " to " + doi + " and marking as archived");
+                    System.out.println("Updating the original-data DOI for " +
+                            expocode + " to " + doi + " and marking as archived");
                 }
                 try {
                     cruiseHandler.saveDatasetInfoToFile(cruise, null);
