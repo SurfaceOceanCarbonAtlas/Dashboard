@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.TreeSet;
@@ -31,17 +32,24 @@ public class GenerateOrigFileBundles {
      *         where IDsFile is a file of IDs of datasets to generating original data file bundles for.
      */
     public static void main(String[] args) {
-        if ( args.length != 1 ) {
-            System.err.println("Arguments:  IDsFile");
+        if ( args.length != 2 ) {
+            System.err.println("Arguments:  IDsFile  Use_Bagit");
             System.err.println();
             System.err.println("Generates original data file bundles for the dataset IDs specified ");
             System.err.println("in IDsFile.  These file bundles are added to the version control ");
             System.err.println("bundles directory, but are not emailed to anyone.  The default ");
             System.err.println("dashboard configuration is used for this process. ");
             System.err.println();
+            System.err.println("If Use_Bagit is 'True' or 'T' (case insensitive), uses bagit instead of zip");
+            System.err.println();
             System.exit(1);
         }
         String idsFilename = args[0];
+        boolean useBagit;
+        if ( "True".equalsIgnoreCase(args[1]) || "T".equalsIgnoreCase(args[1]) )
+            useBagit = true;
+        else
+            useBagit = false;
 
         TreeSet<String> idsSet = new TreeSet<String>();
         try {
@@ -78,9 +86,15 @@ public class GenerateOrigFileBundles {
             for (String datasetId : idsSet) {
                 String commitMsg = "Automated generation of the original data files bundle for " + datasetId;
                 try {
-                    String resultMsg = filesBundler.sendOrigFilesBundle(datasetId, commitMsg,
-                            DashboardServerUtils.NOMAIL_USER_REAL_NAME, DashboardServerUtils.NOMAIL_USER_EMAIL);
-                    System.out.println(datasetId + " : " + resultMsg);
+                    if ( useBagit ) {
+                        File bagFile = filesBundler.createBagitFilesBundle(datasetId, commitMsg);
+                        System.out.println(datasetId + " bagit file: " + bagFile.getPath());
+                    }
+                    else {
+                        String resultMsg = filesBundler.sendOrigFilesBundle(datasetId, commitMsg,
+                                DashboardServerUtils.NOMAIL_USER_REAL_NAME, DashboardServerUtils.NOMAIL_USER_EMAIL);
+                        System.out.println(datasetId + " : " + resultMsg);
+                    }
                 } catch ( IllegalArgumentException | IOException ex ) {
                     System.out.println(datasetId + " : " + "failed - " + ex.getMessage());
                     success = false;

@@ -3,6 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.loc.repository.bagit.creator.BagCreator;
+import gov.loc.repository.bagit.domain.Bag;
+import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
+import gov.loc.repository.bagit.verify.BagVerifier;
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -24,7 +28,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.zip.ZipEntry;
@@ -38,6 +48,7 @@ import java.util.zip.ZipOutputStream;
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
     private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
+    private static final String BAGIT_DIRNAME_EXTENSION = "_bagit";
     private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
@@ -121,21 +132,20 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * The bundle virtual File for the given dataset.
+     * The zip bundle virtual File for the given dataset.
      * Creates the parent subdirectory, if it does not already exist, for this File.
      *
      * @param datasetId
-     *         return the virtual File for the dataset with this ID
+     *         return the zip virtual File for the dataset with this ID
      *
-     * @return the bundle virtual File
+     * @return the zip bundle virtual File for the dataset
      *
      * @throws IllegalArgumentException
-     *         if the dataset is invalid, or if unable to generate the parent subdirectory if it does not already exist
+     *         if the dataset is invalid, or
+     *         if unable to generate the parent subdirectory if it does not already exist
      */
-    public File getBundleFile(String datasetId) throws IllegalArgumentException {
-        // Check and standardize the dataset
+    public File getZipBundleFile(String datasetId) throws IllegalArgumentException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
-        // Create
         File parentFile = new File(filesDir, stdId.substring(0, 4));
         if ( !parentFile.isDirectory() ) {
             if ( parentFile.exists() )
@@ -143,9 +153,42 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             if ( !parentFile.mkdir() )
                 throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
         }
-        // Generate the full path filename for this cruise metadata
+        // Generate the full path filename for this dataset's archive bundle
         File bundleFile = new File(parentFile, stdId + BUNDLE_NAME_EXTENSION);
         return bundleFile;
+    }
+
+    /**
+     * The bagit bundle directory for the given dataset.
+     * Creates the bundle and parent subdirectories, if they do not alread exist
+     *
+     * @param datasetId
+     *         return the bagit directory for the dataset with this ID
+     *
+     * @return the bagit directory for the dataset
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset is invalid, or
+     *         if unable to generate the parent subdirectory if it does not already exist
+     */
+    public File getBagitBundleDir(String datasetId) throws IllegalArgumentException {
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        File parentFile = new File(filesDir, stdId.substring(0, 4));
+        if ( !parentFile.isDirectory() ) {
+            if ( parentFile.exists() )
+                throw new IllegalArgumentException("File exists but is not a directory: " + parentFile.getPath());
+            if ( !parentFile.mkdir() )
+                throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
+        }
+        // Generate the full path filename for this dataset's bagit bundle
+        File bundleDir = new File(parentFile, stdId + BAGIT_DIRNAME_EXTENSION);
+        if ( !bundleDir.isDirectory() ) {
+            if ( bundleDir.exists() )
+                throw new IllegalArgumentException("File exists but is not a directory: " + bundleDir.getPath());
+            if ( !bundleDir.mkdir() )
+                throw new IllegalArgumentException("Problems creating the directory: " + bundleDir.getPath());
+        }
+        return bundleDir;
     }
 
     /**
@@ -209,7 +252,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             throw new IOException("No metadata/supplemental documents for " + stdId);
 
         // Generate the bundle as a zip file
-        File bundleFile = getBundleFile(stdId);
+        File bundleFile = getZipBundleFile(stdId);
         String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
@@ -322,8 +365,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             msg.saveChanges();
         } catch ( MessagingException ex ) {
             String errmsg = getMessageExceptionMsgs(ex);
-            throw new IllegalArgumentException("Unexpected problems creating the archival request email: " + errmsg,
-                    ex);
+            throw new IllegalArgumentException("Problems creating the archival request email: " + errmsg, ex);
         }
 
         // Send the email
@@ -347,8 +389,124 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
+     * Creates the bagit directory for this dataset, then copies data and metadata files to this directory
+     * and finally creates a zip file of this directory.
+     *
+     * @param expocode
+     *         create the bagit bundle directory and zip file for the dataset with this ID
+     * @param commitMsg
+     *         message associated with the subversion commit of the bagit zip file;
+     *         if null, the file is not committed to subversion
+     *
+     * @return the bagit zip file created
+     *
+     * @throws IllegalArgumentException
+     *         if the expocode is invalid, or
+     *         if unable to create the bagit bundle directory
+     * @throws IOException
+     *         if there is not data or metadata files for this dataset,
+     *         if there were problems copying files to the bagit bundle directory, or
+     *         if there were problems creating the bagit zip file from the bagit bundle directory
+     */
+    public File createBagitFilesBundle(String expocode, String commitMsg)
+            throws IllegalArgumentException, IOException {
+        String stdId = DashboardServerUtils.checkDatasetID(expocode);
+        File bundleDir = getBagitBundleDir(stdId);
+        DashboardConfigStore configStore = DashboardConfigStore.get(false);
+
+        // Get the original data file for this dataset
+        File dataFile = configStore.getDataFileHandler().datasetDataFile(stdId);
+        if ( !dataFile.exists() )
+            throw new IOException("No data file for " + stdId);
+
+        // Get the list of metadata documents to be bundled with this data file
+        ArrayList<File> addlDocs = new ArrayList<File>();
+        MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+        for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
+            // Exclude the (dataset)/OME.xml document at this time;
+            // do include the (dataset)/PI_OME.xml
+            String filename = mdata.getFilename();
+            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+                addlDocs.add(metadataHandler.getMetadataFile(stdId, filename));
+            }
+        }
+        if ( addlDocs.isEmpty() )
+            throw new IOException("No metadata/supplemental documents for " + stdId);
+
+        // Copy all the files to the bagit bundle directory
+        try {
+            File dest = new File(bundleDir, dataFile.getName());
+            Files.copy(dataFile.toPath(), dest.toPath());
+            for (File metaFile : addlDocs) {
+                dest = new File(bundleDir, metaFile.getName());
+                Files.copy(dataFile.toPath(), dest.toPath());
+            }
+        } catch ( Exception ex ) {
+            throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
+        }
+
+        // Create the bagit directory in-place (restructures and add files) in the bagit bundles directory
+        File bagitFile;
+        try {
+            Bag bag = BagCreator.bagInPlace(bundleDir.toPath(), Arrays.asList(StandardSupportedAlgorithms.MD5), false);
+            BagVerifier verifier = new BagVerifier();
+            verifier.isComplete(bag, true);
+            verifier.isValid(bag, true);
+            bagitFile = new File(bundleDir.getParent(), bundleDir.getName() + ".zip");
+        } catch ( Exception ex ) {
+            throw new IOException("Problems creating the bagit files: " + ex.getMessage(), ex);
+        }
+
+        // Create a zip file of the bagit bundles directory
+        final Path bundleDirPath = bundleDir.toPath();
+        final ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bagitFile));
+        try {
+            Files.walkFileTree(bundleDirPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
+                    Path relative = bundleDirPath.relativize(filePath);
+                    ZipEntry entry = new ZipEntry(relative.toString());
+                    entry.setTime(filePath.toFile().lastModified());
+                    zipOut.putNextEntry(entry);
+                    Files.copy(filePath, zipOut);
+                    zipOut.closeEntry();
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } finally {
+            zipOut.close();
+        }
+
+        // No longer need the bagit bundle directory
+        Files.walkFileTree(bundleDirPath, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
+                Files.delete(filePath);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dirPath, IOException ex) throws IOException {
+                if ( ex == null )
+                    Files.delete(dirPath);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        // Commit the bagit zip file, if requested
+        if ( (commitMsg != null) && !commitMsg.trim().isEmpty() ) {
+            try {
+                commitVersion(bagitFile, commitMsg);
+            } catch ( Exception ex ) {
+                throw new IOException("Problems commiting the bagit file to subversion: " + ex.getMessage(), ex);
+            }
+        }
+        return bagitFile;
+    }
+
+    /**
      * Generates a single-cruise enhanced data file, then bundles that report with all the metadata documents
-     * for that dataset.  Use {@link #getBundleFile(String)} to get the virtual File of the created bundle.
+     * for that dataset.  Use {@link #getZipBundleFile(String)} to get the virtual File of the created bundle.
      *
      * @param expocode
      *         create the bundle for the dataset with this ID
@@ -362,8 +520,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if unable to create the enhanced data file, or
      *         in unable to create the bundle file
      */
-    public ArrayList<String> createEnhancedFilesBundle(String expocode) throws IllegalArgumentException, IOException {
-        File bundleFile = getBundleFile(expocode);
+    public ArrayList<String> createEnhancedFilesBundle(String expocode) throws
+            IllegalArgumentException, IOException {
+        File bundleFile = getZipBundleFile(expocode);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // Generate the single-cruise SOCAT-enhanced data file

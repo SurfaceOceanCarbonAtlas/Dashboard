@@ -36,6 +36,7 @@ The jar files:
 	xml-apis-ext-1.3.04.jar
 	xmlgraphics-commons-2.2.jar
 were obtained from https://xmlgraphics.apache.org/fop/download.html
+The jar file bagit-5.1.1.jar was obtained from https://github.com/LibraryOfCongress/bagit-java/releases
 
 The jar file sanitychecker.jar is created from the Java classes under SanityChecker/src in this project and added to this location.
 The jar file omemetadata.jar is created from the Java classes under OmeMetadata/src in this project and added to this location.
