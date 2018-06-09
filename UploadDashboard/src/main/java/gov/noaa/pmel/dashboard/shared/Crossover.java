@@ -9,14 +9,14 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * High-quality crossovers are desirable coincidental near-overlaps of location, time, and some other properties found
- * in datasets from different platforms (different NODC codes).
+ * High-quality crossovers are desirable coincidental near-overlaps of location, time, and
+ * some other properties found in datasets from different platforms (different NODC codes).
  *
  * @author Karl Smith
  */
-public class Crossover implements Serializable, IsSerializable {
+public class Crossover implements Serializable, IsSerializable, Comparable<Crossover> {
 
-    private static final long serialVersionUID = -1068460517910734247L;
+    private static final long serialVersionUID = -2012392349823423489L;
 
     protected String[] datasetIds;
     protected Double minDistance;
@@ -42,8 +42,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the two IDs of the crossover datasets; always an array of two Strings, but each String may be null. The
-     *         actual array in this instance is returned.
+     * @return the two IDs of the crossover datasets; always an array of two Strings, but each String may be null.
+     *         The actual array in this instance is returned.
      */
     public String[] getDatasetIds() {
         return datasetIds;
@@ -51,8 +51,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param datasetIds
-     *         the two IDs of the crossover datasets to set. If null, an array of two nulls is assigned; otherwise an
-     *         array of two Strings must be given. The values in the array, but not the array itself, are used.
+     *         the two IDs of the crossover datasets to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Strings must be given.
      */
     public void setDatasetIds(String[] datasetIds) {
         if ( datasetIds == null ) {
@@ -82,8 +82,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the data row numbers (starts with one) of the two datasets at the crossover; always an array of two
-     *         Integers, but each Integer may be null. The actual array in this instance is returned.
+     * @return the data row numbers (starts with one) of the two datasets at the crossover; always an array
+     *         of two Integers, but each Integer may be null.  The actual array in this instance is returned.
      */
     public Integer[] getRowNumsAtMin() {
         return rowNumsAtMin;
@@ -91,9 +91,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param rowNumsAtMin
-     *         the data row numbers (starts with one) of the two datasets at the crossover to set. If null, an array of
-     *         two nulls is assigned; otherwise an array of two Integers must be given. The values in the array, but not
-     *         the array itself, are used.
+     *         the data row numbers (starts with one) of the two datasets at the crossover to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Integers must be given.
      */
     public void setRowNumsAtMin(Integer[] rowNumsAtMin) {
         if ( rowNumsAtMin == null ) {
@@ -108,8 +107,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the longitudes of the two datasets at the crossover; always an array of two Doubles, but each Double may
-     *         be null. The actual array in this instance is returned.
+     * @return the longitudes of the two datasets at the crossover; always an array of two Doubles,
+     *         but each Double may be null.  The actual array in this instance is returned.
      */
     public Double[] getLonsAtMin() {
         return lonsAtMin;
@@ -117,9 +116,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param lonsAtMin
-     *         the longitudes of the two datasets at the crossover to set. If null, an array of two nulls is assigned;
-     *         otherwise an array of two Doubles must be given. The values in the array, but not the array itself, are
-     *         used.
+     *         the longitudes of the two datasets at the crossover to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Doubles must be given.
      */
     public void setLonsAtMin(Double[] lonsAtMin) {
         if ( lonsAtMin == null ) {
@@ -134,8 +132,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the latitudes of the two datasets at the crossover; always an array of two Doubles, but each Double may
-     *         be null. The actual array in this instance is returned.
+     * @return the latitudes of the two datasets at the crossover; always an array of two Doubles,
+     *         but each Double may be null.  The actual array in this instance is returned.
      */
     public Double[] getLatsAtMin() {
         return latsAtMin;
@@ -143,9 +141,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param latsAtMin
-     *         the latitudes of the two datasets at the crossover to set. If null, an array of two nulls is assigned;
-     *         otherwise an array of two Doubles must be given. The values in the array, but not the array itself, are
-     *         used.
+     *         the latitudes of the two datasets at the crossover to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Doubles must be given.
      */
     public void setLatsAtMin(Double[] latsAtMin) {
         if ( latsAtMin == null ) {
@@ -160,8 +157,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the times, in seconds with Jan 1, 1970 00:00:00, of the two datasets at the crossover; always an array of
-     *         two Dates, but each Date may be null. The actual array in this instance is returned.
+     * @return the times, in seconds with Jan 1, 1970 00:00:00, of the two datasets at the crossover; always
+     *         an array of two Longs, but each Long may be null.  The actual array in this instance is returned.
      */
     public Long[] getTimesAtMin() {
         return timesAtMin;
@@ -169,9 +166,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param timesAtMin
-     *         the times, in seconds with Jan 1, 1970 00:00:00, of the two datasets at the crossover to set. If null, an
-     *         array of two nulls is assigned; otherwise an array of two Dates must be given. The values in the array,
-     *         but not the array itself, are used.
+     *         the times, in seconds with Jan 1, 1970 00:00:00, of the two datasets at the crossover to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Longs must be given.
      */
     public void setTimesAtMin(Long[] timesAtMin) {
         if ( timesAtMin == null ) {
@@ -186,8 +182,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the minimum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always an array of
-     *         two Dates, but each Date may be null. The actual array in this instance is returned.
+     * @return the minimum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always
+     *         an array of two Longs, but each Long may be null.  The actual array in this instance is returned.
      */
     public Long[] getDatasetMinTimes() {
         return datasetMinTimes;
@@ -195,9 +191,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param datasetMinTimes
-     *         the minimum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset to set. If null, an
-     *         array of two nulls is assigned; otherwise an array of two Dates must be given. The values in the array,
-     *         but not the array itself, are used.
+     *         the minimum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Longs must be given.
      */
     public void setDatasetMinTimes(Long[] datasetMinTimes) {
         if ( datasetMinTimes == null ) {
@@ -212,8 +207,8 @@ public class Crossover implements Serializable, IsSerializable {
     }
 
     /**
-     * @return maximum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always an array of two
-     *         Dates, but each Date may be null. The actual array in this instance is returned.
+     * @return the maximum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset; always
+     *         an array of two Longs, but each Long may be null.  The actual array in this instance is returned.
      */
     public Long[] getDatasetMaxTimes() {
         return datasetMaxTimes;
@@ -221,9 +216,8 @@ public class Crossover implements Serializable, IsSerializable {
 
     /**
      * @param datasetMaxTimes
-     *         the maximum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset to set. If null, an
-     *         array of two nulls is assigned; otherwise an array of two Dates must be given. The values in the array,
-     *         but not the array itself, are used.
+     *         the maximum time, in seconds with Jan 1, 1970 00:00:00, of all data for each dataset to set.
+     *         If null, an array of two nulls is assigned; otherwise an array of two Longs must be given.
      */
     public void setDatasetMaxTimes(Long[] datasetMaxTimes) {
         if ( datasetMaxTimes == null ) {
@@ -316,6 +310,130 @@ public class Crossover implements Serializable, IsSerializable {
         }
 
         return true;
+    }
+
+    @Override
+    public int compareTo(Crossover other) {
+        // set undefined low and stay compatible with equals
+
+        // First compare minimum crossover distance to show closest crossovers first
+        if ( minDistance == null ) {
+            if ( other.minDistance != null )
+                return -1;
+        }
+        else if ( other.minDistance == null ) {
+            return 1;
+        }
+        else if ( !DashboardUtils.closeTo(minDistance, other.minDistance,
+                0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+            return minDistance.compareTo(other.minDistance);
+        }
+
+        // Expocodes and then the rest to be complete
+        for (int k = 0; k < 2; k++) {
+            if ( datasetIds[k] == null ) {
+                if ( other.datasetIds[k] != null )
+                    return -1;
+            }
+            else if ( other.datasetIds[k] == null ) {
+                return 1;
+            }
+            else {
+                int result = datasetIds[k].compareTo(other.datasetIds[k]);
+                if ( result != 0 )
+                    return result;
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( latsAtMin[k] == null ) {
+                if ( other.latsAtMin[k] != null )
+                    return -1;
+            }
+            else if ( other.latsAtMin[k] == null ) {
+                return 1;
+            }
+            else if ( !DashboardUtils.closeTo(latsAtMin[k], other.latsAtMin[k],
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                return latsAtMin[k].compareTo(other.latsAtMin[k]);
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( lonsAtMin[k] == null ) {
+                if ( other.lonsAtMin[k] != null )
+                    return -1;
+            }
+            else if ( other.lonsAtMin[k] == null ) {
+                return 1;
+            }
+            else if ( !DashboardUtils.longitudeCloseTo(lonsAtMin[k], other.lonsAtMin[k],
+                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
+                return lonsAtMin[k].compareTo(other.lonsAtMin[k]);
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( timesAtMin[k] == null ) {
+                if ( other.timesAtMin[k] != null )
+                    return -1;
+            }
+            else if ( other.timesAtMin[k] == null ) {
+                return 1;
+            }
+            else {
+                int result = timesAtMin[k].compareTo(other.timesAtMin[k]);
+                if ( result != 0 )
+                    return result;
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( rowNumsAtMin[k] == null ) {
+                if ( other.rowNumsAtMin[k] != null )
+                    return -1;
+            }
+            else if ( other.rowNumsAtMin[k] == null ) {
+                return 1;
+            }
+            else {
+                int result = rowNumsAtMin[k].compareTo(other.rowNumsAtMin[k]);
+                if ( result != 0 )
+                    return result;
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( datasetMinTimes[k] == null ) {
+                if ( other.datasetMinTimes[k] != null )
+                    return -1;
+            }
+            else if ( other.datasetMinTimes[k] == null ) {
+                return 1;
+            }
+            else {
+                int result = datasetMinTimes[k].compareTo(other.datasetMinTimes[k]);
+                if ( result != 0 )
+                    return result;
+            }
+        }
+
+        for (int k = 0; k < 2; k++) {
+            if ( datasetMaxTimes[k] == null ) {
+                if ( other.datasetMaxTimes[k] != null )
+                    return -1;
+            }
+            else if ( other.datasetMaxTimes[k] == null ) {
+                return 1;
+            }
+            else {
+                int result = datasetMaxTimes[k].compareTo(other.datasetMaxTimes[k]);
+                if ( result != 0 )
+                    return result;
+            }
+        }
+
+        return 0;
     }
 
     @Override

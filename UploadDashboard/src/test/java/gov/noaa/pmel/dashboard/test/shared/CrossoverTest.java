@@ -321,8 +321,8 @@ public class CrossoverTest {
     }
 
     /**
-     * Test method for {@link Crossover#hashCode()}
-     * and {@link Crossover#equals(Object)}.
+     * Test method for {@link Crossover#hashCode()}, {@link Crossover#equals(Object)},
+     * and {@link Crossover#compareTo(Crossover)}
      */
     @Test
     public void testHashCodeEquals() {
@@ -333,44 +333,60 @@ public class CrossoverTest {
         Crossover second = new Crossover();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setDatasetIds(new String[] { firstExpo, secondExpo });
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setDatasetIds(new String[] { firstExpo, secondExpo });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setMinDistance(new Double(minDist));
         // hashCode ignores floating-point values
         assertEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setMinDistance(new Double(minDist));
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setRowNumsAtMin(new Integer[] { firstRowNum, secondRowNum });
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setRowNumsAtMin(new Integer[] { firstRowNum, secondRowNum });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setLonsAtMin(new Double[] { firstLon, secondLon });
         // hashCode ignores floating-point values
         assertEquals(first.hashCode(), second.hashCode());
         assertNotEquals(first, second);
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setLonsAtMin(new Double[] { firstLon, secondLon });
         assertEquals(first.hashCode(), second.hashCode());
-        assertEquals(first, second);
+        assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setLatsAtMin(new Double[] { firstLat, secondLat });
         // hashCode ignores floating-point values
         assertEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setLatsAtMin(new Double[] { firstLat, secondLat });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setTimesAtMin(new Long[] { firstTime, secondTime });
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -378,20 +394,44 @@ public class CrossoverTest {
         second.setTimesAtMin(new Long[] { firstTime, secondTime });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setDatasetMinTimes(new Long[] { firstMinTime, secondMinTime });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
 
         first.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
+        assertTrue( first.compareTo(second) > 0 );
+        assertTrue( second.compareTo(first) < 0 );
         second.setDatasetMaxTimes(new Long[] { firstMaxTime, secondMaxTime });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
+
+        // Ignores negligible differences in floating point values
+        first.setMinDistance(minDist + 5.0E-7);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
+
+        first.setLatsAtMin(new Double[] {firstLat, secondLat + 5.0E-7});
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
+
+        // And modulo on longitudes
+        first.setLonsAtMin(new Double[] {firstLon, secondLon + 360.0});
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        assertEquals(0, first.compareTo(second));
     }
 
 }
