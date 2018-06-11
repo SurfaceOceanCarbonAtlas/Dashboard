@@ -8,39 +8,23 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.Crossover;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * Finds high-quality crossovers within sets of cruises
+ * Finds high-quality crossovers within sets of datasets
  *
  * @author Karl Smith
  */
 public class GetCruiseCrossovers {
 
-    /**
-     * QC flags of cruises to report any crossovers
-     */
-    static final TreeSet<String> reportFlagsSet = new TreeSet<String>(Arrays.asList(
-            DashboardServerUtils.DATASET_QCFLAG_A,
-            DashboardServerUtils.DATASET_QCFLAG_B,
-            DashboardServerUtils.DATASET_QCFLAG_C,
-            DashboardServerUtils.DATASET_QCFLAG_D,
-            DashboardServerUtils.DATASET_QCFLAG_E,
-            DashboardServerUtils.DATASET_QCFLAG_NEW,
-            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
-            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
-
-    /**
-     * QC flags of cruises that can be involved in crossovers
-     */
-    static final TreeSet<String> acceptableFlagsSet = new TreeSet<String>(Arrays.asList(
+    private static final TreeSet<String> ACCEPTABLE_FLAGS_SET = new TreeSet<String>(Arrays.asList(
             DashboardServerUtils.DATASET_QCFLAG_A,
             DashboardServerUtils.DATASET_QCFLAG_B,
             DashboardServerUtils.DATASET_QCFLAG_C,
@@ -52,7 +36,7 @@ public class GetCruiseCrossovers {
 
     /**
      * @param args
-     *         ExpocodesFile - a file containing expocodes of the set of cruises
+     *         ExpocodesFile - a file containing expocodes of the set of datasets
      *         to examine for high-quality crossovers
      */
     public static void main(String[] args) {
@@ -60,7 +44,7 @@ public class GetCruiseCrossovers {
             System.err.println("Arguments:  ExpocodesFile");
             System.err.println();
             System.err.println("ExpocodesFile");
-            System.err.println("    is a file containing expocodes, one per line, of the set of cruises ");
+            System.err.println("    is a file containing expocodes, one per line, of the set of datasets ");
             System.err.println("    to examine for high-quality crossovers. ");
             System.err.println();
             System.exit(1);
@@ -82,8 +66,7 @@ public class GetCruiseCrossovers {
                 reader.close();
             }
         } catch ( Exception ex ) {
-            System.err.println("Problems reading the file of expocodes '" +
-                    exposFilename + "': " + ex.getMessage());
+            System.err.println("Problems reading the file of expocodes '" + exposFilename + "': " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -92,8 +75,7 @@ public class GetCruiseCrossovers {
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( Exception ex ) {
-            System.err.println("Problems obtaining the default dashboard " +
-                    "configuration: " + ex.getMessage());
+            System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
@@ -103,159 +85,60 @@ public class GetCruiseCrossovers {
 
             long startTime = System.currentTimeMillis();
 
-            // Get the QC flags for the cruises from the DSG files
+            // Get the QC flags for the datasets from the DSG files
             double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-            System.err.format("%.2fm - getting QC flags for the cruises\n", timeDiff);
-            TreeMap<String,String> cruiseFlagsMap = new TreeMap<String,String>();
+            System.err.format("%.2fm - getting QC flags for the datasets\n", timeDiff);
+            TreeMap<String,String> datasetFlagsMap = new TreeMap<String,String>();
+            TreeSet<String> notActuallyAExpos = new TreeSet<String>();
             for (String expo : givenExpocodes) {
                 try {
                     String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expo);
-                    if ( acceptableFlagsSet.contains(flagVersion[0]) ) {
-                        cruiseFlagsMap.put(expo, flagVersion[0]);
+                    if ( ACCEPTABLE_FLAGS_SET.contains(flagVersion[0]) ) {
+                        datasetFlagsMap.put(expo, flagVersion[0]);
                     }
                     else {
                         throw new Exception("QC flag is " + flagVersion[0]);
                     }
+                    // Add all flag-A expocodes, then remove those that actually do have crossovers
+                    if ( DashboardServerUtils.DATASET_QCFLAG_A.equals(flagVersion[0]) )
+                        notActuallyAExpos.add(expo);
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());
+                    // Skip this expocode and continue on
                 }
             }
 
-            // Get the time and latitude limits for all the cruises in the list
-            // in order to narrow down the cruises to examine for crossovers
-            TreeMap<String,double[]> cruiseTimeMinMaxMap = new TreeMap<String,double[]>();
-            TreeMap<String,double[]> cruiseLatMinMaxMap = new TreeMap<String,double[]>();
-            for (String expo : cruiseFlagsMap.keySet()) {
-                timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-                System.err.format("%.2fm - getting data limits for %s\n", timeDiff, expo);
-                double[][] dataVals = null;
-                try {
-                    dataVals = dsgHandler.readLonLatTimeDataValues(expo);
-                } catch ( Exception ex ) {
-                    System.err.println("Unexpected error rereading " + expo + ": " + ex.getMessage());
-                    System.exit(1);
-                }
-                double[] timeMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[2]);
-                if ( (timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
-                        (timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
-                    System.err.println("No valid times for " + expo);
-                    System.exit(1);
-                }
-                cruiseTimeMinMaxMap.put(expo, timeMinMaxVals);
-                double[] latMinMaxVals = DashboardServerUtils.getMinMaxValidData(dataVals[1]);
-                if ( (latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
-                        (latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
-                    System.err.println("No valid latitudes for " + expo);
-                    System.exit(1);
-                }
-                cruiseLatMinMaxMap.put(expo, latMinMaxVals);
+            TreeMap<String,TreeSet<Crossover>> crossoversMap = null;
+            try {
+                Set<String> expoSet = datasetFlagsMap.keySet();
+                CrossoverChecker crossChecker = new CrossoverChecker(configStore.getDsgNcFileHandler());
+                crossoversMap = crossChecker.findCrossovers(expoSet, expoSet, System.err, startTime);
+            } catch ( Exception ex ) {
+                System.err.println("Problems checking for crossovers: " + ex.getMessage());
+                ex.printStackTrace();
+                System.exit(1);
             }
-
-            CrossoverChecker crossChecker = new CrossoverChecker(configStore.getDsgNcFileHandler());
-            TreeMap<String,Crossover> crossoversMap = new TreeMap<String,Crossover>();
-            for (String firstExpo : cruiseFlagsMap.keySet()) {
-                double[] firstTimeMinMax = cruiseTimeMinMaxMap.get(firstExpo);
-                double[] firstLatMinMax = cruiseLatMinMaxMap.get(firstExpo);
-                // Get the list of possibly-crossing cruises to check
-                TreeSet<String> checkExpos = new TreeSet<String>();
-                for (String secondExpo : cruiseFlagsMap.keySet()) {
-                    // Only those cruise preceding this one so not doing two checks on a pair
-                    if ( secondExpo.equals(firstExpo) )
-                        break;
-                    // Must be different instrument - different NODC code
-                    if ( firstExpo.substring(0, 4).equals(secondExpo.substring(0, 4)) )
-                        continue;
-                    // One of the cruises must be from the report set
-                    if ( !(reportFlagsSet.contains(cruiseFlagsMap.get(firstExpo)) ||
-                            reportFlagsSet.contains(cruiseFlagsMap.get(secondExpo))) )
-                        continue;
-                    // Check that there is some overlap in time
-                    double[] secondTimeMinMax = cruiseTimeMinMaxMap.get(secondExpo);
-                    if ( (firstTimeMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
-                            (secondTimeMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < firstTimeMinMax[0]) )
-                        continue;
-                    // Check that there is some overlap in latitude
-                    double[] secondLatMinMax = cruiseLatMinMaxMap.get(secondExpo);
-                    if ( (firstLatMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < secondLatMinMax[0]) ||
-                            (secondLatMinMax[1] + DashboardServerUtils.MAX_TIME_DIFF < firstLatMinMax[0]) )
-                        continue;
-                    checkExpos.add(secondExpo);
-                }
-                // Find any crossovers with this cruise with the selected set of cruises
-                if ( checkExpos.size() > 0 ) {
-                    try {
-                        ArrayList<Crossover> crossList =
-                                crossChecker.getCrossovers(firstExpo, checkExpos, System.err, startTime);
-                        for (Crossover cross : crossList) {
-                            String[] expos = cross.getDatasetIds();
-                            Long[] cruiseMinTimes = new Long[2];
-                            Long[] cruiseMaxTimes = new Long[2];
-                            for (int q = 0; q < 2; q++) {
-                                double[] timeMinMax = cruiseTimeMinMaxMap.get(expos[q]);
-                                cruiseMinTimes[q] = Math.round(timeMinMax[0]);
-                                cruiseMaxTimes[q] = Math.round(timeMinMax[1]);
-                            }
-                            cross.setDatasetMinTimes(cruiseMinTimes);
-                            cross.setDatasetMaxTimes(cruiseMaxTimes);
-                            crossoversMap.put(expos[0] + " and " + expos[1], cross);
-                        }
-                    } catch ( Exception ex ) {
-                        ex.printStackTrace();
-                        System.exit(1);
-                    }
+            for (Map.Entry<String,TreeSet<Crossover>> entry : crossoversMap.entrySet()) {
+                String expo = entry.getKey();
+                notActuallyAExpos.remove(expo);
+                for (Crossover cross : entry.getValue()) {
+                    String[] expoPair = cross.getDatasetIds();
+                    String otherExpo = expo.equals(expoPair[0]) ? expoPair[1] : expoPair[0];
+                    System.out.format("%s (%s) high-quality cross-over with %s (%s) : d=%.2f\n",
+                            expo, datasetFlagsMap.get(expo), otherExpo, datasetFlagsMap.get(otherExpo),
+                            cross.getMinDistance().doubleValue());
                 }
             }
 
-            // Report crossovers found for each QC flag to report on
-            TreeSet<String> reportStrings = new TreeSet<String>();
-            for (String reportFlag : reportFlagsSet) {
-                for (String expocodePair : crossoversMap.keySet()) {
-                    String[] expocodes = expocodePair.split(" and ");
-                    String[] qcFlags = new String[] {
-                            cruiseFlagsMap.get(expocodes[0]), cruiseFlagsMap.get(expocodes[1]) };
-                    if ( reportFlag.equals(qcFlags[0]) ) {
-                        reportStrings.add("    " +
-                                expocodes[0] + " (" + qcFlags[0] + ") high-quality cross-over with " +
-                                expocodes[1] + " (" + qcFlags[1] + ")");
-                    }
-                    if ( reportFlag.equals(qcFlags[1]) ) {
-                        reportStrings.add("    " +
-                                expocodes[1] + " (" + qcFlags[1] + ") high-quality cross-over with " +
-                                expocodes[0] + " (" + qcFlags[0] + ")");
-                    }
-                }
+            System.out.println();
 
-                System.out.println(Integer.toString(reportStrings.size()) +
-                        " crossovers of cruises with a QC flag of " + reportFlag + ": ");
-                for (String report : reportStrings) {
-                    System.out.println(report);
-                }
-                System.out.println();
-                reportStrings.clear();
+            System.out.println(Integer.toString(notActuallyAExpos.size()) +
+                    " datasets with a QC flag of " + DashboardServerUtils.DATASET_QCFLAG_A +
+                    " but without a high-quality crossover: ");
+            for (String expo : notActuallyAExpos) {
+                System.out.println(expo);
             }
 
-            // Check for 'A' cruises without high-quality crossovers
-            for (String expo : cruiseFlagsMap.keySet()) {
-                if ( !DashboardServerUtils.DATASET_QCFLAG_A.equals(cruiseFlagsMap.get(expo)) )
-                    continue;
-                boolean found = false;
-                for (String expocodePair : crossoversMap.keySet()) {
-                    String[] expocodes = expocodePair.split(" and ");
-                    if ( expo.equals(expocodes[0]) || expo.equals(expocodes[1]) ) {
-                        found = true;
-                        break;
-                    }
-                }
-                if ( !found ) {
-                    reportStrings.add("    " + expo);
-                }
-            }
-            System.out.println(Integer.toString(reportStrings.size()) +
-                    " cruises with a QC flag of " + DashboardServerUtils.DATASET_QCFLAG_A +
-                    " with no high-quality crossovers: ");
-            for (String report : reportStrings) {
-                System.out.println(report);
-            }
             System.out.println();
 
         } finally {

@@ -316,8 +316,8 @@ public class CrossoverChecker {
             }
             // Find any crossovers of this dataset with any of the selected set of datasets
             if ( possibleExpos.size() > 0 ) {
-                ArrayList<Crossover> crossList = getCrossovers(firstExpo, possibleExpos,
-                        progressPrinter, startTimeMillis);
+                ArrayList<Crossover> crossList =
+                        getCrossovers(firstExpo, possibleExpos, progressPrinter, startTimeMillis);
                 for (Crossover cross : crossList) {
                     String[] expos = cross.getDatasetIds();
                     Long[] minTimes = new Long[2];
