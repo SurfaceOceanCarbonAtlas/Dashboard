@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests of method in {@link RegenerateDsgs}
+ * Tests of {@link RegenerateDsgs}
  *
  * @author Karl Smith
  */
@@ -44,39 +44,44 @@ public class RegenerateDsgsTest {
             System.exit(1);
         }
 
-        DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+        try {
+            DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
-        // Read the original data and metadata
-        DsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
-        fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
-        fullDataDsg.readData(configStore.getKnownDataFileTypes());
-        DsgMetadata origMeta = fullDataDsg.getMetadata();
-        StdDataArray origData = fullDataDsg.getStdDataArray();
+            // Read the original data and metadata
+            DsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
+            fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
+            fullDataDsg.readData(configStore.getKnownDataFileTypes());
+            DsgMetadata origMeta = fullDataDsg.getMetadata();
+            StdDataArray origData = fullDataDsg.getStdDataArray();
 
-        // Regenerate the DSG files
-        RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
-        assertTrue("regenerateDsgFiles returned false when 'always' set to true",
-                regenerator.regenerateDsgFiles(expocode, true));
+            // Regenerate the DSG files
+            RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
+            assertTrue("regenerateDsgFiles returned false when 'always' set to true",
+                    regenerator.regenerateDsgFiles(expocode, true));
 
-        // Re-read the data and metadata
-        fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
-        fullDataDsg.readData(configStore.getKnownDataFileTypes());
-        DsgMetadata updatedMeta = fullDataDsg.getMetadata();
-        StdDataArray updatedData = fullDataDsg.getStdDataArray();
+            // Re-read the data and metadata
+            fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
+            fullDataDsg.readData(configStore.getKnownDataFileTypes());
+            DsgMetadata updatedMeta = fullDataDsg.getMetadata();
+            StdDataArray updatedData = fullDataDsg.getStdDataArray();
 
-        // Test that nothing has changed
-        assertEquals(origMeta, updatedMeta);
-        assertNotSame(origMeta, updatedMeta);
-        // Check some pieces (to easier see differences) before checking the whole thing
-        assertEquals(origData.getNumDataCols(), updatedData.getNumDataCols());
-        assertEquals(origData.getNumSamples(), updatedData.getNumSamples());
-        for (int j = 0; j < origData.getNumSamples(); j++) {
-            for (int k = 0; k < origData.getNumDataCols(); k++) {
-                assertEquals(origData.getStdVal(j, k), updatedData.getStdVal(j, k));
+            // Test that nothing has changed
+            assertEquals(origMeta, updatedMeta);
+            assertNotSame(origMeta, updatedMeta);
+            // Check some pieces (to easier see differences) before checking the whole thing
+            assertEquals(origData.getNumDataCols(), updatedData.getNumDataCols());
+            assertEquals(origData.getNumSamples(), updatedData.getNumSamples());
+            for (int j = 0; j < origData.getNumSamples(); j++) {
+                for (int k = 0; k < origData.getNumDataCols(); k++) {
+                    assertEquals(origData.getStdVal(j, k), updatedData.getStdVal(j, k));
+                }
             }
+            assertEquals(origData, updatedData);
+            assertNotSame(origData, updatedData);
+
+        } finally {
+            DashboardConfigStore.shutdown();
         }
-        assertEquals(origData, updatedData);
-        assertNotSame(origData, updatedData);
 
     }
 

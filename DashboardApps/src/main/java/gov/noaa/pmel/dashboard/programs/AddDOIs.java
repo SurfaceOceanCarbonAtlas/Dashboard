@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -20,6 +21,66 @@ import java.util.TreeSet;
  * @author Karl Smith
  */
 public class AddDOIs {
+
+    private DataFileHandler dataHandler;
+
+    /**
+     * @param dataHandler
+     *         data file handler for reading and update dataset information files
+     */
+    public AddDOIs(DataFileHandler dataHandler) {
+        this.dataHandler = dataHandler;
+    }
+
+    /**
+     * Update the DOIs for a dataset.  If the original-data DOI is given, mark the dataset as archived.
+     * The changes are not committed to version control.
+     *
+     * @param expocode
+     *         update the DOIs of the dataset with this ID
+     * @param origDoi
+     *         original-data DOI to use; if null or blank, no changes are made to the original-data DOI.
+     *         If not null and not blank, the archive status of the dataset is set to the archived status.
+     * @param enhancedDoi
+     *         enhanced-data DOI to use; if null or blank, no changes are mode to the enhanced-data DOI
+     *
+     * @return message about what was done.
+     *         If both the original-data and enhanced-doi DOIs are null or blank, null is returned.
+     *
+     * @throws IllegalArgumentException
+     *         if the expocode is invalid,
+     *         if the information file for this dataset does not exist, or
+     *         if there are problems reading or updating the information file for this dataset.
+     */
+    public String updateDOIsForDataset(String expocode, String origDoi, String enhancedDoi)
+            throws IllegalArgumentException {
+        String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
+        DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
+        if ( cruise == null )
+            throw new IllegalArgumentException("info file for " + upperExpo + "does not exist");
+        String msg = null;
+        if ( enhancedDoi != null ) {
+            String doi = enhancedDoi.trim();
+            if ( !doi.isEmpty() ) {
+                cruise.setEnhancedDOI(doi);
+                msg = "updated the SOCAT-enhanced DOI for " + upperExpo + " to " + doi;
+            }
+        }
+        if ( origDoi != null ) {
+            String doi = origDoi.trim();
+            if ( !doi.isEmpty() ) {
+                cruise.setSourceDOI(doi);
+                cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
+                if ( msg != null )
+                    msg += "\n";
+                else
+                    msg = "";
+                msg += "updated the original-data DOI for " + upperExpo + " to " + doi + " and marking as archived";
+            }
+        }
+        dataHandler.saveDatasetInfoToFile(cruise, null);
+        return msg;
+    }
 
     /**
      * Creates and returns a map of expocodes to DOIs in the specified file.
@@ -43,9 +104,9 @@ public class AddDOIs {
             String dataline = expoReader.readLine();
             while ( dataline != null ) {
                 if ( !(dataline.isEmpty() || dataline.startsWith("#")) ) {
-                    String[] expodoi = dataline.split("\\s+");
+                    String[] expodoi = dataline.split("\t");
                     if ( expodoi.length < 2 )
-                        throw new IllegalArgumentException("Less than two words in " + dataline.trim());
+                        throw new IllegalArgumentException("not a tab-separated pair: " + dataline.trim());
                     String upperExpo = DashboardServerUtils.checkDatasetID(expodoi[0]);
                     expoDOIMap.put(upperExpo, expodoi[1]);
                 }
@@ -65,12 +126,11 @@ public class AddDOIs {
     public static void main(String[] args) {
         if ( args.length != 2 ) {
             System.err.println();
-            System.err.println("Arguments:  Expo_SOCAT_DOI_File  Expo_Orig_DOI_File");
+            System.err.println("Arguments:  Expo_SOCAT_DOI.tsv  Expo_Orig_DOI.tsv");
             System.err.println();
             System.err.println("Updates the DOIs for the SOCAT-enhanced and original data documents. ");
-            System.err.println(
-                    "Each line in the files should be an expocode followed (whitespace separated) by a DOI. ");
-            System.err.println("Blank lines or lines starting with a '#' are ignored. ");
+            System.err.println("Each line in the files should be an expocode, a tab character, and the ");
+            System.err.println("DOI to assign.  Blank lines or lines starting with a '#' are ignored. ");
             System.err.println("The default dashboard configuration is used for this process. ");
             System.err.println();
             System.exit(1);
@@ -119,36 +179,15 @@ public class AddDOIs {
 
         boolean success = true;
         try {
-            DataFileHandler cruiseHandler = configStore.getDataFileHandler();
+            AddDOIs updater = new AddDOIs(configStore.getDataFileHandler());
             for (String expocode : exposSet) {
-                gov.noaa.pmel.dashboard.shared.DashboardDataset cruise = null;
                 try {
-                    cruise = cruiseHandler.getDatasetFromInfoFile(expocode);
-                    if ( cruise == null )
-                        throw new NullPointerException("no such dataset");
+                    String msg = updater.updateDOIsForDataset(expocode,
+                            origDOIMap.get(expocode), socatDOIMap.get(expocode));
+                    if ( msg != null )
+                        System.out.println(msg);
                 } catch ( Exception ex ) {
-                    System.err.println(
-                            "Problems reading the cruise data properties for " + expocode + ": " + ex.getMessage());
-                    success = false;
-                    continue;
-                }
-                String doi = socatDOIMap.get(expocode);
-                if ( doi != null ) {
-                    cruise.setEnhancedDOI(doi);
-                    System.out.println("Updating the SOCAT-enhanced DOI for " + expocode + " to " + doi);
-                }
-                doi = origDOIMap.get(expocode);
-                if ( doi != null ) {
-                    cruise.setSourceDOI(doi);
-                    cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
-                    System.out.println("Updating the original-data DOI for " +
-                            expocode + " to " + doi + " and marking as archived");
-                }
-                try {
-                    cruiseHandler.saveDatasetInfoToFile(cruise, null);
-                } catch ( Exception ex ) {
-                    System.err.println(
-                            "Problems saving the cruise data properties for " + expocode + ": " + ex.getMessage());
+                    System.err.println("Problems updating the DOIs for " + expocode + ": " + ex.getMessage());
                     success = false;
                     continue;
                 }
@@ -163,3 +202,4 @@ public class AddDOIs {
     }
 
 }
+
