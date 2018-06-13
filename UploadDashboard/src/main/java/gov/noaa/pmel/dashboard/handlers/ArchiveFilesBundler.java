@@ -436,7 +436,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             Files.copy(dataFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             for (File metaFile : addlDocs) {
                 dest = new File(bundleDir, metaFile.getName());
-                Files.copy(dataFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+                Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
