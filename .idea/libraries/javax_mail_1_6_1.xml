@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="javax.mail-1.6.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/javax.mail-1.6.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -897,9 +897,9 @@ public class SocatCruiseReporter {
 
     /**
      * Tab-separated data column names for the data Strings returned by the single-cruise version of
-     * {@link #printDataStrings}
+     * {@link #dataReportString}.  Made public just for unit testing.
      */
-    private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+    public static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
             "SOCAT_DOI\t" +
             "QC_Flag\t" +
@@ -973,9 +973,9 @@ public class SocatCruiseReporter {
 
     /**
      * Tab-separated data column names for the data Strings returned by the multi-cruise version of
-     * {@link #printDataStrings}
+     * {@link #dataReportString}.  Made public just for unit testing.
      */
-    private static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+    public static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
             "SOCAT_DOI\t" +
             "QC_Flag\t" +

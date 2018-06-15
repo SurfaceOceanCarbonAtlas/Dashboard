@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact name="SocatDashboardApps:jar">
+    <output-path>$PROJECT_DIR$/DashboardApps/target/</output-path>
+    <root id="root">
+      <element id="archive" name="SocatDashboardApps.jar">
+        <element id="module-output" name="DashboardApps" />
+      </element>
+    </root>
+  </artifact>
+</component>

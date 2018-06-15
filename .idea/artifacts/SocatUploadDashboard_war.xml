@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="SocatUploadDashboard:war">
+    <output-path>$PROJECT_DIR$/UploadDashboard/target/</output-path>
+    <root id="archive" name="SocatUploadDashboard.war">
+      <element id="artifact" artifact-name="SocatUploadDashboard:war exploded" />
+    </root>
+  </artifact>
+</component>
