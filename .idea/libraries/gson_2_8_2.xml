@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gson-2.8.2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/gson-2.8.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

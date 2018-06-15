@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="sequence-library-1.0.3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/sequence-library-1.0.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

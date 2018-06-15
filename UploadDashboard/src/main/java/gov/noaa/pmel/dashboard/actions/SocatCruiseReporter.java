@@ -962,41 +962,40 @@ public class SocatCruiseReporter {
 
     /**
      * Tab-separated data column names for the data Strings returned by the single-cruise version of
-     * {@link #dataReportString}
+     * {@link #dataReportString}.  Made public just for unit testing.
      */
-    private static final String SINGLE_CRUISE_DATA_REPORT_HEADER =
-            "Expocode\t" +
-                    "version\t" +
-                    "SOCAT_DOI\t" +
-                    "QC_Flag\t" +
-                    "yr\t" +
-                    "mon\t" +
-                    "day\t" +
-                    "hh\t" +
-                    "mm\t" +
-                    "ss\t" +
-                    "longitude [dec.deg.E]\t" +
-                    "latitude [dec.deg.N]\t" +
-                    "sample_depth [m]\t" +
-                    "sal\t" +
-                    "SST [deg.C]\t" +
-                    "Tequ [deg.C]\t" +
-                    "PPPP [hPa]\t" +
-                    "Pequ [hPa]\t" +
-                    "WOA_SSS\t" +
-                    "NCEP_SLP [hPa]\t" +
-                    "ETOPO2_depth [m]\t" +
-                    "dist_to_land [km]\t" +
-                    "GVCO2 [umol/mol]\t" +
-                    "xCO2water_equ_dry [umol/mol]\t" +
-                    "xCO2water_SST_dry [umol/mol]\t" +
-                    "pCO2water_equ_wet [uatm]\t" +
-                    "pCO2water_SST_wet [uatm]\t" +
-                    "fCO2water_equ_wet [uatm]\t" +
-                    "fCO2water_SST_wet [uatm]\t" +
-                    "fCO2rec [uatm]\t" +
-                    "fCO2rec_src\t" +
-                    "fCO2rec_flag";
+    public static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+            "version\t" +
+            "SOCAT_DOI\t" +
+            "QC_Flag\t" +
+            "yr\t" +
+            "mon\t" +
+            "day\t" +
+            "hh\t" +
+            "mm\t" +
+            "ss\t" +
+            "longitude [dec.deg.E]\t" +
+            "latitude [dec.deg.N]\t" +
+            "sample_depth [m]\t" +
+            "sal\t" +
+            "SST [deg.C]\t" +
+            "Tequ [deg.C]\t" +
+            "PPPP [hPa]\t" +
+            "Pequ [hPa]\t" +
+            "WOA_SSS\t" +
+            "NCEP_SLP [hPa]\t" +
+            "ETOPO2_depth [m]\t" +
+            "dist_to_land [km]\t" +
+            "GVCO2 [umol/mol]\t" +
+            "xCO2water_equ_dry [umol/mol]\t" +
+            "xCO2water_SST_dry [umol/mol]\t" +
+            "pCO2water_equ_wet [uatm]\t" +
+            "pCO2water_SST_wet [uatm]\t" +
+            "fCO2water_equ_wet [uatm]\t" +
+            "fCO2water_SST_wet [uatm]\t" +
+            "fCO2rec [uatm]\t" +
+            "fCO2rec_src\t" +
+            "fCO2rec_flag";
 
     /**
      * Explanation lines for the data columns given by the header string
@@ -1041,35 +1040,34 @@ public class SocatCruiseReporter {
 
     /**
      * Tab-separated data column names for the data Strings returned by the multi-cruise version of
-     * {@link #dataReportString}
+     * {@link #dataReportString}.  Made public just for unit testing.
      */
-    private static final String MULTI_CRUISE_DATA_REPORT_HEADER =
-            "Expocode\t" +
-                    "version\t" +
-                    "SOCAT_DOI\t" +
-                    "QC_Flag\t" +
-                    "yr\t" +
-                    "mon\t" +
-                    "day\t" +
-                    "hh\t" +
-                    "mm\t" +
-                    "ss\t" +
-                    "longitude [dec.deg.E]\t" +
-                    "latitude [dec.deg.N]\t" +
-                    "sample_depth [m]\t" +
-                    "sal\t" +
-                    "SST [deg.C]\t" +
-                    "Tequ [deg.C]\t" +
-                    "PPPP [hPa]\t" +
-                    "Pequ [hPa]\t" +
-                    "WOA_SSS\t" +
-                    "NCEP_SLP [hPa]\t" +
-                    "ETOPO2_depth [m]\t" +
-                    "dist_to_land [km]\t" +
-                    "GVCO2 [umol/mol]\t" +
-                    "fCO2rec [uatm]\t" +
-                    "fCO2rec_src\t" +
-                    "fCO2rec_flag";
+    public static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
+            "version\t" +
+            "SOCAT_DOI\t" +
+            "QC_Flag\t" +
+            "yr\t" +
+            "mon\t" +
+            "day\t" +
+            "hh\t" +
+            "mm\t" +
+            "ss\t" +
+            "longitude [dec.deg.E]\t" +
+            "latitude [dec.deg.N]\t" +
+            "sample_depth [m]\t" +
+            "sal\t" +
+            "SST [deg.C]\t" +
+            "Tequ [deg.C]\t" +
+            "PPPP [hPa]\t" +
+            "Pequ [hPa]\t" +
+            "WOA_SSS\t" +
+            "NCEP_SLP [hPa]\t" +
+            "ETOPO2_depth [m]\t" +
+            "dist_to_land [km]\t" +
+            "GVCO2 [umol/mol]\t" +
+            "fCO2rec [uatm]\t" +
+            "fCO2rec_src\t" +
+            "fCO2rec_flag";
 
     /**
      * @param dataVals

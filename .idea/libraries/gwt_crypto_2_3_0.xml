@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="gwt-crypto-2.3.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/gwt-crypto-2.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/gwt-crypto-2.3.0.jar!/" />
+    </SOURCES>
+  </library>
+</component>
