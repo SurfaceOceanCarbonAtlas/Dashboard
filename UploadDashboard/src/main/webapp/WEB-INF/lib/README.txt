@@ -39,5 +39,5 @@ were obtained from https://xmlgraphics.apache.org/fop/download.html
 The jar file bagit-5.1.1.jar was obtained from https://github.com/LibraryOfCongress/bagit-java/releases
 
 The jar file gwt-servlet.jar is obtained from the GWT SDK package used to build this GWT code.
-The GWT SDK packages can be found at http://www.gwtproject.org 
+The GWT SDK packages can be found at http://www.gwtproject.org
 
