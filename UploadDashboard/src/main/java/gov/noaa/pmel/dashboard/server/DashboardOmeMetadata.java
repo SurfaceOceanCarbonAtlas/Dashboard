@@ -102,7 +102,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates using the given OmeMetadata.  The dataset is obtained from the OmeMetadata.
+     * Creates using the given OmeMetadata.  The dataset ID is obtained from the OmeMetadata.
      *
      * @param omeMeta
      *         the OmeMetadata contents of this metadata

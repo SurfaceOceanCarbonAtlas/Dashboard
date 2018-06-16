@@ -308,7 +308,6 @@ public class DataFileHandler extends VersionedFileHandler {
             throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
 
         CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
-                                          .withIgnoreEmptyLines()
                                           .withDelimiter(spacer);
         CSVParser dataParser = new CSVParser(dataReader, format);
 
@@ -720,7 +719,11 @@ public class DataFileHandler extends VersionedFileHandler {
         try {
             PrintWriter writer = new PrintWriter(dataFile);
             try {
-                // The data column headers
+                // metadata preamble
+                for (String metaline : dataset.getPreamble()) {
+                    writer.println(metaline);
+                }
+                // data column headers
                 String dataline = "";
                 boolean first = true;
                 for (String name : dataset.getUserColNames()) {
@@ -731,7 +734,7 @@ public class DataFileHandler extends VersionedFileHandler {
                     dataline += name;
                 }
                 writer.println(dataline);
-                // The data measurements (rows of data)
+                // data measurements (rows of data)
                 for (ArrayList<String> datarow : dataset.getDataValues()) {
                     dataline = "";
                     first = true;
@@ -871,6 +874,20 @@ public class DataFileHandler extends VersionedFileHandler {
         // move the files, and save under the new dataset ID
         DashboardDatasetData datasetData = getDatasetDataFromFiles(oldId, 0, -1);
         datasetData.setDatasetId(newId);
+
+        // Modify the actual list of preamble strings in this dataset
+        ArrayList<String> preamble = datasetData.getPreamble();
+        for (int k = 0; k < preamble.size(); k++) {
+            String metaline = preamble.get(k);
+            for (Pattern pat : EXPOCODE_PATTERNS) {
+                Matcher mat = pat.matcher(metaline);
+                if ( !mat.matches() )
+                    continue;
+                preamble.set(k, metaline.replace(oldId, newId));
+                break;
+            }
+
+        }
         int k = -1;
         int nameIdx = -1;
         for (DataColumnType type : datasetData.getDataColTypes()) {
@@ -880,10 +897,11 @@ public class DataFileHandler extends VersionedFileHandler {
                 break;
             }
         }
-        if ( nameIdx >= 0 )
+        if ( nameIdx >= 0 ) {
             for (ArrayList<String> dataVals : datasetData.getDataValues()) {
                 dataVals.set(k, newName);
             }
+        }
 
         // Move the old dataset files to the new location and name
         String commitMsg = "Rename from " + oldName + " to " + newName;
@@ -1431,15 +1449,14 @@ public class DataFileHandler extends VersionedFileHandler {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
         for (String val : record) {
-            if ( !val.isEmpty() ) {
-                if ( first ) {
-                    first = false;
-                }
-                else {
-                    builder.append(spacer);
-                }
-                builder.append(val);
+            if ( first ) {
+                first = false;
             }
+            else {
+                builder.append(spacer);
+            }
+            if ( !val.isEmpty() )
+                builder.append(val);
         }
         return builder.toString();
     }

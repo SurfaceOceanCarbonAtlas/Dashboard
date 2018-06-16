@@ -14,6 +14,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class AddDOIsTest {
 
+    /**
+     * Test of {@link AddDOIs#updateDOIsForDataset(String, String, String)}
+     */
     @Test
     public void testAddDois() {
         final String expocode = "09AR20140309";
