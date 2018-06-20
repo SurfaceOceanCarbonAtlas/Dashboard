@@ -9,8 +9,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,15 +28,15 @@ public class DataFileHandlerTest {
     // Only uses the Dashboard configuration files; tests data given below
 
     /**
-     * Test method for {@link DataFileHandler#assignDatasetDataFromInput(DashboardDatasetData,
-     * BufferedReader, String, String, int, int)}
+     * Test method for
+     * {@link DataFileHandler#assignDatasetDataFromInput(DashboardDatasetData, Reader, String, String, int, int)}
      */
     @Test
     public void testAssignDatasetDataFromInput() throws IOException {
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
-        BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA));
+        StringReader cruiseReader = new StringReader(CSV_DATA);
         DashboardDatasetData cruiseData = dataHandler.assignDatasetDataFromInput(null, cruiseReader,
                 DashboardUtils.COMMA_FORMAT_TAG, DATASET_OWNER, 0, -1);
 
@@ -94,7 +94,7 @@ public class DataFileHandlerTest {
     private static final ArrayList<String> META_PREAMBLE = new ArrayList<String>(Arrays.asList(
             "Expocode: 00KS20120419",
             "Ship: Atlantis",
-            "PI: Wanninkhof, R.",
+            "\"PI: Wanninkhof, R.\"",
             ""));
 
     private static final ArrayList<String> HEADERS = new ArrayList<String>(Arrays.asList(

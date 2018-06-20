@@ -24,7 +24,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.tmatesoft.svn.core.SVNException;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -32,6 +31,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
@@ -241,7 +241,7 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Assigns or creates a DashboardDatasetData object with data read from the given BufferedReader.
+     * Assigns or creates a DashboardDatasetData object with data read from the given Reader.
      * <p>
      * The data read should have a preamble of metadata containing the ID (expocode)
      * for the dataset on a line such as one of the following (case and space insensitive):
@@ -292,7 +292,7 @@ public class DataFileHandler extends VersionedFileHandler {
      *         if no (or too few) data columns were found,
      *         if no data samples (rows) were found.
      */
-    public DashboardDatasetData assignDatasetDataFromInput(DashboardDatasetData datasetData, BufferedReader dataReader,
+    public DashboardDatasetData assignDatasetDataFromInput(DashboardDatasetData datasetData, Reader dataReader,
             String dataFormat, String owner, int firstRowIdx, int numDataRows) throws IOException {
         char spacer;
         if ( DashboardUtils.TAB_FORMAT_TAG.equals(dataFormat) ) {
@@ -358,7 +358,8 @@ public class DataFileHandler extends VersionedFileHandler {
                 // Still reading metadata?
                 if ( columnNames == null ) {
                     // Put this line of metadata back together using spacer
-                    String metaline = rebuildDataline(record, spacer);
+                    // but since metadata, no need for blank columns with spacers (if any)
+                    String metaline = rebuildDataline(record, spacer, true);
 
                     // Examine this metadata line for the expocode
                     if ( (expocode == null) && !metaline.isEmpty() ) {
@@ -380,7 +381,7 @@ public class DataFileHandler extends VersionedFileHandler {
                 if ( record.size() != numDataColumns )
                     throw new IOException("Inconsistent number of data columns (" + record.size() +
                             " instead of " + numDataColumns + ") for measurement " + dataParser.getRecordNumber() +
-                            ":\n    " + rebuildDataline(record, spacer));
+                            ":\n    " + rebuildDataline(record, spacer, false));
 
                 if ( checkForUnits ) {
                     // Check if the line immediately following the data column names are units
@@ -552,7 +553,7 @@ public class DataFileHandler extends VersionedFileHandler {
         // Read the cruise data file
         File dataFile = datasetDataFile(datasetId);
         try {
-            BufferedReader cruiseReader = new BufferedReader(new FileReader(dataFile));
+            FileReader cruiseReader = new FileReader(dataFile);
             try {
                 // Assign values from the cruise data file
                 assignDatasetDataFromInput(cruiseData, cruiseReader, DashboardUtils.TAB_FORMAT_TAG,
@@ -1442,21 +1443,32 @@ public class DataFileHandler extends VersionedFileHandler {
      *         record to use
      * @param spacer
      *         spacer to use
+     * @param trimEmpty
+     *         remove empty entries (and spacers for those entries)
      *
      * @return recreated string for this record
      */
-    private String rebuildDataline(CSVRecord record, char spacer) {
+    private String rebuildDataline(CSVRecord record, char spacer, boolean trimEmpty) {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
         for (String val : record) {
+            if ( trimEmpty && val.isEmpty() )
+                continue;
             if ( first ) {
                 first = false;
             }
             else {
                 builder.append(spacer);
             }
-            if ( !val.isEmpty() )
-                builder.append(val);
+            if ( !val.isEmpty() ) {
+                if ( val.contains(Character.toString(spacer)) ) {
+                    builder.append('"');
+                    builder.append(val);
+                    builder.append('"');
+                }
+                else
+                    builder.append(val);
+            }
         }
         return builder.toString();
     }

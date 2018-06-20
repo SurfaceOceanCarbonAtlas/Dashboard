@@ -236,7 +236,7 @@ public class DataUploadService extends HttpServlet {
             DashboardDatasetData dsetData;
             String filename = item.getName();
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(item.getInputStream(), encoding));
+                InputStreamReader reader = new InputStreamReader(item.getInputStream(), encoding);
                 try {
                     dsetData = datasetHandler.assignDatasetDataFromInput(null, reader, dataFormat, username, 0, -1);
                     dsetData.setUploadFilename(filename);
