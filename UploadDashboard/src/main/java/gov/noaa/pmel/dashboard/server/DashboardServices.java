@@ -101,7 +101,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
         }
-        return configStore.validateUser(username);
+        if ( !configStore.validateUser(username) ) {
+            // If validation failed, logout to clear the stored username and require a new login
+            logoutUser();
+            return false;
+        }
+        return true;
     }
 
     @Override
