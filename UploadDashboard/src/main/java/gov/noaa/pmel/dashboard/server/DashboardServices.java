@@ -40,7 +40,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -8189933983319827049L;
+    private static final long serialVersionUID = -3459234592834513845L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -120,8 +120,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList deleteDatasets(String pageUsername, TreeSet<String> idsSet,
-            Boolean deleteMetadata) throws IllegalArgumentException {
+    public DashboardDatasetList deleteDatasets(String pageUsername, TreeSet<String> idsSet, Boolean deleteMetadata)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -142,8 +142,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList addDatasetsToList(String pageUsername,
-            String wildDatasetId) throws IllegalArgumentException {
+    public DashboardDatasetList addDatasetsToList(String pageUsername, String wildDatasetId)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -156,8 +156,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList removeDatasetsFromList(String pageUsername,
-            TreeSet<String> idsSet) throws IllegalArgumentException {
+    public DashboardDatasetList removeDatasetsFromList(String pageUsername, TreeSet<String> idsSet)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -170,8 +170,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList changeDatasetOwner(String pageUsername,
-            TreeSet<String> idsSet, String newOwner)
+    public DashboardDatasetList changeDatasetOwner(String pageUsername, TreeSet<String> idsSet, String newOwner)
             throws IllegalArgumentException {
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -204,8 +203,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList getUpdatedDatasets(String pageUsername,
-            TreeSet<String> idsSet) throws IllegalArgumentException {
+    public DashboardDatasetList getUpdatedDatasets(String pageUsername, TreeSet<String> idsSet)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -223,9 +222,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetList deleteAddlDoc(String pageUsername, String deleteFilename,
-            String datasetId, TreeSet<String> allIds)
-            throws IllegalArgumentException {
+    public DashboardDatasetList deleteAddlDoc(String pageUsername, String deleteFilename, String datasetId,
+            TreeSet<String> allIds) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -313,8 +311,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public TypesDatasetDataPair getDataColumnSpecs(String pageUsername,
-            String datasetId) throws IllegalArgumentException {
+    public TypesDatasetDataPair getDataColumnSpecs(String pageUsername, String datasetId)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -349,9 +347,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public ArrayList<ArrayList<String>> getDataWithRowNum(String pageUsername,
-            String datasetId, int firstRow, int numRows)
-            throws IllegalArgumentException {
+    public ArrayList<ArrayList<String>> getDataWithRowNum(String pageUsername, String datasetId,
+            int firstRow, int numRows) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -417,8 +414,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public DashboardDatasetData updateDataColumnSpecs(String pageUsername,
-            DashboardDataset newSpecs) throws IllegalArgumentException {
+    public DashboardDatasetData updateDataColumnSpecs(String pageUsername, DashboardDataset newSpecs)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -469,8 +466,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public void updateDataColumns(String pageUsername,
-            ArrayList<String> idsList) throws IllegalArgumentException {
+    public void updateDataColumns(String pageUsername, ArrayList<String> idsList) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -511,8 +507,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public ADCMessageList getDataMessages(String pageUsername,
-            String datasetId) throws IllegalArgumentException {
+    public ADCMessageList getDataMessages(String pageUsername, String datasetId) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -531,8 +526,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public String getOmeXmlPath(String pageUsername, String datasetId,
-            String previousId) throws IllegalArgumentException {
+    public String getOmeXmlPath(String pageUsername, String datasetId, String previousId)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
@@ -559,8 +554,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public boolean buildPreviewImages(String pageUsername, String datasetId,
-            String timetag, boolean firstCall) throws IllegalArgumentException {
+    public boolean buildPreviewImages(String pageUsername, String datasetId, String timetag, boolean firstCall)
+            throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
