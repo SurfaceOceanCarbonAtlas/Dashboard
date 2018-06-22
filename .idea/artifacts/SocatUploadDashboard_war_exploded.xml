@@ -9,7 +9,6 @@
           <element id="module-output" name="OmeMetadata" />
         </element>
         <element id="directory" name="lib">
-          <element id="file-copy" path="$USER_HOME$/gwt-2.8.1/gwt-servlet.jar" />
           <element id="file-copy" path="$USER_HOME$/gwt-2.8.2/gwt-servlet.jar" />
         </element>
       </element>
