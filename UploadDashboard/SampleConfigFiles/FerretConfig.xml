@@ -28,8 +28,8 @@
         and PYTHONPATH use PyFerret's .../lib/pythonX.X/site-packages subdirectory.
     -->
     <invoker
-        base_dir="/home/users/tomcat"
-        executable="/home/users/tomcat/Ferret/bin/ferret"
+        base_dir="/home/users/socat"
+        executable="/home/users/socat/Ferret/bin/ferret"
         time_limit="60000"
         temp_dir="/var/tmp/socat/"
         compute_driver="calcSOCAT"
@@ -38,6 +38,7 @@
         <arg>-gif</arg>
         <arg>-script</arg>
     </invoker>
+
     <environment>
         <variable>
             <name>FER_DIR</name>
@@ -79,21 +80,27 @@
         <variable>
             <!-- for PyFerret -->
             <name>PYFER_EXTERNAL_FUNCTIONS</name>
-            <value>Ferret/ext_func/pylibs</value>
+            <value>PyFerret/ext_func/pylibs</value>
         </variable>
         <variable>
             <!-- for PyFerret -->
             <name>LD_LIBRARY_PATH</name>
-             <value>/home/users/socat/Ferret/lib/python2.7/site-packages/pyferret</value>
+             <value>/home/users/socat/PyFerret/lib/python2.7/site-packages/pyferret</value>
+        </variable>
+        <variable>
+            <!-- for PyFerret -->
+            <name>DYLD_FALLBACK_LIBRARY_PATH</name>
+             <value>/home/users/socat/PyFerret/dylibs</value>
         </variable>
         <variable>
             <!-- for PyFerret -->
             <name>PYTHONPATH</name>
-             <value>/home/users/socat/Ferret/lib/python2.7/site-packages</value>
+             <value>/home/users/socat/PyFerret/lib/python2.7/site-packages</value>
         </variable>
-
     </environment>
+
     <!-- The remainder of this should not need any modifications -->
+
     <messages>
        <message type="startsWith" level="error">
           <key>PPL+ error</key>
