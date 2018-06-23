@@ -145,7 +145,7 @@ public class DashboardConfigStore {
      * Creates a data store initialized from the contents of the standard configuration file.  See the contents of
      * {@link #CONFIG_FILE_INFO_MSG} for information on the configuration file format.
      * <p>
-     * Do not create an instance of this class; instead use {@link #get()} to retrieve the singleton instance
+     * Do not create an instance of this class; instead use {@link #get(boolean)} to retrieve the singleton instance
      *
      * @param startMonitors
      *         start the file change monitors?
