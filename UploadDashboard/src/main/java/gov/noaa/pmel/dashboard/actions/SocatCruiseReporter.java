@@ -852,7 +852,7 @@ public class SocatCruiseReporter {
 
     /**
      * Explanation lines for the data columns given by the header string {@link #SINGLE_CRUISE_DATA_REPORT_HEADER}
-     * and data strings returned by the single-cruise version of {@link #printDataStrings}
+     * and data printed by the single-cruise version of {@link #printDataStrings}
      */
     private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
@@ -896,8 +896,8 @@ public class SocatCruiseReporter {
     };
 
     /**
-     * Tab-separated data column names for the data Strings returned by the single-cruise version of
-     * {@link #dataReportString}.  Made public just for unit testing.
+     * Tab-separated data column names for the data printed by the single-cruise version of
+     * {@link #printDataStrings}.  Made public just for unit testing.
      */
     public static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
@@ -933,8 +933,8 @@ public class SocatCruiseReporter {
             "fCO2rec_flag";
 
     /**
-     * Explanation lines for the data columns given by the header string {@link #MULTI_CRUISE_DATA_REPORT_HEADER} and
-     * data strings returned by the multi-cruise version of {@link #printDataStrings}
+     * Explanation lines for the data columns given by the header string {@link #MULTI_CRUISE_DATA_REPORT_HEADER}
+     * and data printed by the multi-cruise version of {@link #printDataStrings}
      */
     private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
@@ -972,8 +972,8 @@ public class SocatCruiseReporter {
     };
 
     /**
-     * Tab-separated data column names for the data Strings returned by the multi-cruise version of
-     * {@link #dataReportString}.  Made public just for unit testing.
+     * Tab-separated data column names for the data printed by the multi-cruise version of
+     * {@link #printDataStrings)}.  Made public just for unit testing.
      */
     public static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
