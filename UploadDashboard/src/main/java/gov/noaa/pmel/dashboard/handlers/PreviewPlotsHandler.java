@@ -11,7 +11,6 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -27,6 +26,7 @@ public class PreviewPlotsHandler {
     KnownDataTypes knownMetadataTypes;
     KnownDataTypes knownDataFileTypes;
     FerretConfig ferretConfig;
+    Logger itsLogger;
 
     /**
      * Create with the given directories for the preview DSG files and plots.
@@ -51,6 +51,7 @@ public class PreviewPlotsHandler {
         knownMetadataTypes = configStore.getKnownMetadataTypes();
         knownDataFileTypes = configStore.getKnownDataFileTypes();
         ferretConfig = configStore.getFerretConfig();
+        itsLogger = configStore.getLogger();
     }
 
     /**
@@ -130,13 +131,12 @@ public class PreviewPlotsHandler {
      */
     public void createPreviewPlots(String datasetId, String timetag) throws IllegalArgumentException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
-        Logger log = LogManager.getLogger("PreviewPlotsHandler");
-        log.debug("reading data for " + stdId);
+        itsLogger.debug("reading data for " + stdId);
 
         // Get the complete original cruise data
         DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(stdId, 0, -1);
 
-        log.debug("standardizing data for " + stdId);
+        itsLogger.debug("standardizing data for " + stdId);
 
         // Just create a minimal DsgMetadata to create the preview DSG file
         DsgMetadata dsgMData = new DsgMetadata(knownMetadataTypes);
@@ -154,7 +154,7 @@ public class PreviewPlotsHandler {
         DsgNcFile dsgFile = new DsgNcFile(getDatasetPreviewDsgDir(stdId),
                 stdId + "_" + timetag + ".nc");
 
-        log.debug("generating preview DSG file " + dsgFile.getPath());
+        itsLogger.debug("generating preview DSG file " + dsgFile.getPath());
 
         // Create the preview NetCDF DSG file
         try {
@@ -165,7 +165,7 @@ public class PreviewPlotsHandler {
                     datasetId + ": " + ex.getMessage(), ex);
         }
 
-        log.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
+        itsLogger.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
 
         // Call Ferret to add the computed variables to the preview DSG file
         SocatTool tool = new SocatTool(ferretConfig);
@@ -177,7 +177,7 @@ public class PreviewPlotsHandler {
             throw new IllegalArgumentException("Failure adding computed variables to the preview DSG file for " +
                     datasetId + ": " + tool.getErrorMessage());
 
-        log.debug("generating preview plots for " + dsgFile.getPath());
+        itsLogger.debug("generating preview plots for " + dsgFile.getPath());
 
         // Get the location for the preview plots, creating the directory if it does not exist
         String cruisePlotsDirname = getDatasetPreviewPlotsDir(stdId).getPath();
@@ -192,7 +192,7 @@ public class PreviewPlotsHandler {
             throw new IllegalArgumentException("Failure generating data preview plots for " +
                     datasetId + ": " + tool.getErrorMessage());
 
-        log.debug("preview plots generated in " + cruisePlotsDirname);
+        itsLogger.debug("preview plots generated in " + cruisePlotsDirname);
     }
 
 }

@@ -1,8 +1,5 @@
 package gov.noaa.pmel.dashboard.ferret;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +8,6 @@ import java.io.StringReader;
 
 
 public class Task {
-
-    private static Logger log = LogManager.getLogger(Task.class.getName());
 
     /**
      * An array of strings that indicate there is an error in command output
@@ -237,7 +232,6 @@ public class Task {
 
                     // check if the request was canceled
                     if ( cancel != null && cancel.exists() ) {
-                        log.debug("Backend request canceled: " + cmdString);
                         process.destroy();
                         cancel.delete();
                         throw new Exception("Process canceled.");

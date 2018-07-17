@@ -27,7 +27,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCFlag;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -77,7 +76,7 @@ public class DatasetSubmitter {
         fileMetadataTypes = configStore.getKnownMetadataTypes();
         fileDataTypes = configStore.getKnownDataFileTypes();
         version = configStore.getUploadVersion();
-        logger = LogManager.getLogger(getClass());
+        logger = configStore.getLogger();
     }
 
     /**

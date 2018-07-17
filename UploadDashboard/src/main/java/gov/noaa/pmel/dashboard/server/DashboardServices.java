@@ -20,7 +20,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,34 +39,49 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -3459234592834513845L;
+    private static final long serialVersionUID = -2345235989345923400L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
+    private Logger itsLogger = null;
 
     @Override
     public void logoutUser() {
         HttpServletRequest request = getThreadLocalRequest();
+
+        configStore = null;
+        itsLogger = null;
+        try {
+            configStore = DashboardConfigStore.get(true);
+            itsLogger = configStore.getLogger();
+        } catch ( Exception ex ) {
+            // don't worry about it here - no logging
+        }
+
         username = null;
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
         } catch ( Exception ex ) {
             // Probably null pointer exception - leave username null
         }
+
         HttpSession session = request.getSession(false);
         try {
             session.invalidate();
         } catch ( Exception ex ) {
-            // Log but otherwise ignore this error
-            LogManager.getLogger("DashboardServices").error("session.invalidate failed: " + ex.getMessage());
+            if ( itsLogger != null )
+                itsLogger.error("session.invalidate failed: " + ex.getMessage());
         }
+
         try {
             request.logout();
         } catch ( Exception ex ) {
-            LogManager.getLogger("DashboardServices").error("request.logout failed: " + ex.getMessage());
+            if ( itsLogger != null )
+                itsLogger.error("request.logout failed: " + ex.getMessage());
         }
 
-        LogManager.getLogger("DashboardServices").info("logged out " + username);
+        if ( itsLogger != null )
+            itsLogger.info("logged out " + username);
     }
 
     /**
@@ -96,11 +110,14 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             return false;
 
         configStore = null;
+        itsLogger = null;
         try {
             configStore = DashboardConfigStore.get(true);
+            itsLogger = configStore.getLogger();
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
         }
+
         if ( !configStore.validateUser(username) ) {
             // If validation failed, logout to clear the stored username and require a new login
             logoutUser();
@@ -115,7 +132,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(null) )
             throw new IllegalArgumentException("Invalid user request");
         DashboardDatasetList datasetList = configStore.getUserFileHandler().getDatasetListing(username);
-        LogManager.getLogger("DashboardServices").info("dataset list returned for " + username);
+        itsLogger.info("dataset list returned for " + username);
         return datasetList;
     }
 
@@ -131,13 +148,13 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         for (String datasetId : idsSet) {
             dataHandler.deleteDatasetFiles(datasetId, username, deleteMetadata);
             // IllegalArgumentException for other problems escape as-is
-            LogManager.getLogger("DashboardServices").info("dataset " + datasetId + " deleted by " + username);
+            itsLogger.info("dataset " + datasetId + " deleted by " + username);
         }
 
         // Return the current list of datasets, which should
         // detect the missing datasets and update itself
         DashboardDatasetList datasetList = configStore.getUserFileHandler().getDatasetListing(username);
-        LogManager.getLogger("DashboardServices").info("dataset list returned for " + username);
+        itsLogger.info("dataset list returned for " + username);
         return datasetList;
     }
 
@@ -151,7 +168,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Add the datasets to the user's list and return the updated list
         DashboardDatasetList cruiseList = configStore.getUserFileHandler()
                                                      .addDatasetsToListing(wildDatasetId, username);
-        LogManager.getLogger("DashboardServices").info("added datasets " + wildDatasetId + " for " + username);
+        itsLogger.info("added datasets " + wildDatasetId + " for " + username);
         return cruiseList;
     }
 
@@ -165,7 +182,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Remove the datasets from the user's list and return the updated list
         DashboardDatasetList datasetList = configStore.getUserFileHandler()
                                                       .removeDatasetsFromListing(idsSet, username);
-        LogManager.getLogger("DashboardServices").info("removed datasets " + idsSet.toString() + " for " + username);
+        itsLogger.info("removed datasets " + idsSet.toString() + " for " + username);
         return datasetList;
     }
 
@@ -192,7 +209,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         }
         // Change the owner of the datasets
         DatasetModifier modifier = new DatasetModifier(configStore);
-        Logger itsLogger = LogManager.getLogger("DashboardServices");
         for (String datasetId : idsSet) {
             modifier.changeDatasetOwner(datasetId, newUsername);
             itsLogger.info("changed owner of " + datasetId + " to " + newUsername);
@@ -217,7 +233,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         for (String datasetId : idsSet) {
             datasetList.put(datasetId, dataHandler.getDatasetFromInfoFile(datasetId));
         }
-        LogManager.getLogger("DashboardServices").info("returned updated dataset information for " + username);
+        itsLogger.info("returned updated dataset information for " + username);
         return datasetList;
     }
 
@@ -261,8 +277,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Delete this OME metadata or additional documents file on the server
         mdataHandler.deleteMetadata(username, datasetId, deleteFilename);
 
-        LogManager.getLogger("DashboardServices").info("deleted metadata " + deleteFilename +
-                " from " + datasetId + " for " + username);
+        itsLogger.info("deleted metadata " + deleteFilename + " from " + datasetId + " for " + username);
 
         // Save the updated cruise
         dataHandler.saveDatasetInfoToFile(dataset, "Removed metadata document " +
@@ -290,12 +305,11 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
                 }
                 dataHandler.saveDatasetInfoToFile(dataset, comment);
-                LogManager.getLogger("DashboardServices").info("updated QC status for " + datasetId);
+                itsLogger.info("updated QC status for " + datasetId);
             } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
-                LogManager.getLogger("DashboardServices").error(
-                        "failed to update QC status after deleting metadata " + deleteFilename +
-                                " from " + datasetId + " for " + username + ": " + ex.getMessage());
+                itsLogger.error("failed to update QC status after deleting metadata " + deleteFilename +
+                        " from " + datasetId + " for " + username + ": " + ex.getMessage());
             }
         }
 
@@ -306,7 +320,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         for (String id : allIds) {
             datasetList.put(id, dataHandler.getDatasetFromInfoFile(id));
         }
-        LogManager.getLogger("DashboardServices").info("returned updated dataset information for " + username);
+        itsLogger.info("returned updated dataset information for " + username);
         return datasetList;
     }
 
@@ -340,8 +354,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         typesAndDataset.setAllKnownTypes(knownTypesList);
         typesAndDataset.setDatasetData(dataset);
 
-        LogManager.getLogger("DashboardServices").info("data columns specs returned for " +
-                datasetId + " for " + username);
+        itsLogger.info("data columns specs returned for " + datasetId + " for " + username);
         // Return the cruise with the partial data
         return typesAndDataset;
     }
@@ -370,12 +383,11 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             k++;
         }
         int myLastRow = myFirstRow + dataWithRowNums.size() - 1;
-        Logger myLogger = LogManager.getLogger("DashboardServices");
-        myLogger.info(datasetId + " dataset data [" + Integer.toString(myFirstRow) +
+        itsLogger.info(datasetId + " dataset data [" + Integer.toString(myFirstRow) +
                 " - " + Integer.toString(myLastRow) + "] returned for " + username);
-        if ( myLogger.isDebugEnabled() ) {
+        if ( itsLogger.isDebugEnabled() ) {
             for (k = 0; k < dataWithRowNums.size(); k++) {
-                myLogger.debug("  data[" + Integer.toString(k) + "]=" + dataWithRowNums.get(k).toString());
+                itsLogger.debug("  data[" + Integer.toString(k) + "]=" + dataWithRowNums.get(k).toString());
             }
         }
         return dataWithRowNums;
@@ -409,8 +421,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !username.equals(dataset.getOwner()) )
             configStore.getUserFileHandler().updateUserDataColumnTypes(dataset, dataset.getOwner());
 
-        LogManager.getLogger("DashboardServices").info("data columns specs saved for " +
-                dataset.getDatasetId() + " by " + username);
+        itsLogger.info("data columns specs saved for " + dataset.getDatasetId() + " by " + username);
     }
 
     @Override
@@ -458,8 +469,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                    .clear();
         }
 
-        LogManager.getLogger("DashboardServices").info("data columns specs updated for " +
-                dataset.getDatasetId() + " by " + username);
+        itsLogger.info("data columns specs updated for " + dataset.getDatasetId() + " by " + username);
         // Return the updated truncated cruise data for redisplay
         // in the DataColumnSpecsPage
         return dataset;
@@ -474,7 +484,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         DataFileHandler dataHandler = configStore.getDataFileHandler();
         UserFileHandler userHandler = configStore.getUserFileHandler();
         DatasetChecker datasetChecker = configStore.getDashboardDatasetChecker();
-        Logger dataSpecsLogger = LogManager.getLogger("DashboardServices");
 
         for (String datasetId : idsList) {
             // Retrieve all the current data
@@ -497,10 +506,10 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 // Save and commit the updated dataset information
                 dataHandler.saveDatasetInfoToFile(dataset, "Automated data check status and flags for " +
                         datasetId + " updated by " + username + " from post-processing a multiple-dataset upload");
-                dataSpecsLogger.info("Updated data column specs for " + datasetId + " for " + username);
+                itsLogger.info("Updated data column specs for " + datasetId + " for " + username);
             } catch ( Exception ex ) {
                 // ignore problems (such as unidentified columns) - cruise will not have been updated
-                dataSpecsLogger.error("Unable to update data column specs for " + datasetId + ": " + ex.getMessage());
+                itsLogger.error("Unable to update data column specs for " + datasetId + ": " + ex.getMessage());
                 continue;
             }
         }
@@ -520,8 +529,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             throw new IllegalArgumentException("The automated data checker has never been run on dataset " + datasetId);
         }
         scMsgList.setUsername(username);
-        LogManager.getLogger("DashboardServices")
-                  .info("returned automated data checker messages for " + datasetId + " for " + username);
+        itsLogger.info("returned automated data checker messages for " + datasetId + " for " + username);
         return scMsgList;
     }
 
@@ -579,8 +587,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // Submit the datasets for QC and possibly send to be archived
         configStore.getDashboardDatasetSubmitter().submitDatasets(idsSet,
                 archiveStatus, timestamp, repeatSend, username);
-        LogManager.getLogger("DashboardServices").info("datasets " + idsSet.toString() +
-                " submitted by " + username);
+        itsLogger.info("datasets " + idsSet.toString() + " submitted by " + username);
     }
 
     @Override
@@ -598,8 +605,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             df.saveDatasetInfoToFile(ds, message);
             // TODO: Need to add QCFlag to database and set in DSG file
         }
-        LogManager.getLogger("DashboardServices").info("datasets " + idsSet.toString() +
-                " suspended by " + username);
+        itsLogger.info("datasets " + idsSet.toString() + " suspended by " + username);
     }
 
 }

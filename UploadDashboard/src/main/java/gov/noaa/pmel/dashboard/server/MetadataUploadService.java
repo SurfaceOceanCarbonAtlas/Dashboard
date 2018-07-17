@@ -11,7 +11,6 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.apache.logging.log4j.LogManager;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
@@ -35,7 +34,7 @@ import java.util.TreeSet;
  */
 public class MetadataUploadService extends HttpServlet {
 
-    private static final long serialVersionUID = -1458504704372812166L;
+    private static final long serialVersionUID = 1435923489023890617L;
 
     private ServletFileUpload metadataUpload;
 
@@ -239,10 +238,8 @@ public class MetadataUploadService extends HttpServlet {
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.
-                        LogManager.getLogger("DashboardServices").error(
-                                "failed to update QC status after adding metadata " + uploadFilename +
-                                        " to " + id + " for " + username + ": " + ex.getMessage());
-                        ;
+                        configStore.getLogger().error("failed to update QC status after adding metadata " +
+                                uploadFilename + " to " + id + " for " + username + ": " + ex.getMessage());
                     }
                 }
 

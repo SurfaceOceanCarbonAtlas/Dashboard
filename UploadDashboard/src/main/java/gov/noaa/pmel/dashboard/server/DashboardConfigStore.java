@@ -863,6 +863,13 @@ public class DashboardConfigStore {
     }
 
     /**
+     * @return the logger for this dashboard application
+     */
+    public Logger getLogger() {
+        return itsLogger;
+    }
+
+    /**
      * @return the maximum good and questionable calculated ship speed in knots.
      *         The values returned are the the maximum good and questionable values,
      *         if given, by the CALC_SPEED data type.  If not given, or if the
