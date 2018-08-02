@@ -1,8 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="SocatUploadDashboard:war exploded">
-    <output-path>$PROJECT_DIR$/UploadDashboard/target/SocatUploadDashboard</output-path>
+  <artifact type="exploded-war" name="SocatUploadDashboard:Web exploded">
+    <output-path>$PROJECT_DIR$/target/SocatUploadDashboard</output-path>
     <root id="root">
-      <element id="javaee-facet-resources" facet="UploadDashboard/web/Web" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
           <element id="module-output" name="UploadDashboard" />
@@ -13,6 +12,7 @@
         </element>
       </element>
       <element id="gwt-compiler-output" facet="UploadDashboard/gwt/GWT" />
+      <element id="javaee-facet-resources" facet="UploadDashboard/web/Web" />
     </root>
   </artifact>
 </component>

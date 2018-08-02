@@ -64,7 +64,7 @@ public class SocatCruiseReporterTest {
                     assertEquals(expectedNumColumns, pieces.length);
                     // First 12 must always have values
                     for (int k = 0; k < 12; k++) {
-                        assertFalse("Nan".equals(pieces[k]));
+                        assertFalse("NaN".equals(pieces[k]));
                     }
                     // Rest may or may not depending on if air sample or water sample
                     for (int k = 0; k < expectedNumColumns; k++) {
