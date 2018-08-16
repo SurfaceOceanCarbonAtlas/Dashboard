@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -307,7 +308,7 @@ public class SocatCruiseReporter {
 
         // Get the rest of the metadata info from the OME XML
         DashboardMetadata metadata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
-        DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
+        DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metadataHandler);
 
         // Get the list of additional document filenames associated with this cruise.
         // Use what the QC-ers see - the directory listing.
@@ -433,7 +434,7 @@ public class SocatCruiseReporter {
         ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
         for (String upperExpo : upperExpoList) {
             DashboardMetadata metadata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
-            omeMetaList.add(new DashboardOmeMetadata(metadata, metadataHandler));
+            omeMetaList.add(new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metadataHandler));
         }
 
         // Get the list of additional document filenames associated with this cruise.

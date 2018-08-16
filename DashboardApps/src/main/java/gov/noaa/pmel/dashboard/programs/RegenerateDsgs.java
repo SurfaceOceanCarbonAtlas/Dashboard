@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -87,7 +88,7 @@ public class RegenerateDsgs {
 
             // Get the metadata in the OME XML file
             DashboardMetadata omeMetadoc = metaHandler.getMetadataInfo(stdId, DashboardUtils.OME_FILENAME);
-            DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeMetadoc, metaHandler);
+            DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, omeMetadoc, metaHandler);
             updatedMeta = omeMData.createDsgMetadata(knownMetadataTypes);
             // Copy over metadata not contained in the XML file
             updatedMeta.setEnhancedDOI(fullDataMeta.getEnhancedDOI());

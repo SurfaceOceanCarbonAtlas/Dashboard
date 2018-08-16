@@ -346,7 +346,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the beginning time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+     * @return the beginning (earliest) time for the data, in units of "seconds since 1970-01-01T00:00:00";
      *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getBeginTime() {
@@ -358,7 +358,7 @@ public class DsgMetadata {
 
     /**
      * @param beginTime
-     *         the beginning time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+     *         the beginning (earliest) time for the data to set, in units of "seconds since 1970-01-01T00:00:00";
      *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setBeginTime(Double beginTime) {
@@ -371,7 +371,7 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the ending time for the cruise, in units of "seconds since 1970-01-01T00:00:00";
+     * @return the ending (latest) time for the data, in units of "seconds since 1970-01-01T00:00:00";
      *         never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
      */
     public Double getEndTime() {
@@ -383,7 +383,7 @@ public class DsgMetadata {
 
     /**
      * @param endTime
-     *         the ending time for the cruise to set, in units of "seconds since 1970-01-01T00:00:00";
+     *         the ending (latest) time for the data to set, in units of "seconds since 1970-01-01T00:00:00";
      *         if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
      */
     public void setEndTime(Double endTime) {

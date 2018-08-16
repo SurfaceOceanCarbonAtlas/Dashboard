@@ -4,14 +4,13 @@ import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.jdom2.Document;
-import org.jdom2.Element;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -122,7 +121,7 @@ public class DatasetModifierTest {
         DashboardMetadata metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardUtils.OME_FILENAME);
         assertNotNull(metadata);
         try {
-            new DashboardOmeMetadata(metadata, metaFileHandler);
+            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
         } catch ( Exception ex ) {
             fail("Reading the original OME.xml metadata failed");
         }
@@ -140,7 +139,7 @@ public class DatasetModifierTest {
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {
-            new DashboardOmeMetadata(metadata, metaFileHandler);
+            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
         } catch ( Exception ex ) {
             fail("Reading the new OME.xml metadata after rename failed");
         }
@@ -158,7 +157,7 @@ public class DatasetModifierTest {
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {
-            new DashboardOmeMetadata(metadata, metaFileHandler);
+            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
         } catch ( Exception ex ) {
             fail("Reading the original OME.xml metadata after second rename failed");
         }

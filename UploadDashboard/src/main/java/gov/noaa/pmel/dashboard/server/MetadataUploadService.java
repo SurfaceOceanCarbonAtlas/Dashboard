@@ -190,7 +190,7 @@ public class MetadataUploadService extends HttpServlet {
                     // Make sure the contents are valid OME XML
                     DashboardOmeMetadata omedata;
                     try {
-                        omedata = new DashboardOmeMetadata(metadata, metadataHandler);
+                        omedata = new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metadataHandler);
                     } catch ( IllegalArgumentException ex ) {
                         // Problems with the file - delete it
                         metadataHandler.deleteMetadata(username, id, metadata.getFilename());

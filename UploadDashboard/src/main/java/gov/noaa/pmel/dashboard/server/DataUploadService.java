@@ -13,7 +13,6 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -431,7 +430,8 @@ public class DataUploadService extends HttpServlet {
 
             // Create the OME XML stub file for this dataset
             try {
-                OmeMetadata omeMData = new OmeMetadata(datasetId);
+                CdiacOmeMetadata omeMData = new CdiacOmeMetadata();
+                omeMData.setDatasetId(datasetId);
                 DashboardOmeMetadata mdata =
                         new DashboardOmeMetadata(omeMData, timestamp, username, dsetData.getVersion());
                 String msg = "New OME metadata created from data file for " + datasetId + " uploaded by " + username;

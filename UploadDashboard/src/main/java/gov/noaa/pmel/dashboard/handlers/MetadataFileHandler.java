@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -634,10 +635,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
             // If this is the OME metadata file, read the contents
             if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
-                omeMData = new DashboardOmeMetadata(metaDoc, this);
+                omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, this);
             }
             else if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
-                piOmeMData = new DashboardOmeMetadata(metaDoc, this);
+                piOmeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, this);
             }
 
             File oldMetaFile = getMetadataFile(oldId, uploadFilename);
@@ -737,7 +738,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Save the OME XML document created by {@link DashboardOmeMetadata#createOmeXmlDoc()} as the document file for this
+     * Save the OME XML document created by {@link DashboardOmeMetadata#createDocument()} as the document file for this
      * metadata.  The parent directory for this file is expected to exist and this method will overwrite any existing
      * OME metadata file.
      *
@@ -754,7 +755,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
 
         // Generate the OME XML document
-        Document omeDoc = mdata.createOmeXmlDoc();
+        Document omeDoc = mdata.createDocument();
 
         // Save the XML document to the metadata document file
         try {

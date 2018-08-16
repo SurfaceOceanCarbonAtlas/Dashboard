@@ -542,16 +542,18 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 
         if ( !previousId.isEmpty() ) {
+            // Read the OME XML contents currently saved for this dataset
+            DashboardMetadata mdata = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
+            DashboardOmeMetadata origOmeMData =
+                    new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, metadataHandler);
             // Read the OME XML contents for the previous dataset
-            DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousId, DashboardUtils.OME_FILENAME);
-            DashboardOmeMetadata updatedOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
-            // Reset the ID and related fields to that for this dataset
+            mdata = metadataHandler.getMetadataInfo(previousId, DashboardUtils.OME_FILENAME);
+            DashboardOmeMetadata updatedOmeMData =
+                    new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, metadataHandler);
+            // Reset the ID and related fields to that for this dataset - not strictly required
             updatedOmeMData.changeDatasetID(datasetId);
-            // Read the OME XML contents currently saved for activeExpocode
-            mdata = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
-            DashboardOmeMetadata origOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
             // Create the merged OME and save the results
-            DashboardOmeMetadata mergedOmeMData = origOmeMData.mergeModifiable(updatedOmeMData);
+            DashboardOmeMetadata mergedOmeMData = new DashboardOmeMetadata(origOmeMData, updatedOmeMData);
             metadataHandler.saveAsOmeXmlDoc(mergedOmeMData, "Merged OME of " + previousId +
                     " into OME of " + datasetId);
         }
