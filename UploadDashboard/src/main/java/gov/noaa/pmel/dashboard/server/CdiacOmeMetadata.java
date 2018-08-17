@@ -4,32 +4,40 @@ import org.jdom2.Document;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.TimeZone;
 
-public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterface {
+public class CdiacOmeMetadata implements OmeMetadataInterface {
 
     private static final SimpleDateFormat TIME_PARSER;
+    private static final SimpleDateFormat DATE_STAMPER;
 
     static {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
         TIME_PARSER = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-        TIME_PARSER.setTimeZone(TimeZone.getTimeZone("UTC"));
+        TIME_PARSER.setTimeZone(utc);
+        DATE_STAMPER = new SimpleDateFormat("yyyyMMdd");
+        DATE_STAMPER.setTimeZone(utc);
     }
 
+    private OmeMetadata mdata;
+
     public CdiacOmeMetadata() {
-        super("");
+        mdata = new OmeMetadata("");
     }
 
     @Override
     public Document createDocument() {
-        return this.createOmeXmlDoc();
+        return mdata.createOmeXmlDoc();
     }
 
     @Override
     public void assignFromDocument(Document doc) throws IllegalArgumentException {
         try {
-            this.assignFromOmeXmlDoc(doc);
+            mdata.assignFromOmeXmlDoc(doc);
         } catch ( Exception ex ) {
             throw new IllegalArgumentException(ex);
         }
@@ -37,38 +45,52 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
 
     @Override
     public OmeMetadataInterface merge(OmeMetadataInterface other) throws IllegalArgumentException {
-        if ( !(other instanceof OmeMetadata) )
-            throw new IllegalArgumentException("Unknown class of other OME object");
-        OmeMetadata merged;
+        if ( !(other instanceof CdiacOmeMetadata) )
+            throw new IllegalArgumentException("Unsupported class of other OME object for CdiacOmeMetadata.merge");
+        CdiacOmeMetadata otherMData = (CdiacOmeMetadata) other;
+
+        CdiacOmeMetadata merged = new CdiacOmeMetadata();
         try {
-            merged = OmeMetadata.merge(this, (OmeMetadata) other);
+            merged.mdata = OmeMetadata.merge(mdata, otherMData.mdata);
         } catch ( Exception ex ) {
             throw new IllegalArgumentException(ex);
         }
-        return (CdiacOmeMetadata) merged;
+
+        return merged;
+    }
+
+    @Override
+    public boolean isAcceptable() {
+        return mdata.isAcceptable();
     }
 
     @Override
     public String getDatasetId() {
-        return this.getExpocode();
+        String expocode = mdata.getExpocode();
+        if ( OmeMetadata.CONFLICT_STRING.equals(expocode) )
+            expocode = null;
+        return expocode;
     }
 
     @Override
     public void setDatasetId(String newId) {
         String value = (newId != null) ? newId : "";
-        this.setExpocode(value);
+        mdata.setExpocode(value);
     }
 
     @Override
     public String getDatasetName() {
-        return this.getExperimentName();
+        String datasetName = mdata.getExperimentName();
+        if ( OmeMetadata.CONFLICT_STRING.equals(datasetName) )
+            datasetName = null;
+        return datasetName;
     }
 
     @Override
     public void setDatasetName(String datasetName) {
         String value = (datasetName != null) ? datasetName : "";
         try {
-            this.replaceValue(OmeMetadata.EXPERIMENT_NAME_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.EXPERIMENT_NAME_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -76,14 +98,17 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
 
     @Override
     public String getPlatformName() {
-        return this.getVesselName();
+        String platformName = mdata.getVesselName();
+        if ( OmeMetadata.CONFLICT_STRING.equals(platformName) )
+            platformName = null;
+        return platformName;
     }
 
     @Override
     public void setPlatformName(String platformName) {
         String value = (platformName != null) ? platformName : "";
         try {
-            this.replaceValue(OmeMetadata.VESSEL_NAME_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.VESSEL_NAME_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -93,8 +118,10 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public String getPlatformType() {
         String platformType;
         try {
-            platformType = this.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
-        } catch ( Exception e ) {
+            platformType = mdata.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
+            if ( OmeMetadata.CONFLICT_STRING.equals(platformType) )
+                platformType = null;
+        } catch ( Exception ex ) {
             // Should never happen
             platformType = null;
         }
@@ -105,32 +132,60 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public void setPlatformType(String platformType) {
         String value = (platformType != null) ? platformType : "";
         try {
-            this.replaceValue(OmeMetadata.PLATFORM_TYPE_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.PLATFORM_TYPE_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
+    }
+
+    @Override
+    public ArrayList<String> getInvestigators() {
+        return mdata.getInvestigators();
+    }
+
+    @Override
+    public ArrayList<String> getOrganizations() {
+        return mdata.getOrganizations();
     }
 
     @Override
     public void setInvestigatorsAndOrganizations(List<String> investigators, List<String> organizations) {
-        // TODO:
-    }
-
-    @Override
-    public String getDatasetRefs() {
         try {
-            // Could be null
-            return this.getValue(OmeMetadata.DATA_SET_REFS_STRING);
+            int numNames = investigators.size();
+            if ( organizations.size() != numNames )
+                throw new Exception("number of organizations does not match the number of investigators");
+            mdata.clearCompositeValueList(OmeMetadata.INVESTIGATOR_COMP_NAME);
+            for (int k = 0; k < numNames; k++) {
+                Properties props = new Properties();
+                props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, investigators.get(k));
+                props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, organizations.get(k));
+                mdata.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
+            }
         } catch ( Exception ex ) {
-            // Should never happen
-            return null;
+            throw new IllegalArgumentException("problems updating names: " + ex.getMessage(), ex);
         }
     }
 
     @Override
-    public void setDatasetRefs(String datasetRefs) {
+    public String getDatasetRefs() {
+        String datasetRefs;
         try {
-            this.replaceValue(OmeMetadata.DATA_SET_REFS_STRING, datasetRefs, -1);
+            // Could be null
+            datasetRefs = mdata.getValue(OmeMetadata.DATA_SET_REFS_STRING);
+            if ( OmeMetadata.CONFLICT_STRING.equals(datasetRefs) )
+                datasetRefs = null;
+        } catch ( Exception ex ) {
+            // Should never happen
+            datasetRefs = null;
+        }
+        return datasetRefs;
+    }
+
+    @Override
+    public void setDatasetRefs(String datasetRefs) {
+        String value = (datasetRefs != null) ? datasetRefs : "";
+        try {
+            mdata.replaceValue(OmeMetadata.DATA_SET_REFS_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -151,7 +206,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public Double getWesternLongitude() {
         Double value;
         try {
-            value = Double.parseDouble(this.getWestmostLongitude());
+            value = Double.parseDouble(mdata.getWestmostLongitude());
             if ( (value >= -540.0) && (value <= 540.0) ) {
                 while ( value <= -180.0 ) {
                     value += 360.0;
@@ -178,7 +233,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
             value = "";
         }
         try {
-            this.replaceValue(OmeMetadata.WEST_BOUND_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.WEST_BOUND_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -188,7 +243,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public Double getEasternLongitude() {
         Double value;
         try {
-            value = Double.parseDouble(this.getEastmostLongitude());
+            value = Double.parseDouble(mdata.getEastmostLongitude());
             if ( (value >= -540.0) && (value <= 540.0) ) {
                 while ( value <= -180.0 ) {
                     value += 360.0;
@@ -215,7 +270,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
             value = "";
         }
         try {
-            this.replaceValue(OmeMetadata.EAST_BOUND_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.EAST_BOUND_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -225,7 +280,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public Double getSouthernLatitude() {
         Double value;
         try {
-            value = Double.parseDouble(this.getSouthmostLatitude());
+            value = Double.parseDouble(mdata.getSouthmostLatitude());
             if ( !((value >= -90.0) && (value <= 90.0)) )
                 value = null;
         } catch ( Exception ex ) {
@@ -243,7 +298,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
             value = "";
         }
         try {
-            this.replaceValue(OmeMetadata.SOUTH_BOUND_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.SOUTH_BOUND_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -253,7 +308,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
     public Double getNorthernLatitude() {
         Double value;
         try {
-            value = Double.parseDouble(this.getNorthmostLatitude());
+            value = Double.parseDouble(mdata.getNorthmostLatitude());
             if ( !((value >= -90.0) && (value <= 90.0)) )
                 value = null;
         } catch ( Exception ex ) {
@@ -271,7 +326,7 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
             value = "";
         }
         try {
-            this.replaceValue(OmeMetadata.NORTH_BOUND_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.NORTH_BOUND_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
@@ -279,7 +334,8 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
 
     @Override
     public Double getDataStartTime() {
-        String dateString = this.getTemporalCoverageStartDate();
+        // CDIAC OME only stores the date, in "yyyyMMdd" format
+        String dateString = mdata.getTemporalCoverageStartDate();
         if ( (dateString == null) || dateString.isEmpty() || OmeMetadata.CONFLICT_STRING.equals(dateString) )
             return null;
         try {
@@ -292,12 +348,20 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
 
     @Override
     public void setDataStartTime(Double dataStartTime) {
-        // TODO:
+        // CDIAC OME only stores the date, in "yyyyMMdd" format
+        Date startTime = new Date(Math.round(dataStartTime * 1000.0));
+        String value = DATE_STAMPER.format(startTime);
+        try {
+            mdata.replaceValue(OmeMetadata.TEMP_START_DATE_STRING, value, -1);
+        } catch ( Exception ex ) {
+            // Should not happen
+        }
     }
 
     @Override
     public Double getDataEndTime() {
-        String dateString = this.getTemporalCoverageEndDate();
+        // CDIAC OME only stores the date, in "yyyyMMdd" format
+        String dateString = mdata.getTemporalCoverageEndDate();
         if ( (dateString == null) || dateString.isEmpty() || OmeMetadata.CONFLICT_STRING.equals(dateString) )
             return null;
         try {
@@ -310,7 +374,14 @@ public class CdiacOmeMetadata extends OmeMetadata implements OmeMetadataInterfac
 
     @Override
     public void setDataEndTime(Double dataEndTime) {
-        // TODO:
+        // CDIAC OME only stores the date, in "yyyyMMdd" format
+        Date endTime = new Date(Math.round(dataEndTime * 1000.0));
+        String value = DATE_STAMPER.format(endTime);
+        try {
+            mdata.replaceValue(OmeMetadata.TEMP_END_DATE_STRING, value, -1);
+        } catch ( Exception ex ) {
+            // Should not happen
+        }
     }
 
 }

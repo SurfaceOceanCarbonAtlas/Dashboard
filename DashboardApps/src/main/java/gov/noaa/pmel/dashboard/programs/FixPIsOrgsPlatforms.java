@@ -4,22 +4,18 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.TreeSet;
 
 /**
@@ -160,11 +156,11 @@ public class FixPIsOrgsPlatforms {
      * @throws IllegalArgumentException
      *         if assigning a value throws an exception
      */
-    public boolean fixNamesAndOrganizations(OmeMetadata omeMData) throws IllegalArgumentException {
+    public boolean fixNamesAndOrganizations(DashboardOmeMetadata omeMData) throws IllegalArgumentException {
         boolean changed = false;
         ArrayList<String> errNames = omeMData.getInvestigators();
         ArrayList<String> errOrgs = omeMData.getOrganizations();
-        String errPlatform = omeMData.getVesselName();
+        String errPlatform = omeMData.getPlatformName();
         int numNames = errNames.size();
 
         // TODO: match ? in error name correction template with any letter in err name
@@ -210,19 +206,8 @@ public class FixPIsOrgsPlatforms {
         }
 
         if ( changed ) {
-            numNames = piNames.size();
-            try {
-                omeMData.clearCompositeValueList(OmeMetadata.INVESTIGATOR_COMP_NAME);
-                for (int k = 0; k < numNames; k++) {
-                    Properties props = new Properties();
-                    props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, piNames.get(k));
-                    props.setProperty(OmeMetadata.ORGANIZATION_ELEMENT_NAME, piOrgs.get(k));
-                    omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
-                }
-                omeMData.replaceValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
-            } catch ( Exception ex ) {
-                throw new IllegalArgumentException("problems updating names: " + ex.getMessage(), ex);
-            }
+            omeMData.setInvestigatorsAndOrganizations(piNames, piOrgs);
+            omeMData.setPlatformName(platformName);
         }
         return changed;
     }
@@ -297,17 +282,8 @@ public class FixPIsOrgsPlatforms {
             MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 
             for (String expocode : allExpocodes) {
-                OmeMetadata omeMData = null;
-                File omeFile = mdataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
-                try {
-                    Document omeDoc = (new SAXBuilder()).build(omeFile);
-                    omeMData = new OmeMetadata(expocode);
-                    omeMData.assignFromOmeXmlDoc(omeDoc);
-                } catch ( Exception ex ) {
-                    System.err.println("Problems reading the OME file for " + expocode + ": " + ex.getMessage());
-                    ex.printStackTrace();
-                    System.exit(1);
-                }
+                DashboardMetadata mdata = mdataHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME);
+                DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataHandler);
 
                 boolean changed = false;
                 try {
@@ -320,15 +296,12 @@ public class FixPIsOrgsPlatforms {
 
                 if ( changed ) {
                     try {
-                        Document dashDoc = omeMData.createOmeXmlDoc();
-                        FileOutputStream out = new FileOutputStream(omeFile);
-                        try {
-                            (new XMLOutputter(Format.getPrettyFormat())).output(dashDoc, out);
-                        } finally {
-                            out.close();
-                        }
+                        mdataHandler.saveAsOmeXmlDoc(omeMData, "Correcting PI names, organizations, platform name");
                     } catch ( Exception ex ) {
-                        throw new IllegalArgumentException("Problems writing the updated OME file: " + ex.getMessage());
+                        System.err.println("Problems writing the updated OME file for " + expocode +
+                                ": " + ex.getMessage());
+                        ex.printStackTrace();
+                        System.exit(1);
                     }
                     System.err.println(expocode + ": updated");
                 }

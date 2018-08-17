@@ -146,7 +146,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     public DashboardOmeMetadata(DashboardOmeMetadata first, DashboardOmeMetadata second)
             throws IllegalArgumentException {
         super();
-        // Copy the upload timestamp, owner, and version from the given DashboardMetadata object
+        // Copy the upload timestamp, owner, and version from the primary DashboardMetadata object
         setFilename(DashboardUtils.OME_FILENAME);
         setDatasetId(DashboardServerUtils.checkDatasetID(first.getDatasetId()));
         setUploadTimestamp(first.getUploadTimestamp());
@@ -161,7 +161,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         }
 
         // Some fields should not have been merged; reset to the values in first
-        this.omeMData.setDatasetId(first.datasetId);
         this.omeMData.setWesternLongitude(first.omeMData.getWesternLongitude());
         this.omeMData.setEasternLongitude(first.omeMData.getEasternLongitude());
         this.omeMData.setSouthernLatitude(first.omeMData.getSouthernLatitude());
@@ -362,6 +361,10 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         return platformName;
     }
 
+    public void setPlatformName(String platformName) {
+        omeMData.setPlatformName(platformName);
+    }
+
     /**
      * @return the semicolon-separated list of PI names for this dataset; never null but may be empty
      */
@@ -379,6 +382,30 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             piNames.append(name);
         }
         return piNames.toString();
+    }
+
+    /**
+     * @return PI names in citation order
+     */
+    public ArrayList<String> getInvestigators() {
+        return omeMData.getInvestigators();
+    }
+
+    /**
+     * @return associated organization for each PI
+     */
+    public ArrayList<String> getOrganizations() {
+        return omeMData.getOrganizations();
+    }
+
+    /**
+     * @param piNames
+     *         the PI names, in citation order, to assign
+     * @param piOrgs
+     *         associated organization for each PI to assign
+     */
+    public void setInvestigatorsAndOrganizations(ArrayList<String> piNames, ArrayList<String> piOrgs) {
+        omeMData.setInvestigatorsAndOrganizations(piNames, piOrgs);
     }
 
     /**

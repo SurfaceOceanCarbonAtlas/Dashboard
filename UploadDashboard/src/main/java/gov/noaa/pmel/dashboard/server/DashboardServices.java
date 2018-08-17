@@ -550,7 +550,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             mdata = metadataHandler.getMetadataInfo(previousId, DashboardUtils.OME_FILENAME);
             DashboardOmeMetadata updatedOmeMData =
                     new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, metadataHandler);
-            // Reset the ID and related fields to that for this dataset - not strictly required
+            // Reset the ID and related fields to that for this dataset
             updatedOmeMData.changeDatasetID(datasetId);
             // Create the merged OME and save the results
             DashboardOmeMetadata mergedOmeMData = new DashboardOmeMetadata(origOmeMData, updatedOmeMData);

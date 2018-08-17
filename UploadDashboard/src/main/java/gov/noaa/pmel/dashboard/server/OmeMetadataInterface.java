@@ -26,16 +26,17 @@ public interface OmeMetadataInterface {
     void assignFromDocument(Document doc) throws IllegalArgumentException;
 
     /**
-     * Creates an new OME object that is the result of merging this OME object with another.
-     * In cases where there are conflicting values in the two objects, the two conflicting
-     * values are stored and a conflict flag is set.
+     * Creates an new OME object that is the result of merging this OME object with another
+     * OME object with the same dataset ID / Expocode.  In cases where there are conflicting
+     * values in the two objects, the two conflicting values are stored and a conflict flag is set.
      *
      * @param other
-     *         OME object to merge wit this OME object
+     *         OME object to merge with this OME object
      *
      * @return new OME object containing the merged contents
      *
      * @throws IllegalArgumentException
+     *         if the dataset IDs do not match, or
      *         if unable to interpret the contents of the OME object to merge in
      *         (e.g., unknown implementation of OmeMetadataInterface)
      */
