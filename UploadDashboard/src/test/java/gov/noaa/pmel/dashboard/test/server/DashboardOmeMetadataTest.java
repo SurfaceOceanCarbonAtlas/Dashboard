@@ -11,9 +11,11 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class DashboardOmeMetadataTest {
 
@@ -26,12 +28,17 @@ public class DashboardOmeMetadataTest {
     private static final String STUB_DATASET_NAME = "RB1501Z";
     private static final String STUB_PLATFORM_NAME = "Ronald H. Brown";
     private static final String STUB_PI_NAMES = "Wanninkhof, R.; Pierrot, D.";
+    private static final ArrayList<String> STUB_INVESTIGATORS =
+            new ArrayList<String>(Arrays.asList("Wanninkhof, R.", "Pierrot, D."));
+    private static final ArrayList<String> STUB_ORGANIZATIONS =
+            new ArrayList<String>(Arrays.asList("NOAA/AOML", "NOAA/AOML"));
     private static final double STUB_WESTERN = 148.0;
     private static final double STUB_EASTERN = -132.6;
     private static final double STUB_SOUTHERN = -32.0;
     private static final double STUB_NORTHERN = 25.2;
     private static final String STUB_START_DATE = "2016-01-01";
     private static final String STUB_END_DATE = "2016-02-24";
+    private static final String STUB_DATASET_LINK = "";
 
     private static final String AOML_UPLOAD_TIMESTAMP = "2016-01-05 04:35";
     private static final String AOML_DATASET_OWNER = "Robert.Castle";
@@ -40,13 +47,21 @@ public class DashboardOmeMetadataTest {
     private static final String AOML_DATASET_NAME = "RB1501A";
     private static final String AOML_PLATFORM_NAME = "Ronald H. Brown";
     private static final String AOML_PI_NAMES = "Rik Wanninkhof";
-    private static final String AOML_PI_ORGS = "NOAA/AOML";
+    private static final ArrayList<String> AOML_INVESTIGATORS =
+            new ArrayList<String>(Arrays.asList("Rik Wanninkhof"));
+    private static final ArrayList<String> AOML_ORGANIZATIONS =
+            new ArrayList<String>(Arrays.asList("NOAA/AOML"));
     private static final double AOML_WESTERN = -158.0;
     private static final double AOML_EASTERN = -122.6;
     private static final double AOML_SOUTHERN = -21.2;
     private static final double AOML_NORTHERN = 38.0;
     private static final String AOML_START_DATE = "2015-01-15";
     private static final String AOML_END_DATE = "2015-01-29";
+    private static final String AOML_DATASET_LINK =
+            "Wanninkhof, R., R. D. Castle, and J. Shannahoff. 2013. Underway pCO2 measurements aboard the R/V Ronald H. Brown during the 2014 cruises. " +
+                    "http://cdiac.ornl.gov/ftp/oceans/VOS_Ronald_Brown/RB2013/. " +
+                    "Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tennessee. " +
+                    "doi: 10.3334/CDIAC/OTG.VOS_RB_2012";
 
     private CdiacOmeMetadata cdiacXmlStubMData;
     private CdiacOmeMetadata aomlCdiacXmlMData;
@@ -76,12 +91,15 @@ public class DashboardOmeMetadataTest {
         assertEquals(STUB_DATASET_NAME, mdata.getDatasetName());
         assertEquals(STUB_PLATFORM_NAME, mdata.getPlatformName());
         assertEquals(STUB_PI_NAMES, mdata.getPINames());
+        assertEquals(STUB_INVESTIGATORS, mdata.getInvestigators());
+        assertEquals(STUB_ORGANIZATIONS, mdata.getOrganizations());
         assertEquals(STUB_WESTERN, mdata.getWestmostLongitude(), DELTA);
         assertEquals(STUB_EASTERN, mdata.getEastmostLongitude(), DELTA);
         assertEquals(STUB_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
         assertEquals(STUB_NORTHERN, mdata.getNorthmostLatitude(), DELTA);
         assertEquals(STUB_START_DATE, mdata.getBeginDatestamp());
         assertEquals(STUB_END_DATE, mdata.getEndDatestamp());
+        assertEquals(STUB_DATASET_LINK, mdata.getDatasetLink());
 
         mdata = new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
         assertEquals(AOML_UPLOAD_TIMESTAMP, mdata.getUploadTimestamp());
@@ -91,12 +109,15 @@ public class DashboardOmeMetadataTest {
         assertEquals(AOML_DATASET_NAME, mdata.getDatasetName());
         assertEquals(AOML_PLATFORM_NAME, mdata.getPlatformName());
         assertEquals(AOML_PI_NAMES, mdata.getPINames());
+        assertEquals(AOML_INVESTIGATORS, mdata.getInvestigators());
+        assertEquals(AOML_ORGANIZATIONS, mdata.getOrganizations());
         assertEquals(AOML_WESTERN, mdata.getWestmostLongitude(), DELTA);
         assertEquals(AOML_EASTERN, mdata.getEastmostLongitude(), DELTA);
         assertEquals(AOML_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
         assertEquals(AOML_NORTHERN, mdata.getNorthmostLatitude(), DELTA);
         assertEquals(AOML_START_DATE, mdata.getBeginDatestamp());
         assertEquals(AOML_END_DATE, mdata.getEndDatestamp());
+        assertEquals(AOML_DATASET_LINK, mdata.getDatasetLink());
     }
 
     @Test
@@ -113,8 +134,9 @@ public class DashboardOmeMetadataTest {
         assertEquals(STUB_DATASET_OWNER, mdata.getOwner());
         assertEquals(STUB_VERSION, mdata.getVersion());
         assertEquals(STUB_EXPOCODE, mdata.getDatasetId());
-        assertEquals("", mdata.getDatasetName());
+        assertEquals("", mdata.getDatasetName());  // conflict
         assertEquals(STUB_PLATFORM_NAME, mdata.getPlatformName());
+        // Investigators and organizations get merged starting with secondary - not really what it should be
         assertEquals(STUB_WESTERN, mdata.getWestmostLongitude(), DELTA);
         assertEquals(STUB_EASTERN, mdata.getEastmostLongitude(), DELTA);
         assertEquals(STUB_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
@@ -131,8 +153,9 @@ public class DashboardOmeMetadataTest {
         assertEquals(AOML_DATASET_OWNER, mdata.getOwner());
         assertEquals(AOML_VERSION, mdata.getVersion());
         assertEquals(AOML_EXPOCODE, mdata.getDatasetId());
-        assertEquals("", mdata.getDatasetName());
+        assertEquals("", mdata.getDatasetName());  // conflict
         assertEquals(AOML_PLATFORM_NAME, mdata.getPlatformName());
+        // Investigators and organizations get merged starting with secondary - not really what it should be
         assertEquals(AOML_WESTERN, mdata.getWestmostLongitude(), DELTA);
         assertEquals(AOML_EASTERN, mdata.getEastmostLongitude(), DELTA);
         assertEquals(AOML_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
@@ -148,12 +171,13 @@ public class DashboardOmeMetadataTest {
                 new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
         aomlMData.changeDatasetID(STUB_EXPOCODE);
         assertEquals(STUB_EXPOCODE, aomlMData.getDatasetId());
+        // Check that it was changed in the underlying Document
         Document doc = aomlMData.createDocument();
         Element elem = doc.getRootElement();
         elem = elem.getChild("Cruise_Info");
         elem = elem.getChild("Experiment");
         elem = elem.getChild("Cruise");
-        elem = elem.getChild("Expocode");
+        elem = elem.getChild("Expocode");  // Cruise_ID gets changed to Expocode
         assertEquals(STUB_EXPOCODE, elem.getText());
     }
 
@@ -167,31 +191,51 @@ public class DashboardOmeMetadataTest {
         assertEquals(AOML_EXPOCODE, regen.getExpocode());
         assertEquals(AOML_DATASET_NAME, regen.getExperimentName());
         assertEquals(AOML_PLATFORM_NAME, regen.getVesselName());
-        ArrayList<String> nameList = regen.getInvestigators();
-        assertEquals(1, nameList.size());
-        assertEquals(AOML_PI_NAMES, nameList.get(0));
-        ArrayList<String> orgList = regen.getOrganizations();
-        assertEquals(1, orgList.size());
-        assertEquals(AOML_PI_ORGS, orgList.get(0));
+        assertEquals(AOML_INVESTIGATORS, regen.getInvestigators());
+        assertEquals(AOML_ORGANIZATIONS, regen.getOrganizations());
         assertEquals(String.format("%.1f", AOML_WESTERN), regen.getWestmostLongitude());
         assertEquals(String.format("%.1f", AOML_EASTERN), regen.getEastmostLongitude());
         assertEquals(String.format("%.1f", AOML_SOUTHERN), regen.getSouthmostLatitude());
         assertEquals(String.format("%.1f", AOML_NORTHERN), regen.getNorthmostLatitude());
         assertEquals(AOML_START_DATE.replaceAll("-", ""), regen.getTemporalCoverageStartDate());
         assertEquals(AOML_END_DATE.replaceAll("-", ""), regen.getTemporalCoverageEndDate());
-        // Needs a lot more checks
+        // TODO: Needs a lot more checks
     }
 
     @Test
     public void testGetSetPlatformName() {
+        final String anotherName = "USS Minnow";
+        DashboardOmeMetadata aomlMData =
+                new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
+        assertEquals(AOML_PLATFORM_NAME, aomlMData.getPlatformName());
+        aomlMData.setPlatformName(null);
+        assertEquals("", aomlMData.getPlatformName());
+        aomlMData.setPlatformName(anotherName);
+        assertEquals(anotherName, aomlMData.getPlatformName());
+
     }
 
     @Test
     public void testGetSetInvestigatorsAndOrganizations() {
-    }
-
-    @Test
-    public void testGetDatasetRefs() {
+        DashboardOmeMetadata stubMData =
+                new DashboardOmeMetadata(cdiacXmlStubMData, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
+        assertEquals(STUB_INVESTIGATORS, stubMData.getInvestigators());
+        assertEquals(STUB_ORGANIZATIONS, stubMData.getOrganizations());
+        stubMData.setInvestigatorsAndOrganizations(AOML_INVESTIGATORS, AOML_ORGANIZATIONS);
+        assertEquals(AOML_INVESTIGATORS, stubMData.getInvestigators());
+        assertEquals(AOML_ORGANIZATIONS, stubMData.getOrganizations());
+        try {
+            stubMData.setInvestigatorsAndOrganizations(null, null);
+            fail("null investigators and organizations lists not detected");
+        } catch ( IllegalArgumentException ex ) {
+            // expected result
+        }
+        try {
+            stubMData.setInvestigatorsAndOrganizations(STUB_INVESTIGATORS, AOML_ORGANIZATIONS);
+            fail("difference in sizes of the investigators and organizations lists not detected");
+        } catch ( IllegalArgumentException ex ) {
+            // expected result
+        }
     }
 
     private static final String CDIAC_XML_STUB_DATA_STRING = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +

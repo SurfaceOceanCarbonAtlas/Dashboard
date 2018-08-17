@@ -125,15 +125,15 @@ public interface OmeMetadataInterface {
     void setDatasetDOI(String datasetDOI);
 
     /**
-     * @return the citation for this dataset
+     * @return the http reference for this dataset
      */
-    String getDatasetRefs();
+    String getDatasetLink();
 
     /**
-     * @param datasetRefs
-     *         the citation to assign for this dataset
+     * @param datasetLink
+     *         the http reference to assign for this dataset
      */
-    void setDatasetRefs(String datasetRefs);
+    void setDatasetLink(String datasetLink);
 
     /**
      * @return the longitude, in units of degrees east, of the western-most data point in a dataset

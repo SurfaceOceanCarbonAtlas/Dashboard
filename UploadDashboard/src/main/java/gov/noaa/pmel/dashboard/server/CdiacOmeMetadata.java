@@ -167,25 +167,25 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public String getDatasetRefs() {
-        String datasetRefs;
+    public String getDatasetLink() {
+        String datasetLink;
         try {
             // Could be null
-            datasetRefs = mdata.getValue(OmeMetadata.DATA_SET_REFS_STRING);
-            if ( OmeMetadata.CONFLICT_STRING.equals(datasetRefs) )
-                datasetRefs = null;
+            datasetLink = mdata.getValue(OmeMetadata.CITATION_STRING);
+            if ( OmeMetadata.CONFLICT_STRING.equals(datasetLink) )
+                datasetLink = null;
         } catch ( Exception ex ) {
             // Should never happen
-            datasetRefs = null;
+            datasetLink = null;
         }
-        return datasetRefs;
+        return datasetLink;
     }
 
     @Override
-    public void setDatasetRefs(String datasetRefs) {
-        String value = (datasetRefs != null) ? datasetRefs : "";
+    public void setDatasetLink(String datasetLink) {
+        String value = (datasetLink != null) ? datasetLink : "";
         try {
-            mdata.replaceValue(OmeMetadata.DATA_SET_REFS_STRING, value, -1);
+            mdata.replaceValue(OmeMetadata.CITATION_STRING, value, -1);
         } catch ( Exception ex ) {
             // Should never happen
         }
