@@ -8,11 +8,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="DashboardApps" />
         <module name="OmeMetadata" />
+        <module name="SDIMetadata" />
         <module name="UploadDashboard" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="SocatUploadDashboard" target="1.5" />
+      <module name="SocatUploadDashboard" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
