@@ -1,6 +1,6 @@
-package gov.noaa.pmel.sdimetadata.test;
+package gov.noaa.pmel.sdimetadata.test.person;
 
-import gov.noaa.pmel.sdimetadata.Person;
+import gov.noaa.pmel.sdimetadata.person.Person;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

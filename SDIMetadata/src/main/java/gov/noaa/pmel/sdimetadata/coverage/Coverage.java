@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata;
+package gov.noaa.pmel.sdimetadata.coverage;
 
 public class Coverage {
     protected Double westernLongitude;
@@ -7,8 +7,6 @@ public class Coverage {
     protected Double northernLatitude;
     protected Double earliestDataTime;
     protected Double latestDataTime;
-    protected Double startTime;
-    protected Double endTime;
 
     /**
      * Create with all values assigned as Double.NaN
@@ -20,9 +18,7 @@ public class Coverage {
         northernLatitude = Double.NaN;
         earliestDataTime = Double.NaN;
         latestDataTime = Double.NaN;
-        startTime = Double.NaN;
-        endTime = Double.NaN;
-    }
+   }
 
     /**
      * @return the western longitude limit, in units of decimal degrees east;
@@ -126,45 +122,7 @@ public class Coverage {
         this.latestDataTime = (latestDataTime != null) ? latestDataTime : Double.NaN;
     }
 
-    /**
-     * @return the starting time for the exposition/dataset, in units of second since 01-JAN-1970 00:00:00;
-     *         never null but may be Double.NaN
-     *         The starting time can be earlier, but never later, than the earliest data time.
-     */
-    public Double getStartTime() {
-        return startTime;
-    }
-
-    /**
-     * @param startTime
-     *         assign as the starting time for the exposition/dataset, in units of second since 01-JAN-1970 00:00:00;
-     *         if null, Double.NaN will be assigned
-     *         The starting time can be earlier, but never later, than the earliest data time.
-     */
-    public void setStartTime(Double startTime) {
-        this.startTime = (startTime != null) ? startTime : Double.NaN;
-    }
-
-    /**
-     * @return the ending time for the exposition/dataset, in units of second since 01-JAN-1970 00:00:00;
-     *         never null but may be Double.NaN
-     *         The ending time can be later, but never earlier, than the earliest data time
-     */
-    public Double getEndTime() {
-        return endTime;
-    }
-
-    /**
-     * @param endTime
-     *         assign as the ending time for the exposition/dataset, in units of second since 01-JAN-1970 00:00:00;
-     *         never null but may be Double.NaN
-     *         The ending time can be later, but never earlier, than the earliest data time
-     */
-    public void setEndTime(Double endTime) {
-        this.endTime = (endTime != null) ? endTime : Double.NaN;
-    }
-
-    @Override
+   @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -185,10 +143,6 @@ public class Coverage {
             return false;
         if ( !latestDataTime.equals(other.latestDataTime) )
             return false;
-        if ( !startTime.equals(other.startTime) )
-            return false;
-        if ( !endTime.equals(other.endTime) )
-            return false;
         return true;
     }
 
@@ -201,8 +155,6 @@ public class Coverage {
         result = result * prime + northernLatitude.hashCode();
         result = result * prime + earliestDataTime.hashCode();
         result = result * prime + latestDataTime.hashCode();
-        result = result * prime + startTime.hashCode();
-        result = result * prime + endTime.hashCode();
         return result;
     }
 
@@ -215,8 +167,6 @@ public class Coverage {
                 ", northernLatitude=" + northernLatitude +
                 ", earliestDataTime=" + earliestDataTime +
                 ", latestDataTime=" + latestDataTime +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
                 '}';
     }
 

@@ -1,6 +1,6 @@
-package gov.noaa.pmel.sdimetadata.test;
+package gov.noaa.pmel.sdimetadata.test.coverage;
 
-import gov.noaa.pmel.sdimetadata.Coverage;
+import gov.noaa.pmel.sdimetadata.coverage.Coverage;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,8 +16,6 @@ public class CoverageTest {
     private static final double NORTHERN_LATITUDE = 45.03;
     private static final double EARLIEST_DATA_TIME = 123456.78;
     private static final double LATEST_DATA_TIME = 234567.89;
-    private static final double START_TIME = 123400.00;
-    private static final double END_TIME = 234600.00;
 
     @Test
     public void testGetSetWesternLongitude() {
@@ -95,39 +93,6 @@ public class CoverageTest {
     }
 
     @Test
-    public void testGetSetStartTime() {
-        Coverage coverage = new Coverage();
-        assertTrue(coverage.getStartTime().isNaN());
-        coverage.setStartTime(START_TIME);
-        assertEquals(START_TIME, coverage.getStartTime(), DELTA);
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
-        coverage.setStartTime(null);
-        assertTrue(coverage.getStartTime().isNaN());
-    }
-
-    @Test
-    public void testGetSetEndTime() {
-        Coverage coverage = new Coverage();
-        assertTrue(coverage.getEndTime().isNaN());
-        coverage.setEndTime(END_TIME);
-        assertEquals(END_TIME, coverage.getEndTime(), DELTA);
-        assertTrue(coverage.getStartTime().isNaN());
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
-        coverage.setEndTime(null);
-        assertTrue(coverage.getEndTime().isNaN());
-    }
-
-    @Test
     public void testHashCodeEquals() {
         Coverage first = new Coverage();
         assertFalse(first.equals(null));
@@ -176,20 +141,6 @@ public class CoverageTest {
         assertFalse(first.hashCode() == second.hashCode());
         assertFalse(first.equals(second));
         second.setLatestDataTime(LATEST_DATA_TIME);
-        assertTrue(first.hashCode() == second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setStartTime(START_TIME);
-        assertFalse(first.hashCode() == second.hashCode());
-        assertFalse(first.equals(second));
-        second.setStartTime(START_TIME);
-        assertTrue(first.hashCode() == second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setEndTime(END_TIME);
-        assertFalse(first.hashCode() == second.hashCode());
-        assertFalse(first.equals(second));
-        second.setEndTime(END_TIME);
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
     }

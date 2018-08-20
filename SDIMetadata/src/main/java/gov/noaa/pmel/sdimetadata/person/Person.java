@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata;
+package gov.noaa.pmel.sdimetadata.person;
 
 public class Person {
     protected String lastName;
