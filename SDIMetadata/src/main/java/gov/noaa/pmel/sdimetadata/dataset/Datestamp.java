@@ -36,6 +36,12 @@ public class Datestamp implements Cloneable {
         day = INVALID;
     }
 
+    public Datestamp(Integer year, Integer month, Integer day) {
+        setYear(year);
+        setMonth(month);
+        setDay(day);
+    }
+
     /**
      * @return the earliest time (00:00:00) of the date, in units of seconds since 1970-01-01 00:00:00
      *
@@ -136,6 +142,20 @@ public class Datestamp implements Cloneable {
     }
 
     @Override
+    public Datestamp clone() {
+        Datestamp dup;
+        try {
+            dup = (Datestamp) super.clone();
+        } catch ( CloneNotSupportedException ex ) {
+            throw new RuntimeException(ex);
+        }
+        dup.year = year;
+        dup.month = month;
+        dup.day = day;
+        return dup;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -169,15 +189,6 @@ public class Datestamp implements Cloneable {
                 ", month=" + month +
                 ", day=" + day +
                 '}';
-    }
-
-    @Override
-    public Datestamp clone() {
-        Datestamp dup = new Datestamp();
-        dup.year = this.year;
-        dup.month = this.month;
-        dup.day = this.day;
-        return dup;
     }
 
 }

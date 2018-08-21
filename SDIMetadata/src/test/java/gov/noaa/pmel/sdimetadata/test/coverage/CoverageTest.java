@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 public class CoverageTest {
@@ -145,4 +147,25 @@ public class CoverageTest {
         assertTrue(first.equals(second));
     }
 
+    @Test
+    public void testClone() {
+        Coverage coverage = new Coverage();
+        Coverage dup = coverage.clone();
+        assertEquals(coverage, dup);
+        assertNotSame(coverage, dup);
+
+        coverage.setWesternLongitude(WESTERN_LONGITUDE);
+        coverage.setEasternLongitude(EASTERN_LONGITUDE);
+        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
+        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
+        coverage.setLatestDataTime(LATEST_DATA_TIME);
+        assertNotEquals(coverage, dup);
+
+        dup = coverage.clone();
+        assertEquals(coverage, dup);
+        assertNotSame(coverage, dup);
+    }
+
 }
+

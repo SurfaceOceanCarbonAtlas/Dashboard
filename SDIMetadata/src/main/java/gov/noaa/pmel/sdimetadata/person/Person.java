@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.person;
 
-public class Person {
+public class Person implements Cloneable {
     protected String lastName;
     protected String firstName;
     protected String middleInitials;
@@ -125,6 +125,24 @@ public class Person {
      */
     public void setEmail(String email) {
         this.email = (email != null) ? email : "";
+    }
+
+    @Override
+    public Person clone() {
+        Person dup;
+        try {
+            dup = (Person) super.clone();
+        } catch ( CloneNotSupportedException ex ) {
+            throw new RuntimeException(ex);
+        }
+        dup.lastName = lastName;
+        dup.firstName = firstName;
+        dup.middleInitials = middleInitials;
+        dup.organization = organization;
+        dup.address = address;
+        dup.phone = phone;
+        dup.email = email;
+        return dup;
     }
 
     @Override

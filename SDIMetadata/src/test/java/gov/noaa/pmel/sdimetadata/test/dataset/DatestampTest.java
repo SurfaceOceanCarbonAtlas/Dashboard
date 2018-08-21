@@ -151,6 +151,19 @@ public class DatestampTest {
     }
 
     @Test
+    public void setDatestamp() {
+        Datestamp datestamp = new Datestamp(null, null, null);
+        assertEquals(Datestamp.INVALID, datestamp.getYear());
+        assertEquals(Datestamp.INVALID, datestamp.getMonth());
+        assertEquals(Datestamp.INVALID, datestamp.getDay());
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY);
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+    }
+
+    @Test
     public void testClone() {
         Datestamp datestamp = new Datestamp();
         Datestamp clone = datestamp.clone();
@@ -168,3 +181,4 @@ public class DatestampTest {
     }
 
 }
+

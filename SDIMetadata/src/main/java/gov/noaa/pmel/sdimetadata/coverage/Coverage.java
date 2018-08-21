@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.coverage;
 
-public class Coverage {
+public class Coverage implements Cloneable {
     protected Double westernLongitude;
     protected Double easternLongitude;
     protected Double southernLatitude;
@@ -18,7 +18,7 @@ public class Coverage {
         northernLatitude = Double.NaN;
         earliestDataTime = Double.NaN;
         latestDataTime = Double.NaN;
-   }
+    }
 
     /**
      * @return the western longitude limit, in units of decimal degrees east;
@@ -122,7 +122,24 @@ public class Coverage {
         this.latestDataTime = (latestDataTime != null) ? latestDataTime : Double.NaN;
     }
 
-   @Override
+    @Override
+    public Coverage clone() {
+        Coverage coverage;
+        try {
+            coverage = (Coverage) super.clone();
+        } catch ( CloneNotSupportedException ex ) {
+            throw new RuntimeException(ex);
+        }
+        coverage.westernLongitude = westernLongitude;
+        coverage.easternLongitude = easternLongitude;
+        coverage.southernLatitude = southernLatitude;
+        coverage.northernLatitude = northernLatitude;
+        coverage.earliestDataTime = earliestDataTime;
+        coverage.latestDataTime = latestDataTime;
+        return coverage;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;

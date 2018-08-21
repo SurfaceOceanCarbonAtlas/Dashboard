@@ -3,7 +3,11 @@ package gov.noaa.pmel.sdimetadata.test.person;
 import gov.noaa.pmel.sdimetadata.person.Person;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 public class PersonTest {
 
@@ -109,61 +113,83 @@ public class PersonTest {
     @Test
     public void testHashCodeEquals() {
         Person first = new Person();
-        assertFalse( first.equals(null) );
-        assertFalse( first.equals(LAST_NAME) );
+        assertFalse(first.equals(null));
+        assertFalse(first.equals(LAST_NAME));
 
         Person second = new Person();
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setLastName(LAST_NAME);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setLastName(LAST_NAME);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setFirstName(FIRST_NAME);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setFirstName(FIRST_NAME);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setMiddleInitials(INITIALS);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setMiddleInitials(INITIALS);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setOrganization(ORGANIZATION);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setOrganization(ORGANIZATION);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setAddress(ADDRESS);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setAddress(ADDRESS);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setPhone(PHONE);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setPhone(PHONE);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
+        assertTrue(first.equals(second));
 
         first.setEmail(EMAIL);
         assertFalse(first.hashCode() == second.hashCode());
-        assertFalse( first.equals(second) );
+        assertFalse(first.equals(second));
         second.setEmail(EMAIL);
         assertTrue(first.hashCode() == second.hashCode());
-        assertTrue( first.equals(second) );
-
+        assertTrue(first.equals(second));
     }
+
+    @Test
+    public void testClone() {
+        Person person = new Person();
+        Person dup = person.clone();
+        assertEquals(person, dup);
+        assertNotSame(person, dup);
+
+        person.setLastName(LAST_NAME);
+        person.setFirstName(FIRST_NAME);
+        person.setMiddleInitials(INITIALS);
+        person.setOrganization(ORGANIZATION);
+        person.setAddress(ADDRESS);
+        person.setPhone(PHONE);
+        person.setEmail(EMAIL);
+        assertNotEquals(person, dup);
+
+        dup = person.clone();
+        assertEquals(person, dup);
+        assertNotSame(person, dup);
+    }
+
 }
+
