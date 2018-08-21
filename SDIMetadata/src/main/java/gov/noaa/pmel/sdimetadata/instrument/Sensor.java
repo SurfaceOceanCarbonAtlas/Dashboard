@@ -3,21 +3,55 @@ package gov.noaa.pmel.sdimetadata.instrument;
 import java.util.ArrayList;
 
 public class Sensor implements Cloneable {
+    protected String sensorName;
+    protected String sensorId;
     protected String location;
     protected String manufacturer;
     protected String model;
-    protected String calibration;
     protected ArrayList<String> comments;
 
     /**
      * Create with all fields set to empty Strings or an empty List
      */
     public Sensor() {
+        sensorName = "";
+        sensorId = "";
         location = "";
         manufacturer = "";
         model = "";
-        calibration = "";
         comments = new ArrayList<String>();
+    }
+
+    /**
+     * @return name for this sensor; never null but may be an empty string.
+     *         This name should be unique for sensors in this dataset.
+     */
+    public String getSensorName() {
+        return sensorName;
+    }
+
+    /**
+     * @param sensorName
+     *         assign as the name for this sensor; if null, an empty string is assigned
+     *         This name should be unique for sensors in this dataset.
+     */
+    public void setSensorName(String sensorName) {
+        this.sensorName = (sensorName != null) ? sensorName.trim() : "";
+    }
+
+    /**
+     * @return unique ID (such as a serial number) of this sensor; never null but may be an empty string
+     */
+    public String getSensorId() {
+        return sensorId;
+    }
+
+    /**
+     * @param sensorId
+     *         assign as the unique ID (such as a serial number) of this sensor; if null, an empty string is assigned
+     */
+    public void setSensorId(String sensorId) {
+        this.sensorId = (sensorId != null) ? sensorId.trim() : "";
     }
 
     /**
@@ -32,7 +66,7 @@ public class Sensor implements Cloneable {
      *         assign as the description of the location of the sensor; if null, an empty string is assigned
      */
     public void setLocation(String location) {
-        this.location = (location != null) ? location : "";
+        this.location = (location != null) ? location.trim() : "";
     }
 
     /**
@@ -47,7 +81,7 @@ public class Sensor implements Cloneable {
      *         assign as the manufacturer of the sensor; if null, an empty string is assigned
      */
     public void setManufacturer(String manufacturer) {
-        this.manufacturer = (manufacturer != null) ? manufacturer : "";
+        this.manufacturer = (manufacturer != null) ? manufacturer.trim() : "";
     }
 
     /**
@@ -62,22 +96,7 @@ public class Sensor implements Cloneable {
      *         assign as the model of the sensor; if null, an empty string is assigned
      */
     public void setModel(String model) {
-        this.model = (model != null) ? model : "";
-    }
-
-    /**
-     * @return calibration information for the sensor; never null but may be an empty string
-     */
-    public String getCalibration() {
-        return calibration;
-    }
-
-    /**
-     * @param calibration
-     *         assign as the calibration information for the sensor; if null, an empty string is assigned
-     */
-    public void setCalibration(String calibration) {
-        this.calibration = (calibration != null) ? calibration : "";
+        this.model = (model != null) ? model.trim() : "";
     }
 
     /**
@@ -111,11 +130,11 @@ public class Sensor implements Cloneable {
     }
 
     /**
-     * @return whether all the required fields are assigned with valid values.  Currently this means
-     *         location, manufacturer, and model are not blank.
+     * @return whether all the required fields are assigned with valid values.
+     *         Currently this means name, location, manufacturer, and model are not blank.
      */
     public boolean isValid() {
-        if ( location.isEmpty() || manufacturer.isEmpty() || model.isEmpty() )
+        if ( sensorName.isEmpty() || location.isEmpty() || manufacturer.isEmpty() || model.isEmpty() )
             return false;
         return true;
     }
@@ -128,10 +147,11 @@ public class Sensor implements Cloneable {
         } catch ( CloneNotSupportedException ex ) {
             throw new RuntimeException(ex);
         }
+        sensor.sensorName = sensorName;
+        sensor.sensorId = sensorId;
         sensor.location = location;
         sensor.manufacturer = manufacturer;
         sensor.model = model;
-        sensor.calibration = calibration;
         sensor.comments = new ArrayList<String>(comments);
         return sensor;
     }
@@ -145,13 +165,15 @@ public class Sensor implements Cloneable {
 
         Sensor sensor = (Sensor) obj;
 
+        if ( !sensorName.equals(sensor.sensorName) )
+            return false;
+        if ( !sensorId.equals(sensor.sensorId) )
+            return false;
         if ( !location.equals(sensor.location) )
             return false;
         if ( !manufacturer.equals(sensor.manufacturer) )
             return false;
         if ( !model.equals(sensor.model) )
-            return false;
-        if ( !calibration.equals(sensor.calibration) )
             return false;
         if ( !comments.equals(sensor.comments) )
             return false;
@@ -161,10 +183,11 @@ public class Sensor implements Cloneable {
     @Override
     public int hashCode() {
         final int prime = 37;
-        int result = location.hashCode();
+        int result = sensorName.hashCode();
+        result = result * prime + sensorId.hashCode();
+        result = result * prime + location.hashCode();
         result = result * prime + manufacturer.hashCode();
         result = result * prime + model.hashCode();
-        result = result * prime + calibration.hashCode();
         result = result * prime + comments.hashCode();
         return result;
     }
@@ -172,10 +195,11 @@ public class Sensor implements Cloneable {
     @Override
     public String toString() {
         return "Sensor{" +
-                "location='" + location + '\'' +
+                "sensorName='" + sensorName + '\'' +
+                ", sensorId='" + sensorId + '\'' +
+                ", location='" + location + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
                 ", model='" + model + '\'' +
-                ", calibration='" + calibration + '\'' +
                 ", comments=" + comments +
                 '}';
     }

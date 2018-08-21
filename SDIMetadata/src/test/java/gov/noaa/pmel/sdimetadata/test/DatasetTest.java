@@ -1,5 +1,6 @@
-package gov.noaa.pmel.sdimetadata.test.dataset;
+package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.dataset.Coverage;
 import gov.noaa.pmel.sdimetadata.dataset.Dataset;
 import gov.noaa.pmel.sdimetadata.dataset.Datestamp;
 import org.junit.Test;
@@ -39,6 +40,12 @@ public class DatasetTest {
             new Datestamp(2016, 1, 20),
             new Datestamp(2017, 2, 24)
     ));
+    private static final Coverage COVERAGE = new Coverage(146.23, -120.45, 15.36, 45.03, 1421150400.000,
+            1422532800.000);
+    private static final Coverage BAD_STARTTIME_COVERAGE = new Coverage(146.23, -120.45, 15.36, 45.03, 1421107000.000,
+            1422532800.000);
+    private static final Coverage BAD_ENDTIME_COVERAGE = new Coverage(146.23, -120.45, 15.36, 45.03, 1421150400.000,
+            1422662600.000);
 
     @Test
     public void testGetSetDatasetId() {
@@ -232,6 +239,88 @@ public class DatasetTest {
     }
 
     @Test
+    public void testGetSetCoverage() {
+        Dataset dataset = new Dataset();
+        assertEquals(new Coverage(), dataset.getCoverage());
+        dataset.setCoverage(COVERAGE);
+        assertEquals(COVERAGE, dataset.getCoverage());
+        assertNotSame(COVERAGE, dataset.getCoverage());
+        assertEquals(0, dataset.getHistory().size());
+        assertEquals(EMPTY_DATESTAMP, dataset.getEndDatestamp());
+        assertEquals(EMPTY_DATESTAMP, dataset.getStartDatestamp());
+        assertEquals(0, dataset.getAddnInfo().size());
+        assertEquals(EMPTY_STR, dataset.getCitation());
+        assertEquals(EMPTY_STR, dataset.getWebsite());
+        assertEquals(EMPTY_STR, dataset.getDatasetDoi());
+        assertEquals(EMPTY_STR, dataset.getFunding());
+        assertEquals(EMPTY_STR, dataset.getDatasetName());
+        assertEquals(EMPTY_STR, dataset.getDatasetId());
+        dataset.setCoverage(null);
+        assertEquals(new Coverage(), dataset.getCoverage());
+        dataset.setCoverage(new Coverage());
+        assertEquals(new Coverage(), dataset.getCoverage());
+    }
+
+    @Test
+    public void testIsValid() {
+        Dataset dataset = new Dataset();
+        assertFalse(dataset.isValid());
+
+        dataset.setDatasetId(DATASET_ID);
+        dataset.setStartDatestamp(START_DATESTAMP);
+        dataset.setEndDatestamp(END_DATESTAMP);
+        dataset.setCoverage(COVERAGE);
+        assertTrue(dataset.isValid());
+
+        dataset.setCoverage(BAD_STARTTIME_COVERAGE);
+        assertFalse(dataset.isValid());
+        dataset.setCoverage(COVERAGE);
+        assertTrue(dataset.isValid());
+        dataset.setCoverage(BAD_ENDTIME_COVERAGE);
+        assertFalse(dataset.isValid());
+    }
+
+    @Test
+    public void testClone() {
+        Dataset dataset = new Dataset();
+        Dataset dup = dataset.clone();
+        assertEquals(dataset, dup);
+        assertNotSame(dataset, dup);
+
+        dataset.setDatasetId(DATASET_ID);
+        dataset.setDatasetName(DATASET_NAME);
+        dataset.setFunding(FUNDING_INFO);
+        dataset.setDatasetDoi(DATASET_DOI);
+        dataset.setWebsite(WEBSITE);
+        dataset.setCitation(CITATION);
+        dataset.setAddnInfo(ADDN_INFO_LIST);
+        dataset.setStartDatestamp(START_DATESTAMP);
+        dataset.setEndDatestamp(END_DATESTAMP);
+        dataset.setHistory(HISTORY_LIST);
+        dataset.setCoverage(COVERAGE);
+        assertNotEquals(dataset, dup);
+
+        dup = dataset.clone();
+        assertEquals(dataset, dup);
+        assertNotSame(dataset, dup);
+
+        assertEquals(dataset.getAddnInfo(), dup.getAddnInfo());
+        assertNotSame(dataset.getAddnInfo(), dup.getAddnInfo());
+
+        ArrayList<Datestamp> history = dataset.getHistory();
+        ArrayList<Datestamp> dupHistory = dup.getHistory();
+        assertEquals(history, dupHistory);
+        assertNotSame(history, dupHistory);
+        for (int k = 0; k < history.size(); k++) {
+            assertEquals(history.get(k), dupHistory.get(k));
+            assertNotSame(history.get(k), dupHistory.get(k));
+        }
+
+        assertEquals(dataset.getCoverage(), dup.getCoverage());
+        assertNotSame(dataset.getCoverage(), dup.getCoverage());
+    }
+
+    @Test
     public void testGetHashCodeEquals() {
         Dataset first = new Dataset();
         assertFalse(first.equals(null));
@@ -310,42 +399,13 @@ public class DatasetTest {
         second.setHistory(HISTORY_LIST);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-    }
 
-    @Test
-    public void testClone() {
-        Dataset dataset = new Dataset();
-        Dataset dup = dataset.clone();
-        assertEquals(dataset, dup);
-        assertNotSame(dataset, dup);
-
-        dataset.setDatasetId(DATASET_ID);
-        dataset.setDatasetName(DATASET_NAME);
-        dataset.setFunding(FUNDING_INFO);
-        dataset.setDatasetDoi(DATASET_DOI);
-        dataset.setWebsite(WEBSITE);
-        dataset.setCitation(CITATION);
-        dataset.setAddnInfo(ADDN_INFO_LIST);
-        dataset.setStartDatestamp(START_DATESTAMP);
-        dataset.setEndDatestamp(END_DATESTAMP);
-        dataset.setHistory(HISTORY_LIST);
-        assertNotEquals(dataset, dup);
-
-        dup = dataset.clone();
-        assertEquals(dataset, dup);
-        assertNotSame(dataset, dup);
-
-        assertEquals(dataset.getAddnInfo(), dup.getAddnInfo());
-        assertNotSame(dataset.getAddnInfo(), dup.getAddnInfo());
-
-        ArrayList<Datestamp> history = dataset.getHistory();
-        ArrayList<Datestamp> dupHistory = dup.getHistory();
-        assertEquals(history, dupHistory);
-        assertNotSame(history, dupHistory);
-        for (int k = 0; k < history.size(); k++) {
-            assertEquals(history.get(k), dupHistory.get(k));
-            assertNotSame(history.get(k), dupHistory.get(k));
-        }
+        first.setCoverage(COVERAGE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCoverage(COVERAGE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
 }

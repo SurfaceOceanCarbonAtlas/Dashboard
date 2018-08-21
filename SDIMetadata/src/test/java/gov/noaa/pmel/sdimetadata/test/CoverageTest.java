@@ -1,6 +1,6 @@
-package gov.noaa.pmel.sdimetadata.test.coverage;
+package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.coverage.Coverage;
+import gov.noaa.pmel.sdimetadata.dataset.Coverage;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,8 +16,8 @@ public class CoverageTest {
     private static final double EASTERN_LONGITUDE = -120.45;
     private static final double SOUTHERN_LATITUDE = 15.36;
     private static final double NORTHERN_LATITUDE = 45.03;
-    private static final double EARLIEST_DATA_TIME = 123456.78;
-    private static final double LATEST_DATA_TIME = 234567.89;
+    private static final double EARLIEST_DATA_TIME = 1421150400.000;
+    private static final double LATEST_DATA_TIME = 1422532800.000;
 
     @Test
     public void testGetSetWesternLongitude() {
@@ -119,6 +119,20 @@ public class CoverageTest {
     }
 
     @Test
+    public void testCoverage() {
+        Coverage coverage = new Coverage(null, null, null, null, null, null);
+        assertEquals(new Coverage(), coverage);
+        coverage = new Coverage(WESTERN_LONGITUDE, EASTERN_LONGITUDE, SOUTHERN_LATITUDE, NORTHERN_LATITUDE,
+                EARLIEST_DATA_TIME, LATEST_DATA_TIME);
+        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
+        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
+        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
+        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
+        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
+        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
+    }
+
+    @Test
     public void testIsValid() {
         Coverage coverage = new Coverage();
         assertFalse(coverage.isValid());
@@ -145,6 +159,26 @@ public class CoverageTest {
         coverage.setEarliestDataTime(LATEST_DATA_TIME);
         coverage.setLatestDataTime(EARLIEST_DATA_TIME);
         assertFalse(coverage.isValid());
+    }
+
+    @Test
+    public void testClone() {
+        Coverage coverage = new Coverage();
+        Coverage dup = coverage.clone();
+        assertEquals(coverage, dup);
+        assertNotSame(coverage, dup);
+
+        coverage.setWesternLongitude(WESTERN_LONGITUDE);
+        coverage.setEasternLongitude(EASTERN_LONGITUDE);
+        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
+        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
+        coverage.setLatestDataTime(LATEST_DATA_TIME);
+        assertNotEquals(coverage, dup);
+
+        dup = coverage.clone();
+        assertEquals(coverage, dup);
+        assertNotSame(coverage, dup);
     }
 
     @Test
@@ -198,26 +232,6 @@ public class CoverageTest {
         second.setLatestDataTime(LATEST_DATA_TIME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-    }
-
-    @Test
-    public void testClone() {
-        Coverage coverage = new Coverage();
-        Coverage dup = coverage.clone();
-        assertEquals(coverage, dup);
-        assertNotSame(coverage, dup);
-
-        coverage.setWesternLongitude(WESTERN_LONGITUDE);
-        coverage.setEasternLongitude(EASTERN_LONGITUDE);
-        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
-        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
-        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
-        coverage.setLatestDataTime(LATEST_DATA_TIME);
-        assertNotEquals(coverage, dup);
-
-        dup = coverage.clone();
-        assertEquals(coverage, dup);
-        assertNotSame(coverage, dup);
     }
 
 }

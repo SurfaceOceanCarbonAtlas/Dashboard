@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.person;
 
-public class Person implements Cloneable {
+public class Investigator implements Cloneable {
     protected String lastName;
     protected String firstName;
     protected String middleInitials;
@@ -12,7 +12,7 @@ public class Person implements Cloneable {
     /**
      * Create with empty strings for all fields
      */
-    public Person() {
+    public Investigator() {
         lastName = "";
         firstName = "";
         middleInitials = "";
@@ -34,7 +34,7 @@ public class Person implements Cloneable {
      *         assign as the last name; if null, an empty string is assigned
      */
     public void setLastName(String lastName) {
-        this.lastName = (lastName != null) ? lastName : "";
+        this.lastName = (lastName != null) ? lastName.trim() : "";
     }
 
     /**
@@ -49,7 +49,7 @@ public class Person implements Cloneable {
      *         assign as the first name; if null, an empty string is assigned
      */
     public void setFirstName(String firstName) {
-        this.firstName = (firstName != null) ? firstName : "";
+        this.firstName = (firstName != null) ? firstName.trim() : "";
     }
 
     /**
@@ -64,7 +64,7 @@ public class Person implements Cloneable {
      *         assign as the middle initial(s); if null, an empty string is assigned
      */
     public void setMiddleInitials(String middleInitials) {
-        this.middleInitials = (middleInitials != null) ? middleInitials : "";
+        this.middleInitials = (middleInitials != null) ? middleInitials.trim() : "";
     }
 
     /**
@@ -79,7 +79,7 @@ public class Person implements Cloneable {
      *         assign as the organization; if null, an empty string is assigned
      */
     public void setOrganization(String organization) {
-        this.organization = (organization != null) ? organization : "";
+        this.organization = (organization != null) ? organization.trim() : "";
     }
 
     /**
@@ -94,7 +94,7 @@ public class Person implements Cloneable {
      *         assign as the address; if null, an empty string is assigned
      */
     public void setAddress(String address) {
-        this.address = (address != null) ? address : "";
+        this.address = (address != null) ? address.trim() : "";
     }
 
     /**
@@ -109,7 +109,7 @@ public class Person implements Cloneable {
      *         assign as the phone number; if null, an empty string is assigned
      */
     public void setPhone(String phone) {
-        this.phone = (phone != null) ? phone : "";
+        this.phone = (phone != null) ? phone.trim() : "";
     }
 
     /**
@@ -124,14 +124,25 @@ public class Person implements Cloneable {
      *         assign as the e-mail address; if null, an empty string is assigned
      */
     public void setEmail(String email) {
-        this.email = (email != null) ? email : "";
+        this.email = (email != null) ? email.trim() : "";
+    }
+
+    /**
+     * @return whether all the required fields are assigned with valid values.
+     */
+    public boolean isValid() {
+        if ( lastName.isEmpty() )
+            return false;
+        if ( firstName.isEmpty() )
+            return false;
+        return true;
     }
 
     @Override
-    public Person clone() {
-        Person dup;
+    public Investigator clone() {
+        Investigator dup;
         try {
-            dup = (Person) super.clone();
+            dup = (Investigator) super.clone();
         } catch ( CloneNotSupportedException ex ) {
             throw new RuntimeException(ex);
         }
@@ -149,10 +160,10 @@ public class Person implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( !(obj instanceof Person) )
+        if ( !(obj instanceof Investigator) )
             return false;
 
-        Person other = (Person) obj;
+        Investigator other = (Investigator) obj;
 
         if ( !lastName.equals(other.lastName) )
             return false;
@@ -186,7 +197,7 @@ public class Person implements Cloneable {
 
     @Override
     public String toString() {
-        return "Person{" +
+        return "Investigator{" +
                 "lastName='" + lastName + "'" +
                 ", firstName='" + firstName + "'" +
                 ", middleInitials='" + middleInitials + "'" +
@@ -196,5 +207,6 @@ public class Person implements Cloneable {
                 ", email='" + email + "'" +
                 '}';
     }
+
 }
 

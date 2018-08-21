@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.coverage;
+package gov.noaa.pmel.sdimetadata.dataset;
 
 public class Coverage implements Cloneable {
 
@@ -24,6 +24,19 @@ public class Coverage implements Cloneable {
         northernLatitude = Double.NaN;
         earliestDataTime = Double.NaN;
         latestDataTime = Double.NaN;
+    }
+
+    /**
+     * Create with the given values assigned by their corresponding setters.
+     */
+    public Coverage(Double westernLongitude, Double easternLongitude,
+            Double southernLatitude, Double northernLatitude, Double earliestDataTime, Double latestDataTime) {
+        setWesternLongitude(westernLongitude);
+        setEasternLongitude(easternLongitude);
+        setSouthernLatitude(southernLatitude);
+        setNorthernLatitude(northernLatitude);
+        setEarliestDataTime(earliestDataTime);
+        setLatestDataTime(latestDataTime);
     }
 
     /**

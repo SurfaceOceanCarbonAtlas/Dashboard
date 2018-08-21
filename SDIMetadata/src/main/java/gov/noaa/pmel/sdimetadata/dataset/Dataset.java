@@ -15,6 +15,7 @@ public class Dataset implements Cloneable {
     protected Datestamp startDatestamp;
     protected Datestamp endDatestamp;
     protected ArrayList<Datestamp> history;
+    protected Coverage coverage;
 
     /**
      * Create with empty or invalid values for all fields.
@@ -31,6 +32,7 @@ public class Dataset implements Cloneable {
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
         history = new ArrayList<Datestamp>();
+        coverage = new Coverage();
     }
 
     /**
@@ -236,14 +238,39 @@ public class Dataset implements Cloneable {
     }
 
     /**
-     * @return whether all the required fields are assigned with valid values.  Currently this means
-     *         datasetId is not blank, startDatestamp is valid, endDatestamp is valid, and
-     *         startDatestamp represents a date no later than endDatestamp.
+     * @return the coverage of the data in this dataset; never null but may be unassigned
+     */
+    public Coverage getCoverage() {
+        return coverage.clone();
+    }
+
+    /**
+     * @param coverage
+     *         assign as the coverage of the data in this dataset;
+     *         if null, an unassigned coverage object is assigned
+     */
+    public void setCoverage(Coverage coverage) {
+        this.coverage = (coverage != null) ? coverage.clone() : new Coverage();
+    }
+
+    /**
+     * @return whether all the required fields are assigned with valid values.
      */
     public boolean isValid() {
         if ( datasetId.isEmpty() )
             return false;
-        if ( startDatestamp.getEarliestTime() > endDatestamp.getEarliestTime() )
+        double startTime = startDatestamp.getEarliestTime();
+        double endTime = endDatestamp.getEarliestTime();
+        if ( startTime > endTime )
+            return false;
+        if ( !coverage.isValid() )
+            return false;
+        // set end time to the end of the day
+        endTime += 24.0 * 60.0 * 60.0;
+        // check that the data times are all within the time range for the dataset
+        if ( coverage.getEarliestDataTime() < startTime )
+            return false;
+        if ( coverage.getLatestDataTime() > endTime )
             return false;
         return true;
     }
@@ -270,6 +297,7 @@ public class Dataset implements Cloneable {
         for (Datestamp datestamp : history) {
             dup.history.add(datestamp.clone());
         }
+        dup.coverage = coverage.clone();
         return dup;
     }
 
@@ -304,6 +332,8 @@ public class Dataset implements Cloneable {
             return false;
         if ( !history.equals(dataset.history) )
             return false;
+        if ( !coverage.equals(dataset.coverage) )
+            return false;
         return true;
     }
 
@@ -321,6 +351,7 @@ public class Dataset implements Cloneable {
         result = result * prime + startDatestamp.hashCode();
         result = result * prime + endDatestamp.hashCode();
         result = result * prime + history.hashCode();
+        result = result * prime + coverage.hashCode();
         return result;
     }
 
@@ -338,6 +369,7 @@ public class Dataset implements Cloneable {
                 ", startDatestamp=" + startDatestamp +
                 ", endDatestamp=" + endDatestamp +
                 ", history=" + history +
+                ", coverage=" + coverage +
                 '}';
     }
 

@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.test.dataset;
+package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.dataset.Datestamp;
 import org.junit.Test;
@@ -53,38 +53,6 @@ public class DatestampTest {
     }
 
     @Test
-    public void testHashCodeEquals() {
-        Datestamp first = new Datestamp();
-        assertFalse(first.equals(null));
-        assertFalse(first.equals(YEAR));
-
-        Datestamp second = new Datestamp();
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setYear(YEAR);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setYear(YEAR);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setMonth(MONTH);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setMonth(MONTH);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setDay(DAY);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setDay(DAY);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-    }
-
-    @Test
     public void testGetEarliestTime() {
         Datestamp datestamp = new Datestamp();
         try {
@@ -133,6 +101,19 @@ public class DatestampTest {
     }
 
     @Test
+    public void testDatestamp() {
+        Datestamp datestamp = new Datestamp(null, null, null);
+        assertEquals(Datestamp.INVALID, datestamp.getYear());
+        assertEquals(Datestamp.INVALID, datestamp.getMonth());
+        assertEquals(Datestamp.INVALID, datestamp.getDay());
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY);
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+    }
+
+    @Test
     public void testIsValid() {
         Datestamp datestamp = new Datestamp();
         assertFalse(datestamp.isValid());
@@ -146,19 +127,6 @@ public class DatestampTest {
         datestamp.setMonth(2);
         datestamp.setDay(29);
         assertFalse(datestamp.isValid());
-    }
-
-    @Test
-    public void setDatestamp() {
-        Datestamp datestamp = new Datestamp(null, null, null);
-        assertEquals(Datestamp.INVALID, datestamp.getYear());
-        assertEquals(Datestamp.INVALID, datestamp.getMonth());
-        assertEquals(Datestamp.INVALID, datestamp.getDay());
-
-        datestamp = new Datestamp(YEAR, MONTH, DAY);
-        assertEquals(YEAR, datestamp.getYear());
-        assertEquals(MONTH, datestamp.getMonth());
-        assertEquals(DAY, datestamp.getDay());
     }
 
     @Test
@@ -176,6 +144,38 @@ public class DatestampTest {
         clone = datestamp.clone();
         assertEquals(datestamp, clone);
         assertNotSame(datestamp, clone);
+    }
+
+    @Test
+    public void testHashCodeEquals() {
+        Datestamp first = new Datestamp();
+        assertFalse(first.equals(null));
+        assertFalse(first.equals(YEAR));
+
+        Datestamp second = new Datestamp();
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setYear(YEAR);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setYear(YEAR);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setMonth(MONTH);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setMonth(MONTH);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setDay(DAY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setDay(DAY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
 }
