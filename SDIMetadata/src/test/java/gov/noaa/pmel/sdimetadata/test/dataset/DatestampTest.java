@@ -3,8 +3,6 @@ package gov.noaa.pmel.sdimetadata.test.dataset;
 import gov.noaa.pmel.sdimetadata.dataset.Datestamp;
 import org.junit.Test;
 
-import java.util.Date;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -18,7 +16,7 @@ public class DatestampTest {
     private static final Integer MONTH = 6;
     private static final Integer DAY = 25;
     private static final String DATESTAMP = "2010-06-25";
-    private static final Date DATE_OF_DATESTAMP = new Date(1277424000000L);
+    private static final double TIME_OF_DATESTAMP = 1277424000.000;
 
 
     @Test
@@ -61,28 +59,28 @@ public class DatestampTest {
         assertFalse(first.equals(YEAR));
 
         Datestamp second = new Datestamp();
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setYear(YEAR);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setYear(YEAR);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setMonth(MONTH);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setMonth(MONTH);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDay(DAY);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDay(DAY);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 
@@ -98,7 +96,7 @@ public class DatestampTest {
         datestamp.setYear(YEAR);
         datestamp.setMonth(MONTH);
         datestamp.setDay(DAY);
-        assertEquals(DATE_OF_DATESTAMP, datestamp.getEarliestTime());
+        assertEquals(TIME_OF_DATESTAMP, datestamp.getEarliestTime(), 0.1);
         datestamp.setYear(2011);
         datestamp.setMonth(2);
         datestamp.setDay(29);

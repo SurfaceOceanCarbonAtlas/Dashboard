@@ -26,7 +26,7 @@ public class DatasetTest {
     private static final String WEBSITE = "http://cdiac.ornl.gov/ftp/oceans/VOS_Ronald_Brown/RB2015/";
     private static final String CITATION = "R. Wanninkhof, R. D. Castle, and J. Shannahoff. 2013. " +
             "Underway pCO2 measurements aboard the R/V Ronald H. Brown during the 2014 cruises. " +
-            "Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tennessee. ";
+            "Carbon Dioxide Information Analysis Center, Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tennessee.";
     private static final ArrayList<String> ADDN_INFO_LIST = new ArrayList<String>(Arrays.asList(
             "It was determined that there was a 2.68 minute offset between the SST data record from the SBE-21 in the bow and the Hart 1521 temperature sensor in the equilibrator.  The SST data were interpolated using this offset to determine the SST at the time of the equilibrator measurement.",
             "A total of 6011 measurements were taken with 5661 flagged as good, 342 flagged as questionable, and 8 flagged as bad.  All measurements flagged as 4 (bad) have been removed from the final data file.",
@@ -238,77 +238,77 @@ public class DatasetTest {
         assertFalse(first.equals(DATASET_ID));
 
         Dataset second = new Dataset();
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetId(DATASET_ID);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetId(DATASET_ID);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetName(DATASET_NAME);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetName(DATASET_NAME);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setFunding(FUNDING_INFO);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setFunding(FUNDING_INFO);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setDatasetDoi(DATASET_DOI);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetDoi(DATASET_DOI);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setWebsite(WEBSITE);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setWebsite(WEBSITE);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setCitation(CITATION);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setCitation(CITATION);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setAddnInfo(ADDN_INFO_LIST);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setAddnInfo(ADDN_INFO_LIST);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setStartDatestamp(START_DATESTAMP);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setStartDatestamp(START_DATESTAMP);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setEndDatestamp(END_DATESTAMP);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setEndDatestamp(END_DATESTAMP);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setHistory(HISTORY_LIST);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setHistory(HISTORY_LIST);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 

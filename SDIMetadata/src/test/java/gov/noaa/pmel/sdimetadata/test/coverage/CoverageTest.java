@@ -27,6 +27,10 @@ public class CoverageTest {
         assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
         coverage.setWesternLongitude(null);
         assertTrue(coverage.getWesternLongitude().isNaN());
+        coverage.setWesternLongitude(WESTERN_LONGITUDE);
+        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
+        coverage.setWesternLongitude(-600.0);
+        assertTrue(coverage.getWesternLongitude().isNaN());
     }
 
     @Test
@@ -37,6 +41,10 @@ public class CoverageTest {
         assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
         assertTrue(coverage.getWesternLongitude().isNaN());
         coverage.setEasternLongitude(null);
+        assertTrue(coverage.getEasternLongitude().isNaN());
+        coverage.setEasternLongitude(EASTERN_LONGITUDE);
+        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
+        coverage.setEasternLongitude(600.0);
         assertTrue(coverage.getEasternLongitude().isNaN());
     }
 
@@ -49,6 +57,10 @@ public class CoverageTest {
         assertTrue(coverage.getEasternLongitude().isNaN());
         assertTrue(coverage.getWesternLongitude().isNaN());
         coverage.setSouthernLatitude(null);
+        assertTrue(coverage.getSouthernLatitude().isNaN());
+        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
+        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
+        coverage.setSouthernLatitude(-100.0);
         assertTrue(coverage.getSouthernLatitude().isNaN());
     }
 
@@ -63,6 +75,10 @@ public class CoverageTest {
         assertTrue(coverage.getWesternLongitude().isNaN());
         coverage.setNorthernLatitude(null);
         assertTrue(coverage.getNorthernLatitude().isNaN());
+        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
+        coverage.setNorthernLatitude(100.0);
+        assertTrue(coverage.getNorthernLatitude().isNaN());
     }
 
     @Test
@@ -76,6 +92,10 @@ public class CoverageTest {
         assertTrue(coverage.getEasternLongitude().isNaN());
         assertTrue(coverage.getWesternLongitude().isNaN());
         coverage.setEarliestDataTime(null);
+        assertTrue(coverage.getEarliestDataTime().isNaN());
+        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
+        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
+        coverage.setEarliestDataTime(Coverage.MIN_DATA_TIME - 60.0);
         assertTrue(coverage.getEarliestDataTime().isNaN());
     }
 
@@ -92,6 +112,39 @@ public class CoverageTest {
         assertTrue(coverage.getWesternLongitude().isNaN());
         coverage.setLatestDataTime(null);
         assertTrue(coverage.getLatestDataTime().isNaN());
+        coverage.setLatestDataTime(LATEST_DATA_TIME);
+        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
+        coverage.setLatestDataTime(System.currentTimeMillis() / 1000.0 + 60.0);
+        assertTrue(coverage.getLatestDataTime().isNaN());
+    }
+
+    @Test
+    public void testIsValid() {
+        Coverage coverage = new Coverage();
+        assertFalse(coverage.isValid());
+
+        coverage.setWesternLongitude(WESTERN_LONGITUDE);
+        coverage.setEasternLongitude(EASTERN_LONGITUDE);
+        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
+        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
+        coverage.setLatestDataTime(LATEST_DATA_TIME);
+        assertTrue(coverage.isValid());
+
+        coverage.setWesternLongitude(EASTERN_LONGITUDE);
+        coverage.setEasternLongitude(WESTERN_LONGITUDE);
+        assertTrue(coverage.isValid());
+
+        coverage.setSouthernLatitude(NORTHERN_LATITUDE);
+        coverage.setNorthernLatitude(SOUTHERN_LATITUDE);
+        assertFalse(coverage.isValid());
+        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
+        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        assertTrue(coverage.isValid());
+
+        coverage.setEarliestDataTime(LATEST_DATA_TIME);
+        coverage.setLatestDataTime(EARLIEST_DATA_TIME);
+        assertFalse(coverage.isValid());
     }
 
     @Test
@@ -101,49 +154,49 @@ public class CoverageTest {
         assertFalse(first.equals(WESTERN_LONGITUDE));
 
         Coverage second = new Coverage();
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setWesternLongitude(WESTERN_LONGITUDE);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setWesternLongitude(WESTERN_LONGITUDE);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setEasternLongitude(EASTERN_LONGITUDE);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setEasternLongitude(EASTERN_LONGITUDE);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setSouthernLatitude(SOUTHERN_LATITUDE);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setSouthernLatitude(SOUTHERN_LATITUDE);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setEarliestDataTime(EARLIEST_DATA_TIME);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setEarliestDataTime(EARLIEST_DATA_TIME);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
         first.setLatestDataTime(LATEST_DATA_TIME);
-        assertFalse(first.hashCode() == second.hashCode());
+        assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setLatestDataTime(LATEST_DATA_TIME);
-        assertTrue(first.hashCode() == second.hashCode());
+        assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 

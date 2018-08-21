@@ -1,6 +1,12 @@
 package gov.noaa.pmel.sdimetadata.coverage;
 
 public class Coverage implements Cloneable {
+
+    /**
+     * 1900-01-01 00:00:00 in units of seconds since 1970-01-01 00:00:00
+     */
+    public static final Double MIN_DATA_TIME = -2208988800.000;
+
     protected Double westernLongitude;
     protected Double easternLongitude;
     protected Double southernLatitude;
@@ -21,7 +27,7 @@ public class Coverage implements Cloneable {
     }
 
     /**
-     * @return the western longitude limit, in units of decimal degrees east;
+     * @return the western longitude limit, in units of decimal degrees east in the range (180.0,180.0];
      *         never null but may be Double.NaN
      */
     public Double getWesternLongitude() {
@@ -31,14 +37,24 @@ public class Coverage implements Cloneable {
     /**
      * @param westernLongitude
      *         assign as the western longitude limit, in units of decimal degrees east;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid (not in the range [-540.0,540.0]), Double.NaN will be assigned
      */
     public void setWesternLongitude(Double westernLongitude) {
-        this.westernLongitude = (westernLongitude != null) ? westernLongitude : Double.NaN;
+        if ( (westernLongitude != null) && (westernLongitude >= -540.0) && (westernLongitude <= 540.0) ) {
+            this.westernLongitude = westernLongitude;
+            while ( this.westernLongitude <= -180.0 ) {
+                this.westernLongitude += 360.0;
+            }
+            while ( this.westernLongitude > 180.0 ) {
+                this.westernLongitude -= 360.0;
+            }
+        }
+        else
+            this.westernLongitude = Double.NaN;
     }
 
     /**
-     * @return the eastern longitude limit, in units of decimal degrees east;
+     * @return the eastern longitude limit, in units of decimal degrees east in the range (-180.0,180.0];
      *         never null but may be Double.NaN
      */
     public Double getEasternLongitude() {
@@ -48,10 +64,20 @@ public class Coverage implements Cloneable {
     /**
      * @param easternLongitude
      *         assign as the eastern longitude limit, in units of decimal degrees east;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid (not in the range [-540.0,540.0]), Double.NaN will be assigned
      */
     public void setEasternLongitude(Double easternLongitude) {
-        this.easternLongitude = (easternLongitude != null) ? easternLongitude : Double.NaN;
+        if ( (easternLongitude != null) && (easternLongitude >= -540.0) && (easternLongitude <= 540.0) ) {
+            this.easternLongitude = easternLongitude;
+            while ( this.easternLongitude <= -180.0 ) {
+                this.easternLongitude += 360.0;
+            }
+            while ( this.easternLongitude > 180.0 ) {
+                this.easternLongitude -= 360.0;
+            }
+        }
+        else
+            this.easternLongitude = Double.NaN;
     }
 
     /**
@@ -65,10 +91,13 @@ public class Coverage implements Cloneable {
     /**
      * @param southernLatitude
      *         assign as the southern latitude limit, in units of decimal degrees north;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid, Double.NaN will be assigned
      */
     public void setSouthernLatitude(Double southernLatitude) {
-        this.southernLatitude = (southernLatitude != null) ? southernLatitude : Double.NaN;
+        if ( (southernLatitude != null) && (southernLatitude >= -90.0) && (southernLatitude <= 90.0) )
+            this.southernLatitude = southernLatitude;
+        else
+            this.southernLatitude = Double.NaN;
     }
 
     /**
@@ -82,10 +111,13 @@ public class Coverage implements Cloneable {
     /**
      * @param northernLatitude
      *         assign as the northern latitude limit, in units of decimal degrees north;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid, Double.NaN will be assigned
      */
     public void setNorthernLatitude(Double northernLatitude) {
-        this.northernLatitude = (northernLatitude != null) ? northernLatitude : Double.NaN;
+        if ( (northernLatitude != null) && (northernLatitude >= -90.0) && (northernLatitude <= 90.0) )
+            this.northernLatitude = northernLatitude;
+        else
+            this.northernLatitude = Double.NaN;
     }
 
     /**
@@ -99,10 +131,14 @@ public class Coverage implements Cloneable {
     /**
      * @param earliestDataTime
      *         assign as the earliest (oldest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid (before 1900-01-01 or after the current time), Double.NaN will be assigned
      */
     public void setEarliestDataTime(Double earliestDataTime) {
-        this.earliestDataTime = (earliestDataTime != null) ? earliestDataTime : Double.NaN;
+        if ( (earliestDataTime != null) && (earliestDataTime >= MIN_DATA_TIME) &&
+                (earliestDataTime <= (System.currentTimeMillis() / 1000.0)) )
+            this.earliestDataTime = earliestDataTime;
+        else
+            this.earliestDataTime = Double.NaN;
     }
 
     /**
@@ -116,10 +152,29 @@ public class Coverage implements Cloneable {
     /**
      * @param latestDataTime
      *         assign as the latest (newest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         if null, Double.NaN will be assigned
+     *         if null or invalid (before 1900-01-01 or after the current time), Double.NaN will be assigned
      */
     public void setLatestDataTime(Double latestDataTime) {
-        this.latestDataTime = (latestDataTime != null) ? latestDataTime : Double.NaN;
+        if ( (latestDataTime != null) && (latestDataTime >= MIN_DATA_TIME) &&
+                (latestDataTime <= (System.currentTimeMillis() / 1000.0)) )
+            this.latestDataTime = latestDataTime;
+        else
+            this.latestDataTime = Double.NaN;
+    }
+
+    /**
+     * @return if the coverage bounds are all valid
+     */
+    public boolean isValid() {
+        if ( westernLongitude.isNaN() || easternLongitude.isNaN() || southernLatitude.isNaN() ||
+                northernLatitude.isNaN() || earliestDataTime.isNaN() || latestDataTime.isNaN() )
+            return false;
+        // due to modulo nature of longitudes, the western longitude and be larger than the eastern longitude
+        if ( southernLatitude > northernLatitude )
+            return false;
+        if ( earliestDataTime > latestDataTime )
+            return false;
+        return true;
     }
 
     @Override

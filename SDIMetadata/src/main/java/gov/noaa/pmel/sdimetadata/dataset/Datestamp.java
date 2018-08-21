@@ -50,7 +50,7 @@ public class Datestamp implements Cloneable {
      *         is earlier than 1900-01-01, or
      *         is later than the current date.
      */
-    public Date getEarliestTime() throws IllegalStateException {
+    public Double getEarliestTime() throws IllegalStateException {
         if ( (year < 1900) || (year > 9999) )
             throw new IllegalStateException("invalid year: " + year);
         if ( (month < 1) || (month > 12) )
@@ -64,9 +64,10 @@ public class Datestamp implements Cloneable {
         } catch ( Exception ex ) {
             throw new IllegalStateException("invalid timestamp '" + timestamp + "': " + ex.getMessage());
         }
-        if ( System.currentTimeMillis() < value.getTime() )
+        long time = value.getTime();
+        if ( System.currentTimeMillis() < time )
             throw new IllegalStateException("'" + timestamp + "' is in the future");
-        return value;
+        return time / 1000.0;
     }
 
     /**

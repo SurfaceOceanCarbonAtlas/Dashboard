@@ -45,7 +45,7 @@ public class Dataset implements Cloneable {
      *         assign as the unique ID for this dataset; if null, an empty string is assigned
      */
     public void setDatasetId(String datasetId) {
-        this.datasetId = (datasetId != null) ? datasetId : "";
+        this.datasetId = (datasetId != null) ? datasetId.trim() : "";
     }
 
     /**
@@ -60,7 +60,7 @@ public class Dataset implements Cloneable {
      *         assign as the PI's name for this dataset; if null, an empty string is assigned
      */
     public void setDatasetName(String datasetName) {
-        this.datasetName = (datasetName != null) ? datasetName : "";
+        this.datasetName = (datasetName != null) ? datasetName.trim() : "";
     }
 
     /**
@@ -75,7 +75,7 @@ public class Dataset implements Cloneable {
      *         assign as the brief description for this dataset; if null, an empty string is assigned
      */
     public void setDescription(String description) {
-        this.description = (description != null) ? description : "";
+        this.description = (description != null) ? description.trim() : "";
     }
 
     /**
@@ -90,7 +90,7 @@ public class Dataset implements Cloneable {
      *         assign as the funding source for this dataset; if null, an empty string is assigned
      */
     public void setFunding(String funding) {
-        this.funding = (funding != null) ? funding : "";
+        this.funding = (funding != null) ? funding.trim() : "";
     }
 
     /**
@@ -105,7 +105,7 @@ public class Dataset implements Cloneable {
      *         assign as the DOI for this dataset; if null, an empty string is assigned
      */
     public void setDatasetDoi(String datasetDoi) {
-        this.datasetDoi = (datasetDoi != null) ? datasetDoi : "";
+        this.datasetDoi = (datasetDoi != null) ? datasetDoi.trim() : "";
     }
 
     /**
@@ -120,7 +120,7 @@ public class Dataset implements Cloneable {
      *         assign as the website for this dataset; if null, an empty string is assigned
      */
     public void setWebsite(String website) {
-        this.website = (website != null) ? website : "";
+        this.website = (website != null) ? website.trim() : "";
     }
 
     /**
@@ -135,7 +135,7 @@ public class Dataset implements Cloneable {
      *         assign as the citation for this dataset; if null, an empty string is assigned
      */
     public void setCitation(String citation) {
-        this.citation = (citation != null) ? citation : "";
+        this.citation = (citation != null) ? citation.trim() : "";
     }
 
     /**
@@ -233,6 +233,19 @@ public class Dataset implements Cloneable {
                 this.history.add(datestamp.clone());
             }
         }
+    }
+
+    /**
+     * @return whether all the required fields are assigned with valid values.  Currently this means
+     *         datasetId is not blank, startDatestamp is valid, endDatestamp is valid, and
+     *         startDatestamp represents a date no later than endDatestamp.
+     */
+    public boolean isValid() {
+        if ( datasetId.isEmpty() )
+            return false;
+        if ( startDatestamp.getEarliestTime() > endDatestamp.getEarliestTime() )
+            return false;
+        return true;
     }
 
     @Override
