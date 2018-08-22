@@ -1,5 +1,8 @@
 package gov.noaa.pmel.sdimetadata.dataset;
 
+/**
+ * Information about the longitude, latitude, and time coverage of data in a dataset
+ */
 public class Coverage implements Cloneable {
 
     /**

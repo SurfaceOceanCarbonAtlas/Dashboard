@@ -2,6 +2,9 @@ package gov.noaa.pmel.sdimetadata.dataset;
 
 import java.util.ArrayList;
 
+/**
+ * Miscellaneous information about a dataset.
+ */
 public class Dataset implements Cloneable {
 
     protected String datasetId;

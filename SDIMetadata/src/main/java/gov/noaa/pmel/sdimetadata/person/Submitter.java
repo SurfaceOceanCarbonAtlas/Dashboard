@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.person;
 
 /**
- * Same as an Investigator except isValid requires more valid fields.
+ * Same as Investigator except requires contact information to be valid.
  */
 public class Submitter extends Investigator implements Cloneable {
 

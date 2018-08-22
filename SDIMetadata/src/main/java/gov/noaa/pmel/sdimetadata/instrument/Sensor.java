@@ -2,6 +2,10 @@ package gov.noaa.pmel.sdimetadata.instrument;
 
 import java.util.ArrayList;
 
+/**
+ * Information about a generic sensor.
+ * The super class for specific sensors.
+ */
 public class Sensor implements Cloneable {
     protected String sensorName;
     protected String sensorId;

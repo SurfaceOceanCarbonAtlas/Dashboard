@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 /**
- * Simple class to represent, parse, and format a Date.
+ * Represents and works with a date (without time)
  */
 public class Datestamp implements Cloneable {
 

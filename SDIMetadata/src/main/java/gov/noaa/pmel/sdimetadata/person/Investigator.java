@@ -1,5 +1,9 @@
 package gov.noaa.pmel.sdimetadata.person;
 
+/**
+ * Standard information about a person.
+ * Super class for Submitter.
+ */
 public class Investigator implements Cloneable {
     protected String lastName;
     protected String firstName;
