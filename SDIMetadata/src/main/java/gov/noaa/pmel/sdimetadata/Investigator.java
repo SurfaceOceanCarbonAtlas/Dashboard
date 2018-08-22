@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.person;
+package gov.noaa.pmel.sdimetadata;
 
 import java.util.ArrayList;
 

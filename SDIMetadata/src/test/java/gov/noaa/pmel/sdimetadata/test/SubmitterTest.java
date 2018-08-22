@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.person.Investigator;
-import gov.noaa.pmel.sdimetadata.person.Submitter;
+import gov.noaa.pmel.sdimetadata.Investigator;
+import gov.noaa.pmel.sdimetadata.Submitter;
 import org.junit.Test;
 
 import java.util.ArrayList;

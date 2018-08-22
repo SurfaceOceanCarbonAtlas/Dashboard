@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.dataset;
+package gov.noaa.pmel.sdimetadata;
 
 /**
  * Information about the longitude, latitude, and time coverage of data in a dataset
@@ -16,9 +16,11 @@ public class Coverage implements Cloneable {
     protected Double northernLatitude;
     protected Double earliestDataTime;
     protected Double latestDataTime;
+    protected String regionName;
+    protected String locationInRegion;
 
     /**
-     * Create with all values assigned as Double.NaN
+     * Create with all values assigned as Double.NaN or empty string
      */
     public Coverage() {
         westernLongitude = Double.NaN;
@@ -27,19 +29,25 @@ public class Coverage implements Cloneable {
         northernLatitude = Double.NaN;
         earliestDataTime = Double.NaN;
         latestDataTime = Double.NaN;
+        regionName = "";
+        locationInRegion = "";
     }
 
     /**
      * Create with the given values assigned by their corresponding setters.
      */
     public Coverage(Double westernLongitude, Double easternLongitude,
-            Double southernLatitude, Double northernLatitude, Double earliestDataTime, Double latestDataTime) {
+            Double southernLatitude, Double northernLatitude,
+            Double earliestDataTime, Double latestDataTime,
+            String regionName, String locationInRegion) {
         setWesternLongitude(westernLongitude);
         setEasternLongitude(easternLongitude);
         setSouthernLatitude(southernLatitude);
         setNorthernLatitude(northernLatitude);
         setEarliestDataTime(earliestDataTime);
         setLatestDataTime(latestDataTime);
+        setRegionName(regionName);
+        setLocationInRegion(locationInRegion);
     }
 
     /**
@@ -179,6 +187,36 @@ public class Coverage implements Cloneable {
     }
 
     /**
+     * @return the region name; never null but may be empty
+     */
+    public String getRegionName() {
+        return regionName;
+    }
+
+    /**
+     * @param regionName
+     *         assign as the region name; if null, an empty string is assigned
+     */
+    public void setRegionName(String regionName) {
+        this.regionName = (regionName != null) ? regionName.trim() : "";
+    }
+
+    /**
+     * @return the location in the named region; never null but may be empty
+     */
+    public String getLocationInRegion() {
+        return locationInRegion;
+    }
+
+    /**
+     * @param locationInRegion
+     *         assign as the location in the named region; if null, an empty string is assigned
+     */
+    public void setLocationInRegion(String locationInRegion) {
+        this.locationInRegion = (locationInRegion != null) ? locationInRegion.trim() : "";
+    }
+
+    /**
      * @return if the coverage bounds are all valid
      */
     public boolean isValid() {
@@ -207,6 +245,8 @@ public class Coverage implements Cloneable {
         coverage.northernLatitude = northernLatitude;
         coverage.earliestDataTime = earliestDataTime;
         coverage.latestDataTime = latestDataTime;
+        coverage.regionName = regionName;
+        coverage.locationInRegion = locationInRegion;
         return coverage;
     }
 
@@ -231,6 +271,10 @@ public class Coverage implements Cloneable {
             return false;
         if ( !latestDataTime.equals(other.latestDataTime) )
             return false;
+        if ( !regionName.equals(other.regionName) )
+            return false;
+        if ( !locationInRegion.equals(other.locationInRegion) )
+            return false;
         return true;
     }
 
@@ -243,6 +287,8 @@ public class Coverage implements Cloneable {
         result = result * prime + northernLatitude.hashCode();
         result = result * prime + earliestDataTime.hashCode();
         result = result * prime + latestDataTime.hashCode();
+        result = result * prime + regionName.hashCode();
+        result = result * prime + locationInRegion.hashCode();
         return result;
     }
 
@@ -255,6 +301,8 @@ public class Coverage implements Cloneable {
                 ", northernLatitude=" + northernLatitude +
                 ", earliestDataTime=" + earliestDataTime +
                 ", latestDataTime=" + latestDataTime +
+                ", regionName=" + regionName +
+                ", locationInRegion=" + locationInRegion +
                 '}';
     }
 

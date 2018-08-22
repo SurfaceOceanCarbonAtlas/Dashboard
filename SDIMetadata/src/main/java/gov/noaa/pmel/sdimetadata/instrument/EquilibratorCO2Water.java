@@ -3,7 +3,7 @@ package gov.noaa.pmel.sdimetadata.instrument;
 /**
  * Describes an equilibrator for measuring the amount of dissolved carbon dioxide in water.
  */
-public class EquilibratorCO2Water implements Cloneable {
+public class EquilibratorCO2Water extends Instrument implements Cloneable {
     protected Double intakeDepthM;
     protected String intakeLocation;
     protected String equilibratorType;
@@ -15,7 +15,6 @@ public class EquilibratorCO2Water implements Cloneable {
     protected Double maxGasFlowMilliLPM;
     protected Boolean vented;
     protected String dryingMethod;
-    protected String addnInfo;
 
     /*
      * <Depth_of_Sea_Water_Intake>5 meters</Depth_of_Sea_Water_Intake>

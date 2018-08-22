@@ -1,11 +1,11 @@
-package gov.noaa.pmel.sdimetadata.dataset;
+package gov.noaa.pmel.sdimetadata;
 
 import java.util.ArrayList;
 
 /**
  * Miscellaneous information about a dataset.
  */
-public class Dataset implements Cloneable {
+public class MiscInfo implements Cloneable {
 
     protected String datasetId;
     protected String datasetName;
@@ -18,12 +18,11 @@ public class Dataset implements Cloneable {
     protected Datestamp startDatestamp;
     protected Datestamp endDatestamp;
     protected ArrayList<Datestamp> history;
-    protected Coverage coverage;
 
     /**
      * Create with empty or invalid values for all fields.
      */
-    public Dataset() {
+    public MiscInfo() {
         datasetId = "";
         datasetName = "";
         description = "";
@@ -35,7 +34,6 @@ public class Dataset implements Cloneable {
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
         history = new ArrayList<Datestamp>();
-        coverage = new Coverage();
     }
 
     /**
@@ -241,48 +239,21 @@ public class Dataset implements Cloneable {
     }
 
     /**
-     * @return the coverage of the data in this dataset; never null but may be unassigned
-     */
-    public Coverage getCoverage() {
-        return coverage.clone();
-    }
-
-    /**
-     * @param coverage
-     *         assign as the coverage of the data in this dataset;
-     *         if null, an unassigned coverage object is assigned
-     */
-    public void setCoverage(Coverage coverage) {
-        this.coverage = (coverage != null) ? coverage.clone() : new Coverage();
-    }
-
-    /**
      * @return whether all the required fields are assigned with valid values.
      */
     public boolean isValid() {
         if ( datasetId.isEmpty() )
             return false;
-        double startTime = startDatestamp.getEarliestTime();
-        double endTime = endDatestamp.getEarliestTime();
-        if ( startTime > endTime )
-            return false;
-        if ( !coverage.isValid() )
-            return false;
-        // set end time to the end of the day
-        endTime += 24.0 * 60.0 * 60.0;
-        // check that the data times are all within the time range for the dataset
-        if ( coverage.getEarliestDataTime() < startTime )
-            return false;
-        if ( coverage.getLatestDataTime() > endTime )
+        if ( startDatestamp.getEarliestTime() > endDatestamp.getEarliestTime() )
             return false;
         return true;
     }
 
     @Override
-    public Dataset clone() {
-        Dataset dup;
+    public MiscInfo clone() {
+        MiscInfo dup;
         try {
-            dup = (Dataset) super.clone();
+            dup = (MiscInfo) super.clone();
         } catch ( CloneNotSupportedException ex ) {
             throw new RuntimeException(ex);
         }
@@ -300,7 +271,6 @@ public class Dataset implements Cloneable {
         for (Datestamp datestamp : history) {
             dup.history.add(datestamp.clone());
         }
-        dup.coverage = coverage.clone();
         return dup;
     }
 
@@ -308,34 +278,32 @@ public class Dataset implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( !(obj instanceof Dataset) )
+        if ( !(obj instanceof MiscInfo) )
             return false;
 
-        Dataset dataset = (Dataset) obj;
+        MiscInfo miscInfo = (MiscInfo) obj;
 
-        if ( !datasetId.equals(dataset.datasetId) )
+        if ( !datasetId.equals(miscInfo.datasetId) )
             return false;
-        if ( !datasetName.equals(dataset.datasetName) )
+        if ( !datasetName.equals(miscInfo.datasetName) )
             return false;
-        if ( !description.equals(dataset.description) )
+        if ( !description.equals(miscInfo.description) )
             return false;
-        if ( !funding.equals(dataset.funding) )
+        if ( !funding.equals(miscInfo.funding) )
             return false;
-        if ( !datasetDoi.equals(dataset.datasetDoi) )
+        if ( !datasetDoi.equals(miscInfo.datasetDoi) )
             return false;
-        if ( !website.equals(dataset.website) )
+        if ( !website.equals(miscInfo.website) )
             return false;
-        if ( !citation.equals(dataset.citation) )
+        if ( !citation.equals(miscInfo.citation) )
             return false;
-        if ( !addnInfo.equals(dataset.addnInfo) )
+        if ( !addnInfo.equals(miscInfo.addnInfo) )
             return false;
-        if ( !startDatestamp.equals(dataset.startDatestamp) )
+        if ( !startDatestamp.equals(miscInfo.startDatestamp) )
             return false;
-        if ( !endDatestamp.equals(dataset.endDatestamp) )
+        if ( !endDatestamp.equals(miscInfo.endDatestamp) )
             return false;
-        if ( !history.equals(dataset.history) )
-            return false;
-        if ( !coverage.equals(dataset.coverage) )
+        if ( !history.equals(miscInfo.history) )
             return false;
         return true;
     }
@@ -354,7 +322,6 @@ public class Dataset implements Cloneable {
         result = result * prime + startDatestamp.hashCode();
         result = result * prime + endDatestamp.hashCode();
         result = result * prime + history.hashCode();
-        result = result * prime + coverage.hashCode();
         return result;
     }
 
@@ -372,7 +339,6 @@ public class Dataset implements Cloneable {
                 ", startDatestamp=" + startDatestamp +
                 ", endDatestamp=" + endDatestamp +
                 ", history=" + history +
-                ", coverage=" + coverage +
                 '}';
     }
 

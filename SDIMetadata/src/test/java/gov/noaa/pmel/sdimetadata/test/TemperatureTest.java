@@ -1,10 +1,8 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.datavar.Temperature;
-import gov.noaa.pmel.sdimetadata.datavar.Variable;
+import gov.noaa.pmel.sdimetadata.variable.Temperature;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
-
-import java.time.temporal.ValueRange;
 
 import static org.junit.Assert.*;
 

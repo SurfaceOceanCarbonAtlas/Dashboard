@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.datavar;
+package gov.noaa.pmel.sdimetadata.variable;
 
 /**
  * Describes a temperature data variable in a dataset.

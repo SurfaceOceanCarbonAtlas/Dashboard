@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.person;
+package gov.noaa.pmel.sdimetadata;
 
 /**
  * Same as Investigator except requires contact information to be valid.

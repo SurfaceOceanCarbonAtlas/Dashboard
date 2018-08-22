@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.instrument.Sensor;
+import gov.noaa.pmel.sdimetadata.Sensor;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class SensorTest {
     private static final String EMPTY_STRING = "";
     private static final String SENSOR_NAME = "Equilibrator headspace differential pressure sensor";
     private static final String SENSOR_ID = "Setra-239 #0003245";
-    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
+    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final ArrayList<String> COMMENTS = new ArrayList<String>(Arrays.asList(
             "Pressure reading from the Setra-270 on the exit of the analyzer was added to the differential pressure reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
             "Some other comment just to have a second one."
@@ -48,25 +48,12 @@ public class SensorTest {
         assertEquals(EMPTY_STRING, sensor.getSensorId());
     }
 
-    @Test
-    public void testGetSetLocation() {
-        Sensor sensor = new Sensor();
-        assertEquals(EMPTY_STRING, sensor.getLocation());
-        sensor.setLocation(LOCATION);
-        assertEquals(LOCATION, sensor.getLocation());
-        assertEquals(EMPTY_STRING, sensor.getSensorId());
-        assertEquals(EMPTY_STRING, sensor.getSensorName());
-        sensor.setLocation(null);
-        assertEquals(EMPTY_STRING, sensor.getLocation());
-    }
-
-    @Test
+   @Test
     public void testGetSetManufacturer() {
         Sensor sensor = new Sensor();
         assertEquals(EMPTY_STRING, sensor.getManufacturer());
         sensor.setManufacturer(MANUFACTURER);
         assertEquals(MANUFACTURER, sensor.getManufacturer());
-        assertEquals(EMPTY_STRING, sensor.getLocation());
         assertEquals(EMPTY_STRING, sensor.getSensorId());
         assertEquals(EMPTY_STRING, sensor.getSensorName());
         sensor.setManufacturer(null);
@@ -80,11 +67,24 @@ public class SensorTest {
         sensor.setModel(MODEL);
         assertEquals(MODEL, sensor.getModel());
         assertEquals(EMPTY_STRING, sensor.getManufacturer());
-        assertEquals(EMPTY_STRING, sensor.getLocation());
         assertEquals(EMPTY_STRING, sensor.getSensorId());
         assertEquals(EMPTY_STRING, sensor.getSensorName());
         sensor.setModel(null);
         assertEquals(EMPTY_STRING, sensor.getModel());
+    }
+
+    @Test
+    public void testGetSetLocation() {
+        Sensor sensor = new Sensor();
+        assertEquals(EMPTY_STRING, sensor.getLocation());
+        sensor.setLocation(LOCATION);
+        assertEquals(LOCATION, sensor.getLocation());
+        assertEquals(EMPTY_STRING, sensor.getModel());
+        assertEquals(EMPTY_STRING, sensor.getManufacturer());
+        assertEquals(EMPTY_STRING, sensor.getSensorId());
+        assertEquals(EMPTY_STRING, sensor.getSensorName());
+        sensor.setLocation(null);
+        assertEquals(EMPTY_STRING, sensor.getLocation());
     }
 
     @Test
@@ -124,7 +124,6 @@ public class SensorTest {
         Sensor sensor = new Sensor();
         assertFalse(sensor.isValid());
         sensor.setSensorName(SENSOR_NAME);
-        sensor.setLocation(LOCATION);
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
         assertTrue(sensor.isValid());
@@ -139,9 +138,9 @@ public class SensorTest {
 
         sensor.setSensorName(SENSOR_NAME);
         sensor.setSensorId(SENSOR_ID);
-        sensor.setLocation(LOCATION);
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
+        sensor.setLocation(LOCATION);
         sensor.setComments(COMMENTS);
         assertNotEquals(sensor, dup);
 
@@ -174,13 +173,6 @@ public class SensorTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
         first.setManufacturer(MANUFACTURER);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
@@ -192,6 +184,13 @@ public class SensorTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setModel(MODEL);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setLocation(LOCATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setLocation(LOCATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

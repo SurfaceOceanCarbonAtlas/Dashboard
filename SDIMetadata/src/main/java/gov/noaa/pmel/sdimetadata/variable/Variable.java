@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.datavar;
+package gov.noaa.pmel.sdimetadata.variable;
 
 /**
  * Information about a generic data variable in a dataset.
@@ -8,6 +8,7 @@ public class Variable implements Cloneable {
     protected String varName;
     protected String varUnit;
     protected String description;
+    protected String samplingLocation;
     protected String calibration;
     protected Double precision;
     protected String precisionUnit;

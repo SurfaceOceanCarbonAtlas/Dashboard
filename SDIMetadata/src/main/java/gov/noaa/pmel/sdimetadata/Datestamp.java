@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.dataset;
+package gov.noaa.pmel.sdimetadata;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

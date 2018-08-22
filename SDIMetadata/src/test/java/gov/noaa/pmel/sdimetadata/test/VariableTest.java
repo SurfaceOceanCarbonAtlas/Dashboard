@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.datavar.Variable;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

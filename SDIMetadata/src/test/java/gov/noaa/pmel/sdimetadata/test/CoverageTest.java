@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.dataset.Coverage;
+import gov.noaa.pmel.sdimetadata.Coverage;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,6 +18,8 @@ public class CoverageTest {
     private static final double NORTHERN_LATITUDE = 45.03;
     private static final double EARLIEST_DATA_TIME = 1421150400.000;
     private static final double LATEST_DATA_TIME = 1422532800.000;
+    private static final String REGION_NAME = "Bering Sea";
+    private static final String LOCATION_IN_REGION = "ocean floor";
 
     @Test
     public void testGetSetWesternLongitude() {
@@ -119,17 +121,52 @@ public class CoverageTest {
     }
 
     @Test
+    public void testGetSetRegionName() {
+        Coverage coverage = new Coverage();
+        assertEquals("", coverage.getRegionName());
+        coverage.setRegionName(REGION_NAME);
+        assertEquals(REGION_NAME, coverage.getRegionName());
+        assertTrue(coverage.getLatestDataTime().isNaN());
+        assertTrue(coverage.getEarliestDataTime().isNaN());
+        assertTrue(coverage.getNorthernLatitude().isNaN());
+        assertTrue(coverage.getSouthernLatitude().isNaN());
+        assertTrue(coverage.getEasternLongitude().isNaN());
+        assertTrue(coverage.getWesternLongitude().isNaN());
+        coverage.setRegionName(null);
+        assertEquals("", coverage.getRegionName());
+    }
+
+    @Test
+    public void testGetSetLocationInRegion() {
+        Coverage coverage = new Coverage();
+        assertEquals("", coverage.getLocationInRegion());
+        coverage.setLocationInRegion(LOCATION_IN_REGION);
+        assertEquals(LOCATION_IN_REGION, coverage.getLocationInRegion());
+        assertEquals("", coverage.getRegionName());
+        assertTrue(coverage.getLatestDataTime().isNaN());
+        assertTrue(coverage.getEarliestDataTime().isNaN());
+        assertTrue(coverage.getNorthernLatitude().isNaN());
+        assertTrue(coverage.getSouthernLatitude().isNaN());
+        assertTrue(coverage.getEasternLongitude().isNaN());
+        assertTrue(coverage.getWesternLongitude().isNaN());
+        coverage.setLocationInRegion(null);
+        assertEquals("", coverage.getLocationInRegion());
+    }
+
+    @Test
     public void testCoverage() {
-        Coverage coverage = new Coverage(null, null, null, null, null, null);
+        Coverage coverage = new Coverage(null, null, null, null, null, null, null, null);
         assertEquals(new Coverage(), coverage);
         coverage = new Coverage(WESTERN_LONGITUDE, EASTERN_LONGITUDE, SOUTHERN_LATITUDE, NORTHERN_LATITUDE,
-                EARLIEST_DATA_TIME, LATEST_DATA_TIME);
+                EARLIEST_DATA_TIME, LATEST_DATA_TIME, REGION_NAME, LOCATION_IN_REGION);
         assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
         assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
         assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
         assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
         assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
         assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
+        assertEquals(REGION_NAME, coverage.getRegionName());
+        assertEquals(LOCATION_IN_REGION, coverage.getLocationInRegion());
     }
 
     @Test
@@ -174,6 +211,8 @@ public class CoverageTest {
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
         coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
         coverage.setLatestDataTime(LATEST_DATA_TIME);
+        coverage.setRegionName(REGION_NAME);
+        coverage.setLocationInRegion(LOCATION_IN_REGION);
         assertNotEquals(coverage, dup);
 
         dup = coverage.clone();
@@ -230,6 +269,20 @@ public class CoverageTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setLatestDataTime(LATEST_DATA_TIME);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setRegionName(REGION_NAME);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setRegionName(REGION_NAME);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setLocationInRegion(LOCATION_IN_REGION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setLocationInRegion(LOCATION_IN_REGION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }

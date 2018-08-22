@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata.instrument;
+package gov.noaa.pmel.sdimetadata;
 
 import java.util.ArrayList;
 
@@ -9,9 +9,9 @@ import java.util.ArrayList;
 public class Sensor implements Cloneable {
     protected String sensorName;
     protected String sensorId;
-    protected String location;
     protected String manufacturer;
     protected String model;
+    protected String location;
     protected ArrayList<String> comments;
 
     /**
@@ -20,9 +20,9 @@ public class Sensor implements Cloneable {
     public Sensor() {
         sensorName = "";
         sensorId = "";
-        location = "";
         manufacturer = "";
         model = "";
+        location = "";
         comments = new ArrayList<String>();
     }
 
@@ -59,21 +59,6 @@ public class Sensor implements Cloneable {
     }
 
     /**
-     * @return description of the location of the sensor; never null but may be an empty string
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
-     * @param location
-     *         assign as the description of the location of the sensor; if null, an empty string is assigned
-     */
-    public void setLocation(String location) {
-        this.location = (location != null) ? location.trim() : "";
-    }
-
-    /**
      * @return manufacturer of the sensor; never null but may be an empty string
      */
     public String getManufacturer() {
@@ -101,6 +86,21 @@ public class Sensor implements Cloneable {
      */
     public void setModel(String model) {
         this.model = (model != null) ? model.trim() : "";
+    }
+
+    /**
+     * @return description of the location of the sensor; never null but may be an empty string
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * @param location
+     *         assign as the description of the location of the sensor; if null, an empty string is assigned
+     */
+    public void setLocation(String location) {
+        this.location = (location != null) ? location.trim() : "";
     }
 
     /**
@@ -135,10 +135,10 @@ public class Sensor implements Cloneable {
 
     /**
      * @return whether all the required fields are assigned with valid values.
-     *         Currently this means name, location, manufacturer, and model are not blank.
+     *         Currently this means name, manufacturer, and model are not blank.
      */
     public boolean isValid() {
-        if ( sensorName.isEmpty() || location.isEmpty() || manufacturer.isEmpty() || model.isEmpty() )
+        if ( sensorName.isEmpty() || manufacturer.isEmpty() || model.isEmpty() )
             return false;
         return true;
     }
@@ -153,9 +153,9 @@ public class Sensor implements Cloneable {
         }
         sensor.sensorName = sensorName;
         sensor.sensorId = sensorId;
-        sensor.location = location;
         sensor.manufacturer = manufacturer;
         sensor.model = model;
+        sensor.location = location;
         sensor.comments = new ArrayList<String>(comments);
         return sensor;
     }
@@ -173,11 +173,11 @@ public class Sensor implements Cloneable {
             return false;
         if ( !sensorId.equals(sensor.sensorId) )
             return false;
-        if ( !location.equals(sensor.location) )
-            return false;
         if ( !manufacturer.equals(sensor.manufacturer) )
             return false;
         if ( !model.equals(sensor.model) )
+            return false;
+        if ( !location.equals(sensor.location) )
             return false;
         if ( !comments.equals(sensor.comments) )
             return false;
@@ -189,9 +189,9 @@ public class Sensor implements Cloneable {
         final int prime = 37;
         int result = sensorName.hashCode();
         result = result * prime + sensorId.hashCode();
-        result = result * prime + location.hashCode();
         result = result * prime + manufacturer.hashCode();
         result = result * prime + model.hashCode();
+        result = result * prime + location.hashCode();
         result = result * prime + comments.hashCode();
         return result;
     }
@@ -201,9 +201,9 @@ public class Sensor implements Cloneable {
         return "Sensor{" +
                 "sensorName='" + sensorName + '\'' +
                 ", sensorId='" + sensorId + '\'' +
-                ", location='" + location + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
                 ", model='" + model + '\'' +
+                ", location='" + location + '\'' +
                 ", comments=" + comments +
                 '}';
     }
