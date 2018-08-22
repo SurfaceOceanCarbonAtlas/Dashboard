@@ -11,7 +11,11 @@ public class Submitter extends Investigator implements Cloneable {
             return false;
         if ( firstName.isEmpty() )
             return false;
-        if ( address.isEmpty() )
+        if ( streets.isEmpty() )
+            return false;
+        if ( city.isEmpty() )
+            return false;
+        if ( country.isEmpty() )
             return false;
         if ( phone.isEmpty() )
             return false;

@@ -4,6 +4,9 @@ import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -16,9 +19,19 @@ public class SubmitterTest {
     private static final String FIRST_NAME = "John";
     private static final String INITIALS = "D.Z.";
     private static final String ORGANIZATION = "NOAA/PMEL";
-    private static final String ADDRESS = "123 Main St, Seattle WA 98101";
+    private static final ArrayList<String> STREETS = new ArrayList<String>(Arrays.asList(
+            "Room 259, Bldg 4",
+            "123 Main St"
+    ));
+    private static final String CITY = "Seattle";
+    private static final String REGION = "WA";
+    private static final String ZIP_CODE = "98101";
+    private static final String COUNTRY = "USA";
     private static final String PHONE = "206-555-6789";
-    private static final String EMAIL = "JDZSmith@nowhere.com";
+    private static final String EMAIL = "JDZSmith@not.an.org";
+    private static final String PI_ID = "PI-23423";
+    private static final String PI_ID_TYPE = "PIRecords";
+
 
     @Test
     public void testIsValid() {
@@ -29,7 +42,9 @@ public class SubmitterTest {
         submitter.setFirstName(FIRST_NAME);
         assertFalse(submitter.isValid());
 
-        submitter.setAddress(ADDRESS);
+        submitter.setStreets(STREETS);
+        submitter.setCity(CITY);
+        submitter.setCountry(COUNTRY);
         submitter.setPhone(PHONE);
         submitter.setEmail(EMAIL);
         assertTrue(submitter.isValid());
@@ -46,9 +61,15 @@ public class SubmitterTest {
         submitter.setFirstName(FIRST_NAME);
         submitter.setMiddleInitials(INITIALS);
         submitter.setOrganization(ORGANIZATION);
-        submitter.setAddress(ADDRESS);
+        submitter.setStreets(STREETS);
+        submitter.setCity(CITY);
+        submitter.setRegion(REGION);
+        submitter.setZipCode(ZIP_CODE);
+        submitter.setCountry(COUNTRY);
         submitter.setPhone(PHONE);
         submitter.setEmail(EMAIL);
+        submitter.setPiId(PI_ID);
+        submitter.setPiIdType(PI_ID_TYPE);
         assertNotEquals(submitter, dup);
 
         dup = submitter.clone();
@@ -109,13 +130,53 @@ public class SubmitterTest {
         assertFalse(first.equals(investigator));
         assertTrue(investigator.equals(second));
 
-        first.setAddress(ADDRESS);
+        first.setStreets(STREETS);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setAddress(ADDRESS);
+        second.setStreets(STREETS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setAddress(ADDRESS);
+        investigator.setStreets(STREETS);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setCity(CITY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCity(CITY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setCity(CITY);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setRegion(REGION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setRegion(REGION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setRegion(REGION);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setZipCode(ZIP_CODE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setZipCode(ZIP_CODE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setZipCode(ZIP_CODE);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setCountry(COUNTRY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCountry(COUNTRY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setCountry(COUNTRY);
         assertFalse(first.equals(investigator));
         assertTrue(investigator.equals(second));
 
@@ -136,6 +197,26 @@ public class SubmitterTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         investigator.setEmail(EMAIL);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setPiId(PI_ID);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPiId(PI_ID);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setPiId(PI_ID);
+        assertFalse(first.equals(investigator));
+        assertTrue(investigator.equals(second));
+
+        first.setPiIdType(PI_ID_TYPE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPiIdType(PI_ID_TYPE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        investigator.setPiIdType(PI_ID_TYPE);
         assertFalse(first.equals(investigator));
         assertTrue(investigator.equals(second));
     }

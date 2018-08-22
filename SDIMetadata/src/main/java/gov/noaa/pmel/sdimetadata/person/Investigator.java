@@ -1,5 +1,7 @@
 package gov.noaa.pmel.sdimetadata.person;
 
+import java.util.ArrayList;
+
 /**
  * Standard information about a person.
  * Super class for Submitter.
@@ -9,21 +11,33 @@ public class Investigator implements Cloneable {
     protected String firstName;
     protected String middleInitials;
     protected String organization;
-    protected String address;
+    protected ArrayList<String> streets;
+    protected String city;
+    protected String region;
+    protected String zipCode;
+    protected String country;
     protected String phone;
     protected String email;
+    protected String piId;
+    protected String piIdType;
 
     /**
-     * Create with empty strings for all fields
+     * Create with all fields empty.
      */
     public Investigator() {
         lastName = "";
         firstName = "";
         middleInitials = "";
         organization = "";
-        address = "";
+        streets = new ArrayList<String>(2);
+        city = "";
+        region = "";
+        zipCode = "";
+        country = "";
         phone = "";
         email = "";
+        piId = "";
+        piIdType = "";
     }
 
     /**
@@ -87,18 +101,91 @@ public class Investigator implements Cloneable {
     }
 
     /**
-     * @return the address; never null but may be empty
+     * @return the street / delivery point portion of the address; never null but may be empty
      */
-    public String getAddress() {
-        return address;
+    public ArrayList<String> getStreets() {
+        return new ArrayList<String>(streets);
     }
 
     /**
-     * @param address
-     *         assign as the address; if null, an empty string is assigned
+     * @param streets
+     *         assign as the street / delivery point portion of the address; if null, an empty list is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the given list contains a null or blank string
      */
-    public void setAddress(String address) {
-        this.address = (address != null) ? address.trim() : "";
+    public void setStreets(Iterable<String> streets) throws IllegalArgumentException {
+        this.streets.clear();
+        if ( streets != null ) {
+            for (String loc : streets) {
+                if ( loc == null )
+                    throw new IllegalArgumentException("null street String given");
+                loc = loc.trim();
+                if ( loc.isEmpty() )
+                    throw new IllegalArgumentException("blank street String given");
+                this.streets.add(loc);
+            }
+        }
+    }
+
+    /**
+     * @return the city; never null but may be empty
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * @param city
+     *         assign as the city; if null, an empty string is assigned
+     */
+    public void setCity(String city) {
+        this.city = (city != null) ? city.trim() : "";
+    }
+
+    /**
+     * @return the region / state; never null but may be empty
+     */
+    public String getRegion() {
+        return region;
+    }
+
+    /**
+     * @param region
+     *         assign as the region / state; if null, an empty string is assigned
+     */
+    public void setRegion(String region) {
+        this.region = (region != null) ? region.trim() : "";
+    }
+
+    /**
+     * @return the ZIP code; never null but may be empty
+     */
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    /**
+     * @param zipCode
+     *         assign as the ZIP code; if null, an empty string is assigned
+     */
+    public void setZipCode(String zipCode) {
+        this.zipCode = (zipCode != null) ? zipCode.trim() : "";
+    }
+
+    /**
+     * @return the country; never null but may be empty
+     */
+    public String getCountry() {
+        return country;
+    }
+
+    /**
+     * @param country
+     *         assign as the country; if null, an empty string is assigned
+     */
+    public void setCountry(String country) {
+        this.country = (country != null) ? country.trim() : "";
     }
 
     /**
@@ -132,7 +219,38 @@ public class Investigator implements Cloneable {
     }
 
     /**
+     * @return the investigator ID; never null but may be empty
+     */
+    public String getPiId() {
+        return piId;
+    }
+
+    /**
+     * @param piId
+     *         assign as the investigator ID; if null, an empty string is assigned
+     */
+    public void setPiId(String piId) {
+        this.piId = (piId != null) ? piId.trim() : "";
+    }
+
+    /**
+     * @return the type / issuer of the investigator ID; never null but may be empty
+     */
+    public String getPiIdType() {
+        return piIdType;
+    }
+
+    /**
+     * @param piIdType
+     *         assign as the type / issuer of the investigator ID; if null, an empty string is assigned
+     */
+    public void setPiIdType(String piIdType) {
+        this.piIdType = (piIdType != null) ? piIdType.trim() : "";
+    }
+
+    /**
      * @return whether all the required fields are assigned with valid values.
+     *         For Investigator, the only requirement is non-blank first and last names.
      */
     public boolean isValid() {
         if ( lastName.isEmpty() )
@@ -154,9 +272,15 @@ public class Investigator implements Cloneable {
         dup.firstName = firstName;
         dup.middleInitials = middleInitials;
         dup.organization = organization;
-        dup.address = address;
+        dup.streets = new ArrayList<String>(streets);
+        dup.city = city;
+        dup.region = region;
+        dup.zipCode = zipCode;
+        dup.country = country;
         dup.phone = phone;
         dup.email = email;
+        dup.piId = piId;
+        dup.piIdType = piIdType;
         return dup;
     }
 
@@ -177,11 +301,23 @@ public class Investigator implements Cloneable {
             return false;
         if ( !organization.equals(other.organization) )
             return false;
-        if ( !address.equals(other.address) )
+        if ( !streets.equals(other.streets) )
+            return false;
+        if ( !city.equals(other.city) )
+            return false;
+        if ( !region.equals(other.region) )
+            return false;
+        if ( !zipCode.equals(other.zipCode) )
+            return false;
+        if ( !country.equals(other.country) )
             return false;
         if ( !phone.equals(other.phone) )
             return false;
         if ( !email.equals(other.email) )
+            return false;
+        if ( !piId.equals(other.piId) )
+            return false;
+        if ( !piIdType.equals(other.piIdType) )
             return false;
         return true;
     }
@@ -193,9 +329,15 @@ public class Investigator implements Cloneable {
         result = result * prime + firstName.hashCode();
         result = result * prime + middleInitials.hashCode();
         result = result * prime + organization.hashCode();
-        result = result * prime + address.hashCode();
+        result = result * prime + streets.hashCode();
+        result = result * prime + city.hashCode();
+        result = result * prime + region.hashCode();
+        result = result * prime + zipCode.hashCode();
+        result = result * prime + country.hashCode();
         result = result * prime + phone.hashCode();
         result = result * prime + email.hashCode();
+        result = result * prime + piId.hashCode();
+        result = result * prime + piIdType.hashCode();
         return result;
     }
 
@@ -206,9 +348,15 @@ public class Investigator implements Cloneable {
                 ", firstName='" + firstName + "'" +
                 ", middleInitials='" + middleInitials + "'" +
                 ", organization='" + organization + "'" +
-                ", address='" + address + "'" +
+                ", streets=" + streets +
+                ", city='" + city + "'" +
+                ", region='" + region + "'" +
+                ", zipCode='" + zipCode + "'" +
+                ", country='" + country + "'" +
                 ", phone='" + phone + "'" +
                 ", email='" + email + "'" +
+                ", piId='" + piId + "'" +
+                ", piIdType='" + piIdType + "'" +
                 '}';
     }
 
