@@ -28,14 +28,21 @@ public class SDIMetadata implements Cloneable {
     }
 
     public boolean isValid() {
+        // Check that each component is valid
         if ( !submitter.isValid() )
             return false;
         for (Investigator pi : investigators) {
             if ( !pi.isValid() )
                 return false;
         }
+        if ( ! platform.isValid() )
+            return false;
         if ( !coverage.isValid() )
             return false;
+        for (Instrument inst : instruments) {
+            if ( !inst.isValid() )
+                return false;
+        }
         for (Sensor detector : sensors) {
             if ( !detector.isValid() )
                 return false;
