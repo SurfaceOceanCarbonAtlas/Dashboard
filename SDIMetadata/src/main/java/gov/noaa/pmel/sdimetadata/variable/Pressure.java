@@ -1,31 +1,28 @@
 package gov.noaa.pmel.sdimetadata.variable;
 
 /**
- * Describes a temperature data variable in a dataset.
- * Same as Variable except the unit for precision and accuracy are set to degrees Celsius and cannot be modified,
- * and the default unit for the variable is degrees Celsius (but can be modified).
+ * Describes a pressure data variable in a dataset.
+ * Same as Variable except the unit for precision and accuracy are set to hectopascals and cannot be modified,
+ * and the default unit for the variable is hectopascals (but can be modified).
  */
-public class Temperature extends Variable implements Cloneable {
+public class Pressure extends Variable implements Cloneable {
 
-    public static final String DEGREES_CELSIUS_UNIT = "deg C";
+    public static final String HECTOPASCALS_UNIT = "hPa";
 
-    /**
-     * Create with all fields empty or NaN, except for units which are set to degrees Celsius.
-     */
-    public Temperature() {
+    public Pressure() {
         super();
-        varUnit = DEGREES_CELSIUS_UNIT;
-        precisionUnit = DEGREES_CELSIUS_UNIT;
-        accuracyUnit = DEGREES_CELSIUS_UNIT;
+        varUnit = HECTOPASCALS_UNIT;
+        precisionUnit = HECTOPASCALS_UNIT;
+        accuracyUnit = HECTOPASCALS_UNIT;
     }
 
     /**
      * @param varUnit
-     *         assign as the unit for values of this variable; if null, degrees Celsius is assigned
+     *         assign as the unit for values of this variable; if null, hectopascals is assigned
      */
     @Override
     public void setVarUnit(String varUnit) {
-        this.varUnit = (varUnit != null) ? varUnit.trim() : DEGREES_CELSIUS_UNIT;
+        this.varUnit = (varUnit != null) ? varUnit.trim() : HECTOPASCALS_UNIT;
     }
 
     /**
@@ -47,15 +44,15 @@ public class Temperature extends Variable implements Cloneable {
     }
 
     @Override
-    public Temperature clone() {
-        return (Temperature) super.clone();
+    public Pressure clone() {
+        return (Pressure) super.clone();
     }
 
     @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( !(obj instanceof Temperature) )
+        if ( !(obj instanceof Pressure) )
             return false;
         return super.equals(obj);
     }
@@ -67,8 +64,7 @@ public class Temperature extends Variable implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Variable", "Temperature");
+        return super.toString().replaceFirst("Variable", "Pressure");
     }
 
 }
-

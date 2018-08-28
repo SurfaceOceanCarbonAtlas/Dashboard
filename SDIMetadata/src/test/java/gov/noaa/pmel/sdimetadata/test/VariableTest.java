@@ -16,6 +16,7 @@ public class VariableTest {
     private static final String VAR_NAME = "SST_C";
     private static final String VAR_UNIT = "degrees Celsius";
     private static final String DESCRIPTION = "Sea surface temperature";
+    private static final String SAMPLING_LOCATION = "~5 m below water line";
     private static final String CALIBRATION = "Factory calibration";
     private static final double PRECISION = 0.001;
     private static final String PRECISION_UNIT = "degrees C";
@@ -57,11 +58,25 @@ public class VariableTest {
     }
 
     @Test
+    public void testGetSetSamplingLocation() {
+        Variable var = new Variable();
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+        var.setSamplingLocation(SAMPLING_LOCATION);
+        assertEquals(SAMPLING_LOCATION, var.getSamplingLocation());
+        assertEquals(EMPTY_STRING, var.getDescription());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getVarName());
+        var.setSamplingLocation(null);
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+    }
+
+    @Test
     public void testGetSetCalibration() {
         Variable var = new Variable();
         assertEquals(EMPTY_STRING, var.getCalibration());
         var.setCalibration(CALIBRATION);
         assertEquals(CALIBRATION, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -76,6 +91,7 @@ public class VariableTest {
         var.setPrecision(PRECISION);
         assertEquals(PRECISION, var.getPrecision(), DELTA);
         assertEquals(EMPTY_STRING, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -91,6 +107,7 @@ public class VariableTest {
         assertEquals(PRECISION_UNIT, var.getPrecisionUnit());
         assertTrue(var.getPrecision().isNaN());
         assertEquals(EMPTY_STRING, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -107,6 +124,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getPrecisionUnit());
         assertTrue(var.getPrecision().isNaN());
         assertEquals(EMPTY_STRING, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -124,6 +142,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getPrecisionUnit());
         assertTrue(var.getPrecision().isNaN());
         assertEquals(EMPTY_STRING, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -142,6 +161,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getPrecisionUnit());
         assertTrue(var.getPrecision().isNaN());
         assertEquals(EMPTY_STRING, var.getCalibration());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getDescription());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getVarName());
@@ -157,6 +177,7 @@ public class VariableTest {
         var.setVarName(VAR_NAME);
         var.setVarUnit(VAR_UNIT);
         var.setDescription(DESCRIPTION);
+        var.setSamplingLocation(SAMPLING_LOCATION);
         var.setPrecision(PRECISION);
         var.setPrecisionUnit(PRECISION_UNIT);
         var.setAccuracy(ACCURACY);
@@ -175,6 +196,7 @@ public class VariableTest {
         var.setVarName(VAR_NAME);
         var.setVarUnit(VAR_UNIT);
         var.setDescription(DESCRIPTION);
+        var.setSamplingLocation(SAMPLING_LOCATION);
         var.setCalibration(CALIBRATION);
         var.setPrecision(PRECISION);
         var.setPrecisionUnit(PRECISION_UNIT);
@@ -216,6 +238,13 @@ public class VariableTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDescription(DESCRIPTION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setSamplingLocation(SAMPLING_LOCATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setSamplingLocation(SAMPLING_LOCATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

@@ -16,10 +16,14 @@ public class Variable implements Cloneable {
     protected String accuracyUnit;
     protected String sensorName;
 
+    /**
+     * Create with all fields empty or NaN.
+     */
     public Variable() {
         varName = "";
         varUnit = "";
         description = "";
+        samplingLocation = "";
         calibration = "";
         precision = Double.NaN;
         precisionUnit = "";
@@ -71,6 +75,21 @@ public class Variable implements Cloneable {
      */
     public void setDescription(String description) {
         this.description = (description != null) ? description.trim() : "";
+    }
+
+    /**
+     * @return sampling location for this variable; never null but may be an empty string
+     */
+    public String getSamplingLocation() {
+        return samplingLocation;
+    }
+
+    /**
+     * @param samplingLocation
+     *         assign as the sampling location for this variable; if null, an emptry string is assigned
+     */
+    public void setSamplingLocation(String samplingLocation) {
+        this.samplingLocation = (samplingLocation != null) ? samplingLocation.trim() : "";
     }
 
     /**
@@ -173,6 +192,8 @@ public class Variable implements Cloneable {
             return false;
         if ( description.isEmpty() )
             return false;
+        if ( samplingLocation.isEmpty() )
+            return false;
         if ( precision.isNaN() )
             return false;
         if ( precisionUnit.isEmpty() )
@@ -197,6 +218,7 @@ public class Variable implements Cloneable {
         dup.varName = varName;
         dup.varUnit = varUnit;
         dup.description = description;
+        dup.samplingLocation = samplingLocation;
         dup.calibration = calibration;
         dup.precision = precision;
         dup.precisionUnit = precisionUnit;
@@ -221,6 +243,8 @@ public class Variable implements Cloneable {
             return false;
         if ( !description.equals(variable.description) )
             return false;
+        if ( !samplingLocation.equals(variable.samplingLocation) )
+            return false;
         if ( !calibration.equals(variable.calibration) )
             return false;
         if ( !precision.equals(variable.precision) )
@@ -242,6 +266,7 @@ public class Variable implements Cloneable {
         int result = varName.hashCode();
         result = result * prime + varUnit.hashCode();
         result = result * prime + description.hashCode();
+        result = result * prime + samplingLocation.hashCode();
         result = result * prime + calibration.hashCode();
         result = result * prime + precision.hashCode();
         result = result * prime + precisionUnit.hashCode();
@@ -257,6 +282,7 @@ public class Variable implements Cloneable {
                 "varName='" + varName + '\'' +
                 ", varUnit='" + varUnit + '\'' +
                 ", description='" + description + '\'' +
+                ", samplingLocation='" + samplingLocation + '\'' +
                 ", calibration='" + calibration + '\'' +
                 ", precision=" + precision +
                 ", precisionUnit='" + precisionUnit + '\'' +
