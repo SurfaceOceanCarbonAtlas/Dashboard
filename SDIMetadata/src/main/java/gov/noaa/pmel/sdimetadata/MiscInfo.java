@@ -9,11 +9,18 @@ public class MiscInfo implements Cloneable {
 
     protected String datasetId;
     protected String datasetName;
-    protected String description;
-    protected String funding;
+    protected String fundingAgency;
+    protected String fundingTitle;
+    protected String fundingId;
+    protected String researchProject;
     protected String datasetDoi;
+    protected String accessId;
     protected String website;
+    protected String downloadUrl;
     protected String citation;
+    protected String synopsis;
+    protected String purpose;
+    protected ArrayList<String> references;
     protected ArrayList<String> addnInfo;
     protected Datestamp startDatestamp;
     protected Datestamp endDatestamp;
@@ -25,11 +32,18 @@ public class MiscInfo implements Cloneable {
     public MiscInfo() {
         datasetId = "";
         datasetName = "";
-        description = "";
-        funding = "";
+        fundingAgency = "";
+        fundingTitle = "";
+        fundingId = "";
+        researchProject = "";
         datasetDoi = "";
+        accessId = "";
         website = "";
+        downloadUrl = "";
         citation = "";
+        synopsis = "";
+        purpose = "";
+        references = new ArrayList<String>();
         addnInfo = new ArrayList<String>();
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
@@ -67,33 +81,63 @@ public class MiscInfo implements Cloneable {
     }
 
     /**
-     * @return the brief description for this dataset; never null but may be empty
+     * @return the funding agency name; never null but may be empty
      */
-    public String getDescription() {
-        return description;
+    public String getFundingAgency() {
+        return fundingAgency;
     }
 
     /**
-     * @param description
-     *         assign as the brief description for this dataset; if null, an empty string is assigned
+     * @param fundingAgency
+     *         assign as the funding agency name; if null, an empty string is assigned
      */
-    public void setDescription(String description) {
-        this.description = (description != null) ? description.trim() : "";
+    public void setFundingAgency(String fundingAgency) {
+        this.fundingAgency = (fundingAgency != null) ? fundingAgency.trim() : "";
     }
 
     /**
-     * @return the funding source for this dataset; never null but may be empty
+     * @return the funding grant title; never null but may be empty
      */
-    public String getFunding() {
-        return funding;
+    public String getFundingTitle() {
+        return fundingTitle;
     }
 
     /**
-     * @param funding
-     *         assign as the funding source for this dataset; if null, an empty string is assigned
+     * @param fundingTitle
+     *         assign as the funding grant title; if null, an empty string is assigned
      */
-    public void setFunding(String funding) {
-        this.funding = (funding != null) ? funding.trim() : "";
+    public void setFundingTitle(String fundingTitle) {
+        this.fundingTitle = (fundingTitle != null) ? fundingTitle.trim() : "";
+    }
+
+    /**
+     * @return the funding grant ID; never null but may be empty
+     */
+    public String getFundingId() {
+        return fundingId;
+    }
+
+    /**
+     * @param fundingId
+     *         assign as the funding grant ID; if null, an empty string is assigned
+     */
+    public void setFundingId(String fundingId) {
+        this.fundingId = (fundingId != null) ? fundingId.trim() : "";
+    }
+
+    /**
+     * @return the research project title; never null but may be empty
+     */
+    public String getResearchProject() {
+        return researchProject;
+    }
+
+    /**
+     * @param researchProject
+     *         assign as the research project ID; if null, an empty string is assigned
+     */
+    public void setResearchProject(String researchProject) {
+        this.researchProject = (researchProject != null) ? researchProject.trim() : "";
     }
 
     /**
@@ -112,6 +156,21 @@ public class MiscInfo implements Cloneable {
     }
 
     /**
+     * @return the access ID for this dataset; never null but may be empty
+     */
+    public String getAccessId() {
+        return accessId;
+    }
+
+    /**
+     * @param accessId
+     *         assign as the access ID for this dataset; if null, an empty string is assigned
+     */
+    public void setAccessId(String accessId) {
+        this.accessId = (accessId != null) ? accessId.trim() : "";
+    }
+
+    /**
      * @return the web site for this dataset; never null but may be empty
      */
     public String getWebsite() {
@@ -127,6 +186,21 @@ public class MiscInfo implements Cloneable {
     }
 
     /**
+     * @return the download URL String for this dataset; never null but may be empty
+     */
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    /**
+     * @param downloadUrl
+     *         assign as the download URL String for this dataset; if null, an empty string is assigned
+     */
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = (downloadUrl != null) ? downloadUrl.trim() : "";
+    }
+
+    /**
      * @return the citation for this dataset; never null but may be empty
      */
     public String getCitation() {
@@ -139,6 +213,65 @@ public class MiscInfo implements Cloneable {
      */
     public void setCitation(String citation) {
         this.citation = (citation != null) ? citation.trim() : "";
+    }
+
+    /**
+     * @return the synopsis / abstract for this dataset; never null but may be empty
+     */
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    /**
+     * @param synopsis
+     *         assign as the synposis / abstract for this dataset; if null, an empty string is assigned
+     */
+    public void setSynopsis(String synopsis) {
+        this.synopsis = (synopsis != null) ? synopsis.trim() : "";
+    }
+
+    /**
+     * @return the purpose for this dataset; never null but may be empty
+     */
+    public String getPurpose() {
+        return purpose;
+    }
+
+    /**
+     * @param purpose
+     *         assign as the purpose for this dataset; if null, an empty string is assigned
+     */
+    public void setPurpose(String purpose) {
+        this.purpose = (purpose != null) ? purpose.trim() : "";
+    }
+
+    /**
+     * @return the list of references used by this dataset; never null but may be empty.
+     *         Any reference given is guaranteed to be a valid (non-blank) string.
+     */
+    public ArrayList<String> getReferences() {
+        return new ArrayList<String>(references);
+    }
+
+    /**
+     * @param references
+     *         assign as the list of references used by this dataset; if null, an empty list is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any reference given is null or blank
+     */
+    public void setReferences(Iterable<String> references) throws IllegalArgumentException {
+        this.references.clear();
+        if ( references != null ) {
+            for (String ref : references) {
+                if ( ref == null )
+                    throw new IllegalArgumentException("null reference given");
+                ref = ref.trim();
+                if ( ref.isEmpty() )
+                    throw new IllegalArgumentException("blank reference given");
+                this.references.add(ref);
+            }
+        }
     }
 
     /**
@@ -259,11 +392,18 @@ public class MiscInfo implements Cloneable {
         }
         dup.datasetId = datasetId;
         dup.datasetName = datasetName;
-        dup.description = description;
-        dup.funding = funding;
+        dup.fundingAgency = fundingAgency;
+        dup.fundingTitle = fundingTitle;
+        dup.fundingId = fundingId;
+        dup.researchProject = researchProject;
         dup.datasetDoi = datasetDoi;
+        dup.accessId = accessId;
         dup.website = website;
+        dup.downloadUrl = downloadUrl;
         dup.citation = citation;
+        dup.synopsis = synopsis;
+        dup.purpose = purpose;
+        dup.references = new ArrayList<String>(references);
         dup.addnInfo = new ArrayList<String>(addnInfo);
         dup.startDatestamp = startDatestamp.clone();
         dup.endDatestamp = endDatestamp.clone();
@@ -287,15 +427,29 @@ public class MiscInfo implements Cloneable {
             return false;
         if ( !datasetName.equals(miscInfo.datasetName) )
             return false;
-        if ( !description.equals(miscInfo.description) )
+        if ( !fundingAgency.equals(miscInfo.fundingAgency) )
             return false;
-        if ( !funding.equals(miscInfo.funding) )
+        if ( !fundingTitle.equals(miscInfo.fundingTitle) )
+            return false;
+        if ( !fundingId.equals(miscInfo.fundingId) )
+            return false;
+        if ( !researchProject.equals(miscInfo.researchProject) )
             return false;
         if ( !datasetDoi.equals(miscInfo.datasetDoi) )
             return false;
+        if ( !accessId.equals(miscInfo.accessId) )
+            return false;
         if ( !website.equals(miscInfo.website) )
             return false;
+        if ( !downloadUrl.equals(miscInfo.downloadUrl) )
+            return false;
         if ( !citation.equals(miscInfo.citation) )
+            return false;
+        if ( !synopsis.equals(miscInfo.synopsis) )
+            return false;
+        if ( !purpose.equals(miscInfo.purpose) )
+            return false;
+        if ( !references.equals(miscInfo.references) )
             return false;
         if ( !addnInfo.equals(miscInfo.addnInfo) )
             return false;
@@ -313,11 +467,18 @@ public class MiscInfo implements Cloneable {
         final int prime = 37;
         int result = datasetId.hashCode();
         result = result * prime + datasetName.hashCode();
-        result = result * prime + description.hashCode();
-        result = result * prime + funding.hashCode();
+        result = result * prime + fundingAgency.hashCode();
+        result = result * prime + fundingTitle.hashCode();
+        result = result * prime + fundingId.hashCode();
+        result = result * prime + researchProject.hashCode();
         result = result * prime + datasetDoi.hashCode();
+        result = result * prime + accessId.hashCode();
         result = result * prime + website.hashCode();
+        result = result * prime + downloadUrl.hashCode();
         result = result * prime + citation.hashCode();
+        result = result * prime + synopsis.hashCode();
+        result = result * prime + purpose.hashCode();
+        result = result * prime + references.hashCode();
         result = result * prime + addnInfo.hashCode();
         result = result * prime + startDatestamp.hashCode();
         result = result * prime + endDatestamp.hashCode();
@@ -330,11 +491,18 @@ public class MiscInfo implements Cloneable {
         return "Dataset{" +
                 "datasetId='" + datasetId + '\'' +
                 ", datasetName='" + datasetName + '\'' +
-                ", description='" + description + '\'' +
-                ", funding='" + funding + '\'' +
+                ", fundingAgency='" + fundingAgency + '\'' +
+                ", fundingTitle='" + fundingTitle + '\'' +
+                ", fundingId='" + fundingId + '\'' +
+                ", researchProject='" + researchProject + '\'' +
                 ", datasetDoi='" + datasetDoi + '\'' +
+                ", accessId='" + accessId + '\'' +
                 ", website='" + website + '\'' +
+                ", downloadUrl='" + downloadUrl + '\'' +
                 ", citation='" + citation + '\'' +
+                ", synopsis='" + synopsis + '\'' +
+                ", purpose='" + purpose + '\'' +
+                ", references=" + references +
                 ", addnInfo=" + addnInfo +
                 ", startDatestamp=" + startDatestamp +
                 ", endDatestamp=" + endDatestamp +

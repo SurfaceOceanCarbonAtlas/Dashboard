@@ -7,6 +7,7 @@ public class Variable implements Cloneable {
 
     protected String varName;
     protected String varUnit;
+    protected String fullName;
     protected String description;
     protected String samplingLocation;
     protected String calibration;

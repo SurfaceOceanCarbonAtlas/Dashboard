@@ -1,10 +1,13 @@
 package gov.noaa.pmel.sdimetadata;
 
+import java.util.TreeSet;
+
 /**
  * Information about the longitude, latitude, and time coverage of data in a dataset
  */
 public class Coverage implements Cloneable {
 
+    public static final String WGS84 = "WGS 84";
     /**
      * 1900-01-01 00:00:00 in units of seconds since 1970-01-01 00:00:00
      */
@@ -16,11 +19,12 @@ public class Coverage implements Cloneable {
     protected Double northernLatitude;
     protected Double earliestDataTime;
     protected Double latestDataTime;
-    protected String regionName;
-    protected String locationInRegion;
+    protected String spatialReference;
+    protected TreeSet<String> geographicNames;
 
     /**
-     * Create with all values assigned as Double.NaN or empty string
+     * Create with all numberic values assigned as Double.NaN,
+     * the spatial reference set to WGS 84, and no geographic names.
      */
     public Coverage() {
         westernLongitude = Double.NaN;
@@ -29,25 +33,24 @@ public class Coverage implements Cloneable {
         northernLatitude = Double.NaN;
         earliestDataTime = Double.NaN;
         latestDataTime = Double.NaN;
-        regionName = "";
-        locationInRegion = "";
+        spatialReference = WGS84;
+        geographicNames = new TreeSet<String>();
     }
 
     /**
-     * Create with the given values assigned by their corresponding setters.
+     * Create with the given values assigned by their corresponding setters,
+     * the spatial reference set to WGS 84, and no geographic names.
      */
     public Coverage(Double westernLongitude, Double easternLongitude,
             Double southernLatitude, Double northernLatitude,
-            Double earliestDataTime, Double latestDataTime,
-            String regionName, String locationInRegion) {
+            Double earliestDataTime, Double latestDataTime) {
+        this();
         setWesternLongitude(westernLongitude);
         setEasternLongitude(easternLongitude);
         setSouthernLatitude(southernLatitude);
         setNorthernLatitude(northernLatitude);
         setEarliestDataTime(earliestDataTime);
         setLatestDataTime(latestDataTime);
-        setRegionName(regionName);
-        setLocationInRegion(locationInRegion);
     }
 
     /**
@@ -187,33 +190,47 @@ public class Coverage implements Cloneable {
     }
 
     /**
-     * @return the region name; never null but may be empty
+     * @return the spatial reference; never null but may be empty
      */
-    public String getRegionName() {
-        return regionName;
+    public String getSpatialReference() {
+        return spatialReference;
     }
 
     /**
-     * @param regionName
-     *         assign as the region name; if null, an empty string is assigned
+     * @param spatialReference
+     *         assign as the spatial reference; if null, WGS 84 is assigned
      */
-    public void setRegionName(String regionName) {
-        this.regionName = (regionName != null) ? regionName.trim() : "";
+    public void setSpatialReference(String spatialReference) {
+        this.spatialReference = (spatialReference != null) ? spatialReference.trim() : WGS84;
     }
 
     /**
-     * @return the location in the named region; never null but may be empty
+     * @return the set of geographic names; never null but may be empty.
+     *         Any names given are guaranteed to be non-blank strings.
      */
-    public String getLocationInRegion() {
-        return locationInRegion;
+    public TreeSet<String> getGeographicNames() {
+        return new TreeSet<String>(geographicNames);
     }
 
     /**
-     * @param locationInRegion
-     *         assign as the location in the named region; if null, an empty string is assigned
+     * @param geographicNames
+     *         assign as the list of geographic names; if null, an empty set is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any name given is null or blank
      */
-    public void setLocationInRegion(String locationInRegion) {
-        this.locationInRegion = (locationInRegion != null) ? locationInRegion.trim() : "";
+    public void setGeographicNames(Iterable<String> geographicNames) throws IllegalArgumentException {
+        this.geographicNames.clear();
+        if ( geographicNames != null ) {
+            for (String name : geographicNames) {
+                if ( name == null )
+                    throw new IllegalArgumentException("null geographic region name given");
+                name = name.trim();
+                if ( name.isEmpty() )
+                    throw new IllegalArgumentException("blank geographic region name given");
+                this.geographicNames.add(name);
+            }
+        }
     }
 
     /**
@@ -245,8 +262,8 @@ public class Coverage implements Cloneable {
         coverage.northernLatitude = northernLatitude;
         coverage.earliestDataTime = earliestDataTime;
         coverage.latestDataTime = latestDataTime;
-        coverage.regionName = regionName;
-        coverage.locationInRegion = locationInRegion;
+        coverage.spatialReference = spatialReference;
+        coverage.geographicNames = new TreeSet<String>(geographicNames);
         return coverage;
     }
 
@@ -271,9 +288,9 @@ public class Coverage implements Cloneable {
             return false;
         if ( !latestDataTime.equals(other.latestDataTime) )
             return false;
-        if ( !regionName.equals(other.regionName) )
+        if ( !spatialReference.equals(other.spatialReference) )
             return false;
-        if ( !locationInRegion.equals(other.locationInRegion) )
+        if ( !geographicNames.equals(other.geographicNames) )
             return false;
         return true;
     }
@@ -287,8 +304,8 @@ public class Coverage implements Cloneable {
         result = result * prime + northernLatitude.hashCode();
         result = result * prime + earliestDataTime.hashCode();
         result = result * prime + latestDataTime.hashCode();
-        result = result * prime + regionName.hashCode();
-        result = result * prime + locationInRegion.hashCode();
+        result = result * prime + spatialReference.hashCode();
+        result = result * prime + geographicNames.hashCode();
         return result;
     }
 
@@ -301,8 +318,8 @@ public class Coverage implements Cloneable {
                 ", northernLatitude=" + northernLatitude +
                 ", earliestDataTime=" + earliestDataTime +
                 ", latestDataTime=" + latestDataTime +
-                ", regionName=" + regionName +
-                ", locationInRegion=" + locationInRegion +
+                ", spatialReference='" + spatialReference + "'" +
+                ", geographicNames=" + geographicNames +
                 '}';
     }
 

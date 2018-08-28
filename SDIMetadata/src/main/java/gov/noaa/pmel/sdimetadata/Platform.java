@@ -9,6 +9,7 @@ public class Platform implements Cloneable {
     protected String platformName;
     protected String platformType;
     protected String platformOwner;
+    protected String platformCountry;
 
     /**
      * Create with all values empty
@@ -18,6 +19,7 @@ public class Platform implements Cloneable {
         platformName = "";
         platformType = "";
         platformOwner = "";
+        platformCountry = "";
     }
 
     /**
@@ -29,7 +31,7 @@ public class Platform implements Cloneable {
 
     /**
      * @param platformId
-     *         assign as the unique ID for this platform; if null, and empty string is assigned
+     *         assign as the unique ID for this platform; if null, an empty string is assigned
      */
     public void setPlatformId(String platformId) {
         this.platformId = (platformId != null) ? platformId.trim() : "";
@@ -44,7 +46,7 @@ public class Platform implements Cloneable {
 
     /**
      * @param platformName
-     *         assign as the name for this platform; if null, and empty string is assigned
+     *         assign as the name for this platform; if null, an empty string is assigned
      */
     public void setPlatformName(String platformName) {
         this.platformName = (platformName != null) ? platformName.trim() : "";
@@ -59,7 +61,7 @@ public class Platform implements Cloneable {
 
     /**
      * @param platformType
-     *         assign as the type of this platform (ship, mooring, drifting buoy); if null, and empty string is assigned
+     *         assign as the type of this platform (ship, mooring, drifting buoy); if null, an empty string is assigned
      */
     public void setPlatformType(String platformType) {
         this.platformType = (platformType != null) ? platformType.trim() : "";
@@ -74,10 +76,25 @@ public class Platform implements Cloneable {
 
     /**
      * @param platformOwner
-     *         assign as the owner of this platform; if null, and empty string is assigned
+     *         assign as the owner of this platform; if null, an empty string is assigned
      */
     public void setPlatformOwner(String platformOwner) {
         this.platformOwner = (platformOwner != null) ? platformOwner.trim() : "";
+    }
+
+    /**
+     * @return the country under which this platform is registered; never null but may be empty
+     */
+    public String getPlatformCountry() {
+        return platformCountry;
+    }
+
+    /**
+     * @param platformCountry
+     *         assign as the country under which this platform is registered; if null, an empty string is assigned
+     */
+    public void setPlatformCountry(String platformCountry) {
+        this.platformCountry = (platformCountry != null) ? platformCountry.trim() : "";
     }
 
     /**
@@ -105,6 +122,7 @@ public class Platform implements Cloneable {
         dup.platformName = platformName;
         dup.platformType = platformType;
         dup.platformOwner = platformOwner;
+        dup.platformCountry = platformCountry;
         return dup;
     }
 
@@ -125,6 +143,8 @@ public class Platform implements Cloneable {
             return false;
         if ( !platformOwner.equals(platform.platformOwner) )
             return false;
+        if ( !platformCountry.equals(platform.platformCountry) )
+            return false;
 
         return true;
     }
@@ -136,6 +156,7 @@ public class Platform implements Cloneable {
         result = result * prime + platformName.hashCode();
         result = result * prime + platformType.hashCode();
         result = result * prime + platformOwner.hashCode();
+        result = result * prime + platformCountry.hashCode();
         return result;
     }
 
@@ -146,6 +167,7 @@ public class Platform implements Cloneable {
                 ", platformName='" + platformName + '\'' +
                 ", platformType='" + platformType + '\'' +
                 ", platformOwner='" + platformOwner + '\'' +
+                ", platformCountry='" + platformCountry + '\'' +
                 '}';
     }
 

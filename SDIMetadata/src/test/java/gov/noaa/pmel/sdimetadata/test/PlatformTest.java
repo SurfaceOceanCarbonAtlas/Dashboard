@@ -15,6 +15,7 @@ public class PlatformTest {
     private static final String PLATFORM_NAME = "Ronald H. Brown";
     private static final String PLATFORM_TYPE = "Ship";
     private static final String PLATFORM_OWNER = "NOAA";
+    private static final String PLATFORM_COUNTRY = "USA";
 
     @Test
     public void testGetSetPlatformId() {
@@ -71,6 +72,22 @@ public class PlatformTest {
     }
 
     @Test
+    public void testGetSetPlatformCountry() {
+        Platform platform = new Platform();
+        assertEquals("", platform.getPlatformCountry());
+        platform.setPlatformCountry(PLATFORM_COUNTRY);
+        assertEquals(PLATFORM_COUNTRY, platform.getPlatformCountry());
+        assertEquals("", platform.getPlatformOwner());
+        assertEquals("", platform.getPlatformType());
+        assertEquals("", platform.getPlatformName());
+        assertEquals("", platform.getPlatformId());
+        platform.setPlatformCountry(null);
+        assertEquals("", platform.getPlatformCountry());
+        platform.setPlatformCountry("\t");
+        assertEquals("", platform.getPlatformCountry());
+    }
+
+    @Test
     public void testHashCodeEquals() {
         Platform first = new Platform();
         assertFalse(first.equals(null));
@@ -107,6 +124,13 @@ public class PlatformTest {
         second.setPlatformOwner(PLATFORM_OWNER);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+
+        first.setPlatformCountry(PLATFORM_COUNTRY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPlatformCountry(PLATFORM_COUNTRY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
     @Test
@@ -132,6 +156,7 @@ public class PlatformTest {
         platform.setPlatformName(PLATFORM_NAME);
         platform.setPlatformType(PLATFORM_TYPE);
         platform.setPlatformOwner(PLATFORM_OWNER);
+        platform.setPlatformCountry(PLATFORM_COUNTRY);
         assertNotEquals(platform, dup);
 
         dup = platform.clone();
