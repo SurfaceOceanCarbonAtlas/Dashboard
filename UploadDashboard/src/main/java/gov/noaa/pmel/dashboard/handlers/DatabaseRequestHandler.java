@@ -364,7 +364,7 @@ public class DatabaseRequestHandler {
     /**
      * Adds a new dataset QC event for a dataset.  The QC flag name and id is ignored.
      *
-     * @param qcEvent
+     * @param qcEvents
      *         the QC event to add
      *
      * @throws SQLException
@@ -402,8 +402,8 @@ public class DatabaseRequestHandler {
 
     /**
      * Get the dataset QC flag for the given dataset.  If the latest QC flag for different regions are in conflict, and
-     * a global flag does not later resolve this conflict, the {@link DashboardUtils#QC_CONFLICT_FLAG} flag is
-     * returned.
+     * a global flag does not later resolve this conflict, the {@link DashboardServerUtils#DATASET_QCFLAG_CONFLICT}
+     * flag is returned.
      *
      * @param expocode
      *         get the dataset QC flag for the dataset with this dataset ID.

@@ -49,7 +49,7 @@ public class DatasetDataColumn {
      *         list of all known data column types
      * @param cruise
      *         cruise to associate with this instance
-     * @param column
+     * @param columnIndex
      *         index of the cruise data column to associate with this instance
      */
     DatasetDataColumn(ArrayList<DataColumnType> knownUserTypes, DashboardDataset cruise, int columnIndex) {

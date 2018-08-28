@@ -64,12 +64,14 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
     private static final String REFRESH_HELP_ADDENDUM =
-            " -- if plots do not show after awhile, try pressing the '" + REFRESH_TEXT + "' button given below this image.";
+            " -- if plots do not show after awhile, try pressing the '" + REFRESH_TEXT +
+                    "' button given below this image.";
 
     private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
     private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
     private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time";
-    private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
+    private static final String TIME_SERIES_ALT_TEXT =
+            "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
     private static final String PRESSURES_ALT_TEXT = "pressures versus time";
     private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
     private static final String SALINITIES_ALT_TEXT = "salinities versus time";
@@ -329,7 +331,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     /**
      * Updates the this page with the plots for the indicated cruise.
      *
-     * @param dataset
+     * @param expocode
      *         cruises to use
      * @param username
      *         user requesting these plots

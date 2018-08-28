@@ -82,7 +82,7 @@ public class OmePdfGenerator {
     /**
      * Convert the PI-provided OME XML file for the given dataset to a human-friendly PDF file.
      *
-     * @param dataset
+     * @param expocode
      *         convert the PI-provided OME XML file for this dataset
      *
      * @throws IllegalArgumentException

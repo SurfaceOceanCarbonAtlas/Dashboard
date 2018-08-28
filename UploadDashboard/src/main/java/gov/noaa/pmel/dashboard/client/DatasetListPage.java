@@ -847,20 +847,21 @@ public class DatasetListPage extends CompositeWithUsername {
         message += CHANGE_OWNER_HTML_EPILOGUE;
         if ( changeOwnerPopup == null ) {
             changeOwnerPopup = new DashboardInputPopup(CHANGE_OWNER_INPUT_TEXT,
-                    CHANGE_OWNER_YES_TEXT, CHANGE_OWNER_NO_TEXT, new AsyncCallback<String>() {
-                @Override
-                public void onSuccess(String newOwner) {
-                    if ( newOwner != null ) {
-                        continueChangeOwner(newOwner);
-                    }
-                }
+                    CHANGE_OWNER_YES_TEXT, CHANGE_OWNER_NO_TEXT,
+                    new AsyncCallback<String>() {
+                        @Override
+                        public void onSuccess(String newOwner) {
+                            if ( newOwner != null ) {
+                                continueChangeOwner(newOwner);
+                            }
+                        }
 
-                @Override
-                public void onFailure(Throwable ex) {
-                    // Never called
-                    ;
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable ex) {
+                            // Never called
+                            ;
+                        }
+                    });
         }
         changeOwnerPopup.askForInput(message);
     }
@@ -1446,13 +1447,14 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * Checks the cruises given in checkSet in this instance for metadata compatibility for submitting for QC.  At this
-     * time this only checks that an OME metadata document is associated with each cruise.
+     * Checks the cruises given in checkSet in this instance for metadata compatibility for submitting for QC.
+     * At this time this only checks that an OME metadata document is associated with each cruise.
      * <p>
-     * Then checks the cruises given in checkSet in this instance for data compatibility for submitting for QC.  If the
-     * data has not been checked or is unacceptable, this method presents an error message and returns. If the data has
-     * many serious issues, asks the user if the submit should be continued.  If the answer is yes, or if there were no
-     * serious data issues, continues submitting for QC by calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
+     * Then checks the cruises given in checkSet in this instance for data compatibility for submitting for QC.
+     * If the data has not been checked or is unacceptable, this method presents an error message and returns.
+     * If the data has many serious issues, asks the user if the submit should be continued.
+     * If the answer is yes, or if there were no serious data issues, continues submitting for QC by calling
+     * {@link SubmitForQCPage#showPage(DashboardDatasetList)}.
      */
     private void checkDatasetsForSubmitting() {
         // Check if the cruises have metadata documents
