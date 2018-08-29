@@ -1,20 +1,20 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
 /**
- * Base class for a sampling instrument.
+ * Base class for an analyzing instrument.
  */
-public class Sampler extends Instrument implements Cloneable {
+public class Analyzer extends Instrument {
 
     @Override
-    public Sampler clone() {
-        return (Sampler) super.clone();
+    public Analyzer clone() {
+        return (Analyzer) super.clone();
     }
 
     @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( ! (obj instanceof Sampler) )
+        if ( ! (obj instanceof Analyzer) )
             return false;
         return super.equals(obj);
     }
@@ -26,7 +26,7 @@ public class Sampler extends Instrument implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Instrument", "Sampler");
+        return super.toString().replaceFirst("Instrument", "Analyzer");
     }
 
 }

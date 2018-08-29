@@ -2,7 +2,7 @@ package gov.noaa.pmel.sdimetadata.variable;
 
 /**
  * Describes a pressure data variable in a dataset.
- * Same as Variable except the unit for precision and accuracy are set to hectopascals and cannot be modified,
+ * Same as Variable except the unit for accuracy and precision are set to hectopascals and cannot be modified,
  * and the default unit for the variable is hectopascals (but can be modified).
  */
 public class Pressure extends Variable implements Cloneable {
@@ -11,17 +11,19 @@ public class Pressure extends Variable implements Cloneable {
 
     public Pressure() {
         super();
-        unit = HECTOPASCALS_UNIT;
-        uncertaintyUnit = HECTOPASCALS_UNIT;
+        varUnit = HECTOPASCALS_UNIT;
+        apUnit = HECTOPASCALS_UNIT;
     }
 
     /**
-     * @param unit
-     *         assign as the unit for values of this variable; if null, hectopascals is assigned
+     * @param varUnit
+     *         assign as the unit for values of this variable; if null or blank, hectopascals is assigned
      */
     @Override
-    public void setUnit(String unit) {
-        this.unit = (unit != null) ? unit.trim() : HECTOPASCALS_UNIT;
+    public void setVarUnit(String varUnit) {
+        this.varUnit = (varUnit != null) ? varUnit.trim() : HECTOPASCALS_UNIT;
+        if ( this.varUnit.isEmpty() )
+            this.varUnit = HECTOPASCALS_UNIT;
     }
 
     /**
@@ -29,8 +31,8 @@ public class Pressure extends Variable implements Cloneable {
      *         always
      */
     @Override
-    public void setUncertaintyUnit(String uncertaintyUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("uncertainty units are unmodifiable");
+    public void setApUnit(String apUnit) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("unit for accuracy and precision is unmodifiable");
     }
 
     @Override

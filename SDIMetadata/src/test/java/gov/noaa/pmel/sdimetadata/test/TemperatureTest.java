@@ -17,30 +17,30 @@ public class TemperatureTest {
     private static final String KELVIN_UNIT = "K";
 
     @Test
-    public void testGetSetUnit() {
+    public void testGetSetVarUnit() {
         Temperature temperature = new Temperature();
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getUnit());
-        temperature.setUnit(KELVIN_UNIT);
-        assertEquals(KELVIN_UNIT, temperature.getUnit());
-        temperature.setUnit(null);
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getUnit());
-        temperature.setUnit("\t");
-        assertEquals("", temperature.getUnit());
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
+        temperature.setVarUnit(KELVIN_UNIT);
+        assertEquals(KELVIN_UNIT, temperature.getVarUnit());
+        temperature.setVarUnit(null);
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
+        temperature.setVarUnit("\t");
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
     }
 
     @Test
-    public void testGetSetUncertaintyUnit() {
+    public void testGetSetAPUnit() {
         Temperature temperature = new Temperature();
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getUncertaintyUnit());
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getApUnit());
         try {
-            temperature.setUncertaintyUnit(KELVIN_UNIT);
-            fail("call to setUncertaintyUnit succeeded");
+            temperature.setApUnit(KELVIN_UNIT);
+            fail("call to setApUnit succeeded");
         } catch ( UnsupportedOperationException ex ) {
             // Expected result
         }
         try {
-            ((Variable) temperature).setUncertaintyUnit(KELVIN_UNIT);
-            fail("call to setUncertaintyUnit succeeded");
+            ((Variable) temperature).setApUnit(KELVIN_UNIT);
+            fail("call to setApUnit succeeded");
         } catch ( UnsupportedOperationException ex ) {
             // Expected result
         }
@@ -85,8 +85,8 @@ public class TemperatureTest {
         assertNotEquals(var.hashCode(), second.hashCode());
         assertFalse(var.equals(second));
 
-        var.setUnit(Temperature.DEGREES_CELSIUS_UNIT);
-        var.setUncertaintyUnit(Temperature.DEGREES_CELSIUS_UNIT);
+        var.setVarUnit(Temperature.DEGREES_CELSIUS_UNIT);
+        var.setApUnit(Temperature.DEGREES_CELSIUS_UNIT);
         assertEquals(first.hashCode(), var.hashCode());
         assertFalse(first.equals(var));
         assertEquals(var.hashCode(), second.hashCode());

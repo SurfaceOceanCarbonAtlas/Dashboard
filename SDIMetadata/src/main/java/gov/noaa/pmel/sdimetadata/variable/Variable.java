@@ -11,19 +11,19 @@ public class Variable implements Cloneable {
 
     protected String colName;
     protected String fullName;
-    protected String unit;
+    protected String varUnit;
     protected String observeType;
     protected MethodType measureMethod;
     protected String methodDescription;
     protected String methodReference;
     protected String samplingLocation;
-    protected String poison;
-    protected String samplerName;
-    protected String sensorName;
-    protected Double uncertainty;
-    protected String uncertaintyUnit;
+    protected Double accuracy;
+    protected Double precision;
+    protected String apUnit;
     protected String flagType;
     protected Person researcher;
+    protected ArrayList<String> samplerNames;
+    protected ArrayList<String> analyzerNames;
     protected ArrayList<String> addnInfo;
 
     /**
@@ -32,19 +32,19 @@ public class Variable implements Cloneable {
     public Variable() {
         colName = "";
         fullName = "";
-        unit = "";
+        varUnit = "";
         observeType = "";
         measureMethod = MethodType.UNSPECIFIED;
         methodDescription = "";
         methodReference = "";
         samplingLocation = "";
-        poison = "";
-        samplerName = "";
-        sensorName = "";
-        uncertainty = Double.NaN;
-        uncertaintyUnit = "";
+        accuracy = Double.NaN;
+        precision = Double.NaN;
+        apUnit = "";
         flagType = "";
         researcher = new Person();
+        samplerNames = new ArrayList<String>();
+        analyzerNames = new ArrayList<String>();
         addnInfo = new ArrayList<String>();
     }
 
@@ -82,16 +82,16 @@ public class Variable implements Cloneable {
     /**
      * @return the unit of values for this variable; never null but may be an empty string
      */
-    public String getUnit() {
-        return unit;
+    public String getVarUnit() {
+        return varUnit;
     }
 
     /**
-     * @param unit
+     * @param varUnit
      *         assign as the unit for values of this variable; if null, an empty string is assigned
      */
-    public void setUnit(String unit) {
-        this.unit = (unit != null) ? unit.trim() : "";
+    public void setVarUnit(String varUnit) {
+        this.varUnit = (varUnit != null) ? varUnit.trim() : "";
     }
 
     /**
@@ -171,93 +171,71 @@ public class Variable implements Cloneable {
     }
 
     /**
-     * @return the poison used in the samples from which this variable was obtained; never null but may be empty
+     * @return the accuracy (uncertainty) in values of this variable; never null but may be Double.NaN
      */
-    public String getPoison() {
-        return poison;
+    public Double getAccuracy() {
+        return accuracy;
     }
 
     /**
-     * @param poison
-     *         assign as the poison used in the samples from which this variable was obtained;
-     *         if null, an empty string is assigned
-     */
-    public void setPoison(String poison) {
-        this.poison = (poison != null) ? poison.trim() : "";
-    }
-
-    /**
-     * @return the name of the sampling instrument used for this variable; never null but may be empty
-     */
-    public String getSamplerName() {
-        return samplerName;
-    }
-
-    /**
-     * @param samplerName
-     *         assign as the name of the sampling instrument used for this variable;
-     *         if null, an empty string is assigned
-     */
-    public void setSamplerName(String samplerName) {
-        this.samplerName = (samplerName != null) ? samplerName.trim() : "";
-    }
-
-    /**
-     * @return the name of the sensor measuring this variable; never null but may be an empty string
-     */
-    public String getSensorName() {
-        return sensorName;
-    }
-
-    /**
-     * @param sensorName
-     *         assign as the name of the sensor measuring this variable; if null, an empty string is assigned
-     */
-    public void setSensorName(String sensorName) {
-        this.sensorName = (sensorName != null) ? sensorName.trim() : "";
-    }
-
-
-    /**
-     * @return the uncertainty (accuracy) in values of this variable; never null but may be Double.NaN
-     */
-    public Double getUncertainty() {
-        return uncertainty;
-    }
-
-    /**
-     * @param uncertainty
-     *         assign as the uncertainty (accuracy) in values of this variable; if null, Double.NaN is assigned
+     * @param accuracy
+     *         assign as the accuracy (uncertainty) in values of this variable; if null, Double.NaN is assigned
      *
      * @throws IllegalArgumentException
-     *         if the uncertainty is given (not null) but is infinite or not positive
+     *         if the accuracy is given (not null) but is infinite or not positive
      */
-    public void setUncertainty(Double uncertainty) throws IllegalArgumentException {
-        if ( uncertainty != null ) {
-            if ( uncertainty.isInfinite() )
-                throw new IllegalArgumentException("uncertainty is an infinite value");
-            if ( uncertainty <= 0.0 )
-                throw new IllegalArgumentException("uncertainty is not a positive value");
-            this.uncertainty = uncertainty;
+    public void setAccuracy(Double accuracy) throws IllegalArgumentException {
+        if ( accuracy != null ) {
+            if ( accuracy.isInfinite() )
+                throw new IllegalArgumentException("accuracy is an infinite value");
+            if ( accuracy <= 0.0 )
+                throw new IllegalArgumentException("accuracy is not a positive value");
+            this.accuracy = accuracy;
         }
         else
-            this.uncertainty = Double.NaN;
+            this.accuracy = Double.NaN;
     }
 
     /**
-     * @return the unit of the uncertainty (accuracy) value for this variable; never null but may be an empty string
+     * @return the precision (resolution) in values of this variable; never null but may be Double.NaN
      */
-    public String getUncertaintyUnit() {
-        return uncertaintyUnit;
+    public Double getPrecision() {
+        return precision;
     }
 
     /**
-     * @param uncertaintyUnit
-     *         assign as the unit of the uncertainty (accuracy) value of this variable;
+     * @param precision
+     *         assign as the precision (resolution) in values of this variable; if null, Double.NaN is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the precision is given (not null) but is infinite or not positive
+     */
+    public void setPrecision(Double precision) {
+        if ( precision != null ) {
+            if ( precision.isInfinite() )
+                throw new IllegalArgumentException("precision is an infinite value");
+            if ( precision <= 0.0 )
+                throw new IllegalArgumentException("precision is not a positive value");
+            this.precision = precision;
+        }
+        else
+            this.precision = Double.NaN;
+    }
+
+    /**
+     * @return the unit of the accuracy and precision values for this variable; never null but may be an empty string
+     */
+    public String getApUnit() {
+        return apUnit;
+    }
+
+    /**
+     * @param apUnit
+     *         assign as the unit of the accuracy and precision values of this variable;
      *         if null, an empty string is assigned
      */
-    public void setUncertaintyUnit(String uncertaintyUnit) {
-        this.uncertaintyUnit = (uncertaintyUnit != null) ? uncertaintyUnit.trim() : "";
+    public void setApUnit(String apUnit) {
+        this.apUnit = (apUnit != null) ? apUnit.trim() : "";
     }
 
     /**
@@ -290,6 +268,66 @@ public class Variable implements Cloneable {
      */
     public void setResearcher(Person researcher) {
         this.researcher = (researcher != null) ? researcher.clone() : new Person();
+    }
+
+    /**
+     * @return the list of names of analyzers used to collect this variable; never null but may be empty.
+     *         Any strings given are guaranteed to be strings with content (not blank).
+     */
+    public ArrayList<String> getSamplerNames() {
+        return new ArrayList<String>(samplerNames);
+    }
+
+    /**
+     * @param samplerNames
+     *         assign as the list of names of samplers used to collect this variable;
+     *         if null, an empty list is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any sampler name given is null or blank
+     */
+    public void setSamplerNames(Iterable<String> samplerNames) throws IllegalArgumentException {
+        this.samplerNames.clear();
+        if ( samplerNames != null ) {
+            for (String name : samplerNames) {
+                if ( name == null )
+                    throw new IllegalArgumentException("null sampler name given");
+                name = name.trim();
+                if ( name.isEmpty() )
+                    throw new IllegalArgumentException("blank sampler name given");
+                this.samplerNames.add(name);
+            }
+        }
+    }
+
+    /**
+     * @return the list of names of analyzers used to measure this variable; never null but may be empty.
+     *         Any strings given are guaranteed to be strings with content (not blank).
+     */
+    public ArrayList<String> getAnalyzerNames() {
+        return new ArrayList<String>(analyzerNames);
+    }
+
+    /**
+     * @param analyzerNames
+     *         assign as the list of names of analyzers used to measure this variable;
+     *         if null, an empty list is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any analyzer name given is null or blank
+     */
+    public void setAnalyzerNames(Iterable<String> analyzerNames) throws IllegalArgumentException {
+        this.analyzerNames.clear();
+        if ( analyzerNames != null ) {
+            for (String name : analyzerNames) {
+                if ( name == null )
+                    throw new IllegalArgumentException("null analyzer name given");
+                name = name.trim();
+                if ( name.isEmpty() )
+                    throw new IllegalArgumentException("blank analyzer name given");
+                this.analyzerNames.add(name);
+            }
+        }
     }
 
     /**
@@ -329,22 +367,23 @@ public class Variable implements Cloneable {
             return false;
         if ( fullName.isEmpty() )
             return false;
-        if ( unit.isEmpty() )
-            return false;
         if ( observeType.isEmpty() )
-            return false;
-        if ( measureMethod.equals(MethodType.UNSPECIFIED) )
-            return false;
-        if ( measureMethod.equals(MethodType.COMPUTED) && methodDescription.isEmpty() )
             return false;
         if ( samplingLocation.isEmpty() )
             return false;
-        if ( (!measureMethod.equals(MethodType.COMPUTED)) && samplerName.isEmpty() && sensorName.isEmpty() )
+        if ( accuracy.isNaN() )
             return false;
-        if ( uncertainty.isNaN() )
-            return false;
-        if ( uncertaintyUnit.isEmpty() )
-            return false;
+        switch ( measureMethod ) {
+            case UNSPECIFIED:
+                return false;
+            case COMPUTED:
+                if ( methodDescription.isEmpty() )
+                    return false;
+                break;
+            default:
+                if ( samplerNames.isEmpty() && analyzerNames.isEmpty() )
+                    return false;
+        }
 
         return true;
     }
@@ -359,19 +398,19 @@ public class Variable implements Cloneable {
         }
         dup.colName = colName;
         dup.fullName = fullName;
-        dup.unit = unit;
+        dup.varUnit = varUnit;
         dup.observeType = observeType;
         dup.measureMethod = measureMethod;
         dup.methodDescription = methodDescription;
         dup.methodReference = methodReference;
         dup.samplingLocation = samplingLocation;
-        dup.poison = poison;
-        dup.samplerName = samplerName;
-        dup.sensorName = sensorName;
-        dup.uncertainty = uncertainty;
-        dup.uncertaintyUnit = uncertaintyUnit;
+        dup.accuracy = accuracy;
+        dup.precision = precision;
+        dup.apUnit = apUnit;
         dup.flagType = flagType;
         dup.researcher = researcher.clone();
+        dup.samplerNames = new ArrayList<String>(samplerNames);
+        dup.analyzerNames = new ArrayList<String>(analyzerNames);
         dup.addnInfo = new ArrayList<String>(addnInfo);
         return dup;
     }
@@ -389,7 +428,7 @@ public class Variable implements Cloneable {
             return false;
         if ( !fullName.equals(variable.fullName) )
             return false;
-        if ( !unit.equals(variable.unit) )
+        if ( !varUnit.equals(variable.varUnit) )
             return false;
         if ( !observeType.equals(variable.observeType) )
             return false;
@@ -401,19 +440,19 @@ public class Variable implements Cloneable {
             return false;
         if ( !samplingLocation.equals(variable.samplingLocation) )
             return false;
-        if ( !poison.equals(variable.poison) )
+        if ( !accuracy.equals(variable.accuracy) )
             return false;
-        if ( !samplerName.equals(variable.samplerName) )
+        if ( !precision.equals(variable.precision) )
             return false;
-        if ( !sensorName.equals(variable.sensorName) )
-            return false;
-        if ( !uncertainty.equals(variable.uncertainty) )
-            return false;
-        if ( !uncertaintyUnit.equals(variable.uncertaintyUnit) )
+        if ( !apUnit.equals(variable.apUnit) )
             return false;
         if ( !flagType.equals(variable.flagType) )
             return false;
         if ( !researcher.equals(variable.researcher) )
+            return false;
+        if ( !samplerNames.equals(variable.samplerNames) )
+            return false;
+        if ( !analyzerNames.equals(variable.analyzerNames) )
             return false;
         if ( !addnInfo.equals(variable.addnInfo) )
             return false;
@@ -426,19 +465,19 @@ public class Variable implements Cloneable {
         final int prime = 37;
         int result = colName.hashCode();
         result = result * prime + fullName.hashCode();
-        result = result * prime + unit.hashCode();
+        result = result * prime + varUnit.hashCode();
         result = result * prime + observeType.hashCode();
         result = result * prime + measureMethod.hashCode();
         result = result * prime + methodDescription.hashCode();
         result = result * prime + methodReference.hashCode();
         result = result * prime + samplingLocation.hashCode();
-        result = result * prime + poison.hashCode();
-        result = result * prime + samplerName.hashCode();
-        result = result * prime + sensorName.hashCode();
-        result = result * prime + uncertainty.hashCode();
-        result = result * prime + uncertaintyUnit.hashCode();
+        result = result * prime + accuracy.hashCode();
+        result = result * prime + precision.hashCode();
+        result = result * prime + apUnit.hashCode();
         result = result * prime + flagType.hashCode();
         result = result * prime + researcher.hashCode();
+        result = result * prime + samplerNames.hashCode();
+        result = result * prime + analyzerNames.hashCode();
         result = result * prime + addnInfo.hashCode();
         return result;
     }
@@ -448,19 +487,18 @@ public class Variable implements Cloneable {
         return "Variable{" +
                 "colName='" + colName + '\'' +
                 ", fullName='" + fullName + '\'' +
-                ", unit='" + unit + '\'' +
+                ", varUnit='" + varUnit + '\'' +
                 ", observeType='" + observeType + '\'' +
                 ", measureMethod=" + measureMethod +
                 ", methodDescription='" + methodDescription + '\'' +
                 ", methodReference='" + methodReference + '\'' +
                 ", samplingLocation='" + samplingLocation + '\'' +
-                ", poison='" + poison + '\'' +
-                ", samplerName='" + samplerName + '\'' +
-                ", sensorName='" + sensorName + '\'' +
-                ", uncertainty=" + uncertainty +
-                ", uncertaintyUnit='" + uncertaintyUnit + '\'' +
+                ", accuracy=" + accuracy +
+                ", apUnit='" + apUnit + '\'' +
                 ", flagType='" + flagType + '\'' +
                 ", researcher=" + researcher +
+                ", samplerNames=" + samplerNames +
+                ", analyzerNames=" + analyzerNames +
                 ", addnInfo=" + addnInfo +
                 '}';
     }

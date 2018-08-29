@@ -1,6 +1,8 @@
 package gov.noaa.pmel.sdimetadata;
 
+import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
+import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.instrument.Sensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
@@ -14,8 +16,8 @@ public class SDIMetadata implements Cloneable {
     protected ArrayList<Investigator> investigators;
     protected Platform platform;
     protected Coverage coverage;
-    protected ArrayList<Instrument> instruments;
-    protected ArrayList<Sensor> sensors;
+    protected ArrayList<Sampler> samplers;
+    protected ArrayList<Analyzer> analyzers;
     protected ArrayList<Variable> variables;
     protected MiscInfo miscInfo;
 
@@ -24,8 +26,8 @@ public class SDIMetadata implements Cloneable {
         investigators = new ArrayList<Investigator>();
         platform = new Platform();
         coverage = new Coverage();
-        instruments = new ArrayList<Instrument>();
-        sensors = new ArrayList<Sensor>();
+        samplers = new ArrayList<Sampler>();
+        analyzers = new ArrayList<Analyzer>();
         variables = new ArrayList<Variable>();
         miscInfo = new MiscInfo();
     }
@@ -42,11 +44,11 @@ public class SDIMetadata implements Cloneable {
             return false;
         if ( !coverage.isValid() )
             return false;
-        for (Instrument inst : instruments) {
-            if ( !inst.isValid() )
+        for (Sampler collector : samplers) {
+            if ( !collector.isValid() )
                 return false;
         }
-        for (Sensor detector : sensors) {
+        for (Analyzer detector : analyzers) {
             if ( !detector.isValid() )
                 return false;
         }
@@ -67,6 +69,8 @@ public class SDIMetadata implements Cloneable {
         if ( coverage.getLatestDataTime() > endTime )
             return false;
 
+        // TODO: verify researcher, sampler names, and analyzer names in variables match some entry in investogators, samplers, and analyzers
+
         return true;
     }
 
@@ -85,13 +89,13 @@ public class SDIMetadata implements Cloneable {
         }
         dup.platform = platform.clone();
         dup.coverage = coverage.clone();
-        dup.instruments = new ArrayList<Instrument>(instruments.size());
-        for (Instrument machine : instruments) {
-            dup.instruments.add(machine.clone());
+        dup.samplers = new ArrayList<Sampler>(samplers.size());
+        for (Sampler collector : samplers) {
+            dup.samplers.add(collector.clone());
         }
-        dup.sensors = new ArrayList<Sensor>(sensors.size());
-        for (Sensor detector : sensors) {
-            dup.sensors.add(detector.clone());
+        dup.analyzers = new ArrayList<Analyzer>(analyzers.size());
+        for (Analyzer detector : analyzers) {
+            dup.analyzers.add(detector.clone());
         }
         dup.variables = new ArrayList<Variable>(variables.size());
         for (Variable var : variables) {

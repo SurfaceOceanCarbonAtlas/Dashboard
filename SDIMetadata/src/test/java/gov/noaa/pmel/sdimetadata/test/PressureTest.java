@@ -17,30 +17,30 @@ public class PressureTest {
     private static final String KILOPASCALS_UNIT = "kPa";
 
     @Test
-    public void testGetSetUnit() {
+    public void testGetSetVarUnit() {
         Pressure pressure = new Pressure();
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getUnit());
-        pressure.setUnit(KILOPASCALS_UNIT);
-        assertEquals(KILOPASCALS_UNIT, pressure.getUnit());
-        pressure.setUnit(null);
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getUnit());
-        pressure.setUnit("\t");
-        assertEquals("", pressure.getUnit());
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit(KILOPASCALS_UNIT);
+        assertEquals(KILOPASCALS_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit(null);
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit("\t");
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
     }
 
     @Test
-    public void testGetSetUncertaintyUnit() {
+    public void testGetSetAPUnit() {
         Pressure pressure = new Pressure();
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getUncertaintyUnit());
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getApUnit());
         try {
-            pressure.setUncertaintyUnit(KILOPASCALS_UNIT);
-            fail("call to setUncertaintyUnit succeeded");
+            pressure.setApUnit(KILOPASCALS_UNIT);
+            fail("call to setApUnit succeeded");
         } catch ( UnsupportedOperationException ex ) {
             // Expected result
         }
         try {
-            ((Variable) pressure).setUncertaintyUnit(KILOPASCALS_UNIT);
-            fail("call to setUncertaintyUnit succeeded");
+            ((Variable) pressure).setApUnit(KILOPASCALS_UNIT);
+            fail("call to setApUnit succeeded");
         } catch ( UnsupportedOperationException ex ) {
             // Expected result
         }
@@ -84,8 +84,8 @@ public class PressureTest {
         assertFalse(first.equals(var));
         assertNotEquals(var.hashCode(), second.hashCode());
         assertFalse(var.equals(second));
-        var.setUnit(Pressure.HECTOPASCALS_UNIT);
-        var.setUncertaintyUnit(Pressure.HECTOPASCALS_UNIT);
+        var.setVarUnit(Pressure.HECTOPASCALS_UNIT);
+        var.setApUnit(Pressure.HECTOPASCALS_UNIT);
         assertEquals(first.hashCode(), var.hashCode());
         assertFalse(first.equals(var));
         assertEquals(var.hashCode(), second.hashCode());

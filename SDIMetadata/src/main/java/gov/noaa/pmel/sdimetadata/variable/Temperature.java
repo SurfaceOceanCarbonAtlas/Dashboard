@@ -2,7 +2,7 @@ package gov.noaa.pmel.sdimetadata.variable;
 
 /**
  * Describes a temperature data variable in a dataset.
- * Same as Variable except the unit for precision and accuracy are set to degrees Celsius and cannot be modified,
+ * Same as Variable except the unit for accuracy and precision are set to degrees Celsius and cannot be modified,
  * and the default unit for the variable is degrees Celsius (but can be modified).
  */
 public class Temperature extends Variable implements Cloneable {
@@ -14,17 +14,19 @@ public class Temperature extends Variable implements Cloneable {
      */
     public Temperature() {
         super();
-        unit = DEGREES_CELSIUS_UNIT;
-        uncertaintyUnit = DEGREES_CELSIUS_UNIT;
+        varUnit = DEGREES_CELSIUS_UNIT;
+        apUnit = DEGREES_CELSIUS_UNIT;
     }
 
     /**
-     * @param unit
-     *         assign as the unit for values of this variable; if null, degrees Celsius is assigned
+     * @param varUnit
+     *         assign as the unit for values of this variable; if null or blank, degrees Celsius is assigned
      */
     @Override
-    public void setUnit(String unit) {
-        this.unit = (unit != null) ? unit.trim() : DEGREES_CELSIUS_UNIT;
+    public void setVarUnit(String varUnit) {
+        this.varUnit = (varUnit != null) ? varUnit.trim() : DEGREES_CELSIUS_UNIT;
+        if ( this.varUnit.isEmpty() )
+            this.varUnit = DEGREES_CELSIUS_UNIT;
     }
 
     /**
@@ -32,8 +34,8 @@ public class Temperature extends Variable implements Cloneable {
      *         always
      */
     @Override
-    public void setUncertaintyUnit(String uncertaintyUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("uncertainty units are unmodifiable");
+    public void setApUnit(String apUnit) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("unit for accuracy and precision is unmodifiable");
     }
 
     @Override

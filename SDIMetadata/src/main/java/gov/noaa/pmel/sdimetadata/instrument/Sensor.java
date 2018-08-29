@@ -3,9 +3,9 @@ package gov.noaa.pmel.sdimetadata.instrument;
 /**
  * Basic information about an instrument that is a sensor.  Specific details about values measured by the sensor
  * are part of {@link gov.noaa.pmel.sdimetadata.variable.Variable} since a sensor can be used to measure more than
- * one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., uncertainty).
+ * one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., accuracy).
  */
-public class Sensor extends Instrument implements Cloneable {
+public class Sensor extends Analyzer implements Cloneable {
 
     @Override
     public boolean isValid() {
@@ -35,7 +35,7 @@ public class Sensor extends Instrument implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Instrument", "Sensor");
+        return super.toString().replaceFirst("Analyzer", "Sensor");
     }
 
 }
