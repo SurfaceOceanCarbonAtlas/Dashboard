@@ -1,9 +1,11 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
+import java.util.ArrayList;
+
 /**
- * Describes an equilibrator for measuring the amount of dissolved carbon dioxide in water.
+ * Describes an equilibrator for measuring the amount of a dissolved gas in water.
  */
-public class EquilibratorCO2Water extends Instrument implements Cloneable {
+public class Equilibrator extends Sampler implements Cloneable {
     protected Double intakeDepthM;
     protected String intakeLocation;
     protected String equilibratorType;
@@ -11,10 +13,11 @@ public class EquilibratorCO2Water extends Instrument implements Cloneable {
     protected Double chamberHeadspaceVolL;
     protected Double minWaterFlowLPM;
     protected Double maxWaterFlowLPM;
-    protected Double minGasFlowMilliLPM;
-    protected Double maxGasFlowMilliLPM;
-    protected Boolean vented;
+    protected Double minGasFlowLPM;
+    protected Double maxGasFlowLPM;
+    protected String venting;
     protected String dryingMethod;
+    protected ArrayList<CalibrationGas> calibrationGases;
 
     /*
      * <Depth_of_Sea_Water_Intake>5 meters</Depth_of_Sea_Water_Intake>

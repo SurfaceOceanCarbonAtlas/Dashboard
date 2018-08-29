@@ -1,6 +1,9 @@
 package gov.noaa.pmel.sdimetadata;
 
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
+import gov.noaa.pmel.sdimetadata.instrument.Sensor;
+import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 
 import java.util.ArrayList;

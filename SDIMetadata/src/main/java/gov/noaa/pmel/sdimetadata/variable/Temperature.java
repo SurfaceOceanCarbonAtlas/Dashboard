@@ -14,18 +14,17 @@ public class Temperature extends Variable implements Cloneable {
      */
     public Temperature() {
         super();
-        varUnit = DEGREES_CELSIUS_UNIT;
-        precisionUnit = DEGREES_CELSIUS_UNIT;
-        accuracyUnit = DEGREES_CELSIUS_UNIT;
+        unit = DEGREES_CELSIUS_UNIT;
+        uncertaintyUnit = DEGREES_CELSIUS_UNIT;
     }
 
     /**
-     * @param varUnit
+     * @param unit
      *         assign as the unit for values of this variable; if null, degrees Celsius is assigned
      */
     @Override
-    public void setVarUnit(String varUnit) {
-        this.varUnit = (varUnit != null) ? varUnit.trim() : DEGREES_CELSIUS_UNIT;
+    public void setUnit(String unit) {
+        this.unit = (unit != null) ? unit.trim() : DEGREES_CELSIUS_UNIT;
     }
 
     /**
@@ -33,17 +32,8 @@ public class Temperature extends Variable implements Cloneable {
      *         always
      */
     @Override
-    public void setPrecisionUnit(String precisionUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("units are unmodifiable");
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     *         always
-     */
-    @Override
-    public void setAccuracyUnit(String accuracyUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("units are unmodifiable");
+    public void setUncertaintyUnit(String uncertaintyUnit) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("uncertainty units are unmodifiable");
     }
 
     @Override

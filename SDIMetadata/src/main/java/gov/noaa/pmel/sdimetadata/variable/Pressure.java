@@ -11,18 +11,17 @@ public class Pressure extends Variable implements Cloneable {
 
     public Pressure() {
         super();
-        varUnit = HECTOPASCALS_UNIT;
-        precisionUnit = HECTOPASCALS_UNIT;
-        accuracyUnit = HECTOPASCALS_UNIT;
+        unit = HECTOPASCALS_UNIT;
+        uncertaintyUnit = HECTOPASCALS_UNIT;
     }
 
     /**
-     * @param varUnit
+     * @param unit
      *         assign as the unit for values of this variable; if null, hectopascals is assigned
      */
     @Override
-    public void setVarUnit(String varUnit) {
-        this.varUnit = (varUnit != null) ? varUnit.trim() : HECTOPASCALS_UNIT;
+    public void setUnit(String unit) {
+        this.unit = (unit != null) ? unit.trim() : HECTOPASCALS_UNIT;
     }
 
     /**
@@ -30,17 +29,8 @@ public class Pressure extends Variable implements Cloneable {
      *         always
      */
     @Override
-    public void setPrecisionUnit(String precisionUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("units are unmodifiable");
-    }
-
-    /**
-     * @throws UnsupportedOperationException
-     *         always
-     */
-    @Override
-    public void setAccuracyUnit(String accuracyUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("units are unmodifiable");
+    public void setUncertaintyUnit(String uncertaintyUnit) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("uncertainty units are unmodifiable");
     }
 
     @Override

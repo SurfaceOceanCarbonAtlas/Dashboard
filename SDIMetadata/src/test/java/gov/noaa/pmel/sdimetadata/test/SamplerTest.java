@@ -14,64 +14,53 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class SensorTest {
+public class SamplerTest {
 
-    private static final String NAME = "Equilibrator headspace differential pressure sensor";
-    private static final String ID = "Setra-239 #0003245";
-    private static final String MANUFACTURER = "Setra";
-    private static final String MODEL = "239";
-    private static final String LOCATION = "Attached to equilibrator headspace";
+    private static final String EMPTY_STRING = "";
+    private static final String NAME = "Equilibrator";
+    private static final String ID = "325";
+    private static final String MANUFACTURER = "NOAA";
+    private static final String MODEL = "7";
+    private static final String LOCATION = "Bow of ship";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Pressure reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
-                    "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
-            "Some other comment just to have a second one."
+            "Some comment",
+            "Another comment"
     ));
 
     @Test
-    public void testIsValid() {
-        Sensor sensor = new Sensor();
-        assertFalse(sensor.isValid());
-        sensor.setName(NAME);
-        assertFalse(sensor.isValid());
-        sensor.setManufacturer(MANUFACTURER);
-        sensor.setModel(MODEL);
-        assertTrue(sensor.isValid());
-    }
-
-    @Test
     public void testClone() {
-        Sensor sensor = new Sensor();
-        Sensor dup = sensor.clone();
-        assertEquals(sensor, dup);
-        assertNotSame(sensor, dup);
+        Sampler sampler = new Sampler();
+        Sampler dup = sampler.clone();
+        assertEquals(sampler, dup);
+        assertNotSame(sampler, dup);
 
-        sensor.setName(NAME);
-        sensor.setId(ID);
-        sensor.setManufacturer(MANUFACTURER);
-        sensor.setModel(MODEL);
-        sensor.setLocation(LOCATION);
-        sensor.setAddnInfo(ADDN_INFO);
-        assertNotEquals(sensor, dup);
+        sampler.setName(NAME);
+        sampler.setId(ID);
+        sampler.setManufacturer(MANUFACTURER);
+        sampler.setModel(MODEL);
+        sampler.setLocation(LOCATION);
+        sampler.setAddnInfo(ADDN_INFO);
+        assertNotEquals(sampler, dup);
 
-        dup = sensor.clone();
-        assertEquals(sensor, dup);
-        assertNotSame(sensor, dup);
-        assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());
+        dup = sampler.clone();
+        assertEquals(sampler, dup);
+        assertNotSame(sampler, dup);
+        assertNotSame(sampler.getAddnInfo(), dup.getAddnInfo());
     }
 
     @Test
     public void testHashCodeEquals() {
-        Sensor first = new Sensor();
+        Sampler first = new Sampler();
         assertFalse(first.equals(null));
         assertFalse(first.equals(LOCATION));
 
-        Sensor second = new Sensor();
+        Sampler second = new Sampler();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        Sampler sampler = new Sampler();
-        assertFalse(first.equals(sampler));
-        assertFalse(sampler.equals(second));
+        Sensor sensor = new Sensor();
+        assertFalse(first.equals(sensor));
+        assertFalse(sensor.equals(second));
 
         Instrument other = new Instrument();
         assertFalse(first.equals(other));

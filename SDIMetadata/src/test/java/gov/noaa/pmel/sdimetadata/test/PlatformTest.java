@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class PlatformTest {
 
+    private static final String EMPTY_STR = "";
     private static final String PLATFORM_ID = "33RO";
     private static final String PLATFORM_NAME = "Ronald H. Brown";
     private static final String PLATFORM_TYPE = "Ship";
@@ -20,71 +21,71 @@ public class PlatformTest {
     @Test
     public void testGetSetPlatformId() {
         Platform platform = new Platform();
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformId(PLATFORM_ID);
         assertEquals(PLATFORM_ID, platform.getPlatformId());
         platform.setPlatformId(null);
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformId("\t");
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
     }
 
     @Test
     public void testGetSetPlatformName() {
         Platform platform = new Platform();
-        assertEquals("", platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
         platform.setPlatformName(PLATFORM_NAME);
         assertEquals(PLATFORM_NAME, platform.getPlatformName());
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformName(null);
-        assertEquals("", platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
         platform.setPlatformName("\t");
-        assertEquals("", platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
     }
 
     @Test
     public void testGetSetPlatformType() {
         Platform platform = new Platform();
-        assertEquals("", platform.getPlatformType());
+        assertEquals(EMPTY_STR, platform.getPlatformType());
         platform.setPlatformType(PLATFORM_TYPE);
         assertEquals(PLATFORM_TYPE, platform.getPlatformType());
-        assertEquals("", platform.getPlatformName());
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformType(null);
-        assertEquals("", platform.getPlatformType());
+        assertEquals(EMPTY_STR, platform.getPlatformType());
         platform.setPlatformType("\t");
-        assertEquals("", platform.getPlatformType());
+        assertEquals(EMPTY_STR, platform.getPlatformType());
     }
 
     @Test
     public void testGetSetPlatformOwner() {
         Platform platform = new Platform();
-        assertEquals("", platform.getPlatformOwner());
+        assertEquals(EMPTY_STR, platform.getPlatformOwner());
         platform.setPlatformOwner(PLATFORM_OWNER);
         assertEquals(PLATFORM_OWNER, platform.getPlatformOwner());
-        assertEquals("", platform.getPlatformType());
-        assertEquals("", platform.getPlatformName());
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformOwner(null);
-        assertEquals("", platform.getPlatformOwner());
+        assertEquals(EMPTY_STR, platform.getPlatformOwner());
         platform.setPlatformOwner("\t");
-        assertEquals("", platform.getPlatformOwner());
+        assertEquals(EMPTY_STR, platform.getPlatformOwner());
     }
 
     @Test
     public void testGetSetPlatformCountry() {
         Platform platform = new Platform();
-        assertEquals("", platform.getPlatformCountry());
+        assertEquals(EMPTY_STR, platform.getPlatformCountry());
         platform.setPlatformCountry(PLATFORM_COUNTRY);
         assertEquals(PLATFORM_COUNTRY, platform.getPlatformCountry());
-        assertEquals("", platform.getPlatformOwner());
-        assertEquals("", platform.getPlatformType());
-        assertEquals("", platform.getPlatformName());
-        assertEquals("", platform.getPlatformId());
+        assertEquals(EMPTY_STR, platform.getPlatformOwner());
+        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(EMPTY_STR, platform.getPlatformName());
+        assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformCountry(null);
-        assertEquals("", platform.getPlatformCountry());
+        assertEquals(EMPTY_STR, platform.getPlatformCountry());
         platform.setPlatformCountry("\t");
-        assertEquals("", platform.getPlatformCountry());
+        assertEquals(EMPTY_STR, platform.getPlatformCountry());
     }
 
     @Test

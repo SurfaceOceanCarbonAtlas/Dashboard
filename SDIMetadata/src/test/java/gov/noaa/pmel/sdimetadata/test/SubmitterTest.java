@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.Investigator;
-import gov.noaa.pmel.sdimetadata.Submitter;
+import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Submitter;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,6 +18,8 @@ public class SubmitterTest {
     private static final String LAST_NAME = "Smith";
     private static final String FIRST_NAME = "John";
     private static final String INITIALS = "D.Z.";
+    private static final String ID = "PI-23423";
+    private static final String ID_TYPE = "PIRecords";
     private static final String ORGANIZATION = "NOAA/PMEL";
     private static final ArrayList<String> STREETS = new ArrayList<String>(Arrays.asList(
             "Room 259, Bldg 4",
@@ -29,8 +31,6 @@ public class SubmitterTest {
     private static final String COUNTRY = "USA";
     private static final String PHONE = "206-555-6789";
     private static final String EMAIL = "JDZSmith@not.an.org";
-    private static final String PI_ID = "PI-23423";
-    private static final String PI_ID_TYPE = "PIRecords";
 
 
     @Test
@@ -60,6 +60,8 @@ public class SubmitterTest {
         submitter.setLastName(LAST_NAME);
         submitter.setFirstName(FIRST_NAME);
         submitter.setMiddleInitials(INITIALS);
+        submitter.setId(ID);
+        submitter.setIdType(ID_TYPE);
         submitter.setOrganization(ORGANIZATION);
         submitter.setStreets(STREETS);
         submitter.setCity(CITY);
@@ -68,8 +70,6 @@ public class SubmitterTest {
         submitter.setCountry(COUNTRY);
         submitter.setPhone(PHONE);
         submitter.setEmail(EMAIL);
-        submitter.setPiId(PI_ID);
-        submitter.setPiIdType(PI_ID_TYPE);
         assertNotEquals(submitter, dup);
 
         dup = submitter.clone();
@@ -82,13 +82,14 @@ public class SubmitterTest {
         Submitter first = new Submitter();
         assertFalse(first.equals(null));
         assertFalse(first.equals(LAST_NAME));
-        Investigator investigator = new Investigator();
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(first));
 
         Submitter second = new Submitter();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+
+        Investigator other = new Investigator();
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setLastName(LAST_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -96,9 +97,9 @@ public class SubmitterTest {
         second.setLastName(LAST_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setLastName(LAST_NAME);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setLastName(LAST_NAME);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setFirstName(FIRST_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -106,9 +107,9 @@ public class SubmitterTest {
         second.setFirstName(FIRST_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setFirstName(FIRST_NAME);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setFirstName(FIRST_NAME);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setMiddleInitials(INITIALS);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -116,9 +117,9 @@ public class SubmitterTest {
         second.setMiddleInitials(INITIALS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setMiddleInitials(INITIALS);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setMiddleInitials(INITIALS);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setOrganization(ORGANIZATION);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -126,9 +127,9 @@ public class SubmitterTest {
         second.setOrganization(ORGANIZATION);
         assertTrue(first.hashCode() == second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setOrganization(ORGANIZATION);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setOrganization(ORGANIZATION);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setStreets(STREETS);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -136,9 +137,9 @@ public class SubmitterTest {
         second.setStreets(STREETS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setStreets(STREETS);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setStreets(STREETS);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setCity(CITY);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -146,9 +147,9 @@ public class SubmitterTest {
         second.setCity(CITY);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setCity(CITY);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setCity(CITY);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setRegion(REGION);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -156,9 +157,9 @@ public class SubmitterTest {
         second.setRegion(REGION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setRegion(REGION);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setRegion(REGION);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setZipCode(ZIP_CODE);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -166,9 +167,9 @@ public class SubmitterTest {
         second.setZipCode(ZIP_CODE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setZipCode(ZIP_CODE);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setZipCode(ZIP_CODE);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setCountry(COUNTRY);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -176,9 +177,9 @@ public class SubmitterTest {
         second.setCountry(COUNTRY);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setCountry(COUNTRY);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setCountry(COUNTRY);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setPhone(PHONE);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -186,9 +187,9 @@ public class SubmitterTest {
         second.setPhone(PHONE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setPhone(PHONE);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setPhone(PHONE);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
         first.setEmail(EMAIL);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -196,29 +197,29 @@ public class SubmitterTest {
         second.setEmail(EMAIL);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setEmail(EMAIL);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setEmail(EMAIL);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
-        first.setPiId(PI_ID);
+        first.setId(ID);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setPiId(PI_ID);
+        second.setId(ID);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setPiId(PI_ID);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setId(ID);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
 
-        first.setPiIdType(PI_ID_TYPE);
+        first.setIdType(ID_TYPE);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setPiIdType(PI_ID_TYPE);
+        second.setIdType(ID_TYPE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        investigator.setPiIdType(PI_ID_TYPE);
-        assertFalse(first.equals(investigator));
-        assertTrue(investigator.equals(second));
+        other.setIdType(ID_TYPE);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
     }
 
 }
