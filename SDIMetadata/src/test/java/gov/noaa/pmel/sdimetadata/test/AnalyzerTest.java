@@ -1,8 +1,8 @@
 package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
-import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import org.junit.Test;
 
 import java.util.ArrayList;

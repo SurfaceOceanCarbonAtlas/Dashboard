@@ -179,7 +179,7 @@ public class Instrument implements Cloneable {
             return false;
         if ( !location.equals(that.location) )
             return false;
-        if ( ! addnInfo.equals(that.addnInfo) )
+        if ( !addnInfo.equals(that.addnInfo) )
             return false;
 
         return true;

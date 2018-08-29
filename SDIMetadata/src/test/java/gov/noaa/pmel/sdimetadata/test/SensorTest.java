@@ -1,7 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.instrument.Sensor;
 import org.junit.Test;
 

@@ -4,7 +4,6 @@ import gov.noaa.pmel.sdimetadata.Datestamp;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import org.junit.Test;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -46,20 +45,20 @@ public class MiscInfoTest {
             "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and P. P. Murphy (1998)  A new " +
                     "automated underway system for making high precision pCO2 measurements onboard research ships. " +
                     "Analytica Chim. Acta 377: 185-191.",
-             "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca (1997). Measurement of underway " +
-                     "fCO2 in the Eastern Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER, " +
-                     "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.",
-             "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H. Luger, T. Johannessen, A. Olsen, " +
-                     "R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring " +
-                     "systems and data-reduction routines.  Deep Sea Research II, 56: 512-522.",
-             "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in surface water using continuous " +
-                     "and discrete sampling methods.  Mar. Chem. 44(2-4): 189-205.",
-             "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in water and seawater. " +
-                     "Deep-Sea Research 17: 721-735.",
-             "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the solubility of a non-ideal gas.  " +
-                     "Mar. Chem. 2: 203-215.",
-             "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects of temperature and salinity " +
-                     "on the partial pressure of CO2 in seawater. Nature 300: 511-513."
+            "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca (1997). Measurement of underway " +
+                    "fCO2 in the Eastern Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER, " +
+                    "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.",
+            "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H. Luger, T. Johannessen, A. Olsen, " +
+                    "R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring " +
+                    "systems and data-reduction routines.  Deep Sea Research II, 56: 512-522.",
+            "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in surface water using continuous " +
+                    "and discrete sampling methods.  Mar. Chem. 44(2-4): 189-205.",
+            "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in water and seawater. " +
+                    "Deep-Sea Research 17: 721-735.",
+            "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the solubility of a non-ideal gas.  " +
+                    "Mar. Chem. 2: 203-215.",
+            "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects of temperature and salinity " +
+                    "on the partial pressure of CO2 in seawater. Nature 300: 511-513."
     ));
     private static final ArrayList<String> ADDN_INFO_LIST = new ArrayList<String>(Arrays.asList(
             "It was determined that there was a 2.68 minute offset between the SST data record from the SBE-21 " +

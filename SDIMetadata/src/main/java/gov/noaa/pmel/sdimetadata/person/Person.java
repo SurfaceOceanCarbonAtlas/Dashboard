@@ -81,7 +81,7 @@ public class Person implements Cloneable {
         this.middleInitials = (middleInitials != null) ? middleInitials.trim() : "";
     }
 
-   /**
+    /**
      * @return the investigator ID; never null but may be empty
      */
     public String getId() {
@@ -127,7 +127,6 @@ public class Person implements Cloneable {
     }
 
     /**
-     *
      * @return whether all the required fields are appropriately assigned.
      */
     public boolean isValid() {
@@ -172,7 +171,7 @@ public class Person implements Cloneable {
             return false;
         if ( !id.equals(person.id) )
             return false;
-        if (! idType.equals(person.idType) )
+        if ( !idType.equals(person.idType) )
             return false;
         if ( !organization.equals(person.organization) )
             return false;

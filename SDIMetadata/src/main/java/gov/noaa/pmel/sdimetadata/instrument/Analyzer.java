@@ -14,7 +14,7 @@ public class Analyzer extends Instrument {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( ! (obj instanceof Analyzer) )
+        if ( !(obj instanceof Analyzer) )
             return false;
         return super.equals(obj);
     }
