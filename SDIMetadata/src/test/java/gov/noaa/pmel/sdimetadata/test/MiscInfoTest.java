@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.Datestamp;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import org.junit.Test;
 

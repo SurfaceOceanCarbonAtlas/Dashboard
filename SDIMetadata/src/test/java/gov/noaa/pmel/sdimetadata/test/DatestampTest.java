@@ -1,6 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.Datestamp;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

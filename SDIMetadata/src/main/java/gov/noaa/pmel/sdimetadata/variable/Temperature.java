@@ -1,5 +1,7 @@
 package gov.noaa.pmel.sdimetadata.variable;
 
+import gov.noaa.pmel.sdimetadata.util.NumericString;
+
 /**
  * Describes a temperature data variable in a dataset.
  * Same as Variable except the unit for accuracy and precision are set to degrees Celsius and cannot be modified,
@@ -15,7 +17,8 @@ public class Temperature extends Variable implements Cloneable {
     public Temperature() {
         super();
         varUnit = DEGREES_CELSIUS_UNIT;
-        apUnit = DEGREES_CELSIUS_UNIT;
+        accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
+        precision.setUnitString(DEGREES_CELSIUS_UNIT);
     }
 
     /**
@@ -30,12 +33,31 @@ public class Temperature extends Variable implements Cloneable {
     }
 
     /**
-     * @throws UnsupportedOperationException
-     *         always
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Temperature#DEGREES_CELSIUS_UNIT}
      */
     @Override
-    public void setApUnit(String apUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("unit for accuracy and precision is unmodifiable");
+    public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
+        if ( accuracy != null ) {
+            if ( !DEGREES_CELSIUS_UNIT.equals(accuracy.getUnitString()) )
+                throw new IllegalArgumentException("unit of accuracy is not " + DEGREES_CELSIUS_UNIT);
+            super.setAccuracy(accuracy);
+        }
+        else
+            this.accuracy = new NumericString(null, DEGREES_CELSIUS_UNIT);
+    }
+
+    /**
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Temperature#DEGREES_CELSIUS_UNIT}
+     */
+    @Override
+    public void setPrecision(NumericString precision) throws IllegalArgumentException {
+        if ( precision != null ) {
+            if ( !DEGREES_CELSIUS_UNIT.equals(precision.getUnitString()) )
+                throw new IllegalArgumentException("unit of precision is not " + DEGREES_CELSIUS_UNIT);
+            super.setPrecision(precision);
+        }
+        else
+            this.precision = new NumericString(null, DEGREES_CELSIUS_UNIT);
     }
 
     @Override

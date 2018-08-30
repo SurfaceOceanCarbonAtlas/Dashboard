@@ -1,5 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
@@ -13,52 +14,103 @@ import static org.junit.Assert.fail;
 
 public class TemperatureTest {
 
+    private static final NumericString EMPTY_TEMPERATURE = new NumericString(null, Temperature.DEGREES_CELSIUS_UNIT);
     private static final String COL_NAME = "SST";
     private static final String KELVIN_UNIT = "K";
+    private static final NumericString ACCURACY = new NumericString("0.01", Temperature.DEGREES_CELSIUS_UNIT);
+    private static final NumericString PRECISION = new NumericString("0.001", Temperature.DEGREES_CELSIUS_UNIT);
 
     @Test
     public void testGetSetVarUnit() {
-        Temperature temperature = new Temperature();
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
-        temperature.setVarUnit(KELVIN_UNIT);
-        assertEquals(KELVIN_UNIT, temperature.getVarUnit());
-        temperature.setVarUnit(null);
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
-        temperature.setVarUnit("\t");
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getVarUnit());
+        Temperature pressure = new Temperature();
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit(KELVIN_UNIT);
+        assertEquals(KELVIN_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit(null);
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, pressure.getVarUnit());
+        pressure.setVarUnit("\t");
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, pressure.getVarUnit());
     }
 
     @Test
-    public void testGetSetAPUnit() {
-        Temperature temperature = new Temperature();
-        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, temperature.getApUnit());
+    public void testGetSetAccuracy() {
+        Temperature pressure = new Temperature();
+        assertEquals(EMPTY_TEMPERATURE, pressure.getAccuracy());
+        pressure.setAccuracy(ACCURACY);
+        assertEquals(ACCURACY, pressure.getAccuracy());
+        assertNotSame(ACCURACY, pressure.getAccuracy());
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, pressure.getVarUnit());
+        pressure.setAccuracy(null);
+        assertEquals(EMPTY_TEMPERATURE, pressure.getAccuracy());
         try {
-            temperature.setApUnit(KELVIN_UNIT);
-            fail("call to setApUnit succeeded");
-        } catch ( UnsupportedOperationException ex ) {
+            pressure.setAccuracy(new NumericString("0.0", Temperature.DEGREES_CELSIUS_UNIT));
+            fail("call to setAccuracy with zero deg C succeeded");
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            ((Variable) temperature).setApUnit(KELVIN_UNIT);
-            fail("call to setApUnit succeeded");
-        } catch ( UnsupportedOperationException ex ) {
+            pressure.setAccuracy(new NumericString("0.01", KELVIN_UNIT));
+            fail("call to setAccuracy with Kelvin unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            ((Variable) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
+            fail("call to casted setAccuracy with Kelvin unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+    }
+
+    @Test
+    public void testGetSetPresision() {
+        Temperature pressure = new Temperature();
+        assertEquals(EMPTY_TEMPERATURE, pressure.getPrecision());
+        pressure.setPrecision(PRECISION);
+        assertEquals(PRECISION, pressure.getPrecision());
+        assertNotSame(PRECISION, pressure.getPrecision());
+        assertEquals(EMPTY_TEMPERATURE, pressure.getAccuracy());
+        assertEquals(Temperature.DEGREES_CELSIUS_UNIT, pressure.getVarUnit());
+        pressure.setPrecision(null);
+        assertEquals(EMPTY_TEMPERATURE, pressure.getPrecision());
+        try {
+            pressure.setPrecision(new NumericString("0.0", Temperature.DEGREES_CELSIUS_UNIT));
+            fail("call to setPrecision with zero deg C succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            pressure.setPrecision(new NumericString("0.01", KELVIN_UNIT));
+            fail("call to setPrecision with Kelvin unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            ((Variable) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
+            fail("call to casted setPrecision with Kelvin unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
     }
 
     @Test
     public void testClone() {
-        Temperature temperature = new Temperature();
-        Temperature dup = temperature.clone();
-        assertEquals(temperature, dup);
-        assertNotSame(temperature, dup);
+        Temperature pressure = new Temperature();
+        Temperature dup = pressure.clone();
+        assertEquals(pressure, dup);
+        assertNotSame(pressure, dup);
 
-        temperature.setColName(COL_NAME);
-        assertNotEquals(temperature, dup);
+        pressure.setColName(COL_NAME);
+        pressure.setVarUnit(KELVIN_UNIT);
+        pressure.setAccuracy(ACCURACY);
+        pressure.setPrecision(PRECISION);
+        assertNotEquals(pressure, dup);
 
-        dup = temperature.clone();
-        assertEquals(temperature, dup);
-        assertNotSame(temperature, dup);
+        dup = pressure.clone();
+        assertEquals(pressure, dup);
+        assertNotSame(pressure, dup);
+        assertNotSame(pressure.getAccuracy(), dup.getAccuracy());
+        assertNotSame(pressure.getPrecision(), dup.getPrecision());
     }
 
     @Test
@@ -78,19 +130,26 @@ public class TemperatureTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        Variable var = new Variable();
-        var.setColName(COL_NAME);
-        assertNotEquals(first.hashCode(), var.hashCode());
-        assertFalse(first.equals(var));
-        assertNotEquals(var.hashCode(), second.hashCode());
-        assertFalse(var.equals(second));
+        first.setVarUnit(KELVIN_UNIT);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setVarUnit(KELVIN_UNIT);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
-        var.setVarUnit(Temperature.DEGREES_CELSIUS_UNIT);
-        var.setApUnit(Temperature.DEGREES_CELSIUS_UNIT);
-        assertEquals(first.hashCode(), var.hashCode());
-        assertFalse(first.equals(var));
-        assertEquals(var.hashCode(), second.hashCode());
-        assertTrue(var.equals(second));
+        first.setAccuracy(ACCURACY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setAccuracy(ACCURACY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setPrecision(PRECISION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPrecision(PRECISION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
 }

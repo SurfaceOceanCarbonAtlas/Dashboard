@@ -1,5 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.Pressure;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
@@ -14,9 +15,12 @@ import static org.junit.Assert.fail;
 public class PressureTest {
 
     private static final String EMPTY_STR = "";
+    private static final NumericString EMPTY_PRESSURE = new NumericString(null, Pressure.HECTOPASCALS_UNIT);
     private static final String COL_NAME = "SLP";
     private static final String KILOPASCALS_UNIT = "kPa";
     private static final String PRESSURE_CORRECTION = "normalized to sea level pressure";
+    private static final NumericString ACCURACY = new NumericString("0.01", Pressure.HECTOPASCALS_UNIT);
+    private static final NumericString PRECISION = new NumericString("0.001", Pressure.HECTOPASCALS_UNIT);
 
     @Test
     public void testGetSetPressureCorrection() {
@@ -44,19 +48,64 @@ public class PressureTest {
     }
 
     @Test
-    public void testGetSetAPUnit() {
+    public void testGetSetAccuracy() {
         Pressure pressure = new Pressure();
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getApUnit());
+        assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
+        pressure.setAccuracy(ACCURACY);
+        assertEquals(ACCURACY, pressure.getAccuracy());
+        assertNotSame(ACCURACY, pressure.getAccuracy());
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
+        pressure.setAccuracy(null);
+        assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
         try {
-            pressure.setApUnit(KILOPASCALS_UNIT);
-            fail("call to setApUnit succeeded");
-        } catch ( UnsupportedOperationException ex ) {
+            pressure.setAccuracy(new NumericString("0.0", Pressure.HECTOPASCALS_UNIT));
+            fail("call to setAccuracy with zero hPa succeeded");
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            ((Variable) pressure).setApUnit(KILOPASCALS_UNIT);
-            fail("call to setApUnit succeeded");
-        } catch ( UnsupportedOperationException ex ) {
+            pressure.setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
+            fail("call to setAccuracy with kPa unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            ((Variable) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
+            fail("call to casted setAccuracy with kPa unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+    }
+
+    @Test
+    public void testGetSetPresision() {
+        Pressure pressure = new Pressure();
+        assertEquals(EMPTY_PRESSURE, pressure.getPrecision());
+        pressure.setPrecision(PRECISION);
+        assertEquals(PRECISION, pressure.getPrecision());
+        assertNotSame(PRECISION, pressure.getPrecision());
+        assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
+        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
+        pressure.setPrecision(null);
+        assertEquals(EMPTY_PRESSURE, pressure.getPrecision());
+        try {
+            pressure.setPrecision(new NumericString("0.0", Pressure.HECTOPASCALS_UNIT));
+            fail("call to setPrecision with zero hPa succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            pressure.setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
+            fail("call to setPrecision with kPa unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            ((Variable) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
+            fail("call to casted setPrecision with kPa unit succeeded");
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
     }
@@ -70,11 +119,16 @@ public class PressureTest {
 
         pressure.setPressureCorrection(PRESSURE_CORRECTION);
         pressure.setColName(COL_NAME);
+        pressure.setVarUnit(KILOPASCALS_UNIT);
+        pressure.setAccuracy(ACCURACY);
+        pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
         dup = pressure.clone();
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
+        assertNotSame(pressure.getAccuracy(), dup.getAccuracy());
+        assertNotSame(pressure.getPrecision(), dup.getPrecision());
     }
 
     @Test
@@ -87,6 +141,13 @@ public class PressureTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
+        first.setColName(COL_NAME);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setColName(COL_NAME);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
         first.setPressureCorrection(PRESSURE_CORRECTION);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
@@ -94,10 +155,24 @@ public class PressureTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setColName(COL_NAME);
+        first.setVarUnit(KILOPASCALS_UNIT);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setColName(COL_NAME);
+        second.setVarUnit(KILOPASCALS_UNIT);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setAccuracy(ACCURACY);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setAccuracy(ACCURACY);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setPrecision(PRECISION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPrecision(PRECISION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }

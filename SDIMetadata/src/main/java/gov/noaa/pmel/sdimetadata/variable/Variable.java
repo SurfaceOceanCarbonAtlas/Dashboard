@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.variable;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 
 import java.util.ArrayList;
 
@@ -18,17 +19,16 @@ public class Variable implements Cloneable {
     protected String methodReference;
     protected String samplingLocation;
     protected String samplingElevation;
-    protected Double accuracy;
-    protected Double precision;
-    protected String apUnit;
     protected String flagType;
+    protected NumericString accuracy;
+    protected NumericString precision;
     protected Person researcher;
     protected ArrayList<String> samplerNames;
     protected ArrayList<String> analyzerNames;
     protected ArrayList<String> addnInfo;
 
     /**
-     * Create with all fields empty or NaN.
+     * Create with all fields empty.
      */
     public Variable() {
         colName = "";
@@ -40,10 +40,9 @@ public class Variable implements Cloneable {
         methodReference = "";
         samplingLocation = "";
         samplingElevation = "";
-        accuracy = Double.NaN;
-        precision = Double.NaN;
-        apUnit = "";
         flagType = "";
+        accuracy = new NumericString();
+        precision = new NumericString();
         researcher = new Person();
         samplerNames = new ArrayList<String>();
         analyzerNames = new ArrayList<String>();
@@ -188,74 +187,6 @@ public class Variable implements Cloneable {
     }
 
     /**
-     * @return the accuracy (uncertainty) in values of this variable; never null but may be Double.NaN
-     */
-    public Double getAccuracy() {
-        return accuracy;
-    }
-
-    /**
-     * @param accuracy
-     *         assign as the accuracy (uncertainty) in values of this variable; if null, Double.NaN is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the accuracy is given (not null) but is infinite or not positive
-     */
-    public void setAccuracy(Double accuracy) throws IllegalArgumentException {
-        if ( accuracy != null ) {
-            if ( accuracy.isInfinite() )
-                throw new IllegalArgumentException("accuracy is an infinite value");
-            if ( accuracy <= 0.0 )
-                throw new IllegalArgumentException("accuracy is not a positive value");
-            this.accuracy = accuracy;
-        }
-        else
-            this.accuracy = Double.NaN;
-    }
-
-    /**
-     * @return the precision (resolution) in values of this variable; never null but may be Double.NaN
-     */
-    public Double getPrecision() {
-        return precision;
-    }
-
-    /**
-     * @param precision
-     *         assign as the precision (resolution) in values of this variable; if null, Double.NaN is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the precision is given (not null) but is infinite or not positive
-     */
-    public void setPrecision(Double precision) {
-        if ( precision != null ) {
-            if ( precision.isInfinite() )
-                throw new IllegalArgumentException("precision is an infinite value");
-            if ( precision <= 0.0 )
-                throw new IllegalArgumentException("precision is not a positive value");
-            this.precision = precision;
-        }
-        else
-            this.precision = Double.NaN;
-    }
-
-    /**
-     * @return the unit of the accuracy and precision values for this variable; never null but may be an empty string
-     */
-    public String getApUnit() {
-        return apUnit;
-    }
-
-    /**
-     * @param apUnit
-     *         assign as the unit of the accuracy and precision values of this variable;
-     *         if null, an empty string is assigned
-     */
-    public void setApUnit(String apUnit) {
-        this.apUnit = (apUnit != null) ? apUnit.trim() : "";
-    }
-
-    /**
      * @return the type of QC flag for this variable; never null but may be empty
      */
     public String getFlagType() {
@@ -268,6 +199,58 @@ public class Variable implements Cloneable {
      */
     public void setFlagType(String flagType) {
         this.flagType = (flagType != null) ? flagType.trim() : "";
+    }
+
+    /**
+     * @return the accuracy (uncertainty) in values of this variable; never null but may be empty.
+     * If not empty, guaranteed to represent a finite positive number.
+     */
+    public NumericString getAccuracy() {
+        return accuracy.clone();
+    }
+
+    /**
+     * @param accuracy
+     *         assign as the accuracy (uncertainty) in values of this variable;
+     *         if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the accuracy is given (not null) but is not a finite positive number
+     */
+    public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
+        if ( accuracy != null ) {
+            if ( ! accuracy.isPositive() )
+                throw new IllegalArgumentException("accuracy is not a finite positive number");
+            this.accuracy = accuracy.clone();
+        }
+        else
+            this.accuracy = new NumericString();
+    }
+
+    /**
+     * @return the precision (resolution) in values of this variable; never null but may be empty.
+     * If not empty, guaranteed to represent a finite positive number.
+     */
+    public NumericString getPrecision() {
+        return precision.clone();
+    }
+
+    /**
+     * @param precision
+     *         assign as the precision (resolution) in values of this variable;
+     *         if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the precision is given (not null) but is not a finite positive number
+     */
+    public void setPrecision(NumericString precision) {
+        if ( precision != null ) {
+            if ( ! precision.isPositive() )
+                throw new IllegalArgumentException("precision is not a finite positive number");
+            this.precision = precision.clone();
+        }
+        else
+            this.precision = new NumericString();
     }
 
     /**
@@ -386,7 +369,7 @@ public class Variable implements Cloneable {
             return false;
         if ( observeType.isEmpty() )
             return false;
-        if ( accuracy.isNaN() )
+        if ( ! accuracy.isValid() )
             return false;
         switch ( measureMethod ) {
             case UNSPECIFIED:
@@ -420,10 +403,9 @@ public class Variable implements Cloneable {
         dup.methodReference = methodReference;
         dup.samplingLocation = samplingLocation;
         dup.samplingElevation = samplingElevation;
-        dup.accuracy = accuracy;
-        dup.precision = precision;
-        dup.apUnit = apUnit;
         dup.flagType = flagType;
+        dup.accuracy = accuracy.clone();
+        dup.precision = precision.clone();
         dup.researcher = researcher.clone();
         dup.samplerNames = new ArrayList<String>(samplerNames);
         dup.analyzerNames = new ArrayList<String>(analyzerNames);
@@ -460,13 +442,11 @@ public class Variable implements Cloneable {
             return false;
         if ( !samplingElevation.equals(variable.samplingElevation) )
             return false;
+        if ( !flagType.equals(variable.flagType) )
+            return false;
         if ( !accuracy.equals(variable.accuracy) )
             return false;
         if ( !precision.equals(variable.precision) )
-            return false;
-        if ( !apUnit.equals(variable.apUnit) )
-            return false;
-        if ( !flagType.equals(variable.flagType) )
             return false;
         if ( !researcher.equals(variable.researcher) )
             return false;
@@ -492,10 +472,9 @@ public class Variable implements Cloneable {
         result = result * prime + methodReference.hashCode();
         result = result * prime + samplingLocation.hashCode();
         result = result * prime + samplingElevation.hashCode();
+        result = result * prime + flagType.hashCode();
         result = result * prime + accuracy.hashCode();
         result = result * prime + precision.hashCode();
-        result = result * prime + apUnit.hashCode();
-        result = result * prime + flagType.hashCode();
         result = result * prime + researcher.hashCode();
         result = result * prime + samplerNames.hashCode();
         result = result * prime + analyzerNames.hashCode();
@@ -515,9 +494,9 @@ public class Variable implements Cloneable {
                 ", methodReference='" + methodReference + '\'' +
                 ", samplingLocation='" + samplingLocation + '\'' +
                 ", samplingElevation='" + samplingElevation + '\'' +
-                ", accuracy=" + accuracy +
-                ", apUnit='" + apUnit + '\'' +
                 ", flagType='" + flagType + '\'' +
+                ", accuracy=" + accuracy +
+                ", precision=" + precision +
                 ", researcher=" + researcher +
                 ", samplerNames=" + samplerNames +
                 ", analyzerNames=" + analyzerNames +

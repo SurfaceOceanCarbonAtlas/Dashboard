@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,12 +14,17 @@ import static org.junit.Assert.fail;
 public class CalibrationGasTest {
 
     private static final String EMPTY_STR = "";
-    private static final double DELTA = 1.0E-6;
+    private static final NumericString EMPTY_CONC =
+            new NumericString(null, CalibrationGas.GAS_CONCENTRATION_UNIT);
     private static final String GAS_ID = "LL835339";
     private static final String GAS_TYPE = "CO2";
     private static final String SUPPLIER = "NOAA/ESRL, Global Monitoring Division";
-    private static final double CONCENTRATION = 245.43;
-    private static final double ACCURACY = 0.01;
+    private static final NumericString CONCENTRATION =
+            new NumericString("245.43", CalibrationGas.GAS_CONCENTRATION_UNIT);
+    private static final NumericString ACCURACY =
+            new NumericString("0.01", CalibrationGas.GAS_CONCENTRATION_UNIT);
+    private static final NumericString ZERO_CONC =
+            new NumericString("0.005", CalibrationGas.GAS_CONCENTRATION_UNIT);
 
     @Test
     public void testGetSetId() {
@@ -60,75 +66,57 @@ public class CalibrationGasTest {
     }
 
     @Test
-    public void testGetSetConcUMolPerMol() {
+    public void testGetSetConcentration() {
         CalibrationGas gas = new CalibrationGas();
-        assertTrue(gas.getConcUMolPerMol().isNaN());
-        gas.setConcUMolPerMol(CONCENTRATION);
-        assertEquals(CONCENTRATION, gas.getConcUMolPerMol(), DELTA);
+        assertEquals(EMPTY_CONC, gas.getConcentration());
+        gas.setConcentration(CONCENTRATION);
+        assertEquals(CONCENTRATION, gas.getConcentration());
         assertEquals(EMPTY_STR, gas.getSupplier());
         assertEquals(EMPTY_STR, gas.getType());
         assertEquals(EMPTY_STR, gas.getId());
-        gas.setConcUMolPerMol(null);
-        assertTrue(gas.getConcUMolPerMol().isNaN());
-        gas.setConcUMolPerMol(Double.NaN);
-        assertTrue(gas.getConcUMolPerMol().isNaN());
-        gas.setConcUMolPerMol(0.0);
-        assertEquals(0.0, gas.getConcUMolPerMol(), 0.0);
+        gas.setConcentration(null);
+        assertEquals(EMPTY_CONC, gas.getConcentration());
         try {
-            gas.setConcUMolPerMol(-1.0);
-            fail("calling setConcUMolPerMol with a negative value succeeded");
+            gas.setConcentration(new NumericString("-1.0", CalibrationGas.GAS_CONCENTRATION_UNIT));
+            fail("calling setConcentration with a negative value succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            gas.setConcUMolPerMol(Double.NEGATIVE_INFINITY);
-            fail("calling setConcUMolPerMol with negative infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            gas.setConcUMolPerMol(Double.POSITIVE_INFINITY);
-            fail("calling setConcUMolPerMol with positive infinity succeeded");
+            gas.setConcentration(new NumericString("234.52", "mmol/mol"));
+            fail("calling setConcentration with a unit of mmol/mol succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
     }
 
     @Test
-    public void testGetSetAccuracyUMolPerMol() {
+    public void testGetSetAccuracy() {
         CalibrationGas gas = new CalibrationGas();
-        assertTrue(gas.getAccuracyUMolPerMol().isNaN());
-        gas.setAccuracyUMolPerMol(ACCURACY);
-        assertEquals(ACCURACY, gas.getAccuracyUMolPerMol(), DELTA);
-        assertTrue(gas.getConcUMolPerMol().isNaN());
+        assertEquals(EMPTY_CONC, gas.getAccuracy());
+        gas.setAccuracy(ACCURACY);
+        assertEquals(ACCURACY, gas.getAccuracy());
+        assertEquals(EMPTY_CONC, gas.getConcentration());
         assertEquals(EMPTY_STR, gas.getSupplier());
         assertEquals(EMPTY_STR, gas.getType());
         assertEquals(EMPTY_STR, gas.getId());
-        gas.setAccuracyUMolPerMol(null);
-        assertTrue(gas.getAccuracyUMolPerMol().isNaN());
-        gas.setAccuracyUMolPerMol(Double.NaN);
-        assertTrue(gas.getAccuracyUMolPerMol().isNaN());
+        gas.setAccuracy(null);
+        assertEquals(EMPTY_CONC, gas.getAccuracy());
         try {
-            gas.setAccuracyUMolPerMol(0.0);
-            fail("calling setAccuracyUMolPerMol with zero succeeded");
+            gas.setAccuracy(new NumericString("0.0", CalibrationGas.GAS_CONCENTRATION_UNIT));
+            fail("calling setAccuracy with zero succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            gas.setAccuracyUMolPerMol(-1.0);
-            fail("calling setAccuracyUMolPerMol with a negative value succeeded");
+            gas.setAccuracy(new NumericString("-1.0", CalibrationGas.GAS_CONCENTRATION_UNIT));
+            fail("calling setAccuracy with a negative value succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            gas.setAccuracyUMolPerMol(Double.NEGATIVE_INFINITY);
-            fail("calling setAccuracyUMolPerMol with negative infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            gas.setAccuracyUMolPerMol(Double.POSITIVE_INFINITY);
-            fail("calling setAccuracyUMolPerMol with positive infinity succeeded");
+            gas.setAccuracy(new NumericString("234.64", " mmol/mol"));
+            fail("calling setAccuracy with a unit of mmol/mol succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
@@ -138,12 +126,12 @@ public class CalibrationGasTest {
     public void testCalibrationGas() {
         CalibrationGas gas = new CalibrationGas(null, null, null, null, null);
         assertEquals(new CalibrationGas(), gas);
-        gas = new CalibrationGas(GAS_ID, GAS_TYPE, SUPPLIER, CONCENTRATION, ACCURACY);
+        gas = new CalibrationGas(GAS_ID, GAS_TYPE, SUPPLIER, CONCENTRATION.getValueString(), ACCURACY.getValueString());
         assertEquals(GAS_ID, gas.getId());
         assertEquals(GAS_TYPE, gas.getType());
         assertEquals(SUPPLIER, gas.getSupplier());
-        assertEquals(CONCENTRATION, gas.getConcUMolPerMol(), DELTA);
-        assertEquals(ACCURACY, gas.getAccuracyUMolPerMol(), DELTA);
+        assertEquals(CONCENTRATION, gas.getConcentration());
+        assertEquals(ACCURACY, gas.getAccuracy());
     }
 
     @Test
@@ -155,16 +143,16 @@ public class CalibrationGasTest {
         } catch ( IllegalStateException ex ) {
             // Expected result
         }
-        gas.setConcUMolPerMol(CONCENTRATION);
+        gas.setConcentration(CONCENTRATION);
         try {
             gas.isNonZero();
             fail("calling isNonZero in a CalibrationGas with only concentration assigned succeeded");
         } catch ( IllegalStateException ex ) {
             // Expected result
         }
-        gas.setAccuracyUMolPerMol(ACCURACY);
+        gas.setAccuracy(ACCURACY);
         assertTrue(gas.isNonZero());
-        gas.setConcUMolPerMol(ACCURACY / 10.0);
+        gas.setConcentration(ZERO_CONC);
         assertFalse(gas.isNonZero());
     }
 
@@ -172,7 +160,10 @@ public class CalibrationGasTest {
     public void testIsValid() {
         CalibrationGas gas = new CalibrationGas();
         assertFalse(gas.isValid());
-        gas = new CalibrationGas(GAS_ID, GAS_TYPE, SUPPLIER, CONCENTRATION, ACCURACY);
+        gas = new CalibrationGas(GAS_ID, GAS_TYPE, SUPPLIER, null, null);
+        assertFalse(gas.isValid());
+        gas.setConcentration(CONCENTRATION);
+        gas.setAccuracy(ACCURACY);
         assertTrue(gas.isValid());
     }
 
@@ -186,8 +177,8 @@ public class CalibrationGasTest {
         gas.setId(GAS_ID);
         gas.setType(GAS_TYPE);
         gas.setSupplier(SUPPLIER);
-        gas.setConcUMolPerMol(CONCENTRATION);
-        gas.setAccuracyUMolPerMol(ACCURACY);
+        gas.setConcentration(CONCENTRATION);
+        gas.setAccuracy(ACCURACY);
         assertNotEquals(gas, dup);
 
         dup = gas.clone();
@@ -226,19 +217,20 @@ public class CalibrationGasTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setConcUMolPerMol(CONCENTRATION);
+        first.setConcentration(CONCENTRATION);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setConcUMolPerMol(CONCENTRATION);
+        second.setConcentration(CONCENTRATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setAccuracyUMolPerMol(ACCURACY);
+        first.setAccuracy(ACCURACY);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setAccuracyUMolPerMol(ACCURACY);
+        second.setAccuracy(ACCURACY);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 
 }
+

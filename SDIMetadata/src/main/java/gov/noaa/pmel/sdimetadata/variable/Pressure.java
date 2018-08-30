@@ -1,5 +1,7 @@
 package gov.noaa.pmel.sdimetadata.variable;
 
+import gov.noaa.pmel.sdimetadata.util.NumericString;
+
 /**
  * Describes a pressure data variable in a dataset.
  * The unit for accuracy and precision are set to hectopascals and cannot be modified,
@@ -14,7 +16,8 @@ public class Pressure extends Variable implements Cloneable {
     public Pressure() {
         super();
         varUnit = HECTOPASCALS_UNIT;
-        apUnit = HECTOPASCALS_UNIT;
+        accuracy.setUnitString(HECTOPASCALS_UNIT);
+        precision.setUnitString(HECTOPASCALS_UNIT);
         pressureCorrection = "";
     }
 
@@ -26,7 +29,8 @@ public class Pressure extends Variable implements Cloneable {
     }
 
     /**
-     * @param pressureCorrection assign as the pressure correction string; if null, and empty string is assigned
+     * @param pressureCorrection
+     *         assign as the pressure correction string; if null, and empty string is assigned
      */
     public void setPressureCorrection(String pressureCorrection) {
         this.pressureCorrection = (pressureCorrection != null) ? pressureCorrection.trim() : "";
@@ -44,12 +48,31 @@ public class Pressure extends Variable implements Cloneable {
     }
 
     /**
-     * @throws UnsupportedOperationException
-     *         always
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Pressure#HECTOPASCALS_UNIT}
      */
     @Override
-    public void setApUnit(String apUnit) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("unit for accuracy and precision is unmodifiable");
+    public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
+        if ( accuracy != null ) {
+            if ( !HECTOPASCALS_UNIT.equals(accuracy.getUnitString()) )
+                throw new IllegalArgumentException("unit of accuracy is not " + HECTOPASCALS_UNIT);
+            super.setAccuracy(accuracy);
+        }
+        else
+            this.accuracy = new NumericString(null, HECTOPASCALS_UNIT);
+    }
+
+    /**
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Pressure#HECTOPASCALS_UNIT}
+     */
+    @Override
+    public void setPrecision(NumericString precision) throws IllegalArgumentException {
+        if ( precision != null ) {
+            if ( !HECTOPASCALS_UNIT.equals(precision.getUnitString()) )
+                throw new IllegalArgumentException("unit of precision is not " + HECTOPASCALS_UNIT);
+            super.setPrecision(precision);
+        }
+        else
+            this.precision = new NumericString(null, HECTOPASCALS_UNIT);
     }
 
     @Override

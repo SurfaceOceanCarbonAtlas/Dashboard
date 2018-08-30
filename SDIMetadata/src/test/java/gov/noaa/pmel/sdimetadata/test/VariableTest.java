@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import static org.junit.Assert.fail;
 
 public class VariableTest {
     private static final String EMPTY_STRING = "";
-    private static final double DELTA = 1.0E-6;
+    private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
     private static final String VAR_UNIT = "degrees Celsius";
@@ -27,10 +28,9 @@ public class VariableTest {
     private static final String METHOD_REFERENCE = "No reference";
     private static final String SAMPLING_LOCATION = "Bow";
     private static final String SAMPLING_ELEVATION = "~5 m below water line";
-    private static final double ACCURACY = 0.01;
-    private static final double PRECISION = 0.001;
-    private static final String AP_UNIT = "deg C";
     private static final String FLAG_TYPE = "WOCE 2-4";
+    private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
+    private static final NumericString PRECISION = new NumericString("0.001", "deg C");
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
     private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Cooling intake"));
     private static final ArrayList<String> ANALYZER_NAMES = new ArrayList<String>(Arrays.asList("Ship's SST sensor"));
@@ -182,128 +182,11 @@ public class VariableTest {
     }
 
     @Test
-    public void testGetSetAccuracy() {
-        Variable var = new Variable();
-        assertTrue(var.getAccuracy().isNaN());
-        var.setAccuracy(ACCURACY);
-        assertEquals(ACCURACY, var.getAccuracy(), DELTA);
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setAccuracy(null);
-        assertTrue(var.getAccuracy().isNaN());
-        var.setAccuracy(Double.NaN);
-        assertTrue(var.getAccuracy().isNaN());
-        try {
-            var.setAccuracy(0.0);
-            fail("calling setAccuracy with zero succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAccuracy(-0.001);
-            fail("calling setAccuracy with a negative number succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAccuracy(Double.NEGATIVE_INFINITY);
-            fail("calling setAccuracy with negative infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAccuracy(Double.POSITIVE_INFINITY);
-            fail("calling setAccuracy with positive infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-    }
-
-    @Test
-    public void testGetSetPrecision() {
-        Variable var = new Variable();
-        assertTrue(var.getPrecision().isNaN());
-        var.setPrecision(PRECISION);
-        assertEquals(PRECISION, var.getPrecision(), DELTA);
-        assertTrue(var.getAccuracy().isNaN());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setPrecision(null);
-        assertTrue(var.getPrecision().isNaN());
-        var.setPrecision(Double.NaN);
-        assertTrue(var.getPrecision().isNaN());
-        try {
-            var.setPrecision(0.0);
-            fail("calling setPrecision with zero succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setPrecision(-0.001);
-            fail("calling setPrecision with a negative number succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setPrecision(Double.NEGATIVE_INFINITY);
-            fail("calling setPrecision with negative infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setPrecision(Double.POSITIVE_INFINITY);
-            fail("calling setPrecision with positive infinity succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-    }
-
-    @Test
-    public void testGetSetAPUnit() {
-        Variable var = new Variable();
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        var.setApUnit(AP_UNIT);
-        assertEquals(AP_UNIT, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setApUnit(null);
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        var.setApUnit("\t");
-        assertEquals(EMPTY_STRING, var.getApUnit());
-    }
-
-    @Test
     public void testGetSetFlagType() {
         Variable var = new Variable();
         assertEquals(EMPTY_STRING, var.getFlagType());
         var.setFlagType(FLAG_TYPE);
         assertEquals(FLAG_TYPE, var.getFlagType());
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -320,6 +203,89 @@ public class VariableTest {
     }
 
     @Test
+    public void testGetSetAccuracy() {
+        Variable var = new Variable();
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        var.setAccuracy(ACCURACY);
+        NumericString numstr = var.getAccuracy();
+        assertEquals(ACCURACY, numstr);
+        assertNotSame(ACCURACY, numstr);
+        assertNotSame(numstr, var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getFlagType());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+        assertEquals(EMPTY_STRING, var.getMethodReference());
+        assertEquals(EMPTY_STRING, var.getMethodDescription());
+        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
+        assertEquals(EMPTY_STRING, var.getObserveType());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getFullName());
+        assertEquals(EMPTY_STRING, var.getColName());
+        var.setAccuracy(null);
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        try {
+            var.setAccuracy(new NumericString("0.0", VAR_UNIT));
+            fail("calling setAccuracy with a zero string succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            var.setAccuracy(new NumericString("-0.001", VAR_UNIT));
+            fail("calling setAccuracy with a negative number string succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            var.setAccuracy(EMPTY_NUMSTR);
+            fail("calling setAccuracy with an empty NumericString succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+    }
+
+    @Test
+    public void testGetSetPrecision() {
+        Variable var = new Variable();
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        var.setPrecision(PRECISION);
+        NumericString numstr = var.getPrecision();
+        assertEquals(PRECISION, numstr);
+        assertNotSame(PRECISION, numstr);
+        assertNotSame(numstr, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getFlagType());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+        assertEquals(EMPTY_STRING, var.getMethodReference());
+        assertEquals(EMPTY_STRING, var.getMethodDescription());
+        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
+        assertEquals(EMPTY_STRING, var.getObserveType());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getFullName());
+        assertEquals(EMPTY_STRING, var.getColName());
+        var.setPrecision(null);
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        try {
+            var.setPrecision(new NumericString("0.0", VAR_UNIT));
+            fail("calling setPrecision with a zero string succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            var.setPrecision(new NumericString("-0.001", VAR_UNIT));
+            fail("calling setPrecision with a negative number string succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            var.setPrecision(EMPTY_NUMSTR);
+            fail("calling setPrecision with an empty NumericString succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+    }
+
+    @Test
     public void testGetSetResearcher() {
         Variable var = new Variable();
         assertEquals(new Person(), var.getResearcher());
@@ -328,10 +294,9 @@ public class VariableTest {
         assertEquals(RESEARCHER, researcher);
         assertNotSame(RESEARCHER, researcher);
         assertNotSame(researcher, var.getResearcher());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagType());
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -355,10 +320,9 @@ public class VariableTest {
         assertNotSame(SAMPLER_NAMES, names);
         assertNotSame(names, var.getSamplerNames());
         assertEquals(new Person(), var.getResearcher());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagType());
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -395,10 +359,9 @@ public class VariableTest {
         assertNotSame(names, var.getAnalyzerNames());
         assertEquals(0, var.getSamplerNames().size());
         assertEquals(new Person(), var.getResearcher());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagType());
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -437,10 +400,9 @@ public class VariableTest {
         assertEquals(0, var.getAnalyzerNames().size());
         assertEquals(0, var.getSamplerNames().size());
         assertEquals(new Person(), var.getResearcher());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagType());
-        assertEquals(EMPTY_STRING, var.getApUnit());
-        assertTrue(var.getPrecision().isNaN());
-        assertTrue(var.getAccuracy().isNaN());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -508,7 +470,6 @@ public class VariableTest {
         var.setSamplingElevation(SAMPLING_ELEVATION);
         var.setAccuracy(ACCURACY);
         var.setPrecision(PRECISION);
-        var.setApUnit(AP_UNIT);
         var.setFlagType(FLAG_TYPE);
         var.setResearcher(RESEARCHER);
         var.setSamplerNames(SAMPLER_NAMES);
@@ -596,6 +557,13 @@ public class VariableTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
+        first.setFlagType(FLAG_TYPE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setFlagType(FLAG_TYPE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
         first.setAccuracy(ACCURACY);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
@@ -607,20 +575,6 @@ public class VariableTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setPrecision(PRECISION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setApUnit(AP_UNIT);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setApUnit(AP_UNIT);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setFlagType(FLAG_TYPE);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setFlagType(FLAG_TYPE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
