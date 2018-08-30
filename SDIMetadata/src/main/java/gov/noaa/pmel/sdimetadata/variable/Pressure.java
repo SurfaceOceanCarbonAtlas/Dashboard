@@ -2,17 +2,34 @@ package gov.noaa.pmel.sdimetadata.variable;
 
 /**
  * Describes a pressure data variable in a dataset.
- * Same as Variable except the unit for accuracy and precision are set to hectopascals and cannot be modified,
+ * The unit for accuracy and precision are set to hectopascals and cannot be modified,
  * and the default unit for the variable is hectopascals (but can be modified).
  */
 public class Pressure extends Variable implements Cloneable {
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
+    protected String pressureCorrection;
+
     public Pressure() {
         super();
         varUnit = HECTOPASCALS_UNIT;
         apUnit = HECTOPASCALS_UNIT;
+        pressureCorrection = "";
+    }
+
+    /**
+     * @return the pressure correction information; never null but may be empty
+     */
+    public String getPressureCorrection() {
+        return pressureCorrection;
+    }
+
+    /**
+     * @param pressureCorrection assign as the pressure correction string; if null, and empty string is assigned
+     */
+    public void setPressureCorrection(String pressureCorrection) {
+        this.pressureCorrection = (pressureCorrection != null) ? pressureCorrection.trim() : "";
     }
 
     /**
@@ -37,26 +54,44 @@ public class Pressure extends Variable implements Cloneable {
 
     @Override
     public Pressure clone() {
-        return (Pressure) super.clone();
+        Pressure dup = (Pressure) super.clone();
+        dup.pressureCorrection = pressureCorrection;
+        return dup;
     }
 
     @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Pressure) )
             return false;
-        return super.equals(obj);
+        if ( !super.equals(obj) )
+            return false;
+
+        Pressure other = (Pressure) obj;
+
+        if ( !pressureCorrection.equals(other.pressureCorrection) )
+            return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + pressureCorrection.hashCode();
+        return result;
     }
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Variable", "Pressure");
+        return super.toString()
+                    .replaceFirst("Variable", "Pressure")
+                    .replaceFirst("}", "") +
+                ", pressureCorrection='" + pressureCorrection + "'}";
     }
 
 }

@@ -13,8 +13,22 @@ import static org.junit.Assert.fail;
 
 public class PressureTest {
 
+    private static final String EMPTY_STR = "";
     private static final String COL_NAME = "SLP";
     private static final String KILOPASCALS_UNIT = "kPa";
+    private static final String PRESSURE_CORRECTION = "normalized to sea level pressure";
+
+    @Test
+    public void testGetSetPressureCorrection() {
+        Pressure pressure = new Pressure();
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
+        pressure.setPressureCorrection(PRESSURE_CORRECTION);
+        assertEquals(PRESSURE_CORRECTION, pressure.getPressureCorrection());
+        pressure.setPressureCorrection(null);
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
+        pressure.setPressureCorrection("\t");
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
+    }
 
     @Test
     public void testGetSetVarUnit() {
@@ -22,6 +36,7 @@ public class PressureTest {
         assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         pressure.setVarUnit(KILOPASCALS_UNIT);
         assertEquals(KILOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(EMPTY_STR, pressure.getPressureCorrection());
         pressure.setVarUnit(null);
         assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         pressure.setVarUnit("\t");
@@ -53,6 +68,7 @@ public class PressureTest {
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
+        pressure.setPressureCorrection(PRESSURE_CORRECTION);
         pressure.setColName(COL_NAME);
         assertNotEquals(pressure, dup);
 
@@ -71,25 +87,19 @@ public class PressureTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
+        first.setPressureCorrection(PRESSURE_CORRECTION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPressureCorrection(PRESSURE_CORRECTION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
         first.setColName(COL_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setColName(COL_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-
-        Variable var = new Variable();
-        var.setColName(COL_NAME);
-        assertNotEquals(first.hashCode(), var.hashCode());
-        assertFalse(first.equals(var));
-        assertNotEquals(var.hashCode(), second.hashCode());
-        assertFalse(var.equals(second));
-        var.setVarUnit(Pressure.HECTOPASCALS_UNIT);
-        var.setApUnit(Pressure.HECTOPASCALS_UNIT);
-        assertEquals(first.hashCode(), var.hashCode());
-        assertFalse(first.equals(var));
-        assertEquals(var.hashCode(), second.hashCode());
-        assertTrue(var.equals(second));
     }
 
 }

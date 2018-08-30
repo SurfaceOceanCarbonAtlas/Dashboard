@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.instrument.Sensor;
+import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class SensorTest {
+public class GasSensorTest {
 
     private static final String NAME = "Equilibrator headspace differential pressure sensor";
     private static final String ID = "Setra-239 #0003245";
@@ -28,7 +28,7 @@ public class SensorTest {
 
     @Test
     public void testIsValid() {
-        Sensor sensor = new Sensor();
+        GasSensor sensor = new GasSensor();
         assertFalse(sensor.isValid());
         sensor.setName(NAME);
         assertFalse(sensor.isValid());
@@ -39,8 +39,8 @@ public class SensorTest {
 
     @Test
     public void testClone() {
-        Sensor sensor = new Sensor();
-        Sensor dup = sensor.clone();
+        GasSensor sensor = new GasSensor();
+        GasSensor dup = sensor.clone();
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -60,11 +60,11 @@ public class SensorTest {
 
     @Test
     public void testHashCodeEquals() {
-        Sensor first = new Sensor();
+        GasSensor first = new GasSensor();
         assertFalse(first.equals(null));
         assertFalse(first.equals(LOCATION));
 
-        Sensor second = new Sensor();
+        GasSensor second = new GasSensor();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

@@ -33,6 +33,8 @@ public class Submitter extends Investigator implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Submitter) )
             return false;
         return super.equals(obj);

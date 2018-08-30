@@ -1,22 +1,19 @@
-package gov.noaa.pmel.sdimetadata.instrument;
+package gov.noaa.pmel.sdimetadata.variable;
 
-/**
- * Base class for an analyzing instrument.
- */
-public class Analyzer extends Instrument {
+public class AtmosGasConc extends Variable implements Cloneable {
 
     @Override
-    public Analyzer clone() {
-        return (Analyzer) super.clone();
+    public AtmosGasConc clone() {
+        return (AtmosGasConc) super.clone();
     }
 
     @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( null == obj )
+        if ( obj == null )
             return false;
-        if ( !(obj instanceof Analyzer) )
+        if ( !(obj instanceof AtmosGasConc) )
             return false;
         return super.equals(obj);
     }
@@ -28,7 +25,9 @@ public class Analyzer extends Instrument {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Instrument", "Analyzer");
+        return super.toString()
+                    .replaceFirst("Variable", "AtmosGasConc");
     }
 
 }
+

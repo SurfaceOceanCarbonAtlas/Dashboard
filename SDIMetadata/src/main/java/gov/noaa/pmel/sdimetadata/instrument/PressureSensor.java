@@ -1,11 +1,10 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
 /**
- * Basic information about an instrument that is a sensor.  Specific details about values measured by the sensor
- * are part of {@link gov.noaa.pmel.sdimetadata.variable.Variable} since a sensor can be used to measure more than
- * one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., accuracy).
+ * Basic information about an instrument that is a pressure sensor.  Specific details about values measured
+ * by the sensor are part of {@link gov.noaa.pmel.sdimetadata.variable.Variable}.
  */
-public class Sensor extends Analyzer implements Cloneable {
+public class PressureSensor extends Analyzer implements Cloneable {
 
     @Override
     public boolean isValid() {
@@ -15,15 +14,17 @@ public class Sensor extends Analyzer implements Cloneable {
     }
 
     @Override
-    public Sensor clone() {
-        return (Sensor) super.clone();
+    public PressureSensor clone() {
+        return (PressureSensor) super.clone();
     }
 
     @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( !(obj instanceof Sensor) )
+        if ( null == obj )
+            return false;
+        if ( !(obj instanceof PressureSensor) )
             return false;
         return super.equals(obj);
     }
@@ -35,7 +36,7 @@ public class Sensor extends Analyzer implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Analyzer", "Sensor");
+        return super.toString().replaceFirst("Analyzer", "PressureSensor");
     }
 
 }

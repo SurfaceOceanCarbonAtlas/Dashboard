@@ -1,6 +1,5 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
-import sun.plugin.dom.exception.InvalidStateException;
 
 /**
  * Describes a standard gas mixture used for calibration of instruments.
@@ -156,14 +155,14 @@ public class CalibrationGas implements Cloneable {
     /**
      * @return if this calibration gas is a non-zero gas standard
      *
-     * @throws InvalidStateException
+     * @throws IllegalStateException
      *         if the gas concentration or the accuracy of the gas concentration is not specified (is NaN)
      */
-    public boolean isNonZero() throws InvalidStateException {
+    public boolean isNonZero() throws IllegalStateException {
         if ( concUMolPerMol.isNaN() )
-            throw new InvalidStateException("gas concentration is not given");
+            throw new IllegalStateException("gas concentration is not given");
         if ( accuracyUMolPerMol.isNaN() )
-            throw new InvalidStateException("gas concentration accuracy is not given");
+            throw new IllegalStateException("gas concentration accuracy is not given");
         return (concUMolPerMol > accuracyUMolPerMol);
     }
 
@@ -187,6 +186,8 @@ public class CalibrationGas implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof CalibrationGas) )
             return false;
 

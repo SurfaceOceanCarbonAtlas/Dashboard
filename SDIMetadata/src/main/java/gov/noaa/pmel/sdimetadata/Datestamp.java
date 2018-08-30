@@ -160,6 +160,8 @@ public class Datestamp implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Datestamp) )
             return false;
 

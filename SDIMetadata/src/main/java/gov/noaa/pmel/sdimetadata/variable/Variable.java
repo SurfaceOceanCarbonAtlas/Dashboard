@@ -17,6 +17,7 @@ public class Variable implements Cloneable {
     protected String methodDescription;
     protected String methodReference;
     protected String samplingLocation;
+    protected String samplingElevation;
     protected Double accuracy;
     protected Double precision;
     protected String apUnit;
@@ -38,6 +39,7 @@ public class Variable implements Cloneable {
         methodDescription = "";
         methodReference = "";
         samplingLocation = "";
+        samplingElevation = "";
         accuracy = Double.NaN;
         precision = Double.NaN;
         apUnit = "";
@@ -168,6 +170,21 @@ public class Variable implements Cloneable {
      */
     public void setSamplingLocation(String samplingLocation) {
         this.samplingLocation = (samplingLocation != null) ? samplingLocation.trim() : "";
+    }
+
+    /**
+     * @return sampling height / depth for this variable; never null but may be an empty string
+     */
+    public String getSamplingElevation() {
+        return samplingElevation;
+    }
+
+    /**
+     * @param samplingElevation
+     *         assign as the sampling height / depth for this variable; if null, an emptry string is assigned
+     */
+    public void setSamplingElevation(String samplingElevation) {
+        this.samplingElevation = (samplingElevation != null) ? samplingElevation.trim() : "";
     }
 
     /**
@@ -369,8 +386,6 @@ public class Variable implements Cloneable {
             return false;
         if ( observeType.isEmpty() )
             return false;
-        if ( samplingLocation.isEmpty() )
-            return false;
         if ( accuracy.isNaN() )
             return false;
         switch ( measureMethod ) {
@@ -404,6 +419,7 @@ public class Variable implements Cloneable {
         dup.methodDescription = methodDescription;
         dup.methodReference = methodReference;
         dup.samplingLocation = samplingLocation;
+        dup.samplingElevation = samplingElevation;
         dup.accuracy = accuracy;
         dup.precision = precision;
         dup.apUnit = apUnit;
@@ -419,6 +435,8 @@ public class Variable implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Variable) )
             return false;
 
@@ -439,6 +457,8 @@ public class Variable implements Cloneable {
         if ( !methodReference.equals(variable.methodReference) )
             return false;
         if ( !samplingLocation.equals(variable.samplingLocation) )
+            return false;
+        if ( !samplingElevation.equals(variable.samplingElevation) )
             return false;
         if ( !accuracy.equals(variable.accuracy) )
             return false;
@@ -471,6 +491,7 @@ public class Variable implements Cloneable {
         result = result * prime + methodDescription.hashCode();
         result = result * prime + methodReference.hashCode();
         result = result * prime + samplingLocation.hashCode();
+        result = result * prime + samplingElevation.hashCode();
         result = result * prime + accuracy.hashCode();
         result = result * prime + precision.hashCode();
         result = result * prime + apUnit.hashCode();
@@ -493,6 +514,7 @@ public class Variable implements Cloneable {
                 ", methodDescription='" + methodDescription + '\'' +
                 ", methodReference='" + methodReference + '\'' +
                 ", samplingLocation='" + samplingLocation + '\'' +
+                ", samplingElevation='" + samplingElevation + '\'' +
                 ", accuracy=" + accuracy +
                 ", apUnit='" + apUnit + '\'' +
                 ", flagType='" + flagType + '\'' +

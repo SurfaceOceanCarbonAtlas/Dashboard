@@ -164,6 +164,8 @@ public class Investigator extends Person implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Investigator) )
             return false;
         if ( !super.equals(obj) )

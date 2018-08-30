@@ -1,8 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.instrument.Sampler;
-import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
+import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -14,53 +13,60 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class SamplerTest {
+public class TemperatureSensorTest {
 
-    private static final String EMPTY_STRING = "";
-    private static final String NAME = "Equilibrator";
-    private static final String ID = "325";
-    private static final String MANUFACTURER = "NOAA";
-    private static final String MODEL = "7";
-    private static final String LOCATION = "Bow of ship";
+    private static final String NAME = "Equilibrator headspace differential pressure sensor";
+    private static final String ID = "Setra-239 #0003245";
+    private static final String MANUFACTURER = "Setra";
+    private static final String MODEL = "239";
+    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some comment",
-            "Another comment"
+            "Temperature reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
+                    "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
+            "Some other comment just to have a second one."
     ));
 
     @Test
+    public void testIsValid() {
+        TemperatureSensor sensor = new TemperatureSensor();
+        assertFalse(sensor.isValid());
+        sensor.setName(NAME);
+        assertFalse(sensor.isValid());
+        sensor.setManufacturer(MANUFACTURER);
+        sensor.setModel(MODEL);
+        assertTrue(sensor.isValid());
+    }
+
+    @Test
     public void testClone() {
-        Sampler sampler = new Sampler();
-        Sampler dup = sampler.clone();
-        assertEquals(sampler, dup);
-        assertNotSame(sampler, dup);
+        TemperatureSensor sensor = new TemperatureSensor();
+        TemperatureSensor dup = sensor.clone();
+        assertEquals(sensor, dup);
+        assertNotSame(sensor, dup);
 
-        sampler.setName(NAME);
-        sampler.setId(ID);
-        sampler.setManufacturer(MANUFACTURER);
-        sampler.setModel(MODEL);
-        sampler.setLocation(LOCATION);
-        sampler.setAddnInfo(ADDN_INFO);
-        assertNotEquals(sampler, dup);
+        sensor.setName(NAME);
+        sensor.setId(ID);
+        sensor.setManufacturer(MANUFACTURER);
+        sensor.setModel(MODEL);
+        sensor.setLocation(LOCATION);
+        sensor.setAddnInfo(ADDN_INFO);
+        assertNotEquals(sensor, dup);
 
-        dup = sampler.clone();
-        assertEquals(sampler, dup);
-        assertNotSame(sampler, dup);
-        assertNotSame(sampler.getAddnInfo(), dup.getAddnInfo());
+        dup = sensor.clone();
+        assertEquals(sensor, dup);
+        assertNotSame(sensor, dup);
+        assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());
     }
 
     @Test
     public void testHashCodeEquals() {
-        Sampler first = new Sampler();
+        TemperatureSensor first = new TemperatureSensor();
         assertFalse(first.equals(null));
         assertFalse(first.equals(LOCATION));
 
-        Sampler second = new Sampler();
+        TemperatureSensor second = new TemperatureSensor();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-
-        GasSensor gasSensor = new GasSensor();
-        assertFalse(first.equals(gasSensor));
-        assertFalse(gasSensor.equals(second));
 
         Instrument other = new Instrument();
         assertFalse(first.equals(other));

@@ -130,6 +130,8 @@ public class Platform implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Platform) )
             return false;
 

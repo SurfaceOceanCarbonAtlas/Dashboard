@@ -27,8 +27,8 @@ public class Instrument implements Cloneable {
     }
 
     /**
-     * @return name for this instrument; never null but may be an empty string.
-     *         This name should be unique for instruments in this dataset.
+     * @return name for this instrument; never null but may be an empty string.  This name is used to identify
+     *         this instrument in other classes and should be unique among instument names in this dataset.
      */
     public String getName() {
         return name;
@@ -36,8 +36,8 @@ public class Instrument implements Cloneable {
 
     /**
      * @param name
-     *         assign as the name for this instrument; if null, an empty string is assigned
-     *         This name should be unique for instrument in this dataset.
+     *         assign as the name for this instrument; if null, an empty string is assigned.  This name is used to
+     *         identify this instrument in other classes and should be unique among instument names in this dataset.
      */
     public void setName(String name) {
         this.name = (name != null) ? name.trim() : "";
@@ -164,6 +164,8 @@ public class Instrument implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Instrument) )
             return false;
 

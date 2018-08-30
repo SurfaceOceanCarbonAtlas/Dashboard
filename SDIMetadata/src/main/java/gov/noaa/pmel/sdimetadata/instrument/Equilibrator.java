@@ -6,18 +6,18 @@ import java.util.ArrayList;
  * Describes an equilibrator for measuring the amount of a dissolved gas in water.
  */
 public class Equilibrator extends Sampler implements Cloneable {
-    protected Double intakeDepthM;
+    protected String intakeDepth;
     protected String intakeLocation;
     protected String equilibratorType;
-    protected Double chamberWaterVolL;
-    protected Double chamberHeadspaceVolL;
-    protected Double minWaterFlowLPM;
-    protected Double maxWaterFlowLPM;
-    protected Double minGasFlowLPM;
-    protected Double maxGasFlowLPM;
+    protected String chamberVol;
+    protected String chamberWaterVol;
+    protected String chamberAirVol;
+    protected String waterFlowRate;
+    protected String gasFlowRate;
     protected String venting;
-    protected String dryingMethod;
+    protected String drying;
     protected ArrayList<CalibrationGas> calibrationGases;
+    protected String calibrationInfo;
 
     /*
      * <Depth_of_Sea_Water_Intake>5 meters</Depth_of_Sea_Water_Intake>

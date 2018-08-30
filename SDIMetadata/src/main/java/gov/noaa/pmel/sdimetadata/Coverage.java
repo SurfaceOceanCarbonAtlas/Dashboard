@@ -271,6 +271,8 @@ public class Coverage implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Coverage) )
             return false;
 

@@ -47,6 +47,8 @@ public class Temperature extends Variable implements Cloneable {
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
+        if ( null == obj )
+            return false;
         if ( !(obj instanceof Temperature) )
             return false;
         return super.equals(obj);

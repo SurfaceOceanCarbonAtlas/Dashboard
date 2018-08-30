@@ -25,7 +25,8 @@ public class VariableTest {
     private static final MethodType MEASURE_METHOD = MethodType.MEASURED_INSITU;
     private static final String METHOD_DESCRIPTION = "Directly measured";
     private static final String METHOD_REFERENCE = "No reference";
-    private static final String SAMPLING_LOCATION = "~5 m below water line";
+    private static final String SAMPLING_LOCATION = "Bow";
+    private static final String SAMPLING_ELEVATION = "~5 m below water line";
     private static final double ACCURACY = 0.01;
     private static final double PRECISION = 0.001;
     private static final String AP_UNIT = "deg C";
@@ -161,11 +162,32 @@ public class VariableTest {
     }
 
     @Test
+    public void testGetSetSamplingElevation() {
+        Variable var = new Variable();
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+        var.setSamplingElevation(SAMPLING_ELEVATION);
+        assertEquals(SAMPLING_ELEVATION, var.getSamplingElevation());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+        assertEquals(EMPTY_STRING, var.getMethodReference());
+        assertEquals(EMPTY_STRING, var.getMethodDescription());
+        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
+        assertEquals(EMPTY_STRING, var.getObserveType());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getFullName());
+        assertEquals(EMPTY_STRING, var.getColName());
+        var.setSamplingElevation(null);
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+        var.setSamplingElevation("\t");
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+    }
+
+    @Test
     public void testGetSetAccuracy() {
         Variable var = new Variable();
         assertTrue(var.getAccuracy().isNaN());
         var.setAccuracy(ACCURACY);
         assertEquals(ACCURACY, var.getAccuracy(), DELTA);
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -211,6 +233,7 @@ public class VariableTest {
         var.setPrecision(PRECISION);
         assertEquals(PRECISION, var.getPrecision(), DELTA);
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -257,6 +280,7 @@ public class VariableTest {
         assertEquals(AP_UNIT, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -280,6 +304,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -307,6 +332,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -333,6 +359,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -372,6 +399,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -413,6 +441,7 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getApUnit());
         assertTrue(var.getPrecision().isNaN());
         assertTrue(var.getAccuracy().isNaN());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
         assertEquals(EMPTY_STRING, var.getMethodDescription());
@@ -444,7 +473,6 @@ public class VariableTest {
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setObserveType(OBSERVE_TYPE);
-        var.setSamplingLocation(SAMPLING_LOCATION);
         var.setAccuracy(ACCURACY);
 
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
@@ -477,6 +505,7 @@ public class VariableTest {
         var.setMethodDescription(METHOD_DESCRIPTION);
         var.setMethodReference(METHOD_REFERENCE);
         var.setSamplingLocation(SAMPLING_LOCATION);
+        var.setSamplingElevation(SAMPLING_ELEVATION);
         var.setAccuracy(ACCURACY);
         var.setPrecision(PRECISION);
         var.setApUnit(AP_UNIT);
@@ -557,6 +586,13 @@ public class VariableTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setSamplingLocation(SAMPLING_LOCATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setSamplingElevation(SAMPLING_ELEVATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setSamplingElevation(SAMPLING_ELEVATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

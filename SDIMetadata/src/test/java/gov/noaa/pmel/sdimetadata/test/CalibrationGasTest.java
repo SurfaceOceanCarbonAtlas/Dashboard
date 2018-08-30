@@ -2,7 +2,6 @@ package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import org.junit.Test;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -153,14 +152,14 @@ public class CalibrationGasTest {
         try {
             gas.isNonZero();
             fail("calling isNonZero on a unassigned CalibrationGas succeeded");
-        } catch ( InvalidStateException ex ) {
+        } catch ( IllegalStateException ex ) {
             // Expected result
         }
         gas.setConcUMolPerMol(CONCENTRATION);
         try {
             gas.isNonZero();
             fail("calling isNonZero in a CalibrationGas with only concentration assigned succeeded");
-        } catch ( InvalidStateException ex ) {
+        } catch ( IllegalStateException ex ) {
             // Expected result
         }
         gas.setAccuracyUMolPerMol(ACCURACY);
