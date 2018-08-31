@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.variable.AtmosGasConc;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +46,7 @@ public class AtmosGasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        Variable var = new Variable();
+        DataVar var = new DataVar();
         var.setColName(COL_NAME);
         assertEquals(first.hashCode(), var.hashCode());
         assertFalse(first.equals(var));

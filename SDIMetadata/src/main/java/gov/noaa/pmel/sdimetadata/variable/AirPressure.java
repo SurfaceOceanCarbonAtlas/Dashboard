@@ -3,17 +3,17 @@ package gov.noaa.pmel.sdimetadata.variable;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 
 /**
- * Describes a pressure data variable in a dataset.
+ * Information about an air pressure measurement.
  * The unit for accuracy and precision are set to hectopascals and cannot be modified,
  * and the default unit for the variable is hectopascals (but can be modified).
  */
-public class Pressure extends Variable implements Cloneable {
+public class AirPressure extends DataVar implements Cloneable {
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
     protected String pressureCorrection;
 
-    public Pressure() {
+    public AirPressure() {
         super();
         varUnit = HECTOPASCALS_UNIT;
         accuracy.setUnitString(HECTOPASCALS_UNIT);
@@ -48,7 +48,7 @@ public class Pressure extends Variable implements Cloneable {
     }
 
     /**
-     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Pressure#HECTOPASCALS_UNIT}
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link AirPressure#HECTOPASCALS_UNIT}
      */
     @Override
     public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
@@ -62,7 +62,7 @@ public class Pressure extends Variable implements Cloneable {
     }
 
     /**
-     * @apiNote also throws IllegalArgumentException if the unit string is not {@link Pressure#HECTOPASCALS_UNIT}
+     * @apiNote also throws IllegalArgumentException if the unit string is not {@link AirPressure#HECTOPASCALS_UNIT}
      */
     @Override
     public void setPrecision(NumericString precision) throws IllegalArgumentException {
@@ -76,8 +76,8 @@ public class Pressure extends Variable implements Cloneable {
     }
 
     @Override
-    public Pressure clone() {
-        Pressure dup = (Pressure) super.clone();
+    public AirPressure clone() {
+        AirPressure dup = (AirPressure) super.clone();
         dup.pressureCorrection = pressureCorrection;
         return dup;
     }
@@ -88,12 +88,12 @@ public class Pressure extends Variable implements Cloneable {
             return true;
         if ( null == obj )
             return false;
-        if ( !(obj instanceof Pressure) )
+        if ( !(obj instanceof AirPressure) )
             return false;
         if ( !super.equals(obj) )
             return false;
 
-        Pressure other = (Pressure) obj;
+        AirPressure other = (AirPressure) obj;
 
         if ( !pressureCorrection.equals(other.pressureCorrection) )
             return false;
@@ -111,9 +111,8 @@ public class Pressure extends Variable implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString()
-                    .replaceFirst("Variable", "Pressure")
-                    .replaceFirst("}", "") +
+        String repr = super.toString().replaceFirst("DataVar", "AirPressure");
+        return repr.substring(0, repr.length() - 1) +
                 ", pressureCorrection='" + pressureCorrection + "'}";
     }
 

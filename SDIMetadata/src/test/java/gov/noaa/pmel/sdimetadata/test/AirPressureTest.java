@@ -1,8 +1,8 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.Pressure;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
+import gov.noaa.pmel.sdimetadata.variable.AirPressure;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,19 +12,19 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class PressureTest {
+public class AirPressureTest {
 
     private static final String EMPTY_STR = "";
-    private static final NumericString EMPTY_PRESSURE = new NumericString(null, Pressure.HECTOPASCALS_UNIT);
+    private static final NumericString EMPTY_PRESSURE = new NumericString(null, AirPressure.HECTOPASCALS_UNIT);
     private static final String COL_NAME = "SLP";
     private static final String KILOPASCALS_UNIT = "kPa";
     private static final String PRESSURE_CORRECTION = "normalized to sea level pressure";
-    private static final NumericString ACCURACY = new NumericString("0.01", Pressure.HECTOPASCALS_UNIT);
-    private static final NumericString PRECISION = new NumericString("0.001", Pressure.HECTOPASCALS_UNIT);
+    private static final NumericString ACCURACY = new NumericString("0.01", AirPressure.HECTOPASCALS_UNIT);
+    private static final NumericString PRECISION = new NumericString("0.001", AirPressure.HECTOPASCALS_UNIT);
 
     @Test
     public void testGetSetPressureCorrection() {
-        Pressure pressure = new Pressure();
+        AirPressure pressure = new AirPressure();
         assertEquals(EMPTY_STR, pressure.getPressureCorrection());
         pressure.setPressureCorrection(PRESSURE_CORRECTION);
         assertEquals(PRESSURE_CORRECTION, pressure.getPressureCorrection());
@@ -36,30 +36,30 @@ public class PressureTest {
 
     @Test
     public void testGetSetVarUnit() {
-        Pressure pressure = new Pressure();
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        AirPressure pressure = new AirPressure();
+        assertEquals(AirPressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         pressure.setVarUnit(KILOPASCALS_UNIT);
         assertEquals(KILOPASCALS_UNIT, pressure.getVarUnit());
         assertEquals(EMPTY_STR, pressure.getPressureCorrection());
         pressure.setVarUnit(null);
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(AirPressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         pressure.setVarUnit("\t");
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(AirPressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
     }
 
     @Test
     public void testGetSetAccuracy() {
-        Pressure pressure = new Pressure();
+        AirPressure pressure = new AirPressure();
         assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
         pressure.setAccuracy(ACCURACY);
         assertEquals(ACCURACY, pressure.getAccuracy());
         assertNotSame(ACCURACY, pressure.getAccuracy());
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(AirPressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         assertEquals(EMPTY_STR, pressure.getPressureCorrection());
         pressure.setAccuracy(null);
         assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
         try {
-            pressure.setAccuracy(new NumericString("0.0", Pressure.HECTOPASCALS_UNIT));
+            pressure.setAccuracy(new NumericString("0.0", AirPressure.HECTOPASCALS_UNIT));
             fail("call to setAccuracy with zero hPa succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -71,7 +71,7 @@ public class PressureTest {
             // Expected result
         }
         try {
-            ((Variable) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setAccuracy with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -80,18 +80,18 @@ public class PressureTest {
 
     @Test
     public void testGetSetPresision() {
-        Pressure pressure = new Pressure();
+        AirPressure pressure = new AirPressure();
         assertEquals(EMPTY_PRESSURE, pressure.getPrecision());
         pressure.setPrecision(PRECISION);
         assertEquals(PRECISION, pressure.getPrecision());
         assertNotSame(PRECISION, pressure.getPrecision());
         assertEquals(EMPTY_PRESSURE, pressure.getAccuracy());
-        assertEquals(Pressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
+        assertEquals(AirPressure.HECTOPASCALS_UNIT, pressure.getVarUnit());
         assertEquals(EMPTY_STR, pressure.getPressureCorrection());
         pressure.setPrecision(null);
         assertEquals(EMPTY_PRESSURE, pressure.getPrecision());
         try {
-            pressure.setPrecision(new NumericString("0.0", Pressure.HECTOPASCALS_UNIT));
+            pressure.setPrecision(new NumericString("0.0", AirPressure.HECTOPASCALS_UNIT));
             fail("call to setPrecision with zero hPa succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -103,7 +103,7 @@ public class PressureTest {
             // Expected result
         }
         try {
-            ((Variable) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((DataVar) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setPrecision with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -112,8 +112,8 @@ public class PressureTest {
 
     @Test
     public void testClone() {
-        Pressure pressure = new Pressure();
-        Pressure dup = pressure.clone();
+        AirPressure pressure = new AirPressure();
+        AirPressure dup = pressure.clone();
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -133,11 +133,11 @@ public class PressureTest {
 
     @Test
     public void testHashCodeEquals() {
-        Pressure first = new Pressure();
+        AirPressure first = new AirPressure();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(Pressure.HECTOPASCALS_UNIT));
+        assertFalse(first.equals(AirPressure.HECTOPASCALS_UNIT));
 
-        Pressure second = new Pressure();
+        AirPressure second = new AirPressure();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

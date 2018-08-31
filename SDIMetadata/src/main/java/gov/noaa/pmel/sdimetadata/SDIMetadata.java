@@ -4,7 +4,7 @@ import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class SDIMetadata implements Cloneable {
     protected Coverage coverage;
     protected ArrayList<Sampler> samplers;
     protected ArrayList<Analyzer> analyzers;
-    protected ArrayList<Variable> variables;
+    protected ArrayList<DataVar> variables;
     protected MiscInfo miscInfo;
 
     public SDIMetadata() {
@@ -26,7 +26,7 @@ public class SDIMetadata implements Cloneable {
         coverage = new Coverage();
         samplers = new ArrayList<Sampler>();
         analyzers = new ArrayList<Analyzer>();
-        variables = new ArrayList<Variable>();
+        variables = new ArrayList<DataVar>();
         miscInfo = new MiscInfo();
     }
 
@@ -50,7 +50,7 @@ public class SDIMetadata implements Cloneable {
             if ( !detector.isValid() )
                 return false;
         }
-        for (Variable var : variables) {
+        for (DataVar var : variables) {
             if ( !var.isValid() )
                 return false;
         }
@@ -95,8 +95,8 @@ public class SDIMetadata implements Cloneable {
         for (Analyzer detector : analyzers) {
             dup.analyzers.add(detector.clone());
         }
-        dup.variables = new ArrayList<Variable>(variables.size());
-        for (Variable var : variables) {
+        dup.variables = new ArrayList<DataVar>(variables.size());
+        for (DataVar var : variables) {
             dup.variables.add(var.clone());
         }
         dup.miscInfo = miscInfo.clone();

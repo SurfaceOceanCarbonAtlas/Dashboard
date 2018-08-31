@@ -2,7 +2,7 @@ package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.Temperature;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +55,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((Variable) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
+            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setAccuracy with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -86,7 +86,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((Variable) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
+            ((DataVar) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setPrecision with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result

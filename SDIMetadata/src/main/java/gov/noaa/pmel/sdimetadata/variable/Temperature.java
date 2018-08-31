@@ -3,11 +3,11 @@ package gov.noaa.pmel.sdimetadata.variable;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 
 /**
- * Describes a temperature data variable in a dataset.
- * Same as Variable except the unit for accuracy and precision are set to degrees Celsius and cannot be modified,
+ * Information about a temperature measurement.
+ * The unit for accuracy and precision are set to degrees Celsius and cannot be modified,
  * and the default unit for the variable is degrees Celsius (but can be modified).
  */
-public class Temperature extends Variable implements Cloneable {
+public class Temperature extends DataVar implements Cloneable {
 
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
@@ -83,7 +83,7 @@ public class Temperature extends Variable implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Variable", "Temperature");
+        return super.toString().replaceFirst("DataVar", "Temperature");
     }
 
 }

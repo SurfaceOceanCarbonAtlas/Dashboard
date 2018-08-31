@@ -1,8 +1,10 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
+
 /**
  * Basic information about an instrument that is a salinity sensor.  Specific details about values measured
- * by the sensor are part of {@link gov.noaa.pmel.sdimetadata.variable.Variable}.
+ * by the sensor are part of {@link DataVar}.
  */
 public class SalinitySensor extends Analyzer implements Cloneable {
 

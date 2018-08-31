@@ -1,8 +1,10 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
+
 /**
  * Basic information about an instrument that is a gas sensor.  Specific details about values measured by the sensor
- * are part of {@link gov.noaa.pmel.sdimetadata.variable.Variable} since a sensor can be used to measure more than
+ * are part of {@link DataVar} since a sensor can be used to measure more than
  * one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., accuracy).
  */
 public class GasSensor extends Analyzer implements Cloneable {

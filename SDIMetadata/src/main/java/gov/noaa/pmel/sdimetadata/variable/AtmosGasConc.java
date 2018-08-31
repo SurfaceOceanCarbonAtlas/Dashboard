@@ -1,6 +1,9 @@
 package gov.noaa.pmel.sdimetadata.variable;
 
-public class AtmosGasConc extends Variable implements Cloneable {
+/**
+ * Information about measurements of a gas concentration in the atmosphere.
+ */
+public class AtmosGasConc extends DataVar implements Cloneable {
 
     @Override
     public AtmosGasConc clone() {
@@ -26,7 +29,7 @@ public class AtmosGasConc extends Variable implements Cloneable {
     @Override
     public String toString() {
         return super.toString()
-                    .replaceFirst("Variable", "AtmosGasConc");
+                    .replaceFirst("DataVar", "AtmosGasConc");
     }
 
 }
