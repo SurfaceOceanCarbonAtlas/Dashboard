@@ -20,6 +20,7 @@ public class TemperatureSensorTest {
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
     private static final String LOCATION = "Attached to equilibrator headspace";
+    private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Temperature reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
                     "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
@@ -38,6 +39,7 @@ public class TemperatureSensorTest {
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
         sensor.setLocation(LOCATION);
+        sensor.setCalibration(CALIBRATION);
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
@@ -108,6 +110,16 @@ public class TemperatureSensorTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setLocation(LOCATION);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

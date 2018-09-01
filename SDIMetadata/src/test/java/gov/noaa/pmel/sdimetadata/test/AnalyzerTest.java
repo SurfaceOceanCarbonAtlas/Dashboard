@@ -21,12 +21,14 @@ public class AnalyzerTest {
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
     private static final String LOCATION = "Attached to equilibrator headspace";
+    private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Pressure reading from the Setra-270 on the exit of the sensor was added to the differential pressure " +
                     "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
             "Some other comment just to have a second one."
     ));
 
+    @Test
     public void testClone() {
         Analyzer analyzer = new Analyzer();
         Analyzer dup = analyzer.clone();
@@ -38,6 +40,7 @@ public class AnalyzerTest {
         analyzer.setManufacturer(MANUFACTURER);
         analyzer.setModel(MODEL);
         analyzer.setLocation(LOCATION);
+        analyzer.setCalibration(CALIBRATION);
         analyzer.setAddnInfo(ADDN_INFO);
         assertNotEquals(analyzer, dup);
 
@@ -112,6 +115,17 @@ public class AnalyzerTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setLocation(LOCATION);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
+
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

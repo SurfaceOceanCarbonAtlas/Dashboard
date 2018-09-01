@@ -21,6 +21,7 @@ public class SamplerTest {
     private static final String MANUFACTURER = "NOAA";
     private static final String MODEL = "7";
     private static final String LOCATION = "Bow of ship";
+    private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Some comment",
             "Another comment"
@@ -38,6 +39,7 @@ public class SamplerTest {
         sampler.setManufacturer(MANUFACTURER);
         sampler.setModel(MODEL);
         sampler.setLocation(LOCATION);
+        sampler.setCalibration(CALIBRATION);
         sampler.setAddnInfo(ADDN_INFO);
         assertNotEquals(sampler, dup);
 
@@ -112,6 +114,16 @@ public class SamplerTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setLocation(LOCATION);
+        assertFalse(first.equals(other));
+        assertTrue(other.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 
