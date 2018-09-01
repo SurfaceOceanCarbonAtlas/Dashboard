@@ -3,6 +3,8 @@ package gov.noaa.pmel.sdimetadata.test;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -16,7 +18,7 @@ public class DatestampTest {
     private static final Integer MONTH = 6;
     private static final Integer DAY = 25;
     private static final String DATESTAMP = "2010-06-25";
-    private static final double TIME_OF_DATESTAMP = 1277424000.000;
+    private static final Date TIME_OF_DATESTAMP = new Date(1277424000000L);
 
 
     @Test
@@ -64,7 +66,7 @@ public class DatestampTest {
         datestamp.setYear(YEAR);
         datestamp.setMonth(MONTH);
         datestamp.setDay(DAY);
-        assertEquals(TIME_OF_DATESTAMP, datestamp.getEarliestTime(), 0.1);
+        assertEquals(TIME_OF_DATESTAMP, datestamp.getEarliestTime());
         datestamp.setYear(2011);
         datestamp.setMonth(2);
         datestamp.setDay(29);

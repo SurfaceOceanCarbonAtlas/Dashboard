@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,7 +18,11 @@ import static org.junit.Assert.fail;
 public class MiscInfoTest {
 
     private static final String EMPTY_STR = "";
+    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
     private static final Datestamp EMPTY_DATESTAMP = new Datestamp();
+    private static final ArrayList<Datestamp> EMPTY_STAMPLIST = new ArrayList<Datestamp>();
+
     private static final String DATASET_ID = "33RO20150114";
     private static final String DATASET_NAME = "RB1501A";
     private static final String FUNDING_AGENCY = "NOAA Climate Observation Office/Climate Observations Division";
@@ -318,10 +322,12 @@ public class MiscInfoTest {
     @Test
     public void testGetSetReferences() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(0, miscInfo.getReferences().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         miscInfo.setReferences(REFERENCES);
-        assertEquals(REFERENCES, miscInfo.getReferences());
-        assertNotSame(REFERENCES, miscInfo.getReferences());
+        ArrayList<String> nameList = miscInfo.getReferences();
+        assertEquals(REFERENCES, nameList);
+        assertNotSame(REFERENCES, nameList);
+        assertNotSame(nameList, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -336,9 +342,9 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setReferences(null);
-        assertEquals(0, miscInfo.getReferences().size());
-        miscInfo.setReferences(new HashSet<>());
-        assertEquals(0, miscInfo.getReferences().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        miscInfo.setReferences(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         try {
             miscInfo.setReferences(Arrays.asList("Some information", "\n", "More information"));
             fail("calling setReferences with a list containing an blank string succeeded");
@@ -356,11 +362,13 @@ public class MiscInfoTest {
     @Test
     public void testGetSetAddnInfo() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(0, miscInfo.getAddnInfo().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
         miscInfo.setAddnInfo(ADDN_INFO_LIST);
-        assertEquals(ADDN_INFO_LIST, miscInfo.getAddnInfo());
-        assertNotSame(ADDN_INFO_LIST, miscInfo.getAddnInfo());
-        assertEquals(0, miscInfo.getReferences().size());
+        ArrayList<String> nameList = miscInfo.getAddnInfo();
+        assertEquals(ADDN_INFO_LIST, nameList);
+        assertNotSame(ADDN_INFO_LIST, nameList);
+        assertNotSame(nameList, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -375,9 +383,9 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setAddnInfo(null);
-        assertEquals(0, miscInfo.getAddnInfo().size());
-        miscInfo.setAddnInfo(new HashSet<>());
-        assertEquals(0, miscInfo.getAddnInfo().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        miscInfo.setAddnInfo(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
         try {
             miscInfo.setAddnInfo(Arrays.asList("Some information", "\n", "More information"));
             fail("calling setAddnInfo with a list containing an blank string succeeded");
@@ -397,10 +405,12 @@ public class MiscInfoTest {
         MiscInfo miscInfo = new MiscInfo();
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
         miscInfo.setStartDatestamp(START_DATESTAMP);
-        assertEquals(START_DATESTAMP, miscInfo.getStartDatestamp());
-        assertNotSame(START_DATESTAMP, miscInfo.getStartDatestamp());
-        assertEquals(0, miscInfo.getAddnInfo().size());
-        assertEquals(0, miscInfo.getReferences().size());
+        Datestamp stamp = miscInfo.getStartDatestamp();
+        assertEquals(START_DATESTAMP, stamp);
+        assertNotSame(START_DATESTAMP, stamp);
+        assertNotSame(stamp, miscInfo.getStartDatestamp());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -416,11 +426,8 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setStartDatestamp(null);
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        miscInfo.setStartDatestamp(START_DATESTAMP);
-        assertEquals(START_DATESTAMP, miscInfo.getStartDatestamp());
         miscInfo.setStartDatestamp(EMPTY_DATESTAMP);
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        assertNotSame(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
     }
 
     @Test
@@ -428,11 +435,13 @@ public class MiscInfoTest {
         MiscInfo miscInfo = new MiscInfo();
         assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
         miscInfo.setEndDatestamp(END_DATESTAMP);
-        assertEquals(END_DATESTAMP, miscInfo.getEndDatestamp());
-        assertNotSame(END_DATESTAMP, miscInfo.getEndDatestamp());
+        Datestamp stamp = miscInfo.getEndDatestamp();
+        assertEquals(END_DATESTAMP, stamp);
+        assertNotSame(END_DATESTAMP, stamp);
+        assertNotSame(stamp, miscInfo.getEndDatestamp());
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        assertEquals(0, miscInfo.getAddnInfo().size());
-        assertEquals(0, miscInfo.getReferences().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -448,17 +457,14 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setEndDatestamp(null);
         assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-        miscInfo.setEndDatestamp(END_DATESTAMP);
-        assertEquals(END_DATESTAMP, miscInfo.getEndDatestamp());
         miscInfo.setEndDatestamp(EMPTY_DATESTAMP);
         assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-        assertNotSame(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
     }
 
     @Test
     public void testGetSetHistory() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(0, miscInfo.getHistory().size());
+        assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
         miscInfo.setHistory(HISTORY_LIST);
         ArrayList<Datestamp> history = miscInfo.getHistory();
         assertEquals(HISTORY_LIST, history);
@@ -466,10 +472,11 @@ public class MiscInfoTest {
         for (int k = 0; k < HISTORY_LIST.size(); k++) {
             assertNotSame(HISTORY_LIST.get(k), history.get(k));
         }
+        assertNotSame(history, miscInfo.getHistory());
         assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        assertEquals(0, miscInfo.getAddnInfo().size());
-        assertEquals(0, miscInfo.getReferences().size());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -484,9 +491,9 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setHistory(null);
-        assertEquals(0, miscInfo.getHistory().size());
-        miscInfo.setHistory(new HashSet<Datestamp>());
-        assertEquals(0, miscInfo.getHistory().size());
+        assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
+        miscInfo.setHistory(EMPTY_STAMPLIST);
+        assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
         try {
             miscInfo.setHistory(Arrays.asList(HISTORY_LIST.get(0), EMPTY_DATESTAMP));
             fail("calling setHistory with an invalid datestamp succeeded");
@@ -502,14 +509,17 @@ public class MiscInfoTest {
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         MiscInfo miscInfo = new MiscInfo();
-        assertFalse(miscInfo.isValid());
-
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "datasetId", "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames());
         miscInfo.setDatasetId(DATASET_ID);
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames());
         miscInfo.setStartDatestamp(START_DATESTAMP);
+        assertEquals(new HashSet<String>(Arrays.asList("endDatestamp")), miscInfo.invalidFieldNames());
         miscInfo.setEndDatestamp(END_DATESTAMP);
-        assertTrue(miscInfo.isValid());
+        assertEquals(EMPTY_NAMESET, miscInfo.invalidFieldNames());
     }
 
     @Test

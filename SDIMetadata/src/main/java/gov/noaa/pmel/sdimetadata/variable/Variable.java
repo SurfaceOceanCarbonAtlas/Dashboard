@@ -3,11 +3,13 @@ package gov.noaa.pmel.sdimetadata.variable;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Basic variable information; is the base class for all variable types.
  */
 public class Variable implements Cloneable {
+
     protected String colName;
     protected String fullName;
     protected String varUnit;
@@ -27,6 +29,18 @@ public class Variable implements Cloneable {
         accuracy = new NumericString();
         precision = new NumericString();
         addnInfo = new ArrayList<String>();
+    }
+
+    /**
+     * @return set of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(2);
+        if ( colName.isEmpty() )
+            invalid.add("colName");
+        if ( fullName.isEmpty() )
+            invalid.add("fullName");
+        return invalid;
     }
 
     /**
@@ -171,17 +185,6 @@ public class Variable implements Cloneable {
                 this.addnInfo.add(info);
             }
         }
-    }
-
-    /**
-     * @return whether all the required fields are assigned with valid values.
-     */
-    public boolean isValid() {
-        if ( colName.isEmpty() )
-            return false;
-        if ( fullName.isEmpty() )
-            return false;
-        return true;
     }
 
     @Override

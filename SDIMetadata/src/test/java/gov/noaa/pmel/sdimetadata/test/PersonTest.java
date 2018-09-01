@@ -3,6 +3,9 @@ package gov.noaa.pmel.sdimetadata.test;
 import gov.noaa.pmel.sdimetadata.person.Person;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -12,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class PersonTest {
 
     private static final String EMPTY_STRING = "";
+
     private static final String LAST_NAME = "Smith";
     private static final String FIRST_NAME = "John";
     private static final String INITIALS = "D.Z.";
@@ -120,21 +124,18 @@ public class PersonTest {
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Person person = new Person();
-        assertFalse(person.isValid());
-
+        assertEquals(new HashSet<String>(Arrays.asList("lastName", "firstName")), person.invalidFieldNames());
         person.setLastName(LAST_NAME);
+        assertEquals(new HashSet<String>(Arrays.asList("firstName")), person.invalidFieldNames());
         person.setFirstName(FIRST_NAME);
-        assertTrue(person.isValid());
-
+        assertEquals(new HashSet<String>(), person.invalidFieldNames());
         person.setLastName("\n");
-        assertFalse(person.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("lastName")), person.invalidFieldNames());
         person.setLastName(LAST_NAME);
-        assertTrue(person.isValid());
-
         person.setFirstName("\t");
-        assertFalse(person.isValid());
+        person.setFirstName(FIRST_NAME);
     }
 
     @Test

@@ -4,6 +4,9 @@ import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -157,14 +160,15 @@ public class CalibrationGasTest {
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         CalibrationGas gas = new CalibrationGas();
-        assertFalse(gas.isValid());
+        assertEquals(new HashSet<String>(
+                Arrays.asList("id", "type", "supplier", "concentration", "accuracy")), gas.invalidFieldNames());
         gas = new CalibrationGas(GAS_ID, GAS_TYPE, SUPPLIER, null, null);
-        assertFalse(gas.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("concentration", "accuracy")), gas.invalidFieldNames());
         gas.setConcentration(CONCENTRATION);
         gas.setAccuracy(ACCURACY);
-        assertTrue(gas.isValid());
+        assertEquals(new HashSet<String>(), gas.invalidFieldNames());
     }
 
     @Test

@@ -3,6 +3,8 @@ package gov.noaa.pmel.sdimetadata;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 
 /**
  * Miscellaneous information about a dataset.
@@ -50,6 +52,40 @@ public class MiscInfo implements Cloneable {
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
         history = new ArrayList<Datestamp>();
+    }
+
+    /**
+     * @return list of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(3);
+        if ( datasetId.isEmpty() )
+            invalid.add("datasetId");
+        Date startDate;
+        try {
+            startDate = startDatestamp.getEarliestTime();
+        } catch ( IllegalStateException ex ) {
+            startDate = null;
+        }
+        Date endDate;
+        try {
+            endDate = endDatestamp.getEarliestTime();
+        } catch ( IllegalStateException ex ) {
+            endDate = null;
+        }
+        if ( (startDate != null) && (endDate != null) ) {
+            if ( startDate.after(endDate) ) {
+                invalid.add("startDatestamp");
+                invalid.add("endDatestamp");
+            }
+        }
+        else {
+            if ( null == startDate )
+                invalid.add("startDatestamp");
+            if ( null == endDate )
+                invalid.add("endDatestamp");
+        }
+        return invalid;
     }
 
     /**
@@ -371,17 +407,6 @@ public class MiscInfo implements Cloneable {
                 this.history.add(datestamp.clone());
             }
         }
-    }
-
-    /**
-     * @return whether all the required fields are assigned with valid values.
-     */
-    public boolean isValid() {
-        if ( datasetId.isEmpty() )
-            return false;
-        if ( startDatestamp.getEarliestTime() > endDatestamp.getEarliestTime() )
-            return false;
-        return true;
     }
 
     @Override

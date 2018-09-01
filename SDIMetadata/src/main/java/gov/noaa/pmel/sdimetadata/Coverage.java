@@ -1,5 +1,13 @@
 package gov.noaa.pmel.sdimetadata;
 
+import gov.noaa.pmel.sdimetadata.util.NumericString;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
@@ -7,186 +15,288 @@ import java.util.TreeSet;
  */
 public class Coverage implements Cloneable {
 
+    public static final String LONGITUDE_UNITS = "dec deg E";
+    public static final String LATITUDE_UNITS = "dec deg N";
     public static final String WGS84 = "WGS 84";
-    /**
-     * 1900-01-01 00:00:00 in units of seconds since 1970-01-01 00:00:00
-     */
-    public static final Double MIN_DATA_TIME = -2208988800.000;
 
-    protected Double westernLongitude;
-    protected Double easternLongitude;
-    protected Double southernLatitude;
-    protected Double northernLatitude;
-    protected Double earliestDataTime;
-    protected Double latestDataTime;
+    /**
+     * 1900-01-01 00:00:00 == Date(-2208988800000L)
+     */
+    public static final Date MIN_DATA_TIME;
+
+    private static final DateFormat TIMESTAMP_PARSER;
+
+    static {
+        TIMESTAMP_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        TIMESTAMP_PARSER.setTimeZone(TimeZone.getTimeZone("UTC"));
+        TIMESTAMP_PARSER.setLenient(false);
+        try {
+            MIN_DATA_TIME = TIMESTAMP_PARSER.parse("1900-01-01 00:00:00");
+        } catch ( ParseException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    protected NumericString westernLongitude;
+    protected NumericString easternLongitude;
+    protected NumericString southernLatitude;
+    protected NumericString northernLatitude;
+    protected Date earliestDataTime;
+    protected Date latestDataTime;
     protected String spatialReference;
     protected TreeSet<String> geographicNames;
 
     /**
-     * Create with all numberic values assigned as Double.NaN,
+     * Create with empty longitudes, empty latitudes, invalid times,
      * the spatial reference set to WGS 84, and no geographic names.
      */
     public Coverage() {
-        westernLongitude = Double.NaN;
-        easternLongitude = Double.NaN;
-        southernLatitude = Double.NaN;
-        northernLatitude = Double.NaN;
-        earliestDataTime = Double.NaN;
-        latestDataTime = Double.NaN;
+        westernLongitude = new NumericString(null, LONGITUDE_UNITS);
+        easternLongitude = new NumericString(null, LONGITUDE_UNITS);
+        southernLatitude = new NumericString(null, LATITUDE_UNITS);
+        northernLatitude = new NumericString(null, LATITUDE_UNITS);
+        earliestDataTime = new Date(MIN_DATA_TIME.getTime() - 1);
+        latestDataTime = new Date(MIN_DATA_TIME.getTime() - 1);
         spatialReference = WGS84;
         geographicNames = new TreeSet<String>();
     }
 
     /**
-     * Create with the given values assigned by their corresponding setters,
-     * the spatial reference set to WGS 84, and no geographic names.
+     * Create with the given values, the spatial reference set to WGS 84, and no geographic names.
+     *
+     * @param westernLongitude
+     *         westernmost longitude in decimal degrees east; if null or blank, an empty numeric string is assigned
+     * @param easternLongitude
+     *         easternmost longitude in decimal degrees east; if null or blank, an empty numeric string is assigned
+     * @param southernLatitude
+     *         southernmost latitude in decimal degrees north; if null or blank, an empty numeric string is assigned
+     * @param northernLatitude
+     *         northernmost latitude in decimal degrees north; if null or blank, an empty numeric string is assigned
+     * @param earliestDataTime
+     *         UTC date and time of the earliest (oldest) data measurement in yyyy-MM-dd HH:mm:ss format;
+     *         if null or blank, an invalid time is assigned
+     * @param latestDataTime
+     *         UTC date and time of the latest (newest) data measurement in yyyy-MM-dd HH:mm:ss format;
+     *         if null or blank, an invalid time is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any of the values, if not null or blank, for the longitudes, latitudes, or times are invalid
+     *         (longitudes outside the range [-360, 360] are considered in invalid)
      */
-    public Coverage(Double westernLongitude, Double easternLongitude,
-            Double southernLatitude, Double northernLatitude,
-            Double earliestDataTime, Double latestDataTime) {
+    public Coverage(String westernLongitude, String easternLongitude, String southernLatitude, String northernLatitude,
+            String earliestDataTime, String latestDataTime) throws IllegalArgumentException {
         this();
-        setWesternLongitude(westernLongitude);
-        setEasternLongitude(easternLongitude);
-        setSouthernLatitude(southernLatitude);
-        setNorthernLatitude(northernLatitude);
-        setEarliestDataTime(earliestDataTime);
-        setLatestDataTime(latestDataTime);
+        setWesternLongitude(new NumericString(westernLongitude, LONGITUDE_UNITS));
+        setEasternLongitude(new NumericString(easternLongitude, LONGITUDE_UNITS));
+        setSouthernLatitude(new NumericString(southernLatitude, LATITUDE_UNITS));
+        setNorthernLatitude(new NumericString(northernLatitude, LATITUDE_UNITS));
+        Date dataTime;
+        if ( (earliestDataTime != null) && !earliestDataTime.trim().isEmpty() ) {
+            try {
+                dataTime = TIMESTAMP_PARSER.parse(earliestDataTime.trim());
+            } catch ( ParseException ex ) {
+                throw new IllegalArgumentException("Invalid earliest data time: " + ex.getMessage());
+            }
+        }
+        else
+            dataTime = null;
+        setEarliestDataTime(dataTime);
+        if ( (latestDataTime != null) && !latestDataTime.trim().isEmpty() ) {
+            try {
+                dataTime = TIMESTAMP_PARSER.parse(latestDataTime.trim());
+            } catch ( ParseException ex ) {
+                throw new IllegalArgumentException("Invalid latest data time: " + ex.getMessage());
+            }
+        }
+        else
+            dataTime = null;
+        setLatestDataTime(dataTime);
     }
 
     /**
-     * @return the western longitude limit, in units of decimal degrees east in the range (180.0,180.0];
-     *         never null but may be Double.NaN
+     * @return list of field names that are currently invalid
      */
-    public Double getWesternLongitude() {
-        return westernLongitude;
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(6);
+        if ( !westernLongitude.isValid() )
+            invalid.add("westernLongitude");
+        if ( !easternLongitude.isValid() )
+            invalid.add("easternLongitude");
+
+        if ( southernLatitude.isValid() && northernLatitude.isValid() ) {
+            if ( southernLatitude.getNumericValue() > northernLatitude.getNumericValue() ) {
+                invalid.add("southernLatitude");
+                invalid.add("northernLatitude");
+            }
+        }
+        else {
+            if ( !southernLatitude.isValid() )
+                invalid.add("southernLatitude");
+            if ( !northernLatitude.isValid() )
+                invalid.add("northernLatitude");
+        }
+
+        if ( earliestDataTime.before(MIN_DATA_TIME) || earliestDataTime.after(new Date()) ||
+                earliestDataTime.after(latestDataTime) )
+            invalid.add("earliestDataTime");
+        if ( latestDataTime.before(MIN_DATA_TIME) || latestDataTime.after(new Date()) ||
+                latestDataTime.before(earliestDataTime) )
+            invalid.add("latestDataTime");
+        return invalid;
+    }
+
+    /**
+     * @return the western longitude limit; never null but may be empty. If not empty, the longitude is guaranteed
+     *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}.
+     */
+    public NumericString getWesternLongitude() {
+        return westernLongitude.clone();
     }
 
     /**
      * @param westernLongitude
-     *         assign as the western longitude limit, in units of decimal degrees east;
-     *         if null or invalid (not in the range [-540.0,540.0]), Double.NaN will be assigned
+     *         assign as the western longitude limit; if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the numeric string of the given longitude is not empty and not in the range [-360,360], or
+     *         if the unit string of the given longitude is not {@link #LONGITUDE_UNITS}
      */
-    public void setWesternLongitude(Double westernLongitude) {
-        if ( (westernLongitude != null) && (westernLongitude >= -540.0) && (westernLongitude <= 540.0) ) {
-            this.westernLongitude = westernLongitude;
-            while ( this.westernLongitude <= -180.0 ) {
-                this.westernLongitude += 360.0;
-            }
-            while ( this.westernLongitude > 180.0 ) {
-                this.westernLongitude -= 360.0;
-            }
+    public void setWesternLongitude(NumericString westernLongitude) throws IllegalArgumentException {
+        if ( (westernLongitude != null) && westernLongitude.isValid() ) {
+            double val = westernLongitude.getNumericValue();
+            if ( (val < -360.0) || (val > 360.0) )
+                throw new IllegalArgumentException("westernmost longitude is not in [-360.0,360.0]");
+            if ( !LONGITUDE_UNITS.equals(westernLongitude.getUnitString()) )
+                throw new IllegalArgumentException("westernmost longitude units are not " + LONGITUDE_UNITS);
+            this.westernLongitude = westernLongitude.clone();
         }
         else
-            this.westernLongitude = Double.NaN;
+            this.westernLongitude = new NumericString(null, LONGITUDE_UNITS);
     }
 
     /**
-     * @return the eastern longitude limit, in units of decimal degrees east in the range (-180.0,180.0];
-     *         never null but may be Double.NaN
+     * @return the eastern longitude limit; never null but may be empty. If not empty, the longitude is guaranteed
+     *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}
      */
-    public Double getEasternLongitude() {
-        return easternLongitude;
+    public NumericString getEasternLongitude() {
+        return easternLongitude.clone();
     }
 
     /**
      * @param easternLongitude
-     *         assign as the eastern longitude limit, in units of decimal degrees east;
-     *         if null or invalid (not in the range [-540.0,540.0]), Double.NaN will be assigned
+     *         assign as the eastern longitude limit; if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the numeric string of the given longitude is not empty and not in the range [-360,360], or
+     *         if the unit string of the given longitude is not {@link #LONGITUDE_UNITS}
      */
-    public void setEasternLongitude(Double easternLongitude) {
-        if ( (easternLongitude != null) && (easternLongitude >= -540.0) && (easternLongitude <= 540.0) ) {
-            this.easternLongitude = easternLongitude;
-            while ( this.easternLongitude <= -180.0 ) {
-                this.easternLongitude += 360.0;
-            }
-            while ( this.easternLongitude > 180.0 ) {
-                this.easternLongitude -= 360.0;
-            }
+    public void setEasternLongitude(NumericString easternLongitude) throws IllegalArgumentException {
+        if ( (easternLongitude != null) && easternLongitude.isValid() ) {
+            double val = easternLongitude.getNumericValue();
+            if ( (val < -360.0) || (val > 360.0) )
+                throw new IllegalArgumentException("easternmost longitude is not in [-360.0,360.0]");
+            if ( !LONGITUDE_UNITS.equals(easternLongitude.getUnitString()) )
+                throw new IllegalArgumentException("easternmost longitude units are not " + LONGITUDE_UNITS);
+            this.easternLongitude = easternLongitude.clone();
         }
         else
-            this.easternLongitude = Double.NaN;
+            this.easternLongitude = new NumericString(null, LONGITUDE_UNITS);
     }
 
     /**
-     * @return the southern latitude limit, in units of decimal degrees north;
-     *         never null but may be Double.NaN
+     * @return the southern latitude limit; never null but may be empty. If not empty, the latitude is guaranteed
+     *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
-    public Double getSouthernLatitude() {
-        return southernLatitude;
+    public NumericString getSouthernLatitude() {
+        return southernLatitude.clone();
     }
 
     /**
      * @param southernLatitude
-     *         assign as the southern latitude limit, in units of decimal degrees north;
-     *         if null or invalid, Double.NaN will be assigned
+     *         assign as the southern latitude limit; if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the numeric string of the given latitude is not empty and not in the range [-90,90], or
+     *         if the unit string of the given latitude is not {@link #LATITUDE_UNITS}
      */
-    public void setSouthernLatitude(Double southernLatitude) {
-        if ( (southernLatitude != null) && (southernLatitude >= -90.0) && (southernLatitude <= 90.0) )
-            this.southernLatitude = southernLatitude;
+    public void setSouthernLatitude(NumericString southernLatitude) throws IllegalArgumentException {
+        if ( (southernLatitude != null) && southernLatitude.isValid() ) {
+            double val = southernLatitude.getNumericValue();
+            if ( (val < -90.0) || (val > 90.0) )
+                throw new IllegalArgumentException("southernmost latitude is not in [-90.0,90.0]");
+            if ( !LATITUDE_UNITS.equals(southernLatitude.getUnitString()) )
+                throw new IllegalArgumentException("southernLatitude longitude units are not " + LATITUDE_UNITS);
+            this.southernLatitude = southernLatitude.clone();
+        }
         else
-            this.southernLatitude = Double.NaN;
+            this.southernLatitude = new NumericString(null, LATITUDE_UNITS);
     }
 
     /**
-     * @return the northern latitude limit, in units of decimal degrees north;
-     *         never null but may be Double.NaN
+     * @return the northern latitude limit; never null but may be empty. If not empty, the latitude is guaranteed
+     *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
-    public Double getNorthernLatitude() {
-        return northernLatitude;
+    public NumericString getNorthernLatitude() {
+        return northernLatitude.clone();
     }
 
     /**
      * @param northernLatitude
-     *         assign as the northern latitude limit, in units of decimal degrees north;
-     *         if null or invalid, Double.NaN will be assigned
+     *         assign as the northern latitude limit; if null, an empty NumericString is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if the numeric string of the given latitude is not empty and not in the range [-90,90], or
+     *         if the unit string of the given latitude is not {@link #LATITUDE_UNITS}
      */
-    public void setNorthernLatitude(Double northernLatitude) {
-        if ( (northernLatitude != null) && (northernLatitude >= -90.0) && (northernLatitude <= 90.0) )
-            this.northernLatitude = northernLatitude;
+    public void setNorthernLatitude(NumericString northernLatitude) {
+        if ( (northernLatitude != null) && northernLatitude.isValid() ) {
+            double val = northernLatitude.getNumericValue();
+            if ( (val < -90.0) || (val > 90.0) )
+                throw new IllegalArgumentException("northernmost latitude is not in [-90.0,90.0]");
+            if ( !LATITUDE_UNITS.equals(northernLatitude.getUnitString()) )
+                throw new IllegalArgumentException("northernLatitude longitude units are not " + LATITUDE_UNITS);
+            this.northernLatitude = northernLatitude.clone();
+        }
         else
-            this.northernLatitude = Double.NaN;
+            this.northernLatitude = new NumericString(null, LATITUDE_UNITS);
     }
 
     /**
-     * @return the earliest (oldest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         never null but may be Double.NaN
+     * @return the earliest (oldest) data time value; never null but may be prior to {@link #MIN_DATA_TIME}
      */
-    public Double getEarliestDataTime() {
-        return earliestDataTime;
+    public Date getEarliestDataTime() {
+        return new Date(earliestDataTime.getTime());
     }
 
     /**
      * @param earliestDataTime
-     *         assign as the earliest (oldest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         if null or invalid (before 1900-01-01 or after the current time), Double.NaN will be assigned
+     *         assign as the earliest (oldest) data time value;
+     *         if null, a date prior to {@link #MIN_DATA_TIME} will be assigned
      */
-    public void setEarliestDataTime(Double earliestDataTime) {
-        if ( (earliestDataTime != null) && (earliestDataTime >= MIN_DATA_TIME) &&
-                (earliestDataTime <= (System.currentTimeMillis() / 1000.0)) )
-            this.earliestDataTime = earliestDataTime;
+    public void setEarliestDataTime(Date earliestDataTime) {
+        if ( earliestDataTime != null )
+            this.earliestDataTime = new Date(earliestDataTime.getTime());
         else
-            this.earliestDataTime = Double.NaN;
+            this.earliestDataTime = new Date(MIN_DATA_TIME.getTime() - 1);
     }
 
     /**
-     * @return the latest (newest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         never null but may be Double.NaN
+     * @return the latest (newest) data time value; never null but may be prior to {@link #MIN_DATA_TIME}
      */
-    public Double getLatestDataTime() {
-        return latestDataTime;
+    public Date getLatestDataTime() {
+        return new Date(latestDataTime.getTime());
     }
 
     /**
      * @param latestDataTime
-     *         assign as the latest (newest) data time value, in units of second since 01-JAN-1970 00:00:00;
-     *         if null or invalid (before 1900-01-01 or after the current time), Double.NaN will be assigned
+     *         assign as the latest (newest) data time value;
+     *         if null, a date prior to {@link #MIN_DATA_TIME} will be assigned
      */
-    public void setLatestDataTime(Double latestDataTime) {
-        if ( (latestDataTime != null) && (latestDataTime >= MIN_DATA_TIME) &&
-                (latestDataTime <= (System.currentTimeMillis() / 1000.0)) )
-            this.latestDataTime = latestDataTime;
+    public void setLatestDataTime(Date latestDataTime) {
+        if ( latestDataTime != null )
+            this.latestDataTime = new Date(latestDataTime.getTime());
         else
-            this.latestDataTime = Double.NaN;
+            this.latestDataTime = new Date(MIN_DATA_TIME.getTime() - 1);
     }
 
     /**
@@ -202,6 +312,8 @@ public class Coverage implements Cloneable {
      */
     public void setSpatialReference(String spatialReference) {
         this.spatialReference = (spatialReference != null) ? spatialReference.trim() : WGS84;
+        if ( this.spatialReference.isEmpty() )
+            this.spatialReference = WGS84;
     }
 
     /**
@@ -233,21 +345,6 @@ public class Coverage implements Cloneable {
         }
     }
 
-    /**
-     * @return if the coverage bounds are all valid
-     */
-    public boolean isValid() {
-        if ( westernLongitude.isNaN() || easternLongitude.isNaN() || southernLatitude.isNaN() ||
-                northernLatitude.isNaN() || earliestDataTime.isNaN() || latestDataTime.isNaN() )
-            return false;
-        // due to modulo nature of longitudes, the western longitude and be larger than the eastern longitude
-        if ( southernLatitude > northernLatitude )
-            return false;
-        if ( earliestDataTime > latestDataTime )
-            return false;
-        return true;
-    }
-
     @Override
     public Coverage clone() {
         Coverage coverage;
@@ -256,12 +353,12 @@ public class Coverage implements Cloneable {
         } catch ( CloneNotSupportedException ex ) {
             throw new RuntimeException(ex);
         }
-        coverage.westernLongitude = westernLongitude;
-        coverage.easternLongitude = easternLongitude;
-        coverage.southernLatitude = southernLatitude;
-        coverage.northernLatitude = northernLatitude;
-        coverage.earliestDataTime = earliestDataTime;
-        coverage.latestDataTime = latestDataTime;
+        coverage.westernLongitude = westernLongitude.clone();
+        coverage.easternLongitude = easternLongitude.clone();
+        coverage.southernLatitude = southernLatitude.clone();
+        coverage.northernLatitude = northernLatitude.clone();
+        coverage.earliestDataTime = new Date(earliestDataTime.getTime());
+        coverage.latestDataTime = new Date(latestDataTime.getTime());
         coverage.spatialReference = spatialReference;
         coverage.geographicNames = new TreeSet<String>(geographicNames);
         return coverage;

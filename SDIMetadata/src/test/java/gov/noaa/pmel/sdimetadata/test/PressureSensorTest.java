@@ -27,17 +27,6 @@ public class PressureSensorTest {
     ));
 
     @Test
-    public void testIsValid() {
-        PressureSensor sensor = new PressureSensor();
-        assertFalse(sensor.isValid());
-        sensor.setName(NAME);
-        assertFalse(sensor.isValid());
-        sensor.setManufacturer(MANUFACTURER);
-        sensor.setModel(MODEL);
-        assertTrue(sensor.isValid());
-    }
-
-    @Test
     public void testClone() {
         PressureSensor sensor = new PressureSensor();
         PressureSensor dup = sensor.clone();

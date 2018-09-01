@@ -7,6 +7,7 @@ import java.util.ArrayList;
  * Super class for Submitter.
  */
 public class Investigator extends Person implements Cloneable {
+
     protected ArrayList<String> streets;
     protected String city;
     protected String region;
@@ -207,10 +208,8 @@ public class Investigator extends Person implements Cloneable {
 
     @Override
     public String toString() {
-        String repr = super.toString()
-                           .replaceFirst("Person", "Investigator")
-                           .replaceFirst("}", "");
-        return repr +
+        String repr = super.toString().replaceFirst("Person", "Investigator");
+        return repr.substring(0, repr.length() - 1) +
                 ", streets=" + streets +
                 ", city='" + city + '\'' +
                 ", region='" + region + '\'' +

@@ -18,6 +18,9 @@ import static org.junit.Assert.fail;
 public class InvestigatorTest {
 
     private static final String EMPTY_STRING = "";
+    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
+
     private static final String LAST_NAME = "Smith";
     private static final String FIRST_NAME = "John";
     private static final String INITIALS = "D.Z.";
@@ -38,10 +41,12 @@ public class InvestigatorTest {
     @Test
     public void testGetSetStreets() {
         Investigator investigator = new Investigator();
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         investigator.setStreets(STREETS);
-        assertEquals(STREETS, investigator.getStreets());
-        assertNotSame(STREETS, investigator.getStreets());
+        ArrayList<String> nameList = investigator.getStreets();
+        assertEquals(STREETS, nameList);
+        assertNotSame(STREETS, nameList);
+        assertNotSame(nameList, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -49,11 +54,9 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setStreets(null);
-        assertEquals(0, investigator.getStreets().size());
-        investigator.setStreets(STREETS);
-        assertEquals(STREETS, investigator.getStreets());
-        investigator.setStreets(new HashSet<String>());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        investigator.setStreets(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         try {
             investigator.setStreets(Arrays.asList(STREETS.get(0), null, STREETS.get(1)));
             fail("calling setStreets with a list containing null succeeded");
@@ -74,7 +77,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getCity());
         investigator.setCity(CITY);
         assertEquals(CITY, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -82,6 +85,8 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setCity(null);
+        assertEquals(EMPTY_STRING, investigator.getCity());
+        investigator.setCity("\t");
         assertEquals(EMPTY_STRING, investigator.getCity());
     }
 
@@ -92,7 +97,7 @@ public class InvestigatorTest {
         investigator.setRegion(REGION);
         assertEquals(REGION, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -100,6 +105,8 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setRegion(null);
+        assertEquals(EMPTY_STRING, investigator.getRegion());
+        investigator.setRegion("\t");
         assertEquals(EMPTY_STRING, investigator.getRegion());
     }
 
@@ -111,7 +118,7 @@ public class InvestigatorTest {
         assertEquals(ZIP_CODE, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -119,6 +126,8 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setZipCode(null);
+        assertEquals(EMPTY_STRING, investigator.getZipCode());
+        investigator.setZipCode("\t");
         assertEquals(EMPTY_STRING, investigator.getZipCode());
     }
 
@@ -131,7 +140,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -139,6 +148,8 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setCountry(null);
+        assertEquals(EMPTY_STRING, investigator.getCountry());
+        investigator.setCountry("\t");
         assertEquals(EMPTY_STRING, investigator.getCountry());
     }
 
@@ -152,7 +163,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -160,6 +171,8 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setPhone(null);
+        assertEquals(EMPTY_STRING, investigator.getPhone());
+        investigator.setPhone("\t");
         assertEquals(EMPTY_STRING, investigator.getPhone());
     }
 
@@ -174,7 +187,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(0, investigator.getStreets().size());
+        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -183,24 +196,23 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setEmail(null);
         assertEquals(EMPTY_STRING, investigator.getEmail());
+        investigator.setEmail("\t");
+        assertEquals(EMPTY_STRING, investigator.getEmail());
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Investigator investigator = new Investigator();
-        assertFalse(investigator.isValid());
-
+        assertEquals(new HashSet<String>(Arrays.asList("lastName", "firstName")), investigator.invalidFieldNames());
         investigator.setLastName(LAST_NAME);
+        assertEquals(new HashSet<String>(Arrays.asList("firstName")), investigator.invalidFieldNames());
         investigator.setFirstName(FIRST_NAME);
-        assertTrue(investigator.isValid());
-
+        assertEquals(EMPTY_NAMESET, investigator.invalidFieldNames());
         investigator.setLastName("\n");
-        assertFalse(investigator.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("lastName")), investigator.invalidFieldNames());
         investigator.setLastName(LAST_NAME);
-        assertTrue(investigator.isValid());
-
         investigator.setFirstName("\t");
-        assertFalse(investigator.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("firstName")), investigator.invalidFieldNames());
     }
 
     @Test

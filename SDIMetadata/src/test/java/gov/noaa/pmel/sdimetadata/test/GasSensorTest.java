@@ -1,7 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -25,17 +25,6 @@ public class GasSensorTest {
                     "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
             "Some other comment just to have a second one."
     ));
-
-    @Test
-    public void testIsValid() {
-        GasSensor sensor = new GasSensor();
-        assertFalse(sensor.isValid());
-        sensor.setName(NAME);
-        assertFalse(sensor.isValid());
-        sensor.setManufacturer(MANUFACTURER);
-        sensor.setModel(MODEL);
-        assertTrue(sensor.isValid());
-    }
 
     @Test
     public void testClone() {

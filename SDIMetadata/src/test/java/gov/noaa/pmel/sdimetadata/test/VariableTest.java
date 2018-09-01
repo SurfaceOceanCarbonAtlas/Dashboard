@@ -183,12 +183,13 @@ public class VariableTest {
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Variable var = new Variable();
-        assertFalse(var.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName")), var.invalidFieldNames());
         var.setColName(COL_NAME);
+        assertEquals(new HashSet<String>(Arrays.asList("fullName")), var.invalidFieldNames());
         var.setFullName(FULL_NAME);
-        assertTrue(var.isValid());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
     }
 
     @Test

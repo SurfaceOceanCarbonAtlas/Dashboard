@@ -27,17 +27,6 @@ public class SalinitySensorTest {
     ));
 
     @Test
-    public void testIsValid() {
-        SalinitySensor sensor = new SalinitySensor();
-        assertFalse(sensor.isValid());
-        sensor.setName(NAME);
-        assertFalse(sensor.isValid());
-        sensor.setManufacturer(MANUFACTURER);
-        sensor.setModel(MODEL);
-        assertTrue(sensor.isValid());
-    }
-
-    @Test
     public void testClone() {
         SalinitySensor sensor = new SalinitySensor();
         SalinitySensor dup = sensor.clone();

@@ -1,167 +1,272 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.Coverage;
+import gov.noaa.pmel.sdimetadata.util.NumericString;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class CoverageTest {
 
-    private static final double DELTA = 1.0E-6;
-    private static final double WESTERN_LONGITUDE = 146.23;
-    private static final double EASTERN_LONGITUDE = -120.45;
-    private static final double SOUTHERN_LATITUDE = 15.36;
-    private static final double NORTHERN_LATITUDE = 45.03;
-    private static final double EARLIEST_DATA_TIME = 1421150400.000;
-    private static final double LATEST_DATA_TIME = 1422532800.000;
+    private static final NumericString EMPTY_LONGITUDE = new NumericString(null, Coverage.LONGITUDE_UNITS);
+    private static final NumericString EMPTY_LATITUDE = new NumericString(null, Coverage.LATITUDE_UNITS);
+    private static final TreeSet<String> EMPTY_NAMESET = new TreeSet<String>();
+
+    private static final NumericString WESTERN_LONGITUDE = new NumericString("146.23", Coverage.LONGITUDE_UNITS);
+    private static final NumericString EASTERN_LONGITUDE = new NumericString("-120.45", Coverage.LONGITUDE_UNITS);
+    private static final NumericString SOUTHERN_LATITUDE = new NumericString("15.36", Coverage.LATITUDE_UNITS);
+    private static final NumericString NORTHERN_LATITUDE = new NumericString("45.03", Coverage.LATITUDE_UNITS);
+    private static final String EARLIEST_DATA_TIMESTAMP = "2015-01-05 13:25:53";
+    private static final String LATEST_DATA_TIMESTAMP = "2015-02-14 19:04:23";
     private static final String SPATIAL_REFERENCE = "NAD 83";
     private static final TreeSet<String> GEOGRAPHIC_NAMES = new TreeSet<String>(Arrays.asList(
             "North Pacific",
             "Tropical Pacific"
     ));
 
+    private static final Date EARLIEST_DATA_TIME;
+    private static final Date LATEST_DATA_TIME;
+
+    static {
+        DateFormat timeParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        timeParser.setTimeZone(TimeZone.getTimeZone("UTC"));
+        timeParser.setLenient(false);
+        try {
+            EARLIEST_DATA_TIME = timeParser.parse(EARLIEST_DATA_TIMESTAMP);
+            LATEST_DATA_TIME = timeParser.parse(LATEST_DATA_TIMESTAMP);
+        } catch ( ParseException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     @Test
     public void testGetSetWesternLongitude() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setWesternLongitude(WESTERN_LONGITUDE);
-        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
+        NumericString numstr = coverage.getWesternLongitude();
+        assertEquals(WESTERN_LONGITUDE, numstr);
+        assertNotSame(WESTERN_LONGITUDE, numstr);
+        assertNotSame(numstr, coverage.getWesternLongitude());
         coverage.setWesternLongitude(null);
-        assertTrue(coverage.getWesternLongitude().isNaN());
-        coverage.setWesternLongitude(WESTERN_LONGITUDE);
-        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
-        coverage.setWesternLongitude(-600.0);
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
+        try {
+            coverage.setWesternLongitude(new NumericString("-600.0", Coverage.LONGITUDE_UNITS));
+            fail("calling setWesternLongitude with -600.0 succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            coverage.setWesternLongitude(new NumericString("0.0", Coverage.LATITUDE_UNITS));
+            fail("calling setWesternLongitude with latitude units succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
     }
 
     @Test
     public void testGetSetEasternLongitude() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getEasternLongitude().isNaN());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
         coverage.setEasternLongitude(EASTERN_LONGITUDE);
-        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        NumericString numstr = coverage.getEasternLongitude();
+        assertEquals(EASTERN_LONGITUDE, numstr);
+        assertNotSame(EASTERN_LONGITUDE, numstr);
+        assertNotSame(numstr, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setEasternLongitude(null);
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        coverage.setEasternLongitude(EASTERN_LONGITUDE);
-        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
-        coverage.setEasternLongitude(600.0);
-        assertTrue(coverage.getEasternLongitude().isNaN());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        try {
+            coverage.setEasternLongitude(new NumericString("600.0", Coverage.LONGITUDE_UNITS));
+            fail("calling setEasternLongitude with 600.0 succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            coverage.setEasternLongitude(new NumericString("0.0", Coverage.LATITUDE_UNITS));
+            fail("calling setEasternLongitude with latitude units succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
     }
 
     @Test
     public void testGetSetSouthernLatitude() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getSouthernLatitude().isNaN());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
         coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
-        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        NumericString numstr = coverage.getSouthernLatitude();
+        assertEquals(SOUTHERN_LATITUDE, numstr);
+        assertNotSame(SOUTHERN_LATITUDE, numstr);
+        assertNotSame(numstr, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setSouthernLatitude(null);
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
-        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
-        coverage.setSouthernLatitude(-100.0);
-        assertTrue(coverage.getSouthernLatitude().isNaN());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        try {
+            coverage.setSouthernLatitude(new NumericString("-100.0", Coverage.LATITUDE_UNITS));
+            fail("calling setSouthernLatitude with -100.0 succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            coverage.setSouthernLatitude(new NumericString("0.0", Coverage.LONGITUDE_UNITS));
+            fail("calling setSouthernLatitude with longitude units succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
     }
 
     @Test
     public void testGetSetNorthernLatitude() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getNorthernLatitude().isNaN());
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        NumericString numstr = coverage.getNorthernLatitude();
+        assertEquals(NORTHERN_LATITUDE, numstr);
+        assertNotSame(NORTHERN_LATITUDE, numstr);
+        assertNotSame(numstr, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setNorthernLatitude(null);
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        coverage.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
-        coverage.setNorthernLatitude(100.0);
-        assertTrue(coverage.getNorthernLatitude().isNaN());
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        try {
+            coverage.setNorthernLatitude(new NumericString("100.0", Coverage.LATITUDE_UNITS));
+            fail("calling setNorthernLatitude with 100.0 succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            coverage.setNorthernLatitude(new NumericString("0.0", Coverage.LONGITUDE_UNITS));
+            fail("calling setNorthernLatitude with longitude units succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
     }
 
     @Test
     public void testGetSetEarliestDataTime() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getEarliestDataTime().isNaN());
+        Date dataTime = coverage.getEarliestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
         coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
-        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        dataTime = coverage.getEarliestDataTime();
+        assertEquals(EARLIEST_DATA_TIME, dataTime);
+        assertNotSame(EARLIEST_DATA_TIME, dataTime);
+        assertNotSame(dataTime, coverage.getEarliestDataTime());
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setEarliestDataTime(null);
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
-        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
-        coverage.setEarliestDataTime(Coverage.MIN_DATA_TIME - 60.0);
-        assertTrue(coverage.getEarliestDataTime().isNaN());
+        dataTime = coverage.getEarliestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        dataTime = new Date(Coverage.MIN_DATA_TIME.getTime() - 3600000L);
+        coverage.setEarliestDataTime(dataTime);
+        assertEquals(dataTime, coverage.getEarliestDataTime());
+        assertNotSame(dataTime, coverage.getEarliestDataTime());
+        dataTime = new Date(System.currentTimeMillis() + 3600000L);
+        coverage.setEarliestDataTime(dataTime);
+        assertEquals(dataTime, coverage.getEarliestDataTime());
+        assertNotSame(dataTime, coverage.getEarliestDataTime());
     }
 
     @Test
     public void testGetSetLatestDataTime() {
         Coverage coverage = new Coverage();
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        coverage.setLatestDataTime(LATEST_DATA_TIME);
-        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        Date dataTime = coverage.getLatestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        coverage.setLatestDataTime(EARLIEST_DATA_TIME);
+        dataTime = coverage.getLatestDataTime();
+        assertEquals(EARLIEST_DATA_TIME, dataTime);
+        assertNotSame(EARLIEST_DATA_TIME, dataTime);
+        assertNotSame(dataTime, coverage.getLatestDataTime());
+        dataTime = coverage.getEarliestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setLatestDataTime(null);
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        coverage.setLatestDataTime(LATEST_DATA_TIME);
-        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
-        coverage.setLatestDataTime(System.currentTimeMillis() / 1000.0 + 60.0);
-        assertTrue(coverage.getLatestDataTime().isNaN());
+        dataTime = coverage.getLatestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        dataTime = new Date(Coverage.MIN_DATA_TIME.getTime() - 3600000L);
+        coverage.setLatestDataTime(dataTime);
+        assertEquals(dataTime, coverage.getLatestDataTime());
+        assertNotSame(dataTime, coverage.getLatestDataTime());
+        dataTime = new Date(System.currentTimeMillis() + 3600000L);
+        coverage.setLatestDataTime(dataTime);
+        assertEquals(dataTime, coverage.getLatestDataTime());
+        assertNotSame(dataTime, coverage.getLatestDataTime());
     }
 
     @Test
-    public void testGetSetRegionName() {
+    public void testGetSetSpatialReference() {
         Coverage coverage = new Coverage();
         assertEquals(Coverage.WGS84, coverage.getSpatialReference());
         coverage.setSpatialReference(SPATIAL_REFERENCE);
         assertEquals(SPATIAL_REFERENCE, coverage.getSpatialReference());
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        Date dataTime = coverage.getLatestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        dataTime = coverage.getEarliestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setSpatialReference(null);
+        assertEquals(Coverage.WGS84, coverage.getSpatialReference());
+        coverage.setSpatialReference("\t");
         assertEquals(Coverage.WGS84, coverage.getSpatialReference());
     }
 
     @Test
-    public void testGetSetLocationInRegion() {
+    public void testGetSetGeographicNames() {
         Coverage coverage = new Coverage();
-        assertEquals(0, coverage.getGeographicNames().size());
+        assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
         coverage.setGeographicNames(GEOGRAPHIC_NAMES);
-        assertEquals(GEOGRAPHIC_NAMES, coverage.getGeographicNames());
-        assertNotSame(GEOGRAPHIC_NAMES, coverage.getGeographicNames());
+        TreeSet<String> nameSet = coverage.getGeographicNames();
+        assertEquals(GEOGRAPHIC_NAMES, nameSet);
+        assertNotSame(GEOGRAPHIC_NAMES, nameSet);
+        assertNotSame(nameSet, coverage.getGeographicNames());
         assertEquals(Coverage.WGS84, coverage.getSpatialReference());
-        assertTrue(coverage.getLatestDataTime().isNaN());
-        assertTrue(coverage.getEarliestDataTime().isNaN());
-        assertTrue(coverage.getNorthernLatitude().isNaN());
-        assertTrue(coverage.getSouthernLatitude().isNaN());
-        assertTrue(coverage.getEasternLongitude().isNaN());
-        assertTrue(coverage.getWesternLongitude().isNaN());
+        Date dataTime = coverage.getLatestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        dataTime = coverage.getEarliestDataTime();
+        assertNotNull(dataTime);
+        assertTrue(dataTime.before(Coverage.MIN_DATA_TIME));
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
         coverage.setGeographicNames(null);
-        assertEquals(0, coverage.getGeographicNames().size());
-        coverage.setGeographicNames(new ArrayList<String>());
-        assertEquals(0, coverage.getGeographicNames().size());
+        assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
+        coverage.setSpatialReference("\t");
+        assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
         try {
             coverage.setGeographicNames(Arrays.asList("North Pacific", null, "Tropical Pacific"));
             fail("setGeographicNames with null string succeeded");
@@ -180,45 +285,55 @@ public class CoverageTest {
     public void testCoverage() {
         Coverage coverage = new Coverage(null, null, null, null, null, null);
         assertEquals(new Coverage(), coverage);
-        coverage = new Coverage(WESTERN_LONGITUDE, EASTERN_LONGITUDE, SOUTHERN_LATITUDE,
-                NORTHERN_LATITUDE, EARLIEST_DATA_TIME, LATEST_DATA_TIME);
-        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude(), DELTA);
-        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude(), DELTA);
-        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude(), DELTA);
-        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude(), DELTA);
-        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime(), DELTA);
-        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime(), DELTA);
+        coverage = new Coverage(WESTERN_LONGITUDE.getValueString(), EASTERN_LONGITUDE.getValueString(),
+                SOUTHERN_LATITUDE.getValueString(), NORTHERN_LATITUDE.getValueString(),
+                EARLIEST_DATA_TIMESTAMP, LATEST_DATA_TIMESTAMP);
+        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude());
+        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EARLIEST_DATA_TIME, coverage.getEarliestDataTime());
+        assertEquals(LATEST_DATA_TIME, coverage.getLatestDataTime());
         assertEquals(Coverage.WGS84, coverage.getSpatialReference());
-        assertEquals(0, coverage.getGeographicNames().size());
+        assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Coverage coverage = new Coverage();
-        assertFalse(coverage.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("westernLongitude", "easternLongitude", "southernLatitude",
+                "northernLatitude", "earliestDataTime", "latestDataTime")), coverage.invalidFieldNames());
 
         coverage.setWesternLongitude(WESTERN_LONGITUDE);
         coverage.setEasternLongitude(EASTERN_LONGITUDE);
+        assertEquals(new HashSet<String>(Arrays.asList("southernLatitude", "northernLatitude",
+                "earliestDataTime", "latestDataTime")), coverage.invalidFieldNames());
+
         coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "earliestDataTime", "latestDataTime")), coverage.invalidFieldNames());
+
         coverage.setEarliestDataTime(EARLIEST_DATA_TIME);
         coverage.setLatestDataTime(LATEST_DATA_TIME);
-        assertTrue(coverage.isValid());
+        assertEquals(new HashSet<String>(), coverage.invalidFieldNames());
 
         coverage.setWesternLongitude(EASTERN_LONGITUDE);
         coverage.setEasternLongitude(WESTERN_LONGITUDE);
-        assertTrue(coverage.isValid());
+        assertEquals(new HashSet<String>(), coverage.invalidFieldNames());
 
         coverage.setSouthernLatitude(NORTHERN_LATITUDE);
         coverage.setNorthernLatitude(SOUTHERN_LATITUDE);
-        assertFalse(coverage.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "southernLatitude", "northernLatitude")), coverage.invalidFieldNames());
         coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertTrue(coverage.isValid());
+        assertEquals(new HashSet<String>(), coverage.invalidFieldNames());
 
         coverage.setEarliestDataTime(LATEST_DATA_TIME);
         coverage.setLatestDataTime(EARLIEST_DATA_TIME);
-        assertFalse(coverage.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "earliestDataTime", "latestDataTime")), coverage.invalidFieldNames());
     }
 
     @Test
@@ -241,6 +356,12 @@ public class CoverageTest {
         dup = coverage.clone();
         assertEquals(coverage, dup);
         assertNotSame(coverage, dup);
+        assertNotSame(coverage.getWesternLongitude(), dup.getWesternLongitude());
+        assertNotSame(coverage.getEasternLongitude(), dup.getEasternLongitude());
+        assertNotSame(coverage.getSouthernLatitude(), dup.getSouthernLatitude());
+        assertNotSame(coverage.getNorthernLatitude(), dup.getNorthernLatitude());
+        assertNotSame(coverage.getEarliestDataTime(), dup.getEarliestDataTime());
+        assertNotSame(coverage.getLatestDataTime(), dup.getLatestDataTime());
         assertNotSame(coverage.getGeographicNames(), dup.getGeographicNames());
     }
 

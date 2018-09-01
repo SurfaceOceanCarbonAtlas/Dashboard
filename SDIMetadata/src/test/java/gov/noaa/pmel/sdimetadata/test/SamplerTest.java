@@ -1,8 +1,8 @@
 package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
-import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 
 public class SamplerTest {
 
-    private static final String EMPTY_STRING = "";
     private static final String NAME = "Equilibrator";
     private static final String ID = "325";
     private static final String MANUFACTURER = "NOAA";

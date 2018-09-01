@@ -8,7 +8,7 @@ public final class NumericString implements Cloneable {
 
     private String valueString;
     private String unitString;
-    // numericValue is always assigned from parsing valueString; thus no setter
+    // numericValue is always assigned from parsing valueString
     private double numericValue;
 
     /**
@@ -86,8 +86,15 @@ public final class NumericString implements Cloneable {
     /**
      * @return the numeric value represented by the numeric string
      */
-    public double numericValue() {
+    public double getNumericValue() {
         return numericValue;
+    }
+
+    /**
+     * Does nothing; the numeric value is always assigned from parsing the string value.
+     * This only exist to satisfy JavaBean requirements.
+     */
+    private void setNumericValue(double numericValue) {
     }
 
     /**

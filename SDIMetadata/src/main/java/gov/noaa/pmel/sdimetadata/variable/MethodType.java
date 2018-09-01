@@ -9,7 +9,7 @@ public enum MethodType {
      */
     UNSPECIFIED,
     /**
-     * measured from a sensor during the collection
+     * measured from a sensor during collection
      */
     MEASURED_INSITU,
     /**

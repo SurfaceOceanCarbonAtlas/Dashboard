@@ -1,8 +1,8 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.DataVar;
+import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

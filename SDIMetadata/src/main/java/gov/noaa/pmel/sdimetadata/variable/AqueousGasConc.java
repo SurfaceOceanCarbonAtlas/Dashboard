@@ -4,6 +4,7 @@ package gov.noaa.pmel.sdimetadata.variable;
  * Information about measurements of a gas concentration in a body of water.
  */
 public class AqueousGasConc extends DataVar implements Cloneable {
+
     protected String reportTemperature;
     protected String temperatureCorrection;
     protected String pressureCorrection;

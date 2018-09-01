@@ -1,9 +1,12 @@
 package gov.noaa.pmel.sdimetadata.person;
 
+import java.util.HashSet;
+
 /**
  * Basic information to uniquely describe an investigator.
  */
 public class Person implements Cloneable {
+
     protected String lastName;
     protected String firstName;
     protected String middleInitials;
@@ -34,6 +37,18 @@ public class Person implements Cloneable {
         setId(id);
         setIdType(idType);
         setOrganization(organization);
+    }
+
+    /**
+     * @return set of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(2);
+        if ( lastName.isEmpty() )
+            invalid.add("lastName");
+        if ( firstName.isEmpty() )
+            invalid.add("firstName");
+        return invalid;
     }
 
     /**
@@ -124,17 +139,6 @@ public class Person implements Cloneable {
      */
     public void setOrganization(String organization) {
         this.organization = (organization != null) ? organization.trim() : "";
-    }
-
-    /**
-     * @return whether all the required fields are appropriately assigned.
-     */
-    public boolean isValid() {
-        if ( lastName.isEmpty() )
-            return false;
-        if ( firstName.isEmpty() )
-            return false;
-        return true;
     }
 
     @Override

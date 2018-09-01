@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,20 +35,22 @@ public class SubmitterTest {
 
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Submitter submitter = new Submitter();
-        assertFalse(submitter.isValid());
-
+        assertEquals(new HashSet<String>(Arrays.asList("lastName", "firstName",
+                "streets", "city", "country", "phone", "email")), submitter.invalidFieldNames());
         submitter.setLastName(LAST_NAME);
         submitter.setFirstName(FIRST_NAME);
-        assertFalse(submitter.isValid());
-
+        assertEquals(new HashSet<String>(Arrays.asList("streets", "city",
+                "country", "phone", "email")), submitter.invalidFieldNames());
         submitter.setStreets(STREETS);
         submitter.setCity(CITY);
+        assertEquals(new HashSet<String>(Arrays.asList("country", "phone", "email")), submitter.invalidFieldNames());
         submitter.setCountry(COUNTRY);
         submitter.setPhone(PHONE);
+        assertEquals(new HashSet<String>(Arrays.asList("email")), submitter.invalidFieldNames());
         submitter.setEmail(EMAIL);
-        assertTrue(submitter.isValid());
+        assertEquals(new HashSet<String>(), submitter.invalidFieldNames());
     }
 
     @Test

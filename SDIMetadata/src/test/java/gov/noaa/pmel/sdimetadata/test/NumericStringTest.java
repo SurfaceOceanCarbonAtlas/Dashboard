@@ -97,19 +97,19 @@ public class NumericStringTest {
     }
 
     @Test
-    public void testNumericValue() {
+    public void testGetNumericValue() {
         NumericString numstr = new NumericString();
-        assertTrue(Double.isNaN(numstr.numericValue()));
+        assertTrue(Double.isNaN(numstr.getNumericValue()));
         numstr.setValueString(POSVAL_STR);
-        assertEquals(POSVAL_NUM, numstr.numericValue(), DELTA);
+        assertEquals(POSVAL_NUM, numstr.getNumericValue(), DELTA);
         numstr.setValueString(ZERVAL_STR);
-        assertEquals(ZERVAL_NUM, numstr.numericValue(), DELTA);
+        assertEquals(ZERVAL_NUM, numstr.getNumericValue(), DELTA);
         numstr.setValueString(NEGVAL_STR);
-        assertEquals(NEGVAL_NUM, numstr.numericValue(), DELTA);
+        assertEquals(NEGVAL_NUM, numstr.getNumericValue(), DELTA);
         numstr.setValueString("\t" + NEGVAL_STR + "  ");
-        assertEquals(NEGVAL_NUM, numstr.numericValue(), DELTA);
+        assertEquals(NEGVAL_NUM, numstr.getNumericValue(), DELTA);
         numstr = new NumericString(NEGVAL_STR, "E-3");
-        assertEquals(NEGVAL_NUM, numstr.numericValue(), DELTA);
+        assertEquals(NEGVAL_NUM, numstr.getNumericValue(), DELTA);
     }
 
     @Test

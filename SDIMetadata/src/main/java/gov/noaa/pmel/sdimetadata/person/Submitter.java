@@ -1,27 +1,33 @@
 package gov.noaa.pmel.sdimetadata.person;
 
+import java.util.HashSet;
+
 /**
  * Same as Investigator except requires contact information to be valid.
  */
 public class Submitter extends Investigator implements Cloneable {
 
+    /**
+     * @return set of field names that are currently invalid
+     */
     @Override
-    public boolean isValid() {
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(7);
         if ( lastName.isEmpty() )
-            return false;
+            invalid.add("lastName");
         if ( firstName.isEmpty() )
-            return false;
+            invalid.add("firstName");
         if ( streets.isEmpty() )
-            return false;
+            invalid.add("streets");
         if ( city.isEmpty() )
-            return false;
+            invalid.add("city");
         if ( country.isEmpty() )
-            return false;
+            invalid.add("country");
         if ( phone.isEmpty() )
-            return false;
+            invalid.add("phone");
         if ( email.isEmpty() )
-            return false;
-        return true;
+            invalid.add("email");
+        return invalid;
     }
 
     @Override

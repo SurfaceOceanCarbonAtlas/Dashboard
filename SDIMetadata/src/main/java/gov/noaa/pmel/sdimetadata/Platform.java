@@ -1,5 +1,7 @@
 package gov.noaa.pmel.sdimetadata;
 
+import java.util.HashSet;
+
 /**
  * Basic information about the platform (ship, mooring) used by the dataset.
  */
@@ -20,6 +22,20 @@ public class Platform implements Cloneable {
         platformType = "";
         platformOwner = "";
         platformCountry = "";
+    }
+
+    /**
+     * @return list of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(3);
+        if ( platformId.isEmpty() )
+            invalid.add("platformId");
+        if ( platformName.isEmpty() )
+            invalid.add("platformName");
+        if ( platformType.isEmpty() )
+            invalid.add("platformType");
+        return invalid;
     }
 
     /**
@@ -95,19 +111,6 @@ public class Platform implements Cloneable {
      */
     public void setPlatformCountry(String platformCountry) {
         this.platformCountry = (platformCountry != null) ? platformCountry.trim() : "";
-    }
-
-    /**
-     * @return if all required fields are properly assigned
-     */
-    public boolean isValid() {
-        if ( platformId.isEmpty() )
-            return false;
-        if ( platformName.isEmpty() )
-            return false;
-        if ( platformType.isEmpty() )
-            return false;
-        return true;
     }
 
     @Override

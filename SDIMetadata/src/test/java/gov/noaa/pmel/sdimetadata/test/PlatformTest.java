@@ -3,6 +3,9 @@ package gov.noaa.pmel.sdimetadata.test;
 import gov.noaa.pmel.sdimetadata.Platform;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -12,6 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class PlatformTest {
 
     private static final String EMPTY_STR = "";
+
     private static final String PLATFORM_ID = "33RO";
     private static final String PLATFORM_NAME = "Ronald H. Brown";
     private static final String PLATFORM_TYPE = "Ship";
@@ -89,6 +93,40 @@ public class PlatformTest {
     }
 
     @Test
+    public void testInvalidFieldNames() {
+        Platform platform = new Platform();
+        assertEquals(new HashSet<String>(Arrays.asList(
+                "platformId", "platformName", "platformType")), platform.invalidFieldNames());
+        platform.setPlatformId(PLATFORM_ID);
+        assertEquals(new HashSet<String>(Arrays.asList("platformName", "platformType")), platform.invalidFieldNames());
+        platform.setPlatformName(PLATFORM_NAME);
+        assertEquals(new HashSet<String>(Arrays.asList("platformType")), platform.invalidFieldNames());
+        platform.setPlatformType(PLATFORM_TYPE);
+        assertEquals(new HashSet<String>(), platform.invalidFieldNames());
+        platform.setPlatformType("\n");
+        assertEquals(new HashSet<String>(Arrays.asList("platformType")), platform.invalidFieldNames());
+    }
+
+    @Test
+    public void testClone() {
+        Platform platform = new Platform();
+        Platform dup = platform.clone();
+        assertEquals(platform, dup);
+        assertNotSame(platform, dup);
+
+        platform.setPlatformId(PLATFORM_ID);
+        platform.setPlatformName(PLATFORM_NAME);
+        platform.setPlatformType(PLATFORM_TYPE);
+        platform.setPlatformOwner(PLATFORM_OWNER);
+        platform.setPlatformCountry(PLATFORM_COUNTRY);
+        assertNotEquals(platform, dup);
+
+        dup = platform.clone();
+        assertEquals(platform, dup);
+        assertNotSame(platform, dup);
+    }
+
+    @Test
     public void testHashCodeEquals() {
         Platform first = new Platform();
         assertFalse(first.equals(null));
@@ -132,37 +170,6 @@ public class PlatformTest {
         second.setPlatformCountry(PLATFORM_COUNTRY);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-    }
-
-    @Test
-    public void testIsValid() {
-        Platform platform = new Platform();
-        assertFalse(platform.isValid());
-        platform.setPlatformId(PLATFORM_ID);
-        platform.setPlatformName(PLATFORM_NAME);
-        platform.setPlatformType(PLATFORM_TYPE);
-        assertTrue(platform.isValid());
-        platform.setPlatformType("\n");
-        assertFalse(platform.isValid());
-    }
-
-    @Test
-    public void testClone() {
-        Platform platform = new Platform();
-        Platform dup = platform.clone();
-        assertEquals(platform, dup);
-        assertNotSame(platform, dup);
-
-        platform.setPlatformId(PLATFORM_ID);
-        platform.setPlatformName(PLATFORM_NAME);
-        platform.setPlatformType(PLATFORM_TYPE);
-        platform.setPlatformOwner(PLATFORM_OWNER);
-        platform.setPlatformCountry(PLATFORM_COUNTRY);
-        assertNotEquals(platform, dup);
-
-        dup = platform.clone();
-        assertEquals(platform, dup);
-        assertNotSame(platform, dup);
     }
 
 }

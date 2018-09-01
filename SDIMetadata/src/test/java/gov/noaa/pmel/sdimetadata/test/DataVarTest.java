@@ -2,8 +2,8 @@ package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.DataVar;
+import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
 
@@ -23,6 +23,7 @@ public class DataVarTest {
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
+    private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
 
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
@@ -180,7 +181,7 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAddnInfo(null);
         assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        var.setAddnInfo(new HashSet<String>());
+        var.setAddnInfo(EMPTY_HASHSET);
         assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
         try {
             var.setAddnInfo(Arrays.asList("something", null, "else"));
@@ -348,7 +349,7 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getReplication());
     }
 
-   @Test
+    @Test
     public void testGetSetResearcher() {
         DataVar var = new DataVar();
         assertEquals(new Person(), var.getResearcher());
@@ -364,10 +365,10 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-       assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-       assertEquals(EMPTY_NUMSTR, var.getPrecision());
-       assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-       assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -401,7 +402,7 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getColName());
         var.setSamplerNames(null);
         assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
-        var.setSamplerNames(new HashSet<String>());
+        var.setSamplerNames(EMPTY_HASHSET);
         assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
         try {
             var.setSamplerNames(Arrays.asList("something", null, "else"));
@@ -444,7 +445,7 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAnalyzerNames(null);
         assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        var.setAnalyzerNames(new HashSet<String>());
+        var.setAnalyzerNames(EMPTY_HASHSET);
         assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
         try {
             var.setAnalyzerNames(Arrays.asList("something", null, "else"));
@@ -494,28 +495,31 @@ public class DataVarTest {
         assertEquals(new DataVar(), dataVar);
     }
 
-   @Test
-    public void testIsValid() {
+    @Test
+    public void testInvalidFieldNames() {
         DataVar var = new DataVar();
-        assertFalse(var.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName",
+                "observeType", "accuracy", "measureMethod")), var.invalidFieldNames());
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
+        assertEquals(new HashSet<String>(Arrays.asList("observeType", "accuracy", "measureMethod")),
+                var.invalidFieldNames());
         var.setObserveType(OBSERVE_TYPE);
         var.setAccuracy(ACCURACY);
+        assertEquals(new HashSet<String>(Arrays.asList("measureMethod")), var.invalidFieldNames());
 
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
-        assertFalse(var.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("samplerNames", "analyzerNames")), var.invalidFieldNames());
         var.setSamplerNames(SAMPLER_NAMES);
-        assertTrue(var.isValid());
+        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
         var.setSamplerNames(null);
         var.setAnalyzerNames(ANALYZER_NAMES);
-        assertTrue(var.isValid());
+        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
         var.setAnalyzerNames(null);
-
         var.setMeasureMethod(MethodType.COMPUTED);
-        assertFalse(var.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
         var.setMethodDescription(METHOD_DESCRIPTION);
-        assertTrue(var.isValid());
+        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
     }
 
     @Test

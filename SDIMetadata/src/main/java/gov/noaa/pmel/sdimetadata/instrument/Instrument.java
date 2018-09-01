@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.instrument;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Base class for instruments (eg, sensors, equilibrators)
@@ -12,6 +13,7 @@ public class Instrument implements Cloneable {
     protected String manufacturer;
     protected String model;
     protected String location;
+    protected String calibration;
     protected ArrayList<String> addnInfo;
 
     /**
@@ -23,7 +25,22 @@ public class Instrument implements Cloneable {
         manufacturer = "";
         model = "";
         location = "";
+        calibration = "";
         addnInfo = new ArrayList<String>();
+    }
+
+    /**
+     * @return set of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(3);
+        if ( name.isEmpty() )
+            invalid.add("name");
+        if ( manufacturer.isEmpty() )
+            invalid.add("manufacturer");
+        if ( model.isEmpty() )
+            invalid.add("model");
+        return invalid;
     }
 
     /**
@@ -105,6 +122,21 @@ public class Instrument implements Cloneable {
     }
 
     /**
+     * @return calibration comment; never null but may be empty
+     */
+    public String getCalibration() {
+        return calibration;
+    }
+
+    /**
+     * @param calibration
+     *         assign as the calibration comment; if null, an empty string is assigned
+     */
+    public void setCalibration(String calibration) {
+        this.calibration = (calibration != null) ? calibration.trim() : "";
+    }
+
+    /**
      * @return the list of additional information about this instrument; never null but may be empty.
      *         Any information strings given are guaranteed to have some content (not null, not blank).
      */
@@ -134,15 +166,6 @@ public class Instrument implements Cloneable {
         }
     }
 
-    /**
-     * @return is all required fields are appropriately assigned
-     */
-    public boolean isValid() {
-        if ( name.isEmpty() )
-            return false;
-        return true;
-    }
-
     @Override
     public Instrument clone() {
         Instrument dup;
@@ -156,6 +179,7 @@ public class Instrument implements Cloneable {
         dup.manufacturer = manufacturer;
         dup.model = model;
         dup.location = location;
+        this.calibration = calibration;
         dup.addnInfo = new ArrayList<String>(addnInfo);
         return dup;
     }
@@ -169,19 +193,21 @@ public class Instrument implements Cloneable {
         if ( !(obj instanceof Instrument) )
             return false;
 
-        Instrument that = (Instrument) obj;
+        Instrument other = (Instrument) obj;
 
-        if ( !name.equals(that.name) )
+        if ( !name.equals(other.name) )
             return false;
-        if ( !id.equals(that.id) )
+        if ( !id.equals(other.id) )
             return false;
-        if ( !manufacturer.equals(that.manufacturer) )
+        if ( !manufacturer.equals(other.manufacturer) )
             return false;
-        if ( !model.equals(that.model) )
+        if ( !model.equals(other.model) )
             return false;
-        if ( !location.equals(that.location) )
+        if ( !location.equals(other.location) )
             return false;
-        if ( !addnInfo.equals(that.addnInfo) )
+        if ( !calibration.equals(other.calibration) )
+            return false;
+        if ( !addnInfo.equals(other.addnInfo) )
             return false;
 
         return true;
@@ -195,6 +221,7 @@ public class Instrument implements Cloneable {
         result = result * prime + manufacturer.hashCode();
         result = result * prime + model.hashCode();
         result = result * prime + location.hashCode();
+        result = result * prime + calibration.hashCode();
         result = result * prime + addnInfo.hashCode();
         return result;
     }
@@ -207,6 +234,7 @@ public class Instrument implements Cloneable {
                 ", manufacturer='" + manufacturer + '\'' +
                 ", model='" + model + '\'' +
                 ", location='" + location + '\'' +
+                ", calibration='" + calibration + '\'' +
                 ", addnInfo=" + addnInfo +
                 '}';
     }

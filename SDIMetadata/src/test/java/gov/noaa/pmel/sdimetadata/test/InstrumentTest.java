@@ -17,11 +17,15 @@ import static org.junit.Assert.fail;
 public class InstrumentTest {
 
     private static final String EMPTY_STRING = "";
+    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
+
     private static final String NAME = "Equilibrator headspace differential pressure sensor";
     private static final String ID = "Setra-239 #0003245";
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
     private static final String LOCATION = "Attached to equilibrator headspace";
+    private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Pressure reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
                     "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
@@ -36,6 +40,8 @@ public class InstrumentTest {
         assertEquals(NAME, sensor.getName());
         sensor.setName(null);
         assertEquals(EMPTY_STRING, sensor.getName());
+        sensor.setName("\t");
+        assertEquals(EMPTY_STRING, sensor.getName());
     }
 
     @Test
@@ -46,6 +52,8 @@ public class InstrumentTest {
         assertEquals(ID, sensor.getId());
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setId(null);
+        assertEquals(EMPTY_STRING, sensor.getId());
+        sensor.setId("\t");
         assertEquals(EMPTY_STRING, sensor.getId());
     }
 
@@ -59,6 +67,8 @@ public class InstrumentTest {
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setManufacturer(null);
         assertEquals(EMPTY_STRING, sensor.getManufacturer());
+        sensor.setManufacturer("\t");
+        assertEquals(EMPTY_STRING, sensor.getManufacturer());
     }
 
     @Test
@@ -71,6 +81,8 @@ public class InstrumentTest {
         assertEquals(EMPTY_STRING, sensor.getId());
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setModel(null);
+        assertEquals(EMPTY_STRING, sensor.getModel());
+        sensor.setModel("\t");
         assertEquals(EMPTY_STRING, sensor.getModel());
     }
 
@@ -86,26 +98,45 @@ public class InstrumentTest {
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setLocation(null);
         assertEquals(EMPTY_STRING, sensor.getLocation());
+        sensor.setLocation("\t");
+        assertEquals(EMPTY_STRING, sensor.getLocation());
+    }
+
+    @Test
+    public void testGetSetCalibration() {
+        Instrument sensor = new Instrument();
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
+        sensor.setCalibration(CALIBRATION);
+        assertEquals(CALIBRATION, sensor.getCalibration());
+        assertEquals(EMPTY_STRING, sensor.getLocation());
+        assertEquals(EMPTY_STRING, sensor.getModel());
+        assertEquals(EMPTY_STRING, sensor.getManufacturer());
+        assertEquals(EMPTY_STRING, sensor.getId());
+        assertEquals(EMPTY_STRING, sensor.getName());
+        sensor.setCalibration(null);
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
+        sensor.setCalibration("\t");
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
     }
 
     @Test
     public void testGetSetAddnInfo() {
         Instrument sensor = new Instrument();
-        assertEquals(0, sensor.getAddnInfo().size());
+        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
         sensor.setAddnInfo(ADDN_INFO);
-        assertEquals(ADDN_INFO, sensor.getAddnInfo());
-        assertNotSame(ADDN_INFO, sensor.getAddnInfo());
+        ArrayList<String> info = sensor.getAddnInfo();
+        assertEquals(ADDN_INFO, info);
+        assertNotSame(ADDN_INFO, info);
+        assertNotSame(info, sensor.getAddnInfo());
+        assertEquals(EMPTY_STRING, sensor.getLocation());
         assertEquals(EMPTY_STRING, sensor.getModel());
         assertEquals(EMPTY_STRING, sensor.getManufacturer());
-        assertEquals(EMPTY_STRING, sensor.getLocation());
         assertEquals(EMPTY_STRING, sensor.getId());
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setAddnInfo(null);
-        assertEquals(0, sensor.getAddnInfo().size());
-        sensor.setAddnInfo(ADDN_INFO);
-        assertEquals(ADDN_INFO, sensor.getAddnInfo());
-        sensor.setAddnInfo(new HashSet<String>());
-        assertEquals(0, sensor.getAddnInfo().size());
+        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
+        sensor.setAddnInfo(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
         try {
             sensor.setAddnInfo(Arrays.asList(ADDN_INFO.get(0), "\n"));
             fail("setAddnInfo called with a list containing a blank string succeeded");
@@ -121,11 +152,15 @@ public class InstrumentTest {
     }
 
     @Test
-    public void testIsValid() {
+    public void testInvalidFieldNames() {
         Instrument sensor = new Instrument();
-        assertFalse(sensor.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("name", "manufacturer", "model")), sensor.invalidFieldNames());
         sensor.setName(NAME);
-        assertTrue(sensor.isValid());
+        assertEquals(new HashSet<String>(Arrays.asList("manufacturer", "model")), sensor.invalidFieldNames());
+        sensor.setManufacturer(MANUFACTURER);
+        assertEquals(new HashSet<String>(Arrays.asList("model")), sensor.invalidFieldNames());
+        sensor.setModel(MODEL);
+        assertEquals(EMPTY_NAMESET, sensor.invalidFieldNames());
     }
 
     @Test
@@ -140,6 +175,7 @@ public class InstrumentTest {
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
         sensor.setLocation(LOCATION);
+        sensor.setCalibration(CALIBRATION);
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
@@ -190,6 +226,13 @@ public class InstrumentTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setLocation(LOCATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

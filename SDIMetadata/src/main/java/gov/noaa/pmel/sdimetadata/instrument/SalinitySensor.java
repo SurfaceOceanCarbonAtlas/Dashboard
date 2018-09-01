@@ -9,13 +9,6 @@ import gov.noaa.pmel.sdimetadata.variable.DataVar;
 public class SalinitySensor extends Analyzer implements Cloneable {
 
     @Override
-    public boolean isValid() {
-        if ( name.isEmpty() || manufacturer.isEmpty() || model.isEmpty() )
-            return false;
-        return true;
-    }
-
-    @Override
     public SalinitySensor clone() {
         return (SalinitySensor) super.clone();
     }

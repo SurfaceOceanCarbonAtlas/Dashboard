@@ -3,6 +3,7 @@ package gov.noaa.pmel.sdimetadata.variable;
 import gov.noaa.pmel.sdimetadata.person.Person;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Information about a generic data variable in a dataset.
@@ -52,6 +53,38 @@ public class DataVar extends Variable implements Cloneable {
             addnInfo = new ArrayList<String>(var.addnInfo);
         }
     }
+
+    /**
+     * @return list of field names that are currently invalid
+     */
+    @Override
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(6);
+        if ( colName.isEmpty() )
+            invalid.add("colName");
+        if ( fullName.isEmpty() )
+            invalid.add("fullName");
+        if ( observeType.isEmpty() )
+            invalid.add("observeType");
+        if ( !accuracy.isValid() )
+            invalid.add("accuracy");
+        switch ( measureMethod ) {
+            case UNSPECIFIED:
+                invalid.add("measureMethod");
+                break;
+            case COMPUTED:
+                if ( methodDescription.isEmpty() )
+                    invalid.add("methodDescription");
+                break;
+            default:
+                if ( samplerNames.isEmpty() && analyzerNames.isEmpty() ) {
+                    invalid.add("samplerNames");
+                    invalid.add("analyzerNames");
+                }
+        }
+        return invalid;
+    }
+
 
     /**
      * @return the observation type of this variable; never null but may be empty
@@ -234,33 +267,6 @@ public class DataVar extends Variable implements Cloneable {
                 this.analyzerNames.add(name);
             }
         }
-    }
-
-    /**
-     * @return whether all the required fields are assigned with valid values.
-     */
-    public boolean isValid() {
-        if ( colName.isEmpty() )
-            return false;
-        if ( fullName.isEmpty() )
-            return false;
-        if ( observeType.isEmpty() )
-            return false;
-        if ( !accuracy.isValid() )
-            return false;
-        switch ( measureMethod ) {
-            case UNSPECIFIED:
-                return false;
-            case COMPUTED:
-                if ( methodDescription.isEmpty() )
-                    return false;
-                break;
-            default:
-                if ( samplerNames.isEmpty() && analyzerNames.isEmpty() )
-                    return false;
-        }
-
-        return true;
     }
 
     @Override

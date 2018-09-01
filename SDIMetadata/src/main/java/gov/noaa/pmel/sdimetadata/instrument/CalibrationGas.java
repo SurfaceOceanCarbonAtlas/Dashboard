@@ -3,6 +3,8 @@ package gov.noaa.pmel.sdimetadata.instrument;
 
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 
+import java.util.HashSet;
+
 /**
  * Describes a standard gas mixture used for calibration of instruments.
  */
@@ -57,6 +59,24 @@ public class CalibrationGas implements Cloneable {
         strVal = (accStr != null) ? accStr.trim() : "";
         if ( !strVal.isEmpty() )
             setAccuracy(new NumericString(strVal, GAS_CONCENTRATION_UNIT));
+    }
+
+    /**
+     * @return set of field names that are currently invalid
+     */
+    public HashSet<String> invalidFieldNames() {
+        HashSet<String> invalid = new HashSet<String>(5);
+        if ( id.isEmpty() )
+            invalid.add("id");
+        if ( type.isEmpty() )
+            invalid.add("type");
+        if ( supplier.isEmpty() )
+            invalid.add("supplier");
+        if ( !concentration.isValid() )
+            invalid.add("concentration");
+        if ( !accuracy.isValid() )
+            invalid.add("accuracy");
+        return invalid;
     }
 
     /**
@@ -164,24 +184,6 @@ public class CalibrationGas implements Cloneable {
     }
 
     /**
-     * @return if all the required fields are appropriately assigned
-     */
-    public boolean isValid() {
-        if ( id.isEmpty() )
-            return false;
-        if ( type.isEmpty() )
-            return false;
-        if ( supplier.isEmpty() )
-            return false;
-        if ( !concentration.isValid() )
-            return false;
-        if ( !accuracy.isValid() )
-            return false;
-
-        return true;
-    }
-
-    /**
      * @return if this calibration gas is a non-zero gas standard
      *
      * @throws IllegalStateException
@@ -192,7 +194,7 @@ public class CalibrationGas implements Cloneable {
             throw new IllegalStateException("gas concentration is not given");
         if ( !accuracy.isValid() )
             throw new IllegalStateException("gas concentration accuracy is not given");
-        return (concentration.numericValue() > accuracy.numericValue());
+        return (concentration.getNumericValue() > accuracy.getNumericValue());
     }
 
     @Override

@@ -28,8 +28,7 @@ public class AtmosGasConc extends DataVar implements Cloneable {
 
     @Override
     public String toString() {
-        return super.toString()
-                    .replaceFirst("DataVar", "AtmosGasConc");
+        return super.toString().replaceFirst("DataVar", "AtmosGasConc");
     }
 
 }
