@@ -16,6 +16,7 @@ public class DataVar extends Variable implements Cloneable {
     protected String methodReference;
     protected String samplingLocation;
     protected String samplingElevation;
+    protected String storageMethod;
     protected String replication;
     protected Person researcher;
     protected ArrayList<String> samplerNames;
@@ -32,6 +33,7 @@ public class DataVar extends Variable implements Cloneable {
         methodReference = "";
         samplingLocation = "";
         samplingElevation = "";
+        storageMethod = "";
         replication = "";
         researcher = new Person();
         samplerNames = new ArrayList<String>();
@@ -178,6 +180,22 @@ public class DataVar extends Variable implements Cloneable {
     }
 
     /**
+     * @return information about sample storage prior to measuring this variable; never null but may be empty
+     */
+    public String getStorageMethod() {
+        return storageMethod;
+    }
+
+    /**
+     * @param storageMethod
+     *         assign as information about sample storage prior to measuring this variable;
+     *         if null, an empty string is assigned
+     */
+    public void setStorageMethod(String storageMethod) {
+        this.storageMethod = (storageMethod != null) ? storageMethod.trim() : "";
+    }
+
+    /**
      * @return replication information about this variable; never null but may be empty
      */
     public String getReplication() {
@@ -278,6 +296,7 @@ public class DataVar extends Variable implements Cloneable {
         dup.methodReference = methodReference;
         dup.samplingLocation = samplingLocation;
         dup.samplingElevation = samplingElevation;
+        dup.storageMethod = storageMethod;
         dup.replication = replication;
         dup.researcher = researcher.clone();
         dup.samplerNames = new ArrayList<String>(samplerNames);
@@ -310,6 +329,8 @@ public class DataVar extends Variable implements Cloneable {
             return false;
         if ( !samplingElevation.equals(dataVar.samplingElevation) )
             return false;
+        if ( !storageMethod.equals(dataVar.storageMethod) )
+            return false;
         if ( !replication.equals(dataVar.replication) )
             return false;
         if ( !researcher.equals(dataVar.researcher) )
@@ -332,6 +353,7 @@ public class DataVar extends Variable implements Cloneable {
         result = result * prime + methodReference.hashCode();
         result = result * prime + samplingLocation.hashCode();
         result = result * prime + samplingElevation.hashCode();
+        result = result * prime + storageMethod.hashCode();
         result = result * prime + replication.hashCode();
         result = result * prime + researcher.hashCode();
         result = result * prime + samplerNames.hashCode();
@@ -349,6 +371,7 @@ public class DataVar extends Variable implements Cloneable {
                 ", methodReference='" + methodReference + '\'' +
                 ", samplingLocation='" + samplingLocation + '\'' +
                 ", samplingElevation='" + samplingElevation + '\'' +
+                ", storageMethod='" + storageMethod + '\'' +
                 ", replication='" + replication + '\'' +
                 ", researcher=" + researcher +
                 ", samplerNames=" + samplerNames +

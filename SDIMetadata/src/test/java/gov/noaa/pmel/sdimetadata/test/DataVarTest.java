@@ -42,6 +42,7 @@ public class DataVarTest {
     private static final String METHOD_REFERENCE = "a very old reference";
     private static final String SAMPLING_LOCATION = "Bow";
     private static final String SAMPLING_ELEVATION = "~5 m below water line";
+    private static final String STORAGE_METHOD = "Does not apply";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
     private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Cooling intake"));
@@ -325,11 +326,37 @@ public class DataVarTest {
     }
 
     @Test
+    public void testGetSetStorageMethod() {
+        DataVar var = new DataVar();
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
+        var.setStorageMethod(STORAGE_METHOD);
+        assertEquals(STORAGE_METHOD, var.getStorageMethod());
+        assertEquals(EMPTY_STRING, var.getSamplingElevation());
+        assertEquals(EMPTY_STRING, var.getSamplingLocation());
+        assertEquals(EMPTY_STRING, var.getMethodReference());
+        assertEquals(EMPTY_STRING, var.getMethodDescription());
+        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
+        assertEquals(EMPTY_STRING, var.getObserveType());
+        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getFullName());
+        assertEquals(EMPTY_STRING, var.getColName());
+        var.setStorageMethod(null);
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
+        var.setStorageMethod("\t");
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
+    }
+
+    @Test
     public void testGetSetReplication() {
         DataVar var = new DataVar();
         assertEquals(EMPTY_STRING, var.getReplication());
         var.setReplication(REPLICATION_INFO);
         assertEquals(REPLICATION_INFO, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -359,6 +386,7 @@ public class DataVarTest {
         assertNotSame(RESEARCHER, researcher);
         assertNotSame(researcher, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -387,6 +415,7 @@ public class DataVarTest {
         assertNotSame(names, var.getSamplerNames());
         assertEquals(new Person(), var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -430,6 +459,7 @@ public class DataVarTest {
         assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
         assertEquals(new Person(), var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         assertEquals(EMPTY_STRING, var.getMethodReference());
@@ -477,6 +507,7 @@ public class DataVarTest {
         assertEquals(EMPTY_ARRAYLIST, dataVar.getSamplerNames());
         assertEquals(new Person(), dataVar.getResearcher());
         assertEquals(EMPTY_STRING, dataVar.getReplication());
+        assertEquals(EMPTY_STRING, dataVar.getStorageMethod());
         assertEquals(EMPTY_STRING, dataVar.getSamplingElevation());
         assertEquals(EMPTY_STRING, dataVar.getSamplingLocation());
         assertEquals(EMPTY_STRING, dataVar.getMethodReference());
@@ -543,6 +574,7 @@ public class DataVarTest {
         var.setMethodReference(METHOD_REFERENCE);
         var.setSamplingLocation(SAMPLING_LOCATION);
         var.setSamplingElevation(SAMPLING_ELEVATION);
+        var.setStorageMethod(STORAGE_METHOD);
         var.setReplication(REPLICATION_INFO);
         var.setResearcher(RESEARCHER);
         var.setSamplerNames(SAMPLER_NAMES);
@@ -658,6 +690,13 @@ public class DataVarTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setSamplingElevation(SAMPLING_ELEVATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setStorageMethod(STORAGE_METHOD);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setStorageMethod(STORAGE_METHOD);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
