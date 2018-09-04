@@ -28,7 +28,7 @@ public class Platform implements Cloneable {
      * @return list of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(3);
+        HashSet<String> invalid = new HashSet<String>();
         if ( platformId.isEmpty() )
             invalid.add("platformId");
         if ( platformName.isEmpty() )

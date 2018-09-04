@@ -128,6 +128,7 @@ public class InstrumentTest {
         assertEquals(ADDN_INFO, info);
         assertNotSame(ADDN_INFO, info);
         assertNotSame(info, sensor.getAddnInfo());
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
         assertEquals(EMPTY_STRING, sensor.getLocation());
         assertEquals(EMPTY_STRING, sensor.getModel());
         assertEquals(EMPTY_STRING, sensor.getManufacturer());

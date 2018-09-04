@@ -58,7 +58,7 @@ public class MiscInfo implements Cloneable {
      * @return list of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(3);
+        HashSet<String> invalid = new HashSet<String>();
         if ( datasetId.isEmpty() )
             invalid.add("datasetId");
         Date startDate;

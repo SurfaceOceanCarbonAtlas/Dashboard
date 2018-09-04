@@ -12,7 +12,7 @@ public class Submitter extends Investigator implements Cloneable {
      */
     @Override
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(7);
+        HashSet<String> invalid = new HashSet<String>();
         if ( lastName.isEmpty() )
             invalid.add("lastName");
         if ( firstName.isEmpty() )

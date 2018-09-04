@@ -35,7 +35,7 @@ public class Variable implements Cloneable {
      * @return set of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(2);
+        HashSet<String> invalid = new HashSet<String>();
         if ( colName.isEmpty() )
             invalid.add("colName");
         if ( fullName.isEmpty() )

@@ -117,7 +117,7 @@ public class Coverage implements Cloneable {
      * @return list of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(6);
+        HashSet<String> invalid = new HashSet<String>();
         if ( !westernLongitude.isValid() )
             invalid.add("westernLongitude");
         if ( !easternLongitude.isValid() )

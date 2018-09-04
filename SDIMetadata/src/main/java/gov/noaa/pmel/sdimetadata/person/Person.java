@@ -43,7 +43,7 @@ public class Person implements Cloneable {
      * @return set of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(2);
+        HashSet<String> invalid = new HashSet<String>();
         if ( lastName.isEmpty() )
             invalid.add("lastName");
         if ( firstName.isEmpty() )

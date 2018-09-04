@@ -65,7 +65,7 @@ public class CalibrationGas implements Cloneable {
      * @return set of field names that are currently invalid
      */
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(5);
+        HashSet<String> invalid = new HashSet<String>();
         if ( id.isEmpty() )
             invalid.add("id");
         if ( type.isEmpty() )

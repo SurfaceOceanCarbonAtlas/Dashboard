@@ -61,7 +61,7 @@ public class DataVar extends Variable implements Cloneable {
      */
     @Override
     public HashSet<String> invalidFieldNames() {
-        HashSet<String> invalid = new HashSet<String>(6);
+        HashSet<String> invalid = new HashSet<String>();
         if ( colName.isEmpty() )
             invalid.add("colName");
         if ( fullName.isEmpty() )
