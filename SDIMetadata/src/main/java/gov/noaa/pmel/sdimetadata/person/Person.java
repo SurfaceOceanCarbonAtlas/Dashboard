@@ -9,7 +9,7 @@ public class Person implements Cloneable {
 
     protected String lastName;
     protected String firstName;
-    protected String middleInitials;
+    protected String middle;
     protected String id;
     protected String idType;
     protected String organization;
@@ -20,7 +20,7 @@ public class Person implements Cloneable {
     public Person() {
         lastName = "";
         firstName = "";
-        middleInitials = "";
+        middle = "";
         id = "";
         idType = "";
         organization = "";
@@ -33,7 +33,7 @@ public class Person implements Cloneable {
         this();
         setLastName(lastName);
         setFirstName(firstName);
-        setMiddleInitials(initials);
+        setMiddle(initials);
         setId(id);
         setIdType(idType);
         setOrganization(organization);
@@ -84,16 +84,16 @@ public class Person implements Cloneable {
     /**
      * @return the middle initial(s); never null but may be empty
      */
-    public String getMiddleInitials() {
-        return middleInitials;
+    public String getMiddle() {
+        return middle;
     }
 
     /**
-     * @param middleInitials
+     * @param middle
      *         assign as the middle initial(s); if null, an empty string is assigned
      */
-    public void setMiddleInitials(String middleInitials) {
-        this.middleInitials = (middleInitials != null) ? middleInitials.trim() : "";
+    public void setMiddle(String middle) {
+        this.middle = (middle != null) ? middle.trim() : "";
     }
 
     /**
@@ -151,7 +151,7 @@ public class Person implements Cloneable {
         }
         dup.lastName = lastName;
         dup.firstName = firstName;
-        dup.middleInitials = middleInitials;
+        dup.middle = middle;
         dup.id = id;
         dup.idType = idType;
         dup.organization = organization;
@@ -173,7 +173,7 @@ public class Person implements Cloneable {
             return false;
         if ( !firstName.equals(person.firstName) )
             return false;
-        if ( !middleInitials.equals(person.middleInitials) )
+        if ( !middle.equals(person.middle) )
             return false;
         if ( !id.equals(person.id) )
             return false;
@@ -190,7 +190,7 @@ public class Person implements Cloneable {
         final int prime = 37;
         int result = lastName.hashCode();
         result = result * prime + firstName.hashCode();
-        result = result * prime + middleInitials.hashCode();
+        result = result * prime + middle.hashCode();
         result = result * prime + id.hashCode();
         result = result * prime + idType.hashCode();
         result = result * prime + organization.hashCode();
@@ -202,7 +202,7 @@ public class Person implements Cloneable {
         return "Person{" +
                 "lastName='" + lastName + '\'' +
                 ", firstName='" + firstName + '\'' +
-                ", middleInitials='" + middleInitials + '\'' +
+                ", middle='" + middle + '\'' +
                 ", id='" + id + '\'' +
                 ", idType='" + idType + '\'' +
                 ", organization='" + organization + '\'' +

@@ -50,7 +50,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setStreets(null);
@@ -81,7 +81,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setCity(null);
@@ -101,7 +101,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setRegion(null);
@@ -122,7 +122,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setZipCode(null);
@@ -144,7 +144,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setCountry(null);
@@ -167,7 +167,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setPhone(null);
@@ -191,7 +191,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
-        assertEquals(EMPTY_STRING, investigator.getMiddleInitials());
+        assertEquals(EMPTY_STRING, investigator.getMiddle());
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setEmail(null);
@@ -224,7 +224,7 @@ public class InvestigatorTest {
 
         investigator.setLastName(LAST_NAME);
         investigator.setFirstName(FIRST_NAME);
-        investigator.setMiddleInitials(INITIALS);
+        investigator.setMiddle(INITIALS);
         investigator.setOrganization(ORGANIZATION);
         investigator.setId(ID);
         investigator.setIdType(ID_TYPE);
@@ -276,13 +276,13 @@ public class InvestigatorTest {
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 
-        first.setMiddleInitials(INITIALS);
+        first.setMiddle(INITIALS);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setMiddleInitials(INITIALS);
+        second.setMiddle(INITIALS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        other.setMiddleInitials(INITIALS);
+        other.setMiddle(INITIALS);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

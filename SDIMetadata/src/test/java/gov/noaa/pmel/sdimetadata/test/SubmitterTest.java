@@ -62,7 +62,7 @@ public class SubmitterTest {
 
         submitter.setLastName(LAST_NAME);
         submitter.setFirstName(FIRST_NAME);
-        submitter.setMiddleInitials(INITIALS);
+        submitter.setMiddle(INITIALS);
         submitter.setId(ID);
         submitter.setIdType(ID_TYPE);
         submitter.setOrganization(ORGANIZATION);
@@ -114,13 +114,13 @@ public class SubmitterTest {
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 
-        first.setMiddleInitials(INITIALS);
+        first.setMiddle(INITIALS);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setMiddleInitials(INITIALS);
+        second.setMiddle(INITIALS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
-        other.setMiddleInitials(INITIALS);
+        other.setMiddle(INITIALS);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

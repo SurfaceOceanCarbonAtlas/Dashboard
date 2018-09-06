@@ -1,12 +1,21 @@
 package gov.noaa.pmel.sdimetadata.xml;
 
+import gov.noaa.pmel.sdimetadata.Coverage;
+import gov.noaa.pmel.sdimetadata.MiscInfo;
+import gov.noaa.pmel.sdimetadata.Platform;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
+import gov.noaa.pmel.sdimetadata.instrument.Sampler;
+import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Submitter;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 public class CdiacReader {
@@ -140,7 +149,9 @@ public class CdiacReader {
     private static final String SST_MANUFACTURER_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String SST_MODEL_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String SST_ACCURACY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String SST_UNCERTAINTY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String SST_PRECISION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String SST_RESOLUTION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String SST_CALIBRATION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String SST_COMMENTS_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
 
@@ -149,7 +160,9 @@ public class CdiacReader {
     private static final String EQT_MANUFACTURER_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String EQT_MODEL_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String EQT_ACCURACY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String EQT_UNCERTAINTY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String EQT_PRECISION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String EQT_RESOLUTION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String EQT_CALIBRATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String EQT_WARMING_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + "Warming";
     private static final String EQT_COMMENTS_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
@@ -159,7 +172,9 @@ public class CdiacReader {
     private static final String EQP_MANUFACTURER_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String EQP_MODEL_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String EQP_ACCURACY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String EQP_UNCERTAINTY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String EQP_PRECISION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String EQP_RESOLUTION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String EQP_CALIBRATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String EQP_COMMENTS_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
     private static final String EQP_NORMALIZED_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
@@ -169,7 +184,9 @@ public class CdiacReader {
     private static final String ATM_MANUFACTURER_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String ATM_MODEL_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String ATM_ACCURACY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String ATM_UNCERTAINTY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String ATM_PRECISION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String ATM_RESOLUTION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String ATM_CALIBRATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String ATM_COMMENTS_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
 
@@ -178,7 +195,9 @@ public class CdiacReader {
     private static final String SSS_MANUFACTURER_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String SSS_MODEL_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String SSS_ACCURACY_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String SSS_UNCERTAINTY_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String SSS_PRECISION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String SSS_RESOLUTION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String SSS_CALIBRATION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String SSS_COMMENTS_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
 
@@ -195,8 +214,6 @@ public class CdiacReader {
 
     private static final String FORM_TYPE_ELEMENT_NAME = "form_type";
 
-
-    private Document omeDoc;
     private Element rootElement;
 
     /**
@@ -209,6 +226,7 @@ public class CdiacReader {
      *         if there is a problem reading the file or its XML contents
      */
     public CdiacReader(File xmlfile) throws IllegalArgumentException {
+        Document omeDoc;
         try {
             omeDoc = (new SAXBuilder()).build(xmlfile);
         } catch ( Exception ex ) {
@@ -218,45 +236,145 @@ public class CdiacReader {
         rootElement = omeDoc.getRootElement();
         if ( rootElement == null )
             throw new IllegalArgumentException("No root element found in: " + xmlfile.getPath());
-
-    }
-
-    private String getElementText(String fullElementName) throws IllegalArgumentException {
-        Element elem = rootElement;
-        for (String name : fullElementName.split("\t")) {
-            elem = elem.getChild(name);
-            if ( elem == null )
-                throw new IllegalArgumentException(
-                        name + " element not found in " + fullElementName.replaceAll("\t", "->"));
-        }
-        return elem.getTextTrim();
     }
 
     public SDIMetadata createSDIMetadata() throws IllegalArgumentException {
         SDIMetadata mdata = new SDIMetadata();
-        Element rootElem = omeDoc.getRootElement();
+        mdata.setMiscInfo(getMiscInfo());
+        mdata.setSubmitter(getSubmitter());
+        mdata.setInvestigators(getInvestigators());
+        mdata.setPlatform(getPlatform());
+        mdata.setCoverage(getCoverage());
+        mdata.setVariables(getVariables());
+        mdata.setSamplers(getSamplers());
+        mdata.setAnalyzers(getAnalyzers());
+        return mdata;
+    }
 
-        // First get the Cruise ID / Expocode
-        String expocode;
-        try {
-            expocode = getElementText(EXPOCODE_ELEMENT_NAME);
-        } catch ( IllegalArgumentException ex ) {
-            expocode = null;
+    private Element getElement(String fullElementName) {
+        Element elem = rootElement;
+        for (String name : fullElementName.split("\t")) {
+            elem = elem.getChild(name);
+            if ( null == elem )
+                return null;
         }
-        if ( null == expocode ) {
-            try {
-                expocode = getElementText(CRUISE_ID_ELEMENT_NAME);
-            } catch ( IllegalArgumentException ex ) {
-                // Leave expocode as null
-            }
-        }
+        return elem;
+    }
+
+    private String getElementText(String fullElementName) {
+        Element elem = getElement(fullElementName);
+        return (elem != null) ? elem.getTextTrim() : null;
+    }
+
+    private MiscInfo getMiscInfo() throws IllegalArgumentException {
+        MiscInfo info = new MiscInfo();
+
+        // Dataset ID / Expocode
+        String expocode = getElementText(EXPOCODE_ELEMENT_NAME);
+        if ( null == expocode )
+            expocode = getElementText(CRUISE_ID_ELEMENT_NAME);
         if ( null == expocode )
             throw new IllegalArgumentException("Dataset expocode not found under " +
                     EXPOCODE_ELEMENT_NAME.replaceAll("\t", "->") + " or " +
                     CRUISE_ID_ELEMENT_NAME.replaceAll("\t", "->"));
+        info.setDatasetId(expocode);
 
+        return info;
+    }
 
-        return mdata;
+    private Submitter getSubmitter() throws IllegalArgumentException {
+        Submitter submitter = new Submitter();
+        String lastName = "";
+        String firstName = "";
+        String middle = "";
+        String fullname = getElementText(USER_NAME_ELEMENT_NAME);
+        if ( fullname != null ) {
+            String[] pieces = fullname.split(" ");
+            if ( pieces.length > 0 ) {
+                if ( pieces[0].endsWith("'") || pieces[0].endsWith(";") ) {
+                    lastName = pieces[0].substring(0, pieces[0].length() - 1);
+                    if ( pieces.length > 1 )
+                        firstName = pieces[pieces.length - 1];
+                    for (int k = 2; k < pieces.length; k++) {
+                        middle += pieces[k - 1];
+                    }
+                }
+                else if ( pieces.length > 1 ) {
+                    firstName = pieces[0];
+                    lastName = pieces[pieces.length - 1];
+                    for (int k = 2; k < pieces.length; k++) {
+                        middle += pieces[k-1];
+                    }
+                }
+                else {
+                    lastName = pieces[0];
+                }
+            }
+        }
+        submitter.setLastName(lastName);
+        submitter.setFirstName(firstName);
+        submitter.setMiddle(middle);
+
+        String address = getElementText(USER_ADDRESS_ELEMENT_NAME);
+        if ( address != null ) {
+            String[] pieces = address.split("\n\r");
+
+        }
+        submitter.setOrganization(getElementText(USER_ORGANIZATION_ELEMENT_NAME));
+        submitter.setPhone(getElementText(USER_PHONE_ELEMENT_NAME));
+        submitter.setEmail(getElementText(USER_EMAIL_ELEMENT_NAME));
+
+        // TODO:
+
+        return submitter;
+    }
+
+    private ArrayList<Investigator> getInvestigators() throws IllegalArgumentException {
+        ArrayList<Investigator> pis = new ArrayList<Investigator>();
+
+        // TODO:
+
+        return pis;
+    }
+
+    private Platform getPlatform() throws IllegalArgumentException {
+        Platform platform = new Platform();
+
+        // TODO:
+
+        return platform;
+    }
+
+    private Coverage getCoverage() throws IllegalArgumentException {
+        Coverage coverage = new Coverage();
+
+        // TODO:
+
+        return coverage;
+    }
+
+    private ArrayList<Variable> getVariables() throws IllegalArgumentException {
+        ArrayList<Variable> vars = new ArrayList<Variable>();
+
+        // TODO:
+
+        return vars;
+    }
+
+    private ArrayList<Sampler> getSamplers() throws IllegalArgumentException {
+        ArrayList<Sampler> equilibrators = new ArrayList<Sampler>(1);
+
+        // TODO:
+
+        return equilibrators;
+    }
+
+    private ArrayList<Analyzer> getAnalyzers() throws IllegalArgumentException {
+        ArrayList<Analyzer> sensors = new ArrayList<Analyzer>();
+
+        // TODO:
+
+        return sensors;
     }
 
 }

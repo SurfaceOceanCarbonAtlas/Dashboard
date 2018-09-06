@@ -51,15 +51,15 @@ public class PersonTest {
     @Test
     public void testGetSetMiddleInitials() {
         Person person = new Person();
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
-        person.setMiddleInitials(INITIALS);
-        assertEquals(INITIALS, person.getMiddleInitials());
+        assertEquals(EMPTY_STRING, person.getMiddle());
+        person.setMiddle(INITIALS);
+        assertEquals(INITIALS, person.getMiddle());
         assertEquals(EMPTY_STRING, person.getFirstName());
         assertEquals(EMPTY_STRING, person.getLastName());
-        person.setMiddleInitials(null);
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
-        person.setMiddleInitials("\t");
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
+        person.setMiddle(null);
+        assertEquals(EMPTY_STRING, person.getMiddle());
+        person.setMiddle("\t");
+        assertEquals(EMPTY_STRING, person.getMiddle());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class PersonTest {
         assertEquals(EMPTY_STRING, person.getId());
         person.setId(ID);
         assertEquals(ID, person.getId());
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
+        assertEquals(EMPTY_STRING, person.getMiddle());
         assertEquals(EMPTY_STRING, person.getFirstName());
         assertEquals(EMPTY_STRING, person.getLastName());
         person.setId(null);
@@ -84,7 +84,7 @@ public class PersonTest {
         person.setIdType(ID_TYPE);
         assertEquals(ID_TYPE, person.getIdType());
         assertEquals(EMPTY_STRING, person.getId());
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
+        assertEquals(EMPTY_STRING, person.getMiddle());
         assertEquals(EMPTY_STRING, person.getFirstName());
         assertEquals(EMPTY_STRING, person.getLastName());
         person.setIdType(null);
@@ -101,7 +101,7 @@ public class PersonTest {
         assertEquals(ORGANIZATION, person.getOrganization());
         assertEquals(EMPTY_STRING, person.getIdType());
         assertEquals(EMPTY_STRING, person.getId());
-        assertEquals(EMPTY_STRING, person.getMiddleInitials());
+        assertEquals(EMPTY_STRING, person.getMiddle());
         assertEquals(EMPTY_STRING, person.getFirstName());
         assertEquals(EMPTY_STRING, person.getLastName());
         person.setOrganization(null);
@@ -117,7 +117,7 @@ public class PersonTest {
         person = new Person(LAST_NAME, FIRST_NAME, INITIALS, ID, ID_TYPE, ORGANIZATION);
         assertEquals(LAST_NAME, person.getLastName());
         assertEquals(FIRST_NAME, person.getFirstName());
-        assertEquals(INITIALS, person.getMiddleInitials());
+        assertEquals(INITIALS, person.getMiddle());
         assertEquals(ID, person.getId());
         assertEquals(ID_TYPE, person.getIdType());
         assertEquals(ORGANIZATION, person.getOrganization());
@@ -147,7 +147,7 @@ public class PersonTest {
 
         person.setLastName(LAST_NAME);
         person.setFirstName(FIRST_NAME);
-        person.setMiddleInitials(INITIALS);
+        person.setMiddle(INITIALS);
         person.setId(ID);
         person.setIdType(ID_TYPE);
         person.setOrganization(ORGANIZATION);
@@ -182,10 +182,10 @@ public class PersonTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setMiddleInitials(INITIALS);
+        first.setMiddle(INITIALS);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setMiddleInitials(INITIALS);
+        second.setMiddle(INITIALS);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
