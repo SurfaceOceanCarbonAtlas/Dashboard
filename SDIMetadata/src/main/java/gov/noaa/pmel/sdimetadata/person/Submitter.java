@@ -8,6 +8,23 @@ import java.util.HashSet;
 public class Submitter extends Investigator implements Cloneable {
 
     /**
+     * Create with all fields empty
+     */
+    public Submitter() {
+        super();
+    }
+
+    /**
+     * Create with Person fields assigned from the given person and all other fields empty
+     *
+     * @param person
+     *         assign lastName, firstName, id, idType, and organization fields from here; cannot be null
+     */
+    public Submitter(Person person) {
+        super(person);
+    }
+
+    /**
      * @return set of field names that are currently invalid
      */
     @Override

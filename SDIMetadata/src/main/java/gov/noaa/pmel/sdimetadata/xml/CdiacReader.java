@@ -7,26 +7,22 @@ import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TimeZone;
 
 public class CdiacReader {
-
-    private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyyMMdd");
-
-    static {
-        DATE_PARSER.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
-
-    private static final String ROOT_ELEMENT_NAME = "x_tags";
 
     // Element final names for User as well as the Investigator
     private static final String NAME_ELEMENT_NAME = "Name";
@@ -214,6 +210,20 @@ public class CdiacReader {
 
     private static final String FORM_TYPE_ELEMENT_NAME = "form_type";
 
+    private static final SimpleDateFormat DATE_NUMBER_PARSER = new SimpleDateFormat("yyyyMMdd");
+    private static final SimpleDateFormat DATE_SLASH_PARSER = new SimpleDateFormat("yyyy/MM/dd");
+    private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
+
+    static {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        DATE_NUMBER_PARSER.setTimeZone(utc);
+        DATE_NUMBER_PARSER.setLenient(false);
+        DATE_SLASH_PARSER.setTimeZone(utc);
+        DATE_SLASH_PARSER.setLenient(false);
+        DATE_FORMATTER.setTimeZone(utc);
+        DATE_FORMATTER.setLenient(false);
+    }
+
     private Element rootElement;
 
     /**
@@ -238,7 +248,10 @@ public class CdiacReader {
             throw new IllegalArgumentException("No root element found in: " + xmlfile.getPath());
     }
 
-    public SDIMetadata createSDIMetadata() throws IllegalArgumentException {
+    /**
+     * @return an SDIMetadata object populated with information found in this CDIAC XML file; never null
+     */
+    public SDIMetadata createSDIMetadata() {
         SDIMetadata mdata = new SDIMetadata();
         mdata.setMiscInfo(getMiscInfo());
         mdata.setSubmitter(getSubmitter());
@@ -251,93 +264,216 @@ public class CdiacReader {
         return mdata;
     }
 
-    private Element getElement(String fullElementName) {
+    /**
+     * Get the list of all child elements matching a name path
+     *
+     * @param fullElementListName
+     *         tab-seperated names giving the path from the root element to the desired elements; cannot be null
+     *
+     * @return list of all child elements matching the name path;
+     *         null is returned if no elements matching the path are found
+     */
+    private List<Element> getElementList(String fullElementListName) {
+        Element elem = rootElement;
+        String[] names = fullElementListName.split("\t");
+        for (int k = 0; k < names.length - 1; k++) {
+            elem = elem.getChild(names[k]);
+            if ( null == elem )
+                return null;
+        }
+        return elem.getChildren(names[names.length - 1]);
+    }
+
+    /**
+     * Get the text from a specified element under the root element.
+     *
+     * @param fullElementName
+     *         tab-seperated names giving the path from the root element
+     *         to the element containing the text; cannot be null
+     *
+     * @return trimmed text of the specified element;
+     *         null is returned if the element is not found or if the element does not contain text
+     */
+    private String getElementText(String fullElementName) {
         Element elem = rootElement;
         for (String name : fullElementName.split("\t")) {
             elem = elem.getChild(name);
             if ( null == elem )
                 return null;
         }
-        return elem;
+        return elem.getTextTrim();
     }
 
-    private String getElementText(String fullElementName) {
-        Element elem = getElement(fullElementName);
-        return (elem != null) ? elem.getTextTrim() : null;
+    /**
+     * Determine the lastName, firstName, and middle fields from a given full name.
+     *
+     * @param fullname
+     *         the full name of the person; if null, all fields in the returned Person will be empty
+     *
+     * @return a Person with just the lastName, firstName and middle fields assigned; never null but fields may be empty
+     */
+    private Person getPersonNames(String fullname) {
+        Person person = new Person();
+        if ( fullname != null ) {
+            String[] pieces = fullname.split(" ");
+            if ( pieces.length > 0 ) {
+                if ( pieces[0].endsWith("'") || pieces[0].endsWith(";") ) {
+                    person.setLastName(pieces[0].substring(0, pieces[0].length() - 1));
+                    if ( pieces.length > 1 )
+                        person.setFirstName(pieces[pieces.length - 1]);
+                    String middle = "";
+                    for (int k = 2; k < pieces.length; k++) {
+                        middle += pieces[k - 1];
+                    }
+                    person.setMiddle(middle);
+                }
+                else if ( pieces.length > 1 ) {
+                    person.setFirstName(pieces[0]);
+                    person.setLastName(pieces[pieces.length - 1]);
+                    String middle = "";
+                    for (int k = 2; k < pieces.length; k++) {
+                        middle += pieces[k - 1];
+                    }
+                    person.setMiddle(middle);
+                }
+                else {
+                    person.setLastName(pieces[0]);
+                }
+            }
+        }
+        return person;
     }
 
-    private MiscInfo getMiscInfo() throws IllegalArgumentException {
+    /**
+     * @param address
+     *         full street address containing line breaks to separate street address lines;
+     *         if null, an empty list is returned
+     *
+     * @return list of trimmed street address lines; never null but may be empty
+     */
+    private ArrayList<String> getStreetList(String address) {
+        ArrayList<String> streets = new ArrayList<String>();
+        if ( address != null ) {
+            for (String val : address.split("\n\r")) {
+                val = val.trim();
+                if ( !val.isEmpty() )
+                    streets.add(val);
+            }
+        }
+        return streets;
+    }
+
+
+    /**
+     * @param datestring
+     *         date stamp as yyyyMMdd or yyyy/MM/dd or yyyy-MM-dd; if null or empty, null is returned
+     *
+     * @return datestamp representing this date, or null if the date string is invalid
+     */
+    private Datestamp getDatestamp(String datestring) {
+        if ( (null == datestring) || datestring.isEmpty() )
+            return null;
+        String hypenstring;
+        try {
+            // Convert yyyyMMdd to yyyy-MM-dd, checking if valid
+            hypenstring = DATE_FORMATTER.format(DATE_NUMBER_PARSER.parse(datestring));
+        } catch ( ParseException ex ) {
+            hypenstring = null;
+        }
+        if ( null == hypenstring ) {
+            // Convert yyyy/MM/dd to yyyy-MM-dd, checking if valid
+            try {
+                hypenstring = DATE_FORMATTER.format(DATE_SLASH_PARSER.parse(datestring));
+            } catch ( ParseException ex ) {
+                // leave hypenstring as null
+            }
+        }
+        if ( null == hypenstring ) {
+            // Check if given as yyyy-MM-dd and is valid
+            try {
+                hypenstring = DATE_FORMATTER.format(DATE_FORMATTER.parse(datestring));
+            } catch ( ParseException ex ) {
+                // leave hypenstring as null
+            }
+        }
+        if ( null == hypenstring )
+            return null;
+
+        String[] pieces = hypenstring.split("-");
+        if ( pieces.length != 3 )
+            throw new RuntimeException("Unexpected hyphenated date of: " + hypenstring);
+        return new Datestamp(Integer.valueOf(pieces[0]), Integer.valueOf(pieces[1]), Integer.valueOf(pieces[2]));
+    }
+
+    /**
+     * @return the miscellaneous information read from this CDIAC XML file; never null
+     */
+    private MiscInfo getMiscInfo() {
         MiscInfo info = new MiscInfo();
 
         // Dataset ID / Expocode
         String expocode = getElementText(EXPOCODE_ELEMENT_NAME);
         if ( null == expocode )
             expocode = getElementText(CRUISE_ID_ELEMENT_NAME);
-        if ( null == expocode )
-            throw new IllegalArgumentException("Dataset expocode not found under " +
-                    EXPOCODE_ELEMENT_NAME.replaceAll("\t", "->") + " or " +
-                    CRUISE_ID_ELEMENT_NAME.replaceAll("\t", "->"));
-        info.setDatasetId(expocode);
+        if ( expocode != null )
+            info.setDatasetId(expocode);
+
+        // Funding information all glummed together in CDIAC XML - stick under agency name
+        info.setFundingAgency(getElementText(FUNDING_INFO_ELEMENT_NAME));
+
+        ArrayList<Datestamp> history = new ArrayList<Datestamp>();
+        Datestamp stamp = getDatestamp(getElementText(INITIAL_SUBMISSION_ELEMENT_NAME));
+        if ( stamp != null )
+            history.add(stamp);
+        List<Element> elemList = getElementList(REVISED_SUBMISSION_ELEMENT_NAME);
+        if ( elemList != null ) {
+            for (Element elem : elemList) {
+                stamp = getDatestamp(elem.getTextTrim());
+                if ( (stamp != null) && !elemList.contains(elem) )
+                    elemList.add(elem);
+            }
+        }
+        info.setHistory(history);
+
+        // TODO:
 
         return info;
     }
 
-    private Submitter getSubmitter() throws IllegalArgumentException {
-        Submitter submitter = new Submitter();
-        String lastName = "";
-        String firstName = "";
-        String middle = "";
-        String fullname = getElementText(USER_NAME_ELEMENT_NAME);
-        if ( fullname != null ) {
-            String[] pieces = fullname.split(" ");
-            if ( pieces.length > 0 ) {
-                if ( pieces[0].endsWith("'") || pieces[0].endsWith(";") ) {
-                    lastName = pieces[0].substring(0, pieces[0].length() - 1);
-                    if ( pieces.length > 1 )
-                        firstName = pieces[pieces.length - 1];
-                    for (int k = 2; k < pieces.length; k++) {
-                        middle += pieces[k - 1];
-                    }
-                }
-                else if ( pieces.length > 1 ) {
-                    firstName = pieces[0];
-                    lastName = pieces[pieces.length - 1];
-                    for (int k = 2; k < pieces.length; k++) {
-                        middle += pieces[k-1];
-                    }
-                }
-                else {
-                    lastName = pieces[0];
-                }
-            }
-        }
-        submitter.setLastName(lastName);
-        submitter.setFirstName(firstName);
-        submitter.setMiddle(middle);
-
-        String address = getElementText(USER_ADDRESS_ELEMENT_NAME);
-        if ( address != null ) {
-            String[] pieces = address.split("\n\r");
-
-        }
+    /**
+     * @return information about the metadata/dataset submitter read from this CDIAC XML file; never null
+     */
+    private Submitter getSubmitter() {
+        Submitter submitter = new Submitter(getPersonNames(getElementText(USER_NAME_ELEMENT_NAME)));
+        submitter.setStreets(getStreetList(getElementText(USER_ADDRESS_ELEMENT_NAME)));
         submitter.setOrganization(getElementText(USER_ORGANIZATION_ELEMENT_NAME));
         submitter.setPhone(getElementText(USER_PHONE_ELEMENT_NAME));
         submitter.setEmail(getElementText(USER_EMAIL_ELEMENT_NAME));
-
-        // TODO:
-
+        // CDIAC XML does not have the ID or ID type
         return submitter;
     }
 
-    private ArrayList<Investigator> getInvestigators() throws IllegalArgumentException {
-        ArrayList<Investigator> pis = new ArrayList<Investigator>();
-
-        // TODO:
-
-        return pis;
+    /**
+     * @return information about the investigators read from this CDIAC XML file; never null
+     */
+    private ArrayList<Investigator> getInvestigators() {
+        ArrayList<Investigator> piList = new ArrayList<Investigator>();
+        List<Element> invList = getElementList(INVESTIGATOR_ELEMENT_NAME);
+        if ( invList != null ) {
+            for (Element inv : invList) {
+                Investigator pi = new Investigator(getPersonNames(inv.getChildTextTrim(NAME_ELEMENT_NAME)));
+                pi.setStreets(getStreetList(inv.getChildTextTrim(ADDRESS_ELEMENT_NAME)));
+                pi.setOrganization(inv.getChildTextTrim(ORGANIZATION_ELEMENT_NAME));
+                pi.setPhone(inv.getChildTextTrim(PHONE_ELEMENT_NAME));
+                pi.setEmail(inv.getChildTextTrim(EMAIL_ELEMENT_NAME));
+                // CDIAC XML does not have the ID or ID type
+                piList.add(pi);
+            }
+        }
+        return piList;
     }
 
-    private Platform getPlatform() throws IllegalArgumentException {
+    private Platform getPlatform() {
         Platform platform = new Platform();
 
         // TODO:
@@ -345,7 +481,7 @@ public class CdiacReader {
         return platform;
     }
 
-    private Coverage getCoverage() throws IllegalArgumentException {
+    private Coverage getCoverage() {
         Coverage coverage = new Coverage();
 
         // TODO:
@@ -353,7 +489,7 @@ public class CdiacReader {
         return coverage;
     }
 
-    private ArrayList<Variable> getVariables() throws IllegalArgumentException {
+    private ArrayList<Variable> getVariables() {
         ArrayList<Variable> vars = new ArrayList<Variable>();
 
         // TODO:
@@ -361,7 +497,7 @@ public class CdiacReader {
         return vars;
     }
 
-    private ArrayList<Sampler> getSamplers() throws IllegalArgumentException {
+    private ArrayList<Sampler> getSamplers() {
         ArrayList<Sampler> equilibrators = new ArrayList<Sampler>(1);
 
         // TODO:
@@ -369,7 +505,7 @@ public class CdiacReader {
         return equilibrators;
     }
 
-    private ArrayList<Analyzer> getAnalyzers() throws IllegalArgumentException {
+    private ArrayList<Analyzer> getAnalyzers() {
         ArrayList<Analyzer> sensors = new ArrayList<Analyzer>();
 
         // TODO:

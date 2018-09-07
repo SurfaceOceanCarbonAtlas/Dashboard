@@ -29,11 +29,11 @@ public class Person implements Cloneable {
     /**
      * Create with the arguments given passed to the appropriate setters
      */
-    public Person(String lastName, String firstName, String initials, String id, String idType, String organization) {
+    public Person(String lastName, String firstName, String middle, String id, String idType, String organization) {
         this();
         setLastName(lastName);
         setFirstName(firstName);
-        setMiddle(initials);
+        setMiddle(middle);
         setId(id);
         setIdType(idType);
         setOrganization(organization);
@@ -82,7 +82,7 @@ public class Person implements Cloneable {
     }
 
     /**
-     * @return the middle initial(s); never null but may be empty
+     * @return the middle name or initial(s); never null but may be empty
      */
     public String getMiddle() {
         return middle;
@@ -90,7 +90,7 @@ public class Person implements Cloneable {
 
     /**
      * @param middle
-     *         assign as the middle initial(s); if null, an empty string is assigned
+     *         assign as the middle name or initial(s); if null, an empty string is assigned
      */
     public void setMiddle(String middle) {
         this.middle = (middle != null) ? middle.trim() : "";

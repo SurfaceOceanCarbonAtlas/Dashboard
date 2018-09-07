@@ -31,6 +31,23 @@ public class Investigator extends Person implements Cloneable {
     }
 
     /**
+     * Create with Person fields assigned from the given person and all other fields empty
+     *
+     * @param person
+     *         assign lastName, firstName, id, idType, and organization fields from here; cannot be null
+     */
+    public Investigator(Person person) {
+        super(person.lastName, person.firstName, person.middle, person.id, person.idType, person.organization);
+        streets = new ArrayList<String>(2);
+        city = "";
+        region = "";
+        zipCode = "";
+        country = "";
+        phone = "";
+        email = "";
+    }
+
+    /**
      * @return the street / delivery point portion of the address; never null but may be empty
      */
     public ArrayList<String> getStreets() {
