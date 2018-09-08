@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <annotationProcessing>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="DashboardApps" />
-        <module name="OmeMetadata" />
-        <module name="SDIMetadata" />
-        <module name="UploadDashboard" />
-      </profile>
-    </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="SocatUploadDashboard" target="1.8" />
+      <module name="DashboardApps" target="1.8" />
+      <module name="OmeMetadata" target="1.8" />
+      <module name="SDIMetadata" target="1.8" />
+      <module name="UploadDashboard" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -11,6 +11,19 @@
       </set>
     </option>
   </component>
+  <component name="ProjectFacetManager">
+    <default-configurations>
+      <entry facet-type="gwt">
+        <default-facet-configuration>
+          <configuration>
+            <setting name="compilerMaxHeapSize" value="1024" />
+            <setting name="gwtScriptOutputStyle" value="DETAILED" />
+            <setting name="gwtSdkUrl" value="file://$USER_HOME$/gwt-2.8.2" />
+          </configuration>
+        </default-facet-configuration>
+      </entry>
+    </default-configurations>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/target" />
   </component>

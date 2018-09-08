@@ -268,7 +268,7 @@ public class CdiacReader {
      * Get the list of all child elements matching a name path
      *
      * @param fullElementListName
-     *         tab-seperated names giving the path from the root element to the desired elements; cannot be null
+     *         tab-separated names giving the path from the root element to the desired elements; cannot be null
      *
      * @return list of all child elements matching the name path;
      *         null is returned if no elements matching the path are found
@@ -288,7 +288,7 @@ public class CdiacReader {
      * Get the text from a specified element under the root element.
      *
      * @param fullElementName
-     *         tab-seperated names giving the path from the root element
+     *         tab-separated names giving the path from the root element
      *         to the element containing the text; cannot be null
      *
      * @return trimmed text of the specified element;
