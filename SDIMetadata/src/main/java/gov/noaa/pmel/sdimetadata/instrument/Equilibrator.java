@@ -13,7 +13,7 @@ public class Equilibrator extends Sampler implements Cloneable {
     protected String waterFlowRate;
     protected String gasFlowRate;
     protected String venting;
-    protected String drying;
+    protected String drying; // drying method should be part of GasConcVar
 
     /**
      * Create with all fields empty.

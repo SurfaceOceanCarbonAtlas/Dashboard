@@ -13,6 +13,7 @@ public class MiscInfo implements Cloneable {
 
     protected String datasetId;
     protected String datasetName;
+    protected String sectionName;
     protected String fundingAgency;
     protected String fundingTitle;
     protected String fundingId;
@@ -25,6 +26,7 @@ public class MiscInfo implements Cloneable {
     protected String synopsis;
     protected String purpose;
     protected ArrayList<String> references;
+    protected ArrayList<String> portsOfCall;
     protected ArrayList<String> addnInfo;
     protected Datestamp startDatestamp;
     protected Datestamp endDatestamp;
@@ -36,6 +38,7 @@ public class MiscInfo implements Cloneable {
     public MiscInfo() {
         datasetId = "";
         datasetName = "";
+        sectionName = "";
         fundingAgency = "";
         fundingTitle = "";
         fundingId = "";
@@ -48,6 +51,7 @@ public class MiscInfo implements Cloneable {
         synopsis = "";
         purpose = "";
         references = new ArrayList<String>();
+        portsOfCall = new ArrayList<String>();
         addnInfo = new ArrayList<String>();
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
@@ -116,6 +120,21 @@ public class MiscInfo implements Cloneable {
      */
     public void setDatasetName(String datasetName) {
         this.datasetName = (datasetName != null) ? datasetName.trim() : "";
+    }
+
+    /**
+     * @return the dataset section/leg name; never null but may be empty
+     */
+    public String getSectionName() {
+        return sectionName;
+    }
+
+    /**
+     * @param sectionName
+     *         assign as dataset section/leg name; if null, an empty string is assigned
+     */
+    public void setSectionName(String sectionName) {
+        this.sectionName = (sectionName != null) ? sectionName.trim() : "";
     }
 
     /**
@@ -313,6 +332,36 @@ public class MiscInfo implements Cloneable {
     }
 
     /**
+     * @return the port-of-call list for this dataset; never null but may be empty.
+     *         Any strings given are guaranteed to have some content (not null, not blank).
+     */
+    public ArrayList<String> getPortsOfCall() {
+        return new ArrayList<String>(portsOfCall);
+    }
+
+    /**
+     * @param portsOfCall
+     *         assign as the port-of-call list for this dataset; if null, an empty list is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if any of the port-of-call strings are null or empty
+     */
+    public void setPortsOfCall(Iterable<String> portsOfCall) throws IllegalArgumentException {
+        this.portsOfCall.clear();
+        if ( portsOfCall != null ) {
+            for (String port : portsOfCall) {
+                if ( port == null )
+                    throw new IllegalArgumentException("null port-of-call string given");
+                port = port.trim();
+                if ( port.isEmpty() )
+                    throw new IllegalArgumentException("blank port-of-call string given");
+                this.portsOfCall.add(port);
+            }
+        }
+    }
+
+
+    /**
      * @return the list of addition information strings for this dataset; never null but may be empty.
      *         Any strings given are guaranteed to have some content (not null, not blank).
      */
@@ -419,6 +468,7 @@ public class MiscInfo implements Cloneable {
         }
         dup.datasetId = datasetId;
         dup.datasetName = datasetName;
+        dup.sectionName = sectionName;
         dup.fundingAgency = fundingAgency;
         dup.fundingTitle = fundingTitle;
         dup.fundingId = fundingId;
@@ -431,6 +481,7 @@ public class MiscInfo implements Cloneable {
         dup.synopsis = synopsis;
         dup.purpose = purpose;
         dup.references = new ArrayList<String>(references);
+        dup.portsOfCall = new ArrayList<String>(portsOfCall);
         dup.addnInfo = new ArrayList<String>(addnInfo);
         dup.startDatestamp = startDatestamp.clone();
         dup.endDatestamp = endDatestamp.clone();
@@ -456,6 +507,8 @@ public class MiscInfo implements Cloneable {
             return false;
         if ( !datasetName.equals(miscInfo.datasetName) )
             return false;
+        if ( !sectionName.equals(miscInfo.sectionName) )
+            return false;
         if ( !fundingAgency.equals(miscInfo.fundingAgency) )
             return false;
         if ( !fundingTitle.equals(miscInfo.fundingTitle) )
@@ -480,6 +533,8 @@ public class MiscInfo implements Cloneable {
             return false;
         if ( !references.equals(miscInfo.references) )
             return false;
+        if ( !portsOfCall.equals(miscInfo.portsOfCall) )
+            return false;
         if ( !addnInfo.equals(miscInfo.addnInfo) )
             return false;
         if ( !startDatestamp.equals(miscInfo.startDatestamp) )
@@ -496,6 +551,7 @@ public class MiscInfo implements Cloneable {
         final int prime = 37;
         int result = datasetId.hashCode();
         result = result * prime + datasetName.hashCode();
+        result = result * prime + sectionName.hashCode();
         result = result * prime + fundingAgency.hashCode();
         result = result * prime + fundingTitle.hashCode();
         result = result * prime + fundingId.hashCode();
@@ -508,6 +564,7 @@ public class MiscInfo implements Cloneable {
         result = result * prime + synopsis.hashCode();
         result = result * prime + purpose.hashCode();
         result = result * prime + references.hashCode();
+        result = result * prime + portsOfCall.hashCode();
         result = result * prime + addnInfo.hashCode();
         result = result * prime + startDatestamp.hashCode();
         result = result * prime + endDatestamp.hashCode();
@@ -520,6 +577,7 @@ public class MiscInfo implements Cloneable {
         return "Dataset{" +
                 "datasetId='" + datasetId + '\'' +
                 ", datasetName='" + datasetName + '\'' +
+                ", sectionName='" + sectionName + '\'' +
                 ", fundingAgency='" + fundingAgency + '\'' +
                 ", fundingTitle='" + fundingTitle + '\'' +
                 ", fundingId='" + fundingId + '\'' +
@@ -532,6 +590,7 @@ public class MiscInfo implements Cloneable {
                 ", synopsis='" + synopsis + '\'' +
                 ", purpose='" + purpose + '\'' +
                 ", references=" + references +
+                ", portsOfCall=" + portsOfCall +
                 ", addnInfo=" + addnInfo +
                 ", startDatestamp=" + startDatestamp +
                 ", endDatestamp=" + endDatestamp +

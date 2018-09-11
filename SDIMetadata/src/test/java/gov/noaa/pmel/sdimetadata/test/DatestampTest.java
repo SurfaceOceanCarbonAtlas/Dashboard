@@ -104,15 +104,29 @@ public class DatestampTest {
 
     @Test
     public void testDatestamp() {
-        Datestamp datestamp = new Datestamp(null, null, null);
-        assertEquals(Datestamp.INVALID, datestamp.getYear());
-        assertEquals(Datestamp.INVALID, datestamp.getMonth());
-        assertEquals(Datestamp.INVALID, datestamp.getDay());
-
-        datestamp = new Datestamp(YEAR, MONTH, DAY);
+        Datestamp datestamp = new Datestamp(YEAR.toString(), MONTH.toString(), DAY.toString());
         assertEquals(YEAR, datestamp.getYear());
         assertEquals(MONTH, datestamp.getMonth());
         assertEquals(DAY, datestamp.getDay());
+
+        try {
+            datestamp = new Datestamp(null, MONTH.toString(), DAY.toString());
+            fail("Datestamp constructor with null year succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            datestamp = new Datestamp(YEAR.toString(), null, DAY.toString());
+            fail("Datestamp constructor with null month succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            datestamp = new Datestamp(YEAR.toString(), MONTH.toString(), null);
+            fail("Datestamp constructor with null day succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
     }
 
     @Test

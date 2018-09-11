@@ -25,6 +25,7 @@ public class MiscInfoTest {
 
     private static final String DATASET_ID = "33RO20150114";
     private static final String DATASET_NAME = "RB1501A";
+    private static final String SECTION_NAME = "Winter Leg";
     private static final String FUNDING_AGENCY = "NOAA Climate Observation Office/Climate Observations Division";
     private static final String FUNDING_TITLE = "NOAA Ocean Acidification Monitoring Network";
     private static final String FUNDING_ID = "NOAA.FY15.AOML.001";
@@ -64,6 +65,10 @@ public class MiscInfoTest {
             "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects of temperature and salinity " +
                     "on the partial pressure of CO2 in seawater. Nature 300: 511-513."
     ));
+    private static final ArrayList<String> PORTS_OF_CALL = new ArrayList<String>(Arrays.asList(
+            "Honolulu, HI",
+            "San Francisco, CA"
+    ));
     private static final ArrayList<String> ADDN_INFO_LIST = new ArrayList<String>(Arrays.asList(
             "It was determined that there was a 2.68 minute offset between the SST data record from the SBE-21 " +
                     "in the bow and the Hart 1521 temperature sensor in the equilibrator.  The SST data were " +
@@ -77,11 +82,11 @@ public class MiscInfoTest {
                     "condenser.  The survey tech cleared out the water and restarted the system on 1/26 at 0519.  " +
                     "No data was acquired during the shutdown period."
     ));
-    private static final Datestamp START_DATESTAMP = new Datestamp(2015, 1, 13);
-    private static final Datestamp END_DATESTAMP = new Datestamp(2015, 1, 30);
+    private static final Datestamp START_DATESTAMP = new Datestamp("2015", "1", "13");
+    private static final Datestamp END_DATESTAMP = new Datestamp("2015", "1", "30");
     private static final ArrayList<Datestamp> HISTORY_LIST = new ArrayList<Datestamp>(Arrays.asList(
-            new Datestamp(2016, 1, 20),
-            new Datestamp(2017, 2, 24)
+            new Datestamp("2016", "1", "20"),
+            new Datestamp("2017", "2", "24")
     ));
 
     @Test
@@ -110,11 +115,26 @@ public class MiscInfoTest {
     }
 
     @Test
+    public void testGetSetSectionName() {
+        MiscInfo miscInfo = new MiscInfo();
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
+        miscInfo.setSectionName(SECTION_NAME);
+        assertEquals(SECTION_NAME, miscInfo.getSectionName());
+        assertEquals(EMPTY_STR, miscInfo.getDatasetName());
+        assertEquals(EMPTY_STR, miscInfo.getDatasetId());
+        miscInfo.setSectionName(null);
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
+        miscInfo.setSectionName("\t");
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
+    }
+
+    @Test
     public void testGetSetFundingAgency() {
         MiscInfo miscInfo = new MiscInfo();
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
         miscInfo.setFundingAgency(FUNDING_AGENCY);
         assertEquals(FUNDING_AGENCY, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setFundingAgency(null);
@@ -130,6 +150,7 @@ public class MiscInfoTest {
         miscInfo.setFundingTitle(FUNDING_TITLE);
         assertEquals(FUNDING_TITLE, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setFundingTitle(null);
@@ -146,6 +167,7 @@ public class MiscInfoTest {
         assertEquals(FUNDING_ID, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setFundingId(null);
@@ -163,6 +185,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setResearchProject(null);
@@ -182,6 +205,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setDatasetDoi(null);
@@ -201,6 +225,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setAccessId(null);
@@ -221,6 +246,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setWebsite(null);
@@ -242,6 +268,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setDownloadUrl(null);
@@ -264,6 +291,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setCitation(null);
@@ -287,6 +315,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setSynopsis(null);
@@ -311,6 +340,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setPurpose(null);
@@ -339,6 +369,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setReferences(null);
@@ -360,14 +391,14 @@ public class MiscInfoTest {
     }
 
     @Test
-    public void testGetSetAddnInfo() {
+    public void testGetSetPortsOfCall() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        miscInfo.setAddnInfo(ADDN_INFO_LIST);
-        ArrayList<String> nameList = miscInfo.getAddnInfo();
-        assertEquals(ADDN_INFO_LIST, nameList);
-        assertNotSame(ADDN_INFO_LIST, nameList);
-        assertNotSame(nameList, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
+        miscInfo.setPortsOfCall(PORTS_OF_CALL);
+        ArrayList<String> nameList = miscInfo.getPortsOfCall();
+        assertEquals(PORTS_OF_CALL, nameList);
+        assertNotSame(PORTS_OF_CALL, nameList);
+        assertNotSame(nameList, miscInfo.getPortsOfCall());
         assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
@@ -380,6 +411,50 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
+        assertEquals(EMPTY_STR, miscInfo.getDatasetName());
+        assertEquals(EMPTY_STR, miscInfo.getDatasetId());
+        miscInfo.setPortsOfCall(null);
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
+        miscInfo.setPortsOfCall(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
+        try {
+            miscInfo.setPortsOfCall(Arrays.asList("Some information", "\n", "More information"));
+            fail("calling setPortsOfCall with a list containing an blank string succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+        try {
+            miscInfo.setPortsOfCall(Arrays.asList("Some information", null, "More information"));
+            fail("calling setPortsOfCall with a list containing a null succeeded");
+        } catch ( IllegalArgumentException ex ) {
+            // Expected result
+        }
+    }
+
+    @Test
+    public void testGetSetAddnInfo() {
+        MiscInfo miscInfo = new MiscInfo();
+        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        miscInfo.setAddnInfo(ADDN_INFO_LIST);
+        ArrayList<String> nameList = miscInfo.getAddnInfo();
+        assertEquals(ADDN_INFO_LIST, nameList);
+        assertNotSame(ADDN_INFO_LIST, nameList);
+        assertNotSame(nameList, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        assertEquals(EMPTY_STR, miscInfo.getPurpose());
+        assertEquals(EMPTY_STR, miscInfo.getSynopsis());
+        assertEquals(EMPTY_STR, miscInfo.getCitation());
+        assertEquals(EMPTY_STR, miscInfo.getDownloadUrl());
+        assertEquals(EMPTY_STR, miscInfo.getWebsite());
+        assertEquals(EMPTY_STR, miscInfo.getAccessId());
+        assertEquals(EMPTY_STR, miscInfo.getDatasetDoi());
+        assertEquals(EMPTY_STR, miscInfo.getResearchProject());
+        assertEquals(EMPTY_STR, miscInfo.getFundingId());
+        assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
+        assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setAddnInfo(null);
@@ -410,6 +485,7 @@ public class MiscInfoTest {
         assertNotSame(START_DATESTAMP, stamp);
         assertNotSame(stamp, miscInfo.getStartDatestamp());
         assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
         assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
@@ -422,6 +498,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setStartDatestamp(null);
@@ -441,6 +518,7 @@ public class MiscInfoTest {
         assertNotSame(stamp, miscInfo.getEndDatestamp());
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
         assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
         assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
@@ -453,6 +531,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setEndDatestamp(null);
@@ -476,6 +555,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
         assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
         assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
         assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
@@ -488,6 +568,7 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getFundingId());
         assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
         assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
+        assertEquals(EMPTY_STR, miscInfo.getSectionName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setHistory(null);
@@ -531,6 +612,7 @@ public class MiscInfoTest {
 
         miscInfo.setDatasetId(DATASET_ID);
         miscInfo.setDatasetName(DATASET_NAME);
+        miscInfo.setSectionName(SECTION_NAME);
         miscInfo.setFundingAgency(FUNDING_AGENCY);
         miscInfo.setFundingTitle(FUNDING_TITLE);
         miscInfo.setFundingId(FUNDING_ID);
@@ -543,6 +625,7 @@ public class MiscInfoTest {
         miscInfo.setSynopsis(SYNOPSIS);
         miscInfo.setPurpose(PURPOSE);
         miscInfo.setReferences(REFERENCES);
+        miscInfo.setPortsOfCall(PORTS_OF_CALL);
         miscInfo.setAddnInfo(ADDN_INFO_LIST);
         miscInfo.setStartDatestamp(START_DATESTAMP);
         miscInfo.setEndDatestamp(END_DATESTAMP);
@@ -554,6 +637,7 @@ public class MiscInfoTest {
         assertNotSame(miscInfo, dup);
 
         assertNotSame(miscInfo.getReferences(), dup.getReferences());
+        assertNotSame(miscInfo.getPortsOfCall(), dup.getPortsOfCall());
         assertNotSame(miscInfo.getAddnInfo(), dup.getAddnInfo());
         assertNotSame(miscInfo.getStartDatestamp(), dup.getStartDatestamp());
         assertNotSame(miscInfo.getEndDatestamp(), dup.getEndDatestamp());
@@ -587,6 +671,13 @@ public class MiscInfoTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setDatasetName(DATASET_NAME);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setSectionName(SECTION_NAME);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setSectionName(SECTION_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
@@ -671,6 +762,13 @@ public class MiscInfoTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setReferences(REFERENCES);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setPortsOfCall(PORTS_OF_CALL);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setPortsOfCall(PORTS_OF_CALL);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

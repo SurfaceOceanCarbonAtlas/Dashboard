@@ -51,7 +51,7 @@ public final class NumericString implements Cloneable {
      * @throws IllegalArgumentException
      *         if the given string, if not null or blank, does not represent a finite numeric value
      */
-    public void setValueString(String valueString) throws IllegalStateException {
+    public void setValueString(String valueString) throws IllegalArgumentException {
         this.valueString = (valueString != null) ? valueString.trim() : "";
         if ( !this.valueString.isEmpty() ) {
             try {

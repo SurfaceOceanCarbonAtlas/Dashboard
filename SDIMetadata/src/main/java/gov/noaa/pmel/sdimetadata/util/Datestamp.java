@@ -36,10 +36,28 @@ public final class Datestamp implements Cloneable {
         day = INVALID;
     }
 
-    public Datestamp(Integer year, Integer month, Integer day) {
-        setYear(year);
-        setMonth(month);
-        setDay(day);
+    /**
+     * Create with the given integer string values for year, month, and day.
+     *
+     * @throws IllegalArgumentException
+     *         if any values are null or not integer strings.
+     */
+    public Datestamp(String year, String month, String day) throws IllegalArgumentException {
+        try {
+            this.year = Integer.valueOf(year);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Invalid year '" + year + "': " + ex.getMessage());
+        }
+        try {
+            this.month = Integer.valueOf(month);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Invalid month '" + month + "': " + ex.getMessage());
+        }
+        try {
+            this.day = Integer.valueOf(day);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Invalid day '" + day + "': " + ex.getMessage());
+        }
     }
 
     /**
@@ -108,7 +126,7 @@ public final class Datestamp implements Cloneable {
      *         assign as the year; if null, an invalid value ({@link #INVALID}) is assigned
      */
     public void setYear(Integer year) {
-        this.year = (year != null) ? year : 0;
+        this.year = (year != null) ? year : INVALID;
     }
 
     /**
@@ -123,7 +141,7 @@ public final class Datestamp implements Cloneable {
      *         assign as the month; if null, an invalid value ({@link #INVALID}) is assigned
      */
     public void setMonth(Integer month) {
-        this.month = (month != null) ? month : 0;
+        this.month = (month != null) ? month : INVALID;
     }
 
     /**
@@ -138,7 +156,7 @@ public final class Datestamp implements Cloneable {
      *         assign as the day; if null, an invalid value ({@link #INVALID}) is assigned
      */
     public void setDay(Integer day) {
-        this.day = (day != null) ? day : 0;
+        this.day = (day != null) ? day : INVALID;
     }
 
     @Override
