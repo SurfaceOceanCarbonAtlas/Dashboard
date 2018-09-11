@@ -77,11 +77,11 @@ public abstract class DocumentHandler {
                 (expocode.charAt(13) >= '1') && (expocode.charAt(13) <= '9') )
             expocode = expocode.substring(0, 12);
         // Only exception to NODCYYYYMMDD is QUIMAYYYYMMDD; but QUIM which is not one of the codes
-        if ( len == 12 && EXPOCODE_PATTERN.matcher(expocode).matches() ) {
+        if ( (len == 12) && EXPOCODE_PATTERN.matcher(expocode).matches() ) {
             String nodc = expocode.substring(0, 4);
-            if ( FIXED_PLATFORM_NODC_CODES.contains(nodc.toUpperCase()) )
+            if ( FIXED_PLATFORM_NODC_CODES.contains(nodc) )
                 return "Mooring";
-            if ( DRIFTING_BUOY_NODC_CODES.contains(nodc.toUpperCase()) )
+            if ( DRIFTING_BUOY_NODC_CODES.contains(nodc) )
                 return "Drifting Buoy";
         }
 

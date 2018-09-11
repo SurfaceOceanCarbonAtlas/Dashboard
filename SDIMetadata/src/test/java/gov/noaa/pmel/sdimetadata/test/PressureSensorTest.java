@@ -19,7 +19,6 @@ public class PressureSensorTest {
     private static final String ID = "Setra-239 #0003245";
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
-    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Pressure reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
@@ -38,7 +37,6 @@ public class PressureSensorTest {
         sensor.setId(ID);
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
-        sensor.setLocation(LOCATION);
         sensor.setCalibration(CALIBRATION);
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
@@ -53,7 +51,7 @@ public class PressureSensorTest {
     public void testHashCodeEquals() {
         PressureSensor first = new PressureSensor();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(LOCATION));
+        assertFalse(first.equals(NAME));
 
         PressureSensor second = new PressureSensor();
         assertEquals(first.hashCode(), second.hashCode());
@@ -62,6 +60,13 @@ public class PressureSensorTest {
         Instrument other = new Instrument();
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setName(NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -100,26 +105,6 @@ public class PressureSensorTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setModel(MODEL);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setLocation(LOCATION);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setCalibration(CALIBRATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setCalibration(CALIBRATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

@@ -13,7 +13,6 @@ public class Equilibrator extends Sampler implements Cloneable {
     protected String waterFlowRate;
     protected String gasFlowRate;
     protected String venting;
-    protected String drying; // drying method should be part of GasConcVar
 
     /**
      * Create with all fields empty.
@@ -26,7 +25,6 @@ public class Equilibrator extends Sampler implements Cloneable {
         waterFlowRate = "";
         gasFlowRate = "";
         venting = "";
-        drying = "";
     }
 
     @Override
@@ -44,8 +42,6 @@ public class Equilibrator extends Sampler implements Cloneable {
             invalids.add("gasFlowRate");
         if ( venting.isEmpty() )
             invalids.add("venting");
-        if ( drying.isEmpty() )
-            invalids.add("drying");
         return invalids;
     }
 
@@ -155,22 +151,6 @@ public class Equilibrator extends Sampler implements Cloneable {
         this.venting = (venting != null) ? venting.trim() : "";
     }
 
-    /**
-     * @return information about drying of the equilibrator measured gas stream; never null but may be empty
-     */
-    public String getDrying() {
-        return drying;
-    }
-
-    /**
-     * @param drying
-     *         assign as information about drying of the equilibrator measured gas stream;
-     *         if null or blank, an empty string is assigned
-     */
-    public void setDrying(String drying) {
-        this.drying = (drying != null) ? drying.trim() : "";
-    }
-
     @Override
     public Equilibrator clone() {
         Equilibrator dup = (Equilibrator) super.clone();
@@ -181,7 +161,6 @@ public class Equilibrator extends Sampler implements Cloneable {
         dup.waterFlowRate = waterFlowRate;
         dup.gasFlowRate = gasFlowRate;
         dup.venting = venting;
-        dup.drying = drying;
         return dup;
     }
 
@@ -212,8 +191,6 @@ public class Equilibrator extends Sampler implements Cloneable {
             return false;
         if ( !venting.equals(other.venting) )
             return false;
-        if ( !drying.equals(other.drying) )
-            return false;
 
         return true;
     }
@@ -229,7 +206,6 @@ public class Equilibrator extends Sampler implements Cloneable {
         result = result * prime + waterFlowRate.hashCode();
         result = result * prime + gasFlowRate.hashCode();
         result = result * prime + venting.hashCode();
-        result = result * prime + drying.hashCode();
         return result;
     }
 
@@ -244,7 +220,6 @@ public class Equilibrator extends Sampler implements Cloneable {
                 ", waterFlowRate='" + waterFlowRate + '\'' +
                 ", gasFlowRate='" + gasFlowRate + '\'' +
                 ", venting='" + venting + '\'' +
-                ", drying='" + drying + '\'' +
                 '}';
     }
 

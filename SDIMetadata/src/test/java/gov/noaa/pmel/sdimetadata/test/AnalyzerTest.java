@@ -16,17 +16,33 @@ import static org.junit.Assert.assertTrue;
 
 public class AnalyzerTest {
 
+    private static final String EMPTY_STRING = "";
     private static final String NAME = "Equilibrator headspace differential pressure sensor";
     private static final String ID = "Setra-239 #0003245";
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
-    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Pressure reading from the Setra-270 on the exit of the sensor was added to the differential pressure " +
                     "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
             "Some other comment just to have a second one."
     ));
+
+    @Test
+    public void testGetSetCalibration() {
+        Analyzer sensor = new Analyzer();
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
+        sensor.setCalibration(CALIBRATION);
+        assertEquals(CALIBRATION, sensor.getCalibration());
+        assertEquals(EMPTY_STRING, sensor.getModel());
+        assertEquals(EMPTY_STRING, sensor.getManufacturer());
+        assertEquals(EMPTY_STRING, sensor.getId());
+        assertEquals(EMPTY_STRING, sensor.getName());
+        sensor.setCalibration(null);
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
+        sensor.setCalibration("\t");
+        assertEquals(EMPTY_STRING, sensor.getCalibration());
+    }
 
     @Test
     public void testClone() {
@@ -39,9 +55,8 @@ public class AnalyzerTest {
         analyzer.setId(ID);
         analyzer.setManufacturer(MANUFACTURER);
         analyzer.setModel(MODEL);
-        analyzer.setLocation(LOCATION);
-        analyzer.setCalibration(CALIBRATION);
         analyzer.setAddnInfo(ADDN_INFO);
+        analyzer.setCalibration(CALIBRATION);
         assertNotEquals(analyzer, dup);
 
         dup = analyzer.clone();
@@ -54,7 +69,7 @@ public class AnalyzerTest {
     public void testHashCodeEquals() {
         Analyzer first = new Analyzer();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(LOCATION));
+        assertFalse(first.equals(NAME));
 
         Analyzer second = new Analyzer();
         assertEquals(first.hashCode(), second.hashCode());
@@ -67,6 +82,13 @@ public class AnalyzerTest {
         Instrument other = new Instrument();
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setName(NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -105,27 +127,6 @@ public class AnalyzerTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setModel(MODEL);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setLocation(LOCATION);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-
-        first.setCalibration(CALIBRATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setCalibration(CALIBRATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

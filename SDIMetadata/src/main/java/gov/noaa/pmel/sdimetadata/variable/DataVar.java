@@ -56,9 +56,6 @@ public class DataVar extends Variable implements Cloneable {
         }
     }
 
-    /**
-     * @return list of field names that are currently invalid
-     */
     @Override
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalid = new HashSet<String>();

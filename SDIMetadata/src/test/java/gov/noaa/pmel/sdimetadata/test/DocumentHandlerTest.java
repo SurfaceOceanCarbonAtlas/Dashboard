@@ -12,27 +12,30 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void testGetElementList() {
+    public void guessPlatformType() {
     }
 
     @Test
-    public void testGetElementText() {
+    public void getElementList() {
     }
 
     @Test
-    public void testGetPersonNames() {
+    public void getElementText() {
     }
 
     @Test
-    public void testGetStreetList() {
+    public void getPersonNames() {
     }
 
     @Test
-    public void testGetDatestamp() {
+    public void getListOfLines() {
     }
 
     @Test
-    public void testGetNumericString() {
+    public void getDatestamp() {
     }
 
+    @Test
+    public void getNumericString() {
+    }
 }

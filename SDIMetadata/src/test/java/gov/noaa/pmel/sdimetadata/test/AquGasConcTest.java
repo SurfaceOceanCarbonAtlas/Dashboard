@@ -2,7 +2,7 @@ package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.AqueousGasConc;
+import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
 import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import org.junit.Test;
 
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
-public class AqueousGasConcTest {
+public class AquGasConcTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
@@ -49,15 +49,17 @@ public class AqueousGasConcTest {
 
     private static final String REPORT_TERMPERATURE = "SST";
     private static final String TEMPERATURE_CORRECTION = "Standard data reduction method";
-    private static final String PRESSURE_CORRECTION = "Micro-adjusted from ship deck to sea-level pressure";
+    private static final String DRYING_METHOD = "Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).";
     private static final String WATER_VAPOR_CORRECTION = "Another standard data reduction method";
 
     @Test
     public void testGetSetReportTemperature() {
-        AqueousGasConc var = new AqueousGasConc();
+        AquGasConc var = new AquGasConc();
         assertEquals(EMPTY_STRING, var.getReportTemperature());
         var.setReportTemperature(REPORT_TERMPERATURE);
         assertEquals(REPORT_TERMPERATURE, var.getReportTemperature());
+        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
+        assertEquals(EMPTY_STRING, var.getDryingMethod());
         assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
         assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
@@ -84,11 +86,13 @@ public class AqueousGasConcTest {
 
     @Test
     public void testGetSetTemperatureCorrection() {
-        AqueousGasConc var = new AqueousGasConc();
+        AquGasConc var = new AquGasConc();
         assertEquals(EMPTY_STRING, var.getTemperatureCorrection());
         var.setTemperatureCorrection(TEMPERATURE_CORRECTION);
         assertEquals(TEMPERATURE_CORRECTION, var.getTemperatureCorrection());
         assertEquals(EMPTY_STRING, var.getReportTemperature());
+        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
+        assertEquals(EMPTY_STRING, var.getDryingMethod());
         assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
         assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
@@ -114,73 +118,8 @@ public class AqueousGasConcTest {
     }
 
     @Test
-    public void testGetSetPressureCorrection() {
-        AqueousGasConc var = new AqueousGasConc();
-        assertEquals(EMPTY_STRING, var.getPressureCorrection());
-        var.setPressureCorrection(PRESSURE_CORRECTION);
-        assertEquals(PRESSURE_CORRECTION, var.getPressureCorrection());
-        assertEquals(EMPTY_STRING, var.getTemperatureCorrection());
-        assertEquals(EMPTY_STRING, var.getReportTemperature());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
-        assertEquals(EMPTY_STRING, var.getReplication());
-        assertEquals(EMPTY_STRING, var.getStorageMethod());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setPressureCorrection(null);
-        assertEquals(EMPTY_STRING, var.getPressureCorrection());
-        var.setPressureCorrection("\t");
-        assertEquals(EMPTY_STRING, var.getPressureCorrection());
-    }
-
-    @Test
-    public void testGetSetWaterVaporCorrection() {
-        AqueousGasConc var = new AqueousGasConc();
-        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
-        var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
-        assertEquals(WATER_VAPOR_CORRECTION, var.getWaterVaporCorrection());
-        assertEquals(EMPTY_STRING, var.getPressureCorrection());
-        assertEquals(EMPTY_STRING, var.getTemperatureCorrection());
-        assertEquals(EMPTY_STRING, var.getReportTemperature());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
-        assertEquals(EMPTY_STRING, var.getReplication());
-        assertEquals(EMPTY_STRING, var.getStorageMethod());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setWaterVaporCorrection(null);
-        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
-        var.setWaterVaporCorrection("\t");
-        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
-    }
-
-    @Test
     public void testInvalidFieldNames() {
-        AqueousGasConc var = new AqueousGasConc();
+        AquGasConc var = new AquGasConc();
         assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName", "observeType",
                 "accuracy", "measureMethod", "reportTemperature")), var.invalidFieldNames());
 
@@ -223,8 +162,8 @@ public class AqueousGasConcTest {
 
     @Test
     public void testClone() {
-        AqueousGasConc var = new AqueousGasConc();
-        AqueousGasConc dup = var.clone();
+        AquGasConc var = new AquGasConc();
+        AquGasConc dup = var.clone();
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -248,10 +187,11 @@ public class AqueousGasConcTest {
         var.setSamplerNames(SAMPLER_NAMES);
         var.setAnalyzerNames(ANALYZER_NAMES);
 
+        var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
+        var.setDryingMethod(DRYING_METHOD);
+
         var.setReportTemperature(REPORT_TERMPERATURE);
         var.setTemperatureCorrection(TEMPERATURE_CORRECTION);
-        var.setPressureCorrection(PRESSURE_CORRECTION);
-        var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertNotEquals(var, dup);
 
         dup = var.clone();
@@ -267,11 +207,11 @@ public class AqueousGasConcTest {
 
     @Test
     public void testHashCodeEquals() {
-        AqueousGasConc first = new AqueousGasConc();
+        AquGasConc first = new AquGasConc();
         assertFalse(first.equals(null));
         assertFalse(first.equals(FULL_NAME));
 
-        AqueousGasConc second = new AqueousGasConc();
+        AquGasConc second = new AquGasConc();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
@@ -401,6 +341,20 @@ public class AqueousGasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
+        first.setDryingMethod(DRYING_METHOD);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setDryingMethod(DRYING_METHOD);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
         first.setReportTemperature(REPORT_TERMPERATURE);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
@@ -412,20 +366,6 @@ public class AqueousGasConcTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setTemperatureCorrection(TEMPERATURE_CORRECTION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setPressureCorrection(PRESSURE_CORRECTION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setPressureCorrection(PRESSURE_CORRECTION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }

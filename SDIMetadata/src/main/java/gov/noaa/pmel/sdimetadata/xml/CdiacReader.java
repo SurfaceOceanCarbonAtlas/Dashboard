@@ -365,6 +365,7 @@ public class CdiacReader extends DocumentHandler {
                 getNumericString(getElementText(NORTH_BOUND_ELEMENT_NAME), Coverage.LATITUDE_UNITS));
 
         // CDIAC only has date stamps - so convert to earliest and latest time of that day
+        // This should be reset from the data
         coverage.setEarliestDataTime(getDatestamp(getElementText(TEMP_START_DATE_ELEMENT_NAME)).getEarliestTime());
         Date endDate = getDatestamp(getElementText(TEMP_END_DATE_ELEMENT_NAME)).getEarliestTime();
         endDate = new Date(endDate.getTime() + 24L * 60L * 60L * 1000L - 1000L);

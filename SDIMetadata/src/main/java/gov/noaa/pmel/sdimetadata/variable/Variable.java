@@ -32,7 +32,7 @@ public class Variable implements Cloneable {
     }
 
     /**
-     * @return set of field names that are currently invalid
+     * @return set of field names that are currently invalid; never null but may be empty
      */
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalid = new HashSet<String>();

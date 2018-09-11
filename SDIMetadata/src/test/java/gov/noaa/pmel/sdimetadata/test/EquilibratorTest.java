@@ -43,35 +43,32 @@ public class EquilibratorTest {
         Equilibrator sampler = new Equilibrator();
         assertEquals(new HashSet(Arrays.asList(
                 "equilibratorType", "chamberWaterVol", "chamberGasVol",
-                "waterFlowRate", "gasFlowRate", "venting", "drying"
+                "waterFlowRate", "gasFlowRate", "venting"
         )), sampler.invalidFieldNames());
 
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         assertEquals(new HashSet(Arrays.asList(
-                "chamberWaterVol", "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting", "drying"
+                "chamberWaterVol", "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting"
         )), sampler.invalidFieldNames());
 
         sampler.setChamberWaterVol(CHAMBER_WATER_VOLUME);
         assertEquals(new HashSet(Arrays.asList(
-                "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting", "drying"
+                "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting"
         )), sampler.invalidFieldNames());
 
         sampler.setChamberGasVol(CHAMBER_GAS_VOLUME);
         assertEquals(new HashSet(Arrays.asList(
-                "waterFlowRate", "gasFlowRate", "venting", "drying"
+                "waterFlowRate", "gasFlowRate", "venting"
         )), sampler.invalidFieldNames());
 
         sampler.setWaterFlowRate(WATER_FLOW_RATE);
-        assertEquals(new HashSet(Arrays.asList("gasFlowRate", "venting", "drying")), sampler.invalidFieldNames());
+        assertEquals(new HashSet(Arrays.asList("gasFlowRate", "venting")), sampler.invalidFieldNames());
 
         sampler.setGasFlowRate(GAS_FLOW_RATE);
-        assertEquals(new HashSet(Arrays.asList("venting", "drying")), sampler.invalidFieldNames());
+        assertEquals(new HashSet(Arrays.asList("venting")), sampler.invalidFieldNames());
 
         sampler.setVenting(VENTING);
-        assertEquals(new HashSet(Arrays.asList("drying")), sampler.invalidFieldNames());
-
-        sampler.setDrying(DRYING);
-        assertEquals(new HashSet(Arrays.asList()), sampler.invalidFieldNames());
+        assertEquals(new HashSet(), sampler.invalidFieldNames());
     }
 
     @Test
@@ -81,8 +78,6 @@ public class EquilibratorTest {
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         assertEquals(EQUILIBRATOR_TYPE, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -101,8 +96,6 @@ public class EquilibratorTest {
         assertEquals(CHAMBER_VOLUME, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -122,8 +115,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -144,8 +135,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -167,8 +156,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -191,8 +178,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -216,8 +201,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -226,32 +209,6 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getVenting());
         sampler.setVenting("\t");
         assertEquals(EMPTY_STRING, sampler.getVenting());
-    }
-
-    @Test
-    public void testGetSetDrying() {
-        Equilibrator sampler = new Equilibrator();
-        assertEquals(EMPTY_STRING, sampler.getDrying());
-        sampler.setDrying(DRYING);
-        assertEquals(DRYING, sampler.getDrying());
-        assertEquals(EMPTY_STRING, sampler.getVenting());
-        assertEquals(EMPTY_STRING, sampler.getGasFlowRate());
-        assertEquals(EMPTY_STRING, sampler.getWaterFlowRate());
-        assertEquals(EMPTY_STRING, sampler.getChamberGasVol());
-        assertEquals(EMPTY_STRING, sampler.getChamberWaterVol());
-        assertEquals(EMPTY_STRING, sampler.getChamberVol());
-        assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
-        assertEquals(EMPTY_STRING, sampler.getCalibration());
-        assertEquals(EMPTY_STRING, sampler.getLocation());
-        assertEquals(EMPTY_STRING, sampler.getModel());
-        assertEquals(EMPTY_STRING, sampler.getManufacturer());
-        assertEquals(EMPTY_STRING, sampler.getId());
-        assertEquals(EMPTY_STRING, sampler.getName());
-        sampler.setDrying(null);
-        assertEquals(EMPTY_STRING, sampler.getDrying());
-        sampler.setDrying("\t");
-        assertEquals(EMPTY_STRING, sampler.getDrying());
     }
 
     @Test
@@ -265,8 +222,6 @@ public class EquilibratorTest {
         sampler.setId(ID);
         sampler.setManufacturer(MANUFACTURER);
         sampler.setModel(MODEL);
-        sampler.setLocation(LOCATION);
-        sampler.setCalibration(CALIBRATION);
         sampler.setAddnInfo(ADDN_INFO);
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         sampler.setChamberVol(CHAMBER_VOLUME);
@@ -275,7 +230,6 @@ public class EquilibratorTest {
         sampler.setWaterFlowRate(WATER_FLOW_RATE);
         sampler.setGasFlowRate(GAS_FLOW_RATE);
         sampler.setVenting(VENTING);
-        sampler.setDrying(DRYING);
         assertNotEquals(sampler, dup);
 
         dup = sampler.clone();
@@ -318,20 +272,6 @@ public class EquilibratorTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setModel(MODEL);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setCalibration(CALIBRATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setCalibration(CALIBRATION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
@@ -388,13 +328,6 @@ public class EquilibratorTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setVenting(VENTING);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setDrying(DRYING);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setDrying(DRYING);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }

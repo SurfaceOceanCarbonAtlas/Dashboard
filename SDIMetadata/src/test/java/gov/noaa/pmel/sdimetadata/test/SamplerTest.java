@@ -1,5 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
+import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
@@ -20,8 +21,6 @@ public class SamplerTest {
     private static final String ID = "325";
     private static final String MANUFACTURER = "NOAA";
     private static final String MODEL = "7";
-    private static final String LOCATION = "Bow of ship";
-    private static final String CALIBRATION = "Factory calibration";
     private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
             "Some comment",
             "Another comment"
@@ -38,8 +37,6 @@ public class SamplerTest {
         sampler.setId(ID);
         sampler.setManufacturer(MANUFACTURER);
         sampler.setModel(MODEL);
-        sampler.setLocation(LOCATION);
-        sampler.setCalibration(CALIBRATION);
         sampler.setAddnInfo(ADDN_INFO);
         assertNotEquals(sampler, dup);
 
@@ -53,15 +50,15 @@ public class SamplerTest {
     public void testHashCodeEquals() {
         Sampler first = new Sampler();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(LOCATION));
+        assertFalse(first.equals(NAME));
 
         Sampler second = new Sampler();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        GasSensor gasSensor = new GasSensor();
-        assertFalse(first.equals(gasSensor));
-        assertFalse(gasSensor.equals(second));
+        Analyzer analyzer = new Analyzer();
+        assertFalse(first.equals(analyzer));
+        assertFalse(analyzer.equals(second));
 
         Instrument other = new Instrument();
         assertFalse(first.equals(other));
@@ -104,26 +101,6 @@ public class SamplerTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setModel(MODEL);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setLocation(LOCATION);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setCalibration(CALIBRATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setCalibration(CALIBRATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 

@@ -26,7 +26,6 @@ public class GasSensorTest {
     private static final String ID = "LI-COR 840 #23923";
     private static final String MANUFACTURER = "LI-COR";
     private static final String MODEL = "840";
-    private static final String LOCATION = "Attached to equilibrator headspace";
     private static final String CALIBRATION = "Calibrated using four non-zero gases, " +
             "followed by four atmospheric CO2 measurements, then 32 aqueous CO2 measurement";
     private static final String CALIBRATION_FREQUENCY = "Every ten hours";
@@ -48,7 +47,6 @@ public class GasSensorTest {
         assertEquals(CALIBRATION_FREQUENCY, sensor.getCalibrationFrequency());
         assertEquals(EMPTY_STRLIST, sensor.getAddnInfo());
         assertEquals(EMPTY_STR, sensor.getCalibration());
-        assertEquals(EMPTY_STR, sensor.getLocation());
         assertEquals(EMPTY_STR, sensor.getModel());
         assertEquals(EMPTY_STR, sensor.getManufacturer());
         assertEquals(EMPTY_STR, sensor.getId());
@@ -74,7 +72,6 @@ public class GasSensorTest {
         assertEquals(EMPTY_STR, sensor.getCalibrationFrequency());
         assertEquals(EMPTY_STRLIST, sensor.getAddnInfo());
         assertEquals(EMPTY_STR, sensor.getCalibration());
-        assertEquals(EMPTY_STR, sensor.getLocation());
         assertEquals(EMPTY_STR, sensor.getModel());
         assertEquals(EMPTY_STR, sensor.getManufacturer());
         assertEquals(EMPTY_STR, sensor.getId());
@@ -102,7 +99,6 @@ public class GasSensorTest {
         sensor.setId(ID);
         sensor.setManufacturer(MANUFACTURER);
         sensor.setModel(MODEL);
-        sensor.setLocation(LOCATION);
         sensor.setCalibration(CALIBRATION);
         sensor.setAddnInfo(ADDN_INFO);
         sensor.setCalibrationFrequency(CALIBRATION_FREQUENCY);
@@ -119,7 +115,7 @@ public class GasSensorTest {
     public void testHashCodeEquals() {
         GasSensor first = new GasSensor();
         assertFalse(first.equals(null));
-        assertFalse(first.equals(LOCATION));
+        assertFalse(first.equals(NAME));
 
         GasSensor second = new GasSensor();
         assertEquals(first.hashCode(), second.hashCode());
@@ -128,6 +124,13 @@ public class GasSensorTest {
         Instrument other = new Instrument();
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
+
+        first.setCalibration(CALIBRATION);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setCalibration(CALIBRATION);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
 
         first.setName(NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
@@ -166,26 +169,6 @@ public class GasSensorTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
         other.setModel(MODEL);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setLocation(LOCATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setLocation(LOCATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setLocation(LOCATION);
-        assertFalse(first.equals(other));
-        assertTrue(other.equals(second));
-
-        first.setCalibration(CALIBRATION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setCalibration(CALIBRATION);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-        other.setCalibration(CALIBRATION);
         assertFalse(first.equals(other));
         assertTrue(other.equals(second));
 
