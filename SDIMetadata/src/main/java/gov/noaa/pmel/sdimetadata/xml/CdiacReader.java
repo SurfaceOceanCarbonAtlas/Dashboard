@@ -370,8 +370,7 @@ public class CdiacReader extends DocumentHandler {
         coverage.setNorthernLatitude(
                 getNumericString(getElementText(NORTH_BOUND_ELEMENT_NAME), Coverage.LATITUDE_UNITS));
 
-        // CDIAC only has date stamps - so convert to earliest and latest time of that day
-        // This should be reset from the data
+        // CDIAC only has date stamps - use earliest and latest time of those days; should be reset from data
         coverage.setEarliestDataTime(getDatestamp(getElementText(TEMP_START_DATE_ELEMENT_NAME)).getEarliestTime());
         Date endDate = getDatestamp(getElementText(TEMP_END_DATE_ELEMENT_NAME)).getEarliestTime();
         endDate = new Date(endDate.getTime() + 24L * 60L * 60L * 1000L - 1000L);
@@ -403,6 +402,9 @@ public class CdiacReader extends DocumentHandler {
             // var.setDryingMethod();
             // var.setAddnInfo();
             // DataVar - setSamplingLocation, setSamplingElevation, ....
+            // AirPressure - DataVar + setPressureCorrection
+            // GasConc - DataVar + setDryingMethod, setWaterVaporCorrection
+            // AquGasConc - GasConc + setReportTemperature, setTemperatureCorrection
 
             varList.add(var);
         }
@@ -417,14 +419,14 @@ public class CdiacReader extends DocumentHandler {
         // Only the one equilibrator in CDIAC underway forms
         Equilibrator sampler = new Equilibrator();
         sampler.setName("Equilibrator");
-        // sampler.setId(id);
-        // sampler.setManufacturer(manufacturer);
-        // sampler.setModel(model);
+        // sampler.setId(id); - not specified
+        // sampler.setManufacturer(manufacturer); - not specified
+        // sampler.setModel(model); - not specified
 
         sampler.setEquilibratorType(getElementText(EQUI_TYPE_ELEMENT_NAME));
         sampler.setChamberVol(getElementText(EQUI_VOLUME_ELEMENT_NAME));
-        // sampler.setChamberWaterVol(chamberWaterVol);
-        // sampler.setChamberGasVol(chamberGasVol);
+        // sampler.setChamberWaterVol(chamberWaterVol); - probably part of chamber volume
+        // sampler.setChamberGasVol(chamberGasVol); - probably part of chamber volume
         sampler.setWaterFlowRate(getElementText(WATER_FLOW_RATE_ELEMENT_NAME));
         sampler.setGasFlowRate(getElementText(GAS_FLOW_RATE_ELEMENT_NAME));
         sampler.setVenting(getElementText(VENTED_ELEMENT_NAME));

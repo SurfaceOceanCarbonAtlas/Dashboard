@@ -74,8 +74,10 @@ public abstract class DocumentHandler {
         int len = expocode.length();
         // Trim off the -N at the end of NODCYYYYMMDD-N
         if ( (len == 14) && (expocode.charAt(12) == '-') &&
-                (expocode.charAt(13) >= '1') && (expocode.charAt(13) <= '9') )
+                (expocode.charAt(13) >= '1') && (expocode.charAt(13) <= '9') ) {
             expocode = expocode.substring(0, 12);
+            len = expocode.length();
+        }
         // Only exception to NODCYYYYMMDD is QUIMAYYYYMMDD; but QUIM which is not one of the codes
         if ( (len == 12) && EXPOCODE_PATTERN.matcher(expocode).matches() ) {
             String nodc = expocode.substring(0, 4);
@@ -89,46 +91,6 @@ public abstract class DocumentHandler {
     }
 
     /**
-     * Get the list of all child elements matching a name path
-     *
-     * @param fullElementListName
-     *         tab-separated names giving the path from the root element to the desired elements; cannot be null
-     *
-     * @return list of all child elements matching the name path;
-     *         an empty list is returned if no elements matching the path are found
-     */
-    protected List<Element> getElementList(String fullElementListName) {
-        Element elem = rootElement;
-        String[] names = fullElementListName.split("\t");
-        for (int k = 0; k < names.length - 1; k++) {
-            elem = elem.getChild(names[k]);
-            if ( null == elem )
-                return new ArrayList<Element>(0);
-        }
-        return elem.getChildren(names[names.length - 1]);
-    }
-
-    /**
-     * Get the text from a specified element under the root element.
-     *
-     * @param fullElementName
-     *         tab-separated names giving the path from the root element
-     *         to the element containing the text; cannot be null
-     *
-     * @return trimmed text of the specified element; an empty string is returned
-     *         if the element is not found or if the element does not contain text
-     */
-    protected String getElementText(String fullElementName) {
-        Element elem = rootElement;
-        for (String name : fullElementName.split("\t")) {
-            elem = elem.getChild(name);
-            if ( null == elem )
-                return "";
-        }
-        return elem.getTextTrim();
-    }
-
-    /**
      * Determine the lastName, firstName, and middle fields from a given full name.
      *
      * @param fullname
@@ -136,29 +98,33 @@ public abstract class DocumentHandler {
      *
      * @return a Person with just the lastName, firstName and middle fields assigned; never null but fields may be empty
      */
-    protected Person getPersonNames(String fullname) {
+    public static Person getPersonNames(String fullname) {
         Person person = new Person();
         if ( (fullname != null) && !fullname.isEmpty() ) {
-            String[] pieces = fullname.split(" \t");
+            String[] pieces = fullname.split("[ \t]+");
             if ( pieces.length > 0 ) {
                 if ( pieces[0].endsWith(",") || pieces[0].endsWith(";") ) {
                     person.setLastName(pieces[0].substring(0, pieces[0].length() - 1));
                     if ( pieces.length > 1 )
-                        person.setFirstName(pieces[pieces.length - 1]);
-                    String middle = "";
-                    for (int k = 2; k < pieces.length; k++) {
-                        middle += pieces[k - 1];
+                        person.setFirstName(pieces[1]);
+                    if ( pieces.length > 2 ) {
+                        String middle = pieces[2];
+                        for (int k = 3; k < pieces.length; k++) {
+                            middle += " " + pieces[k];
+                        }
+                        person.setMiddle(middle);
                     }
-                    person.setMiddle(middle);
                 }
                 else if ( pieces.length > 1 ) {
                     person.setFirstName(pieces[0]);
                     person.setLastName(pieces[pieces.length - 1]);
-                    String middle = "";
-                    for (int k = 2; k < pieces.length; k++) {
-                        middle += pieces[k - 1];
+                    if ( pieces.length > 2 ) {
+                        String middle = pieces[1];
+                        for (int k = 2; k < pieces.length - 1; k++) {
+                            middle += " " + pieces[k];
+                        }
+                        person.setMiddle(middle);
                     }
-                    person.setMiddle(middle);
                 }
                 else {
                     person.setLastName(pieces[0]);
@@ -175,10 +141,10 @@ public abstract class DocumentHandler {
      *
      * @return list of trimmed individual line strings; never null but may be empty
      */
-    protected ArrayList<String> getListOfLines(String multiline) {
+    public static ArrayList<String> getListOfLines(String multiline) {
         ArrayList<String> lineList = new ArrayList<String>();
         if ( multiline != null ) {
-            for (String val : multiline.split("\n\r")) {
+            for (String val : multiline.split("[\r\n]+")) {
                 val = val.trim();
                 if ( !val.isEmpty() )
                     lineList.add(val);
@@ -194,7 +160,7 @@ public abstract class DocumentHandler {
      * @return datestamp representing this date, or null if the date string is not in a valid format
      *         (the validity of the date itself is not checked)
      */
-    protected Datestamp getDatestamp(String datestring) {
+    public static Datestamp getDatestamp(String datestring) {
         if ( (null == datestring) || datestring.trim().isEmpty() )
             return null;
         String hypenstring;
@@ -242,23 +208,68 @@ public abstract class DocumentHandler {
      *
      * @return the numeric string object; never null but may be empty
      */
-    protected NumericString getNumericString(String numVal, String unitVal) {
+    public static NumericString getNumericString(String numVal, String unitVal) {
+        String numStr = numVal;
+        String unitStr = unitVal;
         if ( (numVal != null) && (unitVal == null) ) {
             // Check if unit is part of the string in the number element
-            String[] pieces = numVal.split(" \t\\(\\)\\[\\]\\{\\}");
+            String[] pieces = numVal.split("[ \t\\(\\)\\[\\]\\{\\}]+");
             if ( pieces.length > 1 ) {
-                numVal = pieces[0];
-                unitVal = pieces[1];
+                numStr = pieces[0];
+                unitStr = pieces[1];
                 for (int k = 2; k < pieces.length; k++) {
-                    unitVal += " " + pieces[k];
+                    unitStr += " " + pieces[k];
                 }
+            }
+            else {
+                numStr = pieces[0];
             }
         }
         try {
-            return new NumericString(numVal, unitVal);
+            return new NumericString(numStr, unitStr);
         } catch ( Exception ex ) {
             return new NumericString();
         }
+    }
+
+    /**
+     * Get the list of all child elements matching a name path
+     *
+     * @param fullElementListName
+     *         tab-separated names giving the path from the root element to the desired elements; cannot be null
+     *
+     * @return list of all child elements matching the name path;
+     *         an empty list is returned if no elements matching the path are found
+     */
+    public List<Element> getElementList(String fullElementListName) {
+        Element elem = rootElement;
+        String[] names = fullElementListName.split("\t");
+        for (int k = 0; k < names.length - 1; k++) {
+            elem = elem.getChild(names[k]);
+            if ( null == elem )
+                return new ArrayList<Element>(0);
+        }
+        return elem.getChildren(names[names.length - 1]);
+    }
+
+    /**
+     * Get the text from a specified element under the root element.
+     *
+     * @param fullElementName
+     *         tab-separated names giving the path from the root element
+     *         to the element containing the text; cannot be null
+     *
+     * @return trimmed text of the specified element; an empty string is returned
+     *         if the element is not found or if the element does not contain text
+     */
+    public String getElementText(String fullElementName) {
+        Element elem = rootElement;
+        for (String name : fullElementName.split("\t")) {
+            elem = elem.getChild(name);
+            if ( null == elem )
+                return "";
+        }
+        return elem.getTextTrim();
     }
 
 }
