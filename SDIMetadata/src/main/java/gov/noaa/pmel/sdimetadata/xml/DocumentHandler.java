@@ -171,7 +171,7 @@ public abstract class DocumentHandler {
     /**
      * @param multiline
      *         string containing line breaks to separate individual line strings;
-     *         if null, an empty list is returned
+     *         if null or blank, an empty list is returned
      *
      * @return list of trimmed individual line strings; never null but may be empty
      */

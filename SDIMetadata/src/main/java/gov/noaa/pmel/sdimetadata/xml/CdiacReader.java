@@ -6,7 +6,10 @@ import gov.noaa.pmel.sdimetadata.Platform;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
+import gov.noaa.pmel.sdimetadata.instrument.PressureSensor;
+import gov.noaa.pmel.sdimetadata.instrument.SalinitySensor;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
+import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
@@ -53,7 +56,6 @@ public class CdiacReader extends DocumentHandler {
     private static final String EXPERIMENT_NAME_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Experiment_Name";
     private static final String EXPERIMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Experiment_Type";
     private static final String PLATFORM_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Platform_Type";
-    private static final String CO2_INSTRUMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Co2_Instrument_type";
     private static final String MOORING_ID_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Mooring_ID";
 
     private static final String CRUISE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Cruise";
@@ -287,7 +289,7 @@ public class CdiacReader extends DocumentHandler {
 
         ArrayList<String> addnInfo = getListOfLines(getElementText(ADD_INFO_ELEMENT_NAME));
         String text = getElementText(MOORING_ID_ELEMENT_NAME);
-        if ( ! text.isEmpty() )
+        if ( !text.isEmpty() )
             addnInfo.add(0, "Mooring ID: " + text);
         text = getElementText(SUB_CRUISE_INFO_ELEMENT_NAME);
         if ( !text.isEmpty() )
@@ -333,10 +335,10 @@ public class CdiacReader extends DocumentHandler {
 
     /**
      * @param datasetId
-     *         dataset ID; if it matches the expocode pattern, the first four characters are used
-     *         as the platform NODC code to help identify the platform type
+     *         dataset ID; if it matches the expocode pattern, the first four characters
+     *         are used as the platform NODC code to help identify the platform type
      *
-     * @return information about the platform
+     * @return information about the platform; never null
      */
     private Platform getPlatform(String datasetId) {
         Platform platform = new Platform();
@@ -352,6 +354,10 @@ public class CdiacReader extends DocumentHandler {
         return platform;
     }
 
+    /**
+     * @return information about the data coverage; never null.  Data time limits are the earliest day
+     *         of the start date and latest day of the end date, and so are not more accurate than the day.
+     */
     private Coverage getCoverage() {
         Coverage coverage = new Coverage();
 
@@ -403,14 +409,17 @@ public class CdiacReader extends DocumentHandler {
         return varList;
     }
 
+    /**
+     * @return list of sampler information; never null.
+     *         CDIAC underway metadata only describes a single equilibrator.
+     */
     private List<Sampler> getSamplers() {
+        // Only the one equilibrator in CDIAC underway forms
         Equilibrator sampler = new Equilibrator();
-        // sampler.setName(name);
+        sampler.setName("Equilibrator");
         // sampler.setId(id);
         // sampler.setManufacturer(manufacturer);
         // sampler.setModel(model);
-        // sampler.setLocation(location);
-        // sampler.setCalibration(calibration);
 
         sampler.setEquilibratorType(getElementText(EQUI_TYPE_ELEMENT_NAME));
         sampler.setChamberVol(getElementText(EQUI_VOLUME_ELEMENT_NAME));
@@ -419,14 +428,56 @@ public class CdiacReader extends DocumentHandler {
         sampler.setWaterFlowRate(getElementText(WATER_FLOW_RATE_ELEMENT_NAME));
         sampler.setGasFlowRate(getElementText(GAS_FLOW_RATE_ELEMENT_NAME));
         sampler.setVenting(getElementText(VENTED_ELEMENT_NAME));
-
-        // sampler.setAddnInfo(addnInfo);
+        sampler.setAddnInfo(getListOfLines(getElementText(EQUI_ADDITIONAL_INFO_ELEMENT_NAME)));
 
         return Arrays.asList(sampler);
     }
 
+    /**
+     * @return list of analyzer (sensor) information; never null.
+     */
     private ArrayList<Analyzer> getAnalyzers() {
         ArrayList<Analyzer> sensors = new ArrayList<Analyzer>();
+
+        TemperatureSensor sstSensor = new TemperatureSensor();
+        sstSensor.setName("SST Sensor");
+        sstSensor.setManufacturer(getElementText(SST_MANUFACTURER_ELEMENT_NAME));
+        sstSensor.setModel(getElementText(SST_MODEL_ELEMENT_NAME));
+        sstSensor.setCalibration(getElementText(SST_CALIBRATION_ELEMENT_NAME));
+        sstSensor.setAddnInfo(getListOfLines(getElementText(SST_COMMENTS_ELEMENT_NAME)));
+        sensors.add(sstSensor);
+
+        TemperatureSensor teqSensor = new TemperatureSensor();
+        teqSensor.setName("T_equi Sensor");
+        teqSensor.setManufacturer(getElementText(EQT_MANUFACTURER_ELEMENT_NAME));
+        teqSensor.setModel(getElementText(EQT_MODEL_ELEMENT_NAME));
+        teqSensor.setCalibration(getElementText(EQT_CALIBRATION_ELEMENT_NAME));
+        teqSensor.setAddnInfo(getListOfLines(getElementText(EQT_COMMENTS_ELEMENT_NAME)));
+        sensors.add(teqSensor);
+
+        PressureSensor slpSensor = new PressureSensor();
+        slpSensor.setName("SLP Sensor");
+        slpSensor.setManufacturer(getElementText(ATM_MANUFACTURER_ELEMENT_NAME));
+        slpSensor.setModel(getElementText(ATM_MODEL_ELEMENT_NAME));
+        slpSensor.setCalibration(getElementText(ATM_CALIBRATION_ELEMENT_NAME));
+        slpSensor.setAddnInfo(getListOfLines(getElementText(ATM_COMMENTS_ELEMENT_NAME)));
+        sensors.add(slpSensor);
+
+        PressureSensor peqSensor = new PressureSensor();
+        peqSensor.setName("P_equi Sensor");
+        peqSensor.setManufacturer(getElementText(EQP_MANUFACTURER_ELEMENT_NAME));
+        peqSensor.setModel(getElementText(EQP_MODEL_ELEMENT_NAME));
+        peqSensor.setCalibration(getElementText(EQP_CALIBRATION_ELEMENT_NAME));
+        peqSensor.setAddnInfo(getListOfLines(getElementText(EQP_COMMENTS_ELEMENT_NAME)));
+        sensors.add(peqSensor);
+
+        SalinitySensor salSensor = new SalinitySensor();
+        salSensor.setName("Salinity Sensor");
+        salSensor.setManufacturer(getElementText(SSS_MANUFACTURER_ELEMENT_NAME));
+        salSensor.setModel(getElementText(SSS_MODEL_ELEMENT_NAME));
+        salSensor.setCalibration(getElementText(SSS_CALIBRATION_ELEMENT_NAME));
+        salSensor.setAddnInfo(getListOfLines(getElementText(SSS_COMMENTS_ELEMENT_NAME)));
+        sensors.add(salSensor);
 
         // TODO:
 
