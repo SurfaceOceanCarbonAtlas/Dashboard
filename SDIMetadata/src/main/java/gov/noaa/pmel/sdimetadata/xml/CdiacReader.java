@@ -5,7 +5,9 @@ import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.Platform;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
+import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
+import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import gov.noaa.pmel.sdimetadata.instrument.PressureSensor;
 import gov.noaa.pmel.sdimetadata.instrument.SalinitySensor;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
@@ -18,7 +20,7 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import java.io.File;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -122,11 +124,10 @@ public class CdiacReader extends DocumentHandler {
     private static final String CALIBRATION_ELEMENT_NAME = "Calibration";
     private static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
 
-    private static final String CO2_SENSORS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "CO2_Sensors";
-    private static final String CO2_SENSOR_ELEMENT_NAME = CO2_SENSORS_ELEMENT_NAME + "\t" + "CO2_Sensor";
+    private static final String CO2_SENSOR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "CO2_Sensors" + "\t" + "CO2_Sensor";
     private static final String CO2_MEASUREMENT_METHOD_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Measurement_Method";
-    private static final String CO2_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String CO2_MODEL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
+    private static final String CO2_SENSOR_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
+    private static final String CO2_SENSOR_MODEL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String CO2_FREQUENCY_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Frequency";
     private static final String CO2_WATER_RES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Resolution_Water";
     private static final String CO2_WATER_UNC_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Uncertainty_Water";
@@ -139,6 +140,8 @@ public class CdiacReader extends DocumentHandler {
     private static final String DETAILS_OF_CO2_SENSING_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Details_Co2_Sensing";
     private static final String ANALYSIS_OF_COMPARISON_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Analysis_of_Co2_Comparision";
     private static final String MEASURED_CO2_PARAMS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Measured_Co2_Params";
+    private static final String CO2_SENSOR_COMMENTS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
+    private static final String CO2_SENSOR_NUM_NONZERO_GASSES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "No_Of_Non_Zero_Gas_Stds";
 
     private static final String SST_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Sea_Surface_Temperature";
     private static final String SST_LOCATION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
@@ -197,35 +200,37 @@ public class CdiacReader extends DocumentHandler {
     private static final String SSS_CALIBRATION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String SSS_COMMENTS_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
 
-    private static final String OTHER_SENSORS_ELEMENT_NAME = "Other_Sensors";
-    // <Other_Sensors> contains mutliple <Sensor> elements, each with with <Manufacturer>, <Model>, <Accuracy> or <Uncertainty>,
+    private static final String OTHER_SENSORS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Other_Sensors" + "\t" + "Sensor";
+    // <Other_Sensors> contains multiple <Sensor> elements, each with with <Manufacturer>, <Model>, <Accuracy> or <Uncertainty>,
     // <Precision> or <Resolution>, <Calibration>, and <Other_Comments> elements
-    private static final String SENSOR_ELEMENT_NAME = OTHER_SENSORS_ELEMENT_NAME + "\t" + "Sensor";
 
     private static final String DATA_SET_REFS_ELEMENT_NAME = "Data_set_References";
-    private static final String ADD_INFO_ELEMENT_NAME = "Additional_Information";
+    private static final String ADDN_INFO_ELEMENT_NAME = "Additional_Information";
     private static final String CITATION_ELEMENT_NAME = "Citation";
 
+    private static final String DATA_SET_LINK_ELEMENT_NAME = "Data_Set_Link";
+    private static final String DATA_SET_LINK_URL_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + "\t" + "URL";
+    private static final String DATA_SET_LINK_NOTE_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + "\t" + "Link_Note";
+
     /**
-     * Read the XML contents of the given file.
+     * Create from XML content provided by the given reader.
      *
-     * @param xmlfile
-     *         read the XML in this file
+     * @param xmlReader
+     *         read the XML from here
      *
      * @throws IllegalArgumentException
-     *         if there is a problem reading the file or its XML contents
+     *         if there is a problem interpreting the XML read
      */
-    public CdiacReader(File xmlfile) throws IllegalArgumentException {
+    public CdiacReader(Reader xmlReader) throws IllegalArgumentException {
         Document omeDoc;
         try {
-            omeDoc = (new SAXBuilder()).build(xmlfile);
+            omeDoc = (new SAXBuilder()).build(xmlReader);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems interpreting the XML contents in: " + xmlfile.getPath() +
-                    "\n    " + ex.getMessage());
+            throw new IllegalArgumentException("Problems interpreting the XML contents: " + ex.getMessage());
         }
         rootElement = omeDoc.getRootElement();
         if ( rootElement == null )
-            throw new IllegalArgumentException("No root element found in: " + xmlfile.getPath());
+            throw new IllegalArgumentException("No root element found");
     }
 
     /**
@@ -235,10 +240,9 @@ public class CdiacReader extends DocumentHandler {
         SDIMetadata mdata = new SDIMetadata();
         MiscInfo misc = getMiscInfo();
         mdata.setMiscInfo(misc);
-        String datasetId = misc.getDatasetId();
         mdata.setSubmitter(getSubmitter());
         mdata.setInvestigators(getInvestigators());
-        mdata.setPlatform(getPlatform(datasetId));
+        mdata.setPlatform(getPlatform(misc.getDatasetId()));
         mdata.setCoverage(getCoverage());
         mdata.setVariables(getVariables());
         mdata.setSamplers(getSamplers());
@@ -287,8 +291,16 @@ public class CdiacReader extends DocumentHandler {
         }
         info.setPortsOfCall(portsOfCall);
 
-        ArrayList<String> addnInfo = getListOfLines(getElementText(ADD_INFO_ELEMENT_NAME));
-        String text = getElementText(MOORING_ID_ELEMENT_NAME);
+        info.setReferences(getListOfLines(getElementText(DATA_SET_REFS_ELEMENT_NAME)));
+        info.setCitation(getElementText(CITATION_ELEMENT_NAME));
+        info.setWebsite(getElementText(DATA_SET_LINK_URL_ELEMENT_NAME));
+
+        ArrayList<String> addnInfo = getListOfLines(getElementText(ADDN_INFO_ELEMENT_NAME));
+        String text;
+        text = getElementText(DATA_SET_LINK_NOTE_ELEMENT_NAME);
+        if ( !text.isEmpty() )
+            addnInfo.add(0, "Website Note: " + text);
+        text = getElementText(MOORING_ID_ELEMENT_NAME);
         if ( !text.isEmpty() )
             addnInfo.add(0, "Mooring ID: " + text);
         text = getElementText(SUB_CRUISE_INFO_ELEMENT_NAME);
@@ -299,7 +311,6 @@ public class CdiacReader extends DocumentHandler {
             addnInfo.add(0, "Experiment Type: " + text);
         info.setAddnInfo(addnInfo);
 
-        // TODO: references, citation, URL, link note
         return info;
     }
 
@@ -309,6 +320,7 @@ public class CdiacReader extends DocumentHandler {
     private Submitter getSubmitter() {
         Submitter submitter = new Submitter(getPersonNames(getElementText(USER_NAME_ELEMENT_NAME)));
         submitter.setStreets(getListOfLines(getElementText(USER_ADDRESS_ELEMENT_NAME)));
+        // CDIAC XML does not separate streets, city, region, zip, country
         submitter.setOrganization(getElementText(USER_ORGANIZATION_ELEMENT_NAME));
         submitter.setPhone(getElementText(USER_PHONE_ELEMENT_NAME));
         submitter.setEmail(getElementText(USER_EMAIL_ELEMENT_NAME));
@@ -324,6 +336,7 @@ public class CdiacReader extends DocumentHandler {
         for (Element inv : getElementList(INVESTIGATOR_ELEMENT_NAME)) {
             Investigator pi = new Investigator(getPersonNames(inv.getChildTextTrim(NAME_ELEMENT_NAME)));
             pi.setStreets(getListOfLines(inv.getChildTextTrim(ADDRESS_ELEMENT_NAME)));
+            // CDIAC XML does not separate streets, city, region, zip, country
             pi.setOrganization(inv.getChildTextTrim(ORGANIZATION_ELEMENT_NAME));
             pi.setPhone(inv.getChildTextTrim(PHONE_ELEMENT_NAME));
             pi.setEmail(inv.getChildTextTrim(EMAIL_ELEMENT_NAME));
@@ -441,6 +454,39 @@ public class CdiacReader extends DocumentHandler {
     private ArrayList<Analyzer> getAnalyzers() {
         ArrayList<Analyzer> sensors = new ArrayList<Analyzer>();
 
+        GasSensor co2Sensor = new GasSensor();
+        co2Sensor.setName("CO2 Sensor");
+        co2Sensor.setManufacturer(getElementText(CO2_SENSOR_MANUFACTURER_ELEMENT_NAME));
+        co2Sensor.setModel(getElementText(CO2_SENSOR_MODEL_ELEMENT_NAME));
+        co2Sensor.setCalibration(getElementText(CO2_SENSOR_CALIBRATION_ELEMENT_NAME));
+        co2Sensor.setAddnInfo(getListOfLines(getElementText(CO2_SENSOR_COMMENTS_ELEMENT_NAME)));
+        // All the calibration gas information is stuck together in the following ...
+        String calGasInfo = getElementText(CO2_CALIBRATION_MANUFACTURER_ELEMENT_NAME);
+        ArrayList<String> calGasInfoList = getListOfLines(calGasInfo);
+        // ... except for the number of non-zero calibration gasses
+        String numNonZeroGasses = getElementText(CO2_SENSOR_NUM_NONZERO_GASSES_ELEMENT_NAME);
+        int numNonZero = numNonZeroGasses.isEmpty() ? 0 : Integer.parseInt(numNonZeroGasses);
+        if ( (numNonZero > 0) && !calGasInfo.isEmpty() ) {
+            ArrayList<CalibrationGas> gasList = new ArrayList<CalibrationGas>(numNonZero);
+            if ( (calGasInfoList.size() == 1) && (numNonZero == 1) ) {
+                gasList.add(new CalibrationGas(calGasInfo, "CO2", null, null, null));
+            }
+            else if ( calGasInfoList.size() == numNonZero ) {
+                for (int k = 0; k < numNonZero; k++) {
+                    gasList.add(new CalibrationGas(calGasInfoList.get(k), "CO2", null, null, null));
+                }
+            }
+            else {
+                for (int k = 1; k <= numNonZero; k++) {
+                    gasList.add(new CalibrationGas(
+                            "Calibration gas " + Integer.toString(k) + " mentioned in: " + calGasInfo,
+                            "CO2", null, null, null));
+                }
+            }
+            co2Sensor.setCalibrationGases(gasList);
+        }
+        sensors.add(co2Sensor);
+
         TemperatureSensor sstSensor = new TemperatureSensor();
         sstSensor.setName("SST Sensor");
         sstSensor.setManufacturer(getElementText(SST_MANUFACTURER_ELEMENT_NAME));
@@ -454,7 +500,11 @@ public class CdiacReader extends DocumentHandler {
         teqSensor.setManufacturer(getElementText(EQT_MANUFACTURER_ELEMENT_NAME));
         teqSensor.setModel(getElementText(EQT_MODEL_ELEMENT_NAME));
         teqSensor.setCalibration(getElementText(EQT_CALIBRATION_ELEMENT_NAME));
-        teqSensor.setAddnInfo(getListOfLines(getElementText(EQT_COMMENTS_ELEMENT_NAME)));
+        ArrayList<String> addnInfo = getListOfLines(getElementText(EQT_COMMENTS_ELEMENT_NAME));
+        String warming = getElementText(EQT_WARMING_ELEMENT_NAME);
+        if ( !warming.isEmpty() )
+            addnInfo.add(0, "Warming: " + warming);
+        teqSensor.setAddnInfo(addnInfo);
         sensors.add(teqSensor);
 
         PressureSensor slpSensor = new PressureSensor();
@@ -481,7 +531,17 @@ public class CdiacReader extends DocumentHandler {
         salSensor.setAddnInfo(getListOfLines(getElementText(SSS_COMMENTS_ELEMENT_NAME)));
         sensors.add(salSensor);
 
-        // TODO:
+        int k = 0;
+        for (Element elem : getElementList(OTHER_SENSORS_ELEMENT_NAME)) {
+            k++;
+            Analyzer otherSensor = new Analyzer();
+            otherSensor.setName("Other Sensor " + Integer.toString(k));
+            otherSensor.setManufacturer(elem.getChildTextTrim(MANUFACTURER_ELEMENT_NAME));
+            otherSensor.setModel(elem.getChildTextTrim(MODEL_ELEMENT_NAME));
+            otherSensor.setCalibration(elem.getChildTextTrim(CALIBRATION_ELEMENT_NAME));
+            otherSensor.setAddnInfo(getListOfLines(elem.getChildTextTrim(COMMENTS_ELEMENT_NAME)));
+            sensors.add(otherSensor);
+        }
 
         return sensors;
     }
