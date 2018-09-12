@@ -49,6 +49,7 @@ public class DataVar extends Variable implements Cloneable {
             colName = var.colName;
             fullName = var.fullName;
             varUnit = var.varUnit;
+            missVal = var.missVal;
             flagColName = var.flagColName;
             accuracy = var.accuracy.clone();
             precision = var.precision.clone();

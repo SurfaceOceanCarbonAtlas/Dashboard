@@ -13,6 +13,7 @@ public class Variable implements Cloneable {
     protected String colName;
     protected String fullName;
     protected String varUnit;
+    protected String missVal;
     protected String flagColName;
     protected NumericString accuracy;
     protected NumericString precision;
@@ -25,6 +26,7 @@ public class Variable implements Cloneable {
         colName = "";
         fullName = "";
         varUnit = "";
+        missVal = "";
         flagColName = "";
         accuracy = new NumericString();
         precision = new NumericString();
@@ -87,6 +89,23 @@ public class Variable implements Cloneable {
      */
     public void setVarUnit(String varUnit) {
         this.varUnit = (varUnit != null) ? varUnit.trim() : "";
+    }
+
+    /**
+     * @return the value assigned for missing values for this variable;
+     *         never null but may be an empty string (which should be interpreted as standard missing values)
+     */
+    public String getMissVal() {
+        return missVal;
+    }
+
+    /**
+     * @param missVal
+     *         assign as the value assigned for missing values for this variable;
+     *         if null, an empty string is assigned (which should be interpreted as standard missing values)
+     */
+    public void setMissVal(String missVal) {
+        this.missVal = (missVal != null) ? missVal.trim() : "";
     }
 
     /**
@@ -198,6 +217,7 @@ public class Variable implements Cloneable {
         dup.colName = colName;
         dup.fullName = fullName;
         dup.varUnit = varUnit;
+        dup.missVal = missVal;
         dup.flagColName = flagColName;
         dup.accuracy = accuracy.clone();
         dup.precision = precision.clone();
@@ -214,21 +234,23 @@ public class Variable implements Cloneable {
         if ( !(obj instanceof Variable) )
             return false;
 
-        Variable variable = (Variable) obj;
+        Variable other = (Variable) obj;
 
-        if ( !colName.equals(variable.colName) )
+        if ( !colName.equals(other.colName) )
             return false;
-        if ( !fullName.equals(variable.fullName) )
+        if ( !fullName.equals(other.fullName) )
             return false;
-        if ( !varUnit.equals(variable.varUnit) )
+        if ( !varUnit.equals(other.varUnit) )
             return false;
-        if ( !flagColName.equals(variable.flagColName) )
+        if ( !missVal.equals(other.missVal) )
             return false;
-        if ( !accuracy.equals(variable.accuracy) )
+        if ( !flagColName.equals(other.flagColName) )
             return false;
-        if ( !precision.equals(variable.precision) )
+        if ( !accuracy.equals(other.accuracy) )
             return false;
-        if ( !addnInfo.equals(variable.addnInfo) )
+        if ( !precision.equals(other.precision) )
+            return false;
+        if ( !addnInfo.equals(other.addnInfo) )
             return false;
 
         return true;
@@ -240,6 +262,7 @@ public class Variable implements Cloneable {
         int result = colName.hashCode();
         result = result * prime + fullName.hashCode();
         result = result * prime + varUnit.hashCode();
+        result = result * prime + missVal.hashCode();
         result = result * prime + flagColName.hashCode();
         result = result * prime + accuracy.hashCode();
         result = result * prime + precision.hashCode();
@@ -253,6 +276,7 @@ public class Variable implements Cloneable {
                 "colName='" + colName + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", varUnit='" + varUnit + '\'' +
+                ", missVal='" + missVal + '\'' +
                 ", flagColName='" + flagColName + '\'' +
                 ", accuracy=" + accuracy +
                 ", precision=" + precision +

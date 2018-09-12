@@ -15,6 +15,7 @@ import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
+import gov.noaa.pmel.sdimetadata.variable.VarType;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -250,7 +251,6 @@ public class CdiacReader extends DocumentHandler {
         return mdata;
     }
 
-
     /**
      * @return the miscellaneous information read from this CDIAC XML file; never null
      */
@@ -404,9 +404,53 @@ public class CdiacReader extends DocumentHandler {
         ArrayList<Variable> varList = new ArrayList<Variable>();
         for (Element varElem : getElementList(VARIABLE_ELEMENT_NAME)) {
             Variable var = new Variable();
-            var.setColName(varElem.getChildTextTrim(VARIABLES_NAME_ELEMENT_NAME));
+            String colName = varElem.getChildTextTrim(VARIABLES_NAME_ELEMENT_NAME);
+            var.setColName(colName);
             var.setFullName(varElem.getChildTextTrim(VARIABLES_DESCRIPTION_ELEMENT_NAME));
             var.setVarUnit(varElem.getChildTextTrim(VARIABLES_UNIT_OF_VARIABLE_ELEMENT_NAME));
+            // var.setMissVal(missVal); - not specified
+
+            VarType type = VarType.getVarTypeFromColumnName(colName);
+            switch ( type ) {
+                case OTHER:
+                    break;
+                case FCO2_WATER_EQU:
+                    break;
+                case FCO2_WATER_SST:
+                    break;
+                case PCO2_WATER_EQU:
+                    break;
+                case PCO2_WATER_SST:
+                    break;
+                case XCO2_WATER_EQU:
+                    break;
+                case XCO2_WATER_SST:
+                    break;
+                case FCO2_ATM_ACTUAL:
+                    break;
+                case FCO2_ATM_INTERP:
+                    break;
+                case PCO2_ATM_ACTUAL:
+                    break;
+                case PCO2_ATM_INTERP:
+                    break;
+                case XCO2_ATM_ACTUAL:
+                    break;
+                case XCO2_ATM_INTERP:
+                    break;
+                case SEA_SURFACE_TEMPERATURE:
+                    break;
+                case EQUILIBRATOR_TEMPERATURE:
+                    break;
+                case SEA_LEVEL_PRESSURE:
+                    break;
+                case EQUILIBRATOR_PRESSURE:
+                    break;
+                case SALINITY:
+                    break;
+                default:
+                    throw new RuntimeException("Unexpected VarType of " + type);
+            }
 
             // TODO:
             // var.setAccuracy();

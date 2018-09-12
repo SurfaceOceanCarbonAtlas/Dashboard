@@ -28,6 +28,7 @@ public class DataVarTest {
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
     private static final String VAR_UNIT = "degrees Celsius";
+    private static final String MISSING_VALUE = "-999";
     private static final String FLAG_COL_NAME = "WOCE SST";
     private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
     private static final NumericString PRECISION = new NumericString("0.001", "deg C");
@@ -88,11 +89,27 @@ public class DataVarTest {
     }
 
     @Test
+    public void testGetSetMissVal() {
+        DataVar var = new DataVar();
+        assertEquals(EMPTY_STRING, var.getMissVal());
+        var.setMissVal(MISSING_VALUE);
+        assertEquals(MISSING_VALUE, var.getMissVal());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        assertEquals(EMPTY_STRING, var.getFullName());
+        assertEquals(EMPTY_STRING, var.getColName());
+        var.setMissVal(null);
+        assertEquals(EMPTY_STRING, var.getMissVal());
+        var.setMissVal("\t");
+        assertEquals(EMPTY_STRING, var.getMissVal());
+    }
+
+    @Test
     public void testGetSetFlagColName() {
         DataVar var = new DataVar();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -112,6 +129,7 @@ public class DataVarTest {
         assertNotSame(ACCURACY, numstr);
         assertNotSame(numstr, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -144,6 +162,7 @@ public class DataVarTest {
         assertNotSame(numstr, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -177,6 +196,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -208,6 +228,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -228,6 +249,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -247,6 +269,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -269,6 +292,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -292,6 +316,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -316,6 +341,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -341,6 +367,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -367,6 +394,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -397,6 +425,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -426,6 +455,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -470,6 +500,7 @@ public class DataVarTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -497,6 +528,7 @@ public class DataVarTest {
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
+        var.setMissVal(MISSING_VALUE);
         var.setFlagColName(FLAG_COL_NAME);
         var.setAccuracy(ACCURACY);
         var.setPrecision(PRECISION);
@@ -518,6 +550,7 @@ public class DataVarTest {
         assertEquals(PRECISION, dataVar.getPrecision());
         assertEquals(ACCURACY, dataVar.getAccuracy());
         assertEquals(FLAG_COL_NAME, dataVar.getFlagColName());
+        assertEquals(MISSING_VALUE, dataVar.getMissVal());
         assertEquals(VAR_UNIT, dataVar.getVarUnit());
         assertEquals(FULL_NAME, dataVar.getFullName());
         assertEquals(COL_NAME, dataVar.getColName());
@@ -563,6 +596,7 @@ public class DataVarTest {
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
+        var.setMissVal(MISSING_VALUE);
         var.setFlagColName(FLAG_COL_NAME);
         var.setAccuracy(ACCURACY);
         var.setPrecision(PRECISION);
@@ -620,6 +654,13 @@ public class DataVarTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setVarUnit(VAR_UNIT);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setMissVal(MISSING_VALUE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setMissVal(MISSING_VALUE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

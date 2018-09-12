@@ -3,7 +3,6 @@ package gov.noaa.pmel.sdimetadata.test;
 import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.GasConc;
-import gov.noaa.pmel.sdimetadata.variable.DataVar;
 import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import org.junit.Test;
 
@@ -28,6 +27,7 @@ public class GasConcTest {
     private static final String COL_NAME = "xCO2_atm";
     private static final String FULL_NAME = "Mole fraction CO2 in sea level atmosphere";
     private static final String VAR_UNIT = "umol/mol";
+    private static final String MISSING_VALUE = "-999";
     private static final String FLAG_COL_NAME = "WOCE xCO2_atm";
     private static final NumericString ACCURACY = new NumericString("0.01", "umol/mol");
     private static final NumericString PRECISION = new NumericString("0.001", "umol/mol");
@@ -72,6 +72,7 @@ public class GasConcTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -103,6 +104,7 @@ public class GasConcTest {
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
+        assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
@@ -162,6 +164,7 @@ public class GasConcTest {
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
+        var.setMissVal(MISSING_VALUE);
         var.setFlagColName(FLAG_COL_NAME);
         var.setAccuracy(ACCURACY);
         var.setPrecision(PRECISION);
@@ -222,6 +225,13 @@ public class GasConcTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setVarUnit(VAR_UNIT);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setMissVal(MISSING_VALUE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setMissVal(MISSING_VALUE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
