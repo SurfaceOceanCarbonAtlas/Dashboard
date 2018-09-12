@@ -409,10 +409,14 @@ public class CdiacReader extends DocumentHandler {
             var.setFullName(varElem.getChildTextTrim(VARIABLES_DESCRIPTION_ELEMENT_NAME));
             var.setVarUnit(varElem.getChildTextTrim(VARIABLES_UNIT_OF_VARIABLE_ELEMENT_NAME));
             // var.setMissVal(missVal); - not specified
+            // var.setFlagColName(); - not specified
 
             VarType type = VarType.getVarTypeFromColumnName(colName);
             switch ( type ) {
                 case OTHER:
+                    // var.setAccuracy(); - not specified
+                    // var.setPrecision(); - not specified
+                    // var.setAddnInfo(); - not specified
                     break;
                 case FCO2_WATER_EQU:
                     break;
@@ -448,6 +452,10 @@ public class CdiacReader extends DocumentHandler {
                     break;
                 case SALINITY:
                     break;
+                case WOCE_CO2_WATER:
+                    break;
+                case WOCE_CO2_ATM:
+                    break;
                 default:
                     throw new RuntimeException("Unexpected VarType of " + type);
             }
@@ -456,7 +464,6 @@ public class CdiacReader extends DocumentHandler {
             // var.setAccuracy();
             // var.setPrecision();
             // var.setFlagColName();
-            // var.setDryingMethod();
             // var.setAddnInfo();
             // DataVar - setSamplingLocation, setSamplingElevation, ....
             // AirPressure - DataVar + setPressureCorrection

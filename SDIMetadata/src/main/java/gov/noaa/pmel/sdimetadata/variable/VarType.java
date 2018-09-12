@@ -21,7 +21,9 @@ public enum VarType {
     EQUILIBRATOR_TEMPERATURE,
     SEA_LEVEL_PRESSURE,
     EQUILIBRATOR_PRESSURE,
-    SALINITY;
+    SALINITY,
+    WOCE_CO2_WATER,
+    WOCE_CO2_ATM;
 
     private static final Pattern STRIP_PATTERN = Pattern.compile("[^\\p{javaUpperCase}\\p{Digit}]+");
 
@@ -951,6 +953,44 @@ public enum VarType {
         KEY_TO_TYPE_MAP.put("tsgsalcorr", SALINITY);
         KEY_TO_TYPE_MAP.put("tsgsalt", SALINITY);
         KEY_TO_TYPE_MAP.put("tssal", SALINITY);
+
+        KEY_TO_TYPE_MAP.put("co2fwoceflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("co2swqf", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("fco2flag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("fco2qcflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("fco2swqf", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("flag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("pco2swqf", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qc", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcco2aq", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcco2water", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcflagw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qcwater", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qfco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qffco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qfpco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qfxco2", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("qfxco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceco2", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceco2aq", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceco2sw", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceco2water", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceflags", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("woceqcflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("wocewater", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("xco2dryswwoceflag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("xco2flag", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("xco2swqf", WOCE_CO2_WATER);
+        KEY_TO_TYPE_MAP.put("xco2swqfint", WOCE_CO2_WATER);
+
+        KEY_TO_TYPE_MAP.put("woceco2atm", WOCE_CO2_ATM);
+        KEY_TO_TYPE_MAP.put("qcair", WOCE_CO2_ATM);
+        KEY_TO_TYPE_MAP.put("qcco2air", WOCE_CO2_ATM);
+        KEY_TO_TYPE_MAP.put("qcco2atm", WOCE_CO2_ATM);
+        KEY_TO_TYPE_MAP.put("qcflagair", WOCE_CO2_ATM);
     }
 
 }
