@@ -9,10 +9,30 @@ public class GasConc extends DataVar implements Cloneable {
     protected String dryingMethod;
     protected String waterVaporCorrection;
 
+    /**
+     * Create with all field empty.
+     */
     public GasConc() {
         super();
         dryingMethod = "";
         waterVaporCorrection = "";
+    }
+
+    /**
+     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * If a GasConc is given, all GasConc fields are copied.
+     */
+    public GasConc(Variable var) {
+        super(var);
+        if ( (var != null) && (var instanceof GasConc) ) {
+            GasConc conc = (GasConc) var;
+            dryingMethod = conc.dryingMethod;
+            waterVaporCorrection = conc.waterVaporCorrection;
+        }
+        else {
+            dryingMethod = "";
+            waterVaporCorrection = "";
+        }
     }
 
     /**

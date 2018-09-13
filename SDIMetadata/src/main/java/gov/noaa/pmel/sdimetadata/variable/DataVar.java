@@ -41,7 +41,7 @@ public class DataVar extends Variable implements Cloneable {
     }
 
     /**
-     * Create using the basic values in the given variable
+     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
      */
     public DataVar(Variable var) {
         this();
@@ -54,6 +54,20 @@ public class DataVar extends Variable implements Cloneable {
             accuracy = var.accuracy.clone();
             precision = var.precision.clone();
             addnInfo = new ArrayList<String>(var.addnInfo);
+            if ( var instanceof DataVar ) {
+                DataVar other = (DataVar) var;
+                observeType = other.observeType;
+                measureMethod = other.measureMethod;
+                methodDescription = other.methodDescription;
+                methodReference = other.methodReference;
+                samplingLocation = other.samplingLocation;
+                samplingElevation = other.samplingElevation;
+                storageMethod = other.storageMethod;
+                replication = other.replication;
+                researcher = other.researcher.clone();
+                samplerNames = new ArrayList<String>(other.samplerNames);
+                analyzerNames = new ArrayList<String>(other.analyzerNames);
+            }
         }
     }
 

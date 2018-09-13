@@ -15,6 +15,11 @@ import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
+import gov.noaa.pmel.sdimetadata.variable.AirPressure;
+import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
+import gov.noaa.pmel.sdimetadata.variable.GasConc;
+import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.VarType;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
@@ -402,63 +407,17 @@ public class CdiacReader extends DocumentHandler {
 
     private ArrayList<Variable> getVariables() {
         ArrayList<Variable> varList = new ArrayList<Variable>();
+        ArrayList<Integer> co2WaterVarIndices = new ArrayList<Integer>();
+        ArrayList<Integer> co2AtmVarIndices = new ArrayList<Integer>();
+        String woceCO2WaterVarNames = null;
+        String woceCO2AtmVarNames = null;
+        int k = 0;
         for (Element varElem : getElementList(VARIABLE_ELEMENT_NAME)) {
             Variable var = new Variable();
             String colName = varElem.getChildTextTrim(VARIABLES_NAME_ELEMENT_NAME);
             var.setColName(colName);
             var.setFullName(varElem.getChildTextTrim(VARIABLES_DESCRIPTION_ELEMENT_NAME));
             var.setVarUnit(varElem.getChildTextTrim(VARIABLES_UNIT_OF_VARIABLE_ELEMENT_NAME));
-            // var.setMissVal(missVal); - not specified
-            // var.setFlagColName(); - not specified
-
-            VarType type = VarType.getVarTypeFromColumnName(colName);
-            switch ( type ) {
-                case OTHER:
-                    // var.setAccuracy(); - not specified
-                    // var.setPrecision(); - not specified
-                    // var.setAddnInfo(); - not specified
-                    break;
-                case FCO2_WATER_EQU:
-                    break;
-                case FCO2_WATER_SST:
-                    break;
-                case PCO2_WATER_EQU:
-                    break;
-                case PCO2_WATER_SST:
-                    break;
-                case XCO2_WATER_EQU:
-                    break;
-                case XCO2_WATER_SST:
-                    break;
-                case FCO2_ATM_ACTUAL:
-                    break;
-                case FCO2_ATM_INTERP:
-                    break;
-                case PCO2_ATM_ACTUAL:
-                    break;
-                case PCO2_ATM_INTERP:
-                    break;
-                case XCO2_ATM_ACTUAL:
-                    break;
-                case XCO2_ATM_INTERP:
-                    break;
-                case SEA_SURFACE_TEMPERATURE:
-                    break;
-                case EQUILIBRATOR_TEMPERATURE:
-                    break;
-                case SEA_LEVEL_PRESSURE:
-                    break;
-                case EQUILIBRATOR_PRESSURE:
-                    break;
-                case SALINITY:
-                    break;
-                case WOCE_CO2_WATER:
-                    break;
-                case WOCE_CO2_ATM:
-                    break;
-                default:
-                    throw new RuntimeException("Unexpected VarType of " + type);
-            }
 
             // TODO:
             // var.setAccuracy();
@@ -470,8 +429,144 @@ public class CdiacReader extends DocumentHandler {
             // GasConc - DataVar + setDryingMethod, setWaterVaporCorrection
             // AquGasConc - GasConc + setReportTemperature, setTemperatureCorrection
 
+            VarType type = VarType.getVarTypeFromColumnName(colName);
+            switch ( type ) {
+                case OTHER:
+                    break;
+                case FCO2_WATER_EQU:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc fco2WaterEqu = new AquGasConc(var);
+                    // TODO:
+                    fco2WaterEqu.setReportTemperature("Equilibrator temperature");
+                    var = fco2WaterEqu;
+                    break;
+                case FCO2_WATER_SST:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc fco2WaterSst = new AquGasConc(var);
+                    // TODO:
+                    fco2WaterSst.setReportTemperature("Sea surface temperature");
+                    var = fco2WaterSst;
+                    break;
+                case PCO2_WATER_EQU:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc pco2WaterEqu = new AquGasConc(var);
+                    // TODO:
+                    pco2WaterEqu.setReportTemperature("Equilibrator temperature");
+                    var = pco2WaterEqu;
+                    break;
+                case PCO2_WATER_SST:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc pco2WaterSst = new AquGasConc(var);
+                    // TODO:
+                    pco2WaterSst.setReportTemperature("Sea surface temperature");
+                    var = pco2WaterSst;
+                    break;
+                case XCO2_WATER_EQU:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc xco2WaterEqu = new AquGasConc(var);
+                    // TODO:
+                    xco2WaterEqu.setReportTemperature("Equilibrator temperature");
+                    var = xco2WaterEqu;
+                    break;
+                case XCO2_WATER_SST:
+                    co2WaterVarIndices.add(k);
+                    AquGasConc xco2WaterSst = new AquGasConc(var);
+                    // TODO:
+                    xco2WaterSst.setReportTemperature("Sea surface temperature");
+                    var = xco2WaterSst;
+                    break;
+                case FCO2_ATM_ACTUAL:
+                    co2AtmVarIndices.add(k);
+                    GasConc fco2AtmActual = new GasConc(var);
+                    // TODO:
+                    var = fco2AtmActual;
+                    break;
+                case FCO2_ATM_INTERP:
+                    co2AtmVarIndices.add(k);
+                    GasConc fco2AtmInterp = new GasConc(var);
+                    // TODO:
+                    var = fco2AtmInterp;
+                    break;
+                case PCO2_ATM_ACTUAL:
+                    co2AtmVarIndices.add(k);
+                    GasConc pco2AtmActual = new GasConc(var);
+                    // TODO:
+                    var = pco2AtmActual;
+                    break;
+                case PCO2_ATM_INTERP:
+                    co2AtmVarIndices.add(k);
+                    GasConc pco2AtmInterp = new GasConc(var);
+                    // TODO:
+                    var = pco2AtmInterp;
+                    break;
+                case XCO2_ATM_ACTUAL:
+                    co2AtmVarIndices.add(k);
+                    GasConc xco2AtmActual = new GasConc(var);
+                    // TODO:
+                    var = xco2AtmActual;
+                    break;
+                case XCO2_ATM_INTERP:
+                    co2AtmVarIndices.add(k);
+                    GasConc xco2AtmInterp = new GasConc(var);
+                    // TODO:
+                    var = xco2AtmInterp;
+                    break;
+                case SEA_SURFACE_TEMPERATURE:
+                    Temperature sst = new Temperature(var);
+                    // TODO:
+                    var = sst;
+                    break;
+                case EQUILIBRATOR_TEMPERATURE:
+                    Temperature tequ = new Temperature(var);
+                    // TODO:
+                    var = tequ;
+                    break;
+                case SEA_LEVEL_PRESSURE:
+                    AirPressure slp = new AirPressure(var);
+                    // TODO:
+                    var = slp;
+                    break;
+                case EQUILIBRATOR_PRESSURE:
+                    AirPressure pequ = new AirPressure(var);
+                    // TODO:
+                    var = pequ;
+                    break;
+                case SALINITY:
+                    DataVar sal = new DataVar(var);
+                    // TODO:
+                    var = sal;
+                    break;
+                case WOCE_CO2_WATER:
+                    if ( woceCO2WaterVarNames == null )
+                        woceCO2WaterVarNames = colName;
+                    else
+                        woceCO2WaterVarNames += ", " + colName;
+                    break;
+                case WOCE_CO2_ATM:
+                    if ( woceCO2AtmVarNames == null )
+                        woceCO2AtmVarNames = colName;
+                    else
+                        woceCO2AtmVarNames += ", " + colName;
+                    break;
+                default:
+                    throw new RuntimeException("Unexpected VarType of " + type);
+            }
+
             varList.add(var);
+            k++;
         }
+        // Mention any WOCE flags
+        if ( woceCO2WaterVarNames != null ) {
+            for (int idx : co2WaterVarIndices) {
+                varList.get(idx).setFlagColName(woceCO2WaterVarNames);
+            }
+        }
+        if ( woceCO2AtmVarNames != null ) {
+            for (int idx : co2AtmVarIndices) {
+                varList.get(idx).setFlagColName(woceCO2AtmVarNames);
+            }
+        }
+
         return varList;
     }
 

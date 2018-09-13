@@ -12,13 +12,32 @@ public class Temperature extends DataVar implements Cloneable {
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
     /**
-     * Create with all fields empty or NaN, except for units which are set to degrees Celsius.
+     * Create with all fields empty, except for units which are set to degrees Celsius.
      */
     public Temperature() {
         super();
         varUnit = DEGREES_CELSIUS_UNIT;
         accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
         precision.setUnitString(DEGREES_CELSIUS_UNIT);
+    }
+
+    /**
+     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * If a Temperature is given, all Temperature fields are copied.
+     */
+    public Temperature(Variable var) {
+        super(var);
+        if ( (var != null) && ( var instanceof Temperature) ) {
+            Temperature temp = (Temperature) var;
+            varUnit = temp.varUnit;
+            accuracy = temp.accuracy.clone();
+            precision = temp.precision.clone();
+        }
+        else {
+            varUnit = DEGREES_CELSIUS_UNIT;
+            accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
+            precision.setUnitString(DEGREES_CELSIUS_UNIT);
+        }
     }
 
     /**

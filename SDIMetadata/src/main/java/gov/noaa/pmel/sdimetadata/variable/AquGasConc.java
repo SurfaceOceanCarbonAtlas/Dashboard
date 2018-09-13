@@ -19,6 +19,24 @@ public class AquGasConc extends GasConc implements Cloneable {
         temperatureCorrection = "";
     }
 
+    /**
+     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * If a GasConc is given, all GasConc fields are copied. If an AquGasConc is given, all AquGasConc fields are
+     * copied.
+     */
+    public AquGasConc(Variable var) {
+        super(var);
+        if ( (var != null) && (var instanceof AquGasConc) ) {
+            AquGasConc conc = (AquGasConc) var;
+            reportTemperature = conc.reportTemperature;
+            temperatureCorrection = conc.temperatureCorrection;
+        }
+        else {
+            reportTemperature = "";
+            temperatureCorrection = "";
+        }
+    }
+
     @Override
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalids = super.invalidFieldNames();

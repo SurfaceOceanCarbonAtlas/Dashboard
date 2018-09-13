@@ -12,9 +12,17 @@ import gov.noaa.pmel.sdimetadata.instrument.SalinitySensor;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
+import gov.noaa.pmel.sdimetadata.variable.AirPressure;
+import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
+import gov.noaa.pmel.sdimetadata.variable.GasConc;
+import gov.noaa.pmel.sdimetadata.variable.MethodType;
+import gov.noaa.pmel.sdimetadata.variable.Temperature;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 import gov.noaa.pmel.sdimetadata.xml.CdiacReader;
 import org.junit.Test;
 
@@ -23,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CdiacReaderTest {
@@ -211,6 +220,96 @@ public class CdiacReaderTest {
                 "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
                 "to yield the equlibrator pressure.", strList.get(0));
 
+        ArrayList<Variable> variables = mdata.getVariables();
+        assertEquals(13, variables.size());
+
+        Variable var;
+        DataVar dataVar;
+        Temperature temp;
+        AirPressure press;
+        GasConc gasConc;
+        AquGasConc aquGasConc;
+
+        var = variables.get(0);
+        assertEquals("xCO2_EQU_ppm", var.getColName());
+        assertEquals("Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)",
+                var.getFullName());
+        assertEquals("", var.getVarUnit());
+        assertEquals("", var.getMissVal());
+        assertEquals("WOCE_QC_FLAG", var.getFlagColName());
+        assertEquals(new NumericString("1", "microatmosphere"), var.getAccuracy());
+        assertEquals(new NumericString("0.01", "microatmospheres"), var.getPrecision());
+        strList = var.getAddnInfo();
+        assertEquals(1, strList.size());
+        assertEquals("Frequency: Every 150 seconds", strList.get(0));
+
+        assertTrue(var instanceof DataVar);
+        dataVar = (DataVar) var;
+        assertEquals("", dataVar.getObserveType());
+        assertEquals(MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+        assertEquals("", dataVar.getMethodDescription());
+        assertEquals("", dataVar.getMethodReference());
+        assertEquals("Bow", dataVar.getSamplingLocation());
+        assertEquals("Sampling Depth: 5 meters", dataVar.getSamplingElevation());
+        assertEquals("", dataVar.getStorageMethod());
+        assertEquals("", dataVar.getReplication());
+        strList = dataVar.getSamplerNames();
+        assertEquals(1, strList.size());
+        assertEquals("Equilibrator", strList.get(0));
+        strList = dataVar.getAnalyzerNames();
+        assertEquals(1, strList.size());
+        assertEquals("CO2 Sensor", strList.get(0));
+        assertEquals(new Person(), dataVar.getResearcher());
+
+        assertTrue(var instanceof GasConc);
+        gasConc = (GasConc) var;
+        assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then through " +
+                "a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).", gasConc.getDryingMethod());
+        assertEquals("", gasConc.getWaterVaporCorrection());
+
+        assertTrue(var instanceof AquGasConc);
+        aquGasConc = (AquGasConc) var;
+        assertEquals("Equilibrator temperature", aquGasConc.getReportTemperature());
+        assertEquals("", aquGasConc.getTemperatureCorrection());
+
+
+        var = variables.get(1);
+        assertEquals("xCO2_ATM_ppm", var.getColName());
+        assertEquals("Mole fraction of CO2 measured in dry outside air (ppm)", var.getFullName());
+        assertEquals("", var.getVarUnit());
+        assertEquals("", var.getMissVal());
+        assertEquals("", var.getFlagColName());
+        assertEquals(new NumericString("0.2", "ppm"), var.getAccuracy());
+        assertEquals(new NumericString("0.01", "ppm"), var.getPrecision());
+        strList = var.getAddnInfo();
+        assertEquals(1, strList.size());
+        assertEquals("Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+        assertTrue(var instanceof DataVar);
+        dataVar = (DataVar) var;
+        assertEquals("", dataVar.getObserveType());
+        assertEquals(MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+        assertEquals("", dataVar.getMethodDescription());
+        assertEquals("", dataVar.getMethodReference());
+        assertEquals("Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
+        assertEquals("", dataVar.getSamplingElevation());
+        assertEquals("", dataVar.getStorageMethod());
+        assertEquals("", dataVar.getReplication());
+        strList = dataVar.getSamplerNames();
+        assertEquals(1, strList.size());
+        assertEquals("Equilibrator", strList.get(0));
+        strList = dataVar.getAnalyzerNames();
+        assertEquals(1, strList.size());
+        assertEquals("CO2 Sensor", strList.get(0));
+        assertEquals(new Person(), dataVar.getResearcher());
+
+        assertTrue(var instanceof GasConc);
+        gasConc = (GasConc) var;
+        assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then through " +
+                "a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).", gasConc.getDryingMethod());
+        assertEquals("", gasConc.getWaterVaporCorrection());
+
+        assertFalse(var instanceof AquGasConc);
 
         // TODO: Variables
 

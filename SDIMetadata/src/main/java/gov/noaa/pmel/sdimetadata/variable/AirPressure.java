@@ -13,12 +13,38 @@ public class AirPressure extends DataVar implements Cloneable {
 
     protected String pressureCorrection;
 
+    /**
+     * Create with all fields empty except for units which are {@link #HECTOPASCALS_UNIT}
+     */
     public AirPressure() {
         super();
         varUnit = HECTOPASCALS_UNIT;
         accuracy.setUnitString(HECTOPASCALS_UNIT);
         precision.setUnitString(HECTOPASCALS_UNIT);
         pressureCorrection = "";
+    }
+
+    /**
+     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * If a AirPressure is given, all AirPressure fields are copied.
+     */
+    public AirPressure(Variable var) {
+        super(var);
+        accuracy.setUnitString(HECTOPASCALS_UNIT);
+        precision.setUnitString(HECTOPASCALS_UNIT);
+        if ( (var != null) && ( var instanceof AirPressure) ) {
+            AirPressure press = (AirPressure) var;
+            varUnit = press.varUnit;
+            accuracy = press.accuracy.clone();
+            precision = press.precision.clone();
+            pressureCorrection = press.pressureCorrection;
+        }
+        else {
+            varUnit = HECTOPASCALS_UNIT;
+            accuracy.setUnitString(HECTOPASCALS_UNIT);
+            precision.setUnitString(HECTOPASCALS_UNIT);
+            pressureCorrection = "";
+        }
     }
 
     /**
