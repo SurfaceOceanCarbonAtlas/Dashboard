@@ -1,4 +1,4 @@
-package gov.noaa.pmel.sdimetadata;
+package gov.noaa.pmel.sdimetadata.platform;
 
 import java.util.HashSet;
 
@@ -9,7 +9,7 @@ public class Platform implements Cloneable {
 
     protected String platformId;
     protected String platformName;
-    protected String platformType;
+    protected PlatformType platformType;
     protected String platformOwner;
     protected String platformCountry;
 
@@ -19,7 +19,7 @@ public class Platform implements Cloneable {
     public Platform() {
         platformId = "";
         platformName = "";
-        platformType = "";
+        platformType = PlatformType.UNKNOWN;
         platformOwner = "";
         platformCountry = "";
     }
@@ -33,7 +33,7 @@ public class Platform implements Cloneable {
             invalid.add("platformId");
         if ( platformName.isEmpty() )
             invalid.add("platformName");
-        if ( platformType.isEmpty() )
+        if ( PlatformType.UNKNOWN.equals(platformType) )
             invalid.add("platformType");
         return invalid;
     }
@@ -69,18 +69,19 @@ public class Platform implements Cloneable {
     }
 
     /**
-     * @return the type of this platform (ship, mooring, drifting buoy); never null but may be empty
+     * @return the type of this platform (ship, mooring, drifting buoy); never null but may be {@link PlatformType#UNKNOWN}
      */
-    public String getPlatformType() {
+    public PlatformType getPlatformType() {
         return platformType;
     }
 
     /**
      * @param platformType
-     *         assign as the type of this platform (ship, mooring, drifting buoy); if null, an empty string is assigned
+     *         assign as the type of this platform (ship, mooring, drifting buoy);
+     *         if null, {@link PlatformType#UNKNOWN} is assigned
      */
-    public void setPlatformType(String platformType) {
-        this.platformType = (platformType != null) ? platformType.trim() : "";
+    public void setPlatformType(PlatformType platformType) {
+        this.platformType = (platformType != null) ? platformType : PlatformType.UNKNOWN;
     }
 
     /**

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
-import gov.noaa.pmel.sdimetadata.Platform;
+import gov.noaa.pmel.sdimetadata.platform.Platform;
+import gov.noaa.pmel.sdimetadata.platform.PlatformType;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,7 +19,7 @@ public class PlatformTest {
 
     private static final String PLATFORM_ID = "33RO";
     private static final String PLATFORM_NAME = "Ronald H. Brown";
-    private static final String PLATFORM_TYPE = "Ship";
+    private static final PlatformType PLATFORM_TYPE = PlatformType.SHIP;
     private static final String PLATFORM_OWNER = "NOAA";
     private static final String PLATFORM_COUNTRY = "USA";
 
@@ -50,15 +51,13 @@ public class PlatformTest {
     @Test
     public void testGetSetPlatformType() {
         Platform platform = new Platform();
-        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(PlatformType.UNKNOWN, platform.getPlatformType());
         platform.setPlatformType(PLATFORM_TYPE);
         assertEquals(PLATFORM_TYPE, platform.getPlatformType());
         assertEquals(EMPTY_STR, platform.getPlatformName());
         assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformType(null);
-        assertEquals(EMPTY_STR, platform.getPlatformType());
-        platform.setPlatformType("\t");
-        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(PlatformType.UNKNOWN, platform.getPlatformType());
     }
 
     @Test
@@ -103,8 +102,6 @@ public class PlatformTest {
         assertEquals(new HashSet<String>(Arrays.asList("platformType")), platform.invalidFieldNames());
         platform.setPlatformType(PLATFORM_TYPE);
         assertEquals(new HashSet<String>(), platform.invalidFieldNames());
-        platform.setPlatformType("\n");
-        assertEquals(new HashSet<String>(Arrays.asList("platformType")), platform.invalidFieldNames());
     }
 
     @Test

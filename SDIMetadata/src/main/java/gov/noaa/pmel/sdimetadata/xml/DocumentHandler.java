@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.xml;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
+import gov.noaa.pmel.sdimetadata.platform.PlatformType;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import org.jdom2.Element;
@@ -62,13 +63,13 @@ public abstract class DocumentHandler {
      *
      * @return one of "Mooring", "Drifting Buoy", or "Ship"
      */
-    public static String guessPlatformType(String name, String datasetId) {
+    public static PlatformType guessPlatformType(String name, String datasetId) {
         if ( name.toUpperCase().contains("MOORING") )
-            return "Mooring";
+            return PlatformType.MOORING;
         if ( name.toUpperCase().contains("DRIFTING BUOY") )
-            return "Drifting Buoy";
+            return PlatformType.DRIFTING_BUOY;
         if ( name.toUpperCase().contains("BUOY") )
-            return "Mooring";
+            return PlatformType.MOORING;
 
         String expocode = datasetId.toUpperCase();
         int len = expocode.length();
@@ -82,12 +83,12 @@ public abstract class DocumentHandler {
         if ( (len == 12) && EXPOCODE_PATTERN.matcher(expocode).matches() ) {
             String nodc = expocode.substring(0, 4);
             if ( FIXED_PLATFORM_NODC_CODES.contains(nodc) )
-                return "Mooring";
+                return PlatformType.MOORING;
             if ( DRIFTING_BUOY_NODC_CODES.contains(nodc) )
-                return "Drifting Buoy";
+                return PlatformType.DRIFTING_BUOY;
         }
 
-        return "Ship";
+        return PlatformType.SHIP;
     }
 
     /**
@@ -202,7 +203,7 @@ public abstract class DocumentHandler {
     /**
      * @param numVal
      *         the numeric string, possibly with an appended unit string if the given unit string is null;
-     *         if null, an empty string is assigned
+     *         if null, an empty numeric string is assigned
      * @param unitVal
      *         the unit string; if null, the numeric string is examined for an appended unit string
      *
@@ -211,18 +212,28 @@ public abstract class DocumentHandler {
     public static NumericString getNumericString(String numVal, String unitVal) {
         String numStr = numVal;
         String unitStr = unitVal;
-        if ( (numVal != null) && (unitVal == null) ) {
-            // Check if unit is part of the string in the number element
-            String[] pieces = numVal.split("[ \t\\(\\)\\[\\]\\{\\}]+");
-            if ( pieces.length > 1 ) {
-                numStr = pieces[0];
-                unitStr = pieces[1];
-                for (int k = 2; k < pieces.length; k++) {
-                    unitStr += " " + pieces[k];
+        if ( numStr != null ) {
+            // Strip off any initial non-numeric values (such as ~ or ±)
+            for (int k = 0; k < numStr.length(); k++) {
+                char chr = numStr.charAt(k);
+                if ( (chr == '-') || (chr == '+') || (chr == '.') || Character.isDigit(chr) ) {
+                    numStr = numStr.substring(k);
+                    break;
                 }
             }
-            else {
-                numStr = pieces[0];
+            if ( unitStr == null ) {
+                // Check if unit is part of the string in the number element
+                String[] pieces = numStr.split("[ \t\\(\\)\\[\\]\\{\\}]+");
+                if ( pieces.length > 1 ) {
+                    numStr = pieces[0];
+                    unitStr = pieces[1];
+                    for (int k = 2; k < pieces.length; k++) {
+                        unitStr += " " + pieces[k];
+                    }
+                }
+                else {
+                    numStr = pieces[0];
+                }
             }
         }
         try {

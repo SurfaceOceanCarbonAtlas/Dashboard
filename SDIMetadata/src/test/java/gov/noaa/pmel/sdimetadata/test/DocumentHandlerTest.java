@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
+import gov.noaa.pmel.sdimetadata.platform.PlatformType;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.xml.DocumentHandler;
@@ -37,35 +38,35 @@ public class DocumentHandlerTest {
     public void guessPlatformType() {
         String name = "Ronald H. Brown";
         String datasetId = "33RO20150114";
-        assertEquals("Ship", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.SHIP, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "MySpecialPlatform";
         datasetId = "316420100523-1";
-        assertEquals("Mooring", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.MOORING, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "MySpecialPlatform";
         datasetId = "35DR20100523-2";
-        assertEquals("Drifting Buoy", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.DRIFTING_BUOY, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "my special buoy that does not drift in the ocean";
         datasetId = "MySpecialID";
-        assertEquals("Mooring", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.MOORING, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "my special drifting buoy in the ocean";
         datasetId = "MySpecialID";
-        assertEquals("Drifting Buoy", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.DRIFTING_BUOY, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "My Mooring with an incorrect expocode";
         datasetId = "35DR20100523";
-        assertEquals("Mooring", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.MOORING, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "my special mooring in the ocean";
         datasetId = "";
-        assertEquals("Mooring", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.MOORING, DocumentHandler.guessPlatformType(name, datasetId));
 
         name = "";
         datasetId = "";
-        assertEquals("Ship", DocumentHandler.guessPlatformType(name, datasetId));
+        assertEquals(PlatformType.SHIP, DocumentHandler.guessPlatformType(name, datasetId));
     }
 
     @Test

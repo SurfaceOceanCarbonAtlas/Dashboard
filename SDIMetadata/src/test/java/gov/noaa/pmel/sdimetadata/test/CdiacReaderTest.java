@@ -1,7 +1,6 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.Coverage;
-import gov.noaa.pmel.sdimetadata.Platform;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
@@ -14,6 +13,8 @@ import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
+import gov.noaa.pmel.sdimetadata.platform.Platform;
+import gov.noaa.pmel.sdimetadata.platform.PlatformType;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.AirPressure;
@@ -80,7 +81,7 @@ public class CdiacReaderTest {
         Platform platform = mdata.getPlatform();
         assertEquals("33RO", platform.getPlatformId());
         assertEquals("Ronald H. Brown", platform.getPlatformName());
-        assertEquals("Ship", platform.getPlatformType());
+        assertEquals(PlatformType.SHIP, platform.getPlatformType());
         assertEquals("NOAA", platform.getPlatformOwner());
         assertEquals("", platform.getPlatformCountry());
 
@@ -237,18 +238,21 @@ public class CdiacReaderTest {
         assertEquals("", var.getVarUnit());
         assertEquals("", var.getMissVal());
         assertEquals("WOCE_QC_FLAG", var.getFlagColName());
-        assertEquals(new NumericString("1", "microatmosphere"), var.getAccuracy());
-        assertEquals(new NumericString("0.01", "microatmospheres"), var.getPrecision());
+        assertEquals(new NumericString("1", "microatmospheres"), var.getAccuracy());
+        assertEquals(new NumericString("0.01", "microatmosphere"), var.getPrecision());
         strList = var.getAddnInfo();
         assertEquals(1, strList.size());
         assertEquals("Frequency: Every 150 seconds", strList.get(0));
 
         assertTrue(var instanceof DataVar);
         dataVar = (DataVar) var;
-        assertEquals("", dataVar.getObserveType());
+        assertEquals("Surface Underway", dataVar.getObserveType());
         assertEquals(MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
         assertEquals("", dataVar.getMethodDescription());
-        assertEquals("", dataVar.getMethodReference());
+        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
         assertEquals("Bow", dataVar.getSamplingLocation());
         assertEquals("Sampling Depth: 5 meters", dataVar.getSamplingElevation());
         assertEquals("", dataVar.getStorageMethod());
