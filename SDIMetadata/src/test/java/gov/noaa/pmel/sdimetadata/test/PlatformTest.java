@@ -66,7 +66,7 @@ public class PlatformTest {
         assertEquals(EMPTY_STR, platform.getPlatformOwner());
         platform.setPlatformOwner(PLATFORM_OWNER);
         assertEquals(PLATFORM_OWNER, platform.getPlatformOwner());
-        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(PlatformType.UNKNOWN, platform.getPlatformType());
         assertEquals(EMPTY_STR, platform.getPlatformName());
         assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformOwner(null);
@@ -82,7 +82,7 @@ public class PlatformTest {
         platform.setPlatformCountry(PLATFORM_COUNTRY);
         assertEquals(PLATFORM_COUNTRY, platform.getPlatformCountry());
         assertEquals(EMPTY_STR, platform.getPlatformOwner());
-        assertEquals(EMPTY_STR, platform.getPlatformType());
+        assertEquals(PlatformType.UNKNOWN, platform.getPlatformType());
         assertEquals(EMPTY_STR, platform.getPlatformName());
         assertEquals(EMPTY_STR, platform.getPlatformId());
         platform.setPlatformCountry(null);

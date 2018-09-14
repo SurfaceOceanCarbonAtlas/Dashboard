@@ -4,8 +4,8 @@ import gov.noaa.pmel.sdimetadata.util.NumericString;
 
 /**
  * Information about an air pressure measurement.
- * The unit for accuracy and precision are set to hectopascals and cannot be modified,
- * and the default unit for the variable is hectopascals (but can be modified).
+ * The default unit is hectopascals instead of empty.
+ * Also provides a pressure correction field.
  */
 public class AirPressure extends DataVar implements Cloneable {
 
@@ -32,7 +32,7 @@ public class AirPressure extends DataVar implements Cloneable {
         super(var);
         accuracy.setUnitString(HECTOPASCALS_UNIT);
         precision.setUnitString(HECTOPASCALS_UNIT);
-        if ( (var != null) && ( var instanceof AirPressure) ) {
+        if ( (var != null) && (var instanceof AirPressure) ) {
             AirPressure press = (AirPressure) var;
             varUnit = press.varUnit;
             accuracy = press.accuracy.clone();
@@ -74,13 +74,16 @@ public class AirPressure extends DataVar implements Cloneable {
     }
 
     /**
-     * @apiNote also throws IllegalArgumentException if the unit string is not {@link AirPressure#HECTOPASCALS_UNIT}
+     * @param accuracy
+     *         assign as the accuracy (uncertainty) in values of this variable;
+     *         if null, an NumericString with an empty numeric value but units of hectopascals is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if a numeric string is given but is not a finite positive number
      */
     @Override
     public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
         if ( accuracy != null ) {
-            if ( !HECTOPASCALS_UNIT.equals(accuracy.getUnitString()) )
-                throw new IllegalArgumentException("unit of accuracy is not " + HECTOPASCALS_UNIT);
             super.setAccuracy(accuracy);
         }
         else
@@ -88,13 +91,16 @@ public class AirPressure extends DataVar implements Cloneable {
     }
 
     /**
-     * @apiNote also throws IllegalArgumentException if the unit string is not {@link AirPressure#HECTOPASCALS_UNIT}
+     * @param precision
+     *         assign as the precision (resolution) in values of this variable;
+     *         if null, an NumericString with an empty numeric value but units of hectopascals is assigned
+     *
+     * @throws IllegalArgumentException
+     *         if a numeric string is given but is not a finite positive number
      */
     @Override
     public void setPrecision(NumericString precision) throws IllegalArgumentException {
         if ( precision != null ) {
-            if ( !HECTOPASCALS_UNIT.equals(precision.getUnitString()) )
-                throw new IllegalArgumentException("unit of precision is not " + HECTOPASCALS_UNIT);
             super.setPrecision(precision);
         }
         else

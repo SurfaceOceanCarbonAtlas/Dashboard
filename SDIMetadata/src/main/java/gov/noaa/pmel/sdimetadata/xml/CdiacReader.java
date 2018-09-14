@@ -476,9 +476,6 @@ public class CdiacReader extends DocumentHandler {
                     fco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     fco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     fco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     fco2WaterEqu.setAddnInfo(addnInfo);
                     var = fco2WaterEqu;
                     break;
@@ -513,9 +510,6 @@ public class CdiacReader extends DocumentHandler {
                     fco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     fco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     fco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     fco2WaterSst.setAddnInfo(addnInfo);
                     var = fco2WaterSst;
                     break;
@@ -550,9 +544,6 @@ public class CdiacReader extends DocumentHandler {
                     pco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     pco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     pco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     pco2WaterEqu.setAddnInfo(addnInfo);
                     var = pco2WaterEqu;
                     break;
@@ -587,9 +578,6 @@ public class CdiacReader extends DocumentHandler {
                     pco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     pco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     pco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     pco2WaterSst.setAddnInfo(addnInfo);
                     var = pco2WaterSst;
                     break;
@@ -624,9 +612,6 @@ public class CdiacReader extends DocumentHandler {
                     xco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     xco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     xco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     xco2WaterEqu.setAddnInfo(addnInfo);
                     var = xco2WaterEqu;
                     break;
@@ -661,9 +646,6 @@ public class CdiacReader extends DocumentHandler {
                     xco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
                     xco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
                     xco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-
-                    // TODO:
-
                     xco2WaterSst.setAddnInfo(addnInfo);
                     var = xco2WaterSst;
                     break;
@@ -672,7 +654,6 @@ public class CdiacReader extends DocumentHandler {
                     GasConc fco2AtmActual = new GasConc(var);
                     addnInfo = new ArrayList<String>();
                     fco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    fco2AtmActual.setSamplerNames(Arrays.asList("Equilibrator"));
                     fco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         fco2AtmActual.setObserveType("Time series");
@@ -693,11 +674,8 @@ public class CdiacReader extends DocumentHandler {
                     fco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
                     fco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
                     fco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
-
-                    // TODO:
-
                     strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
-                    if ( ! strVal.isEmpty() )
+                    if ( !strVal.isEmpty() )
                         addnInfo.add("Measurement: " + strVal);
                     fco2AtmActual.setAddnInfo(addnInfo);
                     var = fco2AtmActual;
@@ -705,31 +683,147 @@ public class CdiacReader extends DocumentHandler {
                 case FCO2_ATM_INTERP:
                     co2AtmVarIndices.add(k);
                     GasConc fco2AtmInterp = new GasConc(var);
-                    // TODO:
+                    addnInfo = new ArrayList<String>();
+                    fco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
+                    fco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        fco2AtmInterp.setObserveType("Time series");
+                    else
+                        fco2AtmInterp.setObserveType("Surface Underway");
+                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        fco2AtmInterp.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        fco2AtmInterp.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    fco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    fco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    fco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    fco2AtmInterp.setAddnInfo(addnInfo);
                     var = fco2AtmInterp;
                     break;
                 case PCO2_ATM_ACTUAL:
                     co2AtmVarIndices.add(k);
                     GasConc pco2AtmActual = new GasConc(var);
-                    // TODO:
+                    addnInfo = new ArrayList<String>();
+                    pco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    pco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        pco2AtmActual.setObserveType("Time series");
+                    else
+                        pco2AtmActual.setObserveType("Surface Underway");
+                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pco2AtmActual.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pco2AtmActual.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    pco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    pco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    pco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        addnInfo.add("Measurement: " + strVal);
+                    pco2AtmActual.setAddnInfo(addnInfo);
                     var = pco2AtmActual;
                     break;
                 case PCO2_ATM_INTERP:
                     co2AtmVarIndices.add(k);
                     GasConc pco2AtmInterp = new GasConc(var);
-                    // TODO:
+                    addnInfo = new ArrayList<String>();
+                    pco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
+                    pco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        pco2AtmInterp.setObserveType("Time series");
+                    else
+                        pco2AtmInterp.setObserveType("Surface Underway");
+                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pco2AtmInterp.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pco2AtmInterp.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    pco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    pco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    pco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
                     var = pco2AtmInterp;
                     break;
                 case XCO2_ATM_ACTUAL:
                     co2AtmVarIndices.add(k);
                     GasConc xco2AtmActual = new GasConc(var);
-                    // TODO:
+                    addnInfo = new ArrayList<String>();
+                    xco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    xco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        xco2AtmActual.setObserveType("Time series");
+                    else
+                        xco2AtmActual.setObserveType("Surface Underway");
+                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        xco2AtmActual.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        xco2AtmActual.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    xco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    xco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    xco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        addnInfo.add("Measurement: " + strVal);
+                    xco2AtmActual.setAddnInfo(addnInfo);
                     var = xco2AtmActual;
                     break;
                 case XCO2_ATM_INTERP:
                     co2AtmVarIndices.add(k);
                     GasConc xco2AtmInterp = new GasConc(var);
-                    // TODO:
+                    addnInfo = new ArrayList<String>();
+                    xco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
+                    xco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        xco2AtmInterp.setObserveType("Time series");
+                    else
+                        xco2AtmInterp.setObserveType("Surface Underway");
+                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        xco2AtmInterp.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        xco2AtmInterp.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    xco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    xco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    xco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    xco2AtmInterp.setAddnInfo(addnInfo);
                     var = xco2AtmInterp;
                     break;
                 case SEA_SURFACE_TEMPERATURE:
@@ -855,7 +949,7 @@ public class CdiacReader extends DocumentHandler {
         sensors.add(co2Sensor);
 
         TemperatureSensor sstSensor = new TemperatureSensor();
-        sstSensor.setName("SST Sensor");
+        sstSensor.setName("Water Temperature Sensor");
         sstSensor.setManufacturer(getElementText(SST_MANUFACTURER_ELEMENT_NAME));
         sstSensor.setModel(getElementText(SST_MODEL_ELEMENT_NAME));
         sstSensor.setCalibration(getElementText(SST_CALIBRATION_ELEMENT_NAME));
@@ -863,7 +957,7 @@ public class CdiacReader extends DocumentHandler {
         sensors.add(sstSensor);
 
         TemperatureSensor teqSensor = new TemperatureSensor();
-        teqSensor.setName("T_equi Sensor");
+        teqSensor.setName("Equilibrator Temperature Sensor");
         teqSensor.setManufacturer(getElementText(EQT_MANUFACTURER_ELEMENT_NAME));
         teqSensor.setModel(getElementText(EQT_MODEL_ELEMENT_NAME));
         teqSensor.setCalibration(getElementText(EQT_CALIBRATION_ELEMENT_NAME));
@@ -875,7 +969,7 @@ public class CdiacReader extends DocumentHandler {
         sensors.add(teqSensor);
 
         PressureSensor slpSensor = new PressureSensor();
-        slpSensor.setName("SLP Sensor");
+        slpSensor.setName("Atmospheric Pressure Sensor");
         slpSensor.setManufacturer(getElementText(ATM_MANUFACTURER_ELEMENT_NAME));
         slpSensor.setModel(getElementText(ATM_MODEL_ELEMENT_NAME));
         slpSensor.setCalibration(getElementText(ATM_CALIBRATION_ELEMENT_NAME));
@@ -883,7 +977,7 @@ public class CdiacReader extends DocumentHandler {
         sensors.add(slpSensor);
 
         PressureSensor peqSensor = new PressureSensor();
-        peqSensor.setName("P_equi Sensor");
+        peqSensor.setName("Equilibrator Pressure Sensor");
         peqSensor.setManufacturer(getElementText(EQP_MANUFACTURER_ELEMENT_NAME));
         peqSensor.setModel(getElementText(EQP_MODEL_ELEMENT_NAME));
         peqSensor.setCalibration(getElementText(EQP_CALIBRATION_ELEMENT_NAME));
