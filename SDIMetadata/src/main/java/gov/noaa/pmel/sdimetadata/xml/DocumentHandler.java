@@ -18,6 +18,11 @@ import java.util.regex.Pattern;
 
 public abstract class DocumentHandler {
 
+    /**
+     * separator between element names when specifying the path name to an element
+     */
+    public static final String SEP = "\t";
+
     private static final SimpleDateFormat DATE_NUMBER_PARSER = new SimpleDateFormat("yyyyMMdd");
     private static final SimpleDateFormat DATE_SLASH_PARSER = new SimpleDateFormat("yyyy/MM/dd");
     private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd");
@@ -268,14 +273,15 @@ public abstract class DocumentHandler {
      * Get the list of all child elements matching a name path
      *
      * @param fullElementListName
-     *         tab-separated names giving the path from the root element to the desired elements; cannot be null
+     *         path from the root element to the desired elements; cannot be null.
+     *         Element names in the path should be separated by {@link #SEP}.
      *
      * @return list of all child elements matching the name path;
      *         an empty list is returned if no elements matching the path are found
      */
     public List<Element> getElementList(String fullElementListName) {
         Element elem = rootElement;
-        String[] names = fullElementListName.split("\t");
+        String[] names = fullElementListName.split(SEP);
         for (int k = 0; k < names.length - 1; k++) {
             elem = elem.getChild(names[k]);
             if ( null == elem )
@@ -288,15 +294,15 @@ public abstract class DocumentHandler {
      * Get the text from a specified element under the root element.
      *
      * @param fullElementName
-     *         tab-separated names giving the path from the root element
-     *         to the element containing the text; cannot be null
+     *         path from the root element to the element containing the text; cannot be null.
+     *         Element names in the path should be separated by {@link #SEP}.
      *
      * @return trimmed text of the specified element; an empty string is returned
      *         if the element is not found or if the element does not contain text
      */
     public String getElementText(String fullElementName) {
         Element elem = rootElement;
-        for (String name : fullElementName.split("\t")) {
+        for (String name : fullElementName.split(SEP)) {
             elem = elem.getChild(name);
             if ( null == elem )
                 return "";

@@ -46,81 +46,81 @@ public class CdiacReader extends DocumentHandler {
     private static final String EMAIL_ELEMENT_NAME = "Email";
 
     private static final String USER_ELEMENT_NAME = "User";
-    private static final String USER_NAME_ELEMENT_NAME = USER_ELEMENT_NAME + "\t" + NAME_ELEMENT_NAME;
-    private static final String USER_ORGANIZATION_ELEMENT_NAME = USER_ELEMENT_NAME + "\t" + ORGANIZATION_ELEMENT_NAME;
-    private static final String USER_ADDRESS_ELEMENT_NAME = USER_ELEMENT_NAME + "\t" + ADDRESS_ELEMENT_NAME;
-    private static final String USER_PHONE_ELEMENT_NAME = USER_ELEMENT_NAME + "\t" + PHONE_ELEMENT_NAME;
-    private static final String USER_EMAIL_ELEMENT_NAME = USER_ELEMENT_NAME + "\t" + EMAIL_ELEMENT_NAME;
+    private static final String USER_NAME_ELEMENT_NAME = USER_ELEMENT_NAME + SEP + NAME_ELEMENT_NAME;
+    private static final String USER_ORGANIZATION_ELEMENT_NAME = USER_ELEMENT_NAME + SEP + ORGANIZATION_ELEMENT_NAME;
+    private static final String USER_ADDRESS_ELEMENT_NAME = USER_ELEMENT_NAME + SEP + ADDRESS_ELEMENT_NAME;
+    private static final String USER_PHONE_ELEMENT_NAME = USER_ELEMENT_NAME + SEP + PHONE_ELEMENT_NAME;
+    private static final String USER_EMAIL_ELEMENT_NAME = USER_ELEMENT_NAME + SEP + EMAIL_ELEMENT_NAME;
 
     // root element contains multiple <Investigator> elements, each containing <Name>, <Organization>, <Address>, <Phone>, and <Email>
     private static final String INVESTIGATOR_ELEMENT_NAME = "Investigator";
 
     private static final String DATASET_INFO_ELEMENT_NAME = "Dataset_Info";
-    private static final String FUNDING_INFO_ELEMENT_NAME = DATASET_INFO_ELEMENT_NAME + "\t" + "Funding_Info";
+    private static final String FUNDING_INFO_ELEMENT_NAME = DATASET_INFO_ELEMENT_NAME + SEP + "Funding_Info";
 
-    private static final String SUBMISSION_DATES_ELEMENT_NAME = DATASET_INFO_ELEMENT_NAME + "\t" + "Submission_Dates";
-    private static final String INITIAL_SUBMISSION_ELEMENT_NAME = SUBMISSION_DATES_ELEMENT_NAME + "\t" + "Initial_Submission";
-    private static final String REVISED_SUBMISSION_ELEMENT_NAME = SUBMISSION_DATES_ELEMENT_NAME + "\t" + "Revised_Submission";
+    private static final String SUBMISSION_DATES_ELEMENT_NAME = DATASET_INFO_ELEMENT_NAME + SEP + "Submission_Dates";
+    private static final String INITIAL_SUBMISSION_ELEMENT_NAME = SUBMISSION_DATES_ELEMENT_NAME + SEP + "Initial_Submission";
+    private static final String REVISED_SUBMISSION_ELEMENT_NAME = SUBMISSION_DATES_ELEMENT_NAME + SEP + "Revised_Submission";
 
     private static final String CRUISE_INFO_ELEMENT_NAME = "Cruise_Info";
-    private static final String EXPERIMENT_ELEMENT_NAME = CRUISE_INFO_ELEMENT_NAME + "\t" + "Experiment";
-    private static final String EXPERIMENT_NAME_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Experiment_Name";
-    private static final String EXPERIMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Experiment_Type";
-    private static final String PLATFORM_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Platform_Type";
-    private static final String MOORING_ID_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Mooring_ID";
+    private static final String EXPERIMENT_ELEMENT_NAME = CRUISE_INFO_ELEMENT_NAME + SEP + "Experiment";
+    private static final String EXPERIMENT_NAME_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Experiment_Name";
+    private static final String EXPERIMENT_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Experiment_Type";
+    private static final String PLATFORM_TYPE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Platform_Type";
+    private static final String MOORING_ID_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Mooring_ID";
 
-    private static final String CRUISE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + "\t" + "Cruise";
-    private static final String EXPOCODE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Expocode";
-    private static final String CRUISE_ID_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Cruise_ID";
-    private static final String SUB_CRUISE_INFO_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Cruise_Info";
-    private static final String SECTION_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Section";
-    private static final String PORT_OF_CALL_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Ports_of_Call";
+    private static final String CRUISE_ELEMENT_NAME = EXPERIMENT_ELEMENT_NAME + SEP + "Cruise";
+    private static final String EXPOCODE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Expocode";
+    private static final String CRUISE_ID_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Cruise_ID";
+    private static final String SUB_CRUISE_INFO_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Cruise_Info";
+    private static final String SECTION_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Section";
+    private static final String PORT_OF_CALL_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Ports_of_Call";
 
-    private static final String GEO_COVERAGE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Geographical_Coverage";
-    private static final String GEO_REGION_ELEMENT_NAME = GEO_COVERAGE_ELEMENT_NAME + "\t" + "Geographical_Region";
-    private static final String BOUNDS_ELEMENT_NAME = GEO_COVERAGE_ELEMENT_NAME + "\t" + "Bounds";
-    private static final String WEST_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + "\t" + "Westernmost_Longitude";
-    private static final String EAST_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + "\t" + "Easternmost_Longitude";
-    private static final String NORTH_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + "\t" + "Northernmost_Latitude";
-    private static final String SOUTH_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + "\t" + "Southernmost_Latitude";
+    private static final String GEO_COVERAGE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Geographical_Coverage";
+    private static final String GEO_REGION_ELEMENT_NAME = GEO_COVERAGE_ELEMENT_NAME + SEP + "Geographical_Region";
+    private static final String BOUNDS_ELEMENT_NAME = GEO_COVERAGE_ELEMENT_NAME + SEP + "Bounds";
+    private static final String WEST_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + SEP + "Westernmost_Longitude";
+    private static final String EAST_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + SEP + "Easternmost_Longitude";
+    private static final String NORTH_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + SEP + "Northernmost_Latitude";
+    private static final String SOUTH_BOUND_ELEMENT_NAME = BOUNDS_ELEMENT_NAME + SEP + "Southernmost_Latitude";
 
-    private static final String TEMP_COVERAGE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Temporal_Coverage";
-    private static final String TEMP_START_DATE_ELEMENT_NAME = TEMP_COVERAGE_ELEMENT_NAME + "\t" + "Start_Date";
-    private static final String TEMP_END_DATE_ELEMENT_NAME = TEMP_COVERAGE_ELEMENT_NAME + "\t" + "End_Date";
-    private static final String START_DATE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "Start_Date";
-    private static final String END_DATE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + "\t" + "End_Date";
+    private static final String TEMP_COVERAGE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Temporal_Coverage";
+    private static final String TEMP_START_DATE_ELEMENT_NAME = TEMP_COVERAGE_ELEMENT_NAME + SEP + "Start_Date";
+    private static final String TEMP_END_DATE_ELEMENT_NAME = TEMP_COVERAGE_ELEMENT_NAME + SEP + "End_Date";
+    private static final String START_DATE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "Start_Date";
+    private static final String END_DATE_ELEMENT_NAME = CRUISE_ELEMENT_NAME + SEP + "End_Date";
 
-    private static final String VESSEL_ELEMENT_NAME = CRUISE_INFO_ELEMENT_NAME + "\t" + "Vessel";
-    private static final String VESSEL_NAME_ELEMENT_NAME = VESSEL_ELEMENT_NAME + "\t" + "Vessel_Name";
-    private static final String VESSEL_ID_ELEMENT_NAME = VESSEL_ELEMENT_NAME + "\t" + "Vessel_ID";
-    private static final String VESSEL_COUNTRY_ELEMENT_NAME = VESSEL_ELEMENT_NAME + "\t" + "Country";
-    private static final String VESSEL_OWNER_ELEMENT_NAME = VESSEL_ELEMENT_NAME + "\t" + "Vessel_Owner";
+    private static final String VESSEL_ELEMENT_NAME = CRUISE_INFO_ELEMENT_NAME + SEP + "Vessel";
+    private static final String VESSEL_NAME_ELEMENT_NAME = VESSEL_ELEMENT_NAME + SEP + "Vessel_Name";
+    private static final String VESSEL_ID_ELEMENT_NAME = VESSEL_ELEMENT_NAME + SEP + "Vessel_ID";
+    private static final String VESSEL_COUNTRY_ELEMENT_NAME = VESSEL_ELEMENT_NAME + SEP + "Country";
+    private static final String VESSEL_OWNER_ELEMENT_NAME = VESSEL_ELEMENT_NAME + SEP + "Vessel_Owner";
 
     private static final String VARIABLES_INFO_ELEMENT_NAME = "Variables_Info";
     // <Variables_Info> element contains multiple <Variable> elements, each containing <Variable_Name>, <Description_of_Variable>,
     // and possibly <Unit_of_Variable> (or unit of variable may be part of the description)
-    private static final String VARIABLE_ELEMENT_NAME = VARIABLES_INFO_ELEMENT_NAME + "\t" + "Variable";
+    private static final String VARIABLE_ELEMENT_NAME = VARIABLES_INFO_ELEMENT_NAME + SEP + "Variable";
     private static final String VARIABLES_NAME_ELEMENT_NAME = "Variable_Name";
     private static final String VARIABLES_DESCRIPTION_ELEMENT_NAME = "Description_of_Variable";
     private static final String VARIABLES_UNIT_OF_VARIABLE_ELEMENT_NAME = "Unit_of_Variable";
 
 
     private static final String METHOD_DESCRIPTION_ELEMENT_NAME = "Method_Description";
-    private static final String EQUILIBRATOR_DESIGN_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Equilibrator_Design";
-    private static final String INTAKE_DEPTH_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Depth_of_Sea_Water_Intake";
-    private static final String INTAKE_LOCATION_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Location_of_Sea_Water_Intake";
-    private static final String EQUI_TYPE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Equilibrator_Type";
-    private static final String EQUI_VOLUME_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Equilibrator_Volume";
-    private static final String WATER_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Water_Flow_Rate";
-    private static final String GAS_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Headspace_Gas_Flow_Rate";
-    private static final String VENTED_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Vented";
-    private static final String DRYING_METHOD_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Drying_Method_for_CO2_in_water";
-    private static final String EQUI_ADDITIONAL_INFO_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + "\t" + "Additional_Information";
+    private static final String EQUILIBRATOR_DESIGN_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Equilibrator_Design";
+    private static final String INTAKE_DEPTH_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Depth_of_Sea_Water_Intake";
+    private static final String INTAKE_LOCATION_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Location_of_Sea_Water_Intake";
+    private static final String EQUI_TYPE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Equilibrator_Type";
+    private static final String EQUI_VOLUME_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Equilibrator_Volume";
+    private static final String WATER_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Water_Flow_Rate";
+    private static final String GAS_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Headspace_Gas_Flow_Rate";
+    private static final String VENTED_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Vented";
+    private static final String DRYING_METHOD_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Drying_Method_for_CO2_in_water";
+    private static final String EQUI_ADDITIONAL_INFO_ELEMENT_NAME = EQUILIBRATOR_DESIGN_ELEMENT_NAME + SEP + "Additional_Information";
 
-    private static final String CO2_MARINE_AIR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "CO2_in_Marine_Air";
-    private static final String MARINE_AIR_MEASUREMENT_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + "\t" + "Measurement";
-    private static final String MARINE_AIR_LOCATION_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + "\t" + "Location_and_Height";
-    private static final String MARINE_AIR_DRYING_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + "\t" + "Drying_Method";
+    private static final String CO2_MARINE_AIR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "CO2_in_Marine_Air";
+    private static final String MARINE_AIR_MEASUREMENT_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + SEP + "Measurement";
+    private static final String MARINE_AIR_LOCATION_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + SEP + "Location_and_Height";
+    private static final String MARINE_AIR_DRYING_ELEMENT_NAME = CO2_MARINE_AIR_ELEMENT_NAME + SEP + "Drying_Method";
 
     // Element names for the sensors
     private static final String LOCATION_ELEMENT_NAME = "Location";
@@ -133,92 +133,92 @@ public class CdiacReader extends DocumentHandler {
     private static final String RESOLUTION_ELEMENT_NAME = "Resolution";
     private static final String CALIBRATION_ELEMENT_NAME = "Calibration";
 
-    private static final String CO2_SENSOR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "CO2_Sensors" + "\t" + "CO2_Sensor";
-    private static final String CO2_MEASUREMENT_METHOD_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Measurement_Method";
-    private static final String CO2_SENSOR_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String CO2_SENSOR_MODEL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String CO2_FREQUENCY_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Frequency";
-    private static final String CO2_WATER_RES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Resolution_Water";
-    private static final String CO2_WATER_UNC_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Uncertainty_Water";
-    private static final String CO2_AIR_RES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Resolution_Air";
-    private static final String CO2_AIR_UNC_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Uncertainty_Air";
-    private static final String CO2_CALIBRATION_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Manufacturer_of_Calibration_Gas";
-    private static final String CO2_SENSOR_CALIBRATION_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "CO2_Sensor_Calibration";
-    private static final String ENVIRONMENTAL_CONTROL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Environmental_Control";
-    private static final String METHOD_REFS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Method_References";
-    private static final String DETAILS_OF_CO2_SENSING_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Details_Co2_Sensing";
-    private static final String ANALYSIS_OF_COMPARISON_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Analysis_of_Co2_Comparision";
-    private static final String MEASURED_CO2_PARAMS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Measured_Co2_Params";
-    private static final String CO2_SENSOR_COMMENTS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-    private static final String CO2_SENSOR_NUM_NONZERO_GASSES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "No_Of_Non_Zero_Gas_Stds";
+    private static final String CO2_SENSOR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "CO2_Sensors" + SEP + "CO2_Sensor";
+    private static final String CO2_MEASUREMENT_METHOD_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Measurement_Method";
+    private static final String CO2_SENSOR_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String CO2_SENSOR_MODEL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String CO2_FREQUENCY_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Frequency";
+    private static final String CO2_WATER_RES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Resolution_Water";
+    private static final String CO2_WATER_UNC_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Uncertainty_Water";
+    private static final String CO2_AIR_RES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Resolution_Air";
+    private static final String CO2_AIR_UNC_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Uncertainty_Air";
+    private static final String CO2_CALIBRATION_MANUFACTURER_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Manufacturer_of_Calibration_Gas";
+    private static final String CO2_SENSOR_CALIBRATION_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "CO2_Sensor_Calibration";
+    private static final String ENVIRONMENTAL_CONTROL_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Environmental_Control";
+    private static final String METHOD_REFS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Method_References";
+    private static final String DETAILS_OF_CO2_SENSING_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Details_Co2_Sensing";
+    private static final String ANALYSIS_OF_COMPARISON_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Analysis_of_Co2_Comparision";
+    private static final String MEASURED_CO2_PARAMS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "Measured_Co2_Params";
+    private static final String CO2_SENSOR_COMMENTS_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
+    private static final String CO2_SENSOR_NUM_NONZERO_GASSES_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + SEP + "No_Of_Non_Zero_Gas_Stds";
 
-    private static final String SST_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Sea_Surface_Temperature";
-    private static final String SST_LOCATION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String SST_MANUFACTURER_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String SST_MODEL_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String SST_ACCURACY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String SST_ACCURACY_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_degC";
-    private static final String SST_UNCERTAINTY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String SST_PRECISION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String SST_PRECISION_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_degC";
-    private static final String SST_RESOLUTION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String SST_CALIBRATION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String SST_COMMENTS_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
+    private static final String SST_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Sea_Surface_Temperature";
+    private static final String SST_LOCATION_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + LOCATION_ELEMENT_NAME;
+    private static final String SST_MANUFACTURER_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String SST_MODEL_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String SST_ACCURACY_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME;
+    private static final String SST_ACCURACY_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME + "_degC";
+    private static final String SST_UNCERTAINTY_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + UNCERTAINTY_ELEMENT_NAME;
+    private static final String SST_PRECISION_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME;
+    private static final String SST_PRECISION_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME + "_degC";
+    private static final String SST_RESOLUTION_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + RESOLUTION_ELEMENT_NAME;
+    private static final String SST_CALIBRATION_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + CALIBRATION_ELEMENT_NAME;
+    private static final String SST_COMMENTS_ELEMENT_NAME = SST_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
 
-    private static final String EQU_TEMP_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Equilibrator_Temperature";
-    private static final String EQT_LOCATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String EQT_MANUFACTURER_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String EQT_MODEL_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String EQT_ACCURACY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String EQT_ACCURACY_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_degC";
-    private static final String EQT_UNCERTAINTY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String EQT_PRECISION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String EQT_PRECISION_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_degC";
-    private static final String EQT_RESOLUTION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String EQT_CALIBRATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String EQT_COMMENTS_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-    private static final String EQT_WARMING_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + "Warming";
+    private static final String EQU_TEMP_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Equilibrator_Temperature";
+    private static final String EQT_LOCATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + LOCATION_ELEMENT_NAME;
+    private static final String EQT_MANUFACTURER_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String EQT_MODEL_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String EQT_ACCURACY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME;
+    private static final String EQT_ACCURACY_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME + "_degC";
+    private static final String EQT_UNCERTAINTY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + UNCERTAINTY_ELEMENT_NAME;
+    private static final String EQT_PRECISION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME;
+    private static final String EQT_PRECISION_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME + "_degC";
+    private static final String EQT_RESOLUTION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + RESOLUTION_ELEMENT_NAME;
+    private static final String EQT_CALIBRATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + CALIBRATION_ELEMENT_NAME;
+    private static final String EQT_COMMENTS_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
+    private static final String EQT_WARMING_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + SEP + "Warming";
 
-    private static final String ATM_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Atmospheric_Pressure";
-    private static final String ATM_LOCATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String ATM_MANUFACTURER_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String ATM_MODEL_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String ATM_ACCURACY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String ATM_ACCURACY_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_hPa";
-    private static final String ATM_UNCERTAINTY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String ATM_PRECISION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String ATM_PRECISION_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_hPa";
-    private static final String ATM_RESOLUTION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String ATM_CALIBRATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String ATM_COMMENTS_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-    private static final String ATM_NORMALIZED_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
+    private static final String ATM_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Atmospheric_Pressure";
+    private static final String ATM_LOCATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + LOCATION_ELEMENT_NAME;
+    private static final String ATM_MANUFACTURER_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String ATM_MODEL_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String ATM_ACCURACY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME;
+    private static final String ATM_ACCURACY_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME + "_hPa";
+    private static final String ATM_UNCERTAINTY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + UNCERTAINTY_ELEMENT_NAME;
+    private static final String ATM_PRECISION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME;
+    private static final String ATM_PRECISION_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME + "_hPa";
+    private static final String ATM_RESOLUTION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + RESOLUTION_ELEMENT_NAME;
+    private static final String ATM_CALIBRATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + CALIBRATION_ELEMENT_NAME;
+    private static final String ATM_COMMENTS_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
+    private static final String ATM_NORMALIZED_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + SEP + "Normalized";
 
-    private static final String EQU_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Equilibrator_Pressure";
-    private static final String EQP_LOCATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String EQP_MANUFACTURER_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String EQP_MODEL_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String EQP_ACCURACY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String EQP_ACCURACY_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_hPa";
-    private static final String EQP_UNCERTAINTY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String EQP_PRECISION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String EQP_PRECISION_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_hPa";
-    private static final String EQP_RESOLUTION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String EQP_CALIBRATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String EQP_COMMENTS_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-    private static final String EQP_NORMALIZED_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
+    private static final String EQU_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Equilibrator_Pressure";
+    private static final String EQP_LOCATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + LOCATION_ELEMENT_NAME;
+    private static final String EQP_MANUFACTURER_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String EQP_MODEL_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String EQP_ACCURACY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME;
+    private static final String EQP_ACCURACY_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME + "_hPa";
+    private static final String EQP_UNCERTAINTY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + UNCERTAINTY_ELEMENT_NAME;
+    private static final String EQP_PRECISION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME;
+    private static final String EQP_PRECISION_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME + "_hPa";
+    private static final String EQP_RESOLUTION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + RESOLUTION_ELEMENT_NAME;
+    private static final String EQP_CALIBRATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + CALIBRATION_ELEMENT_NAME;
+    private static final String EQP_COMMENTS_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
+    private static final String EQP_NORMALIZED_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + SEP + "Normalized";
 
-    private static final String SSS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Sea_Surface_Salinity";
-    private static final String SSS_LOCATION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String SSS_MANUFACTURER_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String SSS_MODEL_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String SSS_ACCURACY_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String SSS_UNCERTAINTY_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String SSS_PRECISION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String SSS_RESOLUTION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String SSS_CALIBRATION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String SSS_COMMENTS_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
+    private static final String SSS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Sea_Surface_Salinity";
+    private static final String SSS_LOCATION_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + LOCATION_ELEMENT_NAME;
+    private static final String SSS_MANUFACTURER_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + MANUFACTURER_ELEMENT_NAME;
+    private static final String SSS_MODEL_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + MODEL_ELEMENT_NAME;
+    private static final String SSS_ACCURACY_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + ACCURACY_ELEMENT_NAME;
+    private static final String SSS_UNCERTAINTY_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + UNCERTAINTY_ELEMENT_NAME;
+    private static final String SSS_PRECISION_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + PRECISION_ELEMENT_NAME;
+    private static final String SSS_RESOLUTION_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + RESOLUTION_ELEMENT_NAME;
+    private static final String SSS_CALIBRATION_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + CALIBRATION_ELEMENT_NAME;
+    private static final String SSS_COMMENTS_ELEMENT_NAME = SSS_ELEMENT_NAME + SEP + COMMENTS_ELEMENT_NAME;
 
-    private static final String OTHER_SENSORS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Other_Sensors" + "\t" + "Sensor";
+    private static final String OTHER_SENSORS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + SEP + "Other_Sensors" + SEP + "Sensor";
     // <Other_Sensors> contains multiple <Sensor> elements, each with with <Manufacturer>, <Model>, <Accuracy> or <Uncertainty>,
     // <Precision> or <Resolution>, <Calibration>, and <Other_Comments> elements
 
@@ -227,8 +227,8 @@ public class CdiacReader extends DocumentHandler {
     private static final String CITATION_ELEMENT_NAME = "Citation";
 
     private static final String DATA_SET_LINK_ELEMENT_NAME = "Data_Set_Link";
-    private static final String DATA_SET_LINK_URL_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + "\t" + "URL";
-    private static final String DATA_SET_LINK_NOTE_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + "\t" + "Link_Note";
+    private static final String DATA_SET_LINK_URL_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + SEP + "URL";
+    private static final String DATA_SET_LINK_NOTE_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + SEP + "Link_Note";
 
     /**
      * Create from XML content provided by the given reader.
