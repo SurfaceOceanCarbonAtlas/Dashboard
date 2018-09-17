@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
@@ -197,6 +198,26 @@ public abstract class DocumentHandler {
             return new Datestamp(pieces[0], pieces[1], pieces[2]);
         } catch ( IllegalArgumentException ex ) {
             return null;
+        }
+    }
+
+    /**
+     * @param date
+     *         date to use; if null, null is returned
+     *
+     * @return datestamp of the given date; the time portion of the given date is ignored
+     */
+    public static Datestamp getDatestamp(Date date) {
+        if ( null == date )
+            return null;
+        String hypenstring = DATE_FORMATTER.format(date);
+        String[] pieces = hypenstring.split("-");
+        if ( pieces.length != 3 )
+            throw new RuntimeException("Unexpected hyphenated date of: " + hypenstring);
+        try {
+            return new Datestamp(pieces[0], pieces[1], pieces[2]);
+        } catch ( IllegalArgumentException ex ) {
+            throw new RuntimeException("Unexpected failure to make a datestamp from: " + hypenstring);
         }
     }
 

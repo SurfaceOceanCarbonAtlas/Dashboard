@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -119,8 +120,14 @@ public class DocumentHandlerTest {
         concat = year + "/" + month + "/" + day;
         assertEquals(stamp, DocumentHandler.getDatestamp(concat));
         assertNull(DocumentHandler.getDatestamp("Mar 24, 2010"));
-        assertNull(DocumentHandler.getDatestamp(null));
+        assertNull(DocumentHandler.getDatestamp((String) null));
         assertNull(DocumentHandler.getDatestamp("\t"));
+
+        Date time = stamp.getEarliestTime();
+        assertEquals(stamp, DocumentHandler.getDatestamp(time));
+        time = new Date(stamp.getEarliestTime().getTime() + 24L * 60L * 60L * 1000L - 1000L);
+        assertEquals(stamp, DocumentHandler.getDatestamp(time));
+        assertNull(DocumentHandler.getDatestamp((Date) null));
     }
 
     @Test
