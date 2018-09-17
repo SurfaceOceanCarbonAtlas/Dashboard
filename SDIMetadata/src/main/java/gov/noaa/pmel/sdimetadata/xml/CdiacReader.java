@@ -31,7 +31,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
@@ -126,12 +126,12 @@ public class CdiacReader extends DocumentHandler {
     private static final String LOCATION_ELEMENT_NAME = "Location";
     private static final String MANUFACTURER_ELEMENT_NAME = "Manufacturer";
     private static final String MODEL_ELEMENT_NAME = "Model";
+    private static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
     private static final String ACCURACY_ELEMENT_NAME = "Accuracy";
     private static final String UNCERTAINTY_ELEMENT_NAME = "Uncertainty";
     private static final String PRECISION_ELEMENT_NAME = "Precision";
     private static final String RESOLUTION_ELEMENT_NAME = "Resolution";
     private static final String CALIBRATION_ELEMENT_NAME = "Calibration";
-    private static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
 
     private static final String CO2_SENSOR_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "CO2_Sensors" + "\t" + "CO2_Sensor";
     private static final String CO2_MEASUREMENT_METHOD_ELEMENT_NAME = CO2_SENSOR_ELEMENT_NAME + "\t" + "Measurement_Method";
@@ -157,8 +157,10 @@ public class CdiacReader extends DocumentHandler {
     private static final String SST_MANUFACTURER_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String SST_MODEL_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String SST_ACCURACY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String SST_ACCURACY_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_degC";
     private static final String SST_UNCERTAINTY_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String SST_PRECISION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String SST_PRECISION_DEGC_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_degC";
     private static final String SST_RESOLUTION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String SST_CALIBRATION_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String SST_COMMENTS_ELEMENT_NAME = SST_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
@@ -168,35 +170,42 @@ public class CdiacReader extends DocumentHandler {
     private static final String EQT_MANUFACTURER_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String EQT_MODEL_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String EQT_ACCURACY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String EQT_ACCURACY_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_degC";
     private static final String EQT_UNCERTAINTY_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String EQT_PRECISION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String EQT_PRECISION_DEGC_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_degC";
     private static final String EQT_RESOLUTION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String EQT_CALIBRATION_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String EQT_WARMING_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + "Warming";
     private static final String EQT_COMMENTS_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-
-    private static final String EQU_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Equilibrator_Pressure";
-    private static final String EQP_LOCATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
-    private static final String EQP_MANUFACTURER_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
-    private static final String EQP_MODEL_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
-    private static final String EQP_ACCURACY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
-    private static final String EQP_UNCERTAINTY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
-    private static final String EQP_PRECISION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
-    private static final String EQP_RESOLUTION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
-    private static final String EQP_CALIBRATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
-    private static final String EQP_COMMENTS_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
-    private static final String EQP_NORMALIZED_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
+    private static final String EQT_WARMING_ELEMENT_NAME = EQU_TEMP_ELEMENT_NAME + "\t" + "Warming";
 
     private static final String ATM_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Atmospheric_Pressure";
     private static final String ATM_LOCATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
     private static final String ATM_MANUFACTURER_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
     private static final String ATM_MODEL_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
     private static final String ATM_ACCURACY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String ATM_ACCURACY_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_hPa";
     private static final String ATM_UNCERTAINTY_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
     private static final String ATM_PRECISION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String ATM_PRECISION_HPA_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_hPa";
     private static final String ATM_RESOLUTION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
     private static final String ATM_CALIBRATION_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
     private static final String ATM_COMMENTS_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
+    private static final String ATM_NORMALIZED_ELEMENT_NAME = ATM_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
+
+    private static final String EQU_PRESSURE_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Equilibrator_Pressure";
+    private static final String EQP_LOCATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
+    private static final String EQP_MANUFACTURER_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MANUFACTURER_ELEMENT_NAME;
+    private static final String EQP_MODEL_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + MODEL_ELEMENT_NAME;
+    private static final String EQP_ACCURACY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME;
+    private static final String EQP_ACCURACY_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + ACCURACY_ELEMENT_NAME + "_hPa";
+    private static final String EQP_UNCERTAINTY_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + UNCERTAINTY_ELEMENT_NAME;
+    private static final String EQP_PRECISION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME;
+    private static final String EQP_PRECISION_HPA_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + PRECISION_ELEMENT_NAME + "_hPa";
+    private static final String EQP_RESOLUTION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + RESOLUTION_ELEMENT_NAME;
+    private static final String EQP_CALIBRATION_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + CALIBRATION_ELEMENT_NAME;
+    private static final String EQP_COMMENTS_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + COMMENTS_ELEMENT_NAME;
+    private static final String EQP_NORMALIZED_ELEMENT_NAME = EQU_PRESSURE_ELEMENT_NAME + "\t" + "Normalized";
 
     private static final String SSS_ELEMENT_NAME = METHOD_DESCRIPTION_ELEMENT_NAME + "\t" + "Sea_Surface_Salinity";
     private static final String SSS_LOCATION_ELEMENT_NAME = SSS_ELEMENT_NAME + "\t" + LOCATION_ELEMENT_NAME;
@@ -411,7 +420,7 @@ public class CdiacReader extends DocumentHandler {
 
     /**
      * @param platformType
-     *         one of "Ship", "Mooring", or "Drifting Buoy"
+     *         use to set the observation type (Mooring -> "Time Series"; othewise "Surface Underway")
      */
     private ArrayList<Variable> getVariables(PlatformType platformType) {
         ArrayList<Variable> varList = new ArrayList<Variable>();
@@ -427,430 +436,339 @@ public class CdiacReader extends DocumentHandler {
             var.setFullName(varElem.getChildTextTrim(VARIABLES_DESCRIPTION_ELEMENT_NAME));
             var.setVarUnit(varElem.getChildTextTrim(VARIABLES_UNIT_OF_VARIABLE_ELEMENT_NAME));
 
-            ArrayList<String> addnInfo;
-            String strVal;
-            NumericString numStr;
-
-            // TODO:
-            // var.setAccuracy();
-            // var.setPrecision();
-            // var.setFlagColName();
-            // var.setAddnInfo();
-            // DataVar - setSamplingLocation, setSamplingElevation, ....
-            // AirPressure - DataVar + setPressureCorrection
-            // GasConc - DataVar + setDryingMethod, setWaterVaporCorrection
-            // AquGasConc - GasConc + setReportTemperature, setTemperatureCorrection
-
             VarType type = VarType.getVarTypeFromColumnName(colName);
             switch ( type ) {
                 case OTHER:
                     break;
                 case FCO2_WATER_EQU:
-                    co2WaterVarIndices.add(k);
-                    AquGasConc fco2WaterEqu = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    fco2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    fco2WaterEqu.setSamplerNames(Arrays.asList("Equilibrator"));
-                    fco2WaterEqu.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    fco2WaterEqu.setReportTemperature("Equilibrator temperature");
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        fco2WaterEqu.setObserveType("Time series");
-                    else
-                        fco2WaterEqu.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2WaterEqu.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2WaterEqu.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
-                    if ( !strVal.isEmpty() )
-                        addnInfo.add("Frequency: " + strVal);
-                    fco2WaterEqu.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    fco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    fco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    fco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    fco2WaterEqu.setAddnInfo(addnInfo);
-                    var = fco2WaterEqu;
-                    break;
-                case FCO2_WATER_SST:
-                    co2WaterVarIndices.add(k);
-                    AquGasConc fco2WaterSst = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    fco2WaterSst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    fco2WaterSst.setSamplerNames(Arrays.asList("Equilibrator"));
-                    fco2WaterSst.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    fco2WaterSst.setReportTemperature("Sea surface temperature");
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        fco2WaterSst.setObserveType("Time series");
-                    else
-                        fco2WaterSst.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2WaterSst.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2WaterSst.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
-                    if ( !strVal.isEmpty() )
-                        addnInfo.add("Frequency: " + strVal);
-                    fco2WaterSst.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    fco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    fco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    fco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    fco2WaterSst.setAddnInfo(addnInfo);
-                    var = fco2WaterSst;
-                    break;
                 case PCO2_WATER_EQU:
+                case XCO2_WATER_EQU: {
                     co2WaterVarIndices.add(k);
-                    AquGasConc pco2WaterEqu = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    pco2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    pco2WaterEqu.setSamplerNames(Arrays.asList("Equilibrator"));
-                    pco2WaterEqu.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    pco2WaterEqu.setReportTemperature("Equilibrator temperature");
+                    AquGasConc co2WaterEqu = new AquGasConc(var);
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    co2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    co2WaterEqu.setSamplerNames(Collections.singletonList("Equilibrator"));
+                    co2WaterEqu.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
+                    co2WaterEqu.setReportTemperature("Equilibrator temperature");
                     if ( PlatformType.MOORING.equals(platformType) )
-                        pco2WaterEqu.setObserveType("Time series");
+                        co2WaterEqu.setObserveType("Time Series");
                     else
-                        pco2WaterEqu.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
+                        co2WaterEqu.setObserveType("Surface Underway");
+                    String strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2WaterEqu.setAccuracy(numStr);
+                        co2WaterEqu.setAccuracy(numStr);
                     else
                         addnInfo.add("Accuracy/Uncertainty: " + strVal);
                     strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
                     numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2WaterEqu.setPrecision(numStr);
+                        co2WaterEqu.setPrecision(numStr);
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
                     strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
                     if ( !strVal.isEmpty() )
                         addnInfo.add("Frequency: " + strVal);
-                    pco2WaterEqu.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    pco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    pco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    pco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    pco2WaterEqu.setAddnInfo(addnInfo);
-                    var = pco2WaterEqu;
+                    co2WaterEqu.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    co2WaterEqu.setMethodDescription(getElementText(CO2_MEASUREMENT_METHOD_ELEMENT_NAME));
+                    co2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
+                    co2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
+                    co2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
+                    strVal = getElementText(DETAILS_OF_CO2_SENSING_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        addnInfo.add("Details of CO2 Sensing: " + strVal);
+                    co2WaterEqu.setAddnInfo(addnInfo);
+                    var = co2WaterEqu;
                     break;
+                }
+                case FCO2_WATER_SST:
                 case PCO2_WATER_SST:
+                case XCO2_WATER_SST: {
                     co2WaterVarIndices.add(k);
-                    AquGasConc pco2WaterSst = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    pco2WaterSst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    pco2WaterSst.setSamplerNames(Arrays.asList("Equilibrator"));
-                    pco2WaterSst.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    pco2WaterSst.setReportTemperature("Sea surface temperature");
+                    AquGasConc co2WaterSst = new AquGasConc(var);
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    co2WaterSst.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    co2WaterSst.setSamplerNames(Collections.singletonList("Equilibrator"));
+                    co2WaterSst.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
+                    co2WaterSst.setReportTemperature("Sea surface temperature");
                     if ( PlatformType.MOORING.equals(platformType) )
-                        pco2WaterSst.setObserveType("Time series");
+                        co2WaterSst.setObserveType("Time Series");
                     else
-                        pco2WaterSst.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
+                        co2WaterSst.setObserveType("Surface Underway");
+                    String strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2WaterSst.setAccuracy(numStr);
+                        co2WaterSst.setAccuracy(numStr);
                     else
                         addnInfo.add("Accuracy/Uncertainty: " + strVal);
                     strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
                     numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2WaterSst.setPrecision(numStr);
+                        co2WaterSst.setPrecision(numStr);
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
                     strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
                     if ( !strVal.isEmpty() )
                         addnInfo.add("Frequency: " + strVal);
-                    pco2WaterSst.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    pco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    pco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    pco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    pco2WaterSst.setAddnInfo(addnInfo);
-                    var = pco2WaterSst;
-                    break;
-                case XCO2_WATER_EQU:
-                    co2WaterVarIndices.add(k);
-                    AquGasConc xco2WaterEqu = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    xco2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    xco2WaterEqu.setSamplerNames(Arrays.asList("Equilibrator"));
-                    xco2WaterEqu.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    xco2WaterEqu.setReportTemperature("Equilibrator temperature");
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        xco2WaterEqu.setObserveType("Time series");
-                    else
-                        xco2WaterEqu.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2WaterEqu.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2WaterEqu.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
+                    co2WaterSst.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    co2WaterSst.setMethodDescription(getElementText(CO2_MEASUREMENT_METHOD_ELEMENT_NAME));
+                    co2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
+                    co2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
+                    co2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
+                    strVal = getElementText(DETAILS_OF_CO2_SENSING_ELEMENT_NAME);
                     if ( !strVal.isEmpty() )
-                        addnInfo.add("Frequency: " + strVal);
-                    xco2WaterEqu.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    xco2WaterEqu.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    xco2WaterEqu.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    xco2WaterEqu.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    xco2WaterEqu.setAddnInfo(addnInfo);
-                    var = xco2WaterEqu;
+                        addnInfo.add("Details of CO2 Sensing: " + strVal);
+                    co2WaterSst.setAddnInfo(addnInfo);
+                    var = co2WaterSst;
                     break;
-                case XCO2_WATER_SST:
-                    co2WaterVarIndices.add(k);
-                    AquGasConc xco2WaterSst = new AquGasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    xco2WaterSst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    xco2WaterSst.setSamplerNames(Arrays.asList("Equilibrator"));
-                    xco2WaterSst.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    xco2WaterSst.setReportTemperature("Sea surface temperature");
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        xco2WaterSst.setObserveType("Time series");
-                    else
-                        xco2WaterSst.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_WATER_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2WaterSst.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_WATER_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2WaterSst.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    strVal = getElementText(CO2_FREQUENCY_ELEMENT_NAME);
-                    if ( !strVal.isEmpty() )
-                        addnInfo.add("Frequency: " + strVal);
-                    xco2WaterSst.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    xco2WaterSst.setSamplingLocation(getElementText(INTAKE_LOCATION_ELEMENT_NAME));
-                    xco2WaterSst.setSamplingElevation("Sampling Depth: " + getElementText(INTAKE_DEPTH_ELEMENT_NAME));
-                    xco2WaterSst.setDryingMethod(getElementText(DRYING_METHOD_ELEMENT_NAME));
-                    xco2WaterSst.setAddnInfo(addnInfo);
-                    var = xco2WaterSst;
-                    break;
+                }
                 case FCO2_ATM_ACTUAL:
-                    co2AtmVarIndices.add(k);
-                    GasConc fco2AtmActual = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    fco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    fco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        fco2AtmActual.setObserveType("Time series");
-                    else
-                        fco2AtmActual.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2AtmActual.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2AtmActual.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    fco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    fco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    fco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
-                    strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
-                    if ( !strVal.isEmpty() )
-                        addnInfo.add("Measurement: " + strVal);
-                    fco2AtmActual.setAddnInfo(addnInfo);
-                    var = fco2AtmActual;
-                    break;
-                case FCO2_ATM_INTERP:
-                    co2AtmVarIndices.add(k);
-                    GasConc fco2AtmInterp = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    fco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
-                    fco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        fco2AtmInterp.setObserveType("Time series");
-                    else
-                        fco2AtmInterp.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2AtmInterp.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        fco2AtmInterp.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    fco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    fco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    fco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
-                    fco2AtmInterp.setAddnInfo(addnInfo);
-                    var = fco2AtmInterp;
-                    break;
                 case PCO2_ATM_ACTUAL:
+                case XCO2_ATM_ACTUAL: {
                     co2AtmVarIndices.add(k);
-                    GasConc pco2AtmActual = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    pco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    pco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    GasConc co2AtmActual = new GasConc(var);
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    co2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    co2AtmActual.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
-                        pco2AtmActual.setObserveType("Time series");
+                        co2AtmActual.setObserveType("Time Series");
                     else
-                        pco2AtmActual.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
+                        co2AtmActual.setObserveType("Surface Underway");
+                    String strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2AtmActual.setAccuracy(numStr);
+                        co2AtmActual.setAccuracy(numStr);
                     else
                         addnInfo.add("Accuracy/Uncertainty: " + strVal);
                     strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
                     numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2AtmActual.setPrecision(numStr);
+                        co2AtmActual.setPrecision(numStr);
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
-                    pco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    pco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    pco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    co2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    co2AtmActual.setMethodDescription(getElementText(CO2_MEASUREMENT_METHOD_ELEMENT_NAME));
+                    co2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    co2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    strVal = getElementText(DETAILS_OF_CO2_SENSING_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        addnInfo.add("Details of CO2 Sensing: " + strVal);
                     strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
                     if ( !strVal.isEmpty() )
                         addnInfo.add("Measurement: " + strVal);
-                    pco2AtmActual.setAddnInfo(addnInfo);
-                    var = pco2AtmActual;
+                    co2AtmActual.setAddnInfo(addnInfo);
+                    var = co2AtmActual;
                     break;
+                }
+                case FCO2_ATM_INTERP:
                 case PCO2_ATM_INTERP:
+                case XCO2_ATM_INTERP: {
                     co2AtmVarIndices.add(k);
-                    GasConc pco2AtmInterp = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    pco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
-                    pco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                    GasConc co2AtmInterp = new GasConc(var);
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    co2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
+                    co2AtmInterp.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
-                        pco2AtmInterp.setObserveType("Time series");
+                        co2AtmInterp.setObserveType("Time Series");
                     else
-                        pco2AtmInterp.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
+                        co2AtmInterp.setObserveType("Surface Underway");
+                    String strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2AtmInterp.setAccuracy(numStr);
+                        co2AtmInterp.setAccuracy(numStr);
                     else
                         addnInfo.add("Accuracy/Uncertainty: " + strVal);
                     strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
                     numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        pco2AtmInterp.setPrecision(numStr);
+                        co2AtmInterp.setPrecision(numStr);
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
-                    pco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    pco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    pco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
-                    strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
-                    var = pco2AtmInterp;
-                    break;
-                case XCO2_ATM_ACTUAL:
-                    co2AtmVarIndices.add(k);
-                    GasConc xco2AtmActual = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    xco2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    xco2AtmActual.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
-                    if ( PlatformType.MOORING.equals(platformType) )
-                        xco2AtmActual.setObserveType("Time series");
-                    else
-                        xco2AtmActual.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2AtmActual.setAccuracy(numStr);
-                    else
-                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
-                    if ( numStr.isValid() )
-                        xco2AtmActual.setPrecision(numStr);
-                    else
-                        addnInfo.add("Precision/Resolution: " + strVal);
-                    xco2AtmActual.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    xco2AtmActual.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    xco2AtmActual.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    co2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
+                    co2AtmInterp.setMethodDescription(getElementText(CO2_MEASUREMENT_METHOD_ELEMENT_NAME));
+                    co2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
+                    co2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
+                    strVal = getElementText(DETAILS_OF_CO2_SENSING_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        addnInfo.add("Details of CO2 Sensing: " + strVal);
                     strVal = getElementText(MARINE_AIR_MEASUREMENT_ELEMENT_NAME);
                     if ( !strVal.isEmpty() )
                         addnInfo.add("Measurement: " + strVal);
-                    xco2AtmActual.setAddnInfo(addnInfo);
-                    var = xco2AtmActual;
+                    co2AtmInterp.setAddnInfo(addnInfo);
+                    var = co2AtmInterp;
                     break;
-                case XCO2_ATM_INTERP:
-                    co2AtmVarIndices.add(k);
-                    GasConc xco2AtmInterp = new GasConc(var);
-                    addnInfo = new ArrayList<String>();
-                    xco2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
-                    xco2AtmInterp.setAnalyzerNames(Arrays.asList("CO2 Sensor"));
+                }
+                case SEA_SURFACE_TEMPERATURE: {
+                    Temperature sst = new Temperature(var);
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    sst.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    sst.setAnalyzerNames(Collections.singletonList("Water Temperature Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
-                        xco2AtmInterp.setObserveType("Time series");
+                        sst.setObserveType("Time Series");
                     else
-                        xco2AtmInterp.setObserveType("Surface Underway");
-                    strVal = getElementText(CO2_AIR_UNC_ELEMENT_NAME);
-                    numStr = getNumericString(strVal, null);
+                        sst.setObserveType("Surface Underway");
+                    String strVal = getElementText(SST_ACCURACY_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SST_ACCURACY_DEGC_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SST_UNCERTAINTY_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        xco2AtmInterp.setAccuracy(numStr);
+                        sst.setAccuracy(numStr);
                     else
                         addnInfo.add("Accuracy/Uncertainty: " + strVal);
-                    strVal = getElementText(CO2_AIR_RES_ELEMENT_NAME);
+                    strVal = getElementText(SST_PRECISION_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SST_PRECISION_DEGC_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SST_RESOLUTION_ELEMENT_NAME);
                     numStr = getNumericString(strVal, null);
                     if ( numStr.isValid() )
-                        xco2AtmInterp.setPrecision(numStr);
+                        sst.setPrecision(numStr);
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
-                    xco2AtmInterp.setMethodReference(getElementText(METHOD_REFS_ELEMENT_NAME));
-                    xco2AtmInterp.setSamplingLocation(getElementText(MARINE_AIR_LOCATION_ELEMENT_NAME));
-                    xco2AtmInterp.setDryingMethod(getElementText(MARINE_AIR_DRYING_ELEMENT_NAME));
-                    xco2AtmInterp.setAddnInfo(addnInfo);
-                    var = xco2AtmInterp;
-                    break;
-                case SEA_SURFACE_TEMPERATURE:
-                    Temperature sst = new Temperature(var);
-                    // TODO:
+                    sst.setSamplingLocation(getElementText(SST_LOCATION_ELEMENT_NAME));
+                    sst.setAddnInfo(addnInfo);
                     var = sst;
                     break;
-                case EQUILIBRATOR_TEMPERATURE:
+                }
+                case EQUILIBRATOR_TEMPERATURE: {
                     Temperature tequ = new Temperature(var);
-                    // TODO:
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    tequ.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    tequ.setAnalyzerNames(Collections.singletonList("Equilibrator Temperature Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        tequ.setObserveType("Time Series");
+                    else
+                        tequ.setObserveType("Surface Underway");
+                    String strVal = getElementText(EQT_ACCURACY_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQT_ACCURACY_DEGC_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQT_UNCERTAINTY_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        tequ.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(EQT_PRECISION_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQT_PRECISION_DEGC_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQT_RESOLUTION_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        tequ.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    tequ.setSamplingLocation(getElementText(EQT_LOCATION_ELEMENT_NAME));
+                    tequ.setAddnInfo(addnInfo);
                     var = tequ;
                     break;
-                case SEA_LEVEL_PRESSURE:
+                }
+                case SEA_LEVEL_PRESSURE: {
                     AirPressure slp = new AirPressure(var);
-                    // TODO:
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    slp.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    slp.setAnalyzerNames(Collections.singletonList("Atmospheric Pressure Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        slp.setObserveType("Time Series");
+                    else
+                        slp.setObserveType("Surface Underway");
+                    String strVal = getElementText(ATM_ACCURACY_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(ATM_ACCURACY_HPA_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(ATM_UNCERTAINTY_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        slp.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(ATM_PRECISION_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(ATM_PRECISION_HPA_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(ATM_RESOLUTION_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        slp.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    slp.setSamplingLocation(getElementText(ATM_LOCATION_ELEMENT_NAME));
+                    strVal = getElementText(ATM_NORMALIZED_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        slp.setPressureCorrection("Normalized: " + strVal);
+                    slp.setAddnInfo(addnInfo);
                     var = slp;
                     break;
-                case EQUILIBRATOR_PRESSURE:
+                }
+                case EQUILIBRATOR_PRESSURE: {
                     AirPressure pequ = new AirPressure(var);
-                    // TODO:
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    pequ.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    pequ.setAnalyzerNames(Collections.singletonList("Equilibrator Pressure Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        pequ.setObserveType("Time Series");
+                    else
+                        pequ.setObserveType("Surface Underway");
+                    String strVal = getElementText(EQP_ACCURACY_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQP_ACCURACY_HPA_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQP_UNCERTAINTY_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pequ.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(EQP_PRECISION_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQP_PRECISION_HPA_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(EQP_RESOLUTION_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        pequ.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    pequ.setSamplingLocation(getElementText(EQP_LOCATION_ELEMENT_NAME));
+                    strVal = getElementText(EQP_NORMALIZED_ELEMENT_NAME);
+                    if ( !strVal.isEmpty() )
+                        pequ.setPressureCorrection("Normalized: " + strVal);
+                    pequ.setAddnInfo(addnInfo);
                     var = pequ;
                     break;
-                case SALINITY:
+                }
+                case SALINITY: {
                     DataVar sal = new DataVar(var);
-                    // TODO:
+                    ArrayList<String> addnInfo = new ArrayList<String>();
+                    sal.setMeasureMethod(MethodType.MEASURED_INSITU);
+                    sal.setAnalyzerNames(Collections.singletonList("Salinity Sensor"));
+                    if ( PlatformType.MOORING.equals(platformType) )
+                        sal.setObserveType("Time Series");
+                    else
+                        sal.setObserveType("Surface Underway");
+                    String strVal = getElementText(SSS_ACCURACY_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SSS_UNCERTAINTY_ELEMENT_NAME);
+                    NumericString numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        sal.setAccuracy(numStr);
+                    else
+                        addnInfo.add("Accuracy/Uncertainty: " + strVal);
+                    strVal = getElementText(SSS_PRECISION_ELEMENT_NAME);
+                    if ( strVal.isEmpty() )
+                        strVal = getElementText(SSS_RESOLUTION_ELEMENT_NAME);
+                    numStr = getNumericString(strVal, null);
+                    if ( numStr.isValid() )
+                        sal.setPrecision(numStr);
+                    else
+                        addnInfo.add("Precision/Resolution: " + strVal);
+                    sal.setSamplingLocation(getElementText(SSS_LOCATION_ELEMENT_NAME));
                     var = sal;
                     break;
+                }
                 case WOCE_CO2_WATER:
                     if ( woceCO2WaterVarNames == null )
                         woceCO2WaterVarNames = colName;
@@ -906,7 +824,7 @@ public class CdiacReader extends DocumentHandler {
         sampler.setVenting(getElementText(VENTED_ELEMENT_NAME));
         sampler.setAddnInfo(getListOfLines(getElementText(EQUI_ADDITIONAL_INFO_ELEMENT_NAME)));
 
-        return Arrays.asList(sampler);
+        return Collections.singletonList(sampler);
     }
 
     /**
@@ -920,7 +838,17 @@ public class CdiacReader extends DocumentHandler {
         co2Sensor.setManufacturer(getElementText(CO2_SENSOR_MANUFACTURER_ELEMENT_NAME));
         co2Sensor.setModel(getElementText(CO2_SENSOR_MODEL_ELEMENT_NAME));
         co2Sensor.setCalibration(getElementText(CO2_SENSOR_CALIBRATION_ELEMENT_NAME));
-        co2Sensor.setAddnInfo(getListOfLines(getElementText(CO2_SENSOR_COMMENTS_ELEMENT_NAME)));
+        ArrayList<String> addnInfo = getListOfLines(getElementText(CO2_SENSOR_COMMENTS_ELEMENT_NAME));
+        String strVal = getElementText(ANALYSIS_OF_COMPARISON_ELEMENT_NAME);
+        if ( !strVal.isEmpty() )
+            addnInfo.add(0, "Analysis of CO2 Comparison: " + strVal);
+        strVal = getElementText(ENVIRONMENTAL_CONTROL_ELEMENT_NAME);
+        if ( !strVal.isEmpty() )
+            addnInfo.add(0, "Environmental Control: " + strVal);
+        strVal = getElementText(MEASURED_CO2_PARAMS_ELEMENT_NAME);
+        if ( !strVal.isEmpty() )
+            addnInfo.add(0, "Measured CO2 Parameters: " + strVal);
+        co2Sensor.setAddnInfo(addnInfo);
         // All the calibration gas information is stuck together in the following ...
         String calGasInfo = getElementText(CO2_CALIBRATION_MANUFACTURER_ELEMENT_NAME);
         ArrayList<String> calGasInfoList = getListOfLines(calGasInfo);
@@ -961,10 +889,10 @@ public class CdiacReader extends DocumentHandler {
         teqSensor.setManufacturer(getElementText(EQT_MANUFACTURER_ELEMENT_NAME));
         teqSensor.setModel(getElementText(EQT_MODEL_ELEMENT_NAME));
         teqSensor.setCalibration(getElementText(EQT_CALIBRATION_ELEMENT_NAME));
-        ArrayList<String> addnInfo = getListOfLines(getElementText(EQT_COMMENTS_ELEMENT_NAME));
-        String warming = getElementText(EQT_WARMING_ELEMENT_NAME);
-        if ( !warming.isEmpty() )
-            addnInfo.add(0, "Warming: " + warming);
+        addnInfo = getListOfLines(getElementText(EQT_COMMENTS_ELEMENT_NAME));
+        strVal = getElementText(EQT_WARMING_ELEMENT_NAME);
+        if ( !strVal.isEmpty() )
+            addnInfo.add(0, "Warming: " + strVal);
         teqSensor.setAddnInfo(addnInfo);
         sensors.add(teqSensor);
 
