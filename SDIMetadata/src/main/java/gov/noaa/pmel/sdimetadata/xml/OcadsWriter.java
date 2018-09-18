@@ -101,6 +101,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String VARIABLE_IN_SITU_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "insitu";
     private static final String VARIABLE_MEASURED_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "measured";
     private static final String VARIABLE_CALC_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "calcMethod";
+    private static final String VARIABLE_STORAGE_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "storageMethod";
     private static final String VARIABLE_SAMPLING_INST_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "samplingInstrument";
     private static final String VARIABLE_ANALYZING_INST_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "analyzingInstrument";
     private static final String VARIABLE_REPLICATE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "replicate";
@@ -114,6 +115,13 @@ public class OcadsWriter extends DocumentHandler {
 
     private static final String VARIABLE_SAMPLING_LOCATION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "locationSeawaterIntake";
     private static final String VARIABLE_SAMPLING_DEPTH_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "locationSeawaterIntake";
+    private static final String VARIABLE_WATER_VAPOR_CORRECTION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "waterVaportCorrection";
+    private static final String VARIABLE_TEMPERATURE_CORRECTION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureCorrection";
+    private static final String VARIABLE_REPORT_TEMPERATURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "co2ReportTemperature";
+
+    private static final String VARIABLE_ANALYSIS_WATER_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "seawatervol";
+    private static final String VARIABLE_ANALYSIS_HEADSPACE_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "headspacevol";
+    private static final String VARIABLE_ANALYSIS_TEMPERATURE_MEASURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureMeasure";
 
     private static final String EQUILIBRATOR_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "equilibrator";
     private static final String EQUILIBRATOR_TYPE_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "type";
@@ -121,7 +129,24 @@ public class OcadsWriter extends DocumentHandler {
     private static final String EQUILIBRATOR_VENTED_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "vented";
     private static final String EQUILIBRATOR_WATER_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "waterFlowRate";
     private static final String EQUILIBRATOR_GAS_FLOW_RATE_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "gasFlowRate";
-    private static final String EQUILIBRATOR_TEMPERATURE_EQUILIBRATION_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "gasFlowRate";
+    private static final String EQUILIBRATOR_TEMPERATURE_EQUI_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "temperatureEquilibratorMethod";
+    private static final String EQUILIBRATOR_PRESSURE_EQUI_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "pressureEquilibratorMethod";
+    private static final String EQUILIBRATOR_DRYING_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "dryMethod";
+
+    private static final String GAS_SENSOR_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "gasDetector";
+    private static final String GAS_SENSOR_MANUFACTURER_ELEMENT_NAME = GAS_SENSOR_ELEMENT_NAME + SEP + "manufacturer";
+    private static final String GAS_SENSOR_MODEL_ELEMENT_NAME = GAS_SENSOR_ELEMENT_NAME + SEP + "model";
+    private static final String GAS_SENSOR_RESOLUTION_ELEMENT_NAME = GAS_SENSOR_ELEMENT_NAME + SEP + "resolution";
+    private static final String GAS_SENSOR_UNCERTAINTY_ELEMENT_NAME = GAS_SENSOR_ELEMENT_NAME + SEP + "uncertainty";
+
+    private static final String STANDARDIZATION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "standardization";
+    private static final String STANDARDIZATION_DESCRIPTION_ELEMENT_NAME = STANDARDIZATION_ELEMENT_NAME + SEP + "description";
+    private static final String STANDARDIZATION_FREQUENCY_ELEMENT_NAME = STANDARDIZATION_ELEMENT_NAME + SEP + "frequency";
+
+    private static final String STANDARD_GAS_ELEMENT_NAME = STANDARDIZATION_ELEMENT_NAME + SEP + "standardgas";
+    private static final String STANDARD_GAS_MANUFACTURER_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "manufacturer";
+    private static final String STANDARD_GAS_CONCENTRATION_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "concentration";
+    private static final String STANDARD_GAS_UNCERTAINTY_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "uncertainty";
 
     private Writer xmlWriter;
 
@@ -131,6 +156,7 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     public void writeSDIMetadata(SDIMetadata mdata) throws IOException {
+
 
         // TODO: write everything under rootElement
 

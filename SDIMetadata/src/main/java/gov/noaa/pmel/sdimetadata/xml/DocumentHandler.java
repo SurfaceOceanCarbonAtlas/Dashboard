@@ -310,4 +310,53 @@ public abstract class DocumentHandler {
         return elem.getTextTrim();
     }
 
+    /**
+     * Adds the given text to the indicated element.
+     *
+     * @param fullElementName
+     *         path from the root element to the element to add the text to; cannot be null.
+     *         Element names in the path should be separated by {@link #SEP}.
+     * @param text
+     *         text to assign after trimming; if null, an empty string is assigned
+     */
+    public void addElementText(String fullElementName, String text) {
+        Element parent = rootElement;
+        for (String name : fullElementName.split(SEP)) {
+            Element elem = parent.getChild(name);
+            if ( null == elem ) {
+                elem = new Element(name);
+                parent.addContent(elem);
+                parent = elem;
+            }
+        }
+        parent.addContent((text != null) ? text.trim() : "");
+    }
+
+    /**
+     * Adds an new instance of the indicated element.
+     * Any parent elements are reused; only the element with the final name is created.
+     *
+     * @param fullElementListName
+     *         path from the root element to the element to be created; cannot be null.
+     *         Element names in the path should be separated by {@link #SEP}.
+     *
+     * @return the new empty new element
+     */
+    public Element addListElement(String fullElementListName) {
+        Element parent = rootElement;
+        String[] names = fullElementListName.split(SEP);
+        for (int k = 0; k < names.length - 1; k++) {
+            Element elem = parent.getChild(names[k]);
+            if ( null == elem ) {
+                elem = new Element(names[k]);
+                parent.addContent(elem);
+                parent = elem;
+            }
+        }
+        Element child = new Element(names[names.length - 1]);
+        parent.addContent(child);
+        return child;
+    }
+
 }
+
