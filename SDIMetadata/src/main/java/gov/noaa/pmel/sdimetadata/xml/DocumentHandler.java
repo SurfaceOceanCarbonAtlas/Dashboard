@@ -272,16 +272,16 @@ public abstract class DocumentHandler {
     /**
      * Get the list of all child elements matching a name path
      *
-     * @param fullElementListName
-     *         path from the root element to the desired elements; cannot be null.
+     * @param listFullElementName
+     *         path from the root element to the desired elements; cannot be null or blank.
      *         Element names in the path should be separated by {@link #SEP}.
      *
      * @return list of all child elements matching the name path;
      *         an empty list is returned if no elements matching the path are found
      */
-    public List<Element> getElementList(String fullElementListName) {
+    public List<Element> getElementList(String listFullElementName) {
         Element elem = rootElement;
-        String[] names = fullElementListName.split(SEP);
+        String[] names = listFullElementName.split(SEP);
         for (int k = 0; k < names.length - 1; k++) {
             elem = elem.getChild(names[k]);
             if ( null == elem )
@@ -294,7 +294,7 @@ public abstract class DocumentHandler {
      * Get the text from a specified element under the root element.
      *
      * @param fullElementName
-     *         path from the root element to the element containing the text; cannot be null.
+     *         path from the root element to the element containing the text; cannot be null or blank.
      *         Element names in the path should be separated by {@link #SEP}.
      *
      * @return trimmed text of the specified element; an empty string is returned
@@ -311,47 +311,51 @@ public abstract class DocumentHandler {
     }
 
     /**
-     * Adds the given text to the indicated element.
+     * Any content (child elements or text) in the indicated element is deleted and the given text is assigned as
+     * its content.  Any elements in the path that do not exist are created unless the given text is null or blank.
      *
      * @param fullElementName
-     *         path from the root element to the element to add the text to; cannot be null.
+     *         path from the root element to the element to assign the text to; cannot be null or blank.
      *         Element names in the path should be separated by {@link #SEP}.
      * @param text
-     *         text to assign after trimming; if null, an empty string is assigned
+     *         text to assign after trimming
      */
-    public void addElementText(String fullElementName, String text) {
+    public void setElementText(String fullElementName, String text) {
+        boolean noText = (null == text) || text.trim().isEmpty();
         Element parent = rootElement;
         for (String name : fullElementName.split(SEP)) {
             Element elem = parent.getChild(name);
             if ( null == elem ) {
+                if ( noText )
+                    return;
                 elem = new Element(name);
                 parent.addContent(elem);
-                parent = elem;
             }
+            parent = elem;
         }
-        parent.addContent((text != null) ? text.trim() : "");
+        parent.setText(noText ? "" : text.trim());
     }
 
     /**
-     * Adds an new instance of the indicated element.
-     * Any parent elements are reused; only the element with the final name is created.
+     * Creates an element with the indicated name as an new child element of its parent element.  Any parent elements
+     * (all but the final name in the name path) that exist are reused, and those that do not exist are created.
      *
-     * @param fullElementListName
-     *         path from the root element to the element to be created; cannot be null.
+     * @param listFullElementName
+     *         path from the root element to the child element to be created; cannot be null or blank.
      *         Element names in the path should be separated by {@link #SEP}.
      *
-     * @return the new empty new element
+     * @return the new empty child element
      */
-    public Element addListElement(String fullElementListName) {
+    public Element addListElement(String listFullElementName) {
         Element parent = rootElement;
-        String[] names = fullElementListName.split(SEP);
+        String[] names = listFullElementName.split(SEP);
         for (int k = 0; k < names.length - 1; k++) {
             Element elem = parent.getChild(names[k]);
             if ( null == elem ) {
                 elem = new Element(names[k]);
                 parent.addContent(elem);
-                parent = elem;
             }
+            parent = elem;
         }
         Element child = new Element(names[names.length - 1]);
         parent.addContent(child);

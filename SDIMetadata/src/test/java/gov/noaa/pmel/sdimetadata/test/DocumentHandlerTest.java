@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static gov.noaa.pmel.sdimetadata.xml.DocumentHandler.SEP;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -36,7 +37,7 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void guessPlatformType() {
+    public void testGuessPlatformType() {
         String name = "Ronald H. Brown";
         String datasetId = "33RO20150114";
         assertEquals(PlatformType.SHIP, DocumentHandler.guessPlatformType(name, datasetId));
@@ -71,7 +72,7 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void getPersonNames() {
+    public void testGetPersonNames() {
         assertEquals(new Person("Brown", "H.M.S.", "Ronald H.", null, null, null),
                 DocumentHandler.getPersonNames("H.M.S. Ronald H. Brown"));
         assertEquals(new Person("Brown", "Ronald", "H.", null, null, null),
@@ -89,7 +90,7 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void getListOfLines() {
+    public void testGetListOfLines() {
         final ArrayList<String> lines = new ArrayList<String>(Arrays.asList(
                 "first line of information",
                 "second line\twith a tab",
@@ -105,7 +106,7 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void getDatestamp() {
+    public void testGetDatestamp() {
         final String year = "2010";
         final String month = "3";
         final String day = "24";
@@ -131,7 +132,7 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void getNumericString() {
+    public void testGetNumericString() {
         final String numVal = "345.0";
         final String unitVal = "umol / mol";
         final NumericString numstr = new NumericString(numVal, unitVal);
@@ -152,31 +153,88 @@ public class DocumentHandlerTest {
     }
 
     @Test
-    public void getElementList() {
+    public void testGetElementList() {
         MyDocHandler docHandler = new MyDocHandler(CdiacReaderTest.AOML_CDIAC_XML_DATA_STRING);
         List<Element> elems = docHandler.getElementList("Investigator");
         assertEquals(1, elems.size());
         assertEquals("Rik Wanninkhof", elems.get(0).getChildTextTrim("Name"));
-        elems = docHandler.getElementList("Variables_Info" + "\t" + "Variable");
+        elems = docHandler.getElementList("Variables_Info" + SEP + "Variable");
         assertEquals(13, elems.size());
         assertEquals("xCO2_EQU_ppm", elems.get(0).getChildTextTrim("Variable_Name"));
-        elems = docHandler.getElementList("Cruise_Info" + "\t" + "Experiment" + "\t" + "Experiment_Name");
+        elems = docHandler.getElementList("Cruise_Info" + SEP + "Experiment" + SEP + "Experiment_Name");
         assertEquals(1, elems.size());
         assertEquals("RB1501A", elems.get(0).getTextTrim());
-        elems = docHandler.getElementList("Cruise_Info" + "\t" + "Experiment" + "\t" + "garbage");
+        elems = docHandler.getElementList("Cruise_Info" + SEP + "Experiment" + SEP + "garbage");
         assertEquals(0, elems.size());
         elems = docHandler.getElementList("");
         assertEquals(0, elems.size());
     }
 
     @Test
-    public void getElementText() {
+    public void testGetElementText() {
         MyDocHandler docHandler = new MyDocHandler(CdiacReaderTest.AOML_CDIAC_XML_DATA_STRING);
-        assertEquals("Robert Castle", docHandler.getElementText("User" + "\t" + "Name"));
+        assertEquals("Robert Castle", docHandler.getElementText("User" + SEP + "Name"));
         assertEquals("", docHandler.getElementText("Cruise_Info"));
-        assertEquals("", docHandler.getElementText("User" + "\t" + "garbage"));
+        assertEquals("", docHandler.getElementText("User" + SEP + "garbage"));
         assertEquals("", docHandler.getElementText(""));
     }
+
+    @Test
+    public void testSetElementText() {
+        MyDocHandler docHandler = new MyDocHandler(EMPTY_OCADS_XML_DATA_STRING);
+        String name = "Expocode";
+        String value = "316420100523";
+        docHandler.setElementText(name, value);
+        assertEquals(value, docHandler.getElementText(name));
+        name = "person" + SEP + "name";
+        value = "Ronald H. Brown";
+        docHandler.setElementText(name, value);
+        assertEquals(value, docHandler.getElementText(name));
+        String otherval = "John Smith";
+        docHandler.setElementText(name, otherval);
+        List<Element> elemList = docHandler.getElementList(name);
+        assertEquals(1, elemList.size());
+        assertEquals(otherval, elemList.get(0).getText());
+        name = "some" + SEP + "path" + SEP + "name";
+        docHandler.setElementText(name, null);
+        assertEquals(0, docHandler.getElementList(name).size());
+        assertEquals(0, docHandler.getElementList("some" + SEP + "path").size());
+        assertEquals(0, docHandler.getElementList("some").size());
+        docHandler.setElementText(name, "\t");
+        assertEquals(0, docHandler.getElementList(name).size());
+        assertEquals(0, docHandler.getElementList("some" + SEP + "path").size());
+        assertEquals(0, docHandler.getElementList("some").size());
+    }
+
+    @Test
+    public void testAddListElement() {
+        MyDocHandler docHandler = new MyDocHandler(EMPTY_OCADS_XML_DATA_STRING);
+        String name = "investigators" + SEP + "investigator" + SEP + "name";
+        String value = "Ronald H. Brown";
+        String otherval = "John Smith";
+        Element elem = docHandler.addListElement(name);
+        elem.setText(value);
+        elem = docHandler.addListElement(name);
+        elem.setText(otherval);
+        List<Element> elemList = docHandler.getElementList(name);
+        assertEquals(2, elemList.size());
+        assertEquals(value, elemList.get(0).getText());
+        assertEquals(otherval, elemList.get(1).getText());
+        name = "update";
+        value = "2018-01-23";
+        otherval = "2018-08-03";
+        elem = docHandler.addListElement(name);
+        elem.setText(value);
+        elem = docHandler.addListElement(name);
+        elem.setText(otherval);
+        elemList = docHandler.getElementList(name);
+        assertEquals(2, elemList.size());
+        assertEquals(value, elemList.get(0).getText());
+        assertEquals(otherval, elemList.get(1).getText());
+    }
+
+    static final String EMPTY_OCADS_XML_DATA_STRING = "<?xml-stylesheet href=\"xmlblob.xsl\" type=\"text/xsl\"?>" +
+            "<metadata></metadata>";
 
 }
 

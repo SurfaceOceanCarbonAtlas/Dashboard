@@ -1,6 +1,8 @@
 package gov.noaa.pmel.sdimetadata.xml;
 
+import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -8,6 +10,7 @@ import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 
 public class OcadsWriter extends DocumentHandler {
 
@@ -156,7 +159,17 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     public void writeSDIMetadata(SDIMetadata mdata) throws IOException {
+        Element elem;
 
+        MiscInfo info = mdata.getMiscInfo();
+        setElementText(ACCESS_ID_ELEMENT_NAME, info.getAccessId());
+        ArrayList<Datestamp> history = info.getHistory();
+        if ( history.size() > 0 )
+            setElementText(SUBMISSION_DATE_ELEMENT_NAME, history.get(0).stampString());
+        for (int k = 1; k < history.size(); k++) {
+            elem = addListElement(UPDATE_DATE_ELEMENT_NAME);
+            elem.setText(history.get(k).stampString());
+        }
 
         // TODO: write everything under rootElement
 
