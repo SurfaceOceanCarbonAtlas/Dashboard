@@ -326,7 +326,7 @@ public abstract class DocumentHandler {
      *         to which the text is to be assigned; cannot be null or blank.  Element names in the path should be
      *         separated by {@link #SEP}.
      * @param text
-     *         text to assign after trimmming
+     *         text to assign after trimmming; if null or blank, an empty string is assigned if the element exists
      *
      * @throws IllegalArgumentException
      *         if the ancestor element is not null and either:

@@ -142,6 +142,14 @@ public final class NumericString implements Cloneable {
         return (numericValue < 0.0);
     }
 
+    /**
+     * @return the trimmed string resulting from concatenating the numeric string, a space, and the unit string
+     */
+    public String asOneString() {
+        String repr = valueString + " " + unitString;
+        return repr.trim();
+    }
+
     @Override
     public NumericString clone() {
         NumericString dup;

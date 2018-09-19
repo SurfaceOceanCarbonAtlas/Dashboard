@@ -151,6 +151,22 @@ public class NumericStringTest {
     }
 
     @Test
+    public void testAsOneString() {
+        NumericString numstr = new NumericString();
+        assertEquals(EMPTY_STR, numstr.asOneString());
+        numstr.setValueString(POSVAL_STR);
+        assertEquals(POSVAL_STR, numstr.asOneString());
+        numstr.setUnitString(UNIT_STR);
+        assertEquals(POSVAL_STR + " " + UNIT_STR, numstr.asOneString());
+        numstr.setValueString("\t" + NEGVAL_STR + "  ");
+        assertEquals(NEGVAL_STR + " " + UNIT_STR, numstr.asOneString());
+        numstr.setValueString(null);
+        assertEquals(UNIT_STR, numstr.asOneString());
+        numstr.setUnitString("\t");
+        assertEquals(EMPTY_STR, numstr.getValueString());
+    }
+
+    @Test
     public void testClone() {
         NumericString numstr = new NumericString();
         NumericString dup = numstr.clone();

@@ -3,10 +3,16 @@ package gov.noaa.pmel.sdimetadata.xml;
 import gov.noaa.pmel.sdimetadata.Coverage;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
+import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
+import gov.noaa.pmel.sdimetadata.variable.AirPressure;
+import gov.noaa.pmel.sdimetadata.variable.DataVar;
+import gov.noaa.pmel.sdimetadata.variable.GasConc;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -23,7 +29,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String UPDATE_DATE_ELEMENT_NAME = "update";
 
     private static final String NAME_ELEMENT_NAME = "name";
-    private static final String ORGANIZATION_ELEMENT_NAME = "organization";
+    private static final String ORG_ELEMENT_NAME = "organization";
     private static final String FIRST_STREET_ELEMENT_NAME = "deliverypoint1";
     private static final String SECOND_STREET_ELEMENT_NAME = "deliverypoint2";
     private static final String CITY_ELEMENT_NAME = "city";
@@ -37,7 +43,7 @@ public class OcadsWriter extends DocumentHandler {
 
     private static final String SUBMITTER_ELEMENT_NAME = "datasubmitter";
     private static final String SUBMITTER_NAME_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + NAME_ELEMENT_NAME;
-    private static final String SUBMITTER_ORGANIZATION_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + ORGANIZATION_ELEMENT_NAME;
+    private static final String SUBMITTER_ORG_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + ORG_ELEMENT_NAME;
     private static final String SUBMITTER_FIRST_STREET_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + FIRST_STREET_ELEMENT_NAME;
     private static final String SUBMITTER_SECOND_STREET_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + SECOND_STREET_ELEMENT_NAME;
     private static final String SUBMITTER_CITY_ELEMENT_NAME = SUBMITTER_ELEMENT_NAME + SEP + CITY_ELEMENT_NAME;
@@ -52,7 +58,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String INVESTIGATOR_ELEMENT_NAME = "person";
     private static final String INVESTIGATOR_ROLE_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + "role";
     private static final String INVESTIGATOR_NAME_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + NAME_ELEMENT_NAME;
-    private static final String INVESTIGATOR_ORGANIZATION_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + ORGANIZATION_ELEMENT_NAME;
+    private static final String INVESTIGATOR_ORG_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + ORG_ELEMENT_NAME;
     private static final String INVESTIGATOR_FIRST_STREET_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + FIRST_STREET_ELEMENT_NAME;
     private static final String INVESTIGATOR_SECOND_STREET_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + SECOND_STREET_ELEMENT_NAME;
     private static final String INVESTIGATOR_CITY_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + CITY_ELEMENT_NAME;
@@ -185,55 +191,10 @@ public class OcadsWriter extends DocumentHandler {
             elem.setText(history.get(k).stampString());
         }
 
-        Submitter submitter = mdata.getSubmitter();
-        String strVal = submitter.getFirstName() + " " + submitter.getMiddle();
-        strVal = strVal.trim() + " " + submitter.getLastName();
-        setElementText(null, SUBMITTER_NAME_ELEMENT_NAME, strVal);
-        setElementText(null, SUBMITTER_ORGANIZATION_ELEMENT_NAME, submitter.getOrganization());
-        ArrayList<String> strList = submitter.getStreets();
-        if ( strList.size() > 0 )
-            setElementText(null, SUBMITTER_FIRST_STREET_ELEMENT_NAME, strList.get(0));
-        if ( strList.size() > 1 ) {
-            strVal = strList.get(1);
-            for (int k = 2; k < strList.size(); k++) {
-                strVal += "\n" + strList.get(k);
-            }
-            setElementText(null, SUBMITTER_SECOND_STREET_ELEMENT_NAME, strVal);
-        }
-        setElementText(null, SUBMITTER_CITY_ELEMENT_NAME, submitter.getCity());
-        setElementText(null, SUBMITTER_REGION_ELEMENT_NAME, submitter.getRegion());
-        setElementText(null, SUBMITTER_ZIP_ELEMENT_NAME, submitter.getZipCode());
-        setElementText(null, SUBMITTER_COUNTRY_ELEMENT_NAME, submitter.getCountry());
-        setElementText(null, SUBMITTER_EMAIL_ELEMENT_NAME, submitter.getEmail());
-        setElementText(null, SUBMITTER_PHONE_ELEMENT_NAME, submitter.getPhone());
-        setElementText(null, SUBMITTER_ID_ELEMENT_NAME, submitter.getId());
-        setElementText(null, SUBMITTER_ID_TYPE_ELEMENT_NAME, submitter.getIdType());
-
+        addInvestigatorFields(null, mdata.getSubmitter());
         for (Investigator pi : mdata.getInvestigators()) {
             Element ancestor = addListElement(null, INVESTIGATOR_ELEMENT_NAME);
-            setElementText(ancestor, INVESTIGATOR_ROLE_ELEMENT_NAME, "investigator");
-            strVal = pi.getFirstName() + " " + pi.getMiddle();
-            strVal = strVal.trim() + " " + pi.getLastName();
-            setElementText(ancestor, INVESTIGATOR_NAME_ELEMENT_NAME, strVal);
-            setElementText(ancestor, INVESTIGATOR_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
-            strList = pi.getStreets();
-            if ( strList.size() > 0 )
-                setElementText(ancestor, INVESTIGATOR_FIRST_STREET_ELEMENT_NAME, strList.get(0));
-            if ( strList.size() > 1 ) {
-                strVal = strList.get(1);
-                for (int k = 2; k < strList.size(); k++) {
-                    strVal += "\n" + strList.get(k);
-                }
-                setElementText(ancestor, INVESTIGATOR_SECOND_STREET_ELEMENT_NAME, strVal);
-            }
-            setElementText(ancestor, INVESTIGATOR_CITY_ELEMENT_NAME, pi.getCity());
-            setElementText(ancestor, INVESTIGATOR_REGION_ELEMENT_NAME, pi.getRegion());
-            setElementText(ancestor, INVESTIGATOR_ZIP_ELEMENT_NAME, pi.getZipCode());
-            setElementText(ancestor, INVESTIGATOR_COUNTRY_ELEMENT_NAME, pi.getCountry());
-            setElementText(ancestor, INVESTIGATOR_EMAIL_ELEMENT_NAME, pi.getEmail());
-            setElementText(ancestor, INVESTIGATOR_PHONE_ELEMENT_NAME, pi.getPhone());
-            setElementText(ancestor, INVESTIGATOR_ID_ELEMENT_NAME, pi.getId());
-            setElementText(ancestor, INVESTIGATOR_ID_TYPE_ELEMENT_NAME, pi.getIdType());
+            addInvestigatorFields(ancestor, pi);
         }
 
         // setElementText(null, TITLE_ELEMENT_NAME, ?
@@ -269,13 +230,205 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, DATASET_ID_ELEMENT_NAME, info.getDatasetId());
         setElementText(null, DATASET_NAME_ELEMENT_NAME, info.getDatasetName());
         setElementText(null, SECTION_NAME_ELEMENT_NAME, info.getSectionName());
+
         setElementText(null, CITATION_ELEMENT_NAME, info.getCitation());
 
-        // TODO: write everything under rootElement
+        StringBuilder strBldr = new StringBuilder();
+        for (String ref : info.getReferences()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append(ref);
+        }
+        setElementText(null, REFERENCE_ELEMENT_NAME, strBldr.toString());
+
+        strBldr = new StringBuilder();
+        for (String port : info.getPortsOfCall()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append("Port-of-Call: ");
+            strBldr.append(port);
+
+        }
+        for (String addn : info.getAddnInfo()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append(addn);
+        }
+        setElementText(null, ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+
+        setElementText(null, WEBSITE_ELEMENT_NAME, info.getWebsite());
+        setElementText(null, DOWNLOAD_URL_ELEMENT_NAME, info.getDownloadUrl());
+
+        ArrayList<Sampler> samplers = mdata.getSamplers();
+        ArrayList<Analyzer> sensors = mdata.getAnalyzers();
+        ArrayList<Investigator> pis = mdata.getInvestigators();
+        for (Variable var : mdata.getVariables()) {
+            Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
+            addVariableFields(ancestor, var);
+            if ( var instanceof DataVar )
+                addDataVariableAddnFields(ancestor, (DataVar) var, samplers, sensors, pis);
+            if ( var instanceof AirPressure )
+                addAirPressureAddnFields(ancestor, (AirPressure) var);
+            if ( var instanceof GasConc )
+                addGasConcAddnFields(ancestor, (GasConc) var);
+            if ( var instanceof GasConc )
+                addAquGasConcAddnFields(ancestor, (GasConc) var);
+        }
 
         Document doc = new Document(rootElement);
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
         outputter.output(doc, xmlWriter);
+    }
+
+    /**
+     * Add the OCADS XML for this Investigator.  If the Investigator given is
+     * an instance of the subclass Submitter, Submitter tags are used instead of Investigator tags.
+     *
+     * @param ancestor
+     *         add under this element; if a Submitter, this should be null
+     * @param pi
+     *         use the information from this investigator or submitter
+     */
+    private void addInvestigatorFields(Element ancestor, Investigator pi) {
+        boolean issubmitter;
+        if ( pi instanceof Submitter ) {
+            issubmitter = true;
+        }
+        else {
+            issubmitter = false;
+            setElementText(ancestor, INVESTIGATOR_ROLE_ELEMENT_NAME, "investigator");
+        }
+        String strVal = pi.getFirstName() + " " + pi.getMiddle();
+        strVal = strVal.trim() + " " + pi.getLastName();
+        setElementText(ancestor, issubmitter ? SUBMITTER_NAME_ELEMENT_NAME : INVESTIGATOR_NAME_ELEMENT_NAME,
+                strVal);
+        setElementText(ancestor, issubmitter ? SUBMITTER_ORG_ELEMENT_NAME : INVESTIGATOR_ORG_ELEMENT_NAME,
+                pi.getOrganization());
+        ArrayList<String> strList = pi.getStreets();
+        if ( strList.size() > 0 )
+            setElementText(ancestor,
+                    issubmitter ? SUBMITTER_FIRST_STREET_ELEMENT_NAME : INVESTIGATOR_FIRST_STREET_ELEMENT_NAME,
+                    strList.get(0));
+        if ( strList.size() > 1 ) {
+            strVal = strList.get(1);
+            for (int k = 2; k < strList.size(); k++) {
+                strVal += "\n" + strList.get(k);
+            }
+            setElementText(ancestor,
+                    issubmitter ? SUBMITTER_SECOND_STREET_ELEMENT_NAME : INVESTIGATOR_SECOND_STREET_ELEMENT_NAME,
+                    strVal);
+        }
+        setElementText(ancestor, issubmitter ? SUBMITTER_CITY_ELEMENT_NAME : INVESTIGATOR_CITY_ELEMENT_NAME,
+                pi.getCity());
+        setElementText(ancestor, issubmitter ? SUBMITTER_REGION_ELEMENT_NAME : INVESTIGATOR_REGION_ELEMENT_NAME,
+                pi.getRegion());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ZIP_ELEMENT_NAME : INVESTIGATOR_ZIP_ELEMENT_NAME,
+                pi.getZipCode());
+        setElementText(ancestor, issubmitter ? SUBMITTER_COUNTRY_ELEMENT_NAME : INVESTIGATOR_COUNTRY_ELEMENT_NAME,
+                pi.getCountry());
+        setElementText(ancestor, issubmitter ? SUBMITTER_EMAIL_ELEMENT_NAME : INVESTIGATOR_EMAIL_ELEMENT_NAME,
+                pi.getEmail());
+        setElementText(ancestor, issubmitter ? SUBMITTER_PHONE_ELEMENT_NAME : INVESTIGATOR_PHONE_ELEMENT_NAME,
+                pi.getPhone());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_ELEMENT_NAME : INVESTIGATOR_ID_ELEMENT_NAME,
+                pi.getId());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_TYPE_ELEMENT_NAME : INVESTIGATOR_ID_TYPE_ELEMENT_NAME,
+                pi.getIdType());
+    }
+
+    /**
+     * Add the OCADS XML for the fields found in Variable
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this variable
+     */
+    private void addVariableFields(Element ancestor, Variable var) {
+        setElementText(ancestor, VARIABLE_COLUMN_NAME_ELEMENT_NAME, var.getColName());
+        setElementText(ancestor, VARIABLE_FULL_NAME_ELEMENT_NAME, var.getFullName());
+        setElementText(ancestor, VARIABLE_UNIT_ELEMENT_NAME, var.getVarUnit());
+        setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
+        String strVal = var.getFlagColName();
+        if ( !strVal.isEmpty() )
+            setElementText(ancestor, VARIABLE_FLAG_ELEMENT_NAME, "Given in column: " + strVal);
+
+        StringBuilder strBldr = new StringBuilder();
+        strVal = var.getMissVal();
+        if ( !strVal.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append("Missing Value: ");
+            strBldr.append(strVal);
+        }
+        strVal = var.getPrecision().asOneString();
+        if ( !strVal.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append("Resolution/Precision: ");
+            strBldr.append(strVal);
+        }
+        for (String addn : var.getAddnInfo()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("\n");
+            strBldr.append(addn);
+        }
+        setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+    }
+
+    /**
+     * Add the OCADS XML for the additional fields found in DataVar
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this data variable
+     * @param samplers
+     *         list of samplers used in this dataset
+     * @param sensors
+     *         list of analyzers used in this dataset
+     * @param pis
+     *         list of investigators for this dataset
+     */
+    private void addDataVariableAddnFields(Element ancestor, DataVar var, ArrayList<Sampler> samplers,
+            ArrayList<Analyzer> sensors, ArrayList<Investigator> pis) {
+        // TODO:
+    }
+
+    /**
+     * Add the OCADS XMl for the additional fields found in AirPressure
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this air pressure variable
+     */
+    private void addAirPressureAddnFields(Element ancestor, AirPressure var) {
+        // TODO:
+    }
+
+    /**
+     * Add the OCADS XMl for the additional fields found in GasConc
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this gas concentration variable
+     */
+    private void addGasConcAddnFields(Element ancestor, GasConc var) {
+        // TODO:
+    }
+
+    /**
+     * Add the OCADS XMl for the additional fields found in AquGasConc
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this aqueous gas concentration
+     */
+    private void addAquGasConcAddnFields(Element ancestor, GasConc var) {
+        // TODO:
     }
 
 }
