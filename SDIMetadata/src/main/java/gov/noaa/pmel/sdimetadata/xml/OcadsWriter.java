@@ -1,7 +1,11 @@
 package gov.noaa.pmel.sdimetadata.xml;
 
+import gov.noaa.pmel.sdimetadata.Coverage;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Submitter;
+import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -15,7 +19,7 @@ import java.util.ArrayList;
 public class OcadsWriter extends DocumentHandler {
 
     private static final String ACCESS_ID_ELEMENT_NAME = "related" + SEP + "name";
-    private static final String SUBMISSION_DATE_ELEMENT_NAME = "submissionDate";
+    private static final String SUBMISSION_DATE_ELEMENT_NAME = "submissiondate";
     private static final String UPDATE_DATE_ELEMENT_NAME = "update";
 
     private static final String NAME_ELEMENT_NAME = "name";
@@ -78,7 +82,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String REFERENCE_ELEMENT_NAME = "reference";
 
     private static final String ADDN_INFO_ELEMENT_NAME = "suppleInfo";
-    private static final String WEBSITE_ELEMENT_NAME = "link_lanking";
+    private static final String WEBSITE_ELEMENT_NAME = "link_landing";
     private static final String DOWNLOAD_URL_ELEMENT_NAME = "link_download";
 
     private static final String DATA_START_DATE_ELEMENT_NAME = "startdate";
@@ -91,10 +95,11 @@ public class OcadsWriter extends DocumentHandler {
     private static final String GEOGRAPHIC_NAME_ELEMENT_NAME = "geographicName";
 
     private static final String PLATFORM_ELEMENT_NAME = "Platform";
-    private static final String PLATFORM_ID_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + "t" + "PlatformID";
-    private static final String PLATFORM_TYPE_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + "t" + "PlatformType";
-    private static final String PLATFORM_OWNER_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + "t" + "PlatformOwner";
-    private static final String PLATFORM_COUNTRY_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + "t" + "PlatformCountry";
+    private static final String PLATFORM_NAME_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + SEP + "PlatformName";
+    private static final String PLATFORM_ID_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + SEP + "PlatformID";
+    private static final String PLATFORM_TYPE_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + SEP + "PlatformType";
+    private static final String PLATFORM_OWNER_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + SEP + "PlatformOwner";
+    private static final String PLATFORM_COUNTRY_ELEMENT_NAME = PLATFORM_ELEMENT_NAME + SEP + "PlatformCountry";
 
     private static final String VARIABLE_ELEMENT_NAME = "variable";
     private static final String VARIABLE_COLUMN_NAME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "abbrev";
@@ -151,25 +156,120 @@ public class OcadsWriter extends DocumentHandler {
     private static final String STANDARD_GAS_CONCENTRATION_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "concentration";
     private static final String STANDARD_GAS_UNCERTAINTY_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "uncertainty";
 
-    private Writer xmlWriter;
-
-    public OcadsWriter(Writer xmlWriter) {
-        this.xmlWriter = xmlWriter;
+    /**
+     * Create a new document containing only the root element for OCADS XML content
+     */
+    public OcadsWriter() {
         rootElement = new Element("metadata");
     }
 
-    public void writeSDIMetadata(SDIMetadata mdata) throws IOException {
-        Element elem;
-
+    /**
+     * Write the contents of the given metadata in OCADS XML to the given writer.
+     *
+     * @param mdata
+     *         write the contents of this metadata
+     * @param xmlWriter
+     *         write OCADS XML to this writer
+     *
+     * @throws IOException
+     *         if writing to the given writer throws one
+     */
+    public void writeSDIMetadata(SDIMetadata mdata, Writer xmlWriter) throws IOException {
         MiscInfo info = mdata.getMiscInfo();
-        setElementText(ACCESS_ID_ELEMENT_NAME, info.getAccessId());
+        setElementText(null, ACCESS_ID_ELEMENT_NAME, info.getAccessId());
         ArrayList<Datestamp> history = info.getHistory();
         if ( history.size() > 0 )
-            setElementText(SUBMISSION_DATE_ELEMENT_NAME, history.get(0).stampString());
+            setElementText(null, SUBMISSION_DATE_ELEMENT_NAME, history.get(0).stampString());
         for (int k = 1; k < history.size(); k++) {
-            elem = addListElement(UPDATE_DATE_ELEMENT_NAME);
+            Element elem = addListElement(null, UPDATE_DATE_ELEMENT_NAME);
             elem.setText(history.get(k).stampString());
         }
+
+        Submitter submitter = mdata.getSubmitter();
+        String strVal = submitter.getFirstName() + " " + submitter.getMiddle();
+        strVal = strVal.trim() + " " + submitter.getLastName();
+        setElementText(null, SUBMITTER_NAME_ELEMENT_NAME, strVal);
+        setElementText(null, SUBMITTER_ORGANIZATION_ELEMENT_NAME, submitter.getOrganization());
+        ArrayList<String> strList = submitter.getStreets();
+        if ( strList.size() > 0 )
+            setElementText(null, SUBMITTER_FIRST_STREET_ELEMENT_NAME, strList.get(0));
+        if ( strList.size() > 1 ) {
+            strVal = strList.get(1);
+            for (int k = 2; k < strList.size(); k++) {
+                strVal += "\n" + strList.get(k);
+            }
+            setElementText(null, SUBMITTER_SECOND_STREET_ELEMENT_NAME, strVal);
+        }
+        setElementText(null, SUBMITTER_CITY_ELEMENT_NAME, submitter.getCity());
+        setElementText(null, SUBMITTER_REGION_ELEMENT_NAME, submitter.getRegion());
+        setElementText(null, SUBMITTER_ZIP_ELEMENT_NAME, submitter.getZipCode());
+        setElementText(null, SUBMITTER_COUNTRY_ELEMENT_NAME, submitter.getCountry());
+        setElementText(null, SUBMITTER_EMAIL_ELEMENT_NAME, submitter.getEmail());
+        setElementText(null, SUBMITTER_PHONE_ELEMENT_NAME, submitter.getPhone());
+        setElementText(null, SUBMITTER_ID_ELEMENT_NAME, submitter.getId());
+        setElementText(null, SUBMITTER_ID_TYPE_ELEMENT_NAME, submitter.getIdType());
+
+        for (Investigator pi : mdata.getInvestigators()) {
+            Element ancestor = addListElement(null, INVESTIGATOR_ELEMENT_NAME);
+            setElementText(ancestor, INVESTIGATOR_ROLE_ELEMENT_NAME, "investigator");
+            strVal = pi.getFirstName() + " " + pi.getMiddle();
+            strVal = strVal.trim() + " " + pi.getLastName();
+            setElementText(ancestor, INVESTIGATOR_NAME_ELEMENT_NAME, strVal);
+            setElementText(ancestor, INVESTIGATOR_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+            strList = pi.getStreets();
+            if ( strList.size() > 0 )
+                setElementText(ancestor, INVESTIGATOR_FIRST_STREET_ELEMENT_NAME, strList.get(0));
+            if ( strList.size() > 1 ) {
+                strVal = strList.get(1);
+                for (int k = 2; k < strList.size(); k++) {
+                    strVal += "\n" + strList.get(k);
+                }
+                setElementText(ancestor, INVESTIGATOR_SECOND_STREET_ELEMENT_NAME, strVal);
+            }
+            setElementText(ancestor, INVESTIGATOR_CITY_ELEMENT_NAME, pi.getCity());
+            setElementText(ancestor, INVESTIGATOR_REGION_ELEMENT_NAME, pi.getRegion());
+            setElementText(ancestor, INVESTIGATOR_ZIP_ELEMENT_NAME, pi.getZipCode());
+            setElementText(ancestor, INVESTIGATOR_COUNTRY_ELEMENT_NAME, pi.getCountry());
+            setElementText(ancestor, INVESTIGATOR_EMAIL_ELEMENT_NAME, pi.getEmail());
+            setElementText(ancestor, INVESTIGATOR_PHONE_ELEMENT_NAME, pi.getPhone());
+            setElementText(ancestor, INVESTIGATOR_ID_ELEMENT_NAME, pi.getId());
+            setElementText(ancestor, INVESTIGATOR_ID_TYPE_ELEMENT_NAME, pi.getIdType());
+        }
+
+        // setElementText(null, TITLE_ELEMENT_NAME, ?
+        setElementText(null, SYNOPSIS_ELEMENT_NAME, info.getSynopsis());
+        setElementText(null, PURPOSE_ELEMENT_NAME, info.getPurpose());
+
+        Coverage coverage = mdata.getCoverage();
+        Datestamp stamp = DocumentHandler.getDatestamp(coverage.getEarliestDataTime());
+        setElementText(null, DATA_START_DATE_ELEMENT_NAME, stamp.stampString());
+        stamp = DocumentHandler.getDatestamp(coverage.getLatestDataTime());
+        setElementText(null, DATA_END_DATE_ELEMENT_NAME, stamp.stampString());
+        setElementText(null, WESTERNMOST_LONGITUDE_ELEMENT_NAME, coverage.getWesternLongitude().getValueString());
+        setElementText(null, EASTERNMOST_LONGITUDE_ELEMENT_NAME, coverage.getEasternLongitude().getValueString());
+        setElementText(null, SOUTHERNMOST_LATITUDE_ELEMENT_NAME, coverage.getSouthernLatitude().getValueString());
+        setElementText(null, NORTHERNMOST_LATITUDE_ELEMENT_NAME, coverage.getNorthernLatitude().getValueString());
+        setElementText(null, SPATIAL_REFERENCE_ELEMENT_NAME, coverage.getSpatialReference());
+        for (String region : coverage.getGeographicNames()) {
+            addListElement(null, GEOGRAPHIC_NAME_ELEMENT_NAME).setText(region);
+        }
+
+        setElementText(null, FUNDING_AGENCY_NAME_ELEMENT_NAME, info.getFundingAgency());
+        setElementText(null, FUNDING_AGENCY_TITLE_ELEMENT_NAME, info.getFundingTitle());
+        setElementText(null, FUNDING_AGENCY_ID_ELEMENT_NAME, info.getFundingId());
+        setElementText(null, RESEARCH_PROJECT_ELEMENT_NAME, info.getResearchProject());
+
+        Platform platform = mdata.getPlatform();
+        setElementText(null, PLATFORM_NAME_ELEMENT_NAME, platform.getPlatformName());
+        setElementText(null, PLATFORM_ID_ELEMENT_NAME, platform.getPlatformId());
+        setElementText(null, PLATFORM_TYPE_ELEMENT_NAME, platform.getPlatformType().toString());
+        setElementText(null, PLATFORM_OWNER_ELEMENT_NAME, platform.getPlatformOwner());
+        setElementText(null, PLATFORM_COUNTRY_ELEMENT_NAME, platform.getPlatformCountry());
+
+        setElementText(null, DATASET_ID_ELEMENT_NAME, info.getDatasetId());
+        setElementText(null, DATASET_NAME_ELEMENT_NAME, info.getDatasetName());
+        setElementText(null, SECTION_NAME_ELEMENT_NAME, info.getSectionName());
+        setElementText(null, CITATION_ELEMENT_NAME, info.getCitation());
 
         // TODO: write everything under rootElement
 

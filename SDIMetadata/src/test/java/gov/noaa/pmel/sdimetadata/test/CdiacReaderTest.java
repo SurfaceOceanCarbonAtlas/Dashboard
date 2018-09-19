@@ -1,6 +1,7 @@
 package gov.noaa.pmel.sdimetadata.test;
 
 import gov.noaa.pmel.sdimetadata.Coverage;
+import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
@@ -29,6 +30,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
@@ -80,6 +82,79 @@ public class CdiacReaderTest {
         assertEquals(investigator.toString(), "", investigator.getCountry());
         assertEquals(investigator.toString(), "305-361-4379", investigator.getPhone());
         assertEquals(investigator.toString(), "Rik.Wanninkhof@noaa.gov", investigator.getEmail());
+
+        MiscInfo info = mdata.getMiscInfo();
+        assertEquals(info.toString(), "33RO20150114", info.getDatasetId());
+        assertEquals(info.toString(), "RB1501A", info.getDatasetName());
+        assertEquals(info.toString(), "", info.getSectionName());
+        assertEquals(info.toString(), "NOAA Climate Observation Office/Climate Observations Division",
+                info.getFundingAgency());
+        assertEquals(info.toString(), "", info.getFundingTitle());
+        assertEquals(info.toString(), "", info.getFundingId());
+        assertEquals(info.toString(), "", info.getResearchProject());
+        assertEquals(info.toString(), "", info.getDatasetDoi());
+        assertEquals(info.toString(), "", info.getAccessId());
+        assertEquals(info.toString(), "http://www.aoml.noaa.gov/ocd/gcc/rvbrown_introduction.php", info.getWebsite());
+        assertEquals(info.toString(), "", info.getDownloadUrl());
+        assertEquals(info.toString(), "Wanninkhof, R., R. D. Castle, and J. Shannahoff. 2013. " +
+                "Underway pCO2 measurements aboard the R/V Ronald H. Brown during the 2014 cruises. " +
+                "http://cdiac.ornl.gov/ftp/oceans/VOS_Ronald_Brown/RB2013/. Carbon Dioxide Information " +
+                "Analysis Center, Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tennessee. " +
+                "doi: 10.3334/CDIAC/OTG.VOS_RB_2012", info.getCitation());
+        assertEquals(info.toString(), "", info.getSynopsis());
+        assertEquals(info.toString(), "", info.getPurpose());
+        assertEquals(info.toString(), new ArrayList<String>(Arrays.asList(
+                "DOE (1994). Handbook of methods for the analysis of the various",
+                "parameters of the carbon dioxide system in sea water; version",
+                "2. DOE.",
+                "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and",
+                "P. P. Murphy (1998) A new automated underway system for making",
+                "high precision pCO2 measurements onboard research ships.",
+                "Analytica Chim. Acta 377: 185-191.",
+                "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca",
+                "(1997). Measurement of underway fCO2 in the Eastern",
+                "Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER,",
+                "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.",
+                "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H.",
+                "Luger, T. Johannessen, A. Olsen, R. A. Feely, and C. E.",
+                "Cosca (2009), Recommendations for autonomous underway pCO2",
+                "measuring systems and data-reduction routines.  Deep Sea",
+                "Research II, 56: 512-522.",
+                "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in",
+                "surface water using continuous and discrete sampling methods.",
+                "Mar. Chem. 44(2-4): 189-205.",
+                "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in",
+                "water and seawater. Deep-Sea Research 17: 721-735.",
+                "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the",
+                "solubility of a non-ideal gas.  Mar. Chem. 2: 203-215.",
+                "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects",
+                "of temperature and salinity on the partial pressure of CO2 in",
+                "seawater. Nature 300: 511-513."
+        )), info.getReferences());
+        assertEquals(info.toString(), new ArrayList<String>(Arrays.asList("Honolulu, HI", "San Francisco, CA")),
+                info.getPortsOfCall());
+        assertEquals(info.toString(), new ArrayList<String>(Arrays.asList(
+                "Experiment Type: Research Cruise",
+                "Cruise Info: CALWATER II Leg 1",
+                "Website Note: All AOML fCO2 underway data from the R/V Ronald H. Brown are posted on this site.",
+                "(1.) It was determined that there was a 2.68 minute offset between the SST data record from the " +
+                        "SBE-21 in the bow and the Hart 1521 temperature sensor in the equilibrator.  The SST data " +
+                        "were interpolated using this offset to determine the SST at the time of the equilibrator " +
+                        "measurement.  (2.) A total of 6011 measurements were taken with 5661 flagged as good, 342 " +
+                        "flagged as questionable, and 8 flagged as bad.  All measurements flagged as 4 (bad) have " +
+                        "been removed from the final data file.  (3.) There was a 17-1/2 hour dropout of EqT readings at",
+                "the start of the cruise.  New values were determined using a relation between equilibrator " +
+                        "temperature and SST.  The equation used was EqT = 0.9734*SST + 0.7735, n = 124, " +
+                        "r^2 = 0.9630.  All of these values have been flagged 3.  (4.) On 1/22 at 1730, an emergency " +
+                        "shutdown of the system",
+                "occurred due to water getting into the atm condenser. The survey tech cleared out the water and " +
+                        "restarted the system on 1/26 at 0519.  No data was acquired during the shutdown period."
+        )), info.getAddnInfo());
+        assertEquals(info.toString(), new Datestamp(), info.getStartDatestamp());
+        assertEquals(info.toString(), new Datestamp(), info.getEndDatestamp());
+        assertEquals(info.toString(), new ArrayList<Datestamp>(Arrays.asList(
+                new Datestamp("2016", "01", "20")
+        )), info.getHistory());
 
         Platform platform = mdata.getPlatform();
         assertEquals(platform.toString(), "33RO", platform.getPlatformId());

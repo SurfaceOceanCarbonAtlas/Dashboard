@@ -311,44 +311,107 @@ public abstract class DocumentHandler {
     }
 
     /**
-     * Any content (child elements or text) in the indicated element is deleted and the given text is assigned as
-     * its content.  Any elements in the path that do not exist are created unless the given text is null or blank.
+     * Any content (child elements or text) in the element indicated with the full path name is deleted and the given
+     * text is assigned as its content.  If the ancestor element is not null, the full path name must start with
+     * the full path name of this ancestor element, and the elements starting with this ancestor element is used;
+     * otherwise the elements starting under the root element is used.   Any elements in the path from the ancestor
+     * element, or any elements if the ancestor element is null, to the indicated element that do not exist are created
+     * unless the given text is null or blank.
      *
+     * @param ancestor
+     *         assign text to the specified element starting with this element;
+     *         if null, assign starting with the root element
      * @param fullElementName
-     *         path from the root element to the element to assign the text to; cannot be null or blank.
-     *         Element names in the path should be separated by {@link #SEP}.
+     *         path from the root element, through the ancestor element if ancestor is not null, to the element
+     *         to which the text is to be assigned; cannot be null or blank.  Element names in the path should be
+     *         separated by {@link #SEP}.
      * @param text
-     *         text to assign after trimming
+     *         text to assign after trimmming
+     *
+     * @throws IllegalArgumentException
+     *         if the ancestor element is not null and either:
+     *         the ancestor element is not an element of this DocumentHandler, or
+     *         the full element name does not start with the path to the ancestor element
      */
-    public void setElementText(String fullElementName, String text) {
+    public void setElementText(Element ancestor, String fullElementName, String text) {
+        Element elem;
+        String pathName;
+        if ( ancestor != null ) {
+            String ancestorName = ancestor.getName();
+            elem = ancestor.getParentElement();
+            while ( elem != rootElement ) {
+                if ( elem == null )
+                    throw new IllegalArgumentException("ancestor element (" + ancestorName +
+                            ") not part of this document");
+                ancestorName = elem.getName() + SEP + ancestorName;
+                elem = elem.getParentElement();
+            }
+            ancestorName += SEP;
+            if ( !fullElementName.startsWith(ancestorName) )
+                throw new IllegalArgumentException("full element path (" + fullElementName +
+                        ") does not start with the ancestor full element path (" + ancestorName + ")");
+            elem = ancestor;
+            pathName = fullElementName.substring(ancestorName.length());
+        }
+        else {
+            elem = rootElement;
+            pathName = fullElementName;
+        }
         boolean noText = (null == text) || text.trim().isEmpty();
-        Element parent = rootElement;
-        for (String name : fullElementName.split(SEP)) {
-            Element elem = parent.getChild(name);
-            if ( null == elem ) {
+        for (String name : pathName.split(SEP)) {
+            Element child = elem.getChild(name);
+            if ( null == child ) {
                 if ( noText )
                     return;
-                elem = new Element(name);
-                parent.addContent(elem);
+                child = new Element(name);
+                elem.addContent(child);
             }
-            parent = elem;
+            elem = child;
         }
-        parent.setText(noText ? "" : text.trim());
+        elem.setText(noText ? "" : text.trim());
     }
 
     /**
-     * Creates an element with the indicated name as an new child element of its parent element.  Any parent elements
-     * (all but the final name in the name path) that exist are reused, and those that do not exist are created.
+     * Creates an element with the indicated name as an new child element of its immediate parent element.  If the
+     * ancestor element is not null, the full path name for the new child element must start with the full path name
+     * of this ancestor element, and the element is created starting under this ancestor element; otherwise the element
+     * is created starting under the root element.   Any elements in the path from the ancestor element, or any elements
+     * if the ancestor element is null, to the indicated element that do not exist are created.
      *
+     * @param ancestor
+     *         create the new child element starting under this element;
+     *         if null, create starting under the root element
      * @param listFullElementName
-     *         path from the root element to the child element to be created; cannot be null or blank.
-     *         Element names in the path should be separated by {@link #SEP}.
+     *         path from the root element, through the ancestor element if ancestor is not null, to the element
+     *         to be created; cannot be null or blank.  Element names in the path should be separated by {@link #SEP}.
      *
      * @return the new empty child element
      */
-    public Element addListElement(String listFullElementName) {
-        Element parent = rootElement;
-        String[] names = listFullElementName.split(SEP);
+    public Element addListElement(Element ancestor, String listFullElementName) {
+        Element parent;
+        String pathName;
+        if ( ancestor != null ) {
+            String ancestorName = ancestor.getName();
+            parent = ancestor.getParentElement();
+            while ( parent != rootElement ) {
+                if ( parent == null )
+                    throw new IllegalArgumentException("ancestor element (" + ancestorName +
+                            ") not part of this document");
+                ancestorName = parent.getName() + SEP + ancestorName;
+                parent = parent.getParentElement();
+            }
+            ancestorName += SEP;
+            if ( !listFullElementName.startsWith(ancestorName) )
+                throw new IllegalArgumentException("full element path (" + listFullElementName +
+                        ") does not start with the ancestor full element path (" + ancestorName + ")");
+            parent = ancestor;
+            pathName = listFullElementName.substring(ancestorName.length());
+        }
+        else {
+            parent = rootElement;
+            pathName = listFullElementName;
+        }
+        String[] names = pathName.split(SEP);
         for (int k = 0; k < names.length - 1; k++) {
             Element elem = parent.getChild(names[k]);
             if ( null == elem ) {

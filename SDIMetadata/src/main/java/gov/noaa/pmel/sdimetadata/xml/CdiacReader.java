@@ -231,10 +231,10 @@ public class CdiacReader extends DocumentHandler {
     private static final String DATA_SET_LINK_NOTE_ELEMENT_NAME = DATA_SET_LINK_ELEMENT_NAME + SEP + "Link_Note";
 
     /**
-     * Create from XML content provided by the given reader.
+     * Create from CDIAC XML content provided by the given reader.
      *
      * @param xmlReader
-     *         read the XML from here
+     *         read the CDIAC XML from here
      *
      * @throws IllegalArgumentException
      *         if there is a problem interpreting the XML read

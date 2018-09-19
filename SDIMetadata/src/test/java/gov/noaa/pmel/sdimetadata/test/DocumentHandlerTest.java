@@ -18,6 +18,7 @@ import java.util.List;
 
 import static gov.noaa.pmel.sdimetadata.xml.DocumentHandler.SEP;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class DocumentHandlerTest {
@@ -184,26 +185,50 @@ public class DocumentHandlerTest {
         MyDocHandler docHandler = new MyDocHandler(EMPTY_OCADS_XML_DATA_STRING);
         String name = "Expocode";
         String value = "316420100523";
-        docHandler.setElementText(name, value);
+        docHandler.setElementText(null, name, value);
         assertEquals(value, docHandler.getElementText(name));
+
         name = "person" + SEP + "name";
         value = "Ronald H. Brown";
-        docHandler.setElementText(name, value);
+        docHandler.setElementText(null, name, value);
         assertEquals(value, docHandler.getElementText(name));
+
         String otherval = "John Smith";
-        docHandler.setElementText(name, otherval);
+        docHandler.setElementText(null, name, otherval);
         List<Element> elemList = docHandler.getElementList(name);
         assertEquals(1, elemList.size());
         assertEquals(otherval, elemList.get(0).getText());
-        name = "some" + SEP + "path" + SEP + "name";
-        docHandler.setElementText(name, null);
+
+        docHandler.setElementText(null, name, null);
+        elemList = docHandler.getElementList(name);
+        assertEquals(1, elemList.size());
+        assertEquals("", elemList.get(0).getText());
+
+        String childName = "first";
+        String fullName = name + SEP + childName;
+        value = "Ronald";
+        docHandler.setElementText(elemList.get(0), fullName, value);
+        elemList = docHandler.getElementList(name);
+        assertEquals(1, elemList.size());
+        Element elem = elemList.get(0).getChild(childName);
+        assertNotNull(elem);
+        assertEquals(value, elem.getText());
+
+        name = "some" + SEP + "name";
+        docHandler.setElementText(null, name, null);
         assertEquals(0, docHandler.getElementList(name).size());
-        assertEquals(0, docHandler.getElementList("some" + SEP + "path").size());
         assertEquals(0, docHandler.getElementList("some").size());
-        docHandler.setElementText(name, "\t");
+        docHandler.setElementText(null, name, "\t");
         assertEquals(0, docHandler.getElementList(name).size());
-        assertEquals(0, docHandler.getElementList("some" + SEP + "path").size());
         assertEquals(0, docHandler.getElementList("some").size());
+
+        name = fullName + SEP + "some" + SEP + "name";
+        docHandler.setElementText(elem, name, null);
+        assertEquals(0, docHandler.getElementList(name).size());
+        assertEquals(0, docHandler.getElementList(fullName + SEP + "some").size());
+        docHandler.setElementText(elem, name, "\t");
+        assertEquals(0, docHandler.getElementList(name).size());
+        assertEquals(0, docHandler.getElementList(fullName + SEP + "some").size());
     }
 
     @Test
@@ -212,20 +237,37 @@ public class DocumentHandlerTest {
         String name = "investigators" + SEP + "investigator" + SEP + "name";
         String value = "Ronald H. Brown";
         String otherval = "John Smith";
-        Element elem = docHandler.addListElement(name);
+        Element elem = docHandler.addListElement(null, name);
         elem.setText(value);
-        elem = docHandler.addListElement(name);
+        elem = docHandler.addListElement(null, name);
         elem.setText(otherval);
         List<Element> elemList = docHandler.getElementList(name);
         assertEquals(2, elemList.size());
         assertEquals(value, elemList.get(0).getText());
         assertEquals(otherval, elemList.get(1).getText());
+
         name = "update";
         value = "2018-01-23";
         otherval = "2018-08-03";
-        elem = docHandler.addListElement(name);
+        elem = docHandler.addListElement(null, name);
         elem.setText(value);
-        elem = docHandler.addListElement(name);
+        elem = docHandler.addListElement(null, name);
+        elem.setText(otherval);
+        elemList = docHandler.getElementList(name);
+        assertEquals(2, elemList.size());
+        assertEquals(value, elemList.get(0).getText());
+        assertEquals(otherval, elemList.get(1).getText());
+
+        String parentName = "investigators" + SEP + "investigator";
+        elemList = docHandler.getElementList(parentName);
+        assertEquals(1, elemList.size());
+        String childName = "street" + SEP + "first";
+        name = parentName + SEP + childName;
+        elem = docHandler.addListElement(elemList.get(0), name);
+        value = "123 Main St";
+        elem.setText(value);
+        elem = docHandler.addListElement(elemList.get(0), name);
+        otherval = "Suite 405";
         elem.setText(otherval);
         elemList = docHandler.getElementList(name);
         assertEquals(2, elemList.size());
