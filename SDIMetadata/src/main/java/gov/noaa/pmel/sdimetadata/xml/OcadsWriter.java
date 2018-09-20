@@ -404,7 +404,18 @@ public class OcadsWriter extends DocumentHandler {
      *         use the information given in this air pressure variable
      */
     private void addAirPressureAddnFields(Element ancestor, AirPressure var) {
-        // TODO:
+        String pressureCorrection = var.getPressureCorrection();
+        if ( pressureCorrection.isEmpty() )
+            return;
+        String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+        StringBuilder strBldr = new StringBuilder();
+        strBldr.append("Pressure Correction: ");
+        strBldr.append(pressureCorrection);
+        if ( !addnInfo.isEmpty() ) {
+            strBldr.append("\n");
+            strBldr.append(addnInfo);
+        }
+        setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
     }
 
     /**

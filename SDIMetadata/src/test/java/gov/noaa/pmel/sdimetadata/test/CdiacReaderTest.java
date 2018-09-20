@@ -306,10 +306,13 @@ public class CdiacReaderTest {
         assertEquals(sensor.toString(), "239", sensor.getModel());
         assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
         strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
+        assertEquals(sensor.toString(), 4, strList.size());
+        assertEquals(sensor.toString(), "Location: Attached to equilibrator headspace", strList.get(0));
+        assertEquals(sensor.toString(), "Accuracy/Uncertainty: ± 0.052 hPa", strList.get(1));
+        assertEquals(sensor.toString(), "Precision/Resolution: 0.01 hPa", strList.get(2));
         assertEquals(sensor.toString(), "Pressure reading from the Setra-270 on the exit of the analyzer was added " +
                 "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
-                "to yield the equlibrator pressure.", strList.get(0));
+                "to yield the equlibrator pressure.", strList.get(3));
 
         ArrayList<Variable> variables = mdata.getVariables();
         assertEquals(variables.toString(), 13, variables.size());

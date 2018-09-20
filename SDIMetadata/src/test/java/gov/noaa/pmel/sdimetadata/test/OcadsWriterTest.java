@@ -56,12 +56,12 @@ public class OcadsWriterTest {
             fail("Problems interpreting the OCADS XML contents: " + ex.getMessage());
         }
 
-        assertEquals("", docHandler.getElementText("related" + SEP + "name"));
+        assertEquals("", docHandler.getElementText(null, "related" + SEP + "name"));
 
-        assertEquals("2016-01-20", docHandler.getElementText("submissiondate"));
-        assertEquals(0, docHandler.getElementList("update").size());
+        assertEquals("2016-01-20", docHandler.getElementText(null, "submissiondate"));
+        assertEquals(0, docHandler.getElementList(null, "update").size());
 
-        List<Element> elemList = docHandler.getElementList("datasubmitter");
+        List<Element> elemList = docHandler.getElementList(null, "datasubmitter");
         assertEquals(1, elemList.size());
         Element elem = elemList.get(0);
         assertEquals("Robert Castle", elem.getChildTextTrim("name"));
@@ -77,7 +77,7 @@ public class OcadsWriterTest {
         assertEquals(null, elem.getChildTextTrim("ID"));
         assertEquals(null, elem.getChildTextTrim("IDtype"));
 
-        elemList = docHandler.getElementList("person");
+        elemList = docHandler.getElementList(null, "person");
         assertEquals(1, elemList.size());
         elem = elemList.get(0);
         assertEquals("Rik Wanninkhof", elem.getChildTextTrim("name"));
@@ -94,42 +94,42 @@ public class OcadsWriterTest {
         assertEquals(null, elem.getChildTextTrim("IDtype"));
         assertEquals("investigator", elem.getChildTextTrim("role"));
 
-        assertEquals("", docHandler.getElementText("title"));
-        assertEquals("", docHandler.getElementText("abstract"));
-        assertEquals("", docHandler.getElementText("purpose"));
+        assertEquals("", docHandler.getElementText(null, "title"));
+        assertEquals("", docHandler.getElementText(null, "abstract"));
+        assertEquals("", docHandler.getElementText(null, "purpose"));
 
-        assertEquals("2015-01-15", docHandler.getElementText("startdate"));
-        assertEquals("2015-01-29", docHandler.getElementText("enddate"));
-        assertEquals("-158.0", docHandler.getElementText("westbd"));
-        assertEquals("-122.6", docHandler.getElementText("eastbd"));
-        assertEquals("-21.2", docHandler.getElementText("southbd"));
-        assertEquals("38.0", docHandler.getElementText("northbd"));
-        assertEquals(Coverage.WGS84, docHandler.getElementText("spatialReference"));
-        assertEquals(0, docHandler.getElementList("geographicName").size());
+        assertEquals("2015-01-15", docHandler.getElementText(null, "startdate"));
+        assertEquals("2015-01-29", docHandler.getElementText(null, "enddate"));
+        assertEquals("-158.0", docHandler.getElementText(null, "westbd"));
+        assertEquals("-122.6", docHandler.getElementText(null, "eastbd"));
+        assertEquals("-21.2", docHandler.getElementText(null, "southbd"));
+        assertEquals("38.0", docHandler.getElementText(null, "northbd"));
+        assertEquals(Coverage.WGS84, docHandler.getElementText(null, "spatialReference"));
+        assertEquals(0, docHandler.getElementList(null, "geographicName").size());
 
         assertEquals("NOAA Climate Observation Office/Climate Observations Division",
-                docHandler.getElementText("fundingAgency" + SEP + "agency"));
-        assertEquals("", docHandler.getElementText("fundingAgency" + SEP + "title"));
-        assertEquals("", docHandler.getElementText("fundingAgency" + SEP + "ID"));
+                docHandler.getElementText(null, "fundingAgency" + SEP + "agency"));
+        assertEquals("", docHandler.getElementText(null, "fundingAgency" + SEP + "title"));
+        assertEquals("", docHandler.getElementText(null, "fundingAgency" + SEP + "ID"));
 
-        assertEquals("", docHandler.getElementText("researchProject"));
+        assertEquals("", docHandler.getElementText(null, "researchProject"));
 
-        assertEquals("Ronald H. Brown", docHandler.getElementText("Platform" + SEP + "PlatformName"));
-        assertEquals("33RO", docHandler.getElementText("Platform" + SEP + "PlatformID"));
-        assertEquals("Ship", docHandler.getElementText("Platform" + SEP + "PlatformType"));
-        assertEquals("NOAA", docHandler.getElementText("Platform" + SEP + "PlatformOwner"));
-        assertEquals("", docHandler.getElementText("Platform" + SEP + "PlatformCountry"));
+        assertEquals("Ronald H. Brown", docHandler.getElementText(null, "Platform" + SEP + "PlatformName"));
+        assertEquals("33RO", docHandler.getElementText(null, "Platform" + SEP + "PlatformID"));
+        assertEquals("Ship", docHandler.getElementText(null, "Platform" + SEP + "PlatformType"));
+        assertEquals("NOAA", docHandler.getElementText(null, "Platform" + SEP + "PlatformOwner"));
+        assertEquals("", docHandler.getElementText(null, "Platform" + SEP + "PlatformCountry"));
 
-        assertEquals("33RO20150114", docHandler.getElementText("expocode"));
-        assertEquals("RB1501A", docHandler.getElementText("cruiseID"));
-        assertEquals("", docHandler.getElementText("section"));
+        assertEquals("33RO20150114", docHandler.getElementText(null, "expocode"));
+        assertEquals("RB1501A", docHandler.getElementText(null, "cruiseID"));
+        assertEquals("", docHandler.getElementText(null, "section"));
 
         assertEquals("Wanninkhof, R., R. D. Castle, and J. Shannahoff. 2013. " +
                         "Underway pCO2 measurements aboard the R/V Ronald H. Brown during the 2014 cruises. " +
                         "http://cdiac.ornl.gov/ftp/oceans/VOS_Ronald_Brown/RB2013/. Carbon Dioxide Information " +
                         "Analysis Center, Oak Ridge National Laboratory, US Department of Energy, Oak Ridge, Tennessee. " +
                         "doi: 10.3334/CDIAC/OTG.VOS_RB_2012",
-                docHandler.getElementText("citation"));
+                docHandler.getElementText(null, "citation"));
 
         assertEquals("DOE (1994). Handbook of methods for the analysis of the various\n" +
                         "parameters of the carbon dioxide system in sea water; version\n" +
@@ -157,7 +157,7 @@ public class OcadsWriterTest {
                         "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects\n" +
                         "of temperature and salinity on the partial pressure of CO2 in\n" +
                         "seawater. Nature 300: 511-513.",
-                docHandler.getElementText("reference"));
+                docHandler.getElementText(null, "reference"));
 
         assertEquals("Port-of-Call: Honolulu, HI\n" +
                         "Port-of-Call: San Francisco, CA\n" +
@@ -176,135 +176,175 @@ public class OcadsWriterTest {
                         "shutdown of the system\n" +
                         "occurred due to water getting into the atm condenser. The survey tech cleared out the water and " +
                         "restarted the system on 1/26 at 0519.  No data was acquired during the shutdown period.",
-                docHandler.getElementText("suppleInfo"));
+                docHandler.getElementText(null, "suppleInfo"));
 
-        List<Element> variables = docHandler.getElementList("variable");
+        List<Element> variables = docHandler.getElementList(null, "variable");
         assertEquals(13, variables.size());
 
-        final String abbrev = "abbrev";
-        final String fullname = "fullname";
-        final String unit = "unit";
-        final String uncertainty = "uncertainty";
-        final String flag = "flag";
-        final String detailedInfo = "detailedInfo";
+        final String abbrev = "variable" + SEP + "abbrev";
+        final String fullname = "variable" + SEP + "fullname";
+        final String unit = "variable" + SEP + "unit";
+        final String uncertainty = "variable" + SEP + "uncertainty";
+        final String flag = "variable" + SEP + "flag";
+        final String detailedInfo = "variable" + SEP + "detailedInfo";
+
+        final String observation = "variable" + SEP + "observation";
+        final String insitu = "variable" + SEP + "insitu";
+        final String measured = "variable" + SEP + "measured";
+        final String calcMethod = "variable" + SEP + "calcMethod";
+        final String samplingInstrument = "variable" + SEP + "samplingInstrument";
+        final String analyzingInstrument = "variable" + SEP + "analyzingInstrument";
+        final String duration = "variable" + SEP + "duration";
+        final String replicate = "variable" + SEP + "replicate";
+        final String methodReference = "variable" + SEP + "methodReference";
+        final String researcherName = "variable" + SEP + "researcherName";
+        final String researcherInstitution = "variable" + SEP + "researcherInstitution";
+        final String internal = "variable" + SEP + "internal";
+
+        // final String manipulationMethod = "variable" + SEP + "manipulationMethod";
+        // final String biologicalSubject = "variable" + SEP + "biologicalSubject";
+        // final String speciesID = "variable" + SEP + "speciesID";
+        // final String lifeStage = "variable" + SEP + "lifeStage";
+
+        final String dryMethod = "variable" + SEP + "equilibrator" + SEP + "dryMethod";
+
+        final String locationSeawaterIntake = "variable" + SEP + "locationSeawaterIntake";
+        final String depthSeawaterIntake = "variable" + SEP + "DepthSeawaterIntake";
+        final String equilibratorType = "variable" + SEP + "equilibrator" + SEP + "type";
+        final String equilibratorVolume = "variable" + SEP + "equilibrator" + SEP + "volume";
+        final String equilibratorVented = "variable" + SEP + "equilibrator" + SEP + "vented";
+        final String equilibratorWaterFlowRate = "variable" + SEP + "equilibrator" + SEP + "waterFlowRate";
+        final String equilibratorGasFlowRate = "variable" + SEP + "equilibrator" + SEP + "gasFlowRate";
+        final String temperatureEquilibratorMethod = "variable" + SEP + "equilibrator" + SEP + "temperatureEquilibratorMethod";
+        final String pressureEquilibratorMethod = "variable" + SEP + "equilibrator" + SEP + "pressureEquilibratorMethod";
+        final String gasDetectorManufacturer = "variable" + SEP + "gasDetector" + SEP + "Manufacturer";
+        final String gasDetectorModel = "variable" + SEP + "gasDetector" + SEP + "Model";
+        final String gasDetectorResolution = "variable" + SEP + "gasDetector" + SEP + "Resolution";
+        final String gasDetectorUncertainty = "variable" + SEP + "gasDetector" + SEP + "Uncertainty";
+        final String waterVaporCorrection = "variable" + SEP + "waterVaporCorrection";
+        final String temperatureCorrection = "variable" + SEP + "temperatureCorrection";
+        final String co2ReportTemperature = "variable" + SEP + "co2ReportTemperature";
         Element var;
 
 
         var = variables.get(0);
-        assertEquals("xCO2_EQU_ppm", var.getChildTextTrim(abbrev));
+        assertEquals("xCO2_EQU_ppm", docHandler.getElementText(var, abbrev));
         assertEquals("Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)",
-                var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals("Given in column: WOCE_QC_FLAG", var.getChildTextTrim(flag));
-        assertEquals("1 microatmospheres", var.getChildTextTrim(uncertainty));
+                docHandler.getElementText(var, fullname));
+        assertEquals("", docHandler.getElementText(var, unit));
+        assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
+        assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
-                var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var, detailedInfo));
         // TODO:
+        assertEquals("", docHandler.getElementText(var, dryMethod));
 
 
         var = variables.get(1);
-        assertEquals("xCO2_ATM_ppm", var.getChildTextTrim(abbrev));
-        assertEquals("Mole fraction of CO2 measured in dry outside air (ppm)", var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.2 ppm", var.getChildTextTrim(uncertainty));
+        assertEquals("xCO2_ATM_ppm", docHandler.getElementText(var, abbrev));
+        assertEquals("Mole fraction of CO2 measured in dry outside air (ppm)",
+                docHandler.getElementText(var, fullname));
+        assertEquals("", docHandler.getElementText(var, unit));
+        assertEquals("", docHandler.getElementText(var, flag));
+        assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
         assertEquals("Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var, detailedInfo));
         // TODO:
 
 
         var = variables.get(2);
-        assertEquals("xCO2_ATM_interpolated_ppm", var.getChildTextTrim(abbrev));
+        assertEquals("xCO2_ATM_interpolated_ppm", docHandler.getElementText(var,abbrev));
         assertEquals("Mole fraction of CO2 in outside air associated with each water analysis.  " +
                         "These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)",
-                var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.2 ppm", var.getChildTextTrim(uncertainty));
+                docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.2 ppm", docHandler.getElementText(var,uncertainty));
         assertEquals("Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(3);
-        assertEquals("PRES_EQU_hPa", var.getChildTextTrim(abbrev));
+        assertEquals("PRES_EQU_hPa", docHandler.getElementText(var,abbrev));
         assertEquals("Barometric pressure in the equilibrator headspace (hectopascals)",
-                var.getChildTextTrim(fullname));
-        assertEquals("hPa", var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.05 hPa", var.getChildTextTrim(uncertainty));
-        assertEquals("Resolution/Precision: 0.015 hPa", var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,fullname));
+        assertEquals("hPa", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.05 hPa", docHandler.getElementText(var,uncertainty));
+        assertEquals("Resolution/Precision: 0.015 hPa", docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(4);
-        assertEquals("PRES_ATM@SSP_hPa", var.getChildTextTrim(abbrev));
+        assertEquals("PRES_ATM@SSP_hPa", docHandler.getElementText(var,abbrev));
         assertEquals("Barometric pressure measured outside, corrected to sea level (hectopascals)",
-                var.getChildTextTrim(fullname));
-        assertEquals("hPa", var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.2 hPa", var.getChildTextTrim(uncertainty));
-        assertEquals("Resolution/Precision: 0.08 hPa", var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,fullname));
+        assertEquals("hPa", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.2 hPa", docHandler.getElementText(var,uncertainty));
+        assertEquals("Pressure Correction: Normalized: yes\n" +
+                "Resolution/Precision: 0.08 hPa", docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(5);
-        assertEquals("TEMP_EQU_C", var.getChildTextTrim(abbrev));
-        assertEquals("Water temperature in equilibrator (degrees Celsius)", var.getChildTextTrim(fullname));
-        assertEquals("deg C", var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.025 °C", var.getChildTextTrim(uncertainty));
-        assertEquals("Resolution/Precision: 0.01 °C", var.getChildTextTrim(detailedInfo));
+        assertEquals("TEMP_EQU_C", docHandler.getElementText(var,abbrev));
+        assertEquals("Water temperature in equilibrator (degrees Celsius)", docHandler.getElementText(var,fullname));
+        assertEquals("deg C", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.025 °C", docHandler.getElementText(var,uncertainty));
+        assertEquals("Resolution/Precision: 0.01 °C", docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(6);
-        assertEquals("SST_C", var.getChildTextTrim(abbrev));
-        assertEquals("Sea surface temperature (degrees Celsius)", var.getChildTextTrim(fullname));
-        assertEquals("deg C", var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.01 °C", var.getChildTextTrim(uncertainty));
-        assertEquals("Resolution/Precision: 0.001 °C", var.getChildTextTrim(detailedInfo));
+        assertEquals("SST_C", docHandler.getElementText(var,abbrev));
+        assertEquals("Sea surface temperature (degrees Celsius)", docHandler.getElementText(var,fullname));
+        assertEquals("deg C", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.01 °C", docHandler.getElementText(var,uncertainty));
+        assertEquals("Resolution/Precision: 0.001 °C", docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(7);
-        assertEquals("SAL_permil", var.getChildTextTrim(abbrev));
-        assertEquals("Sea surface salinity on Practical Salinity Scale (permil)", var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.005 permil", var.getChildTextTrim(uncertainty));
-        assertEquals("Resolution/Precision: 0.0002 permil", var.getChildTextTrim(detailedInfo));
+        assertEquals("SAL_permil", docHandler.getElementText(var,abbrev));
+        assertEquals("Sea surface salinity on Practical Salinity Scale (permil)", docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.005 permil", docHandler.getElementText(var,uncertainty));
+        assertEquals("Resolution/Precision: 0.0002 permil", docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(8);
-        assertEquals("fCO2_SW@SST_uatm", var.getChildTextTrim(abbrev));
+        assertEquals("fCO2_SW@SST_uatm", docHandler.getElementText(var,abbrev));
         assertEquals("Fugacity of CO2 in sea water at SST and 100% humidity (microatmospheres)",
-                var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals("Given in column: WOCE_QC_FLAG", var.getChildTextTrim(flag));
-        assertEquals("1 microatmospheres", var.getChildTextTrim(uncertainty));
+                docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var,flag));
+        assertEquals("1 microatmospheres", docHandler.getElementText(var,uncertainty));
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
-                var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
         var = variables.get(9);
-        assertEquals("fCO2_ATM_interpolated_uatm", var.getChildTextTrim(abbrev));
+        assertEquals("fCO2_ATM_interpolated_uatm", docHandler.getElementText(var,abbrev));
         assertEquals(
                 "Fugacity of CO2 in air corresponding to the interpolated xCO2 at SST and 100% humidity (microatmospheres)",
-                var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals("0.2 ppm", var.getChildTextTrim(uncertainty));
+                docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("0.2 ppm", docHandler.getElementText(var,uncertainty));
         assertEquals("Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,detailedInfo));
         // TODO:
 
 
@@ -421,10 +461,6 @@ public class OcadsWriterTest {
         assertEquals(dataVar.toString(), "Equilibrator Pressure Sensor", strList.get(0));
         assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
 
-        assertTrue(var instanceof AirPressure);
-        pressure = (AirPressure) var;
-        assertEquals(pressure.toString(), "", pressure.getPressureCorrection());
-
 
         var = variables.get(4);
         assertEquals(var.toString(), "PRES_ATM@SSP_hPa", var.getColName());
@@ -454,10 +490,6 @@ public class OcadsWriterTest {
         assertEquals(dataVar.toString(), 1, strList.size());
         assertEquals(dataVar.toString(), "Atmospheric Pressure Sensor", strList.get(0));
         assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof AirPressure);
-        pressure = (AirPressure) var;
-        assertEquals(pressure.toString(), "Normalized: yes", pressure.getPressureCorrection());
 
 
         var = variables.get(5);
@@ -593,31 +625,31 @@ public class OcadsWriterTest {
          */
 
         var = variables.get(10);
-        assertEquals("dfCO2_uatm", var.getChildTextTrim(abbrev));
-        assertEquals("Sea water fCO2 minus interpolated air fCO2 (microatmospheres)", var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals(null, var.getChildTextTrim(uncertainty));
-        assertEquals(null, var.getChildTextTrim(detailedInfo));
+        assertEquals("dfCO2_uatm", docHandler.getElementText(var,abbrev));
+        assertEquals("Sea water fCO2 minus interpolated air fCO2 (microatmospheres)", docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("", docHandler.getElementText(var,uncertainty));
+        assertEquals("", docHandler.getElementText(var,detailedInfo));
 
 
         var = variables.get(11);
-        assertEquals("WOCE_QC_FLAG", var.getChildTextTrim(abbrev));
-        assertEquals("Quality control flag for fCO2 values (2=good, 3=questionable)", var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals(null, var.getChildTextTrim(uncertainty));
-        assertEquals(null, var.getChildTextTrim(detailedInfo));
+        assertEquals("WOCE_QC_FLAG", docHandler.getElementText(var,abbrev));
+        assertEquals("Quality control flag for fCO2 values (2=good, 3=questionable)", docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("", docHandler.getElementText(var,uncertainty));
+        assertEquals("", docHandler.getElementText(var,detailedInfo));
 
 
         var = variables.get(12);
-        assertEquals("QC_SUBFLAG", var.getChildTextTrim(abbrev));
+        assertEquals("QC_SUBFLAG", docHandler.getElementText(var,abbrev));
         assertEquals("Quality control subflag for fCO2 values, provides explanation when QC flag=3",
-                var.getChildTextTrim(fullname));
-        assertEquals(null, var.getChildTextTrim(unit));
-        assertEquals(null, var.getChildTextTrim(flag));
-        assertEquals(null, var.getChildTextTrim(uncertainty));
-        assertEquals(null, var.getChildTextTrim(detailedInfo));
+                docHandler.getElementText(var,fullname));
+        assertEquals("", docHandler.getElementText(var,unit));
+        assertEquals("", docHandler.getElementText(var,flag));
+        assertEquals("", docHandler.getElementText(var,uncertainty));
+        assertEquals("", docHandler.getElementText(var,detailedInfo));
 
     }
 
