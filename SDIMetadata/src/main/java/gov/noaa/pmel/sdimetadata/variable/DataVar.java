@@ -16,6 +16,7 @@ public class DataVar extends Variable implements Cloneable {
     protected String samplingLocation;
     protected String samplingElevation;
     protected String storageMethod;
+    protected String analysisTemperature;
     protected String replication;
     protected Person researcher;
     protected HashSet<String> samplerNames;
@@ -33,6 +34,7 @@ public class DataVar extends Variable implements Cloneable {
         samplingLocation = "";
         samplingElevation = "";
         storageMethod = "";
+        analysisTemperature = "";
         replication = "";
         researcher = new Person();
         samplerNames = new HashSet<String>();
@@ -53,6 +55,7 @@ public class DataVar extends Variable implements Cloneable {
             samplingLocation = other.samplingLocation;
             samplingElevation = other.samplingElevation;
             storageMethod = other.storageMethod;
+            analysisTemperature = other.analysisTemperature;
             replication = other.replication;
             researcher = other.researcher.clone();
             samplerNames = new HashSet<String>(other.samplerNames);
@@ -66,6 +69,7 @@ public class DataVar extends Variable implements Cloneable {
             samplingLocation = "";
             samplingElevation = "";
             storageMethod = "";
+            analysisTemperature = "";
             replication = "";
             researcher = new Person();
             samplerNames = new HashSet<String>();
@@ -210,6 +214,23 @@ public class DataVar extends Variable implements Cloneable {
     }
 
     /**
+     * @return the water temperature at which the gas concentration was measured;
+     *         never null but may be empty
+     */
+    public String getAnalysisTemperature() {
+        return analysisTemperature;
+    }
+
+    /**
+     * @param analysisTemperature
+     *         assign as the water temperature at which the gas concentration was measured;
+     *         if null or blank, an empty string is assigned
+     */
+    public void setAnalysisTemperature(String analysisTemperature) {
+        this.analysisTemperature = (analysisTemperature != null) ? analysisTemperature.trim() : "";
+    }
+
+    /**
      * @return replication information about this variable; never null but may be empty
      */
     public String getReplication() {
@@ -311,6 +332,7 @@ public class DataVar extends Variable implements Cloneable {
         dup.samplingLocation = samplingLocation;
         dup.samplingElevation = samplingElevation;
         dup.storageMethod = storageMethod;
+        dup.analysisTemperature = analysisTemperature;
         dup.replication = replication;
         dup.researcher = researcher.clone();
         dup.samplerNames = new HashSet<String>(samplerNames);
@@ -345,6 +367,8 @@ public class DataVar extends Variable implements Cloneable {
             return false;
         if ( !storageMethod.equals(dataVar.storageMethod) )
             return false;
+        if ( !analysisTemperature.equals(dataVar.analysisTemperature) )
+            return false;
         if ( !replication.equals(dataVar.replication) )
             return false;
         if ( !researcher.equals(dataVar.researcher) )
@@ -368,6 +392,7 @@ public class DataVar extends Variable implements Cloneable {
         result = result * prime + samplingLocation.hashCode();
         result = result * prime + samplingElevation.hashCode();
         result = result * prime + storageMethod.hashCode();
+        result = result * prime + analysisTemperature.hashCode();
         result = result * prime + replication.hashCode();
         result = result * prime + researcher.hashCode();
         result = result * prime + samplerNames.hashCode();
@@ -386,6 +411,7 @@ public class DataVar extends Variable implements Cloneable {
                 ", samplingLocation='" + samplingLocation + '\'' +
                 ", samplingElevation='" + samplingElevation + '\'' +
                 ", storageMethod='" + storageMethod + '\'' +
+                ", analysisTemperature='" + analysisTemperature + '\'' +
                 ", replication='" + replication + '\'' +
                 ", researcher=" + researcher +
                 ", samplerNames=" + samplerNames +

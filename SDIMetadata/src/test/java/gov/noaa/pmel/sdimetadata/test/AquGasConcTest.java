@@ -43,13 +43,13 @@ public class AquGasConcTest {
     private static final String SAMPLING_LOCATION = "Bow";
     private static final String SAMPLING_ELEVATION = "~5 m below water line";
     private static final String STORAGE_METHOD = "Does not apply";
+    private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
     private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Equilibrator"));
     private static final ArrayList<String> ANALYZER_NAMES = new ArrayList<String>(Arrays.asList("Equilibrator LICOR"));
 
     private static final String REPORT_TERMPERATURE = "SST";
-    private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String TEMPERATURE_CORRECTION = "Standard data reduction method";
     private static final String DRYING_METHOD = "Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).";
     private static final String WATER_VAPOR_CORRECTION = "Another standard data reduction method";
@@ -66,6 +66,7 @@ public class AquGasConcTest {
         assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
@@ -88,46 +89,11 @@ public class AquGasConcTest {
     }
 
     @Test
-    public void testGetSetMeasureTemperature() {
-        AquGasConc var = new AquGasConc();
-        assertEquals(EMPTY_STRING, var.getMeasureTemperature());
-        var.setMeasureTemperature(MEASURE_TEMPERATURE);
-        assertEquals(MEASURE_TEMPERATURE, var.getMeasureTemperature());
-        assertEquals(EMPTY_STRING, var.getReportTemperature());
-        assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
-        assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
-        assertEquals(EMPTY_STRING, var.getReplication());
-        assertEquals(EMPTY_STRING, var.getStorageMethod());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
-        assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setMeasureTemperature(null);
-        assertEquals(EMPTY_STRING, var.getMeasureTemperature());
-        var.setMeasureTemperature("\t");
-        assertEquals(EMPTY_STRING, var.getMeasureTemperature());
-    }
-
-    @Test
     public void testGetSetTemperatureCorrection() {
         AquGasConc var = new AquGasConc();
         assertEquals(EMPTY_STRING, var.getTemperatureCorrection());
         var.setTemperatureCorrection(TEMPERATURE_CORRECTION);
         assertEquals(TEMPERATURE_CORRECTION, var.getTemperatureCorrection());
-        assertEquals(EMPTY_STRING, var.getMeasureTemperature());
         assertEquals(EMPTY_STRING, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
@@ -135,6 +101,7 @@ public class AquGasConcTest {
         assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
@@ -222,6 +189,7 @@ public class AquGasConcTest {
         var.setSamplingLocation(SAMPLING_LOCATION);
         var.setSamplingElevation(SAMPLING_ELEVATION);
         var.setStorageMethod(STORAGE_METHOD);
+        var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
         var.setResearcher(RESEARCHER);
         var.setSamplerNames(SAMPLER_NAMES);
@@ -231,7 +199,6 @@ public class AquGasConcTest {
         var.setDryingMethod(DRYING_METHOD);
 
         var.setReportTemperature(REPORT_TERMPERATURE);
-        var.setMeasureTemperature(MEASURE_TEMPERATURE);
         var.setTemperatureCorrection(TEMPERATURE_CORRECTION);
         assertNotEquals(var, dup);
 
@@ -361,6 +328,13 @@ public class AquGasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
+        first.setAnalysisTemperature(MEASURE_TEMPERATURE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setAnalysisTemperature(MEASURE_TEMPERATURE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
         first.setReplication(REPLICATION_INFO);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
@@ -407,13 +381,6 @@ public class AquGasConcTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setReportTemperature(REPORT_TERMPERATURE);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setMeasureTemperature(MEASURE_TEMPERATURE);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setMeasureTemperature(MEASURE_TEMPERATURE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

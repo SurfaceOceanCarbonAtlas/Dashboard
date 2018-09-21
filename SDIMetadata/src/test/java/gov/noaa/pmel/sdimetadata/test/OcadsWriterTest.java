@@ -189,7 +189,7 @@ public class OcadsWriterTest {
         final String flag = "variable" + SEP + "flag";
         final String detailedInfo = "variable" + SEP + "detailedInfo";
 
-        final String observation = "variable" + SEP + "observation";
+        final String observationType = "variable" + SEP + "observationType";
         final String insitu = "variable" + SEP + "insitu";
         final String measured = "variable" + SEP + "measured";
         final String calcMethod = "variable" + SEP + "calcMethod";
@@ -249,12 +249,13 @@ public class OcadsWriterTest {
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
+                docHandler.getElementText(var, samplingInstrument));
         // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
@@ -267,11 +268,12 @@ public class OcadsWriterTest {
         assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
         assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
         // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+        assertEquals("Sprayhead above dynamic pool, with thermal jacket",
+                docHandler.getElementText(var, equilibratorType));
+        assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
+        assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
+        assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
+        assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
         assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
         assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
@@ -286,7 +288,8 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, standardizationFrequency));
         assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
         elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(4, elemList.size());
+        // assertEquals(4, elemList.size());
+        assertEquals(0, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
@@ -317,7 +320,7 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
@@ -374,7 +377,7 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
@@ -426,7 +429,7 @@ public class OcadsWriterTest {
         assertEquals("0.05 hPa", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: Attached to CO2 analyzer exit to lab.\n" +
                 "Resolution/Precision: 0.015 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -476,7 +479,7 @@ public class OcadsWriterTest {
                 "Sampling location: On bulkhead exterior on the port side of the radio room aft of the bridge " +
                 "at ~14 m above the sea surface.\n" +
                 "Resolution/Precision: 0.08 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -523,7 +526,7 @@ public class OcadsWriterTest {
         assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
                 "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -570,7 +573,7 @@ public class OcadsWriterTest {
         assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
                 "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -619,7 +622,7 @@ public class OcadsWriterTest {
         assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
                         "Resolution/Precision: 0.0002 permil",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -668,12 +671,13 @@ public class OcadsWriterTest {
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
+                docHandler.getElementText(var, samplingInstrument));
         // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
@@ -686,11 +690,11 @@ public class OcadsWriterTest {
         assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
         assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
         // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+        assertEquals("Sprayhead above dynamic pool, with thermal jacket", docHandler.getElementText(var, equilibratorType));
+        assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
+        assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
+        assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
+        assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
         assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
         assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
@@ -705,7 +709,8 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, standardizationFrequency));
         assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
         elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(4, elemList.size());
+        assertEquals(0, elemList.size());
+        // assertEquals(4, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
@@ -737,7 +742,7 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
@@ -787,7 +792,7 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, flag));
         assertEquals("", docHandler.getElementText(var, uncertainty));
         assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("", docHandler.getElementText(var, observationType));
         assertEquals("", docHandler.getElementText(var, insitu));
         assertEquals("", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -833,7 +838,7 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, flag));
         assertEquals("", docHandler.getElementText(var, uncertainty));
         assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("", docHandler.getElementText(var, observationType));
         assertEquals("", docHandler.getElementText(var, insitu));
         assertEquals("", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
@@ -879,7 +884,7 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, flag));
         assertEquals("", docHandler.getElementText(var, uncertainty));
         assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("", docHandler.getElementText(var, observationType));
         assertEquals("", docHandler.getElementText(var, insitu));
         assertEquals("", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));

@@ -43,6 +43,7 @@ public class GasConcTest {
     private static final String SAMPLING_LOCATION = "Bow";
     private static final String SAMPLING_ELEVATION = "~5 m above water line";
     private static final String STORAGE_METHOD = "Does not apply";
+    private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
     private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Equilibrator"));
@@ -61,6 +62,7 @@ public class GasConcTest {
         assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
@@ -93,6 +95,7 @@ public class GasConcTest {
         assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
+        assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
@@ -177,6 +180,7 @@ public class GasConcTest {
         var.setSamplingLocation(SAMPLING_LOCATION);
         var.setSamplingElevation(SAMPLING_ELEVATION);
         var.setStorageMethod(STORAGE_METHOD);
+        var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
         var.setResearcher(RESEARCHER);
         var.setSamplerNames(SAMPLER_NAMES);
@@ -309,6 +313,13 @@ public class GasConcTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setStorageMethod(STORAGE_METHOD);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setAnalysisTemperature(MEASURE_TEMPERATURE);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setAnalysisTemperature(MEASURE_TEMPERATURE);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

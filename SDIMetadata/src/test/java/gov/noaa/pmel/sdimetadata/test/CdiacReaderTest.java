@@ -369,7 +369,7 @@ public class CdiacReaderTest {
         assertTrue(var instanceof AquGasConc);
         aquGasConc = (AquGasConc) var;
         assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getMeasureTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
         assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
 
 
@@ -661,7 +661,7 @@ public class CdiacReaderTest {
         assertTrue(var instanceof AquGasConc);
         aquGasConc = (AquGasConc) var;
         assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getMeasureTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
         assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
 
 

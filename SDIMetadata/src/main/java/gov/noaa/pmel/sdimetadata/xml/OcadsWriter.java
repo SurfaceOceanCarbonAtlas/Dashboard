@@ -4,6 +4,7 @@ import gov.noaa.pmel.sdimetadata.Coverage;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
+import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Person;
@@ -139,7 +140,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String VARIABLE_STORAGE_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "storageMethod";
     private static final String VARIABLE_ANALYSIS_WATER_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "seawatervol";
     private static final String VARIABLE_ANALYSIS_HEADSPACE_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "headspacevol";
-    private static final String VARIABLE_ANALYSIS_TEMPERATURE_MEASURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureMeasure";
+    private static final String VARIABLE_ANALYSIS_TEMPERATURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureMeasure";
 
     private static final String EQUILIBRATOR_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "equilibrator";
     private static final String EQUILIBRATOR_TYPE_ELEMENT_NAME = EQUILIBRATOR_ELEMENT_NAME + SEP + "type";
@@ -412,16 +413,25 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_CALC_METHOD_ELEMENT_NAME, var.getMethodDescription());
         setElementText(ancestor, VARIABLE_METHOD_REFERENCE_ELEMENT_NAME, var.getMethodReference());
 
-        HashSet<String> samplerNames = new HashSet<String>(var.getSamplerNames());
-        if ( !samplerNames.isEmpty() ) {
+        HashSet<String> strSet = var.getSamplerNames();
+        if ( !strSet.isEmpty() ) {
             for (Sampler inst : samplers) {
-                if ( !samplerNames.contains(inst.getName()) )
+                if ( !strSet.contains(inst.getName()) )
                     continue;
+                addSamplerElements(ancestor, var, inst);
+            }
+        }
+        strSet = var.getAnalyzerNames();
+        if ( !strSet.isEmpty() ) {
+            for (Analyzer inst : sensors) {
+                if ( !strSet.contains(inst.getName()) )
+                    continue;
+                addAnalyzerElements(ancestor, var, inst);
             }
         }
 
         if ( (var instanceof AquGasConc) && MethodType.MEASURED_INSITU.equals(var.getMeasureMethod()) ) {
-            // There tags are only defined for "autonomous" (in-situ) aqueous CO2 measurements
+            // These tags are only defined for "autonomous" (in-situ) aqueous CO2 measurements
             setElementText(ancestor, VARIABLE_SAMPLING_LOCATION_ELEMENT_NAME, var.getSamplingLocation());
             setElementText(ancestor, VARIABLE_SAMPLING_DEPTH_ELEMENT_NAME, var.getSamplingElevation());
         }
@@ -451,6 +461,35 @@ public class OcadsWriter extends DocumentHandler {
 
         // TODO:
 
+        if ( (var instanceof AquGasConc) && MethodType.MEASURED_DISCRETE.equals(var.getMeasureMethod()) ) {
+            // These tags are only defined for values from stored samples for CO2 and pH - but not doing pH at this time
+            setElementText(ancestor, VARIABLE_STORAGE_METHOD_ELEMENT_NAME, var.getStorageMethod());
+            setElementText(ancestor, VARIABLE_ANALYSIS_TEMPERATURE_ELEMENT_NAME, var.getAnalysisTemperature());
+        }
+        else {
+            String store = var.getStorageMethod();
+            String mtemp = var.getAnalysisTemperature();
+            if ( !(store.isEmpty() && mtemp.isEmpty()) ) {
+                String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+                StringBuilder strBldr = new StringBuilder();
+                if ( !store.isEmpty() ) {
+                    strBldr.append("Storage Method: ");
+                    strBldr.append(store);
+                }
+                if ( !mtemp.isEmpty() ) {
+                    if ( strBldr.length() > 0 )
+                        strBldr.append("\n");
+                    strBldr.append("Measurement Temperature: ");
+                    strBldr.append(mtemp);
+                }
+                if ( !addnInfo.isEmpty() ) {
+                    strBldr.append("\n");
+                    strBldr.append(addnInfo);
+                }
+                setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+            }
+        }
+        setElementText(ancestor, VARIABLE_REPLICATE_ELEMENT_NAME, var.getReplication());
         Person pi = var.getResearcher();
         String fullname = pi.getFirstName() + " " + pi.getMiddle();
         fullname = fullname.trim() + " " + pi.getLastName();
@@ -549,6 +588,151 @@ public class OcadsWriter extends DocumentHandler {
     private void addAquGasConcAddnFields(Element ancestor, AquGasConc var) {
         setElementText(ancestor, VARIABLE_REPORT_TEMPERATURE_ELEMENT_NAME, var.getReportTemperature());
         setElementText(ancestor, VARIABLE_TEMPERATURE_CORRECTION_ELEMENT_NAME, var.getTemperatureCorrection());
+    }
+
+    /**
+     * Add the OCADS XML describing the given sampling instrument.
+     *
+     * @param ancestor
+     * add under this element
+     * @param var
+     * use the information given in the variable
+     * @param inst
+     */
+    private void addSamplerElements(Element ancestor, DataVar var, Sampler inst) {
+        if ( (var instanceof AquGasConc) && (inst instanceof Equilibrator) ) {
+            // These tags are only available for aqueous CO2
+            Equilibrator equil = (Equilibrator) inst;
+            if ( MethodType.MEASURED_INSITU.equals(var.getMeasureMethod()) ) {
+                // These tags are only available for "autonimous" (in-situ) aqueous CO2
+                setElementText(ancestor, EQUILIBRATOR_TYPE_ELEMENT_NAME, equil.getEquilibratorType());
+                StringBuilder strBldr = new StringBuilder();
+                strBldr.append(equil.getChamberVol());
+                String vol = equil.getChamberWaterVol();
+                if ( !vol.isEmpty() ) {
+                    if ( strBldr.length() > 0 )
+                        strBldr.append("; ");
+                    strBldr.append("Water Volume: ");
+                    strBldr.append(vol);
+                }
+                vol = equil.getChamberGasVol();
+                if ( !vol.isEmpty() ) {
+                    if ( strBldr.length() > 0 )
+                        strBldr.append("; ");
+                    strBldr.append("Gas Volume: ");
+                    strBldr.append(vol);
+
+                }
+                setElementText(ancestor, EQUILIBRATOR_VOLUME_ELEMENT_NAME, strBldr.toString());
+                setElementText(ancestor, EQUILIBRATOR_VENTED_ELEMENT_NAME, equil.getVenting());
+                setElementText(ancestor, EQUILIBRATOR_WATER_FLOW_RATE_ELEMENT_NAME, equil.getWaterFlowRate());
+                setElementText(ancestor, EQUILIBRATOR_GAS_FLOW_RATE_ELEMENT_NAME, equil.getGasFlowRate());
+                //TODO: equilibrator sensors
+                // setElementText(ancestor, EQUILIBRATOR_TEMPERATURE_EQUI_ELEMENT_NAME, equil.???);
+                // setElementText(ancestor, EQUILIBRATOR_PRESSURE_EQUI_ELEMENT_NAME, equil.???);
+            }
+            else if ( MethodType.MEASURED_DISCRETE.equals(var.getMeasureMethod()) ) {
+                // These tags are only available for discrete sampled aqueous CO2
+                String vol = equil.getChamberWaterVol();
+                if ( vol.isEmpty() )
+                    vol = "Water volume of: " + equil.getChamberVol();
+                setElementText(ancestor, VARIABLE_ANALYSIS_WATER_VOLUME_ELEMENT_NAME, vol);
+                vol = equil.getChamberGasVol();
+                if ( vol.isEmpty() )
+                    vol = "Gas volume of: " + equil.getChamberVol();
+                setElementText(ancestor, VARIABLE_ANALYSIS_HEADSPACE_VOLUME_ELEMENT_NAME, vol);
+            }
+        }
+        // Always describe everything under the generic sampling instrument tag
+        StringBuilder strBldr = new StringBuilder();
+        String str = inst.getManufacturer();
+        if ( !str.isEmpty() ) {
+            strBldr.append("Manufacturer: ");
+            strBldr.append(str);
+        }
+        str = inst.getModel();
+        if ( !str.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append("Model: ");
+            strBldr.append(str);
+        }
+        str = inst.getId();
+        if ( ! str.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append("ID/Serial: ");
+            strBldr.append(str);
+        }
+        for (String addn : inst.getAddnInfo()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append(addn);
+        }
+        String instDesc = strBldr.toString();
+
+        strBldr = new StringBuilder();
+        str = getElementText(ancestor, VARIABLE_SAMPLING_INST_ELEMENT_NAME);
+        if ( !str.isEmpty() ) {
+            strBldr.append(str);
+            strBldr.append("\n");
+        }
+        strBldr.append(inst.getName());
+        if ( ! instDesc.isEmpty() ) {
+            strBldr.append(": ");
+            strBldr.append(instDesc);
+        }
+        setElementText(ancestor, VARIABLE_SAMPLING_INST_ELEMENT_NAME, strBldr.toString());
+    }
+
+    private void addAnalyzerElements(Element ancestor, DataVar var, Analyzer inst) {
+        // Always describe everything under the generic analyzing instrument tag
+        StringBuilder strBldr = new StringBuilder();
+        String str = inst.getManufacturer();
+        if ( !str.isEmpty() ) {
+            strBldr.append("Manufacturer: ");
+            strBldr.append(str);
+        }
+        str = inst.getModel();
+        if ( !str.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append("Model: ");
+            strBldr.append(str);
+        }
+        str = inst.getId();
+        if ( ! str.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append("ID/Serial: ");
+            strBldr.append(str);
+        }
+        str = inst.getCalibration();
+        if ( ! str.isEmpty() ) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append("Calibration: ");
+            strBldr.append(str);
+        }
+        for (String addn : inst.getAddnInfo()) {
+            if ( strBldr.length() > 0 )
+                strBldr.append("; ");
+            strBldr.append(addn);
+        }
+        String instDesc = strBldr.toString();
+
+        strBldr = new StringBuilder();
+        str = getElementText(ancestor, VARIABLE_ANALYZING_INST_ELEMENT_NAME);
+        if ( !str.isEmpty() ) {
+            strBldr.append(str);
+            strBldr.append("\n");
+        }
+        strBldr.append(inst.getName());
+        if ( ! instDesc.isEmpty() ) {
+            strBldr.append(": ");
+            strBldr.append(instDesc);
+        }
+        setElementText(ancestor, VARIABLE_ANALYZING_INST_ELEMENT_NAME, strBldr.toString());
     }
 
 }
