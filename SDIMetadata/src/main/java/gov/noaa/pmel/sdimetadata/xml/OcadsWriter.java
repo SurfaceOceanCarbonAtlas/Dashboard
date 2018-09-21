@@ -6,12 +6,15 @@ import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
+import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.variable.AirPressure;
+import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
 import gov.noaa.pmel.sdimetadata.variable.DataVar;
 import gov.noaa.pmel.sdimetadata.variable.GasConc;
+import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -70,7 +73,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String INVESTIGATOR_ID_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + ID_ELEMENT_NAME;
     private static final String INVESTIGATOR_ID_TYPE_ELEMENT_NAME = INVESTIGATOR_ELEMENT_NAME + SEP + ID_TYPE_ELEMENT_NAME;
 
-    private static final String TITLE_ELEMENT_NAME = "title";
+    // private static final String TITLE_ELEMENT_NAME = "title";
     private static final String SYNOPSIS_ELEMENT_NAME = "abstract";
     private static final String PURPOSE_ELEMENT_NAME = "purpose";
     private static final String RESEARCH_PROJECT_ELEMENT_NAME = "researchProject";
@@ -245,7 +248,7 @@ public class OcadsWriter extends DocumentHandler {
         for (String port : info.getPortsOfCall()) {
             if ( strBldr.length() > 0 )
                 strBldr.append("\n");
-            strBldr.append("Port-of-Call: ");
+            strBldr.append("Port of Call: ");
             strBldr.append(port);
 
         }
@@ -261,18 +264,17 @@ public class OcadsWriter extends DocumentHandler {
 
         ArrayList<Sampler> samplers = mdata.getSamplers();
         ArrayList<Analyzer> sensors = mdata.getAnalyzers();
-        ArrayList<Investigator> pis = mdata.getInvestigators();
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
             if ( var instanceof DataVar )
-                addDataVariableAddnFields(ancestor, (DataVar) var, samplers, sensors, pis);
+                addDataVariableAddnFields(ancestor, (DataVar) var, samplers, sensors);
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
                 addGasConcAddnFields(ancestor, (GasConc) var);
-            if ( var instanceof GasConc )
-                addAquGasConcAddnFields(ancestor, (GasConc) var);
+            if ( var instanceof AquGasConc )
+                addAquGasConcAddnFields(ancestor, (AquGasConc) var);
         }
 
         Document doc = new Document(rootElement);
@@ -387,16 +389,85 @@ public class OcadsWriter extends DocumentHandler {
      *         list of samplers used in this dataset
      * @param sensors
      *         list of analyzers used in this dataset
-     * @param pis
-     *         list of investigators for this dataset
      */
-    private void addDataVariableAddnFields(Element ancestor, DataVar var, ArrayList<Sampler> samplers,
-            ArrayList<Analyzer> sensors, ArrayList<Investigator> pis) {
+    private void addDataVariableAddnFields(Element ancestor, DataVar var,
+            ArrayList<Sampler> samplers, ArrayList<Analyzer> sensors) {
+        setElementText(ancestor, VARIABLE_OBS_TYPE_ELEMENT_NAME, var.getObserveType());
+        switch ( var.getMeasureMethod() ) {
+            case MEASURED_INSITU:
+                setElementText(ancestor, VARIABLE_IN_SITU_ELEMENT_NAME, "Measured in-situ");
+                setElementText(ancestor, VARIABLE_MEASURED_ELEMENT_NAME, "Measured in-situ");
+                break;
+            case MEASURED_DISCRETE:
+                setElementText(ancestor, VARIABLE_IN_SITU_ELEMENT_NAME, "Measured from collected sample");
+                setElementText(ancestor, VARIABLE_MEASURED_ELEMENT_NAME, "Measured from collected sample");
+                break;
+            case COMPUTED:
+                setElementText(ancestor, VARIABLE_IN_SITU_ELEMENT_NAME, "Computed");
+                setElementText(ancestor, VARIABLE_MEASURED_ELEMENT_NAME, "Computed");
+                break;
+            default:
+        }
+        setElementText(ancestor, VARIABLE_CALC_METHOD_ELEMENT_NAME, var.getMethodDescription());
+        setElementText(ancestor, VARIABLE_METHOD_REFERENCE_ELEMENT_NAME, var.getMethodReference());
+        if ( (var instanceof AquGasConc) && MethodType.MEASURED_INSITU.equals(var.getMeasureMethod()) ) {
+            // There tags are only defined for "autonomous" (in-situ) aqueous CO2 measurements
+            setElementText(ancestor, VARIABLE_SAMPLING_LOCATION_ELEMENT_NAME, var.getSamplingLocation());
+            setElementText(ancestor, VARIABLE_SAMPLING_DEPTH_ELEMENT_NAME, var.getSamplingElevation());
+        }
+        else {
+            String loc = var.getSamplingLocation();
+            String elev = var.getSamplingElevation();
+            if ( !(loc.isEmpty() && elev.isEmpty()) ) {
+                String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+                StringBuilder strBldr = new StringBuilder();
+                if ( !loc.isEmpty() ) {
+                    strBldr.append("Sampling location: ");
+                    strBldr.append(loc);
+                }
+                if ( !elev.isEmpty() ) {
+                    if ( strBldr.length() > 0 )
+                        strBldr.append("\n");
+                    strBldr.append("Sampling elevation: ");
+                    strBldr.append(elev);
+                }
+                if ( !addnInfo.isEmpty() ) {
+                    strBldr.append("\n");
+                    strBldr.append(addnInfo);
+                }
+                setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+            }
+        }
+
         // TODO:
+
+        Person pi = var.getResearcher();
+        String fullname = pi.getFirstName() + " " + pi.getMiddle();
+        fullname = fullname.trim() + " " + pi.getLastName();
+        setElementText(ancestor, VARIABLE_RESEARCHER_NAME_ELEMENT_NAME, fullname);
+        setElementText(ancestor, VARIABLE_RESEARCHER_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+
+        if ( var instanceof AquGasConc ) {
+            switch ( var.getMeasureMethod() ) {
+                case MEASURED_INSITU:
+                    setElementText(ancestor, VARIABLE_INTERNAL_ELEMENT_NAME, "4");
+                    break;
+                case MEASURED_DISCRETE:
+                    setElementText(ancestor, VARIABLE_INTERNAL_ELEMENT_NAME, "5");
+                    break;
+                default:
+                    setElementText(ancestor, VARIABLE_INTERNAL_ELEMENT_NAME, "0");
+                    break;
+            }
+        }
+        else {
+            // Not handling DIC, TA, or pH at this time
+            setElementText(ancestor, VARIABLE_INTERNAL_ELEMENT_NAME, "0");
+        }
     }
 
     /**
-     * Add the OCADS XMl for the additional fields found in AirPressure
+     * Add the OCADS XML for the additional fields found in AirPressure
      *
      * @param ancestor
      *         add under this element
@@ -419,7 +490,7 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     /**
-     * Add the OCADS XMl for the additional fields found in GasConc
+     * Add the OCADS XML for the additional fields found in GasConc
      *
      * @param ancestor
      *         add under this element
@@ -427,19 +498,47 @@ public class OcadsWriter extends DocumentHandler {
      *         use the information given in this gas concentration variable
      */
     private void addGasConcAddnFields(Element ancestor, GasConc var) {
-        // TODO:
+        if ( (var instanceof AquGasConc) && MethodType.MEASURED_INSITU.equals(var.getMeasureMethod()) ) {
+            // Only "autonomous" (in-situ) aqueous CO2 has these fields
+            setElementText(ancestor, EQUILIBRATOR_DRYING_ELEMENT_NAME, var.getDryingMethod());
+            setElementText(ancestor, VARIABLE_WATER_VAPOR_CORRECTION_ELEMENT_NAME, var.getWaterVaporCorrection());
+        }
+        else {
+            String dryMethod = var.getDryingMethod();
+            String waterVaporCorrection = var.getWaterVaporCorrection();
+            if ( ! ( dryMethod.isEmpty() && waterVaporCorrection.isEmpty()) ) {
+                String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+                StringBuilder strBldr = new StringBuilder();
+                if ( ! dryMethod.isEmpty() ) {
+                   strBldr.append("Drying Method: ");
+                   strBldr.append(dryMethod);
+                }
+                if ( ! waterVaporCorrection.isEmpty() ) {
+                    if ( strBldr.length() > 0 )
+                        strBldr.append("\n");
+                    strBldr.append("Water Vapor Correction: ");
+                    strBldr.append(waterVaporCorrection);
+                }
+                if ( ! addnInfo.isEmpty() ) {
+                    strBldr.append("\n");
+                    strBldr.append(addnInfo);
+                }
+                setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+            }
+        }
     }
 
     /**
-     * Add the OCADS XMl for the additional fields found in AquGasConc
+     * Add the OCADS XML for the additional fields found in AquGasConc
      *
      * @param ancestor
      *         add under this element
      * @param var
      *         use the information given in this aqueous gas concentration
      */
-    private void addAquGasConcAddnFields(Element ancestor, GasConc var) {
-        // TODO:
+    private void addAquGasConcAddnFields(Element ancestor, AquGasConc var) {
+        setElementText(ancestor, VARIABLE_REPORT_TEMPERATURE_ELEMENT_NAME, var.getReportTemperature());
+        setElementText(ancestor, VARIABLE_TEMPERATURE_CORRECTION_ELEMENT_NAME, var.getTemperatureCorrection());
     }
 
 }

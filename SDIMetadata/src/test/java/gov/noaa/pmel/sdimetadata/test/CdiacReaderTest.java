@@ -367,7 +367,8 @@ public class CdiacReaderTest {
 
         assertTrue(var instanceof AquGasConc);
         aquGasConc = (AquGasConc) var;
-        assertEquals(aquGasConc.toString(), "Equilibrator temperature", aquGasConc.getReportTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getMeasureTemperature());
         assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
 
 
@@ -429,7 +430,7 @@ public class CdiacReaderTest {
         assertTrue(var instanceof DataVar);
         dataVar = (DataVar) var;
         assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
+        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
         assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
         assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                 "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
@@ -658,7 +659,8 @@ public class CdiacReaderTest {
 
         assertTrue(var instanceof AquGasConc);
         aquGasConc = (AquGasConc) var;
-        assertEquals(aquGasConc.toString(), "Sea surface temperature", aquGasConc.getReportTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
+        assertEquals(aquGasConc.toString(), "", aquGasConc.getMeasureTemperature());
         assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
 
 
@@ -678,7 +680,7 @@ public class CdiacReaderTest {
         assertTrue(var instanceof DataVar);
         dataVar = (DataVar) var;
         assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
+        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
         assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
         assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                 "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +

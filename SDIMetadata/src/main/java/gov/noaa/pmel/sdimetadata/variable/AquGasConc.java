@@ -8,6 +8,7 @@ import java.util.HashSet;
 public class AquGasConc extends GasConc implements Cloneable {
 
     protected String reportTemperature;
+    protected String measureTemperature;
     protected String temperatureCorrection;
 
     /**
@@ -16,6 +17,7 @@ public class AquGasConc extends GasConc implements Cloneable {
     public AquGasConc() {
         super();
         reportTemperature = "";
+        measureTemperature = "";
         temperatureCorrection = "";
     }
 
@@ -29,10 +31,12 @@ public class AquGasConc extends GasConc implements Cloneable {
         if ( (var != null) && (var instanceof AquGasConc) ) {
             AquGasConc conc = (AquGasConc) var;
             reportTemperature = conc.reportTemperature;
+            measureTemperature = conc.measureTemperature;
             temperatureCorrection = conc.temperatureCorrection;
         }
         else {
             reportTemperature = "";
+            measureTemperature = "";
             temperatureCorrection = "";
         }
     }
@@ -63,6 +67,23 @@ public class AquGasConc extends GasConc implements Cloneable {
     }
 
     /**
+     * @return the water temperature at which the gas concentration was measured;
+     *         never null but may be empty
+     */
+    public String getMeasureTemperature() {
+        return measureTemperature;
+    }
+
+    /**
+     * @param measureTemperature
+     *         assign as the water temperature at which the gas concentration was measured;
+     *         if null or blank, an empty string is assigned
+     */
+    public void setMeasureTemperature(String measureTemperature) {
+        this.measureTemperature = (measureTemperature != null) ? measureTemperature.trim() : "";
+    }
+
+    /**
      * @return temperature effect corrections applied; never null but may be empty
      */
     public String getTemperatureCorrection() {
@@ -81,6 +102,7 @@ public class AquGasConc extends GasConc implements Cloneable {
     public AquGasConc clone() {
         AquGasConc dup = (AquGasConc) super.clone();
         dup.reportTemperature = reportTemperature;
+        dup.measureTemperature = measureTemperature;
         dup.temperatureCorrection = temperatureCorrection;
         return dup;
     }
@@ -100,6 +122,8 @@ public class AquGasConc extends GasConc implements Cloneable {
 
         if ( !reportTemperature.equals(other.reportTemperature) )
             return false;
+        if ( !measureTemperature.equals(other.measureTemperature) )
+            return false;
         if ( !temperatureCorrection.equals(other.temperatureCorrection) )
             return false;
 
@@ -111,6 +135,7 @@ public class AquGasConc extends GasConc implements Cloneable {
         final int prime = 37;
         int result = super.hashCode();
         result = result * prime + reportTemperature.hashCode();
+        result = result * prime + measureTemperature.hashCode();
         result = result * prime + temperatureCorrection.hashCode();
         return result;
     }
@@ -120,6 +145,7 @@ public class AquGasConc extends GasConc implements Cloneable {
         String repr = "Aqu" + super.toString();
         return repr.substring(0, repr.length() - 1) +
                 ", reportTemperature='" + reportTemperature + '\'' +
+                ", measureTemperature='" + measureTemperature + '\'' +
                 ", temperatureCorrection='" + temperatureCorrection + '\'' +
                 '}';
     }
