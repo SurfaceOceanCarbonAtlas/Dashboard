@@ -57,8 +57,8 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getDryingMethod());
         var.setDryingMethod(DRYING_METHOD);
         assertEquals(DRYING_METHOD, var.getDryingMethod());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -89,8 +89,8 @@ public class GasConcTest {
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertEquals(WATER_VAPOR_CORRECTION, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());

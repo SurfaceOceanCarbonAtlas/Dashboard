@@ -46,8 +46,8 @@ public class DataVarTest {
     private static final String STORAGE_METHOD = "Does not apply";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Cooling intake"));
-    private static final ArrayList<String> ANALYZER_NAMES = new ArrayList<String>(Arrays.asList("Ship's SST sensor"));
+    private static final HashSet<String> SAMPLER_NAMES = new HashSet<String>(Arrays.asList("Cooling intake"));
+    private static final HashSet<String> ANALYZER_NAMES = new HashSet<String>(Arrays.asList("Ship's SST sensor"));
 
     @Test
     public void testGetSetColName() {
@@ -436,9 +436,9 @@ public class DataVarTest {
     @Test
     public void testGetSetSamplerNames() {
         DataVar var = new DataVar();
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         var.setSamplerNames(SAMPLER_NAMES);
-        ArrayList<String> names = var.getSamplerNames();
+        HashSet<String> names = var.getSamplerNames();
         assertEquals(SAMPLER_NAMES, names);
         assertNotSame(SAMPLER_NAMES, names);
         assertNotSame(names, var.getSamplerNames());
@@ -460,9 +460,9 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setSamplerNames(null);
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
-        var.setSamplerNames(EMPTY_HASHSET);
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        var.setSamplerNames(EMPTY_ARRAYLIST);
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         try {
             var.setSamplerNames(Arrays.asList("something", null, "else"));
             fail("calling setSamplerNames with a null string succeeded");
@@ -480,13 +480,13 @@ public class DataVarTest {
     @Test
     public void testGetSetAnalyzerNames() {
         DataVar var = new DataVar();
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
         var.setAnalyzerNames(ANALYZER_NAMES);
-        ArrayList<String> names = var.getAnalyzerNames();
+        HashSet<String> names = var.getAnalyzerNames();
         assertEquals(ANALYZER_NAMES, names);
         assertNotSame(ANALYZER_NAMES, names);
         assertNotSame(names, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(new Person(), var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -505,9 +505,9 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAnalyzerNames(null);
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        var.setAnalyzerNames(EMPTY_HASHSET);
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        var.setAnalyzerNames(EMPTY_ARRAYLIST);
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
         try {
             var.setAnalyzerNames(Arrays.asList("something", null, "else"));
             fail("calling setAnalyzerNames with a null string succeeded");
@@ -535,8 +535,8 @@ public class DataVarTest {
         var.setAddnInfo(ADDN_INFO);
 
         DataVar dataVar = new DataVar(var);
-        assertEquals(EMPTY_ARRAYLIST, dataVar.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, dataVar.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, dataVar.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, dataVar.getSamplerNames());
         assertEquals(new Person(), dataVar.getResearcher());
         assertEquals(EMPTY_STRING, dataVar.getReplication());
         assertEquals(EMPTY_STRING, dataVar.getStorageMethod());

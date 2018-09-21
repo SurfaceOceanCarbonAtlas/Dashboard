@@ -24,6 +24,7 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class OcadsWriter extends DocumentHandler {
 
@@ -118,7 +119,6 @@ public class OcadsWriter extends DocumentHandler {
     private static final String VARIABLE_IN_SITU_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "insitu";
     private static final String VARIABLE_MEASURED_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "measured";
     private static final String VARIABLE_CALC_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "calcMethod";
-    private static final String VARIABLE_STORAGE_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "storageMethod";
     private static final String VARIABLE_SAMPLING_INST_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "samplingInstrument";
     private static final String VARIABLE_ANALYZING_INST_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "analyzingInstrument";
     private static final String VARIABLE_REPLICATE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "replicate";
@@ -131,11 +131,12 @@ public class OcadsWriter extends DocumentHandler {
     private static final String VARIABLE_INTERNAL_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "internal";
 
     private static final String VARIABLE_SAMPLING_LOCATION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "locationSeawaterIntake";
-    private static final String VARIABLE_SAMPLING_DEPTH_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "locationSeawaterIntake";
+    private static final String VARIABLE_SAMPLING_DEPTH_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "DepthSeawaterIntake";
     private static final String VARIABLE_WATER_VAPOR_CORRECTION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "waterVaportCorrection";
     private static final String VARIABLE_TEMPERATURE_CORRECTION_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureCorrection";
     private static final String VARIABLE_REPORT_TEMPERATURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "co2ReportTemperature";
 
+    private static final String VARIABLE_STORAGE_METHOD_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "storageMethod";
     private static final String VARIABLE_ANALYSIS_WATER_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "seawatervol";
     private static final String VARIABLE_ANALYSIS_HEADSPACE_VOLUME_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "headspacevol";
     private static final String VARIABLE_ANALYSIS_TEMPERATURE_MEASURE_ELEMENT_NAME = VARIABLE_ELEMENT_NAME + SEP + "temperatureMeasure";
@@ -410,6 +411,15 @@ public class OcadsWriter extends DocumentHandler {
         }
         setElementText(ancestor, VARIABLE_CALC_METHOD_ELEMENT_NAME, var.getMethodDescription());
         setElementText(ancestor, VARIABLE_METHOD_REFERENCE_ELEMENT_NAME, var.getMethodReference());
+
+        HashSet<String> samplerNames = new HashSet<String>(var.getSamplerNames());
+        if ( !samplerNames.isEmpty() ) {
+            for (Sampler inst : samplers) {
+                if ( !samplerNames.contains(inst.getName()) )
+                    continue;
+            }
+        }
+
         if ( (var instanceof AquGasConc) && MethodType.MEASURED_INSITU.equals(var.getMeasureMethod()) ) {
             // There tags are only defined for "autonomous" (in-situ) aqueous CO2 measurements
             setElementText(ancestor, VARIABLE_SAMPLING_LOCATION_ELEMENT_NAME, var.getSamplingLocation());
@@ -506,20 +516,20 @@ public class OcadsWriter extends DocumentHandler {
         else {
             String dryMethod = var.getDryingMethod();
             String waterVaporCorrection = var.getWaterVaporCorrection();
-            if ( ! ( dryMethod.isEmpty() && waterVaporCorrection.isEmpty()) ) {
+            if ( !(dryMethod.isEmpty() && waterVaporCorrection.isEmpty()) ) {
                 String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
                 StringBuilder strBldr = new StringBuilder();
-                if ( ! dryMethod.isEmpty() ) {
-                   strBldr.append("Drying Method: ");
-                   strBldr.append(dryMethod);
+                if ( !dryMethod.isEmpty() ) {
+                    strBldr.append("Drying Method: ");
+                    strBldr.append(dryMethod);
                 }
-                if ( ! waterVaporCorrection.isEmpty() ) {
+                if ( !waterVaporCorrection.isEmpty() ) {
                     if ( strBldr.length() > 0 )
                         strBldr.append("\n");
                     strBldr.append("Water Vapor Correction: ");
                     strBldr.append(waterVaporCorrection);
                 }
-                if ( ! addnInfo.isEmpty() ) {
+                if ( !addnInfo.isEmpty() ) {
                     strBldr.append("\n");
                     strBldr.append(addnInfo);
                 }

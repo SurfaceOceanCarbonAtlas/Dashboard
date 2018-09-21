@@ -34,6 +34,34 @@ public class Variable implements Cloneable {
     }
 
     /**
+     * Create using values in the given variable.
+     * This exists only for calling from constructors of subclasses;
+     * use {@link Variable#clone()}} for normal uses.
+     */
+    protected Variable(Variable var) {
+        if ( var != null ) {
+            colName = var.colName;
+            fullName = var.fullName;
+            varUnit = var.varUnit;
+            missVal = var.missVal;
+            flagColName = var.flagColName;
+            accuracy = var.accuracy.clone();
+            precision = var.precision.clone();
+            addnInfo = new ArrayList<String>(var.addnInfo);
+        }
+        else {
+            colName = "";
+            fullName = "";
+            varUnit = "";
+            missVal = "";
+            flagColName = "";
+            accuracy = new NumericString();
+            precision = new NumericString();
+            addnInfo = new ArrayList<String>();
+        }
+    }
+
+    /**
      * @return set of field names that are currently invalid; never null but may be empty
      */
     public HashSet<String> invalidFieldNames() {

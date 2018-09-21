@@ -2,7 +2,6 @@ package gov.noaa.pmel.sdimetadata.variable;
 
 import gov.noaa.pmel.sdimetadata.person.Person;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -19,8 +18,8 @@ public class DataVar extends Variable implements Cloneable {
     protected String storageMethod;
     protected String replication;
     protected Person researcher;
-    protected ArrayList<String> samplerNames;
-    protected ArrayList<String> analyzerNames;
+    protected HashSet<String> samplerNames;
+    protected HashSet<String> analyzerNames;
 
     /**
      * Create with all fields empty.
@@ -36,38 +35,41 @@ public class DataVar extends Variable implements Cloneable {
         storageMethod = "";
         replication = "";
         researcher = new Person();
-        samplerNames = new ArrayList<String>();
-        analyzerNames = new ArrayList<String>();
+        samplerNames = new HashSet<String>();
+        analyzerNames = new HashSet<String>();
     }
 
     /**
      * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
      */
     public DataVar(Variable var) {
-        this();
-        if ( var != null ) {
-            colName = var.colName;
-            fullName = var.fullName;
-            varUnit = var.varUnit;
-            missVal = var.missVal;
-            flagColName = var.flagColName;
-            accuracy = var.accuracy.clone();
-            precision = var.precision.clone();
-            addnInfo = new ArrayList<String>(var.addnInfo);
-            if ( var instanceof DataVar ) {
-                DataVar other = (DataVar) var;
-                observeType = other.observeType;
-                measureMethod = other.measureMethod;
-                methodDescription = other.methodDescription;
-                methodReference = other.methodReference;
-                samplingLocation = other.samplingLocation;
-                samplingElevation = other.samplingElevation;
-                storageMethod = other.storageMethod;
-                replication = other.replication;
-                researcher = other.researcher.clone();
-                samplerNames = new ArrayList<String>(other.samplerNames);
-                analyzerNames = new ArrayList<String>(other.analyzerNames);
-            }
+        super(var);
+        if ( (var != null) && (var instanceof DataVar) ) {
+            DataVar other = (DataVar) var;
+            observeType = other.observeType;
+            measureMethod = other.measureMethod;
+            methodDescription = other.methodDescription;
+            methodReference = other.methodReference;
+            samplingLocation = other.samplingLocation;
+            samplingElevation = other.samplingElevation;
+            storageMethod = other.storageMethod;
+            replication = other.replication;
+            researcher = other.researcher.clone();
+            samplerNames = new HashSet<String>(other.samplerNames);
+            analyzerNames = new HashSet<String>(other.analyzerNames);
+        }
+        else {
+            observeType = "";
+            measureMethod = MethodType.UNSPECIFIED;
+            methodDescription = "";
+            methodReference = "";
+            samplingLocation = "";
+            samplingElevation = "";
+            storageMethod = "";
+            replication = "";
+            researcher = new Person();
+            samplerNames = new HashSet<String>();
+            analyzerNames = new HashSet<String>();
         }
     }
 
@@ -243,8 +245,8 @@ public class DataVar extends Variable implements Cloneable {
      * @return the list of names of analyzers used to collect this variable; never null but may be empty.
      *         Any strings given are guaranteed to be strings with content (not blank).
      */
-    public ArrayList<String> getSamplerNames() {
-        return new ArrayList<String>(samplerNames);
+    public HashSet<String> getSamplerNames() {
+        return new HashSet<String>(samplerNames);
     }
 
     /**
@@ -273,8 +275,8 @@ public class DataVar extends Variable implements Cloneable {
      * @return the list of names of analyzers used to measure this variable; never null but may be empty.
      *         Any strings given are guaranteed to be strings with content (not blank).
      */
-    public ArrayList<String> getAnalyzerNames() {
-        return new ArrayList<String>(analyzerNames);
+    public HashSet<String> getAnalyzerNames() {
+        return new HashSet<String>(analyzerNames);
     }
 
     /**
@@ -311,8 +313,8 @@ public class DataVar extends Variable implements Cloneable {
         dup.storageMethod = storageMethod;
         dup.replication = replication;
         dup.researcher = researcher.clone();
-        dup.samplerNames = new ArrayList<String>(samplerNames);
-        dup.analyzerNames = new ArrayList<String>(analyzerNames);
+        dup.samplerNames = new HashSet<String>(samplerNames);
+        dup.analyzerNames = new HashSet<String>(analyzerNames);
         return dup;
     }
 

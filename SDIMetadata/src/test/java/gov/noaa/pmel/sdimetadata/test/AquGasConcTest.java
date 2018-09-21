@@ -62,8 +62,8 @@ public class AquGasConcTest {
         assertEquals(REPORT_TERMPERATURE, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -96,8 +96,8 @@ public class AquGasConcTest {
         assertEquals(EMPTY_STRING, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -131,8 +131,8 @@ public class AquGasConcTest {
         assertEquals(EMPTY_STRING, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_ARRAYLIST, var.getAnalyzerNames());
-        assertEquals(EMPTY_ARRAYLIST, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getStorageMethod());

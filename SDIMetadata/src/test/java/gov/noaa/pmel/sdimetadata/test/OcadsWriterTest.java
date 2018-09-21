@@ -249,11 +249,13 @@ public class OcadsWriterTest {
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -262,8 +264,9 @@ public class OcadsWriterTest {
                         "Recommendations for autonomous underway pCO2 measuring systems \n" +
                         "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
                 docHandler.getElementText(var, methodReference));
-        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+        assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
+        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
+        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("", docHandler.getElementText(var, equilibratorType));
         assertEquals("", docHandler.getElementText(var, equilibratorVolume));
         assertEquals("", docHandler.getElementText(var, equilibratorVented));
@@ -274,6 +277,7 @@ public class OcadsWriterTest {
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                         "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                 docHandler.getElementText(var, dryMethod));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
         assertEquals("", docHandler.getElementText(var, gasDetectorModel));
         assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
@@ -282,7 +286,7 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, standardizationFrequency));
         assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
         elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(0, elemList.size());
+        assertEquals(4, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
@@ -313,11 +317,12 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -369,11 +374,12 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -420,11 +426,12 @@ public class OcadsWriterTest {
         assertEquals("0.05 hPa", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: Attached to CO2 analyzer exit to lab.\n" +
                 "Resolution/Precision: 0.015 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "Equilibrator Pressure Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -469,11 +476,12 @@ public class OcadsWriterTest {
                 "Sampling location: On bulkhead exterior on the port side of the radio room aft of the bridge " +
                 "at ~14 m above the sea surface.\n" +
                 "Resolution/Precision: 0.08 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "Atmospheric Pressure Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -515,11 +523,12 @@ public class OcadsWriterTest {
         assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
                 "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "Equilibrator Temperature Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -561,11 +570,12 @@ public class OcadsWriterTest {
         assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
         assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
                 "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "Water Temperature Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -609,11 +619,12 @@ public class OcadsWriterTest {
         assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
                         "Resolution/Precision: 0.0002 permil",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "Salinity Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -657,11 +668,13 @@ public class OcadsWriterTest {
         assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
                         "Frequency: Every 150 seconds",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -670,8 +683,9 @@ public class OcadsWriterTest {
                         "Recommendations for autonomous underway pCO2 measuring systems \n" +
                         "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
                 docHandler.getElementText(var, methodReference));
-        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+        assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
+        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
+        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("", docHandler.getElementText(var, equilibratorType));
         assertEquals("", docHandler.getElementText(var, equilibratorVolume));
         assertEquals("", docHandler.getElementText(var, equilibratorVented));
@@ -682,6 +696,7 @@ public class OcadsWriterTest {
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                         "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                 docHandler.getElementText(var, dryMethod));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
         assertEquals("", docHandler.getElementText(var, gasDetectorModel));
         assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
@@ -690,7 +705,7 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, standardizationFrequency));
         assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
         elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(0, elemList.size());
+        assertEquals(4, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
@@ -722,11 +737,12 @@ public class OcadsWriterTest {
                         "Resolution/Precision: 0.01 ppm\n" +
                         "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                 docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observation));
+        assertEquals("Surface Underway", docHandler.getElementText(var, observation));
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
+        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
@@ -762,214 +778,6 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, researcherName));
         assertEquals("", docHandler.getElementText(var, researcherInstitution));
         assertEquals("0", docHandler.getElementText(var, internal));
-
-        /*
-        var = variables.get(0);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(1);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(2);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(3);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Attached to CO2 analyzer exit to lab.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Equilibrator Pressure Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(4);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "On bulkhead exterior on the port side of the radio room aft of the bridge " +
-                "at ~14 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strList.size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Atmospheric Pressure Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(5);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strList.size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Equilibrator Temperature Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(6);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow thruster room, before sea water pump, ~5 m below water line.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strList.size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Water Temperature Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(7);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Attached to underway system at sea water input.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strList.size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Salinity Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(8);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strList = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-
-        var = variables.get(9);
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strList = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strList.size());
-        assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-      */
 
         var = variables.get(10);
         assertEquals("dfCO2_uatm", docHandler.getElementText(var, abbrev));
