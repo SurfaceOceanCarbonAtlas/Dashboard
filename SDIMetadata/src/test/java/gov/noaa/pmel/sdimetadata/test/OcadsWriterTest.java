@@ -253,11 +253,14 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
                 docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) are " +
+                        "used to set the zero and span of the LI-COR analyzer.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
@@ -267,7 +270,6 @@ public class OcadsWriterTest {
                 docHandler.getElementText(var, methodReference));
         assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
         assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
-        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("Sprayhead above dynamic pool, with thermal jacket",
                 docHandler.getElementText(var, equilibratorType));
         assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
@@ -279,7 +281,6 @@ public class OcadsWriterTest {
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                         "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                 docHandler.getElementText(var, dryMethod));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
         assertEquals("", docHandler.getElementText(var, gasDetectorModel));
         assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
@@ -288,7 +289,6 @@ public class OcadsWriterTest {
         assertEquals("", docHandler.getElementText(var, standardizationFrequency));
         assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
         elemList = docHandler.getElementList(var, standardGas);
-        // assertEquals(4, elemList.size());
         assertEquals(0, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
@@ -325,8 +325,12 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                        "are used to set the zero and span of the LI-COR analyzer.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
@@ -382,8 +386,12 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                        "are used to set the zero and span of the LI-COR analyzer.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
@@ -434,8 +442,11 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "Equilibrator Pressure Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory " +
+                        "calibration.; Pressure reading from the Setra-270 on the exit of the analyzer was added " +
+                        "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                        "to yield the equlibrator pressure.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("", docHandler.getElementText(var, methodReference));
@@ -484,8 +495,9 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "Atmospheric Pressure Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("Atmospheric Pressure Sensor: Manufacturer: Vaisala; Model: PTB330; Calibration: " +
+                        "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("", docHandler.getElementText(var, methodReference));
@@ -531,8 +543,9 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "Equilibrator Temperature Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1521; " +
+                        "Calibration: Factory calibration; Warming: 0.1 - 0.6 °C",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("", docHandler.getElementText(var, methodReference));
@@ -578,8 +591,9 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "Water Temperature Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("Water Temperature Sensor: Manufacturer: Seabird; Model: SBE-21; Calibration: " +
+                        "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("", docHandler.getElementText(var, methodReference));
@@ -627,8 +641,9 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "Salinity Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("Salinity Sensor: Manufacturer: Seabird; Model: SBE-45; Calibration: Factory " +
+                        "calibration.; Manufacturer's resolution is taken as precision.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("", docHandler.getElementText(var, methodReference));
@@ -675,11 +690,14 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
         assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
                 docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                        "are used to set the zero and span of the LI-COR analyzer.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
@@ -689,8 +707,8 @@ public class OcadsWriterTest {
                 docHandler.getElementText(var, methodReference));
         assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
         assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
-        // assertEquals(dataVar.toString(), "Equilibrator", strList.get(0));
-        assertEquals("Sprayhead above dynamic pool, with thermal jacket", docHandler.getElementText(var, equilibratorType));
+        assertEquals("Sprayhead above dynamic pool, with thermal jacket",
+                docHandler.getElementText(var, equilibratorType));
         assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
         assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
         assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
@@ -700,7 +718,6 @@ public class OcadsWriterTest {
         assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                         "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                 docHandler.getElementText(var, dryMethod));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
         assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
         assertEquals("", docHandler.getElementText(var, gasDetectorModel));
         assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
@@ -747,8 +764,12 @@ public class OcadsWriterTest {
         assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
         assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
         assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        // assertEquals(dataVar.toString(), "CO2 Sensor", strList.get(0));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                        "are used to set the zero and span of the LI-COR analyzer.",
+                docHandler.getElementText(var, analyzingInstrument));
         assertEquals("", docHandler.getElementText(var, duration));
         assertEquals("", docHandler.getElementText(var, replicate));
         assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +

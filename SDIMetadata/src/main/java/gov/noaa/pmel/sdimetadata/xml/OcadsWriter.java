@@ -594,10 +594,11 @@ public class OcadsWriter extends DocumentHandler {
      * Add the OCADS XML describing the given sampling instrument.
      *
      * @param ancestor
-     * add under this element
+     *         add under this element
      * @param var
-     * use the information given in the variable
+     *         describe the sampler appropriately for this variable
      * @param inst
+     *         describe this sampling instrument
      */
     private void addSamplerElements(Element ancestor, DataVar var, Sampler inst) {
         if ( (var instanceof AquGasConc) && (inst instanceof Equilibrator) ) {
@@ -658,7 +659,7 @@ public class OcadsWriter extends DocumentHandler {
             strBldr.append(str);
         }
         str = inst.getId();
-        if ( ! str.isEmpty() ) {
+        if ( !str.isEmpty() ) {
             if ( strBldr.length() > 0 )
                 strBldr.append("; ");
             strBldr.append("ID/Serial: ");
@@ -678,13 +679,23 @@ public class OcadsWriter extends DocumentHandler {
             strBldr.append("\n");
         }
         strBldr.append(inst.getName());
-        if ( ! instDesc.isEmpty() ) {
+        if ( !instDesc.isEmpty() ) {
             strBldr.append(": ");
             strBldr.append(instDesc);
         }
         setElementText(ancestor, VARIABLE_SAMPLING_INST_ELEMENT_NAME, strBldr.toString());
     }
 
+    /**
+     * Add the OCADS XML describing the given analyzing instrument.
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         describe the analyzer appropriately for this variable
+     * @param inst
+     *         describe this analyzing instrument
+     */
     private void addAnalyzerElements(Element ancestor, DataVar var, Analyzer inst) {
         // Always describe everything under the generic analyzing instrument tag
         StringBuilder strBldr = new StringBuilder();
@@ -701,14 +712,14 @@ public class OcadsWriter extends DocumentHandler {
             strBldr.append(str);
         }
         str = inst.getId();
-        if ( ! str.isEmpty() ) {
+        if ( !str.isEmpty() ) {
             if ( strBldr.length() > 0 )
                 strBldr.append("; ");
             strBldr.append("ID/Serial: ");
             strBldr.append(str);
         }
         str = inst.getCalibration();
-        if ( ! str.isEmpty() ) {
+        if ( !str.isEmpty() ) {
             if ( strBldr.length() > 0 )
                 strBldr.append("; ");
             strBldr.append("Calibration: ");
@@ -728,7 +739,7 @@ public class OcadsWriter extends DocumentHandler {
             strBldr.append("\n");
         }
         strBldr.append(inst.getName());
-        if ( ! instDesc.isEmpty() ) {
+        if ( !instDesc.isEmpty() ) {
             strBldr.append(": ");
             strBldr.append(instDesc);
         }
