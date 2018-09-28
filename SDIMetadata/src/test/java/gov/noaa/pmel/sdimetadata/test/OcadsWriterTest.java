@@ -292,7 +292,6 @@ public class OcadsWriterTest {
         assertEquals(0, elemList.size());
         for (Element stdgas : elemList) {
             assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
             assertEquals("", docHandler.getElementText(stdgas, standardGasConcentration));
             assertEquals("", docHandler.getElementText(stdgas, standardGasUncertainty));
         }
