@@ -1,7 +1,6 @@
 package gov.noaa.pmel.sdimetadata;
 
-import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
-import gov.noaa.pmel.sdimetadata.instrument.Sampler;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
 import gov.noaa.pmel.sdimetadata.platform.Platform;
@@ -17,8 +16,7 @@ public class SDIMetadata implements Cloneable {
     protected ArrayList<Investigator> investigators;
     protected Platform platform;
     protected Coverage coverage;
-    protected ArrayList<Sampler> samplers;
-    protected ArrayList<Analyzer> analyzers;
+    protected ArrayList<Instrument> instruments;
     protected ArrayList<Variable> variables;
     protected MiscInfo miscInfo;
 
@@ -27,8 +25,7 @@ public class SDIMetadata implements Cloneable {
         investigators = new ArrayList<Investigator>();
         platform = new Platform();
         coverage = new Coverage();
-        samplers = new ArrayList<Sampler>();
-        analyzers = new ArrayList<Analyzer>();
+        instruments = new ArrayList<Instrument>();
         variables = new ArrayList<Variable>();
         miscInfo = new MiscInfo();
     }
@@ -53,14 +50,9 @@ public class SDIMetadata implements Cloneable {
         for (String name : coverage.invalidFieldNames()) {
             invalid.add("coverage." + name);
         }
-        for (int k = 0; k < samplers.size(); k++) {
-            for (String name : samplers.get(k).invalidFieldNames()) {
-                invalid.add("samplers[" + k + "]." + name);
-            }
-        }
-        for (int k = 0; k < analyzers.size(); k++) {
-            for (String name : analyzers.get(k).invalidFieldNames()) {
-                invalid.add("analyzers[" + k + "]." + name);
+        for (int k = 0; k < instruments.size(); k++) {
+            for (String name : instruments.get(k).invalidFieldNames()) {
+                invalid.add("instruments[" + k + "]." + name);
             }
         }
         for (int k = 0; k < variables.size(); k++) {
@@ -89,7 +81,7 @@ public class SDIMetadata implements Cloneable {
             }
         }
 
-        // TODO: verify researcher, sampler names, and analyzer names in variables match some entry in investogators, samplers, and analyzers
+        // TODO: verify researcher and instrument names in variables match some entry in investigators and instruments
 
         return invalid;
     }
@@ -137,40 +129,21 @@ public class SDIMetadata implements Cloneable {
         this.coverage = (coverage != null) ? coverage.clone() : new Coverage();
     }
 
-    public ArrayList<Sampler> getSamplers() {
-        ArrayList<Sampler> collectList = new ArrayList<Sampler>(samplers.size());
-        for (Sampler collector : samplers) {
-            collectList.add(collector.clone());
+    public ArrayList<Instrument> getInstruments() {
+        ArrayList<Instrument> instList = new ArrayList<Instrument>(instruments.size());
+        for (Instrument inst : instruments) {
+            instList.add(inst.clone());
         }
-        return collectList;
+        return instList;
     }
 
-    public void setSamplers(Iterable<Sampler> samplers) throws IllegalArgumentException {
-        this.samplers.clear();
-        if ( samplers != null ) {
-            for (Sampler collector : samplers) {
-                if ( null == collector )
-                    throw new IllegalArgumentException("null sampler given");
-                this.samplers.add(collector.clone());
-            }
-        }
-    }
-
-    public ArrayList<Analyzer> getAnalyzers() {
-        ArrayList<Analyzer> detectList = new ArrayList<Analyzer>(analyzers.size());
-        for (Analyzer detector : analyzers) {
-            detectList.add(detector.clone());
-        }
-        return detectList;
-    }
-
-    public void setAnalyzers(Iterable<Analyzer> analyzers) throws IllegalArgumentException {
-        this.analyzers.clear();
-        if ( analyzers != null ) {
-            for (Analyzer detector : analyzers) {
-                if ( null == detector )
-                    throw new IllegalArgumentException("null analyzer given");
-                this.analyzers.add(detector.clone());
+    public void setInstruments(Iterable<Instrument> instruments) throws IllegalArgumentException {
+        this.instruments.clear();
+        if ( instruments != null ) {
+            for (Instrument inst : instruments) {
+                if ( null == inst )
+                    throw new IllegalArgumentException("null instrument given");
+                this.instruments.add(inst.clone());
             }
         }
     }
@@ -217,13 +190,9 @@ public class SDIMetadata implements Cloneable {
         }
         dup.platform = platform.clone();
         dup.coverage = coverage.clone();
-        dup.samplers = new ArrayList<Sampler>(samplers.size());
-        for (Sampler collector : samplers) {
-            dup.samplers.add(collector.clone());
-        }
-        dup.analyzers = new ArrayList<Analyzer>(analyzers.size());
-        for (Analyzer detector : analyzers) {
-            dup.analyzers.add(detector.clone());
+        dup.instruments = new ArrayList<Instrument>(instruments.size());
+        for (Instrument inst : instruments) {
+            dup.instruments.add(inst.clone());
         }
         dup.variables = new ArrayList<Variable>(variables.size());
         for (Variable var : variables) {
@@ -252,9 +221,7 @@ public class SDIMetadata implements Cloneable {
             return false;
         if ( !coverage.equals(other.coverage) )
             return false;
-        if ( !samplers.equals(other.samplers) )
-            return false;
-        if ( !analyzers.equals(other.analyzers) )
+        if ( !instruments.equals(other.instruments) )
             return false;
         if ( !variables.equals(other.variables) )
             return false;
@@ -268,8 +235,7 @@ public class SDIMetadata implements Cloneable {
         result = result * prime + investigators.hashCode();
         result = result * prime + platform.hashCode();
         result = result * prime + coverage.hashCode();
-        result = result * prime + samplers.hashCode();
-        result = result * prime + analyzers.hashCode();
+        result = result * prime + instruments.hashCode();
         result = result * prime + variables.hashCode();
         result = result * prime + miscInfo.hashCode();
         return result;
@@ -282,8 +248,7 @@ public class SDIMetadata implements Cloneable {
                 ", investigators=" + investigators +
                 ", platform=" + platform +
                 ", coverage=" + coverage +
-                ", samplers=" + samplers +
-                ", analyzers=" + analyzers +
+                ", instruments=" + instruments +
                 ", variables=" + variables +
                 ", miscInfo=" + miscInfo +
                 '}';

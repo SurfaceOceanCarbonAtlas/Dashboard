@@ -7,9 +7,9 @@ import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.PressureSensor;
 import gov.noaa.pmel.sdimetadata.instrument.SalinitySensor;
-import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.instrument.TemperatureSensor;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Submitter;
@@ -31,9 +31,9 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.TreeSet;
 
 public class CdiacReader extends DocumentHandler {
@@ -271,8 +271,7 @@ public class CdiacReader extends DocumentHandler {
         mdata.setPlatform(platform);
         mdata.setCoverage(getCoverage());
         mdata.setVariables(getVariables(platform.getPlatformType()));
-        mdata.setSamplers(getSamplers());
-        mdata.setAnalyzers(getAnalyzers());
+        mdata.setInstruments(getInstruments());
         return mdata;
     }
 
@@ -459,8 +458,7 @@ public class CdiacReader extends DocumentHandler {
                     AquGasConc co2WaterEqu = new AquGasConc(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     co2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    co2WaterEqu.setSamplerNames(Collections.singletonList("Equilibrator"));
-                    co2WaterEqu.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
+                    co2WaterEqu.setInstrumentNames(Arrays.asList("Equilibrator", "CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2WaterEqu.setObserveType("Time Series");
                     else
@@ -504,7 +502,7 @@ public class CdiacReader extends DocumentHandler {
                     GasConc co2AtmActual = new GasConc(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     co2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    co2AtmActual.setAnalyzerNames(Collections.singletonList("CO2 Sensor"));
+                    co2AtmActual.setInstrumentNames(Collections.singletonList("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2AtmActual.setObserveType("Time Series");
                     else
@@ -539,7 +537,7 @@ public class CdiacReader extends DocumentHandler {
                     Temperature sst = new Temperature(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     sst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    sst.setAnalyzerNames(Collections.singletonList("Water Temperature Sensor"));
+                    sst.setInstrumentNames(Collections.singletonList("Water Temperature Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         sst.setObserveType("Time Series");
                     else
@@ -573,7 +571,7 @@ public class CdiacReader extends DocumentHandler {
                     Temperature tequ = new Temperature(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     tequ.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    tequ.setAnalyzerNames(Collections.singletonList("Equilibrator Temperature Sensor"));
+                    tequ.setInstrumentNames(Collections.singletonList("Equilibrator Temperature Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         tequ.setObserveType("Time Series");
                     else
@@ -607,7 +605,7 @@ public class CdiacReader extends DocumentHandler {
                     AirPressure slp = new AirPressure(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     slp.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    slp.setAnalyzerNames(Collections.singletonList("Atmospheric Pressure Sensor"));
+                    slp.setInstrumentNames(Collections.singletonList("Atmospheric Pressure Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         slp.setObserveType("Time Series");
                     else
@@ -644,7 +642,7 @@ public class CdiacReader extends DocumentHandler {
                     AirPressure pequ = new AirPressure(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     pequ.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    pequ.setAnalyzerNames(Collections.singletonList("Equilibrator Pressure Sensor"));
+                    pequ.setInstrumentNames(Collections.singletonList("Equilibrator Pressure Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         pequ.setObserveType("Time Series");
                     else
@@ -681,7 +679,7 @@ public class CdiacReader extends DocumentHandler {
                     DataVar sal = new DataVar(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     sal.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    sal.setAnalyzerNames(Collections.singletonList("Salinity Sensor"));
+                    sal.setInstrumentNames(Collections.singletonList("Salinity Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         sal.setObserveType("Time Series");
                     else
@@ -741,34 +739,27 @@ public class CdiacReader extends DocumentHandler {
     }
 
     /**
-     * @return list of sampler information; never null.
-     *         CDIAC underway metadata only describes a single equilibrator.
+     * @return list of instrument information; never null.
      */
-    private List<Sampler> getSamplers() {
-        // Only the one equilibrator in CDIAC underway forms
-        Equilibrator sampler = new Equilibrator();
-        sampler.setName("Equilibrator");
+    private ArrayList<Instrument> getInstruments() {
+        ArrayList<Instrument> instruments = new ArrayList<Instrument>();
+
+        Equilibrator equilibrator = new Equilibrator();
+        equilibrator.setName("Equilibrator");
         // sampler.setId(id); - not specified
         // sampler.setManufacturer(manufacturer); - not specified
         // sampler.setModel(model); - not specified
 
-        sampler.setEquilibratorType(getElementText(null, EQUI_TYPE_ELEMENT_NAME));
-        sampler.setChamberVol(getElementText(null, EQUI_VOLUME_ELEMENT_NAME));
+        equilibrator.setEquilibratorType(getElementText(null, EQUI_TYPE_ELEMENT_NAME));
+        equilibrator.setChamberVol(getElementText(null, EQUI_VOLUME_ELEMENT_NAME));
         // sampler.setChamberWaterVol(chamberWaterVol); - not specified but probably part of chamber volume
         // sampler.setChamberGasVol(chamberGasVol); - not specified but probably part of chamber volume
-        sampler.setWaterFlowRate(getElementText(null, WATER_FLOW_RATE_ELEMENT_NAME));
-        sampler.setGasFlowRate(getElementText(null, GAS_FLOW_RATE_ELEMENT_NAME));
-        sampler.setVenting(getElementText(null, VENTED_ELEMENT_NAME));
-        sampler.setAddnInfo(getListOfLines(getElementText(null, EQUI_ADDITIONAL_INFO_ELEMENT_NAME)));
+        equilibrator.setWaterFlowRate(getElementText(null, WATER_FLOW_RATE_ELEMENT_NAME));
+        equilibrator.setGasFlowRate(getElementText(null, GAS_FLOW_RATE_ELEMENT_NAME));
+        equilibrator.setVenting(getElementText(null, VENTED_ELEMENT_NAME));
+        equilibrator.setAddnInfo(getListOfLines(getElementText(null, EQUI_ADDITIONAL_INFO_ELEMENT_NAME)));
 
-        return Collections.singletonList(sampler);
-    }
-
-    /**
-     * @return list of analyzer (sensor) information; never null.
-     */
-    private ArrayList<Analyzer> getAnalyzers() {
-        ArrayList<Analyzer> sensors = new ArrayList<Analyzer>();
+        instruments.add(equilibrator);
 
         GasSensor co2Sensor = new GasSensor();
         co2Sensor.setName("CO2 Sensor");
@@ -811,7 +802,7 @@ public class CdiacReader extends DocumentHandler {
             }
             co2Sensor.setCalibrationGases(gasList);
         }
-        sensors.add(co2Sensor);
+        instruments.add(co2Sensor);
 
         TemperatureSensor sstSensor = new TemperatureSensor();
         sstSensor.setName("Water Temperature Sensor");
@@ -819,7 +810,7 @@ public class CdiacReader extends DocumentHandler {
         sstSensor.setModel(getElementText(null, SST_MODEL_ELEMENT_NAME));
         sstSensor.setCalibration(getElementText(null, SST_CALIBRATION_ELEMENT_NAME));
         sstSensor.setAddnInfo(getListOfLines(getElementText(null, SST_COMMENTS_ELEMENT_NAME)));
-        sensors.add(sstSensor);
+        instruments.add(sstSensor);
 
         TemperatureSensor teqSensor = new TemperatureSensor();
         teqSensor.setName("Equilibrator Temperature Sensor");
@@ -831,7 +822,7 @@ public class CdiacReader extends DocumentHandler {
         if ( !strVal.isEmpty() )
             addnInfo.add(0, "Warming: " + strVal);
         teqSensor.setAddnInfo(addnInfo);
-        sensors.add(teqSensor);
+        instruments.add(teqSensor);
 
         PressureSensor slpSensor = new PressureSensor();
         slpSensor.setName("Atmospheric Pressure Sensor");
@@ -839,7 +830,7 @@ public class CdiacReader extends DocumentHandler {
         slpSensor.setModel(getElementText(null, ATM_MODEL_ELEMENT_NAME));
         slpSensor.setCalibration(getElementText(null, ATM_CALIBRATION_ELEMENT_NAME));
         slpSensor.setAddnInfo(getListOfLines(getElementText(null, ATM_COMMENTS_ELEMENT_NAME)));
-        sensors.add(slpSensor);
+        instruments.add(slpSensor);
 
         PressureSensor peqSensor = new PressureSensor();
         peqSensor.setName("Equilibrator Pressure Sensor");
@@ -847,7 +838,7 @@ public class CdiacReader extends DocumentHandler {
         peqSensor.setModel(getElementText(null, EQP_MODEL_ELEMENT_NAME));
         peqSensor.setCalibration(getElementText(null, EQP_CALIBRATION_ELEMENT_NAME));
         peqSensor.setAddnInfo(getListOfLines(getElementText(null, EQP_COMMENTS_ELEMENT_NAME)));
-        sensors.add(peqSensor);
+        instruments.add(peqSensor);
 
         SalinitySensor salSensor = new SalinitySensor();
         salSensor.setName("Salinity Sensor");
@@ -855,7 +846,7 @@ public class CdiacReader extends DocumentHandler {
         salSensor.setModel(getElementText(null, SSS_MODEL_ELEMENT_NAME));
         salSensor.setCalibration(getElementText(null, SSS_CALIBRATION_ELEMENT_NAME));
         salSensor.setAddnInfo(getListOfLines(getElementText(null, SSS_COMMENTS_ELEMENT_NAME)));
-        sensors.add(salSensor);
+        instruments.add(salSensor);
 
         int k = 0;
         for (Element elem : getElementList(null, OTHER_SENSORS_ELEMENT_NAME)) {
@@ -880,10 +871,10 @@ public class CdiacReader extends DocumentHandler {
             if ( !strVal.isEmpty() )
                 addnInfo.add(0, "Location: " + strVal);
             otherSensor.setAddnInfo(addnInfo);
-            sensors.add(otherSensor);
+            instruments.add(otherSensor);
         }
 
-        return sensors;
+        return instruments;
     }
 
 }

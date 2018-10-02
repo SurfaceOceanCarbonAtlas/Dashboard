@@ -62,38 +62,43 @@ public class OcadsWriterTest {
         assertEquals("2016-01-20", docHandler.getElementText(null, "submissiondate"));
         assertEquals(0, docHandler.getElementList(null, "update").size());
 
-        List<Element> elemList = docHandler.getElementList(null, "datasubmitter");
-        assertEquals(1, elemList.size());
-        Element elem = elemList.get(0);
-        assertEquals("Robert Castle", elem.getChildTextTrim("name"));
-        assertEquals("NOAA/Atlantic Oceanographic & Meteorological Laboratory", elem.getChildTextTrim("organization"));
-        assertEquals("4301 Rickenbacker Causeway; Miami, FL 33149", elem.getChildTextTrim("deliverypoint1"));
-        assertNull(elem.getChildTextTrim("deliverypoint2"));
-        assertNull(elem.getChildTextTrim("city"));
-        assertNull(elem.getChildTextTrim("administrativeArea"));
-        assertNull(elem.getChildTextTrim("zip"));
-        assertNull(elem.getChildTextTrim("country"));
-        assertEquals("305-361-4418", elem.getChildTextTrim("phone"));
-        assertEquals("Robert.Castle@noaa.gov", elem.getChildTextTrim("email"));
-        assertNull(elem.getChildTextTrim("ID"));
-        assertNull(elem.getChildTextTrim("IDtype"));
+        {
+            List<Element> elemList = docHandler.getElementList(null, "datasubmitter");
+            assertEquals(1, elemList.size());
+            Element elem = elemList.get(0);
+            assertEquals("Robert Castle", elem.getChildTextTrim("name"));
+            assertEquals("NOAA/Atlantic Oceanographic & Meteorological Laboratory",
+                    elem.getChildTextTrim("organization"));
+            assertEquals("4301 Rickenbacker Causeway; Miami, FL 33149", elem.getChildTextTrim("deliverypoint1"));
+            assertNull(elem.getChildTextTrim("deliverypoint2"));
+            assertNull(elem.getChildTextTrim("city"));
+            assertNull(elem.getChildTextTrim("administrativeArea"));
+            assertNull(elem.getChildTextTrim("zip"));
+            assertNull(elem.getChildTextTrim("country"));
+            assertEquals("305-361-4418", elem.getChildTextTrim("phone"));
+            assertEquals("Robert.Castle@noaa.gov", elem.getChildTextTrim("email"));
+            assertNull(elem.getChildTextTrim("ID"));
+            assertNull(elem.getChildTextTrim("IDtype"));
+        }
 
-        elemList = docHandler.getElementList(null, "person");
-        assertEquals(1, elemList.size());
-        elem = elemList.get(0);
-        assertEquals("Rik Wanninkhof", elem.getChildTextTrim("name"));
-        assertEquals("NOAA/AOML", elem.getChildTextTrim("organization"));
-        assertEquals("4301 Rickenbacker Causeway; Miami Fl, 33149", elem.getChildTextTrim("deliverypoint1"));
-        assertNull(elem.getChildTextTrim("deliverypoint2"));
-        assertNull(elem.getChildTextTrim("city"));
-        assertNull(elem.getChildTextTrim("administrativeArea"));
-        assertNull(elem.getChildTextTrim("zip"));
-        assertNull(elem.getChildTextTrim("country"));
-        assertEquals("305-361-4379", elem.getChildTextTrim("phone"));
-        assertEquals("Rik.Wanninkhof@noaa.gov", elem.getChildTextTrim("email"));
-        assertNull(elem.getChildTextTrim("ID"));
-        assertNull(elem.getChildTextTrim("IDtype"));
-        assertEquals("investigator", elem.getChildTextTrim("role"));
+        {
+            List<Element> elemList = docHandler.getElementList(null, "person");
+            assertEquals(1, elemList.size());
+            Element elem = elemList.get(0);
+            assertEquals("Rik Wanninkhof", elem.getChildTextTrim("name"));
+            assertEquals("NOAA/AOML", elem.getChildTextTrim("organization"));
+            assertEquals("4301 Rickenbacker Causeway; Miami Fl, 33149", elem.getChildTextTrim("deliverypoint1"));
+            assertNull(elem.getChildTextTrim("deliverypoint2"));
+            assertNull(elem.getChildTextTrim("city"));
+            assertNull(elem.getChildTextTrim("administrativeArea"));
+            assertNull(elem.getChildTextTrim("zip"));
+            assertNull(elem.getChildTextTrim("country"));
+            assertEquals("305-361-4379", elem.getChildTextTrim("phone"));
+            assertEquals("Rik.Wanninkhof@noaa.gov", elem.getChildTextTrim("email"));
+            assertNull(elem.getChildTextTrim("ID"));
+            assertNull(elem.getChildTextTrim("IDtype"));
+            assertEquals("investigator", elem.getChildTextTrim("role"));
+        }
 
         assertEquals("", docHandler.getElementText(null, "title"));
         assertEquals("", docHandler.getElementText(null, "abstract"));
@@ -236,710 +241,724 @@ public class OcadsWriterTest {
         final String standardGasConcentration = standardGas + SEP + "concentration";
         final String standardGasUncertainty = standardGas + SEP + "uncertainty";
 
-        Element var;
-
-
-        var = variables.get(0);
-        assertEquals("xCO2_EQU_ppm", docHandler.getElementText(var, abbrev));
-        assertEquals("Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-        assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-        assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
-                        "Frequency: Every 150 seconds",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
-                docHandler.getElementText(var, samplingInstrument));
-        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
-                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
-                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
-                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) are " +
-                        "used to set the zero and span of the LI-COR analyzer.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                        "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                        "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                        "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
-                docHandler.getElementText(var, methodReference));
-        assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("Sprayhead above dynamic pool, with thermal jacket",
-                docHandler.getElementText(var, equilibratorType));
-        assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(0, elemList.size());
-        for (Element stdgas : elemList) {
-            assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasConcentration));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasUncertainty));
+        {
+            Element var = variables.get(0);
+            assertEquals("xCO2_EQU_ppm", docHandler.getElementText(var, abbrev));
+            assertEquals("Mole fraction of CO2 in the equilibrator headspace (dry) at equilibrator temperature (ppm)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
+            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+                            "Frequency: Every 150 seconds",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+            assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
+                    docHandler.getElementText(var, samplingInstrument));
+            assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                            "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                            "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                            "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) are " +
+                            "used to set the zero and span of the LI-COR analyzer.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    docHandler.getElementText(var, methodReference));
+            assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("Sprayhead above dynamic pool, with thermal jacket",
+                    docHandler.getElementText(var, equilibratorType));
+            assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            List<Element> elemList = docHandler.getElementList(var, standardGas);
+            assertEquals(0, elemList.size());
+            // assertEquals(4, elemList.size());
+            for (Element stdgas : elemList) {
+                assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
+                assertEquals("", docHandler.getElementText(stdgas, standardGasConcentration));
+                assertEquals("", docHandler.getElementText(stdgas, standardGasUncertainty));
+            }
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("4", docHandler.getElementText(var, internal));
         }
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("4", docHandler.getElementText(var, internal));
 
-
-        var = variables.get(1);
-        assertEquals("xCO2_ATM_ppm", docHandler.getElementText(var, abbrev));
-        assertEquals("Mole fraction of CO2 measured in dry outside air (ppm)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
-        assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
-                        "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
-                        "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                        "Resolution/Precision: 0.01 ppm\n" +
-                        "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
-                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
-                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
-                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
-                        "are used to set the zero and span of the LI-COR analyzer.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                        "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                        "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                        "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
-                docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(2);
-        assertEquals("xCO2_ATM_interpolated_ppm", docHandler.getElementText(var, abbrev));
-        assertEquals("Mole fraction of CO2 in outside air associated with each water analysis.  " +
-                        "These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
-        assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
-                        "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
-                        "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                        "Resolution/Precision: 0.01 ppm\n" +
-                        "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
-                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
-                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
-                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
-                        "are used to set the zero and span of the LI-COR analyzer.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                        "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                        "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                        "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
-                docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(3);
-        assertEquals("PRES_EQU_hPa", docHandler.getElementText(var, abbrev));
-        assertEquals("Barometric pressure in the equilibrator headspace (hectopascals)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("hPa", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.05 hPa", docHandler.getElementText(var, uncertainty));
-        assertEquals("Sampling location: Attached to CO2 analyzer exit to lab.\n" +
-                "Resolution/Precision: 0.015 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory " +
-                        "calibration.; Pressure reading from the Setra-270 on the exit of the analyzer was added " +
-                        "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
-                        "to yield the equlibrator pressure.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(4);
-        assertEquals("PRES_ATM@SSP_hPa", docHandler.getElementText(var, abbrev));
-        assertEquals("Barometric pressure measured outside, corrected to sea level (hectopascals)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("hPa", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.2 hPa", docHandler.getElementText(var, uncertainty));
-        assertEquals("Pressure Correction: Normalized: yes\n" +
-                "Sampling location: On bulkhead exterior on the port side of the radio room aft of the bridge " +
-                "at ~14 m above the sea surface.\n" +
-                "Resolution/Precision: 0.08 hPa", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("Atmospheric Pressure Sensor: Manufacturer: Vaisala; Model: PTB330; Calibration: " +
-                        "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(5);
-        assertEquals("TEMP_EQU_C", docHandler.getElementText(var, abbrev));
-        assertEquals("Water temperature in equilibrator (degrees Celsius)", docHandler.getElementText(var, fullname));
-        assertEquals("deg C", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
-        assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
-                "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1521; " +
-                        "Calibration: Factory calibration; Warming: 0.1 - 0.6 °C",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(6);
-        assertEquals("SST_C", docHandler.getElementText(var, abbrev));
-        assertEquals("Sea surface temperature (degrees Celsius)", docHandler.getElementText(var, fullname));
-        assertEquals("deg C", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
-        assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
-                "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("Water Temperature Sensor: Manufacturer: Seabird; Model: SBE-21; Calibration: " +
-                        "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(7);
-        assertEquals("SAL_permil", docHandler.getElementText(var, abbrev));
-        assertEquals("Sea surface salinity on Practical Salinity Scale (permil)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.005 permil", docHandler.getElementText(var, uncertainty));
-        assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
-                        "Resolution/Precision: 0.0002 permil",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("Salinity Sensor: Manufacturer: Seabird; Model: SBE-45; Calibration: Factory " +
-                        "calibration.; Manufacturer's resolution is taken as precision.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
-
-
-        var = variables.get(8);
-        assertEquals("fCO2_SW@SST_uatm", docHandler.getElementText(var, abbrev));
-        assertEquals("Fugacity of CO2 in sea water at SST and 100% humidity (microatmospheres)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-        assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-        assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
-                        "Frequency: Every 150 seconds",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
-                docHandler.getElementText(var, samplingInstrument));
-        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
-                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
-                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
-                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
-                        "are used to set the zero and span of the LI-COR analyzer.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                        "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                        "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                        "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
-                docHandler.getElementText(var, methodReference));
-        assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("Sprayhead above dynamic pool, with thermal jacket",
-                docHandler.getElementText(var, equilibratorType));
-        assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        elemList = docHandler.getElementList(var, standardGas);
-        assertEquals(0, elemList.size());
-        // assertEquals(4, elemList.size());
-        for (Element stdgas : elemList) {
-            assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasConcentration));
-            assertEquals("", docHandler.getElementText(stdgas, standardGasUncertainty));
+        {
+            Element var = variables.get(1);
+            assertEquals("xCO2_ATM_ppm", docHandler.getElementText(var, abbrev));
+            assertEquals("Mole fraction of CO2 measured in dry outside air (ppm)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
+                            "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
+                            "Sampling location: Bow tower ~10 m above the sea surface.\n" +
+                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Measurement: Yes, 5 readings in a group every 3.25 hours.",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                            "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                            "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                            "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                            "are used to set the zero and span of the LI-COR analyzer.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
         }
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("4", docHandler.getElementText(var, internal));
 
+        {
+            Element var = variables.get(2);
+            assertEquals("xCO2_ATM_interpolated_ppm", docHandler.getElementText(var, abbrev));
+            assertEquals("Mole fraction of CO2 in outside air associated with each water analysis.  " +
+                            "These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
+                            "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
+                            "Sampling location: Bow tower ~10 m above the sea surface.\n" +
+                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Measurement: Yes, 5 readings in a group every 3.25 hours.",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                            "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                            "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                            "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                            "are used to set the zero and span of the LI-COR analyzer.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
-        var = variables.get(9);
-        assertEquals("fCO2_ATM_interpolated_uatm", docHandler.getElementText(var, abbrev));
-        assertEquals("Fugacity of CO2 in air corresponding to the interpolated xCO2 at SST " +
-                        "and 100% humidity (microatmospheres)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
-        assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
-                        "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
-                        "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                        "Resolution/Precision: 0.01 ppm\n" +
-                        "Measurement: Yes, 5 readings in a group every 3.25 hours.",
-                docHandler.getElementText(var, detailedInfo));
-        assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
-        assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
-        assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
-                        "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
-                        "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
-                        "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
-                        "are used to set the zero and span of the LI-COR analyzer.",
-                docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                        "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                        "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                        "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
-                docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("0", docHandler.getElementText(var, internal));
+        {
+            Element var = variables.get(3);
+            assertEquals("PRES_EQU_hPa", docHandler.getElementText(var, abbrev));
+            assertEquals("Barometric pressure in the equilibrator headspace (hectopascals)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("hPa", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.05 hPa", docHandler.getElementText(var, uncertainty));
+            assertEquals("Sampling location: Attached to CO2 analyzer exit to lab.\n" +
+                    "Resolution/Precision: 0.015 hPa", docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("Equilibrator Pressure Sensor: Manufacturer: Setra; Model: 270; Calibration: Factory " +
+                            "calibration.; Pressure reading from the Setra-270 on the exit of the analyzer was added " +
+                            "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                            "to yield the equlibrator pressure.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
-        var = variables.get(10);
-        assertEquals("dfCO2_uatm", docHandler.getElementText(var, abbrev));
-        assertEquals("Sea water fCO2 minus interpolated air fCO2 (microatmospheres)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("", docHandler.getElementText(var, uncertainty));
-        assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observationType));
-        assertEquals("", docHandler.getElementText(var, insitu));
-        assertEquals("", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("", docHandler.getElementText(var, internal));
+        {
+            Element var = variables.get(4);
+            assertEquals("PRES_ATM@SSP_hPa", docHandler.getElementText(var, abbrev));
+            assertEquals("Barometric pressure measured outside, corrected to sea level (hectopascals)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("hPa", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.2 hPa", docHandler.getElementText(var, uncertainty));
+            assertEquals("Pressure Correction: Normalized: yes\n" +
+                    "Sampling location: On bulkhead exterior on the port side of the radio room aft of the bridge " +
+                    "at ~14 m above the sea surface.\n" +
+                    "Resolution/Precision: 0.08 hPa", docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("Atmospheric Pressure Sensor: Manufacturer: Vaisala; Model: PTB330; Calibration: " +
+                            "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
+        {
+            Element var = variables.get(5);
+            assertEquals("TEMP_EQU_C", docHandler.getElementText(var, abbrev));
+            assertEquals("Water temperature in equilibrator (degrees Celsius)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("deg C", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
+                    "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("Equilibrator Temperature Sensor: Manufacturer: Hart; Model: 1521; " +
+                            "Calibration: Factory calibration; Warming: 0.1 - 0.6 °C",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
-        var = variables.get(11);
-        assertEquals("WOCE_QC_FLAG", docHandler.getElementText(var, abbrev));
-        assertEquals("Quality control flag for fCO2 values (2=good, 3=questionable)",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("", docHandler.getElementText(var, uncertainty));
-        assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observationType));
-        assertEquals("", docHandler.getElementText(var, insitu));
-        assertEquals("", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("", docHandler.getElementText(var, internal));
+        {
+            Element var = variables.get(6);
+            assertEquals("SST_C", docHandler.getElementText(var, abbrev));
+            assertEquals("Sea surface temperature (degrees Celsius)", docHandler.getElementText(var, fullname));
+            assertEquals("deg C", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
+                    "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("Water Temperature Sensor: Manufacturer: Seabird; Model: SBE-21; Calibration: " +
+                            "Factory calibration; Manufacturer's resolution is taken as precision. Maintained by ship.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
+        {
+            Element var = variables.get(7);
+            assertEquals("SAL_permil", docHandler.getElementText(var, abbrev));
+            assertEquals("Sea surface salinity on Practical Salinity Scale (permil)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.005 permil", docHandler.getElementText(var, uncertainty));
+            assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
+                            "Resolution/Precision: 0.0002 permil",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("Salinity Sensor: Manufacturer: Seabird; Model: SBE-45; Calibration: Factory " +
+                            "calibration.; Manufacturer's resolution is taken as precision.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
 
-        var = variables.get(12);
-        assertEquals("QC_SUBFLAG", docHandler.getElementText(var, abbrev));
-        assertEquals("Quality control subflag for fCO2 values, provides explanation when QC flag=3",
-                docHandler.getElementText(var, fullname));
-        assertEquals("", docHandler.getElementText(var, unit));
-        assertEquals("", docHandler.getElementText(var, flag));
-        assertEquals("", docHandler.getElementText(var, uncertainty));
-        assertEquals("", docHandler.getElementText(var, detailedInfo));
-        assertEquals("", docHandler.getElementText(var, observationType));
-        assertEquals("", docHandler.getElementText(var, insitu));
-        assertEquals("", docHandler.getElementText(var, measured));
-        assertEquals("", docHandler.getElementText(var, calcMethod));
-        assertEquals("", docHandler.getElementText(var, samplingInstrument));
-        assertEquals("", docHandler.getElementText(var, analyzingInstrument));
-        assertEquals("", docHandler.getElementText(var, duration));
-        assertEquals("", docHandler.getElementText(var, replicate));
-        assertEquals("", docHandler.getElementText(var, methodReference));
-        assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
-        assertEquals("", docHandler.getElementText(var, equilibratorType));
-        assertEquals("", docHandler.getElementText(var, equilibratorVolume));
-        assertEquals("", docHandler.getElementText(var, equilibratorVented));
-        assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
-        assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
-        assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
-        assertEquals("", docHandler.getElementText(var, dryMethod));
-        assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
-        assertEquals("", docHandler.getElementText(var, gasDetectorModel));
-        assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
-        assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
-        assertEquals("", docHandler.getElementText(var, standardizationDescription));
-        assertEquals("", docHandler.getElementText(var, standardizationFrequency));
-        assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
-        assertEquals(0, docHandler.getElementList(var, standardGas).size());
-        assertEquals("", docHandler.getElementText(var, seawatervol));
-        assertEquals("", docHandler.getElementText(var, headspacevol));
-        assertEquals("", docHandler.getElementText(var, temperatureMeasure));
-        assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
-        assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
-        assertEquals("", docHandler.getElementText(var, temperatureCorrection));
-        assertEquals("", docHandler.getElementText(var, researcherName));
-        assertEquals("", docHandler.getElementText(var, researcherInstitution));
-        assertEquals("", docHandler.getElementText(var, internal));
+        {
+            Element var = variables.get(8);
+            assertEquals("fCO2_SW@SST_uatm", docHandler.getElementText(var, abbrev));
+            assertEquals("Fugacity of CO2 in sea water at SST and 100% humidity (microatmospheres)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
+            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+                            "Frequency: Every 150 seconds",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+            assertEquals("Equilibrator: Primary equlibrator is vented through a secondary equilibrator",
+                    docHandler.getElementText(var, samplingInstrument));
+            assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                            "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                            "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                            "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                            "are used to set the zero and span of the LI-COR analyzer.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    docHandler.getElementText(var, methodReference));
+            assertEquals("Bow", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("Sprayhead above dynamic pool, with thermal jacket",
+                    docHandler.getElementText(var, equilibratorType));
+            assertEquals("0.95 L (0.4 L water, 0.55 L headspace)", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            List<Element> elemList = docHandler.getElementList(var, standardGas);
+            assertEquals(0, elemList.size());
+            // assertEquals(4, elemList.size());
+            for (Element stdgas : elemList) {
+                assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
+                assertEquals("", docHandler.getElementText(stdgas, standardGasManufacturer));
+                assertEquals("", docHandler.getElementText(stdgas, standardGasConcentration));
+                assertEquals("", docHandler.getElementText(stdgas, standardGasUncertainty));
+            }
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("4", docHandler.getElementText(var, internal));
+        }
+
+        {
+            Element var = variables.get(9);
+            assertEquals("fCO2_ATM_interpolated_uatm", docHandler.getElementText(var, abbrev));
+            assertEquals("Fugacity of CO2 in air corresponding to the interpolated xCO2 at SST " +
+                            "and 100% humidity (microatmospheres)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
+                            "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
+                            "Sampling location: Bow tower ~10 m above the sea surface.\n" +
+                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Measurement: Yes, 5 readings in a group every 3.25 hours.",
+                    docHandler.getElementText(var, detailedInfo));
+            assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
+            assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
+            assertEquals("Infrared absorption of dry sample gas.", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("CO2 Sensor: Manufacturer: LI-COR; Model: LI-6262; Calibration: The analyzer is " +
+                            "calibrated every 3.25 hours with standards from ESRL in Boulder, CO that are directly " +
+                            "traceable to the WMO scale.  The zero gas is 99.9% nitrogen.; The instrument is located " +
+                            "in an air-conditioned laboratory.  99.9% Nitrogen gas and the high standard (Std 4) " +
+                            "are used to set the zero and span of the LI-COR analyzer.",
+                    docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("0", docHandler.getElementText(var, internal));
+        }
+
+        {
+            Element var = variables.get(10);
+            assertEquals("dfCO2_uatm", docHandler.getElementText(var, abbrev));
+            assertEquals("Sea water fCO2 minus interpolated air fCO2 (microatmospheres)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("", docHandler.getElementText(var, uncertainty));
+            assertEquals("", docHandler.getElementText(var, detailedInfo));
+            assertEquals("", docHandler.getElementText(var, observationType));
+            assertEquals("", docHandler.getElementText(var, insitu));
+            assertEquals("", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("", docHandler.getElementText(var, internal));
+        }
+
+        {
+            Element var = variables.get(11);
+            assertEquals("WOCE_QC_FLAG", docHandler.getElementText(var, abbrev));
+            assertEquals("Quality control flag for fCO2 values (2=good, 3=questionable)",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("", docHandler.getElementText(var, uncertainty));
+            assertEquals("", docHandler.getElementText(var, detailedInfo));
+            assertEquals("", docHandler.getElementText(var, observationType));
+            assertEquals("", docHandler.getElementText(var, insitu));
+            assertEquals("", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("", docHandler.getElementText(var, internal));
+        }
+
+        {
+            Element var = variables.get(12);
+            assertEquals("QC_SUBFLAG", docHandler.getElementText(var, abbrev));
+            assertEquals("Quality control subflag for fCO2 values, provides explanation when QC flag=3",
+                    docHandler.getElementText(var, fullname));
+            assertEquals("", docHandler.getElementText(var, unit));
+            assertEquals("", docHandler.getElementText(var, flag));
+            assertEquals("", docHandler.getElementText(var, uncertainty));
+            assertEquals("", docHandler.getElementText(var, detailedInfo));
+            assertEquals("", docHandler.getElementText(var, observationType));
+            assertEquals("", docHandler.getElementText(var, insitu));
+            assertEquals("", docHandler.getElementText(var, measured));
+            assertEquals("", docHandler.getElementText(var, calcMethod));
+            assertEquals("", docHandler.getElementText(var, samplingInstrument));
+            assertEquals("", docHandler.getElementText(var, analyzingInstrument));
+            assertEquals("", docHandler.getElementText(var, duration));
+            assertEquals("", docHandler.getElementText(var, replicate));
+            assertEquals("", docHandler.getElementText(var, methodReference));
+            assertEquals("", docHandler.getElementText(var, locationSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, depthSeawaterIntake));
+            assertEquals("", docHandler.getElementText(var, equilibratorType));
+            assertEquals("", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("", docHandler.getElementText(var, equilibratorVented));
+            assertEquals("", docHandler.getElementText(var, equilibratorWaterFlowRate));
+            assertEquals("", docHandler.getElementText(var, equilibratorGasFlowRate));
+            assertEquals("", docHandler.getElementText(var, temperatureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, pressureEquilibratorMethod));
+            assertEquals("", docHandler.getElementText(var, dryMethod));
+            assertEquals("", docHandler.getElementText(var, gasDetectorManufacturer));
+            assertEquals("", docHandler.getElementText(var, gasDetectorModel));
+            assertEquals("", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("", docHandler.getElementText(var, standardizationDescription));
+            assertEquals("", docHandler.getElementText(var, standardizationFrequency));
+            assertEquals("", docHandler.getElementText(var, standardizationTemperatureStd));
+            assertEquals(0, docHandler.getElementList(var, standardGas).size());
+            assertEquals("", docHandler.getElementText(var, seawatervol));
+            assertEquals("", docHandler.getElementText(var, headspacevol));
+            assertEquals("", docHandler.getElementText(var, temperatureMeasure));
+            assertEquals("", docHandler.getElementText(var, waterVaporCorrection));
+            assertEquals("", docHandler.getElementText(var, co2ReportTemperature));
+            assertEquals("", docHandler.getElementText(var, temperatureCorrection));
+            assertEquals("", docHandler.getElementText(var, researcherName));
+            assertEquals("", docHandler.getElementText(var, researcherInstitution));
+            assertEquals("", docHandler.getElementText(var, internal));
+        }
 
     }
 

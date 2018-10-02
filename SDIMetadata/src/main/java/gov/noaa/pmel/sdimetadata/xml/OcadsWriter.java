@@ -5,6 +5,7 @@ import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
 import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Person;
@@ -264,13 +265,12 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, WEBSITE_ELEMENT_NAME, info.getWebsite());
         setElementText(null, DOWNLOAD_URL_ELEMENT_NAME, info.getDownloadUrl());
 
-        ArrayList<Sampler> samplers = mdata.getSamplers();
-        ArrayList<Analyzer> sensors = mdata.getAnalyzers();
+        ArrayList<Instrument> instruments = mdata.getInstruments();
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
             if ( var instanceof DataVar )
-                addDataVariableAddnFields(ancestor, (DataVar) var, samplers, sensors);
+                addDataVariableAddnFields(ancestor, (DataVar) var, instruments);
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -387,13 +387,10 @@ public class OcadsWriter extends DocumentHandler {
      *         add under this element
      * @param var
      *         use the information given in this data variable
-     * @param samplers
-     *         list of samplers used in this dataset
-     * @param sensors
-     *         list of analyzers used in this dataset
+     * @param instruments
+     *         list of instruments used in this dataset
      */
-    private void addDataVariableAddnFields(Element ancestor, DataVar var,
-            ArrayList<Sampler> samplers, ArrayList<Analyzer> sensors) {
+    private void addDataVariableAddnFields(Element ancestor, DataVar var, ArrayList<Instrument> instruments) {
         setElementText(ancestor, VARIABLE_OBS_TYPE_ELEMENT_NAME, var.getObserveType());
         switch ( var.getMeasureMethod() ) {
             case MEASURED_INSITU:
@@ -413,20 +410,15 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_CALC_METHOD_ELEMENT_NAME, var.getMethodDescription());
         setElementText(ancestor, VARIABLE_METHOD_REFERENCE_ELEMENT_NAME, var.getMethodReference());
 
-        HashSet<String> strSet = var.getSamplerNames();
+        HashSet<String> strSet = var.getInstrumentNames();
         if ( !strSet.isEmpty() ) {
-            for (Sampler inst : samplers) {
+            for (Instrument inst : instruments) {
                 if ( !strSet.contains(inst.getName()) )
                     continue;
-                addSamplerElements(ancestor, var, inst);
-            }
-        }
-        strSet = var.getAnalyzerNames();
-        if ( !strSet.isEmpty() ) {
-            for (Analyzer inst : sensors) {
-                if ( !strSet.contains(inst.getName()) )
-                    continue;
-                addAnalyzerElements(ancestor, var, inst);
+                if ( inst instanceof Sampler )
+                    addSamplerElements(ancestor, var, (Sampler) inst);
+                else if ( inst instanceof Analyzer )
+                    addAnalyzerElements(ancestor, var, (Analyzer) inst);
             }
         }
 

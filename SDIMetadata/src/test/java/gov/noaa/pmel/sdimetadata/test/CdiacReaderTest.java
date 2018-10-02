@@ -7,6 +7,7 @@ import gov.noaa.pmel.sdimetadata.instrument.Analyzer;
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.instrument.PressureSensor;
 import gov.noaa.pmel.sdimetadata.instrument.SalinitySensor;
 import gov.noaa.pmel.sdimetadata.instrument.Sampler;
@@ -183,570 +184,613 @@ public class CdiacReaderTest {
         assertEquals(coverage.toString(), Coverage.WGS84, coverage.getSpatialReference());
         assertEquals(coverage.toString(), 0, coverage.getGeographicNames().size());
 
-        ArrayList<Sampler> samplers = mdata.getSamplers();
-        assertEquals(samplers.toString(), 1, samplers.size());
-        Sampler inst = samplers.get(0);
-        assertEquals(inst.toString(), "Equilibrator", inst.getName());
-        assertEquals(inst.toString(), "", inst.getId());
-        assertEquals(inst.toString(), "", inst.getManufacturer());
-        assertEquals(inst.toString(), "", inst.getModel());
-        strList = inst.getAddnInfo();
-        assertEquals(inst.toString(), 1, strList.size());
-        assertEquals(inst.toString(), "Primary equlibrator is vented through a secondary equilibrator", strList.get(0));
+        ArrayList<Instrument> instruments = mdata.getInstruments();
+        assertEquals(instruments.toString(), 8, instruments.size());
 
-        assertTrue(inst instanceof Equilibrator);
-        Equilibrator equilibrator = (Equilibrator) inst;
-        assertEquals(equilibrator.toString(), "Sprayhead above dynamic pool, with thermal jacket",
-                equilibrator.getEquilibratorType());
-        assertEquals(equilibrator.toString(), "0.95 L (0.4 L water, 0.55 L headspace)", equilibrator.getChamberVol());
-        assertEquals(equilibrator.toString(), "", equilibrator.getChamberWaterVol());
-        assertEquals(equilibrator.toString(), "", equilibrator.getChamberGasVol());
-        assertEquals(equilibrator.toString(), "1.5 - 2.0 L/min", equilibrator.getWaterFlowRate());
-        assertEquals(equilibrator.toString(), "70 - 150 ml/min", equilibrator.getGasFlowRate());
-        assertEquals(equilibrator.toString(), "Yes", equilibrator.getVenting());
+        {
+            Instrument inst = instruments.get(0);
+            assertEquals(inst.toString(), "Equilibrator", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "", inst.getManufacturer());
+            assertEquals(inst.toString(), "", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Primary equlibrator is vented through a secondary equilibrator",
+                    strList.get(0));
 
-        ArrayList<Analyzer> analyzers = mdata.getAnalyzers();
-        assertEquals(analyzers.toString(), 7, analyzers.size());
+            assertTrue(inst instanceof Sampler);
 
-        Analyzer sensor = analyzers.get(0);
-        assertEquals(sensor.toString(), "CO2 Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "LI-COR", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "LI-6262", sensor.getModel());
-        assertEquals(sensor.toString(), "The analyzer is calibrated every 3.25 hours with standards from ESRL " +
-                        "in Boulder, CO that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
-                sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "The instrument is located in an air-conditioned laboratory.  " +
-                "99.9% Nitrogen gas and the high standard (Std 4) are used to set the zero and span " +
-                "of the LI-COR analyzer.", strList.get(0));
-
-        assertTrue(sensor instanceof GasSensor);
-        GasSensor gasSensor = (GasSensor) sensor;
-        assertEquals(sensor.toString(), "", gasSensor.getCalibrationFrequency());
-        ArrayList<CalibrationGas> gasList = gasSensor.getCalibrationGases();
-        assertEquals(sensor.toString(), 4, gasList.size());
-        for (int k = 0; k < 4; k++) {
-            CalibrationGas gas = gasList.get(k);
-            assertEquals(gas.toString(), "Calibration gas " + Integer.toString(k + 1) + " mentioned in: " +
-                    "ESRL in Boulder, CO.\r  " +
-                    "Std 1: CA04957, 282.55 ppm; Std 2: CC105863, 380.22 ppm; " +
-                    "Std 3: CB09696, 453.04 ppm; Std 4: CB09032, 539.38 ppm", gas.getId());
-            assertEquals(gas.toString(), "CO2", gas.getType());
-            assertEquals(gas.toString(), "", gas.getSupplier());
-            assertEquals(gas.toString(), new NumericString(null, CalibrationGas.GAS_CONCENTRATION_UNIT),
-                    gas.getConcentration());
-            assertEquals(gas.toString(), new NumericString(null, CalibrationGas.GAS_CONCENTRATION_UNIT),
-                    gas.getAccuracy());
+            assertTrue(inst instanceof Equilibrator);
+            Equilibrator equilibrator = (Equilibrator) inst;
+            assertEquals(equilibrator.toString(), "Sprayhead above dynamic pool, with thermal jacket",
+                    equilibrator.getEquilibratorType());
+            assertEquals(equilibrator.toString(), "0.95 L (0.4 L water, 0.55 L headspace)",
+                    equilibrator.getChamberVol());
+            assertEquals(equilibrator.toString(), "", equilibrator.getChamberWaterVol());
+            assertEquals(equilibrator.toString(), "", equilibrator.getChamberGasVol());
+            assertEquals(equilibrator.toString(), "1.5 - 2.0 L/min", equilibrator.getWaterFlowRate());
+            assertEquals(equilibrator.toString(), "70 - 150 ml/min", equilibrator.getGasFlowRate());
+            assertEquals(equilibrator.toString(), "Yes", equilibrator.getVenting());
         }
 
-        sensor = analyzers.get(1);
-        assertEquals(sensor.toString(), "Water Temperature Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Seabird", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "SBE-21", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "Manufacturer's resolution is taken as precision. Maintained by ship.",
-                strList.get(0));
-        assertTrue(sensor instanceof TemperatureSensor);
+        {
+            Instrument inst = instruments.get(1);
+            assertEquals(inst.toString(), "CO2 Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "LI-COR", inst.getManufacturer());
+            assertEquals(inst.toString(), "LI-6262", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "The instrument is located in an air-conditioned laboratory.  " +
+                    "99.9% Nitrogen gas and the high standard (Std 4) are used to set the zero and span " +
+                    "of the LI-COR analyzer.", strList.get(0));
 
-        sensor = analyzers.get(2);
-        assertEquals(sensor.toString(), "Equilibrator Temperature Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Hart", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "1521", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "Warming: 0.1 - 0.6 °C", strList.get(0));
-        assertTrue(sensor instanceof TemperatureSensor);
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(inst.toString(), "The analyzer is calibrated every 3.25 hours with standards from ESRL " +
+                            "in Boulder, CO that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
+                    sensor.getCalibration());
 
-        sensor = analyzers.get(3);
-        assertEquals(sensor.toString(), "Atmospheric Pressure Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Vaisala", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "PTB330", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "Manufacturer's resolution is taken as precision. Maintained by ship.",
-                strList.get(0));
-        assertTrue(sensor instanceof PressureSensor);
+            assertTrue(sensor instanceof GasSensor);
+            GasSensor gasSensor = (GasSensor) sensor;
+            assertEquals(gasSensor.toString(), "", gasSensor.getCalibrationFrequency());
+            ArrayList<CalibrationGas> gasList = gasSensor.getCalibrationGases();
+            assertEquals(gasSensor.toString(), 4, gasList.size());
+            for (int k = 0; k < 4; k++) {
+                CalibrationGas gas = gasList.get(k);
+                assertEquals(gas.toString(), "Calibration gas " + Integer.toString(k + 1) + " mentioned in: " +
+                        "ESRL in Boulder, CO.\r  " +
+                        "Std 1: CA04957, 282.55 ppm; Std 2: CC105863, 380.22 ppm; " +
+                        "Std 3: CB09696, 453.04 ppm; Std 4: CB09032, 539.38 ppm", gas.getId());
+                assertEquals(gas.toString(), "CO2", gas.getType());
+                assertEquals(gas.toString(), "", gas.getSupplier());
+                assertEquals(gas.toString(), new NumericString(null, CalibrationGas.GAS_CONCENTRATION_UNIT),
+                        gas.getConcentration());
+                assertEquals(gas.toString(), new NumericString(null, CalibrationGas.GAS_CONCENTRATION_UNIT),
+                        gas.getAccuracy());
+            }
+        }
 
-        sensor = analyzers.get(4);
-        assertEquals(sensor.toString(), "Equilibrator Pressure Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Setra", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "270", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration.", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "Pressure reading from the Setra-270 on the exit of the analyzer was added " +
-                "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
-                "to yield the equlibrator pressure.", strList.get(0));
-        assertTrue(sensor instanceof PressureSensor);
+        {
+            Instrument inst = instruments.get(2);
+            assertEquals(inst.toString(), "Water Temperature Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Seabird", inst.getManufacturer());
+            assertEquals(inst.toString(), "SBE-21", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Manufacturer's resolution is taken as precision. Maintained by ship.",
+                    strList.get(0));
 
-        sensor = analyzers.get(5);
-        assertEquals(sensor.toString(), "Salinity Sensor", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Seabird", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "SBE-45", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration.", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 1, strList.size());
-        assertEquals(sensor.toString(), "Manufacturer's resolution is taken as precision.", strList.get(0));
-        assertTrue(sensor instanceof SalinitySensor);
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
 
-        sensor = analyzers.get(6);
-        assertEquals(sensor.toString(), "Other Sensor 1", sensor.getName());
-        assertEquals(sensor.toString(), "", sensor.getId());
-        assertEquals(sensor.toString(), "Setra", sensor.getManufacturer());
-        assertEquals(sensor.toString(), "239", sensor.getModel());
-        assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
-        strList = sensor.getAddnInfo();
-        assertEquals(sensor.toString(), 4, strList.size());
-        assertEquals(sensor.toString(), "Location: Attached to equilibrator headspace", strList.get(0));
-        assertEquals(sensor.toString(), "Accuracy/Uncertainty: ± 0.052 hPa", strList.get(1));
-        assertEquals(sensor.toString(), "Precision/Resolution: 0.01 hPa", strList.get(2));
-        assertEquals(sensor.toString(), "Pressure reading from the Setra-270 on the exit of the analyzer was added " +
-                "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
-                "to yield the equlibrator pressure.", strList.get(3));
+            assertTrue(sensor instanceof TemperatureSensor);
+        }
+
+        {
+            Instrument inst = instruments.get(3);
+            assertEquals(inst.toString(), "Equilibrator Temperature Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Hart", inst.getManufacturer());
+            assertEquals(inst.toString(), "1521", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Warming: 0.1 - 0.6 °C", strList.get(0));
+
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
+
+            assertTrue(sensor instanceof TemperatureSensor);
+        }
+
+        {
+            Instrument inst = instruments.get(4);
+            assertEquals(inst.toString(), "Atmospheric Pressure Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Vaisala", inst.getManufacturer());
+            assertEquals(inst.toString(), "PTB330", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Manufacturer's resolution is taken as precision. Maintained by ship.",
+                    strList.get(0));
+
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
+
+            assertTrue(sensor instanceof PressureSensor);
+        }
+
+        {
+            Instrument inst = instruments.get(5);
+            assertEquals(inst.toString(), "Equilibrator Pressure Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Setra", inst.getManufacturer());
+            assertEquals(inst.toString(), "270", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Pressure reading from the Setra-270 on the exit of the analyzer was added " +
+                    "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                    "to yield the equlibrator pressure.", strList.get(0));
+
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration.", sensor.getCalibration());
+
+            assertTrue(sensor instanceof PressureSensor);
+        }
+
+        {
+            Instrument inst = instruments.get(6);
+            assertEquals(inst.toString(), "Salinity Sensor", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Seabird", inst.getManufacturer());
+            assertEquals(inst.toString(), "SBE-45", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 1, strList.size());
+            assertEquals(inst.toString(), "Manufacturer's resolution is taken as precision.", strList.get(0));
+
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration.", sensor.getCalibration());
+
+            assertTrue(sensor instanceof SalinitySensor);
+        }
+
+        {
+            Instrument inst = instruments.get(7);
+            assertEquals(inst.toString(), "Other Sensor 1", inst.getName());
+            assertEquals(inst.toString(), "", inst.getId());
+            assertEquals(inst.toString(), "Setra", inst.getManufacturer());
+            assertEquals(inst.toString(), "239", inst.getModel());
+            strList = inst.getAddnInfo();
+            assertEquals(inst.toString(), 4, strList.size());
+            assertEquals(inst.toString(), "Location: Attached to equilibrator headspace", strList.get(0));
+            assertEquals(inst.toString(), "Accuracy/Uncertainty: ± 0.052 hPa", strList.get(1));
+            assertEquals(inst.toString(), "Precision/Resolution: 0.01 hPa", strList.get(2));
+            assertEquals(inst.toString(), "Pressure reading from the Setra-270 on the exit of the analyzer was added " +
+                    "to the differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                    "to yield the equlibrator pressure.", strList.get(3));
+
+            assertTrue(inst instanceof Analyzer);
+            Analyzer sensor = (Analyzer) inst;
+            assertEquals(sensor.toString(), "Factory calibration", sensor.getCalibration());
+        }
 
         ArrayList<Variable> variables = mdata.getVariables();
         assertEquals(variables.toString(), 13, variables.size());
 
-        Variable var;
-        DataVar dataVar;
-        AirPressure pressure;
-        GasConc gasConc;
-        AquGasConc aquGasConc;
+        {
+            Variable var = variables.get(0);
+            assertEquals(var.toString(), "xCO2_EQU_ppm", var.getColName());
+            assertEquals(var.toString(), "Mole fraction of CO2 in the equilibrator headspace (dry) " +
+                    "at equilibrator temperature (ppm)", var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
+            strList = var.getAddnInfo();
+            assertEquals(var.toString(), 1, strList.size());
+            assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(),
+                    "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 2, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
+            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) dataVar;
+            assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    gasConc.getDryingMethod());
+            assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+
+            assertTrue(gasConc instanceof AquGasConc);
+            AquGasConc aquGasConc = (AquGasConc) gasConc;
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
+        }
+
+        {
+            Variable var = variables.get(1);
+            assertEquals(var.toString(), "xCO2_ATM_ppm", var.getColName());
+            assertEquals(var.toString(), "Mole fraction of CO2 measured in dry outside air (ppm)", var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
+            strList = var.getAddnInfo();
+            assertEquals(var.toString(), 1, strList.size());
+            assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(),
+                    "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) dataVar;
+            assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    gasConc.getDryingMethod());
+            assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+
+            assertFalse(gasConc instanceof AquGasConc);
+        }
+
+        {
+            Variable var = variables.get(2);
+            assertEquals(var.toString(), "xCO2_ATM_interpolated_ppm", var.getColName());
+            assertEquals(var.toString(), "Mole fraction of CO2 in outside air associated with each water analysis.  " +
+                            "These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
+            strList = var.getAddnInfo();
+            assertEquals(var.toString(), 1, strList.size());
+            assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(),
+                    "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) dataVar;
+            assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    gasConc.getDryingMethod());
+            assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+
+            assertFalse(var instanceof AquGasConc);
+        }
+
+        {
+            Variable var = variables.get(3);
+            assertEquals(var.toString(), "PRES_EQU_hPa", var.getColName());
+            assertEquals(var.toString(), "Barometric pressure in the equilibrator headspace (hectopascals)",
+                    var.getFullName());
+            assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.05", "hPa"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.015", "hPa"), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Attached to CO2 analyzer exit to lab.", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Equilibrator Pressure Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof AirPressure);
+            AirPressure pressure = (AirPressure) dataVar;
+            assertEquals(pressure.toString(), "", pressure.getPressureCorrection());
+        }
+
+        {
+            Variable var = variables.get(4);
+            assertEquals(var.toString(), "PRES_ATM@SSP_hPa", var.getColName());
+            assertEquals(var.toString(), "Barometric pressure measured outside, corrected to sea level (hectopascals)",
+                    var.getFullName());
+            assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.2", "hPa"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.08", "hPa"), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(),
+                    "On bulkhead exterior on the port side of the radio room aft of the bridge " +
+                            "at ~14 m above the sea surface.", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Atmospheric Pressure Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof AirPressure);
+            AirPressure pressure = (AirPressure) dataVar;
+            assertEquals(pressure.toString(), "Normalized: yes", pressure.getPressureCorrection());
+        }
+
+        {
+            Variable var = variables.get(5);
+            assertEquals(var.toString(), "TEMP_EQU_C", var.getColName());
+            assertEquals(var.toString(), "Water temperature in equilibrator (degrees Celsius)", var.getFullName());
+            assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.025", "°C"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.",
+                    dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Equilibrator Temperature Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof Temperature);
+        }
+
+        {
+            Variable var = variables.get(6);
+            assertEquals(var.toString(), "SST_C", var.getColName());
+            assertEquals(var.toString(), "Sea surface temperature (degrees Celsius)", var.getFullName());
+            assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.001", "°C"), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow thruster room, before sea water pump, ~5 m below water line.",
+                    dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Water Temperature Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof Temperature);
+        }
+
+        {
+            Variable var = variables.get(7);
+            assertEquals(var.toString(), "SAL_permil", var.getColName());
+            assertEquals(var.toString(), "Sea surface salinity on Practical Salinity Scale (permil)",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.005 ", "permil"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.0002", "permil"), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Attached to underway system at sea water input.",
+                    dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Salinity Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertFalse(dataVar instanceof Temperature);
+            assertFalse(dataVar instanceof AirPressure);
+        }
+
+        {
+            Variable var = variables.get(8);
+            assertEquals(var.toString(), "fCO2_SW@SST_uatm", var.getColName());
+            assertEquals(var.toString(), "Fugacity of CO2 in sea water at SST and 100% humidity (microatmospheres)",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
+            strList = var.getAddnInfo();
+            assertEquals(var.toString(), 1, strList.size());
+            assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(),
+                    "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 2, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
+            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) dataVar;
+            assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    gasConc.getDryingMethod());
+            assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+
+            assertTrue(gasConc instanceof AquGasConc);
+            AquGasConc aquGasConc = (AquGasConc) gasConc;
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
+            assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
+        }
+
+        {
+            Variable var = variables.get(9);
+            assertEquals(var.toString(), "fCO2_ATM_interpolated_uatm", var.getColName());
+            assertEquals(var.toString(), "Fugacity of CO2 in air corresponding to the interpolated xCO2 " +
+                    "at SST and 100% humidity (microatmospheres)", var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
+            strList = var.getAddnInfo();
+            assertEquals(var.toString(), 1, strList.size());
+            assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof DataVar);
+            DataVar dataVar = (DataVar) var;
+            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
+            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
+            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
+            assertEquals(dataVar.toString(),
+                    "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
+                            "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
+                            "Recommendations for autonomous underway pCO2 measuring systems \n" +
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
+            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
+            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
+            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
+            assertEquals(dataVar.toString(), "", dataVar.getReplication());
+            HashSet<String> strSet = dataVar.getInstrumentNames();
+            assertEquals(dataVar.toString(), 1, strSet.size());
+            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+
+            assertTrue(dataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) dataVar;
+            assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
+                            "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
+                    gasConc.getDryingMethod());
+            assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+
+            assertFalse(gasConc instanceof AquGasConc);
+        }
 
 
-        var = variables.get(0);
-        assertEquals(var.toString(), "xCO2_EQU_ppm", var.getColName());
-        assertEquals(var.toString(), "Mole fraction of CO2 in the equilibrator headspace (dry) " +
-                "at equilibrator temperature (ppm)", var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
-        strList = var.getAddnInfo();
-        assertEquals(var.toString(), 1, strList.size());
-        assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
+        {
+            Variable var = variables.get(10);
+            assertEquals(var.toString(), "dfCO2_uatm", var.getColName());
+            assertEquals(var.toString(), "Sea water fCO2 minus interpolated air fCO2 (microatmospheres)",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        HashSet<String> strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+            assertFalse(var instanceof DataVar);
+        }
 
-        assertTrue(var instanceof GasConc);
-        gasConc = (GasConc) var;
-        assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                gasConc.getDryingMethod());
-        assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
+        {
+            Variable var = variables.get(11);
+            assertEquals(var.toString(), "WOCE_QC_FLAG", var.getColName());
+            assertEquals(var.toString(), "Quality control flag for fCO2 values (2=good, 3=questionable)",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-        assertTrue(var instanceof AquGasConc);
-        aquGasConc = (AquGasConc) var;
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
+            assertFalse(var instanceof DataVar);
+        }
 
+        {
+            Variable var = variables.get(12);
+            assertEquals(var.toString(), "QC_SUBFLAG", var.getColName());
+            assertEquals(var.toString(), "Quality control subflag for fCO2 values, provides explanation when QC flag=3",
+                    var.getFullName());
+            assertEquals(var.toString(), "", var.getVarUnit());
+            assertEquals(var.toString(), "", var.getMissVal());
+            assertEquals(var.toString(), "", var.getFlagColName());
+            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
+            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
+            assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-        var = variables.get(1);
-        assertEquals(var.toString(), "xCO2_ATM_ppm", var.getColName());
-        assertEquals(var.toString(), "Mole fraction of CO2 measured in dry outside air (ppm)", var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
-        strList = var.getAddnInfo();
-        assertEquals(var.toString(), 1, strList.size());
-        assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof GasConc);
-        gasConc = (GasConc) var;
-        assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                gasConc.getDryingMethod());
-        assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
-
-        assertFalse(var instanceof AquGasConc);
-
-
-        var = variables.get(2);
-        assertEquals(var.toString(), "xCO2_ATM_interpolated_ppm", var.getColName());
-        assertEquals(var.toString(), "Mole fraction of CO2 in outside air associated with each water analysis.  " +
-                        "These values are interpolated between the bracketing averaged good xCO2_ATM analyses (ppm)",
-                var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
-        strList = var.getAddnInfo();
-        assertEquals(var.toString(), 1, strList.size());
-        assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof GasConc);
-        gasConc = (GasConc) var;
-        assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                gasConc.getDryingMethod());
-        assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
-
-        assertFalse(var instanceof AquGasConc);
-
-
-        var = variables.get(3);
-        assertEquals(var.toString(), "PRES_EQU_hPa", var.getColName());
-        assertEquals(var.toString(), "Barometric pressure in the equilibrator headspace (hectopascals)",
-                var.getFullName());
-        assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.05", "hPa"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.015", "hPa"), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Attached to CO2 analyzer exit to lab.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Equilibrator Pressure Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof AirPressure);
-        pressure = (AirPressure) var;
-        assertEquals(pressure.toString(), "", pressure.getPressureCorrection());
-
-
-        var = variables.get(4);
-        assertEquals(var.toString(), "PRES_ATM@SSP_hPa", var.getColName());
-        assertEquals(var.toString(), "Barometric pressure measured outside, corrected to sea level (hectopascals)",
-                var.getFullName());
-        assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.2", "hPa"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.08", "hPa"), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "On bulkhead exterior on the port side of the radio room aft of the bridge " +
-                "at ~14 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strSet.size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Atmospheric Pressure Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof AirPressure);
-        pressure = (AirPressure) var;
-        assertEquals(pressure.toString(), "Normalized: yes", pressure.getPressureCorrection());
-
-
-        var = variables.get(5);
-        assertEquals(var.toString(), "TEMP_EQU_C", var.getColName());
-        assertEquals(var.toString(), "Water temperature in equilibrator (degrees Celsius)", var.getFullName());
-        assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.025", "°C"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strSet.size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Equilibrator Temperature Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof Temperature);
-
-
-        var = variables.get(6);
-        assertEquals(var.toString(), "SST_C", var.getColName());
-        assertEquals(var.toString(), "Sea surface temperature (degrees Celsius)", var.getFullName());
-        assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.001", "°C"), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow thruster room, before sea water pump, ~5 m below water line.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strSet.size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Water Temperature Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof Temperature);
-
-
-        var = variables.get(7);
-        assertEquals(var.toString(), "SAL_permil", var.getColName());
-        assertEquals(var.toString(), "Sea surface salinity on Practical Salinity Scale (permil)", var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.005 ", "permil"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.0002", "permil"), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Attached to underway system at sea water input.",
-                dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 0, strSet.size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Salinity Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertFalse(var instanceof Temperature);
-        assertFalse(var instanceof AirPressure);
-
-
-        var = variables.get(8);
-        assertEquals(var.toString(), "fCO2_SW@SST_uatm", var.getColName());
-        assertEquals(var.toString(), "Fugacity of CO2 in sea water at SST and 100% humidity (microatmospheres)",
-                var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
-        strList = var.getAddnInfo();
-        assertEquals(var.toString(), 1, strList.size());
-        assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        strSet = dataVar.getSamplerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof GasConc);
-        gasConc = (GasConc) var;
-        assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                gasConc.getDryingMethod());
-        assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
-
-        assertTrue(var instanceof AquGasConc);
-        aquGasConc = (AquGasConc) var;
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getReportTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getAnalysisTemperature());
-        assertEquals(aquGasConc.toString(), "", aquGasConc.getTemperatureCorrection());
-
-
-        var = variables.get(9);
-        assertEquals(var.toString(), "fCO2_ATM_interpolated_uatm", var.getColName());
-        assertEquals(var.toString(), "Fugacity of CO2 in air corresponding to the interpolated xCO2 " +
-                "at SST and 100% humidity (microatmospheres)", var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
-        strList = var.getAddnInfo();
-        assertEquals(var.toString(), 1, strList.size());
-        assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
-
-        assertTrue(var instanceof DataVar);
-        dataVar = (DataVar) var;
-        assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-        assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-        assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-        assertEquals(dataVar.toString(), "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
-                "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
-                "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-        assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-        assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-        assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-        assertEquals(dataVar.toString(), "", dataVar.getReplication());
-        assertEquals(dataVar.toString(), 0, dataVar.getSamplerNames().size());
-        strSet = dataVar.getAnalyzerNames();
-        assertEquals(dataVar.toString(), 1, strSet.size());
-        assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-        assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
-
-        assertTrue(var instanceof GasConc);
-        gasConc = (GasConc) var;
-        assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
-                        "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
-                gasConc.getDryingMethod());
-        assertEquals(gasConc.toString(), "", gasConc.getWaterVaporCorrection());
-
-        assertFalse(var instanceof AquGasConc);
-
-
-        var = variables.get(10);
-        assertEquals(var.toString(), "dfCO2_uatm", var.getColName());
-        assertEquals(var.toString(), "Sea water fCO2 minus interpolated air fCO2 (microatmospheres)",
-                var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertFalse(var instanceof DataVar);
-
-
-        var = variables.get(11);
-        assertEquals(var.toString(), "WOCE_QC_FLAG", var.getColName());
-        assertEquals(var.toString(), "Quality control flag for fCO2 values (2=good, 3=questionable)",
-                var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertFalse(var instanceof DataVar);
-
-
-        var = variables.get(12);
-        assertEquals(var.toString(), "QC_SUBFLAG", var.getColName());
-        assertEquals(var.toString(), "Quality control subflag for fCO2 values, provides explanation when QC flag=3",
-                var.getFullName());
-        assertEquals(var.toString(), "", var.getVarUnit());
-        assertEquals(var.toString(), "", var.getMissVal());
-        assertEquals(var.toString(), "", var.getFlagColName());
-        assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-        assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
-        assertEquals(var.toString(), 0, var.getAddnInfo().size());
-
-        assertFalse(var instanceof DataVar);
+            assertFalse(var instanceof DataVar);
+        }
 
     }
 

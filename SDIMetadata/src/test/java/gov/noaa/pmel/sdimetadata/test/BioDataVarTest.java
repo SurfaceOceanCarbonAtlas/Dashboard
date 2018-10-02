@@ -48,8 +48,7 @@ public class BioDataVarTest {
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
         assertEquals(BIOLOGICAL_SUBJECT, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -81,8 +80,7 @@ public class BioDataVarTest {
         var.setSpeciesId(SPECIES_ID);
         assertEquals(SPECIES_ID, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -115,8 +113,7 @@ public class BioDataVarTest {
         assertEquals(LIFE_STAGE, var.getLifeStage());
         assertEquals(EMPTY_STRING, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -154,10 +151,10 @@ public class BioDataVarTest {
         assertEquals(new HashSet<String>(Arrays.asList("measureMethod")), var.invalidFieldNames());
 
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
-        assertEquals(new HashSet<String>(Arrays.asList("analyzerNames")), var.invalidFieldNames());
-        var.setAnalyzerNames(ANALYZER_NAMES);
+        assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
+        var.setInstrumentNames(ANALYZER_NAMES);
         assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
-        var.setAnalyzerNames(null);
+        var.setInstrumentNames(null);
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
         var.setMethodDescription(METHOD_DESCRIPTION);
@@ -173,7 +170,7 @@ public class BioDataVarTest {
         var.setFlagColName(FLAG_COL_NAME);
 
         BioDataVar biovar = new BioDataVar(var);
-        assertEquals(EMPTY_HASHSET, biovar.getAnalyzerNames());
+        assertEquals(EMPTY_HASHSET, biovar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, biovar.getResearcher());
         assertEquals(EMPTY_STRING, biovar.getMethodReference());
         assertEquals(EMPTY_STRING, biovar.getMethodDescription());
@@ -190,10 +187,10 @@ public class BioDataVarTest {
         datavar.setMethodDescription(METHOD_DESCRIPTION);
         datavar.setMethodReference(METHOD_REFERENCE);
         datavar.setResearcher(RESEARCHER);
-        datavar.setAnalyzerNames(ANALYZER_NAMES);
+        datavar.setInstrumentNames(ANALYZER_NAMES);
 
         biovar = new BioDataVar(datavar);
-        assertEquals(ANALYZER_NAMES, biovar.getAnalyzerNames());
+        assertEquals(ANALYZER_NAMES, biovar.getInstrumentNames());
         assertEquals(RESEARCHER, biovar.getResearcher());
         assertEquals(METHOD_REFERENCE, biovar.getMethodReference());
         assertEquals(METHOD_DESCRIPTION, biovar.getMethodDescription());
@@ -226,7 +223,7 @@ public class BioDataVarTest {
         var.setMethodDescription(METHOD_DESCRIPTION);
         var.setMethodReference(METHOD_REFERENCE);
         var.setResearcher(RESEARCHER);
-        var.setAnalyzerNames(ANALYZER_NAMES);
+        var.setInstrumentNames(ANALYZER_NAMES);
 
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
         var.setSpeciesId(SPECIES_ID);
@@ -311,10 +308,10 @@ public class BioDataVarTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setAnalyzerNames(ANALYZER_NAMES);
+        first.setInstrumentNames(ANALYZER_NAMES);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setAnalyzerNames(ANALYZER_NAMES);
+        second.setInstrumentNames(ANALYZER_NAMES);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

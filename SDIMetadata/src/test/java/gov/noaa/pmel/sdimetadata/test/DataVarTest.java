@@ -48,8 +48,7 @@ public class DataVarTest {
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final HashSet<String> SAMPLER_NAMES = new HashSet<String>(Arrays.asList("Cooling intake"));
-    private static final HashSet<String> ANALYZER_NAMES = new HashSet<String>(Arrays.asList("Ship's SST sensor"));
+    private static final HashSet<String> INSTRUMENT_NAMES = new HashSet<String>(Arrays.asList("Ship's SST sensor"));
 
     @Test
     public void testGetSetColName() {
@@ -385,8 +384,7 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         assertEquals(MEASURE_TEMPERATURE, var.getAnalysisTemperature());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
@@ -467,14 +465,14 @@ public class DataVarTest {
     }
 
     @Test
-    public void testGetSetSamplerNames() {
+    public void testGetSetInstrumentNames() {
         DataVar var = new DataVar();
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
-        var.setSamplerNames(SAMPLER_NAMES);
-        HashSet<String> names = var.getSamplerNames();
-        assertEquals(SAMPLER_NAMES, names);
-        assertNotSame(SAMPLER_NAMES, names);
-        assertNotSame(names, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        var.setInstrumentNames(INSTRUMENT_NAMES);
+        HashSet<String> names = var.getInstrumentNames();
+        assertEquals(INSTRUMENT_NAMES, names);
+        assertNotSame(INSTRUMENT_NAMES, names);
+        assertNotSame(names, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -493,65 +491,19 @@ public class DataVarTest {
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
-        var.setSamplerNames(null);
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
-        var.setSamplerNames(EMPTY_ARRAYLIST);
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        var.setInstrumentNames(null);
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        var.setInstrumentNames(EMPTY_ARRAYLIST);
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         try {
-            var.setSamplerNames(Arrays.asList("something", null, "else"));
-            fail("calling setSamplerNames with a null string succeeded");
+            var.setInstrumentNames(Arrays.asList("something", null, "else"));
+            fail("calling setInstrumentNames with a null string succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            var.setSamplerNames(Arrays.asList("something", "\n", "else"));
-            fail("calling setSamplerNames with a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-    }
-
-    @Test
-    public void testGetSetAnalyzerNames() {
-        DataVar var = new DataVar();
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        var.setAnalyzerNames(ANALYZER_NAMES);
-        HashSet<String> names = var.getAnalyzerNames();
-        assertEquals(ANALYZER_NAMES, names);
-        assertNotSame(ANALYZER_NAMES, names);
-        assertNotSame(names, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
-        assertEquals(EMPTY_STRING, var.getReplication());
-        assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
-        assertEquals(EMPTY_STRING, var.getStorageMethod());
-        assertEquals(EMPTY_STRING, var.getSamplingElevation());
-        assertEquals(EMPTY_STRING, var.getSamplingLocation());
-        assertEquals(EMPTY_STRING, var.getMethodReference());
-        assertEquals(EMPTY_STRING, var.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
-        assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
-        assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
-        assertEquals(EMPTY_STRING, var.getFullName());
-        assertEquals(EMPTY_STRING, var.getColName());
-        var.setAnalyzerNames(null);
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        var.setAnalyzerNames(EMPTY_ARRAYLIST);
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        try {
-            var.setAnalyzerNames(Arrays.asList("something", null, "else"));
-            fail("calling setAnalyzerNames with a null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAnalyzerNames(Arrays.asList("something", "\n", "else"));
-            fail("calling setAnalyzerNames with a blank string succeeded");
+            var.setInstrumentNames(Arrays.asList("something", "\n", "else"));
+            fail("calling setInstrumentNames with a blank string succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
@@ -570,8 +522,7 @@ public class DataVarTest {
         var.setAddnInfo(ADDN_INFO);
 
         DataVar dataVar = new DataVar(var);
-        assertEquals(EMPTY_HASHSET, dataVar.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, dataVar.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, dataVar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, dataVar.getResearcher());
         assertEquals(EMPTY_STRING, dataVar.getReplication());
         assertEquals(EMPTY_STRING, dataVar.getAnalysisTemperature());
@@ -609,13 +560,10 @@ public class DataVarTest {
         assertEquals(new HashSet<String>(Arrays.asList("measureMethod")), var.invalidFieldNames());
 
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
-        assertEquals(new HashSet<String>(Arrays.asList("samplerNames", "analyzerNames")), var.invalidFieldNames());
-        var.setSamplerNames(SAMPLER_NAMES);
+        assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
+        var.setInstrumentNames(INSTRUMENT_NAMES);
         assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
-        var.setSamplerNames(null);
-        var.setAnalyzerNames(ANALYZER_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
-        var.setAnalyzerNames(null);
+        var.setInstrumentNames(null);
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
         var.setMethodDescription(METHOD_DESCRIPTION);
@@ -648,8 +596,7 @@ public class DataVarTest {
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
         var.setResearcher(RESEARCHER);
-        var.setSamplerNames(SAMPLER_NAMES);
-        var.setAnalyzerNames(ANALYZER_NAMES);
+        var.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(var, dup);
 
         dup = var.clone();
@@ -659,8 +606,7 @@ public class DataVarTest {
         assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
         assertNotSame(var.getResearcher(), dup.getResearcher());
-        assertNotSame(var.getSamplerNames(), dup.getSamplerNames());
-        assertNotSame(var.getAnalyzerNames(), dup.getAnalyzerNames());
+        assertNotSame(var.getInstrumentNames(), dup.getInstrumentNames());
     }
 
     @Test
@@ -799,17 +745,10 @@ public class DataVarTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setSamplerNames(SAMPLER_NAMES);
+        first.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setSamplerNames(SAMPLER_NAMES);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setAnalyzerNames(ANALYZER_NAMES);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setAnalyzerNames(ANALYZER_NAMES);
+        second.setInstrumentNames(INSTRUMENT_NAMES);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }

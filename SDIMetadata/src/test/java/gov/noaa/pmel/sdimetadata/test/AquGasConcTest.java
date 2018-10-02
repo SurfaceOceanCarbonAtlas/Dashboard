@@ -46,8 +46,10 @@ public class AquGasConcTest {
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final ArrayList<String> SAMPLER_NAMES = new ArrayList<String>(Arrays.asList("Equilibrator"));
-    private static final ArrayList<String> ANALYZER_NAMES = new ArrayList<String>(Arrays.asList("Equilibrator LICOR"));
+    private static final ArrayList<String> INSTRUMENT_NAMES = new ArrayList<String>(Arrays.asList(
+            "Equilibrator",
+            "Equilibrator LICOR"
+    ));
 
     private static final String REPORT_TERMPERATURE = "SST";
     private static final String TEMPERATURE_CORRECTION = "Standard data reduction method";
@@ -62,8 +64,7 @@ public class AquGasConcTest {
         assertEquals(REPORT_TERMPERATURE, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -97,8 +98,7 @@ public class AquGasConcTest {
         assertEquals(EMPTY_STRING, var.getReportTemperature());
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getAnalyzerNames());
-        assertEquals(EMPTY_HASHSET, var.getSamplerNames());
+        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -149,15 +149,11 @@ public class AquGasConcTest {
         assertEquals(new HashSet<String>(Arrays.asList("measureMethod")), var.invalidFieldNames());
 
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
-        assertEquals(new HashSet<String>(Arrays.asList("samplerNames", "analyzerNames")), var.invalidFieldNames());
+        assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
 
-        var.setSamplerNames(SAMPLER_NAMES);
+        var.setInstrumentNames(INSTRUMENT_NAMES);
         assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
-        var.setSamplerNames(null);
-
-        var.setAnalyzerNames(ANALYZER_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
-        var.setAnalyzerNames(null);
+        var.setInstrumentNames(null);
 
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
@@ -192,8 +188,7 @@ public class AquGasConcTest {
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
         var.setResearcher(RESEARCHER);
-        var.setSamplerNames(SAMPLER_NAMES);
-        var.setAnalyzerNames(ANALYZER_NAMES);
+        var.setInstrumentNames(INSTRUMENT_NAMES);
 
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         var.setDryingMethod(DRYING_METHOD);
@@ -209,8 +204,7 @@ public class AquGasConcTest {
         assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
         assertNotSame(var.getResearcher(), dup.getResearcher());
-        assertNotSame(var.getSamplerNames(), dup.getSamplerNames());
-        assertNotSame(var.getAnalyzerNames(), dup.getAnalyzerNames());
+        assertNotSame(var.getInstrumentNames(), dup.getInstrumentNames());
     }
 
     @Test
@@ -349,17 +343,10 @@ public class AquGasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setSamplerNames(SAMPLER_NAMES);
+        first.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setSamplerNames(SAMPLER_NAMES);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setAnalyzerNames(ANALYZER_NAMES);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setAnalyzerNames(ANALYZER_NAMES);
+        second.setInstrumentNames(INSTRUMENT_NAMES);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

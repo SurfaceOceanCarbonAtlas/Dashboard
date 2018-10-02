@@ -54,8 +54,8 @@ public class BioDataVar extends DataVar implements Cloneable {
                     invalids.add("methodDescription");
                 break;
             default:
-                if ( analyzerNames.isEmpty() )
-                    invalids.add("analyzerNames");
+                if ( instrumentNames.isEmpty() )
+                    invalids.add("instrumentNames");
         }
         if ( speciesId.isEmpty() )
             invalids.add("speciesId");

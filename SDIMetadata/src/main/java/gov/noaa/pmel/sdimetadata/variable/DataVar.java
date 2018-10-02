@@ -19,8 +19,7 @@ public class DataVar extends Variable implements Cloneable {
     protected String analysisTemperature;
     protected String replication;
     protected Person researcher;
-    protected HashSet<String> samplerNames;
-    protected HashSet<String> analyzerNames;
+    protected HashSet<String> instrumentNames;
 
     /**
      * Create with all fields empty.
@@ -37,8 +36,7 @@ public class DataVar extends Variable implements Cloneable {
         analysisTemperature = "";
         replication = "";
         researcher = new Person();
-        samplerNames = new HashSet<String>();
-        analyzerNames = new HashSet<String>();
+        instrumentNames = new HashSet<String>();
     }
 
     /**
@@ -58,8 +56,7 @@ public class DataVar extends Variable implements Cloneable {
             analysisTemperature = other.analysisTemperature;
             replication = other.replication;
             researcher = other.researcher.clone();
-            samplerNames = new HashSet<String>(other.samplerNames);
-            analyzerNames = new HashSet<String>(other.analyzerNames);
+            instrumentNames = new HashSet<String>(other.instrumentNames);
         }
         else {
             observeType = "";
@@ -72,8 +69,7 @@ public class DataVar extends Variable implements Cloneable {
             analysisTemperature = "";
             replication = "";
             researcher = new Person();
-            samplerNames = new HashSet<String>();
-            analyzerNames = new HashSet<String>();
+            instrumentNames = new HashSet<String>();
         }
     }
 
@@ -97,10 +93,8 @@ public class DataVar extends Variable implements Cloneable {
                     invalid.add("methodDescription");
                 break;
             default:
-                if ( samplerNames.isEmpty() && analyzerNames.isEmpty() ) {
-                    invalid.add("samplerNames");
-                    invalid.add("analyzerNames");
-                }
+                if ( instrumentNames.isEmpty() )
+                    invalid.add("instrumentNames");
         }
         return invalid;
     }
@@ -263,61 +257,31 @@ public class DataVar extends Variable implements Cloneable {
     }
 
     /**
-     * @return the list of names of analyzers used to collect this variable; never null but may be empty.
+     * @return the list of names of instruments used to sample or analyze this variable; never null but may be empty.
      *         Any strings given are guaranteed to be strings with content (not blank).
      */
-    public HashSet<String> getSamplerNames() {
-        return new HashSet<String>(samplerNames);
+    public HashSet<String> getInstrumentNames() {
+        return new HashSet<String>(instrumentNames);
     }
 
     /**
-     * @param samplerNames
-     *         assign as the list of names of samplers used to collect this variable;
-     *         if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any sampler name given is null or blank
-     */
-    public void setSamplerNames(Iterable<String> samplerNames) throws IllegalArgumentException {
-        this.samplerNames.clear();
-        if ( samplerNames != null ) {
-            for (String name : samplerNames) {
-                if ( name == null )
-                    throw new IllegalArgumentException("null sampler name given");
-                name = name.trim();
-                if ( name.isEmpty() )
-                    throw new IllegalArgumentException("blank sampler name given");
-                this.samplerNames.add(name);
-            }
-        }
-    }
-
-    /**
-     * @return the list of names of analyzers used to measure this variable; never null but may be empty.
-     *         Any strings given are guaranteed to be strings with content (not blank).
-     */
-    public HashSet<String> getAnalyzerNames() {
-        return new HashSet<String>(analyzerNames);
-    }
-
-    /**
-     * @param analyzerNames
-     *         assign as the list of names of analyzers used to measure this variable;
+     * @param instrumentNames
+     *         assign as the list of names of instruments used to sample or analyze this variable;
      *         if null, an empty list is assigned
      *
      * @throws IllegalArgumentException
      *         if any analyzer name given is null or blank
      */
-    public void setAnalyzerNames(Iterable<String> analyzerNames) throws IllegalArgumentException {
-        this.analyzerNames.clear();
-        if ( analyzerNames != null ) {
-            for (String name : analyzerNames) {
+    public void setInstrumentNames(Iterable<String> instrumentNames) throws IllegalArgumentException {
+        this.instrumentNames.clear();
+        if ( instrumentNames != null ) {
+            for (String name : instrumentNames) {
                 if ( name == null )
-                    throw new IllegalArgumentException("null analyzer name given");
+                    throw new IllegalArgumentException("null instrument name given");
                 name = name.trim();
                 if ( name.isEmpty() )
-                    throw new IllegalArgumentException("blank analyzer name given");
-                this.analyzerNames.add(name);
+                    throw new IllegalArgumentException("blank instrument name given");
+                this.instrumentNames.add(name);
             }
         }
     }
@@ -335,8 +299,7 @@ public class DataVar extends Variable implements Cloneable {
         dup.analysisTemperature = analysisTemperature;
         dup.replication = replication;
         dup.researcher = researcher.clone();
-        dup.samplerNames = new HashSet<String>(samplerNames);
-        dup.analyzerNames = new HashSet<String>(analyzerNames);
+        dup.instrumentNames = new HashSet<String>(instrumentNames);
         return dup;
     }
 
@@ -373,9 +336,7 @@ public class DataVar extends Variable implements Cloneable {
             return false;
         if ( !researcher.equals(dataVar.researcher) )
             return false;
-        if ( !samplerNames.equals(dataVar.samplerNames) )
-            return false;
-        if ( !analyzerNames.equals(dataVar.analyzerNames) )
+        if ( !instrumentNames.equals(dataVar.instrumentNames) )
             return false;
 
         return true;
@@ -395,8 +356,7 @@ public class DataVar extends Variable implements Cloneable {
         result = result * prime + analysisTemperature.hashCode();
         result = result * prime + replication.hashCode();
         result = result * prime + researcher.hashCode();
-        result = result * prime + samplerNames.hashCode();
-        result = result * prime + analyzerNames.hashCode();
+        result = result * prime + instrumentNames.hashCode();
         return result;
     }
 
@@ -414,8 +374,7 @@ public class DataVar extends Variable implements Cloneable {
                 ", analysisTemperature='" + analysisTemperature + '\'' +
                 ", replication='" + replication + '\'' +
                 ", researcher=" + researcher +
-                ", samplerNames=" + samplerNames +
-                ", analyzerNames=" + analyzerNames +
+                ", instrumentNames=" + instrumentNames +
                 '}';
     }
 }
