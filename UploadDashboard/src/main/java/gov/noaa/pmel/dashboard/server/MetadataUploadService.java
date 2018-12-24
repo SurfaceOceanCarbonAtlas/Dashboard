@@ -231,7 +231,7 @@ public class MetadataUploadService extends HttpServlet {
                                 allRegionsArray.length + " values");
                     // Add the update flags to global, then all the regions
                     String allRegionIds = DashboardUtils.REGION_ID_GLOBAL + allRegionsArray[0];
-                    ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length() + 1);
+                    ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
                     for (int k = 0; k < allRegionIds.length(); k++) {
                         QCEvent qcEvent = new QCEvent();
                         qcEvent.setDatasetId(id);
