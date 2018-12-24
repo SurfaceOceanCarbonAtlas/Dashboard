@@ -312,6 +312,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 qcEvent.setVersion(version);
                 qcEvent.setUsername(username);
                 qcEvent.setComment(comment);
+                qcEventList.add(qcEvent);
             }
             try {
                 // Add the 'U' QC flag with the current upload version

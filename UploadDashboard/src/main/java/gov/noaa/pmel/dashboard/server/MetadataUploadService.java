@@ -241,6 +241,7 @@ public class MetadataUploadService extends HttpServlet {
                         qcEvent.setVersion(version);
                         qcEvent.setUsername(username);
                         qcEvent.setComment(comment);
+                        qcEventList.add(qcEvent);
                     }
                     try {
                         // Add the 'U' QC flags
