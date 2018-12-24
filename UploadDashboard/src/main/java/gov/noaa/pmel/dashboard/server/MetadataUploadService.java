@@ -211,6 +211,7 @@ public class MetadataUploadService extends HttpServlet {
 
                 // If the dataset is submitted (possibly even archived), add dataset QC indicating the change
                 if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
+                    Date now = new Date();
                     String comment;
                     if ( isOme )
                         comment = "Update of OME metadata.  ";
@@ -236,7 +237,7 @@ public class MetadataUploadService extends HttpServlet {
                         QCEvent qcEvent = new QCEvent();
                         qcEvent.setDatasetId(id);
                         qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
-                        qcEvent.setFlagDate(new Date());
+                        qcEvent.setFlagDate(now);
                         qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                         qcEvent.setVersion(version);
                         qcEvent.setUsername(username);

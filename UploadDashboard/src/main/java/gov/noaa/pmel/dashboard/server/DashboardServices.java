@@ -286,6 +286,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         // If the dataset is submitted (possibly even archived), add dataset QC indicating the change
         if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
             DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+            Date now = new Date();
             String version = configStore.getUploadVersion();
             String comment = "Deleted metadata file \"" + deleteFilename +
                     "\".  Data and WOCE flags were not changed.";
@@ -307,7 +308,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 QCEvent qcEvent = new QCEvent();
                 qcEvent.setDatasetId(datasetId);
                 qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
-                qcEvent.setFlagDate(new Date());
+                qcEvent.setFlagDate(now);
                 qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                 qcEvent.setVersion(version);
                 qcEvent.setUsername(username);
@@ -317,7 +318,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             try {
                 // Add the 'U' QC flag with the current upload version
                 configStore.getDatabaseRequestHandler().addDatasetQCEvents(qcEventList);
-                configStore.getDsgNcFileHandler().updateDatasetQCFlagAndVersion(qcEventList.get(0));
+                dsgHandler.updateDatasetQCFlagAndVersion(qcEventList.get(0));
                 // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 if ( dataset.isEditable() == null ) {
