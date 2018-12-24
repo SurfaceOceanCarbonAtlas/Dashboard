@@ -15,7 +15,6 @@
 
     <modules>
         <module>OmeMetadata</module>
-        <module>SDIMetadata</module>
         <module>UploadDashboard</module>
         <module>DashboardApps</module>
     </modules>
