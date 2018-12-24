@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
@@ -27,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -285,20 +285,38 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // If the dataset is submitted (possibly even archived), add dataset QC indicating the change
         if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
-            QCEvent qcEvent = new QCEvent();
-            qcEvent.setDatasetId(datasetId);
-            qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
-            qcEvent.setFlagDate(new Date());
-            qcEvent.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
-            qcEvent.setVersion(configStore.getUploadVersion());
-            qcEvent.setUsername(username);
+            DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+            String version = configStore.getUploadVersion();
             String comment = "Deleted metadata file \"" + deleteFilename +
                     "\".  Data and WOCE flags were not changed.";
-            qcEvent.setComment(comment);
+            String allRegionsArray[];
+            try {
+                allRegionsArray = dsgHandler.readStringVarDataValues(datasetId,
+                        DashboardServerUtils.ALL_REGION_IDS.getVarName());
+            } catch ( Exception ex ) {
+                throw new RuntimeException("Unexpect failure to read the DSG file variable " +
+                        DashboardServerUtils.ALL_REGION_IDS.getVarName());
+            }
+            if ( allRegionsArray.length != 1 )
+                throw new RuntimeException("Expected only one " + DashboardServerUtils.ALL_REGION_IDS.getVarName() +
+                        " value but got " + allRegionsArray.length + " values");
+            // Add the update flags to global, then all the regions
+            String allRegionIds = DashboardUtils.REGION_ID_GLOBAL + allRegionsArray[0];
+            ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length() + 1);
+            for (int k = 0; k < allRegionIds.length(); k++) {
+                QCEvent qcEvent = new QCEvent();
+                qcEvent.setDatasetId(datasetId);
+                qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
+                qcEvent.setFlagDate(new Date());
+                qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
+                qcEvent.setVersion(version);
+                qcEvent.setUsername(username);
+                qcEvent.setComment(comment);
+            }
             try {
                 // Add the 'U' QC flag with the current upload version
-                configStore.getDatabaseRequestHandler().addDatasetQCEvents(Arrays.asList(qcEvent));
-                configStore.getDsgNcFileHandler().updateDatasetQCFlagAndVersion(qcEvent);
+                configStore.getDatabaseRequestHandler().addDatasetQCEvents(qcEventList);
+                configStore.getDsgNcFileHandler().updateDatasetQCFlagAndVersion(qcEventList.get(0));
                 // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 if ( dataset.isEditable() == null ) {

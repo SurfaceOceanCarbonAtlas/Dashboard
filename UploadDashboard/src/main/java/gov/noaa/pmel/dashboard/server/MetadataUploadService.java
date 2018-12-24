@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -211,24 +211,41 @@ public class MetadataUploadService extends HttpServlet {
 
                 // If the dataset is submitted (possibly even archived), add dataset QC indicating the change
                 if ( !Boolean.TRUE.equals(dataset.isEditable()) ) {
-                    QCEvent qcEvent = new QCEvent();
-                    qcEvent.setDatasetId(id);
-                    qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
-                    qcEvent.setFlagDate(new Date());
-                    qcEvent.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
-                    qcEvent.setVersion(version);
-                    qcEvent.setUsername(username);
                     String comment;
                     if ( isOme )
                         comment = "Update of OME metadata.  ";
                     else
                         comment = "Update of metadata file \"" + uploadFilename + "\".  ";
                     comment += "Data and WOCE flags were not changed.";
-                    qcEvent.setComment(comment);
+                    String allRegionsArray[];
                     try {
-                        // Add the 'U' QC flag
-                        databaseHandler.addDatasetQCEvents(Arrays.asList(qcEvent));
-                        dsgHandler.updateDatasetQCFlagAndVersion(qcEvent);
+                        allRegionsArray = dsgHandler.readStringVarDataValues(id,
+                                DashboardServerUtils.ALL_REGION_IDS.getVarName());
+                    } catch ( Exception ex ) {
+                        throw new RuntimeException("Unexpect failure to read the DSG file variable " +
+                                DashboardServerUtils.ALL_REGION_IDS.getVarName());
+                    }
+                    if ( allRegionsArray.length != 1 )
+                        throw new RuntimeException("Expected only one " +
+                                DashboardServerUtils.ALL_REGION_IDS.getVarName() + " value but got " +
+                                allRegionsArray.length + " values");
+                    // Add the update flags to global, then all the regions
+                    String allRegionIds = DashboardUtils.REGION_ID_GLOBAL + allRegionsArray[0];
+                    ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length() + 1);
+                    for (int k = 0; k < allRegionIds.length(); k++) {
+                        QCEvent qcEvent = new QCEvent();
+                        qcEvent.setDatasetId(id);
+                        qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
+                        qcEvent.setFlagDate(new Date());
+                        qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
+                        qcEvent.setVersion(version);
+                        qcEvent.setUsername(username);
+                        qcEvent.setComment(comment);
+                    }
+                    try {
+                        // Add the 'U' QC flags
+                        databaseHandler.addDatasetQCEvents(qcEventList);
+                        dsgHandler.updateDatasetQCFlagAndVersion(qcEventList.get(0));
                         // Update the dashboard status for the 'U' QC flag
                         dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);
                         // If archived, reset the archived status so the updated metadata will be archived
