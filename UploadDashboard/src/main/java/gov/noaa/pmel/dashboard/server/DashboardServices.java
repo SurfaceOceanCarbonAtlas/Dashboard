@@ -290,19 +290,15 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             String version = configStore.getUploadVersion();
             String comment = "Deleted metadata file \"" + deleteFilename +
                     "\".  Data and WOCE flags were not changed.";
-            String allRegionsArray[];
+
+            String allRegionIds = "G";
             try {
-                allRegionsArray = dsgHandler.readStringVarDataValues(datasetId,
-                        DashboardServerUtils.ALL_REGION_IDS.getVarName());
+                allRegionIds += dsgHandler.updateAllRegionIds(datasetId);
             } catch ( Exception ex ) {
-                throw new RuntimeException("Unexpect failure to read the DSG file variable " +
-                        DashboardServerUtils.ALL_REGION_IDS.getVarName());
+                throw new RuntimeException("Unexpect failure to obtain all the region IDs for " +
+                        datasetId + ": " + ex.getMessage());
+
             }
-            if ( allRegionsArray.length != 1 )
-                throw new RuntimeException("Expected only one " + DashboardServerUtils.ALL_REGION_IDS.getVarName() +
-                        " value but got " + allRegionsArray.length + " values");
-            // Add the update flags to global, then all the regions
-            String allRegionIds = DashboardUtils.REGION_ID_GLOBAL + allRegionsArray[0];
             ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
             for (int k = 0; k < allRegionIds.length(); k++) {
                 QCEvent qcEvent = new QCEvent();
