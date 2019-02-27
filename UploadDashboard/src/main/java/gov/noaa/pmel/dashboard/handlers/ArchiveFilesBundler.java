@@ -47,7 +47,6 @@ import java.util.zip.ZipOutputStream;
  */
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
-    private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
     private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
@@ -60,10 +59,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             " to SOCAT for QC, \n" +
                     "the SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END =
-            " \nhas requested immediate OCADS archival of the attached data and metadata. \n" +
-                    "The attached file is a ZIP file of the data and metadata, but \"" +
-                    MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
-                    "has been appended to the name for sending as an email attachment. \n" +
+            " \nhas requested immediate OCADS archival of the attached ZIP file of data and metadata. \n" +
                     "\n" +
                     "Best regards, \n" +
                     "SOCAT Team \n";
@@ -340,7 +336,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // Create the attachment message part
             MimeBodyPart attMsgPart = new MimeBodyPart();
             attMsgPart.attachFile(bundleFile);
-            attMsgPart.setFileName(bundleFile.getName() + MAILED_BUNDLE_NAME_ADDENDUM);
+            attMsgPart.setFileName(bundleFile.getName());
             // Create and add the multipart document to the message
             Multipart mp = new MimeMultipart();
             mp.addBodyPart(textMsgPart);
