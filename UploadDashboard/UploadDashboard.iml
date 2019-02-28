@@ -38,7 +38,7 @@
     <orderEntry type="library" scope="PROVIDED" name="avalon-framework-impl-4.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="bagit-5.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="batik-all-1.9" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="commons-csv-1.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="commons-csv-1.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="commons-io-1.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="commons-logging-1.0.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="fontbox-2.0.4" level="project" />
