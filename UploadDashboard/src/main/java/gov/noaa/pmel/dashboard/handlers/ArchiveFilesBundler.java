@@ -12,6 +12,8 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -24,8 +26,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -237,10 +241,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
-            copyFileToBundle(zipOut, dataFile);
-            infoMsg += "    " + dataFile.getName() + "\n";
+            copyFileToBundle(zipOut, dataFile, true);
+            infoMsg += "    " + dataFile.getName() + " (converted to CSV)\n";
             for (File metaFile : addlDocs) {
-                copyFileToBundle(zipOut, metaFile);
+                copyFileToBundle(zipOut, metaFile, false);
                 infoMsg += "    " + metaFile.getName() + "\n";
             }
         } finally {
@@ -537,9 +541,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Generate the bundle as a zip file
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
-            copyFileToBundle(zipOut, enhancedDataFile);
+            copyFileToBundle(zipOut, enhancedDataFile, false);
             for (File metaFile : addlDocs) {
-                copyFileToBundle(zipOut, metaFile);
+                copyFileToBundle(zipOut, metaFile, false);
             }
         } finally {
             zipOut.close();
@@ -599,11 +603,42 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if reading from the data files throws one, or
      *         if writing to the zip file throws one
      */
-    private void copyFileToBundle(ZipOutputStream zipOut, File dataFile) throws IOException {
-        ZipEntry entry = new ZipEntry(dataFile.getName());
+    private void copyFileToBundle(ZipOutputStream zipOut, File dataFile, boolean convertToCSV) throws IOException {
+        String filename = dataFile.getName();
+        if ( convertToCSV ) {
+            if ( !filename.endsWith(".tsv") )
+                throw new RuntimeException(
+                        "Unexpected request to convert to CSV a file with a name that does not end in .tsv");
+            filename = filename.substring(0, filename.length() - 4) + ".csv";
+        }
+        ZipEntry entry = new ZipEntry(filename);
         entry.setTime(dataFile.lastModified());
         zipOut.putNextEntry(entry);
-        Files.copy(dataFile.toPath(), zipOut);
+        if ( convertToCSV ) {
+            StringBuilder bldr = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new FileReader(dataFile));
+            try {
+                CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
+                                                  .withDelimiter(',');
+                CSVPrinter csvout = new CSVPrinter(bldr, format);
+                try {
+                    String dataline = reader.readLine();
+                    while ( dataline != null ) {
+                        csvout.printRecord(Arrays.asList(dataline.split("\t", -1)));
+                        dataline = reader.readLine();
+                    }
+                    csvout.flush();
+                } finally {
+                    csvout.close();
+                }
+            } finally {
+                reader.close();
+            }
+            zipOut.write(bldr.toString().getBytes());
+        }
+        else {
+            Files.copy(dataFile.toPath(), zipOut);
+        }
         zipOut.closeEntry();
     }
 
