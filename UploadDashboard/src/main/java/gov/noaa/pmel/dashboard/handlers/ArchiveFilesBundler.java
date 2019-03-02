@@ -8,7 +8,9 @@ import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
+import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -28,8 +30,10 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -41,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -63,7 +68,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             " to SOCAT for QC, \n" +
                     "the SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END =
-            " \nhas requested immediate OCADS archival of the attached ZIP file of data and metadata. \n" +
+            " \nhas requested immediate OCADS archival of the attached BagIt ZIP file of data and metadata. \n" +
                     "\n" +
                     "Best regards, \n" +
                     "SOCAT Team \n";
@@ -74,9 +79,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private String smtpPort;
     private PasswordAuthentication auth;
     private boolean debugIt;
+    private Pattern nameCleaner;
 
     public enum BundleType {
-        ORIG_FILE_PLAIN_ZIP,
         ORIG_FILE_BAGIT_ZIP,
         ENHANCED_FILE_PLAIN_ZIP
     }
@@ -133,6 +138,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             auth = new PasswordAuthentication(smtpUsername, smtpPassword);
         }
         debugIt = setDebug;
+        nameCleaner = Pattern.compile("[^A-Za-z0-9]+");
     }
 
     /**
@@ -161,9 +167,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         }
         File bundleFile;
         switch ( bundleType ) {
-            case ORIG_FILE_PLAIN_ZIP:
-                bundleFile = new File(parentFile, stdId + "_bundle.zip");
-                break;
             case ORIG_FILE_BAGIT_ZIP:
                 bundleFile = new File(parentFile, stdId + "_bagit.zip");
                 break;
@@ -177,24 +180,29 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Creates the file bundle of original data and metadata, and emails this bundle, if appropriate, for archival.
-     * This bundle is also committed to version control using the given message.
+     * Creates the bagit zip file bundle of the original data file converted to "Excel" CSV
+     * format as well as any appropriate metadata files.  If appropriate, e-mails this bundle
+     * for archival.  Also, if appropriate, commits this bundle to version control using the
+     * given message.
      * <p>
-     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME} and the value of userEmail
-     * is {@link DashboardServerUtils#NOMAIL_USER_EMAIL}, then the bundle is created but not emailed.
+     * If the value of userRealName is {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
+     * and the value of userEmail is {@link DashboardServerUtils#NOMAIL_USER_EMAIL}, then
+     * the bundle is created but not emailed.
+     * <p>
+     * If the version control commit message is null or empty, the bundle is not committed
+     * to version control.
      *
      * @param datasetId
      *         create the bundle for the dataset with this ID
      * @param message
-     *         version control commit message for the bundle file;
-     *         if null or empty, the bundle file is not committed to version control
+     *         version control commit message for the bundle file
      * @param userRealName
-     *         real name of the user make this archival request, or {@link DashboardServerUtils#NOMAIL_USER_REAL_NAME}
+     *         real name of the user make this archival request
      * @param userEmail
-     *         email address of the user making this archival request (and this address will be cc'd
-     *         on the bundle email sent for archival), or {@link DashboardServerUtils#NOMAIL_USER_EMAIL}.
+     *         email address of the user making this archival request
+     *         (this address will be cc'd on the bundle email sent for archival)
      *
-     * @return an message indicating what was sent and to whom
+     * @return a message indicating what was sent and to whom
      *
      * @throws IllegalArgumentException
      *         if the dataset is not valid, or if there is a problem sending the archival request email
@@ -217,39 +225,41 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
-        // Get the original data file for this dataset
-        File dataFile = configStore.getDataFileHandler().datasetDataFile(stdId);
-        if ( !dataFile.exists() )
-            throw new IOException("No data file for " + stdId);
-
-        // Get the list of metadata documents to be bundled with this data file
-        ArrayList<File> addlDocs = new ArrayList<File>();
-        MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-        for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
-            // Exclude the (dataset)/OME.xml document at this time;
-            // do include the (dataset)/PI_OME.xml
-            String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
-                addlDocs.add(metadataHandler.getMetadataFile(stdId, filename));
+        // Check if there is a platform name (mainly for moorings)
+        MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+        String platformName = "";
+        try {
+            DashboardMetadata mdata = mdataHandler.getMetadataInfo(stdId, "PI_OME.xml");
+            DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataHandler);
+            platformName = omeMetadata.getPlatformName();
+        } catch ( Exception ex ) {
+            // Probably no PI_OME.xml metadata document
+        }
+        if ( platformName.isEmpty() ) {
+            try {
+                DashboardMetadata mdata = mdataHandler.getMetadataInfo(stdId, "OME.xml");
+                DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata,
+                        mdataHandler);
+                platformName = omeMetadata.getPlatformName();
+            } catch ( Exception ex ) {
+                // Should always have an OME.xml metadata document, but ignore this problem here
             }
         }
-        if ( addlDocs.isEmpty() )
-            throw new IOException("No metadata/supplemental documents for " + stdId);
+
+        String fullId;
+        String emailBundleName;
+        if ( !platformName.isEmpty() ) {
+            fullId = stdId + " (" + platformName + ")";
+            emailBundleName = stdId + "_" + nameCleaner.matcher(platformName).replaceAll("") + "_bagit.zip";
+        }
+        else {
+            fullId = stdId;
+            emailBundleName = stdId + "_bagit.zip";
+        }
 
         // Generate the bundle as a zip file
-        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_PLAIN_ZIP);
-        String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
-        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
-        try {
-            copyFileToBundle(zipOut, dataFile, true);
-            infoMsg += "    " + dataFile.getName() + " (converted to CSV)\n";
-            for (File metaFile : addlDocs) {
-                copyFileToBundle(zipOut, metaFile, false);
-                infoMsg += "    " + metaFile.getName() + "\n";
-            }
-        } finally {
-            zipOut.close();
-        }
+        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
+        String infoMsg = createBagitFilesBundle(stdId);
 
         // Commit the bundle to version control
         if ( (message != null) && !message.isEmpty() ) {
@@ -325,7 +335,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         MimeMessage msg = new MimeMessage(sessn);
         try {
             msg.setHeader("X-Mailer", "ArchiveFilesBundler");
-            msg.setSubject(EMAIL_SUBJECT_MSG_START + stdId + EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
+            msg.setSubject(EMAIL_SUBJECT_MSG_START + fullId + EMAIL_SUBJECT_MSG_MIDDLE + userRealName);
             msg.setSentDate(new Date());
             // Set the addresses
             // Mark as sent from the second cc'd address (the dashboard's);
@@ -336,11 +346,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             msg.setRecipients(Message.RecipientType.CC, ccAddresses);
             // Create the text message part
             MimeBodyPart textMsgPart = new MimeBodyPart();
-            textMsgPart.setText(EMAIL_MSG_START + stdId + EMAIL_MSG_MIDDLE + userRealName + EMAIL_MSG_END);
+            textMsgPart.setText(EMAIL_MSG_START + fullId + EMAIL_MSG_MIDDLE + userRealName + EMAIL_MSG_END);
             // Create the attachment message part
             MimeBodyPart attMsgPart = new MimeBodyPart();
             attMsgPart.attachFile(bundleFile);
-            attMsgPart.setFileName(bundleFile.getName());
+            attMsgPart.setFileName(emailBundleName);
             // Create and add the multipart document to the message
             Multipart mp = new MimeMultipart();
             mp.addBodyPart(textMsgPart);
@@ -374,25 +384,25 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Creates the bagit zip file of the original data and metadata for a given dataset.
+     * Generates the bagit zip file of the original data file converted to "Excel" CSV format,
+     * as well as any appropriate metadata files for a given dataset.
+     * Use {@link #getZipBundleFile(String, BundleType)} with {@link BundleType#ORIG_FILE_BAGIT_ZIP}
+     * bundle type to get the virtual File of the created bundle.
      *
      * @param expocode
      *         create the bagit zip file for the dataset with this ID
-     * @param commitMsg
-     *         message associated with the subversion commit of the bagit zip file;
-     *         if null, the file is not committed to subversion
      *
-     * @return the bagit zip file that was created
+     * @return info message describing this bundle and its contents
      *
      * @throws IllegalArgumentException
      *         if the expocode is invalid, or
      *         if unable to create the bagit bundle directory used for creating the bagit zip file
      * @throws IOException
-     *         if there is not data or metadata files for this dataset,
+     *         if there is no data or metadata files for this dataset,
      *         if there were problems copying files to the bagit bundle directory, or
      *         if there were problems creating the bagit zip file from the bagit bundle directory
      */
-    public File createBagitFilesBundle(String expocode, String commitMsg)
+    private String createBagitFilesBundle(String expocode)
             throws IllegalArgumentException, IOException {
         String stdId = DashboardServerUtils.checkDatasetID(expocode);
         File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
@@ -402,6 +412,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         File dataFile = configStore.getDataFileHandler().datasetDataFile(stdId);
         if ( !dataFile.exists() )
             throw new IOException("No data file for " + stdId);
+        if ( !dataFile.getName().endsWith(".tsv") )
+            throw new RuntimeException("Unexpected data file name does not end with .tsv");
+        String csvFilename = dataFile.getName();
+        csvFilename = csvFilename.substring(0, csvFilename.length() - 4) + ".csv";
 
         // Get the list of metadata documents to be bundled with this data file
         ArrayList<File> addlDocs = new ArrayList<File>();
@@ -431,10 +445,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         }
 
         // Copy all the files to the bagit bundle directory
+        String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
         try {
-            File dest = new File(bundleDir, dataFile.getName());
-            Files.copy(dataFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            infoMsg += "    " + csvFilename + "\n";
+            File dest = new File(bundleDir, csvFilename);
+            copyTsvToCsvFile(dataFile, dest);
             for (File metaFile : addlDocs) {
+                infoMsg += "    " + metaFile.getName() + "\n";
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
@@ -460,7 +477,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 @Override
                 public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
                     Path relative = bundleDirPath.relativize(filePath);
-                    ZipEntry entry = new ZipEntry(relative.toString());
+                    ZipEntry entry = new ZipEntry(expocode + File.separator + relative.toString());
                     entry.setTime(filePath.toFile().lastModified());
                     zipOut.putNextEntry(entry);
                     Files.copy(filePath, zipOut);
@@ -488,15 +505,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             }
         });
 
-        // Commit the bagit zip file, if requested
-        if ( (commitMsg != null) && !commitMsg.trim().isEmpty() ) {
-            try {
-                commitVersion(bundleFile, commitMsg);
-            } catch ( Exception ex ) {
-                throw new IOException("Problems commiting the bagit file to subversion: " + ex.getMessage(), ex);
-            }
-        }
-        return bundleFile;
+        return infoMsg;
     }
 
     /**
@@ -541,9 +550,9 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Generate the bundle as a zip file
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
         try {
-            copyFileToBundle(zipOut, enhancedDataFile, false);
+            copyFileToZipBundle(zipOut, expocode, enhancedDataFile);
             for (File metaFile : addlDocs) {
-                copyFileToBundle(zipOut, metaFile, false);
+                copyFileToZipBundle(zipOut, expocode, metaFile);
             }
         } finally {
             zipOut.close();
@@ -591,11 +600,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
     /**
      * Copies the contents of the given data file to the zip file.
-     * Note that only the file name, and not any path component, is recorded in the zip file.
+     * Note that only the file names, without any path component, is recorded
+     * in the zip file as being under a directory with name given by parentName.
      * The timestamp recorded in the zip file is the last modified time of the file.
      *
      * @param zipOut
      *         copy the contents of the given file to here
+     * @param parentName
+     *         name to use as the parent directory of all the files in the zip file
      * @param dataFile
      *         copy the contents of this file
      *
@@ -603,43 +615,50 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if reading from the data files throws one, or
      *         if writing to the zip file throws one
      */
-    private void copyFileToBundle(ZipOutputStream zipOut, File dataFile, boolean convertToCSV) throws IOException {
-        String filename = dataFile.getName();
-        if ( convertToCSV ) {
-            if ( !filename.endsWith(".tsv") )
-                throw new RuntimeException(
-                        "Unexpected request to convert to CSV a file with a name that does not end in .tsv");
-            filename = filename.substring(0, filename.length() - 4) + ".csv";
-        }
-        ZipEntry entry = new ZipEntry(filename);
+    private void copyFileToZipBundle(ZipOutputStream zipOut, String parentName, File dataFile) throws IOException {
+        ZipEntry entry = new ZipEntry(parentName + File.separator + dataFile.getName());
         entry.setTime(dataFile.lastModified());
         zipOut.putNextEntry(entry);
-        if ( convertToCSV ) {
-            StringBuilder bldr = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new FileReader(dataFile));
-            try {
-                CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces()
-                                                  .withDelimiter(',');
-                CSVPrinter csvout = new CSVPrinter(bldr, format);
-                try {
-                    String dataline = reader.readLine();
-                    while ( dataline != null ) {
-                        csvout.printRecord(Arrays.asList(dataline.split("\t", -1)));
-                        dataline = reader.readLine();
-                    }
-                    csvout.flush();
-                } finally {
-                    csvout.close();
-                }
-            } finally {
-                reader.close();
-            }
-            zipOut.write(bldr.toString().getBytes());
-        }
-        else {
-            Files.copy(dataFile.toPath(), zipOut);
-        }
+        Files.copy(dataFile.toPath(), zipOut);
         zipOut.closeEntry();
+    }
+
+    /**
+     * Copies the simple TSV data file to a new file in "Excel" CSV format.
+     *
+     * @param dataFile
+     *         existing simple TSV data file to be copied
+     * @param csvFile
+     *         new "Excel" CSV file to create
+     *
+     * @throws FileNotFoundException
+     *         if the TSV data file does not exist
+     * @throws IOException
+     *         if reading from or writing to the files throws one
+     */
+    private void copyTsvToCsvFile(File dataFile, File csvFile) throws FileNotFoundException, IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(dataFile));
+        try {
+            CSVPrinter csvout = new CSVPrinter(new FileWriter(csvFile),
+                    CSVFormat.EXCEL.withIgnoreSurroundingSpaces().withDelimiter(','));
+            try {
+                String dataline = reader.readLine();
+                while ( dataline != null ) {
+                    csvout.printRecord(Arrays.asList(dataline.split("\t", -1)));
+                    dataline = reader.readLine();
+                }
+                csvout.flush();
+            } finally {
+                csvout.close();
+            }
+        } finally {
+            reader.close();
+        }
+        try {
+            Files.setLastModifiedTime(csvFile.toPath(), Files.getLastModifiedTime(dataFile.toPath()));
+        } catch ( Exception ex ) {
+            // ignore any problems with resetting the last modified time
+        }
     }
 
 }
