@@ -55,7 +55,7 @@ public class PreviewPlotsHandlerTest {
                 DatasetPreviewPage.REPORT_REC_FCO2_IMAGE_NAME,
                 DatasetPreviewPage.REC_FCO2_DELTA_IMAGE_NAME,
                 DatasetPreviewPage.REC_FCO2_SOURCES_IMAGE_NAME }) {
-            plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".gif");
+            plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".png");
             assertTrue("Plot for " + imgName + " does not exist", plotFile.exists());
             plotFile.delete();
         }
