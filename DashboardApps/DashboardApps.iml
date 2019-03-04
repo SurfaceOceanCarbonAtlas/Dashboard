@@ -9,6 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="OmeMetadata" />
+    <orderEntry type="module" module-name="SDIMetadata" />
     <orderEntry type="module" module-name="UploadDashboard" />
     <orderEntry type="library" scope="PROVIDED" name="gwt-user" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="antlr-runtime-3.4" level="project" />
