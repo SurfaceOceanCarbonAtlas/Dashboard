@@ -43,27 +43,27 @@ public class DataUploadService extends HttpServlet {
 
     // Patterns for getting the PI name(s) from the metadata preamble
     private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
-            Pattern.compile("Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("PI\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("#*\\s*Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*PI\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
 
     // Patterns for getting the platform name from the metadata preamble
     private static final Pattern[] PLATFORM_NAME_PATTERNS = new Pattern[] {
-            Pattern.compile("Platform\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Platform\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("#*\\s*Platform\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Platform\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
 
     // Patterns for getting the platform type from the metadata preamble
     private static final Pattern[] PLATFORM_TYPE_PATTERNS = new Pattern[] {
-            Pattern.compile("Platform\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+            Pattern.compile("#*\\s*Platform\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
 
 

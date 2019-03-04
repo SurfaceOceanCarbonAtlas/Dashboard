@@ -60,10 +60,8 @@ public class DataFileHandlerTest {
     }
 
     private static final String DATASET_OWNER = "Kevin Sullivan";
-    private static final String UPLOAD_FILENAME = "Atlantis April 2012.csv";
-    private static final String UPLOAD_TIMESTAMP = "2012-06-25 12:35+4";
-    private static final String CSV_DATA = "Expocode: 00KS20120419 , , , , , , , , , , , , , , , , , , ,\n" +
-            "Ship: Atlantis         , , , , , , , , , , , , , , , , , , ,\n" +
+    private static final String CSV_DATA = "# Expocode: 00KS20120419 , , , , , , , , , , , , , , , , , , ,\n" +
+            "#Ship: Atlantis         , , , , , , , , , , , , , , , , , , ,\n" +
             "\"PI: Wanninkhof, R.\"     , , , , , , , , , , , , , , , , , , ,\n" +
             ", , , , , , , , , , , , , , , , , , ,\n" +
 
@@ -92,8 +90,8 @@ public class DataFileHandlerTest {
             " , , , , , , , , , , , , , , , , , , , \n";
 
     private static final ArrayList<String> META_PREAMBLE = new ArrayList<String>(Arrays.asList(
-            "Expocode: 00KS20120419",
-            "Ship: Atlantis",
+            "# Expocode: 00KS20120419",
+            "#Ship: Atlantis",
             "\"PI: Wanninkhof, R.\"",
             ""));
 

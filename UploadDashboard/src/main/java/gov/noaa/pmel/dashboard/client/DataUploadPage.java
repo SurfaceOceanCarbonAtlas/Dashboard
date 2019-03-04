@@ -53,12 +53,12 @@ public class DataUploadPage extends CompositeWithUsername {
                     "</ul></p>" +
                     "<p>The expocode, vessel (ship) name, and investigators " +
                     "names must be given (vessel type is optional) in either " +
-                    "the metadata lines: " +
+                    "the metadata lines (# at start is optional): " +
                     "<ul style=\"list-style-type: none\">" +
-                    "<li>expocode: ZZZZ20051231</li>" +
-                    "<li>vessel name: Pacific Minnow</li>" +
-                    "<li>PIs: Smith, K.; Doe, J.</li>" +
-                    "<li>vessel type: Ship</li>" +
+                    "<li># expocode: ZZZZ20051231</li>" +
+                    "<li># vessel name: Pacific Minnow</li>" +
+                    "<li># PIs: Smith, K.; Doe, J.</li>" +
+                    "<li># vessel type: Ship</li>" +
                     "</ul> " +
                     "or they can be in columns with appropriate names.  </p>";
 
@@ -87,17 +87,18 @@ public class DataUploadPage extends CompositeWithUsername {
                     " of opportunity Pyxis (P1) with the first day of the cruise " +
                     "on 18 December 2010.  " +
                     "</p><p>" +
-                    "Tags for metadata items are case insensitive.  The tag is followed " +
-                    "by either a colon or equals sign, which can have spaces around them.  " +
-                    "Tags for the expocode include 'expocode' and 'cruise expocode'.  " +
-                    "Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
-                    "and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
-                    "'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
-                    "'PI name', and PI names'.  For datasets with multiple investigators, " +
-                    "put all names on one metadata line and separate the names with semicolons.  " +
-                    "Tags for the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
-                    "If the vessel type is not specified, an intelligent guess is made based " +
-                    "on the vessel name and/or the NODC code part of the expocode.  " +
+                    "Tags for metadata items are case insensitive and optionally can " +
+                    "start with a #.  The tag is followed by either a colon or equals " +
+                    "sign, which can have spaces around them.  Tags for the expocode " +
+                    "include 'expocode' and 'cruise expocode'.  Tags for the ship/vessel " +
+                    "name include 'ship', 'ship name', 'vessel', and 'vessel name'.  " +
+                    "Tags for the investigator names include 'investigator', 'investigators', " +
+                    "'investigator name', 'investigator names', 'PI', 'PIs', 'PI name', and " +
+                    "PI names'.  For datasets with multiple investigators, put all names " +
+                    "on one metadata line and separate the names with semicolons.  Tags for " +
+                    "the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
+                    "If the vessel type is not specified, an intelligent guess is made " +
+                    "based on the vessel name and/or the NODC code part of the expocode.  " +
                     "</p><p>" +
                     "Units for the columns can be given on a second column header line, " +
                     "such as the following:" +
@@ -126,8 +127,8 @@ public class DataUploadPage extends CompositeWithUsername {
             "Select a character set encoding for this file." +
                     "<ul>" +
                     "<li>If you are unsure of the encoding, UTF-8 should work fine.</li>" +
-                    "<li>The main differences in UTF-8 and ISO encodings are the " +
-                    "\"extended\" characters.</li>" +
+                    "<li>The main differences in UTF-8 and ISO encodings are the \"extended\" " +
+                    "(non-ANSI/English) characters, so preview if using these characters.</li>" +
                     "<li>Use UTF-16 only if you know your file is encoded in that format, " +
                     "but be aware that only Western European characters can be " +
                     "properly handled.</li>" +
