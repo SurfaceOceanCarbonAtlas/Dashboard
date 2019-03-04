@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.qc;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 

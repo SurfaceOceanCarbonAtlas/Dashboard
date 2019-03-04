@@ -5,8 +5,8 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

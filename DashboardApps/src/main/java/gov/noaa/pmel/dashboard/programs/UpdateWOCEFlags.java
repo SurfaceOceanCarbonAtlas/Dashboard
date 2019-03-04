@@ -7,10 +7,10 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.qc.DataLocation;
+import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
-import gov.noaa.pmel.dashboard.server.DataQCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

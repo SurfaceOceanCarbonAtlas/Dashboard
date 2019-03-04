@@ -1,10 +1,10 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.qc;
 
+import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
 import org.junit.Test;
 
 import java.util.Date;

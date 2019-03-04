@@ -9,8 +9,8 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
+import gov.noaa.pmel.dashboard.qc.RowColumn;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.RowColumn;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -466,6 +466,7 @@ public class DatasetCheckerTest {
             SocatTypes.SALINITY.duplicate(),
             DashboardServerUtils.SAMPLE_DEPTH.duplicate()
     ));
+
     static {
         dupsDataColTypes.get(1).setSelectedUnit("mm-dd-yyyy");
     }

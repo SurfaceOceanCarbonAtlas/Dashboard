@@ -3,13 +3,13 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.qc.DataLocation;
+import gov.noaa.pmel.dashboard.qc.DataQCEvent;
+import gov.noaa.pmel.dashboard.qc.RowNumSet;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
-import gov.noaa.pmel.dashboard.server.DataQCEvent;
-import gov.noaa.pmel.dashboard.server.RowNumSet;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;

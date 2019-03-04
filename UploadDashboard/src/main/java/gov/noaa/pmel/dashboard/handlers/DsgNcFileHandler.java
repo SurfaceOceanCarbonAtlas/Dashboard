@@ -10,10 +10,10 @@ import gov.noaa.pmel.dashboard.dsg.StdDataArray;
 import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
+import gov.noaa.pmel.dashboard.qc.DataLocation;
+import gov.noaa.pmel.dashboard.qc.DataQCEvent;
+import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
-import gov.noaa.pmel.dashboard.server.DataQCEvent;
-import gov.noaa.pmel.dashboard.server.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;

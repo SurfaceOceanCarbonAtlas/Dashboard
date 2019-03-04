@@ -6,10 +6,10 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.qc.DataLocation;
+import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
-import gov.noaa.pmel.dashboard.server.DataQCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.Overlap;
 

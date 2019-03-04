@@ -1,7 +1,7 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.server;
+package gov.noaa.pmel.dashboard.qc;
 
 import java.util.TreeSet;
 

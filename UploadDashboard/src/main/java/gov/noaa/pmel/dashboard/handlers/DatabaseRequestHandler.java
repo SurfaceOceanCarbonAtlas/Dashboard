@@ -4,10 +4,10 @@
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.qc.DataLocation;
+import gov.noaa.pmel.dashboard.qc.DataQCEvent;
+import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.DataLocation;
-import gov.noaa.pmel.dashboard.server.DataQCEvent;
-import gov.noaa.pmel.dashboard.server.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.FileNotFoundException;

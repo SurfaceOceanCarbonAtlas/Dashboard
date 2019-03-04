@@ -1,6 +1,6 @@
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.qc;
 
-import gov.noaa.pmel.dashboard.server.RowColumn;
+import gov.noaa.pmel.dashboard.qc.RowColumn;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 

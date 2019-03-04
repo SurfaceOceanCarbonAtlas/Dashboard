@@ -1,9 +1,9 @@
 /**
  *
  */
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.qc;
 
-import gov.noaa.pmel.dashboard.server.RowNumSet;
+import gov.noaa.pmel.dashboard.qc.RowNumSet;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

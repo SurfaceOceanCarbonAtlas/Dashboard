@@ -1,7 +1,7 @@
-package gov.noaa.pmel.dashboard.test.server;
+package gov.noaa.pmel.dashboard.test.metadata;
 
-import gov.noaa.pmel.dashboard.server.CdiacOmeMetadata;
-import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
