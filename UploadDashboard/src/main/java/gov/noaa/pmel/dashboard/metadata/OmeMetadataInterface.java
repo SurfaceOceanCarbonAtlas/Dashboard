@@ -1,34 +1,41 @@
 package gov.noaa.pmel.dashboard.metadata;
 
-import org.jdom2.Document;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Interface for dealing with various types of OME (metadata of a well-known format)
+ * objects in the dashboard.
+ */
 public interface OmeMetadataInterface {
 
     /**
-     * @return a {@link Document} containing all relevant information in this OME object.
-     *         This Document should be populated such that this OME object can be recreated
-     *         from {@link #assignFromDocument(Document)}
-     */
-    Document createDocument();
-
-    /**
-     * Assign fields in this OME object from values obtained in the given {@link Document}.
+     * Assigns this OME object from the contents of the given metadata file.
      *
-     * @param doc
-     *         Document to use
+     * @param datasetId
+     *         dataset ID (expocode) associated with this metadata
+     * @param mdataFile
+     *         read metadata from this file
      *
      * @throws IllegalArgumentException
-     *         if there is a problem interpreting the given Document
+     *         if the given dataset ID does not match that specified in the metadata file, or
+     *         if the contents of the metadata files are invalid for assigning this OME object
+     * @throws FileNotFoundException
+     *         if the metadata file does not exist
+     * @throws IOException
+     *         if there are problems reading from the metadata file
      */
-    void assignFromDocument(Document doc) throws IllegalArgumentException;
+    void read(String datasetId, File mdataFile)
+            throws IllegalArgumentException, FileNotFoundException, IOException;
 
     /**
-     * Creates an new OME object that is the result of merging this OME object with another
-     * OME object with the same dataset ID / Expocode.  In cases where there are conflicting
-     * values in the two objects, the two conflicting values are stored and a conflict flag is set.
+     * Creates an new OME object that is the result of merging this OME object
+     * with another OME object with the same dataset ID (expocode).  In cases
+     * where there are conflicting values in the two objects, the two conflicting
+     * values are stored and a conflict flag is set.
      *
      * @param other
      *         OME object to merge with this OME object
@@ -36,11 +43,26 @@ public interface OmeMetadataInterface {
      * @return new OME object containing the merged contents
      *
      * @throws IllegalArgumentException
-     *         if the dataset IDs do not match, or
+     *         if the dataset IDs (expocodes) do not match,
      *         if unable to interpret the contents of the OME object to merge in
-     *         (e.g., unknown implementation of OmeMetadataInterface)
+     *         (e.g., unknown implementation of OmeMetadataInterface), or
+     *         if unable to merge the contents
      */
-    OmeMetadataInterface merge(OmeMetadataInterface other) throws IllegalArgumentException;
+    OmeMetadataInterface merge(OmeMetadataInterface other)
+            throws IllegalArgumentException;
+
+    /**
+     * Saves the contents of the OME object in the specified metadata file.
+     * The contents of this file should allow regeneration of this OME object
+     * from an appropriate call to {@link #read(String, File)}
+     *
+     * @param mdataFile
+     *         metadata file to create or overwrite
+     *
+     * @throws IOException
+     *         if there are problems writing the metadata file
+     */
+    void write(File mdataFile) throws IOException;
 
     /**
      * @return if the current contents this OME object are acceptable; in particular,

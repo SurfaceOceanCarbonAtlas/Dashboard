@@ -4,8 +4,6 @@ import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
-import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
@@ -112,7 +110,6 @@ public class DatasetModifierTest {
         DatasetModifier modifier = new DatasetModifier(configStore);
         DataFileHandler dataFileHandler = configStore.getDataFileHandler();
         MetadataFileHandler metaFileHandler = configStore.getMetadataFileHandler();
-        UserFileHandler userFileHandler = configStore.getUserFileHandler();
 
         // Verify the original data files exist
         DashboardDataset dataset = dataFileHandler.getDatasetFromInfoFile(origExpo);
@@ -121,7 +118,7 @@ public class DatasetModifierTest {
         DashboardMetadata metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardUtils.OME_FILENAME);
         assertNotNull(metadata);
         try {
-            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
+            metaFileHandler.getOmeFromFile(metadata);
         } catch ( Exception ex ) {
             fail("Reading the original OME.xml metadata failed");
         }
@@ -139,7 +136,7 @@ public class DatasetModifierTest {
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {
-            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
+            metaFileHandler.getOmeFromFile(metadata);
         } catch ( Exception ex ) {
             fail("Reading the new OME.xml metadata after rename failed");
         }
@@ -157,7 +154,7 @@ public class DatasetModifierTest {
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {
-            new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metaFileHandler);
+            metaFileHandler.getOmeFromFile(metadata);
         } catch ( Exception ex ) {
             fail("Reading the original OME.xml metadata after second rename failed");
         }

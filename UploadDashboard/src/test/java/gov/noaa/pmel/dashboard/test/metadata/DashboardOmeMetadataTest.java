@@ -10,6 +10,7 @@ import org.junit.Test;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.io.StringReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ public class DashboardOmeMetadataTest {
 
     private static final double DELTA = 1.0E-6;
 
+    private static final String STUB_UPLOAD_FILENAME = "33RO20160101_OME.xml";
     private static final String STUB_UPLOAD_TIMESTAMP = "2017-04-15 14:35";
     private static final String STUB_DATASET_OWNER = "Somebody.Else";
     private static final String STUB_VERSION = "6.0";
@@ -65,25 +67,34 @@ public class DashboardOmeMetadataTest {
 
     private CdiacOmeMetadata cdiacXmlStubMData;
     private CdiacOmeMetadata aomlCdiacXmlMData;
+    private OmeMetadata aomlOmeObj;
 
     @Before
     public void setUp() throws Exception {
+        Field field = CdiacOmeMetadata.class.getDeclaredField("mdata");
+        field.setAccessible(true);
+
         cdiacXmlStubMData = new CdiacOmeMetadata();
         cdiacXmlStubMData.setDatasetId(STUB_EXPOCODE);
+        OmeMetadata cdiacOmeObj = (OmeMetadata) field.get(cdiacXmlStubMData);
+
         Document doc = (new SAXBuilder()).build(new StringReader(CDIAC_XML_STUB_DATA_STRING));
-        cdiacXmlStubMData.assignFromDocument(doc);
+        cdiacOmeObj.assignFromOmeXmlDoc(doc);
 
         aomlCdiacXmlMData = new CdiacOmeMetadata();
         aomlCdiacXmlMData.setDatasetId(AOML_EXPOCODE);
+        aomlOmeObj = (OmeMetadata) field.get(aomlCdiacXmlMData);
+
         doc = (new SAXBuilder()).build(new StringReader(AOML_CDIAC_XML_DATA_STRING));
-        aomlCdiacXmlMData.assignFromDocument(doc);
+        aomlOmeObj.assignFromOmeXmlDoc(doc);
     }
 
     @Test
     public void testDashboardOmeMetadataFromOmeObject() {
         DashboardOmeMetadata mdata;
 
-        mdata = new DashboardOmeMetadata(cdiacXmlStubMData, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
+        mdata = new DashboardOmeMetadata(cdiacXmlStubMData, STUB_UPLOAD_FILENAME,
+                STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
         assertEquals(STUB_UPLOAD_TIMESTAMP, mdata.getUploadTimestamp());
         assertEquals(STUB_DATASET_OWNER, mdata.getOwner());
         assertEquals(STUB_VERSION, mdata.getVersion());
@@ -101,7 +112,8 @@ public class DashboardOmeMetadataTest {
         assertEquals(STUB_END_DATE, mdata.getEndDatestamp());
         assertEquals(STUB_DATASET_LINK, mdata.getDatasetLink());
 
-        mdata = new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
+        mdata = new DashboardOmeMetadata(aomlCdiacXmlMData, STUB_UPLOAD_FILENAME,
+                AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
         assertEquals(AOML_UPLOAD_TIMESTAMP, mdata.getUploadTimestamp());
         assertEquals(AOML_DATASET_OWNER, mdata.getOwner());
         assertEquals(AOML_VERSION, mdata.getVersion());
@@ -122,10 +134,10 @@ public class DashboardOmeMetadataTest {
 
     @Test
     public void testDashboardOmeMetadataFromMerge() {
-        DashboardOmeMetadata stubMData =
-                new DashboardOmeMetadata(cdiacXmlStubMData, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
-        DashboardOmeMetadata aomlMData =
-                new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
+        DashboardOmeMetadata stubMData = new DashboardOmeMetadata(cdiacXmlStubMData,
+                STUB_UPLOAD_FILENAME, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
+        DashboardOmeMetadata aomlMData = new DashboardOmeMetadata(aomlCdiacXmlMData,
+                STUB_UPLOAD_FILENAME, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
 
         aomlMData.changeDatasetID(STUB_EXPOCODE);
 
@@ -167,12 +179,12 @@ public class DashboardOmeMetadataTest {
 
     @Test
     public void testChangeDatasetID() {
-        DashboardOmeMetadata aomlMData =
-                new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
+        DashboardOmeMetadata aomlMData = new DashboardOmeMetadata(aomlCdiacXmlMData,
+                STUB_UPLOAD_FILENAME, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
         aomlMData.changeDatasetID(STUB_EXPOCODE);
         assertEquals(STUB_EXPOCODE, aomlMData.getDatasetId());
         // Check that it was changed in the underlying Document
-        Document doc = aomlMData.createDocument();
+        Document doc = aomlOmeObj.createOmeXmlDoc();
         Element elem = doc.getRootElement();
         elem = elem.getChild("Cruise_Info");
         elem = elem.getChild("Experiment");
@@ -182,31 +194,10 @@ public class DashboardOmeMetadataTest {
     }
 
     @Test
-    public void testCreateDocument() throws Exception {
-        DashboardOmeMetadata aomlMData =
-                new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
-        Document doc = aomlMData.createDocument();
-        OmeMetadata regen = new OmeMetadata(AOML_EXPOCODE);
-        regen.assignFromOmeXmlDoc(doc);
-        assertEquals(AOML_EXPOCODE, regen.getExpocode());
-        assertEquals(AOML_DATASET_NAME, regen.getExperimentName());
-        assertEquals(AOML_PLATFORM_NAME, regen.getVesselName());
-        assertEquals(AOML_INVESTIGATORS, regen.getInvestigators());
-        assertEquals(AOML_ORGANIZATIONS, regen.getOrganizations());
-        assertEquals(String.format("%.1f", AOML_WESTERN), regen.getWestmostLongitude());
-        assertEquals(String.format("%.1f", AOML_EASTERN), regen.getEastmostLongitude());
-        assertEquals(String.format("%.1f", AOML_SOUTHERN), regen.getSouthmostLatitude());
-        assertEquals(String.format("%.1f", AOML_NORTHERN), regen.getNorthmostLatitude());
-        assertEquals(AOML_START_DATE.replaceAll("-", ""), regen.getTemporalCoverageStartDate());
-        assertEquals(AOML_END_DATE.replaceAll("-", ""), regen.getTemporalCoverageEndDate());
-        // TODO: Needs a lot more checks
-    }
-
-    @Test
     public void testGetSetPlatformName() {
         final String anotherName = "USS Minnow";
-        DashboardOmeMetadata aomlMData =
-                new DashboardOmeMetadata(aomlCdiacXmlMData, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
+        DashboardOmeMetadata aomlMData = new DashboardOmeMetadata(aomlCdiacXmlMData,
+                STUB_UPLOAD_FILENAME, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
         assertEquals(AOML_PLATFORM_NAME, aomlMData.getPlatformName());
         aomlMData.setPlatformName(null);
         assertEquals("", aomlMData.getPlatformName());
@@ -217,8 +208,8 @@ public class DashboardOmeMetadataTest {
 
     @Test
     public void testGetSetInvestigatorsAndOrganizations() {
-        DashboardOmeMetadata stubMData =
-                new DashboardOmeMetadata(cdiacXmlStubMData, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
+        DashboardOmeMetadata stubMData = new DashboardOmeMetadata(cdiacXmlStubMData,
+                STUB_UPLOAD_FILENAME, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
         assertEquals(STUB_INVESTIGATORS, stubMData.getInvestigators());
         assertEquals(STUB_ORGANIZATIONS, stubMData.getOrganizations());
         stubMData.setInvestigatorsAndOrganizations(AOML_INVESTIGATORS, AOML_ORGANIZATIONS);

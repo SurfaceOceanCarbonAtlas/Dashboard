@@ -434,12 +434,12 @@ public class DataUploadService extends HttpServlet {
             try {
                 CdiacOmeMetadata omeMData = new CdiacOmeMetadata();
                 omeMData.setDatasetId(datasetId);
-                DashboardOmeMetadata mdata =
-                        new DashboardOmeMetadata(omeMData, timestamp, username, dsetData.getVersion());
+                DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
+                        DashboardUtils.OME_FILENAME, timestamp, username, dsetData.getVersion());
                 String msg = "New OME metadata created from data file for " + datasetId + " uploaded by " + username;
                 MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
                 mdataHandler.saveMetadataInfo(mdata, msg, false);
-                mdataHandler.saveAsOmeXmlDoc(mdata, msg);
+                mdataHandler.saveOmeToFile(mdata, msg);
             } catch ( Exception ex ) {
                 // should not happen
                 messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " + filename + " ; " + datasetId);

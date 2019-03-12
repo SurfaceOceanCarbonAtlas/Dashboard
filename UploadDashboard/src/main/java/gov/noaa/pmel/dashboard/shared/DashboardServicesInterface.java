@@ -242,23 +242,6 @@ public interface DashboardServicesInterface extends RemoteService {
     ADCMessageList getDataMessages(String username, String datasetId) throws IllegalArgumentException;
 
     /**
-     * Provides the absolute path to the OME.xml file for a dataset
-     *
-     * @param username
-     *         name of the current user - for validation
-     * @param datasetId
-     *         get the OME for this dataset
-     * @param previousId
-     *         if not empty, initialize with metadata from this dataset's metadata
-     *
-     * @return the absolute path to the OME.xml file
-     *
-     * @throws IllegalArgumentException
-     *         if authentication failed, or if the appropriate content for the OME could not be found
-     */
-    String getOmeXmlPath(String username, String datasetId, String previousId) throws IllegalArgumentException;
-
-    /**
      * Requests that the preview images for a dataset be generated.
      *
      * @param username

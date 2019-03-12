@@ -8,7 +8,6 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -193,7 +192,7 @@ public class MetadataUploadService extends HttpServlet {
                     // Make sure the contents are valid OME XML
                     DashboardOmeMetadata omedata;
                     try {
-                        omedata = new DashboardOmeMetadata(CdiacOmeMetadata.class, metadata, metadataHandler);
+                        omedata = metadataHandler.getOmeFromFile(metadata);
                     } catch ( IllegalArgumentException ex ) {
                         // Problems with the file - delete it
                         metadataHandler.deleteMetadata(username, id, metadata.getFilename());

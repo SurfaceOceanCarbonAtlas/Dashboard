@@ -13,9 +13,6 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.tomcat.util.http.fileupload.FileItem;
-import org.jdom2.Document;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.tmatesoft.svn.core.SVNException;
 
 import java.io.File;
@@ -633,18 +630,18 @@ public class MetadataFileHandler extends VersionedFileHandler {
         for (DashboardMetadata metaDoc : getMetadataFiles(oldId)) {
             String uploadFilename = metaDoc.getFilename();
 
-            // If this is the OME metadata file, read the contents
-            if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
-                omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, this);
-            }
-            else if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
-                piOmeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, this);
-            }
-
             File oldMetaFile = getMetadataFile(oldId, uploadFilename);
             if ( !oldMetaFile.exists() )
                 throw new RuntimeException("Unexpected failure: metadata file " +
                         oldMetaFile.getName() + " does not exist");
+
+            // If this is an OME metadata file, read the contents
+            if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
+                omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, oldMetaFile);
+            }
+            else if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
+                piOmeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, oldMetaFile);
+            }
 
             File oldMetaInfoFile = new File(oldMetaFile.getPath() + INFOFILE_SUFFIX);
             if ( !oldMetaInfoFile.exists() )
@@ -678,12 +675,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
         if ( omeMData != null ) {
             omeMData.changeDatasetID(newId);
-            saveAsOmeXmlDoc(omeMData, "Change dataset for OME XML document from " +
+            saveOmeToFile(omeMData, "Change dataset for OME XML document from " +
                     oldId + " to " + newId);
         }
         if ( piOmeMData != null ) {
             piOmeMData.changeDatasetID(newId);
-            saveAsOmeXmlDoc(omeMData, "Change dataset for PI OME XML document from " +
+            saveOmeToFile(omeMData, "Change dataset for PI OME XML document from " +
                     oldId + " to " + newId);
             // The PI_OME.pdf file will have been moved (as a normal metadata document)
             // but the dataset ID it contains needs to be updated, so regenerate it.
@@ -738,37 +735,24 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Save the OME XML document created by {@link DashboardOmeMetadata#createDocument()} as the document file for this
-     * metadata.  The parent directory for this file is expected to exist and this method will overwrite any existing
-     * OME metadata file.
+     * Save the OME object to the contents of this metadata file.  The parent directory
+     * for this file is expected to exist and this method will overwrite any existing
+     * metadata file.  Note that this does NOT save the information about this metadata
+     * file to the properties file; use a separate call to
+     * {@link #saveMetadataInfo(DashboardMetadata, String, boolean)}
      *
      * @param mdata
-     *         OME metadata to save as an OME XML document
+     *         OME metadata to save
      * @param message
      *         version control commit message; if null, the commit is not performed
      *
      * @throws IllegalArgumentException
-     *         if the dataset or uploadFilename in this object is invalid, or writing the metadata document file
-     *         generates one.
+     *         if the dataset ID (expocode) or filename in the metadata properties is invalid, or
+     *         if there are problems writing the metadata document to file
      */
-    public void saveAsOmeXmlDoc(DashboardOmeMetadata mdata, String message) throws IllegalArgumentException {
+    public void saveOmeToFile(DashboardOmeMetadata mdata, String message) throws IllegalArgumentException {
         File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
-
-        // Generate the OME XML document
-        Document omeDoc = mdata.createDocument();
-
-        // Save the XML document to the metadata document file
-        try {
-            FileOutputStream out = new FileOutputStream(mdataFile);
-            try {
-                (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, out);
-            } finally {
-                out.close();
-            }
-        } catch ( IOException ex ) {
-            throw new IllegalArgumentException(
-                    "Problems writing the OME metadata document: " + ex.getMessage());
-        }
+        mdata.saveOmeToFile(mdataFile);
 
         if ( (message == null) || message.trim().isEmpty() )
             return;
@@ -780,6 +764,49 @@ public class MetadataFileHandler extends VersionedFileHandler {
             throw new IllegalArgumentException("Problems committing updated OME metadata information " +
                     mdataFile.getPath() + ":\n    " + ex.getMessage());
         }
+    }
+
+    /**
+     * Read an OME metadata file (metadata file of a well-known format) to create an OME metadata object.
+     * This is a convenience function calling {@link #getOmeFromFile(DashboardMetadata)}.
+     *
+     * @param datasetId
+     *         read the OME metadata file for the dataset with this ID (expocode)
+     * @param metaname
+     *         read the OME metadata file with this (upload) filename
+     *
+     * @return OME metadata object created from the contents of the OME metadata file
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID (expocode) is invalid,
+     *         if the specified metadata file or its properties file does not exist,
+     *         if the contents of the metadata file are invalid for all known OME classes, or
+     *         if the dataset ID (expocode) in the metadata file does not match that given
+     */
+    public DashboardOmeMetadata getOmeFromFile(String datasetId, String metaname)
+            throws IllegalArgumentException {
+        return getOmeFromFile(getMetadataInfo(datasetId, metaname));
+    }
+
+    /**
+     * Read an OME metadata file (metadata file of a well-known format) to create an OME metadata object.
+     *
+     * @param mdata
+     *         properties of the OME metadata file to read
+     *
+     * @return OME metadata object created from the contents of the OME metadata file
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID (expocode) in the of the metadata properties file is invalid,
+     *         if the metadata file indicated by the metadata properties file does not exist,
+     *         if the contents of the metadata file are invalid for all known OME classes, or
+     *         if the dataset ID (expocode) in the metadata file does not match that in the metadata properties
+     */
+    public DashboardOmeMetadata getOmeFromFile(DashboardMetadata mdata)
+            throws IllegalArgumentException {
+        File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
+        DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
+        return omeMData;
     }
 
     /**

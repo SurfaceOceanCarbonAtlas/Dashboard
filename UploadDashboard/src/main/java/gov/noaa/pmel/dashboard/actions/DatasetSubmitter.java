@@ -14,7 +14,6 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
@@ -128,8 +127,7 @@ public class DatasetSubmitter {
                         metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " +
                                 version + " with submission of " + datasetId, false);
                     }
-                    DashboardOmeMetadata omeMData =
-                            new DashboardOmeMetadata(CdiacOmeMetadata.class, omeInfo, metadataHandler);
+                    DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(omeInfo);
                     DsgMetadata dsgMData = omeMData.createDsgMetadata(fileMetadataTypes);
 
                     // For SOCAT, the version string in the DsgMetadata is the submit version number plus an 'N' or 'U'

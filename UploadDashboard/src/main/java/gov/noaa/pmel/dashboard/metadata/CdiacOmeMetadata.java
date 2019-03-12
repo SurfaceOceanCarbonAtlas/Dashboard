@@ -1,8 +1,17 @@
 package gov.noaa.pmel.dashboard.metadata;
 
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,33 +39,58 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public Document createDocument() {
-        return mdata.createOmeXmlDoc();
-    }
-
-    @Override
-    public void assignFromDocument(Document doc) throws IllegalArgumentException {
+    public void read(String datasetId, File mdataFile)
+            throws IllegalArgumentException, FileNotFoundException, IOException {
+        if ( !mdataFile.exists() )
+            throw new FileNotFoundException("Metadata file " + mdataFile.getName() +
+                    " does not exist for dataset " + datasetId);
+        Document omeDoc;
         try {
-            mdata.assignFromOmeXmlDoc(doc);
+            omeDoc = (new SAXBuilder()).build(mdataFile);
+        } catch ( JDOMException ex ) {
+            throw new IOException(ex);
+        }
+        try {
+            mdata.assignFromOmeXmlDoc(omeDoc);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException(ex);
+            throw new IOException(ex);
+        }
+        try {
+            String stdId = DashboardServerUtils.checkDatasetID(mdata.getExpocode());
+            if ( !stdId.equalsIgnoreCase(datasetId) )
+                throw new IllegalArgumentException();
+        } catch ( IllegalArgumentException ex ) {
+            throw new IllegalArgumentException("Invalid dataset ID (expocode) of " +
+                    mdata.getExpocode() + " in metadata file " +
+                    mdataFile.getName() + " for dataset " + datasetId);
         }
     }
 
     @Override
-    public OmeMetadataInterface merge(OmeMetadataInterface other) throws IllegalArgumentException {
+    public OmeMetadataInterface merge(OmeMetadataInterface other)
+            throws IllegalArgumentException {
         if ( !(other instanceof CdiacOmeMetadata) )
-            throw new IllegalArgumentException("Unsupported class of other OME object for CdiacOmeMetadata.merge");
+            throw new IllegalArgumentException(
+                    "Unsupported class of other OME object for CdiacOmeMetadata.merge");
         CdiacOmeMetadata otherMData = (CdiacOmeMetadata) other;
-
         CdiacOmeMetadata merged = new CdiacOmeMetadata();
         try {
             merged.mdata = OmeMetadata.merge(mdata, otherMData.mdata);
         } catch ( Exception ex ) {
             throw new IllegalArgumentException(ex);
         }
-
         return merged;
+    }
+
+    @Override
+    public void write(File mdataFile) throws IOException {
+        Document omeDoc = mdata.createOmeXmlDoc();
+        FileOutputStream outStream = new FileOutputStream(mdataFile);
+        try {
+            (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, outStream);
+        } finally {
+            outStream.close();
+        }
     }
 
     @Override

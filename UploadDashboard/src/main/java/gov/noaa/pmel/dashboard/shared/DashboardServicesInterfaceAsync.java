@@ -217,21 +217,6 @@ public interface DashboardServicesInterfaceAsync {
     void getDataMessages(String username, String datasetId, AsyncCallback<ADCMessageList> callback);
 
     /**
-     * Client-side interface for getting the absolute path to the OME.xml file for a cruise
-     *
-     * @param username
-     *         name of the current user - for validation
-     * @param datasetId
-     *         get the OME for this dataset
-     * @param previousId
-     *         if not empty, initialize with metadata from this dataset's metadata
-     * @param callback
-     *         the callback to make with the absolute path to the OME.xml file; the onFailure method of the callback
-     *         will be called if authentication failed, or if the appropriate content for the OME could not be found
-     */
-    void getOmeXmlPath(String username, String datasetId, String previousId, AsyncCallback<String> callback);
-
-    /**
      * Client side request to generate the preview images for a dataset.
      *
      * @param username

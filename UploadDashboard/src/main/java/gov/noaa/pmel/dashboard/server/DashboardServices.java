@@ -12,8 +12,6 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
-import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -28,7 +26,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -550,36 +547,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         scMsgList.setUsername(username);
         itsLogger.info("returned automated data checker messages for " + datasetId + " for " + username);
         return scMsgList;
-    }
-
-    @Override
-    public String getOmeXmlPath(String pageUsername, String datasetId, String previousId)
-            throws IllegalArgumentException {
-        // Get the dashboard data store and current username, and validate that username
-        if ( !validateRequest(pageUsername) )
-            throw new IllegalArgumentException("Invalid user request");
-        MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-
-        if ( !previousId.isEmpty() ) {
-            // Read the OME XML contents currently saved for this dataset
-            DashboardMetadata mdata = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
-            DashboardOmeMetadata origOmeMData =
-                    new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, metadataHandler);
-            // Read the OME XML contents for the previous dataset
-            mdata = metadataHandler.getMetadataInfo(previousId, DashboardUtils.OME_FILENAME);
-            DashboardOmeMetadata updatedOmeMData =
-                    new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, metadataHandler);
-            // Reset the ID and related fields to that for this dataset
-            updatedOmeMData.changeDatasetID(datasetId);
-            // Create the merged OME and save the results
-            DashboardOmeMetadata mergedOmeMData = new DashboardOmeMetadata(origOmeMData, updatedOmeMData);
-            metadataHandler.saveAsOmeXmlDoc(mergedOmeMData, "Merged OME of " + previousId +
-                    " into OME of " + datasetId);
-        }
-
-        // return the absolute path to the OME.xml for activeExpcode
-        File omeFile = metadataHandler.getMetadataFile(datasetId, DashboardUtils.OME_FILENAME);
-        return omeFile.getAbsolutePath();
     }
 
     @Override

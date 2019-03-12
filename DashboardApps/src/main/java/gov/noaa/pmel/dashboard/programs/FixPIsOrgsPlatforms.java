@@ -4,11 +4,9 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -282,8 +280,7 @@ public class FixPIsOrgsPlatforms {
             MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 
             for (String expocode : allExpocodes) {
-                DashboardMetadata mdata = mdataHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME);
-                DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataHandler);
+                DashboardOmeMetadata omeMData = mdataHandler.getOmeFromFile(expocode, DashboardUtils.OME_FILENAME);
 
                 boolean changed = false;
                 try {
@@ -296,7 +293,7 @@ public class FixPIsOrgsPlatforms {
 
                 if ( changed ) {
                     try {
-                        mdataHandler.saveAsOmeXmlDoc(omeMData, "Correcting PI names, organizations, platform name");
+                        mdataHandler.saveOmeToFile(omeMData, "Correcting PI names, organizations, platform name");
                     } catch ( Exception ex ) {
                         System.err.println("Problems writing the updated OME file for " + expocode +
                                 ": " + ex.getMessage());

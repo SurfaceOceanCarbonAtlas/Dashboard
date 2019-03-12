@@ -5,13 +5,9 @@ package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import org.jdom2.Document;
-import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -21,15 +17,14 @@ import java.util.HashSet;
 import java.util.TimeZone;
 
 /**
- * Class for the one special metadata file per cruise that must be present, has a known format, and contains
- * user-provided values needed by the dashboard. Extends DashboardMetadata, but uses {@link OmeMetadataInterface}
- * to work with the actual metadata.
+ * Class for OME files (metadata files of well-known format containing user-provided values needed by the dashboard).
+ * Extends DashboardMetadata, but uses {@link OmeMetadataInterface} to work with the actual OME objects.
  *
  * @author Karl Smith
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 2349022349952348949L;
+    private static final long serialVersionUID = 9023459134599348949L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -47,61 +42,46 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     private OmeMetadataInterface omeMData;
 
     /**
-     * Creates from the contents of the OME XML file specified by the given DashboardMetadata.
+     * Create from the contents of the OME metadata file specified.
      *
      * @param omeClass
      *         class of OME object to use in this instance
-     * @param mdata
-     *         OME XML file to read.  The dataset ID, upload timestamp, and owner are copied from mdata,
-     *         and the file it specifies is read to populate this OME object used by this instance.
-     * @param mdataHandler
-     *         MetadataFileHandler to use to get the given OME XML file
+     * @param mdataInfo
+     *         initialize metadata properties from this information
+     * @param mdataFile
+     *         initialize the OME object with metadata in this file
      *
      * @throws IllegalArgumentException
-     *         if mdata is null,
-     *         if the information in the DashboardMetadata is invalid,
-     *         if the contents of the metadata document are not valid, or
-     *         if omeClass cannot be instantiated
+     *         if omeClass cannot be instantiated,
+     *         if the contents of the metadata file are not valid for the OME class, or
+     *         if the dataset ID (expocode) in the metadata file does not match that in the metadata properties
      */
     public DashboardOmeMetadata(Class<? extends OmeMetadataInterface> omeClass,
-            DashboardMetadata mdata, MetadataFileHandler mdataHandler)
-            throws IllegalArgumentException {
-        // Initialize to an empty OME metadata document with the standard OME filename
+            DashboardMetadata mdataInfo, File mdataFile) throws IllegalArgumentException {
         super();
-        this.filename = DashboardUtils.OME_FILENAME;
-        if ( mdata == null )
-            throw new IllegalArgumentException("No metadata file given");
+        String stdId = DashboardServerUtils.checkDatasetID(mdataInfo.getDatasetId());
 
-        // Copy the dataset ID, upload timestamp, owner, and version from the given DashboardMetadata object
-        setDatasetId(mdata.getDatasetId());
-        setUploadTimestamp(mdata.getUploadTimestamp());
-        setOwner(mdata.getOwner());
-        setVersion(mdata.getVersion());
-
-        // Read the XML given in the file specified by the given DashboardMetadata
-        File mdataFile = mdataHandler.getMetadataFile(this.datasetId, mdata.getFilename());
-        Document omeDoc;
-        try {
-            omeDoc = (new SAXBuilder()).build(mdataFile);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems interpreting the OME XML contents in " + mdataFile.getPath() +
-                    "\n    " + ex.getMessage());
-        }
+        // Copy the metadata properties to this instance
+        setDatasetId(stdId);
+        setFilename(mdataInfo.getFilename());
+        setUploadTimestamp(mdataInfo.getUploadTimestamp());
+        setOwner(mdataInfo.getOwner());
+        setVersion(mdataInfo.getVersion());
 
         // Create the OME object for this instance
         try {
             this.omeMData = omeClass.newInstance();
-            this.omeMData.setDatasetId(mdata.getDatasetId());
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Unable to create an instance of " + omeClass.getSimpleName() +
-                    ": " + ex.getMessage());
+            throw new IllegalArgumentException("Unable to create an instance of " +
+                    omeClass.getSimpleName() + ": " + ex.getMessage());
         }
-        // Populate the OME object from the OME XML contents
+
+        // Populate the OME object from the file contents
         try {
-            this.omeMData.assignFromDocument(omeDoc);
+            this.omeMData.read(stdId, mdataFile);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problem with " + mdataFile.getPath() +
-                    "\n    " + ex.getMessage(), ex);
+            throw new IllegalArgumentException("Problem with metadata file " + getFilename() +
+                    " for dataset " + stdId + "\n    " + ex.getMessage(), ex);
         }
         setConflicted(!this.omeMData.isAcceptable());
     }
@@ -112,17 +92,25 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      * @param omeMeta
      *         the OME object to use in this instance.  All appropriate fields in this OME object
      *         are assumed to be assigned.  This OME object, not a copy of it, is used in this instance.
+     * @param metaname
+     *         the upload filename for this metadata
      * @param timestamp
      *         the upload timestamp for this metadata
      * @param owner
      *         the owner of this metadata
      * @param version
      *         the SOCAT version of this metadata
+     *
+     * @throws IllegalArgumentException
+     *         if the OME object is full
      */
-    public DashboardOmeMetadata(OmeMetadataInterface omeMeta, String timestamp, String owner, String version) {
+    public DashboardOmeMetadata(OmeMetadataInterface omeMeta, String metaname,
+            String timestamp, String owner, String version) throws IllegalArgumentException {
         super();
-        setFilename(DashboardUtils.OME_FILENAME);
+        if ( omeMeta == null )
+            throw new IllegalArgumentException("No OME object given");
         setDatasetId(DashboardServerUtils.checkDatasetID(omeMeta.getDatasetId()));
+        setFilename(metaname);
         setUploadTimestamp(timestamp);
         setOwner(owner);
         setVersion(version);
@@ -132,8 +120,9 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * Creates from an OME object resulting from appropriately merging the content of a secondary OME object into
-     * the primary OME object.  The dataset ID, upload timestamp, owner, version, and fields derived from the data
-     * are copied from the primary OME object (first) and values in the secondary OME object (second) are ignored.
+     * the primary OME object.  The dataset ID, filename, upload timestamp, owner, version, and fields derived from
+     * the data are copied from the primary OME object (first) and these values in the secondary OME object (second)
+     * are ignored.
      *
      * @param first
      *         start with a copy of this content
@@ -141,15 +130,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      *         merge in this content where appropriate
      *
      * @throws IllegalArgumentException
-     *         if the merge method of the primary OME object using with the secondary OME object as an argument
-     *         raises an exception
+     *         if the merge of the OME objects raises an exception
      */
     public DashboardOmeMetadata(DashboardOmeMetadata first, DashboardOmeMetadata second)
             throws IllegalArgumentException {
         super();
         // Copy the upload timestamp, owner, and version from the primary DashboardMetadata object
-        setFilename(DashboardUtils.OME_FILENAME);
         setDatasetId(DashboardServerUtils.checkDatasetID(first.getDatasetId()));
+        setFilename(first.getFilename());
         setUploadTimestamp(first.getUploadTimestamp());
         setOwner(first.getOwner());
         setVersion(first.getVersion());
@@ -170,6 +158,27 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         this.omeMData.setDataEndTime(first.omeMData.getDataEndTime());
 
         setConflicted(!this.omeMData.isAcceptable());
+    }
+
+    /**
+     * Save the contents of the OME object to indicated metadata file.  The contents
+     * of the file are such that this object can be recreated using an appropriate
+     * call to {@link #DashboardOmeMetadata(Class, DashboardMetadata, File)}
+     * Note that this does NOT save the information about this metadata file
+     * to the properties file.
+     *
+     * @param mdataFile
+     *         metadata file to create / overwrite
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems writing the metadata file
+     */
+    public void saveOmeToFile(File mdataFile) throws IllegalArgumentException {
+        try {
+            this.omeMData.write(mdataFile);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     /**
@@ -251,15 +260,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     public void changeDatasetID(String newId) {
         omeMData.setDatasetId(newId);
         setDatasetId(newId);
-    }
-
-    /**
-     * Generate a document that contains the contents of the data contained in this OME metadata object.
-     *
-     * @return the generated OME XML document
-     */
-    public Document createDocument() {
-        return omeMData.createDocument();
     }
 
     /**

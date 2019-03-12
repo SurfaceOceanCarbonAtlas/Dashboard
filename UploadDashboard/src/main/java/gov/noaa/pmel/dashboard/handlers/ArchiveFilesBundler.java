@@ -8,7 +8,6 @@ import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
-import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -229,17 +228,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
         String platformName = "";
         try {
-            DashboardMetadata mdata = mdataHandler.getMetadataInfo(stdId, "PI_OME.xml");
-            DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataHandler);
+            DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.PI_OME_FILENAME);
             platformName = omeMetadata.getPlatformName();
         } catch ( Exception ex ) {
             // Probably no PI_OME.xml metadata document
         }
         if ( platformName.isEmpty() ) {
             try {
-                DashboardMetadata mdata = mdataHandler.getMetadataInfo(stdId, "OME.xml");
-                DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata,
-                        mdataHandler);
+                DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.OME_FILENAME);
                 platformName = omeMetadata.getPlatformName();
             } catch ( Exception ex ) {
                 // Should always have an OME.xml metadata document, but ignore this problem here
