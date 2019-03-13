@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6281568935061988193L;
+    private static final long serialVersionUID = -6933115758590739121L;
 
     protected String varName;
     protected Double sortOrder;

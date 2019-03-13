@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 4800004152004279471L;
+    private static final long serialVersionUID = 8947621857406378016L;
 
     /**
      * Separator between the filename and the upload timestamp in additional document titles.

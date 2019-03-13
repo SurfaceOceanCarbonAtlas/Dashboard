@@ -13,7 +13,7 @@ import java.util.TreeSet;
  */
 public class RowNumSet extends TreeSet<Integer> {
 
-    private static final long serialVersionUID = -7041956741978307894L;
+    private static final long serialVersionUID = 6330118819228802042L;
 
     /**
      * Creates an empty set.

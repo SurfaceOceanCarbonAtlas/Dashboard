@@ -16,7 +16,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5005454171404329101L;
+    private static final long serialVersionUID = -7059048686537302765L;
 
     protected boolean selected;
     protected String version;

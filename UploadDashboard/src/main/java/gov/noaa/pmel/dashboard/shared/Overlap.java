@@ -20,7 +20,7 @@ import java.util.Arrays;
  */
 public class Overlap implements Serializable, IsSerializable, Comparable<Overlap> {
 
-    private static final long serialVersionUID = 7268526718169557931L;
+    private static final long serialVersionUID = 8793295231128742822L;
 
     protected String[] datasetIds;
     protected ArrayList<Integer>[] rowNums;

@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.shared;
  */
 public class CommentedQCFlag extends QCFlag {
 
-    private static final long serialVersionUID = 2394081498129081835L;
+    private static final long serialVersionUID = 4473792492507538463L;
 
     String comment;
 

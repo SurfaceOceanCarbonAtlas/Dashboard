@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
  */
 public class DataUploadService extends HttpServlet {
 
-    private static final long serialVersionUID = 1547524322159252520L;
+    private static final long serialVersionUID = 2280481050265455773L;
 
     // Patterns for getting the PI name(s) from the metadata preamble
     private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
@@ -65,7 +65,6 @@ public class DataUploadService extends HttpServlet {
             Pattern.compile("#*\\s*Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
             Pattern.compile("#*\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
-
 
     private ServletFileUpload datafileUpload;
 

@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1802598804328743505L;
+    private static final long serialVersionUID = 5519675665366522436L;
 
     /**
      * WOCE-like enumerated type indicating the severity of a QC flag value

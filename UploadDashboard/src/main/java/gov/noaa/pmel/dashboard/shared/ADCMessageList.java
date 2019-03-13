@@ -16,7 +16,7 @@ import java.util.HashSet;
  */
 public class ADCMessageList extends HashSet<ADCMessage> implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2922125729137984943L;
+    private static final long serialVersionUID = 4506301634351253061L;
 
     protected String username;
     protected String datasetId;

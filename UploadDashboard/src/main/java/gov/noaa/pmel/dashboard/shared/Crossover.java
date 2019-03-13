@@ -16,7 +16,7 @@ import java.util.Arrays;
  */
 public class Crossover implements Serializable, IsSerializable, Comparable<Crossover> {
 
-    private static final long serialVersionUID = -2012392349823423489L;
+    private static final long serialVersionUID = 5778334571477012406L;
 
     protected String[] datasetIds;
     protected Double minDistance;

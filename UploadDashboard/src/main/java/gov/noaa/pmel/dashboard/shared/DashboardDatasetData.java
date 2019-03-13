@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class DashboardDatasetData extends DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 3410692666983612359L;
+    private static final long serialVersionUID = -3346602282862933992L;
 
     protected ArrayList<String> preamble;
     protected ArrayList<Integer> rowNums;

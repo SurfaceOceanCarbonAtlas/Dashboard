@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public class ADCMessage implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -4524821044077234564L;
+    private static final long serialVersionUID = 7102386783315203802L;
 
     protected Severity severity;
     protected Integer rowNumber;

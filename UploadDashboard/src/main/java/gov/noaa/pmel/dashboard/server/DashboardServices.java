@@ -39,7 +39,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -2345235989345923400L;
+    private static final long serialVersionUID = 7353457807957608679L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;

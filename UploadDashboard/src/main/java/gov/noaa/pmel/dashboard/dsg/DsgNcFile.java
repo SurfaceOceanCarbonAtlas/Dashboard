@@ -33,7 +33,7 @@ import java.util.TreeSet;
 
 public class DsgNcFile extends File {
 
-    private static final long serialVersionUID = -7695491814772713480L;
+    private static final long serialVersionUID = -4101244523736694568L;
 
     private static final String DSG_VERSION = "DsgNcFile 2.0";
     private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";

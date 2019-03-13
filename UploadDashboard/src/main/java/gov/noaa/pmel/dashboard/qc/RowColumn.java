@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  * Ordering is such that rows with the same column number are next to each other (so first on column, then on row).
  */
 public class RowColumn implements Comparable<RowColumn> {
+
     Integer row;
     Integer column;
 

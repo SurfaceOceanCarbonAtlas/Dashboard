@@ -36,7 +36,7 @@ import java.util.TreeSet;
  */
 public class MetadataUploadService extends HttpServlet {
 
-    private static final long serialVersionUID = 1435923489023890617L;
+    private static final long serialVersionUID = -1458504704372812166L;
 
     private ServletFileUpload metadataUpload;
 

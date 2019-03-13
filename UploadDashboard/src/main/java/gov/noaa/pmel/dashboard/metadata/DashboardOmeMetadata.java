@@ -24,7 +24,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 9023459134599348949L;
+    private static final long serialVersionUID = -5972791331367156492L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
