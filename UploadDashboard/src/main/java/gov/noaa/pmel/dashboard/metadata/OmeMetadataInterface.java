@@ -202,13 +202,13 @@ public interface OmeMetadataInterface {
     void setNorthernLatitude(Double northernLatitude);
 
     /**
-     * @return the UTC time, in units of seconds since Jan 1 1970 00:00:00, of the earlier (starting) data point
+     * @return the UTC time, in units of seconds since Jan 1 1970 00:00:00, of the earliest (starting) data point
      */
     Double getDataStartTime();
 
     /**
      * @param dataStartTime
-     *         the UTC time, in units of seconds since Jan 1 1970 00:00:00, to set as the earlier (starting) data point
+     *         the UTC time, in units of seconds since Jan 1 1970 00:00:00, to set as the earliest (starting) data point
      */
     void setDataStartTime(Double dataStartTime);
 
