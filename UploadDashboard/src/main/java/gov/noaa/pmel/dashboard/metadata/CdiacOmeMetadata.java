@@ -67,22 +67,6 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public OmeMetadataInterface merge(OmeMetadataInterface other)
-            throws IllegalArgumentException {
-        if ( !(other instanceof CdiacOmeMetadata) )
-            throw new IllegalArgumentException(
-                    "Unsupported class of other OME object for CdiacOmeMetadata.merge");
-        CdiacOmeMetadata otherMData = (CdiacOmeMetadata) other;
-        CdiacOmeMetadata merged = new CdiacOmeMetadata();
-        try {
-            merged.mdata = OmeMetadata.merge(mdata, otherMData.mdata);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException(ex);
-        }
-        return merged;
-    }
-
-    @Override
     public void write(File mdataFile) throws IOException {
         Document omeDoc = mdata.createOmeXmlDoc();
         FileOutputStream outStream = new FileOutputStream(mdataFile);

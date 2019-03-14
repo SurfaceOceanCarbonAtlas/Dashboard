@@ -119,48 +119,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Creates from an OME object resulting from appropriately merging the content of a secondary OME object into
-     * the primary OME object.  The dataset ID, filename, upload timestamp, owner, version, and fields derived from
-     * the data are copied from the primary OME object (first) and these values in the secondary OME object (second)
-     * are ignored.
-     *
-     * @param first
-     *         start with a copy of this content
-     * @param second
-     *         merge in this content where appropriate
-     *
-     * @throws IllegalArgumentException
-     *         if the merge of the OME objects raises an exception
-     */
-    public DashboardOmeMetadata(DashboardOmeMetadata first, DashboardOmeMetadata second)
-            throws IllegalArgumentException {
-        super();
-        // Copy the upload timestamp, owner, and version from the primary DashboardMetadata object
-        setDatasetId(DashboardServerUtils.checkDatasetID(first.getDatasetId()));
-        setFilename(first.getFilename());
-        setUploadTimestamp(first.getUploadTimestamp());
-        setOwner(first.getOwner());
-        setVersion(first.getVersion());
-
-        // Create the OME object for this instance
-        try {
-            this.omeMData = first.omeMData.merge(second.omeMData);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Unable to merge OME documents: " + ex.getMessage(), ex);
-        }
-
-        // Some fields should not have been merged; reset to the values in first
-        this.omeMData.setWesternLongitude(first.omeMData.getWesternLongitude());
-        this.omeMData.setEasternLongitude(first.omeMData.getEasternLongitude());
-        this.omeMData.setSouthernLatitude(first.omeMData.getSouthernLatitude());
-        this.omeMData.setNorthernLatitude(first.omeMData.getNorthernLatitude());
-        this.omeMData.setDataStartTime(first.omeMData.getDataStartTime());
-        this.omeMData.setDataEndTime(first.omeMData.getDataEndTime());
-
-        setConflicted(!this.omeMData.isAcceptable());
-    }
-
-    /**
      * Save the contents of the OME object to indicated metadata file.  The contents
      * of the file are such that this object can be recreated using an appropriate
      * call to {@link #DashboardOmeMetadata(Class, DashboardMetadata, File)}

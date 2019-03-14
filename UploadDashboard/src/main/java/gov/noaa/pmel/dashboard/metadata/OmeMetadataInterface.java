@@ -32,26 +32,6 @@ public interface OmeMetadataInterface {
             throws IllegalArgumentException, FileNotFoundException, IOException;
 
     /**
-     * Creates an new OME object that is the result of merging this OME object
-     * with another OME object with the same dataset ID (expocode).  In cases
-     * where there are conflicting values in the two objects, the two conflicting
-     * values are stored and a conflict flag is set.
-     *
-     * @param other
-     *         OME object to merge with this OME object
-     *
-     * @return new OME object containing the merged contents
-     *
-     * @throws IllegalArgumentException
-     *         if the dataset IDs (expocodes) do not match,
-     *         if unable to interpret the contents of the OME object to merge in
-     *         (e.g., unknown implementation of OmeMetadataInterface), or
-     *         if unable to merge the contents
-     */
-    OmeMetadataInterface merge(OmeMetadataInterface other)
-            throws IllegalArgumentException;
-
-    /**
      * Saves the contents of the OME object in the specified metadata file.
      * The contents of this file should allow regeneration of this OME object
      * from an appropriate call to {@link #read(String, File)}

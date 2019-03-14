@@ -10,6 +10,7 @@ import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.platform.PlatformType;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.xml.DocumentHandler;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -51,11 +52,6 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
             throw new IllegalArgumentException("Inappropriate dataset ID (" + givenId +
                     ") in the metadata file " + mdataFile.getName() + " for dataset " + datasetId);
         }
-    }
-
-    @Override
-    public OmeMetadataInterface merge(OmeMetadataInterface other) throws IllegalArgumentException {
-        return null;
     }
 
     @Override

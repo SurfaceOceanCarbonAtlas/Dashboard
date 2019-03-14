@@ -13,9 +13,9 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class DashboardOmeMetadataTest {
@@ -50,9 +50,9 @@ public class DashboardOmeMetadataTest {
     private static final String AOML_PLATFORM_NAME = "Ronald H. Brown";
     private static final String AOML_PI_NAMES = "Rik Wanninkhof";
     private static final ArrayList<String> AOML_INVESTIGATORS =
-            new ArrayList<String>(Arrays.asList("Rik Wanninkhof"));
+            new ArrayList<String>(Collections.singletonList("Rik Wanninkhof"));
     private static final ArrayList<String> AOML_ORGANIZATIONS =
-            new ArrayList<String>(Arrays.asList("NOAA/AOML"));
+            new ArrayList<String>(Collections.singletonList("NOAA/AOML"));
     private static final double AOML_WESTERN = -158.0;
     private static final double AOML_EASTERN = -122.6;
     private static final double AOML_SOUTHERN = -21.2;
@@ -130,51 +130,6 @@ public class DashboardOmeMetadataTest {
         assertEquals(AOML_START_DATE, mdata.getBeginDatestamp());
         assertEquals(AOML_END_DATE, mdata.getEndDatestamp());
         assertEquals(AOML_DATASET_LINK, mdata.getDatasetLink());
-    }
-
-    @Test
-    public void testDashboardOmeMetadataFromMerge() {
-        DashboardOmeMetadata stubMData = new DashboardOmeMetadata(cdiacXmlStubMData,
-                STUB_UPLOAD_FILENAME, STUB_UPLOAD_TIMESTAMP, STUB_DATASET_OWNER, STUB_VERSION);
-        DashboardOmeMetadata aomlMData = new DashboardOmeMetadata(aomlCdiacXmlMData,
-                STUB_UPLOAD_FILENAME, AOML_UPLOAD_TIMESTAMP, AOML_DATASET_OWNER, AOML_VERSION);
-
-        aomlMData.changeDatasetID(STUB_EXPOCODE);
-
-        DashboardOmeMetadata mdata = new DashboardOmeMetadata(stubMData, aomlMData);
-        assertEquals(STUB_UPLOAD_TIMESTAMP, mdata.getUploadTimestamp());
-        assertEquals(STUB_DATASET_OWNER, mdata.getOwner());
-        assertEquals(STUB_VERSION, mdata.getVersion());
-        assertEquals(STUB_EXPOCODE, mdata.getDatasetId());
-        assertEquals("", mdata.getDatasetName());  // conflict
-        assertEquals(STUB_PLATFORM_NAME, mdata.getPlatformName());
-        // Investigators and organizations get merged starting with secondary - not really what it should be
-        assertEquals(STUB_WESTERN, mdata.getWestmostLongitude(), DELTA);
-        assertEquals(STUB_EASTERN, mdata.getEastmostLongitude(), DELTA);
-        assertEquals(STUB_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
-        assertEquals(STUB_NORTHERN, mdata.getNorthmostLatitude(), DELTA);
-        assertEquals(STUB_START_DATE, mdata.getBeginDatestamp());
-        assertEquals(STUB_END_DATE, mdata.getEndDatestamp());
-        assertTrue(mdata.isConflicted());
-
-        aomlMData.changeDatasetID(AOML_EXPOCODE);
-        stubMData.changeDatasetID(AOML_EXPOCODE);
-
-        mdata = new DashboardOmeMetadata(aomlMData, stubMData);
-        assertEquals(AOML_UPLOAD_TIMESTAMP, mdata.getUploadTimestamp());
-        assertEquals(AOML_DATASET_OWNER, mdata.getOwner());
-        assertEquals(AOML_VERSION, mdata.getVersion());
-        assertEquals(AOML_EXPOCODE, mdata.getDatasetId());
-        assertEquals("", mdata.getDatasetName());  // conflict
-        assertEquals(AOML_PLATFORM_NAME, mdata.getPlatformName());
-        // Investigators and organizations get merged starting with secondary - not really what it should be
-        assertEquals(AOML_WESTERN, mdata.getWestmostLongitude(), DELTA);
-        assertEquals(AOML_EASTERN, mdata.getEastmostLongitude(), DELTA);
-        assertEquals(AOML_SOUTHERN, mdata.getSouthmostLatitude(), DELTA);
-        assertEquals(AOML_NORTHERN, mdata.getNorthmostLatitude(), DELTA);
-        assertEquals(AOML_START_DATE, mdata.getBeginDatestamp());
-        assertEquals(AOML_END_DATE, mdata.getEndDatestamp());
-        assertTrue(mdata.isConflicted());
     }
 
     @Test
