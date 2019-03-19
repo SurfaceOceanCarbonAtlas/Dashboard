@@ -8,9 +8,8 @@ import gov.noaa.pmel.sdimetadata.person.Investigator;
 import gov.noaa.pmel.sdimetadata.person.Person;
 import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.platform.PlatformType;
+import gov.noaa.pmel.sdimetadata.translate.DocumentHandler;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.xml.DocumentHandler;
-import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
