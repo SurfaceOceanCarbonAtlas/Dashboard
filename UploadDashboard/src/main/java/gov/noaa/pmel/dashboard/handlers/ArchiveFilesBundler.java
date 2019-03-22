@@ -8,11 +8,17 @@ import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
+import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -43,6 +49,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -56,6 +63,7 @@ import java.util.zip.ZipOutputStream;
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
+    private static final String OCADS_OME_XML_FILENAME = "PI_OME_to_OCADS.xml";
 
     private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
     private static final String EMAIL_SUBJECT_MSG_MIDDLE = " from SOCAT dashboard user ";
@@ -68,6 +76,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                     "the SOCAT Upload Dashboard user ";
     private static final String EMAIL_MSG_END =
             " \nhas requested immediate OCADS archival of the attached BagIt ZIP file of data and metadata. \n" +
+                    "\n" +
+                    "The metadata file " + OCADS_OME_XML_FILENAME + ", if present, is an *experimental* translation \n" +
+                    "of the PI-provided metadata in " + DashboardUtils.PI_OME_FILENAME + ". \n" +
+                    "The " + OCADS_OME_XML_FILENAME + " file was machine-generated and added only to assist \n" +
+                    "in the archival, but should *not* be archived. \n" +
                     "\n" +
                     "Best regards, \n" +
                     "SOCAT Team \n";
@@ -83,6 +96,31 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     public enum BundleType {
         ORIG_FILE_BAGIT_ZIP,
         ENHANCED_FILE_PLAIN_ZIP
+    }
+
+    private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
+
+    static {
+        DASH_TYPE_TO_CDIAC_TYPE = new HashMap<String,CdiacReader.VarType>();
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_WATER_TEQU_WET.getVarName(), CdiacReader.VarType.FCO2_WATER_EQU);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_WATER_SST_WET.getVarName(), CdiacReader.VarType.FCO2_WATER_SST);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(), CdiacReader.VarType.PCO2_WATER_EQU);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_WATER_SST_WET.getVarName(), CdiacReader.VarType.PCO2_WATER_SST);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(), CdiacReader.VarType.XCO2_WATER_EQU);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_WATER_SST_DRY.getVarName(), CdiacReader.VarType.XCO2_WATER_SST);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.FCO2_ATM_ACTUAL);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.FCO2_ATM_INTERP);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.PCO2_ATM_ACTUAL);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.PCO2_ATM_INTERP);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.XCO2_ATM_ACTUAL);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.XCO2_ATM_INTERP);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.SST.getVarName(), CdiacReader.VarType.SEA_SURFACE_TEMPERATURE);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.TEQU.getVarName(), CdiacReader.VarType.EQUILIBRATOR_TEMPERATURE);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PATM.getVarName(), CdiacReader.VarType.SEA_LEVEL_PRESSURE);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PEQU.getVarName(), CdiacReader.VarType.EQUILIBRATOR_PRESSURE);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.SALINITY.getVarName(), CdiacReader.VarType.SALINITY);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.WOCE_CO2_WATER.getVarName(), CdiacReader.VarType.WOCE_CO2_WATER);
+        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.WOCE_CO2_ATM.getVarName(), CdiacReader.VarType.WOCE_CO2_ATM);
     }
 
     /**
@@ -224,16 +262,42 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
-        // Check if there is a platform name (mainly for moorings)
-        MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+        // The platform name needed for the email message - mainly for moorings, which do not have a distinctive NODC code
         String platformName = "";
+        // The SDIMetadata object created from PI-provided OME metadata - for auto-generating OCADS XML file
+        SDIMetadata sdimdata = null;
+
+        MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+        // Check if there is a PI-provided OME document
         try {
             DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            // Get the platform name
             platformName = omeMetadata.getPlatformName();
+            // Make sure all data column names used are mapped to the correct CdiacReader.VarType
+            HashMap<String,CdiacReader.VarType> nameToVarTypeMap = new HashMap<String,CdiacReader.VarType>();
+            DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
+            ArrayList<String> dataColNames = dsetInfo.getUserColNames();
+            ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
+            for (int k = 0; k < dataColNames.size(); k++) {
+                CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
+                if ( vtype != null ) {
+                    String namekey = CdiacReader.STRIP_PATTERN.matcher(dataColNames.get(k).toUpperCase())
+                                                              .replaceAll("")
+                                                              .toLowerCase();
+                    nameToVarTypeMap.put(namekey, vtype);
+                }
+            }
+            // Create an SDIMetadata object from the PI-provided CDIAC XML
+            File omefile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            FileReader xmlReader = new FileReader(omefile);
+            CdiacReader reader = new CdiacReader(xmlReader, nameToVarTypeMap);
+            sdimdata = reader.createSDIMetadata();
+            xmlReader.close();
         } catch ( Exception ex ) {
             // Probably no PI_OME.xml metadata document
         }
         if ( platformName.isEmpty() ) {
+            // Check if there is a platform name in the OME stub
             try {
                 DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.OME_FILENAME);
                 platformName = omeMetadata.getPlatformName();
@@ -255,7 +319,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // Generate the bundle as a zip file
         File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
-        String infoMsg = createBagitFilesBundle(stdId);
+        String infoMsg = createBagitFilesBundle(stdId, sdimdata);
 
         // Commit the bundle to version control
         if ( (message != null) && !message.isEmpty() ) {
@@ -387,6 +451,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *
      * @param expocode
      *         create the bagit zip file for the dataset with this ID
+     * @param sdimdata
+     *         metadata to be written as an OCADS XML file; can be null
      *
      * @return info message describing this bundle and its contents
      *
@@ -398,7 +464,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if there were problems copying files to the bagit bundle directory, or
      *         if there were problems creating the bagit zip file from the bagit bundle directory
      */
-    private String createBagitFilesBundle(String expocode)
+    private String createBagitFilesBundle(String expocode, SDIMetadata sdimdata)
             throws IllegalArgumentException, IOException {
         String stdId = DashboardServerUtils.checkDatasetID(expocode);
         File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
@@ -450,6 +516,13 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 infoMsg += "    " + metaFile.getName() + "\n";
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
+            }
+            if ( sdimdata != null ) {
+                infoMsg += "    " + OCADS_OME_XML_FILENAME + "\n";
+                dest = new File(bundleDir, OCADS_OME_XML_FILENAME);
+                FileWriter xmlwriter = new FileWriter(dest);
+                (new OcadsWriter()).writeOcadsXml(sdimdata, xmlwriter);
+                xmlwriter.close();
             }
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);

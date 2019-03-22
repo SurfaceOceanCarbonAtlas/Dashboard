@@ -72,7 +72,8 @@ public class SocatTypes {
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
-    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType("pCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType PCO2_WATER_SST_WET = new DoubleDashDataType(
+            "pCO2_water_sst_100humidity_uatm",
             633.0, "pCO2_water_SST_wet", "water pCO2 wet using sst", false,
             PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
@@ -82,9 +83,40 @@ public class SocatTypes {
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
-    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType("fCO2_water_sst_100humidity_uatm",
+    public static final DoubleDashDataType FCO2_WATER_SST_WET = new DoubleDashDataType(
+            "fCO2_water_sst_100humidity_uatm",
             635.0, "fCO2_water_SST_wet", "water fCO2 wet using sst", false,
             FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_sea_water", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType XCO2_ATM_DRY_ACTUAL = new DoubleDashDataType("xCO2_atm_dry_actual",
+            640.0, "xCO2_atm_dry_actual", "actual air xCO2 dry", false,
+            XCO2_UNITS, "mole_fraction_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType PCO2_ATM_DRY_ACTUAL = new DoubleDashDataType("pCO2_atm_wet_actual",
+            641.0, "pCO2_atm_wet_actual", "actual air pCO2 wet", false,
+            PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType FCO2_ATM_DRY_ACTUAL = new DoubleDashDataType("fCO2_atm_wet_actual",
+            642.0, "fCO2_atm_wet_actual", "actual air fCO2 wet", false,
+            FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType XCO2_ATM_DRY_INTERP = new DoubleDashDataType("xCO2_atm_dry_interp",
+            643.0, "xCO2_atm_dry_interp", "interpolated air xCO2 dry", false,
+            XCO2_UNITS, "mole_fraction_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType PCO2_ATM_DRY_INTERP = new DoubleDashDataType("pCO2_atm_wet_interp",
+            644.0, "pCO2_atm_wet_interp", "interpolated air pCO2 wet", false,
+            PCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
+            "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
+
+    public static final DoubleDashDataType FCO2_ATM_DRY_INTERP = new DoubleDashDataType("fCO2_atm_wet_interp",
+            645.0, "fCO2_atm_wet_interp", "interpolated air fCO2 wet", false,
+            FCO2_UNITS, "surface_partial_pressure_of_carbon_dioxide_in_air", CO2_CATEGORY, null,
             "0.0", "80.0", "1200.0", "50000.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
     public static final StringDashDataType WOCE_CO2_WATER = new StringDashDataType("WOCE_CO2_water",

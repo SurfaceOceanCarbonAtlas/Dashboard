@@ -355,15 +355,12 @@ public class UserFileHandler extends VersionedFileHandler {
      * @param username
      *         user whose dataset list is to be updated
      *
-     * @return updated list of datasets for user
-     *
      * @throws IllegalArgumentException
      *         if username is invalid, if any of the datasetIds are invalid, if the cruise information file does not
      *         exist, if there was a problem saving the updated cruise listing, or if there was an error committing the
      *         updated cruise listing to version control
      */
-    public DashboardDatasetList addDatasetsToListing(Collection<String> idsSet, String username)
-            throws IllegalArgumentException {
+    public void addDatasetsToListing(Collection<String> idsSet, String username) throws IllegalArgumentException {
         String cleanUsername = DashboardServerUtils.cleanUsername(username);
         if ( cleanUsername.isEmpty() )
             throw new IllegalArgumentException("invalid username");
@@ -392,7 +389,25 @@ public class UserFileHandler extends VersionedFileHandler {
             commitMsg += " to the listing for " + cleanUsername;
             saveDatasetListing(datasetList, commitMsg);
         }
-        return datasetList;
+    }
+
+    /**
+     * @param username
+     *         modify the default map of data columns to types for this user;
+     *         if null or blank or not a known user, a copy of the default map is returned
+     *
+     * @return a map of data column to types, modified for the specified user
+     */
+    public HashMap<String,DataColumnType> getUserColNamesToTypesMap(String username) {
+        // Copy the default maps of data column names to types and units
+        HashMap<String,DataColumnType> userColNamesToTypes = new HashMap<String,DataColumnType>(defaultColNamesToTypes);
+        if ( (username == null) || username.trim().isEmpty() )
+            return userColNamesToTypes;
+        // Add the user-customized map of column names to types
+        File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
+        if ( propsFile.exists() )
+            addDataColumnNames(userColNamesToTypes, propsFile);
+        return userColNamesToTypes;
     }
 
     /**
@@ -407,13 +422,7 @@ public class UserFileHandler extends VersionedFileHandler {
      *         the file exists, is invalid.
      */
     public void assignDataColumnTypes(DashboardDataset dataset) throws IllegalArgumentException {
-        // Copy the default maps of data column names to types and units
-        HashMap<String,DataColumnType> userColNamesToTypes =
-                new HashMap<String,DataColumnType>(defaultColNamesToTypes);
-        // Add the user-customized map of column names to types
-        File propsFile = new File(filesDir, dataset.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
-        if ( propsFile.exists() )
-            addDataColumnNames(userColNamesToTypes, propsFile);
+        HashMap<String,DataColumnType> userColNamesToTypes = getUserColNamesToTypesMap(dataset.getOwner());
         ArrayList<String> userColNames = dataset.getUserColNames();
         ArrayList<DataColumnType> colTypes = new ArrayList<DataColumnType>(userColNames.size());
         // Go through the column names to assign these lists
@@ -441,12 +450,7 @@ public class UserFileHandler extends VersionedFileHandler {
      *         updated version of this file
      */
     public void updateUserDataColumnTypes(DashboardDataset dataset, String username) throws IllegalArgumentException {
-        // Copy the default maps of data column names to types and units
-        HashMap<String,DataColumnType> userColNamesToTypes = new HashMap<String,DataColumnType>(defaultColNamesToTypes);
-        // Add the user-customized map of column names to types
-        File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
-        if ( propsFile.exists() )
-            addDataColumnNames(userColNamesToTypes, propsFile);
+        HashMap<String,DataColumnType> userColNamesToTypes = getUserColNamesToTypesMap(username);
         // Add mappings of data columns names to types, units, and missing values from this dataset
         ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
         boolean changed = false;
@@ -481,6 +485,7 @@ public class UserFileHandler extends VersionedFileHandler {
                     thisColType.getSelectedMissingValue());
         }
         // Save this Properties object to file
+        File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
         try {
             FileWriter propsWriter = new FileWriter(propsFile);
             try {
