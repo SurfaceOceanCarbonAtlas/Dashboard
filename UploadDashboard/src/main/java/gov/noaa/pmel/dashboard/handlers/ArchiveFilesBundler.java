@@ -273,26 +273,26 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.PI_OME_FILENAME);
             // Get the platform name
             platformName = omeMetadata.getPlatformName();
+            // Read the PI-provided CDIAC XML
+            File omefile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            FileReader xmlReader = new FileReader(omefile);
+            CdiacReader reader;
+            try {
+                reader = new CdiacReader(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
             // Make sure all data column names used are mapped to the correct CdiacReader.VarType
-            HashMap<String,CdiacReader.VarType> nameToVarTypeMap = new HashMap<String,CdiacReader.VarType>();
             DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
             ArrayList<String> dataColNames = dsetInfo.getUserColNames();
             ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
             for (int k = 0; k < dataColNames.size(); k++) {
                 CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
-                if ( vtype != null ) {
-                    String namekey = CdiacReader.STRIP_PATTERN.matcher(dataColNames.get(k).toUpperCase())
-                                                              .replaceAll("")
-                                                              .toLowerCase();
-                    nameToVarTypeMap.put(namekey, vtype);
-                }
+                if ( vtype != null )
+                    reader.associateColumnNameWithVarType(dataColNames.get(k), vtype);
             }
             // Create an SDIMetadata object from the PI-provided CDIAC XML
-            File omefile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
-            FileReader xmlReader = new FileReader(omefile);
-            CdiacReader reader = new CdiacReader(xmlReader, nameToVarTypeMap);
             sdimdata = reader.createSDIMetadata();
-            xmlReader.close();
         } catch ( Exception ex ) {
             // Probably no PI_OME.xml metadata document
         }
