@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -22,13 +23,13 @@ public class SocatTypes {
     public static final String SALINITY_CATEGORY = "Salinity";
     public static final String TEMPERATURE_CATEGORY = "Temperature";
 
-    public static final List<String> SALINITY_UNITS = Arrays.asList("PSU");
-    public static final List<String> TEMPERATURE_UNITS = Arrays.asList("deg C");
+    public static final List<String> SALINITY_UNITS = Collections.singletonList("PSU");
+    public static final List<String> TEMPERATURE_UNITS = Collections.singletonList("deg C");
     public static final List<String> PRESSURE_UNITS = Arrays.asList("hPa", "kPa", "mmHg");
-    public static final List<String> XCO2_UNITS = Arrays.asList("umol/mol");
-    public static final List<String> PCO2_UNITS = Arrays.asList("uatm");
-    public static final List<String> FCO2_UNITS = Arrays.asList("uatm");
-    public static final List<String> DISTANCE_UNITS = Arrays.asList("km");
+    public static final List<String> XCO2_UNITS = Collections.singletonList("umol/mol");
+    public static final List<String> PCO2_UNITS = Collections.singletonList("uatm");
+    public static final List<String> FCO2_UNITS = Collections.singletonList("uatm");
+    public static final List<String> DISTANCE_UNITS = Collections.singletonList("km");
     public static final List<String> SPEED_UNITS = Arrays.asList("knots", "km/h", "m/s", "mph");
 
     // Additional data provided by the user

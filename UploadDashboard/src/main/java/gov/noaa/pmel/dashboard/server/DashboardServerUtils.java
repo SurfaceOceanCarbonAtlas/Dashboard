@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.shared.QCFlag;
 import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -186,25 +187,25 @@ public class DashboardServerUtils {
      * Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z")
      */
     public static final List<String> TIME_UNITS =
-            Arrays.asList("seconds since 1970-01-01T00:00:00Z");
+            Collections.singletonList("seconds since 1970-01-01T00:00:00Z");
 
     /**
      * Data type is only user-provided data; not used in DSG files.
      */
     public static final List<DashDataType.Role> USER_ONLY_ROLES =
-            Arrays.asList(DashDataType.Role.USER_DATA);
+            Collections.singletonList(DashDataType.Role.USER_DATA);
 
     /**
      * Data type is only data in DSG files; not (directly) provided by the user.
      */
     public static final List<DashDataType.Role> FILE_DATA_ONLY_ROLES =
-            Arrays.asList(DashDataType.Role.FILE_DATA);
+            Collections.singletonList(DashDataType.Role.FILE_DATA);
 
     /**
      * Data type is only metadata in DSG files; not (directly) provided by the user.
      */
     public static final List<DashDataType.Role> FILE_METADATA_ONLY_ROLES =
-            Arrays.asList(DashDataType.Role.FILE_METADATA);
+            Collections.singletonList(DashDataType.Role.FILE_METADATA);
 
     /**
      * Data type is user-provided data also in DSG files.
@@ -265,7 +266,7 @@ public class DashboardServerUtils {
      * User-provided name for the dataset
      */
     public static final StringDashDataType DATASET_NAME = new StringDashDataType("dataset_name",
-            100.0, "cruise/dataset name", "unique name for this dataset", false,
+            100.0, "cruise/dataset name", "investigator's name for this dataset", false,
             DashboardUtils.NO_UNITS, "dataset_name", IDENTIFIER_CATEGORY, null,
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
@@ -279,33 +280,33 @@ public class DashboardServerUtils {
             DashboardUtils.NO_UNITS, "platform_type", PLATFORM_CATEGORY, null,
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
-    public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
-            103.0, "organization", "organization", false,
-            DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
-            null, null, null, null, USER_FILE_METADATA_ROLES);
-
     public static final StringDashDataType INVESTIGATOR_NAMES = new StringDashDataType("investigators",
-            104.0, "PI names", "investigators", false,
+            103.0, "PI names", "investigators", false,
             DashboardUtils.NO_UNITS, "investigators", IDENTIFIER_CATEGORY, null,
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
+    public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
+            104.0, "PI organizations", "organization for each PI", false,
+            DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
+            null, null, null, null, USER_FILE_METADATA_ROLES);
+
     public static final DoubleDashDataType WESTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_min",
-            110.0, "westmost lon", "westernmost longitude", false,
+            110.0, "westernmost lon", "westernmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_min", LOCATION_CATEGORY, "degrees_east",
             "-540.0", "-180.0", "360.0", "540.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType EASTERNMOST_LONGITUDE = new DoubleDashDataType("geospatial_lon_max",
-            111.0, "eastmost lon", "easternmost longitude", false,
+            111.0, "easternmost lon", "easternmost longitude", false,
             DashboardUtils.LONGITUDE_UNITS, "geospatial_lon_max", LOCATION_CATEGORY, "degrees_east",
             "-540.0", "-180.0", "360.0", "540.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType SOUTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_min",
-            112.0, "southmost lat", "southernmost latitude", false,
+            112.0, "southernmost lat", "southernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_min", LOCATION_CATEGORY, "degrees_north",
             "-90.0", null, null, "90.0", FILE_METADATA_ONLY_ROLES);
 
     public static final DoubleDashDataType NORTHERNMOST_LATITUDE = new DoubleDashDataType("geospatial_lat_max",
-            113.0, "northmost lat", "northernmost latitude", false,
+            113.0, "northernmost lat", "northernmost latitude", false,
             DashboardUtils.LATITUDE_UNITS, "geospatial_lat_max", LOCATION_CATEGORY, "degrees_north",
             "-90.0", null, null, "90.0", FILE_METADATA_ONLY_ROLES);
 

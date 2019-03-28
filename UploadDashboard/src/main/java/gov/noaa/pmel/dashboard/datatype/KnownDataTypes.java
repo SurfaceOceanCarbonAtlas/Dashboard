@@ -138,8 +138,8 @@ public class KnownDataTypes {
         addDataType(DashboardServerUtils.ENHANCED_DOI);
         addDataType(DashboardServerUtils.PLATFORM_NAME);
         addDataType(DashboardServerUtils.PLATFORM_TYPE);
-        addDataType(DashboardServerUtils.ORGANIZATION_NAME);
         addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
+        addDataType(DashboardServerUtils.ORGANIZATION_NAME);
         addDataType(DashboardServerUtils.WESTERNMOST_LONGITUDE);
         addDataType(DashboardServerUtils.EASTERNMOST_LONGITUDE);
         addDataType(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
