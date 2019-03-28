@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.actions.DatasetModifier;
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
@@ -28,8 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -39,7 +40,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = 7353457807957608679L;
+    private static final long serialVersionUID = -1849939750979152323L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -566,7 +567,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public void submitDatasetsForQC(String pageUsername, HashSet<String> idsSet, String archiveStatus,
+    public void submitDatasetsForQC(String pageUsername, TreeSet<String> idsSet, String archiveStatus,
             String timestamp, boolean repeatSend) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
@@ -579,21 +580,54 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public void suspendDatasets(String pageUsername, HashSet<String> idsSet, String timestamp)
+    public void suspendDatasets(String pageUsername, TreeSet<String> idsSet)
             throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
+        //  Global suspend QCFlag to add to the database (after adding the dataset ID)
+        QCEvent qc = new QCEvent();
+        qc.setUsername(username);
+        qc.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_SUSPEND);
+        qc.setFlagDate(new Date());
+        qc.setVersion(configStore.getQCVersion());
+        qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+        qc.setComment("suspended for update from the SOCAT Dashboard");
+
+        DataFileHandler dataHandler = configStore.getDataFileHandler();
+        DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+        DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+
+        StringBuilder errmsgs = new StringBuilder();
         for (String datasetId : idsSet) {
-            String message = "Suspending dataset " + datasetId;
-            DataFileHandler df = configStore.getDataFileHandler();
-            DashboardDataset ds = df.getDatasetFromInfoFile(datasetId);
-            ds.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
-            df.saveDatasetInfoToFile(ds, message);
-            // TODO: Need to add QCFlag to database and set in DSG file
+            try {
+                DashboardDataset dset = dataHandler.getDatasetFromInfoFile(datasetId);
+                // Only update if not already editable; ignore if already editable
+                if ( !Boolean.TRUE.equals(dset.isEditable()) ) {
+                    qc.setDatasetId(datasetId);
+                    //  add the global suspend QCFlag to database
+                    dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
+                    //  update the DSG files
+                    dsgHandler.updateDatasetQCFlagAndVersion(qc);
+                    //  update the dataset properties file
+                    String message = "dataset " + datasetId + " suspended by " + username;
+                    dset.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
+                    dataHandler.saveDatasetInfoToFile(dset, message);
+                    itsLogger.info(message);
+                }
+            } catch ( Exception ex ) {
+                if ( errmsgs.length() > 0 )
+                    errmsgs.append('\n');
+                errmsgs.append("Unable to suspend " + datasetId);
+                String msg = ex.getMessage();
+                msg = (msg != null) ? msg.trim() : "";
+                if ( !msg.isEmpty() )
+                    errmsgs.append(": " + msg);
+            }
         }
-        itsLogger.info("datasets " + idsSet.toString() + " suspended by " + username);
+        if ( errmsgs.length() > 0 )
+            throw new IllegalArgumentException(errmsgs.toString());
     }
 
 }

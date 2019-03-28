@@ -12,7 +12,6 @@ import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,8 +44,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -138,14 +135,15 @@ public class DatasetListPage extends CompositeWithUsername {
             "for dataset preview.";
     private static final String FOR_QC_SUBMIT_ERR_END =
             "for submitting for QC and archival.";
-    private static final String FOR_SUSPEND_ERR_END =
-            "for suspension.";
     private static final String FOR_DELETE_ERR_END =
             "for deletion from the system.";
     private static final String FOR_HIDE_ERR_END =
             "for hiding from your list of displayed datasets.";
     private static final String FOR_CHANGE_OWNER_ERR_END =
             "for changing ownership";
+
+    private static final String NO_DATASETS_TO_SUSPEND_ERR_MSG =
+            "All datasets selected (if any) can be modified and, thus, do not need to be suspended.";
 
     private static final String CANNOT_PREVIEW_UNCHECKED_ERRMSG =
             "Preview plots cannot be generated for datasets " +
@@ -175,6 +173,15 @@ public class DatasetListPage extends CompositeWithUsername {
                     "Do you want to continue? ";
     private static final String AUTOFAIL_YES_TEXT = "Yes";
     private static final String AUTOFAIL_NO_TEXT = "No";
+
+    private static final String SUSPEND_HTML_PROLOGUE =
+            "The following datasets will be suspended from QC to allow updates: <ul>";
+    private static final String SUSPEND_HTML_EPILOGUE =
+            "</ul> Do you want to proceed?";
+    private static final String SUSPEND_YES_TEXT = "Yes";
+    private static final String SUSPEND_NO_TEXT = "No";
+    private static final String SUSPEND_FAIL_MSG =
+            "Problems suspending the selected datasets";
 
     private static final String DATASETS_TO_SHOW_MSG =
             "Enter the ID, possibly with wildcards * and ?, of the dataset(s) " +
@@ -297,6 +304,7 @@ public class DatasetListPage extends CompositeWithUsername {
     DataGrid<DashboardDataset> datasetsGrid;
 
     private ListDataProvider<DashboardDataset> listProvider;
+    private DashboardAskPopup askSuspendPopup;
     private DashboardAskPopup askDeletePopup;
     private DashboardAskPopup askRemovePopup;
     private DashboardInputPopup changeOwnerPopup;
@@ -656,21 +664,63 @@ public class DatasetListPage extends CompositeWithUsername {
 
     @UiHandler("suspendDatasetButton")
     void suspendDatasetOnClick(ClickEvent event) {
-        if ( !getSelectedDatasets(false) ) {
-            UploadDashboard.showMessage(
-                    ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_SUSPEND_ERR_END);
+        getSelectedDatasets(null);
+        // remove any datasets that are editable
+        datasetIdsSet.clear();
+        for (DashboardDataset dset : datasetsSet.values()) {
+            if ( !Boolean.TRUE.equals(dset.isEditable()) )
+                datasetIdsSet.add(dset.getDatasetId());
+        }
+        if ( datasetIdsSet.size() == 0 ) {
+            UploadDashboard.showMessage(NO_DATASETS_TO_SUSPEND_ERR_MSG);
             return;
         }
-        if ( datasetsSet.size() == 0 ) {
-            UploadDashboard.showMessage(
-                    NO_DATASET_SELECTED_ERR_START + FOR_SUSPEND_ERR_END);
-            return;
+        // Confirm datasets to be suspended
+        String message = SUSPEND_HTML_PROLOGUE;
+        for (String datasetId : datasetIdsSet) {
+            message += "<li>" + SafeHtmlUtils.htmlEscape(datasetId) + "</li>";
         }
-        checkSet.clear();
-        checkSet.putAll(datasetsSet);
-        checkSet.setUsername(getUsername());
-        checkDatasetsForSuspension();
-        suspendDatasets();
+        message += SUSPEND_HTML_EPILOGUE;
+        if ( askSuspendPopup == null ) {
+            askSuspendPopup = new DashboardAskPopup(SUSPEND_YES_TEXT,
+                    SUSPEND_NO_TEXT, new AsyncCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean okay) {
+                    // Only proceed only if yes button was selected
+                    if ( okay ) {
+                        continueSuspendDatasets();
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable ex) {
+                    // Never called
+                    ;
+                }
+            });
+        }
+        askSuspendPopup.askQuestion(message);
+    }
+
+    /**
+     * Makes the request to suspend the currently selected datasets that are not editable, and processes the results.
+     */
+    private void continueSuspendDatasets() {
+        String username = getUsername();
+        UploadDashboard.showWaitCursor();
+        service.suspendDatasets(username, datasetIdsSet, new AsyncCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                DatasetListPage.showPage();
+                UploadDashboard.showAutoCursor();
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showFailureMessage(SUSPEND_FAIL_MSG, ex);
+                UploadDashboard.showAutoCursor();
+            }
+        });
     }
 
     @UiHandler("deleteButton")
@@ -1448,7 +1498,8 @@ public class DatasetListPage extends CompositeWithUsername {
 
     /**
      * Checks the cruises given in checkSet in this instance for metadata compatibility for submitting for QC.
-     * At this time this only checks that an OME metadata document is associated with each cruise.
+     * At this time this only checks that an OME metadata document or an additional document is associated with
+     * each cruise.
      * <p>
      * Then checks the cruises given in checkSet in this instance for data compatibility for submitting for QC.
      * If the data has not been checked or is unacceptable, this method presents an error message and returns.
@@ -1539,31 +1590,4 @@ public class DatasetListPage extends CompositeWithUsername {
         SubmitForQCPage.showPage(checkSet);
     }
 
-    private void checkDatasetsForSuspension() {
-    }
-
-    private void suspendDatasets() {
-        String username = getUsername();
-        HashSet<String> datasetIds = new HashSet<String>();
-        for (DashboardDataset ds : checkSet.values()) {
-            datasetIds.add(ds.getDatasetId());
-        }
-        String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
-        UploadDashboard.showWaitCursor();
-        service.suspendDatasets(username, datasetIds, localTimestamp, new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                String errMsg = "There was a problem suspending the datasets: " + caught.getMessage();
-                UploadDashboard.showMessage(errMsg);
-                UploadDashboard.showAutoCursor();
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                DatasetListPage.showPage();
-                UploadDashboard.showAutoCursor();
-            }
-        });
-
-    }
 }
