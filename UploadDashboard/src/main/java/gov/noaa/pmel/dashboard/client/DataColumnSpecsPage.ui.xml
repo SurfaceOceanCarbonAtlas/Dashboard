@@ -31,6 +31,7 @@
                 <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
                     <g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton"/>
                     <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>
+                    <g:Button addStyleNames="{style.horizontalbutton}" ui:field="saveButton"/>
                 </g:FlowPanel>
             </g:FlowPanel>
         </g:FlowPanel>

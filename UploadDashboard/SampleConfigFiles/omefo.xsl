@@ -73,23 +73,23 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Name:</fo:inline>
+                                        <fo:inline font-weight="bold">Name: </fo:inline>
                                         <xsl:value-of select="User/Name"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Organization:</fo:inline>
+                                        <fo:inline font-weight="bold">Organization: </fo:inline>
                                         <xsl:value-of select="User/Organization"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Address:</fo:inline>
+                                        <fo:inline font-weight="bold">Address: </fo:inline>
                                         <xsl:value-of select="User/Address"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Phone:</fo:inline>
+                                        <fo:inline font-weight="bold">Phone: </fo:inline>
                                         <xsl:value-of select="User/Phone"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Email:</fo:inline>
+                                        <fo:inline font-weight="bold">Email: </fo:inline>
                                         <xsl:value-of select="User/Email"/>
                                     </fo:block>
                                 </fo:table-cell>
@@ -104,23 +104,23 @@
                                     </fo:table-cell>
                                     <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Name:</fo:inline>
+                                            <fo:inline font-weight="bold">Name: </fo:inline>
                                             <xsl:value-of select="Name"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Organization:</fo:inline>
+                                            <fo:inline font-weight="bold">Organization: </fo:inline>
                                             <xsl:value-of select="Organization"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Address:</fo:inline>
+                                            <fo:inline font-weight="bold">Address: </fo:inline>
                                             <xsl:value-of select="Address"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Phone:</fo:inline>
+                                            <fo:inline font-weight="bold">Phone: </fo:inline>
                                             <xsl:value-of select="Phone"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Email:</fo:inline>
+                                            <fo:inline font-weight="bold">Email: </fo:inline>
                                             <xsl:value-of select="Email"/>
                                         </fo:block>
                                         <fo:block>
@@ -138,15 +138,15 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Funding Info:</fo:inline>
+                                        <fo:inline font-weight="bold">Funding Info: </fo:inline>
                                         <xsl:value-of select="Dataset_Info/Funding_Info"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Initial Submission (yyyymmdd):</fo:inline>
+                                        <fo:inline font-weight="bold">Initial Submission (yyyymmdd): </fo:inline>
                                         <xsl:value-of select="Dataset_Info/Submission_Dates/Initial_Submission"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Revised Submission (yyyymmdd):</fo:inline>
+                                        <fo:inline font-weight="bold">Revised Submission (yyyymmdd): </fo:inline>
                                         <xsl:value-of select="Dataset_Info/Submission_Dates/Revised_Submission"/>
                                     </fo:block>
                                 </fo:table-cell>
@@ -160,39 +160,39 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Expocode:</fo:inline>
+                                        <fo:inline font-weight="bold">Expocode: </fo:inline>
                                         <xsl:value-of select="$expocode"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Campaign/Cruise Name:</fo:inline>
+                                        <fo:inline font-weight="bold">Campaign/Cruise Name: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Experiment/Experiment_Name"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Campaign/Cruise Info:</fo:inline>
+                                        <fo:inline font-weight="bold">Campaign/Cruise Info: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Experiment/Cruise/Cruise_Info"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Platform Type:</fo:inline>
+                                        <fo:inline font-weight="bold">Platform Type: </fo:inline>
                                         <xsl:value-of select="CruiseInfo/Experiment/Platform_Type"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">CO2 Instrument Type:</fo:inline>
+                                        <fo:inline font-weight="bold">CO2 Instrument Type: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Experiment/Co2_Instrument_type"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Survey Type:</fo:inline>
+                                        <fo:inline font-weight="bold">Survey Type: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Experiment/Experiment_Type"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Vessel Name:</fo:inline>
+                                        <fo:inline font-weight="bold">Vessel Name: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Vessel/Vessel_Name"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Vessel Owner:</fo:inline>
+                                        <fo:inline font-weight="bold">Vessel Owner: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Vessel/Vessel_Owner"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Vessel Code:</fo:inline>
+                                        <fo:inline font-weight="bold">Vessel Code: </fo:inline>
                                         <xsl:value-of select="Cruise_Info/Vessel/Vessel_ID"/>
                                     </fo:block>
                                     <fo:block>
@@ -209,17 +209,17 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Start Date (yyyymmdd):</fo:inline>
+                                        <fo:inline font-weight="bold">Start Date (yyyymmdd): </fo:inline>
                                         <xsl:value-of
                                                 select="Cruise_Info/Experiment/Cruise/Temporal_Coverage/Start_Date"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">End Date (yyyymmdd):</fo:inline>
+                                        <fo:inline font-weight="bold">End Date (yyyymmdd): </fo:inline>
                                         <xsl:value-of
                                                 select="Cruise_Info/Experiment/Cruise/Temporal_Coverage/End_Date"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Westernmost Longitude:</fo:inline>
+                                        <fo:inline font-weight="bold">Westernmost Longitude: </fo:inline>
                                         <xsl:variable name="westlon">
                                             <xsl:value-of
                                                     select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude"/>
@@ -234,7 +234,7 @@
                                         </xsl:choose>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Easternmost Longitude:</fo:inline>
+                                        <fo:inline font-weight="bold">Easternmost Longitude: </fo:inline>
                                         <xsl:variable name="eastlon">
                                             <xsl:value-of
                                                     select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Easternmost_Longitude"/>
@@ -249,7 +249,7 @@
                                         </xsl:choose>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Northernmost Latitude:</fo:inline>
+                                        <fo:inline font-weight="bold">Northernmost Latitude: </fo:inline>
                                         <xsl:variable name="northlat">
                                             <xsl:value-of
                                                     select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Northernmost_Latitude"/>
@@ -264,7 +264,7 @@
                                         </xsl:choose>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Southernmost Latitude:</fo:inline>
+                                        <fo:inline font-weight="bold">Southernmost Latitude: </fo:inline>
                                         <xsl:variable name="southlat">
                                             <xsl:value-of
                                                     select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Southernmost_Latitude"/>
@@ -280,7 +280,7 @@
                                     </fo:block>
                                     <xsl:for-each select="Cruise_Info/Experiment/Cruise/Ports_of_Call">
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Port of Call:</fo:inline>
+                                            <fo:inline font-weight="bold">Port of Call: </fo:inline>
                                             <xsl:value-of select="."/>
                                         </fo:block>
                                     </xsl:for-each>
@@ -296,15 +296,15 @@
                                     </fo:table-cell>
                                     <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Name:</fo:inline>
+                                            <fo:inline font-weight="bold">Name: </fo:inline>
                                             <xsl:value-of select="Variable_Name"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Unit:</fo:inline>
+                                            <fo:inline font-weight="bold">Unit: </fo:inline>
                                             <xsl:value-of select="Unit_of_Variable"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Description:</fo:inline>
+                                            <fo:inline font-weight="bold">Description: </fo:inline>
                                             <xsl:value-of select="Description_of_Variable"/>
                                         </fo:block>
                                     </fo:table-cell>
@@ -319,19 +319,19 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Location: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Temperature/Location"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Temperature/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Temperature/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                         <xsl:variable name="sstaccuracy0">
                                             <xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy"/>
                                         </xsl:variable>
@@ -357,7 +357,7 @@
                                         (&#176;C if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Precision: </fo:inline>
                                         <xsl:variable name="sstprecision0">
                                             <xsl:value-of
                                                     select="Method_Description/Sea_Surface_Temperature/Precision"/>
@@ -384,11 +384,11 @@
                                         (&#176;C if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Temperature/Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Sea_Surface_Temperature/Other_Comments"/>
                                     </fo:block>
@@ -403,31 +403,31 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Location: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Location"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Accuracy"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Precision: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Precision"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of select="Method_Description/Sea_Surface_Salinity/Other_Comments"/>
                                     </fo:block>
                                 </fo:table-cell>
@@ -441,11 +441,11 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Location: </fo:inline>
                                         <xsl:value-of select="Method_Description/Atmospheric_Pressure/Location"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Normalized to Sea Level:</fo:inline>
+                                        <fo:inline font-weight="bold">Normalized to Sea Level: </fo:inline>
                                         <xsl:variable name="patmnormalized">
                                             <xsl:value-of select="Method_Description/Atmospheric_Pressure/Normalized"/>
                                         </xsl:variable>
@@ -463,15 +463,15 @@
                                         </xsl:choose>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of select="Method_Description/Atmospheric_Pressure/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/Atmospheric_Pressure/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                         <xsl:variable name="ppppaccuracy0">
                                             <xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy"/>
                                         </xsl:variable>
@@ -497,7 +497,7 @@
                                         (hPa if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Precision: </fo:inline>
                                         <xsl:variable name="ppppprecision0">
                                             <xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision"/>
                                         </xsl:variable>
@@ -523,11 +523,11 @@
                                         (hPa if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration: </fo:inline>
                                         <xsl:value-of select="Method_Description/Atmospheric_Pressure/Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of select="Method_Description/Atmospheric_Pressure/Other_Comments"/>
                                     </fo:block>
                                 </fo:table-cell>
@@ -541,25 +541,25 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Measured/Frequency:</fo:inline>
+                                        <fo:inline font-weight="bold">Measured/Frequency: </fo:inline>
                                         <xsl:value-of select="Method_Description/CO2_in_Marine_Air/Measurement"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Intake Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Intake Location: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_in_Marine_Air/Location_and_Height"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Drying Method:</fo:inline>
+                                        <fo:inline font-weight="bold">Drying Method: </fo:inline>
                                         <xsl:value-of select="Method_Description/CO2_in_Marine_Air/Drying_Method"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Atmospheric CO2 Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Atmospheric CO2 Accuracy: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Uncertainty_Air"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Atmospheric CO2 Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Atmospheric CO2 Precision: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Resolution_Air"/>
                                     </fo:block>
@@ -574,50 +574,50 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">System Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">System Manufacturer: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/System_Manufacturer_Description"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Intake Depth:</fo:inline>
+                                        <fo:inline font-weight="bold">Intake Depth: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Depth_of_Sea_Water_Intake"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Intake Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Intake Location: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Location_of_Sea_Water_Intake"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Equilibration Type:</fo:inline>
+                                        <fo:inline font-weight="bold">Equilibration Type: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Equilibrator_Type"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Equilibrator Volume (L):</fo:inline>
+                                        <fo:inline font-weight="bold">Equilibrator Volume (L): </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Equilibrator_Volume"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Headspace Gas Flow Rate (ml/min):</fo:inline>
+                                        <fo:inline font-weight="bold">Headspace Gas Flow Rate (ml/min): </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Headspace_Gas_Flow_Rate"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Equilibrator Water Flow Rate (L/min):</fo:inline>
+                                        <fo:inline font-weight="bold">Equilibrator Water Flow Rate (L/min): </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Design/Water_Flow_Rate"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Equilibrator Vented:</fo:inline>
+                                        <fo:inline font-weight="bold">Equilibrator Vented: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Design/Vented"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Equilibration Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Equilibration Comments: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Additional_Information"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Drying Method:</fo:inline>
+                                        <fo:inline font-weight="bold">Drying Method: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Design/Drying_Method_for_CO2_in_water"/>
                                     </fo:block>
@@ -632,64 +632,64 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Measurement Method:</fo:inline>
+                                        <fo:inline font-weight="bold">Measurement Method: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Measurement_Method"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Method details:</fo:inline>
+                                        <fo:inline font-weight="bold">Method details: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Details_Co2_Sensing"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Measured CO2 Values:</fo:inline>
+                                        <fo:inline font-weight="bold">Measured CO2 Values: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Measured_Co2_Params"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Measurement Frequency:</fo:inline>
+                                        <fo:inline font-weight="bold">Measurement Frequency: </fo:inline>
                                         <xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Frequency"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Aqueous CO2 Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Aqueous CO2 Accuracy: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Uncertainty_Water"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Aqueous CO2 Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Aqueous CO2 Precision: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Resolution_Water"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Sensor Calibrations:</fo:inline>
+                                        <fo:inline font-weight="bold">Sensor Calibrations: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Sensor_Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration of Calibration Gases:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration of Calibration Gases: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/CO2_Sensor_Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Number Non-Zero Gas Standards:</fo:inline>
+                                        <fo:inline font-weight="bold">Number Non-Zero Gas Standards: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/No_Of_Non_Zero_Gas_Stds"/>
                                     </fo:block>
                                     <fo:block linefeed-treatment="preserve">
-                                        <fo:block font-weight="bold">Calibration Gases:</fo:block>
+                                        <fo:block font-weight="bold">Calibration Gases: </fo:block>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer_of_Calibration_Gas"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comparison to Other CO2 Analyses:</fo:inline>
+                                        <fo:inline font-weight="bold">Comparison to Other CO2 Analyses: </fo:inline>
                                         <!--
                                             Currently comments get mapped to Enviromental_Control and the value for
                                             this field is not saved by the OME.  I suspect that this field should
@@ -697,12 +697,12 @@
                                         -->
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control"/>
                                     </fo:block>
                                     <fo:block linefeed-treatment="preserve">
-                                        <fo:block font-weight="bold">Method Reference:</fo:block>
+                                        <fo:block font-weight="bold">Method Reference: </fo:block>
                                         <xsl:value-of
                                                 select="Method_Description/CO2_Sensors/CO2_Sensor/Method_References"/>
                                     </fo:block>
@@ -717,20 +717,20 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Location: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Temperature/Location"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Temperature/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Temperature/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                         <xsl:variable name="teqaccuracy0">
                                             <xsl:value-of
                                                     select="Method_Description/Equilibrator_Temperature/Accuracy"/>
@@ -757,7 +757,7 @@
                                         (&#176;C if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Precision: </fo:inline>
                                         <xsl:variable name="teqprecision0">
                                             <xsl:value-of
                                                     select="Method_Description/Equilibrator_Temperature/Precision"/>
@@ -784,11 +784,11 @@
                                         (&#176;C if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Temperature/Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of
                                                 select="Method_Description/Equilibrator_Temperature/Other_Comments"/>
                                     </fo:block>
@@ -803,19 +803,19 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Location:</fo:inline>
+                                        <fo:inline font-weight="bold">Location: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Pressure/Location"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                        <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Pressure/Manufacturer"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Model:</fo:inline>
+                                        <fo:inline font-weight="bold">Model: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Pressure/Model"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                        <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                         <xsl:variable name="peqaccuracy0">
                                             <xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy"/>
                                         </xsl:variable>
@@ -841,7 +841,7 @@
                                         (hPa if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Precision:</fo:inline>
+                                        <fo:inline font-weight="bold">Precision: </fo:inline>
                                         <xsl:variable name="peqprecision0">
                                             <xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision"/>
                                         </xsl:variable>
@@ -867,11 +867,11 @@
                                         (hPa if units not given)
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                        <fo:inline font-weight="bold">Calibration: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Pressure/Calibration"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Comments: </fo:inline>
                                         <xsl:value-of select="Method_Description/Equilibrator_Pressure/Other_Comments"/>
                                     </fo:block>
                                 </fo:table-cell>
@@ -886,31 +886,31 @@
                                     </fo:table-cell>
                                     <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Description:</fo:inline>
+                                            <fo:inline font-weight="bold">Description: </fo:inline>
                                             <xsl:value-of select="Description"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Manufacturer:</fo:inline>
+                                            <fo:inline font-weight="bold">Manufacturer: </fo:inline>
                                             <xsl:value-of select="Manufacturer"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Model:</fo:inline>
+                                            <fo:inline font-weight="bold">Model: </fo:inline>
                                             <xsl:value-of select="Model"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Accuracy:</fo:inline>
+                                            <fo:inline font-weight="bold">Accuracy: </fo:inline>
                                             <xsl:value-of select="Accuracy"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Precision:</fo:inline>
+                                            <fo:inline font-weight="bold">Precision: </fo:inline>
                                             <xsl:value-of select="Precision"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Calibration:</fo:inline>
+                                            <fo:inline font-weight="bold">Calibration: </fo:inline>
                                             <xsl:value-of select="Calibration"/>
                                         </fo:block>
                                         <fo:block>
-                                            <fo:inline font-weight="bold">Comments:</fo:inline>
+                                            <fo:inline font-weight="bold">Comments: </fo:inline>
                                             <xsl:value-of select="Other_Comments"/>
                                         </fo:block>
                                     </fo:table-cell>
@@ -925,19 +925,19 @@
                                 </fo:table-cell>
                                 <fo:table-cell border-width="6pt" border-style="solid" border-color="white">
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Suggested QC flag from Data Provider:</fo:inline>
+                                        <fo:inline font-weight="bold">Suggested QC flag from Data Provider: </fo:inline>
                                         <xsl:value-of select="Preliminary_Quality_control"/>
                                     </fo:block>
                                     <fo:block>
-                                        <fo:inline font-weight="bold">Additional Comments:</fo:inline>
+                                        <fo:inline font-weight="bold">Additional Comments: </fo:inline>
                                         <xsl:value-of select="Additional_Information"/>
                                     </fo:block>
                                     <fo:block linefeed-treatment="preserve">
-                                        <fo:block font-weight="bold">Citation for this Dataset:</fo:block>
+                                        <fo:block font-weight="bold">Citation for this Dataset: </fo:block>
                                         <xsl:value-of select="Citation"/>
                                     </fo:block>
                                     <fo:block linefeed-treatment="preserve">
-                                        <fo:block font-weight="bold">Other References for this Dataset:</fo:block>
+                                        <fo:block font-weight="bold">Other References for this Dataset: </fo:block>
                                         <xsl:value-of select="Data_set_References"/>
                                     </fo:block>
                                 </fo:table-cell>

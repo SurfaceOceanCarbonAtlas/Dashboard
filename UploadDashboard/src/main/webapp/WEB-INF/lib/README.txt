@@ -1,4 +1,3 @@
-The jar file gwt-crypto-2.3.0.jar was obtained from the gwt-crypt Google code site https://code.google.com/p/gwt-crypto/ (now https://github.com/mooreds/gwt-crypto/)
 The jar file tomcat-coyote-7.0.86.jar was obtained as part of Apache Tomcat from http://tomcat.apache.org/
 The jar file joda-time-2.9.9.jar was obtained from the Joda-Time site http://www.joda.org/joda-time/
 The jar files:
@@ -37,7 +36,8 @@ The jar files:
 	xml-apis-ext-1.3.04.jar
 	xmlgraphics-commons-2.2.jar
 were obtained from https://xmlgraphics.apache.org/fop/download.html
+The jar file bagit-5.1.1.jar was obtained from https://github.com/LibraryOfCongress/bagit-java/releases
 
-The jar file sanitychecker.jar is created from the Java classes under SanityChecker/src in this project and added to this location.
-The jar file omemetadata.jar is created from the Java classes under OmeMetadata/src in this project and added to this location.
-The jar file gwt-servlet.jar is obtained from the GWT SDK package used to build this GWT code.  The GWT SDK packages can be found at http://www.gwtproject.org 
+The jar file gwt-servlet.jar is obtained from the GWT SDK package used to build this GWT code.
+The GWT SDK packages can be found at http://www.gwtproject.org
+

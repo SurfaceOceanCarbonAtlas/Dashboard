@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="log4j-slf4j-impl-2.11.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/log4j-slf4j-impl-2.11.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,11 +1,9 @@
 /**
- * This software is provided by NOAA for full, free and open release.  It is
- * understood by the recipient/user that NOAA assumes no liability for any
- * errors contained in the code.  Although this software is released without
- * conditions or restrictions in its use, it is expected that appropriate
- * credit be given to its author and to the National Oceanic and Atmospheric
- * Administration should the software be included by the recipient as an
- * element in other product development.
+ * This software is provided by NOAA for full, free and open release.  It is understood by the recipient/user that NOAA
+ * assumes no liability for any errors contained in the code.  Although this software is released without conditions or
+ * restrictions in its use, it is expected that appropriate credit be given to its author and to the National Oceanic
+ * and Atmospheric Administration should the software be included by the recipient as an element in other product
+ * development.
  */
 package gov.noaa.pmel.dashboard.ferret;
 
@@ -132,8 +130,8 @@ public class RuntimeEnvironment implements Cloneable {
                 int i;
                 for (i = dollarPos + 1; i < value.length(); i++) {
                     char c = value.charAt(i);
-                    if ( !( ( c >= 'A' && c <= 'Z' ) || ( c >= 'a' && c <= 'z' )
-                            || ( c >= '0' && c <= '0' ) || c == '_' ) )
+                    if ( !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
+                            || (c >= '0' && c <= '0') || c == '_') )
                         break;
                 }
                 String replaceVar = value.substring(dollarPos + 1, i);
@@ -152,12 +150,14 @@ public class RuntimeEnvironment implements Cloneable {
     }
 
     /**
-     * Builds fully qualified path names based on a base and a string of blank separated paths.  Relative paths get the basePath prepended.
+     * Builds fully qualified path names based on a base and a string of blank separated paths.  Relative paths get the
+     * basePath prepended.
      *
      * @param paths
      *         to be resolved
      * @param basePath
      *         the "root" path
+     *
      * @return the fully qualified path
      */
     public String resolvePaths(String paths, String basePath) {

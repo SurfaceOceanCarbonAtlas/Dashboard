@@ -43,22 +43,19 @@ public class DashboardAskPopup extends Composite {
     HandlerRegistration askHandler;
 
     /**
-     * Widget for asking a question in a PopupPanel
-     * that is modal and does not auto-hide.
+     * Widget for asking a question in a PopupPanel that is modal and does not auto-hide.
      *
      * @param yesText
      *         text for the yes button
      * @param noText
      *         text for the no button
      * @param callback
-     *         calls the onSuccess method of this callback with the answer:
-     *         true for the yes button, false for the no button, or null if
-     *         the window was (somehow) closed without pressing either the
-     *         yes or no button.  The onFailure method of this callback is
-     *         never called.
+     *         calls the onSuccess method of this callback with the answer: true for the yes button, false for the no
+     *         button, or null if the window was (somehow) closed without pressing either the yes or no button.  The
+     *         onFailure method of this callback is never called.
      */
     public DashboardAskPopup(String yesText, String noText,
-                             final AsyncCallback<Boolean> callback) {
+            final AsyncCallback<Boolean> callback) {
         initWidget(uiBinder.createAndBindUi(this));
 
         parentPanel = new PopupPanel(false, true);
@@ -82,13 +79,11 @@ public class DashboardAskPopup extends Composite {
     }
 
     /**
-     * Assigns the question asked in this PopupPanel and
-     * shows the PopupPanel centered in the browser window.
-     * The no button is given the focus.
+     * Assigns the question asked in this PopupPanel and shows the PopupPanel centered in the browser window. The no
+     * button is given the focus.
      *
      * @param htmlQuestion
-     *         the unchecked HTML question to display.
-     *         For safety, use only known (static) HTML.
+     *         the unchecked HTML question to display. For safety, use only known (static) HTML.
      */
     void askQuestion(String htmlQuestion) {
         noButton.setFocus(true);

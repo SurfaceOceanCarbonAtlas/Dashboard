@@ -1,3 +1,0 @@
-2013-01-04 15:17:27,479 TRACE main Sanity Checker_INIT - Logging initialised
-2013-01-04 15:17:27,480 DEBUG main Sanity Checker_INIT - Reading base configuration
-2013-01-04 15:17:27,569 FATAL main Sanity Checker_INIT - socat.sanitychecker.config.ConfigException: FILE ./config.properties, LINE 0: Specified ColumnSpecSchemaFile does not exist

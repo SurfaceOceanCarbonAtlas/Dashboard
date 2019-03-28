@@ -1,11 +1,11 @@
 package gov.noaa.pmel.dashboard.ferret;
 
+import org.jdom2.Element;
+
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jdom2.Element;
 
 
 public class SocatTool extends Thread {
@@ -100,14 +100,14 @@ public class SocatTool extends Thread {
             long timelimit = ferret.getTimeLimit();
 
             Task task = new Task(fullCmd, ferret.getRuntimeEnvironment().getEnv(),
-                                 new File(temp_dir), new File("cancel"), timelimit, ferret.getErrorKeys());
+                    new File(temp_dir), new File("cancel"), timelimit, ferret.getErrorKeys());
             task.run();
             error = task.getHasError();
             message = task.getErrorMessage();
             done = true;
             if ( !error )
                 script.delete();
-        } catch (Exception e) {
+        } catch ( Exception e ) {
             done = true;
             error = true;
             message = e.getMessage();

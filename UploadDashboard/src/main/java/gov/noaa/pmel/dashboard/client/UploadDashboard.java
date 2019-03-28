@@ -22,37 +22,45 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
      */
     public enum PagesEnum {
         /**
-         * History tag for CruiseListPage
+         * History tag for DatasetListPage
          */
         SHOW_DATASETS,
+
         /**
-         * History tag for CruiseUploadPage
+         * History tag for DataUploadPage
          */
-        UPLOAD_DATASETS,
+        UPLOAD_DATA,
+
         /**
          * History tag for DataColumnSpecsPage
          */
         IDENTIFY_COLUMNS,
+
         /**
          * History tag for DataMessagesPage
          */
         SHOW_DATA_MESSAGES,
+
         /**
          * History tag for OmeManagerPage
          */
         EDIT_METADATA,
+
         /**
          * History tag for AddlDocsManagerPage
          */
         MANAGE_DOCUMENTS,
+
         /**
-         * History tag for CruisePreviewPage
+         * History tag for DatasetPreviewPage
          */
-        PREVIEW_CRUISE,
+        PREVIEW_DATASET,
+
         /**
          * History tag for SubmitForQCPage
          */
         SUBMIT_FOR_QC,
+
         /**
          * History tag for DashboardLogoutPage
          */
@@ -87,14 +95,13 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     private DashboardInfoPopup msgPopup;
 
     /**
-     * Create the manager for the UploadDashboard pages.
-     * Do not use this constructor; instead use the static
-     * methods provided to display pages and messages.
+     * Create the manager for the UploadDashboard pages. Do not use this constructor; instead use the static methods
+     * provided to display pages and messages.
      */
     UploadDashboard() {
         // Just in case this gets called more than once,
         // remove any recorded page in the previous instantiation
-        if ( ( singleton != null ) && ( singleton.currentPage != null ) ) {
+        if ( (singleton != null) && (singleton.currentPage != null) ) {
             RootLayoutPanel.get().remove(singleton.currentPage);
             singleton.currentPage = null;
         }
@@ -121,14 +128,13 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Shows the message in a popup panel relative to the given UI obect.
-     * See {@link PopupPanel#showRelativeTo(UIObject)}.
+     * Shows the message in a popup panel relative to the given UI obect. See {@link
+     * PopupPanel#showRelativeTo(UIObject)}.
      *
      * @param htmlMsg
      *         unchecked HTML message to show.
      * @param obj
-     *         show the message relative to this object
-     *         (usually underneath, left-aligned)
+     *         show the message relative to this object (usually underneath, left-aligned)
      */
     public static void showMessageAt(String htmlMsg, UIObject obj) {
         if ( singleton == null )
@@ -140,8 +146,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Shows an error message, along with the message from an
-     * exception, in a popup panel centered on the page.
+     * Shows an error message, along with the message from an exception, in a popup panel centered on the page.
      *
      * @param htmlMsg
      *         unchecked HTML message to show before the exception message
@@ -159,8 +164,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Updates the displayed page by removing any page
-     * currently being shown and adding the given page.
+     * Updates the displayed page by removing any page currently being shown and adding the given page.
      *
      * @param newPage
      *         new page to be shown; if null, not page is shown
@@ -176,17 +180,17 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
     }
 
     /**
-     * Returns whether the given page is still the current page instance
-     * in the dashboard.
+     * Returns whether the given page is still the current page instance in the dashboard.
      *
      * @param page
      *         page to check; if null, checks if there is no current page
+     *
      * @return true if the given page is the current page in the dashboard
      */
     public static boolean isCurrentPage(CompositeWithUsername page) {
         if ( singleton == null )
             singleton = new UploadDashboard();
-        return ( page == singleton.currentPage );
+        return (page == singleton.currentPage);
     }
 
     /**
@@ -218,17 +222,17 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         String token = event.getValue();
         if ( token != null )
             token = token.trim();
-        if ( ( token == null ) || token.isEmpty() || ( currentPage == null ) ) {
+        if ( (token == null) || token.isEmpty() || (currentPage == null) ) {
             // Initial history setup; show the cruise list page
-            CruiseListPage.showPage();
+            DatasetListPage.showPage();
         }
         else if ( token.equals(PagesEnum.SHOW_DATASETS.name()) ) {
-            // Cruise list page from history
-            CruiseListPage.redisplayPage(currentPage.getUsername());
+            // Dataset list page from history
+            DatasetListPage.redisplayPage(currentPage.getUsername());
         }
-        else if ( token.equals(PagesEnum.UPLOAD_DATASETS.name()) ) {
-            // Cruise upload page from history
-            CruiseUploadPage.redisplayPage(currentPage.getUsername());
+        else if ( token.equals(PagesEnum.UPLOAD_DATA.name()) ) {
+            // Dataset upload page from history
+            DataUploadPage.redisplayPage(currentPage.getUsername());
         }
         else if ( token.equals(PagesEnum.IDENTIFY_COLUMNS.name()) ) {
             // Data column specs page from history
@@ -242,9 +246,9 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
             // Additional data manager page from history
             AddlDocsManagerPage.redisplayPage(currentPage.getUsername());
         }
-        else if ( token.equals(PagesEnum.PREVIEW_CRUISE.name()) ) {
+        else if ( token.equals(PagesEnum.PREVIEW_DATASET.name()) ) {
             // Preview cruise page from history
-            CruisePreviewPage.redisplayPage(currentPage.getUsername());
+            DatasetPreviewPage.redisplayPage(currentPage.getUsername());
         }
         else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
             // Submit for QC page from history
@@ -256,7 +260,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         }
         else {
             // Unknown page from the history; instead show the  cruise list page
-            CruiseListPage.redisplayPage(currentPage.getUsername());
+            DatasetListPage.redisplayPage(currentPage.getUsername());
         }
     }
 
@@ -264,7 +268,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
      * Removes the history change handler, if there is one
      */
     public static void stopHistoryHandling() {
-        if ( ( singleton == null ) || ( singleton.historyHandlerReg == null ) )
+        if ( (singleton == null) || (singleton.historyHandlerReg == null) )
             return;
         singleton.historyHandlerReg.removeHandler();
         singleton.historyHandlerReg = null;

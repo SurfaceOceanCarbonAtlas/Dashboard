@@ -49,8 +49,7 @@ public class DashboardInputPopup extends Composite {
     HandlerRegistration askHandler;
 
     /**
-     * Widget for asking for input in a PopupPanel
-     * that is modal and does not auto-hide.
+     * Widget for asking for input in a PopupPanel that is modal and does not auto-hide.
      *
      * @param labelText
      *         text for the label next to the input text box
@@ -59,14 +58,12 @@ public class DashboardInputPopup extends Composite {
      * @param noText
      *         text for the no button
      * @param callback
-     *         calls the onSuccess method of this callback with the input
-     *         provided by the user if the yes button was selected.  If the
-     *         no button was selected, or if the window was (somehow) closed
-     *         without pressing either the yes or no button, null is returned.
-     *         The onFailure method of this callback is never called.
+     *         calls the onSuccess method of this callback with the input provided by the user if the yes button was
+     *         selected.  If the no button was selected, or if the window was (somehow) closed without pressing either
+     *         the yes or no button, null is returned. The onFailure method of this callback is never called.
      */
     public DashboardInputPopup(String labelText, String yesText,
-                               String noText, final AsyncCallback<String> callback) {
+            String noText, final AsyncCallback<String> callback) {
         initWidget(uiBinder.createAndBindUi(this));
 
         parentPanel = new PopupPanel(false, true);
@@ -90,13 +87,11 @@ public class DashboardInputPopup extends Composite {
     }
 
     /**
-     * Assigns the question asked in this PopupPanel and
-     * shows the PopupPanel centered in the browser window.
-     * The no button is given the focus.
+     * Assigns the question asked in this PopupPanel and shows the PopupPanel centered in the browser window. The no
+     * button is given the focus.
      *
      * @param htmlInfo
-     *         the unchecked HTML information to display.
-     *         For safety, use only known (static) HTML.
+     *         the unchecked HTML information to display. For safety, use only known (static) HTML.
      */
     void askForInput(String htmlInfo) {
         noButton.setFocus(true);

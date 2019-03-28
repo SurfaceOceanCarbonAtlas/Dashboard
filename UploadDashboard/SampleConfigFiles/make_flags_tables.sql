@@ -8,13 +8,13 @@ CREATE TABLE `Regions` (
   `region_id` CHAR(1) NOT NULL DEFAULT ' ',
   `region_name` VARCHAR(32) NOT NULL DEFAULT '',
   PRIMARY KEY (`region_id`)
-) DEFAULT CHARSET=latin1;
+);
 INSERT INTO `Regions` (`region_id`, `region_name`) VALUES
   ('A', 'North Atlantic'),
   ('C', 'Coastal'),
   ('G', 'Global'),
   ('I', 'Indian'),
-  ('N', 'North Pacific'), 
+  ('N', 'North Pacific'),
   ('O', 'Southern Ocean'),
   ('R', 'Arctic'),
   ('T', 'Tropical Pacific'),
@@ -28,7 +28,7 @@ CREATE TABLE `Reviewers` (
   PRIMARY KEY (`reviewer_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `realname` (`realname`)
-) DEFAULT CHARSET=latin1;
+);
 INSERT INTO `Reviewers` (`realname`, `username`) VALUES
   ('automated data checker', 'automated.data.checker');
 
@@ -50,7 +50,7 @@ CREATE TABLE `QCEvents` (
   KEY `reviewer_id` (`reviewer_id`),
   CONSTRAINT `QCEvents_region_id` FOREIGN KEY (`region_id`) REFERENCES `Regions` (`region_id`),
   CONSTRAINT `QCEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
-) DEFAULT CHARSET=latin1;
+);
 
 CREATE TABLE `WOCEEvents` (
   `woce_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -71,7 +71,7 @@ CREATE TABLE `WOCEEvents` (
   KEY `data_name` (`data_name`),
   KEY `reviewer_id` (`reviewer_id`),
   CONSTRAINT `WOCEEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
-) DEFAULT CHARSET=latin1;
+);
 
 CREATE TABLE `WOCELocations` (
   `wloc_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -91,5 +91,5 @@ CREATE TABLE `WOCELocations` (
   KEY `data_time` (`data_time`),
   CONSTRAINT `WOCEPoints_region_id` FOREIGN KEY (`region_id`) REFERENCES `Regions` (`region_id`),
   CONSTRAINT `WOCEPoints_woce_id` FOREIGN KEY (`woce_id`) REFERENCES `WOCEEvents` (`woce_id`)
-) DEFAULT CHARSET=latin1;
+);
 

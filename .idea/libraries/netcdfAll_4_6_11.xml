@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="netcdfAll-4.6.11">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/netcdfAll-4.6.11.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

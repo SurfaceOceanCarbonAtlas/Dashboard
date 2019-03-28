@@ -3,19 +3,15 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.dsg.StdUserDataArray;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.SCMessage;
-import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
-import gov.noaa.pmel.dashboard.shared.WoceFlag;
-import gov.noaa.pmel.dashboard.shared.WoceType;
+import gov.noaa.pmel.dashboard.shared.QCFlag;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,53 +20,36 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
-import uk.ac.uea.socat.sanitychecker.Output;
-import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
-import uk.ac.uea.socat.sanitychecker.messages.MessageSummary;
-
 /**
- * Processes SanityChecker messages for a cruise.
+ * Processes automated data check flags and messages, as well as PI-provided QC flags, for a dataset.
  *
  * @author Karl Smith
  */
 public class CheckerMessageHandler {
 
-    private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
-    private static final String SCMSG_KEY_VALUE_SEP = ":";
-    private static final String SCMSG_SEVERITY_KEY = "SCMsgSeverity";
-    private static final String SCMSG_ROW_NUMBER_KEY = "SCMsgRowNumber";
-    private static final String SCMSG_LONGITUDE_KEY = "SCMsgLongitude";
-    private static final String SCMSG_LATITUDE_KEY = "SCMsgLatitude";
-    private static final String SCMSG_TIMESTAMP_KEY = "SCMsgTimestamp";
-    private static final String SCMSG_COLUMN_NUMBER_KEY = "SCMsgColumnNumber";
-    private static final String SCMSG_COLUMN_NAME_KEY = "SCMsgColumnName";
-    private static final String SCMSG_GENERAL_MSG_KEY = "SCMsgGeneralMessage";
-    private static final String SCMSG_DETAILED_MSG_KEY = "SCMsgDetailedMessage";
-    private static final String SCMSG_OLD_MESSAGE_KEY = "SCMsgMessage";
-    private static final String SCMSG_SUMMARY_MSG_KEY = "SCMsgSummaryMessage";
-    private static final DateTimeFormatter DATETIME_FORMATTER =
-            DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
+    private static final String MSGS_FILENAME_EXTENSION = ".messages";
+    private static final String MSG_KEY_VALUE_SEP = ":";
+    private static final String MSG_SEVERITY_KEY = "MsgSeverity";
+    private static final String MSG_ROW_NUMBER_KEY = "MsgRowNumber";
+    private static final String MSG_COLUMN_NUMBER_KEY = "MsgColumnNumber";
+    private static final String MSG_COLUMN_NAME_KEY = "MsgColumnName";
+    private static final String MSG_GENERAL_MSG_KEY = "MsgGeneralMessage";
+    private static final String MSG_DETAILED_MSG_KEY = "MsgDetailedMessage";
+    private static final String MSG_SUMMARY_MSG_KEY = "MsgSummaryMessage";
 
     private File filesDir;
 
     /**
-     * Handler for SanityChecker messages, including categorizing and making WOCE flags
-     * and events from them.
+     * Handler for automated data check flags and messages.
      *
      * @param filesDirName
-     *         save SanityChecker messages under this directory
+     *         save messages under this directory
      */
     public CheckerMessageHandler(String filesDirName) {
         filesDir = new File(filesDirName);
@@ -79,630 +58,415 @@ public class CheckerMessageHandler {
     }
 
     /**
-     * @param expocode
-     *         expocode of the cruise
-     * @return the cruise messages file associated with the cruise
+     * @param datasetId
+     *         ID of the dataset
+     *
+     * @return the messages file associated with the dataset
+     *
      * @throws IllegalArgumentException
-     *         if the cruise expocode is invalid
+     *         if the dataset ID is invalid
      */
-    private File cruiseMsgsFile(String expocode) throws IllegalArgumentException {
-        // Check that the expocode is somewhat reasonable
-        String upperExpo = DashboardServerUtils.checkExpocode(expocode);
-        // Get the name of the cruise messages file
-        return new File(filesDir, upperExpo.substring(0, 4) +
-                File.separatorChar + upperExpo + CRUISE_MSGS_FILENAME_EXTENSION);
+    private File messagesFile(String datasetId) throws IllegalArgumentException {
+        // standardize the dataset ID
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        // Get the parent directory
+        File parentDir = new File(filesDir, stdId.substring(0, 4));
+        // Get the dataset messages file
+        File msgsFile = new File(parentDir, stdId + MSGS_FILENAME_EXTENSION);
+        return msgsFile;
     }
 
     /**
-     * Appropriately renames a cruise messages file, if one exists,
-     * for a change in cruise expocode.
+     * Appropriately renames a messages file, if one exists, for a change in dataset ID.
      *
-     * @param oldExpocode
-     *         standardized old expocode of the cruise
-     * @param newExpocode
-     *         standardized new expocode for the cruise
+     * @param oldId
+     *         standardized old ID for the dataset
+     * @param newId
+     *         standardized new ID for the dataset
+     *
      * @throws IllegalArgumentException
-     *         if a messages file for the new expocode already exists, or
-     *         if unable to rename the messages file
+     *         if a messages file for the new ID already exists, or if unable to rename the messages file
      */
-    public void renameMsgsFile(String oldExpocode, String newExpocode) throws IllegalArgumentException {
-        File oldMsgsFile = cruiseMsgsFile(oldExpocode);
+    public void renameMsgsFile(String oldId, String newId) throws IllegalArgumentException {
+        File oldMsgsFile = messagesFile(oldId);
         if ( !oldMsgsFile.exists() )
             return;
 
-        File newMsgsFile = cruiseMsgsFile(newExpocode);
+        File newMsgsFile = messagesFile(newId);
         if ( newMsgsFile.exists() )
-            throw new IllegalArgumentException(
-                    "Messages file already exists for " + newExpocode);
+            throw new IllegalArgumentException("Messages file already exists for " + newId);
 
         File newParent = newMsgsFile.getParentFile();
         if ( !newParent.exists() )
             newParent.mkdirs();
 
         if ( !oldMsgsFile.renameTo(newMsgsFile) )
-            throw new IllegalArgumentException("Unable to rename messages "
-                                                       + "file from " + oldExpocode + " to " + newExpocode);
+            throw new IllegalArgumentException("Unable to rename messages file from " +
+                    oldId + " to " + newId);
     }
 
     /**
-     * Deletes the sanity checker messages file, if it exists, associated with a cruise.
+     * Deletes the messages file, if it exists, associated with a dataset.
      *
-     * @param expocode
-     *         delete the messages file associated with the cruise with this expocode
-     * @return true if messages file exists and was deleted;
-     * false if the messages file does not exist.
+     * @param datasetId
+     *         delete the messages file for the dataset with this ID
+     *
+     * @return true if messages file exists and was deleted; false if the messages file does not exist.
+     *
      * @throws IllegalArgumentException
-     *         if the expocode is invalid, or
-     *         if the messages file exists but could not be deleted
+     *         if the dataset ID is invalid, or if the messages file exists but could not be deleted
      */
-    public boolean deleteMsgsFile(String expocode) throws IllegalArgumentException {
-        File msgsFile = cruiseMsgsFile(expocode);
+    public boolean deleteMsgsFile(String datasetId) throws IllegalArgumentException {
+        File msgsFile = messagesFile(datasetId);
         if ( !msgsFile.exists() )
             return false;
         if ( !msgsFile.delete() ) {
             throw new IllegalArgumentException("Unable to delete " +
-                                                       "the sanity checker messages file for " + expocode);
+                    "the automated data checker messages file for " + datasetId);
         }
         return true;
     }
 
     /**
-     * Processes the list of messages produced by the SanityChecker.
-     * Saves the messages to the appropriate messages file.
-     * Clears and assigns the WOCE-3 or WOCE-4 flags for the given cruise
-     * from the given SanityChecker output for the cruise as well as any
-     * user-provided WOCE flags in the cruise data.
+     * Save the list of automated data check messages given with a standardized user data array object.
+     * Using these messages, assigns the set of automated data checker data QC flags in the dataset.
+     * Also assigns the set of PI-provided data QC flags in the dataset.  This assumes PI-provided QC flags
+     * indicating issues have flag values that are integers in the range [3,9] (e.g., WOCE or bottle QC flags).
      *
-     * @param cruiseData
-     *         process messages for this cruise
-     * @param output
-     *         SanityChecker output for this cruise
+     * @param dataset
+     *         save message for this dataset as well as the sets of data QC flags in this dataset
+     * @param stdUserData
+     *         standardized user data for this dataset containing automated data check messages
+     *
      * @throws IllegalArgumentException
-     *         if the expocode is invalid
+     *         if the dataset or standardized user data is invalid
      */
-    public void processCruiseMessages(DashboardCruiseWithData cruiseData,
-                                      Output output) throws IllegalArgumentException {
+    public void processCheckerMessages(DashboardDataset dataset, StdUserDataArray stdUserData)
+            throws IllegalArgumentException {
+        int numSamples = stdUserData.getNumSamples();
+        if ( numSamples <= 0 )
+            throw new IllegalArgumentException("no standardized data");
+        int numStdCols = stdUserData.getNumDataCols();
+        if ( numStdCols <= 0 )
+            throw new IllegalArgumentException("no standardized data columns");
+        List<DashDataType<?>> stdDataTypes = stdUserData.getDataTypes();
 
-        TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
-        TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
+        if ( dataset.getNumDataRows() != numSamples )
+            throw new IllegalArgumentException("number of data rows recorded for this dataset (" +
+                    dataset.getNumDataRows() + ") does not match the number of samples (rows) " +
+                    "in the standardized data (" + numSamples + ")");
+        int numUserCols = dataset.getDataColTypes().size();
+        if ( numUserCols <= 0 )
+            throw new IllegalArgumentException("no data columns in this dataset");
+        if ( numUserCols > numStdCols )
+            throw new IllegalArgumentException("more dataset columns than standardized user data columns");
+        {
+            int k = -1;
+            for (DataColumnType dtype : dataset.getDataColTypes()) {
+                k++;
+                if ( !stdDataTypes.get(k).typeNameEquals(dtype) )
+                    throw new IllegalArgumentException("types for column number " + Integer.toString(k + 1) +
+                            " in the dataset and in the standardized data do not match");
+            }
+        }
 
-        // Get the cruise messages file to be written
-        File msgsFile = cruiseMsgsFile(cruiseData.getExpocode());
-        // Create the parent subdirectories if they do not exist
+        ArrayList<ADCMessage> msgList = stdUserData.getStandardizationMessages();
+
+        // Get the dataset messages file to be written
+        File msgsFile = messagesFile(dataset.getDatasetId());
         File parentFile = msgsFile.getParentFile();
         if ( !parentFile.exists() )
             parentFile.mkdirs();
-        // Write the messages to file and save WOCE flags from these messages
         PrintWriter msgsWriter;
         try {
             msgsWriter = new PrintWriter(msgsFile);
-        } catch (FileNotFoundException ex) {
+        } catch ( FileNotFoundException ex ) {
             throw new RuntimeException("Unexpected error opening messages file " +
-                                               msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
+                    msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
         }
-
         try {
 
-            List<SocatDataRecord> dataRecs = output.getRecords();
-            int numRecs = dataRecs.size();
-            try {
-
-                for (MessageSummary summary : output.getMessages().getMessageSummaries()) {
-                    String msg = summary.getSummaryString();
-                    int count = summary.getErrorCount();
-                    if ( count > 0 ) {
-                        msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP +
-                                                   Integer.toString(count) + " errors of type: " + msg);
-                    }
-                    count = summary.getWarningCount();
-                    if ( count > 0 ) {
-                        msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP +
-                                                   Integer.toString(count) + " warnings of type: " + msg);
-                    }
+            TreeMap<String,Integer> errorCnt = new TreeMap<String,Integer>();
+            TreeMap<String,Integer> warnCnt = new TreeMap<String,Integer>();
+            for (ADCMessage msg : msgList) {
+                // Start with a summary giving the counts of each general message/severity
+                QCFlag.Severity severity = msg.getSeverity();
+                String summary = msg.getGeneralComment();
+                if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
+                    Integer cnt = errorCnt.get(summary);
+                    if ( cnt == null )
+                        cnt = 1;
+                    else
+                        cnt += 1;
+                    errorCnt.put(summary, cnt);
                 }
-
-                for (Message msg : output.getMessages().getMessages()) {
-                    int rowNum = msg.getLineNumber();
-                    int colNum = msg.getColumnIndex();
-
-                    // Generate a list of key-value strings describing this message
-                    ArrayList<String> mappings = new ArrayList<String>();
-
-                    if ( msg.isError() ) {
-                        mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP +
-                                             SCMsgSeverity.ERROR.name());
-                    }
-                    else if ( msg.isWarning() ) {
-                        mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP +
-                                             SCMsgSeverity.WARNING.name());
-                    }
-
-                    if ( ( rowNum > 0 ) && ( rowNum <= numRecs ) ) {
-                        mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP +
-                                             Integer.toString(rowNum));
-
-                        SocatDataRecord stdData = dataRecs.get(rowNum - 1);
-                        try {
-                            double longitude = stdData.getLongitude();
-                            if ( !Double.isNaN(longitude) )
-                                mappings.add(SCMSG_LONGITUDE_KEY + SCMSG_KEY_VALUE_SEP +
-                                                     Double.toString(longitude));
-                        } catch (Exception ex) {
-                            // no entry
-                        }
-                        try {
-                            double latitude = stdData.getLatitude();
-                            if ( !Double.isNaN(latitude) )
-                                mappings.add(SCMSG_LATITUDE_KEY + SCMSG_KEY_VALUE_SEP +
-                                                     Double.toString(latitude));
-                        } catch (Exception ex) {
-                            // no entry
-                        }
-                        try {
-                            DateTime timestamp = stdData.getTime();
-                            if ( timestamp != null )
-                                mappings.add(SCMSG_TIMESTAMP_KEY + SCMSG_KEY_VALUE_SEP +
-                                                     DATETIME_FORMATTER.print(timestamp));
-                        } catch (Exception ex) {
-                            // no entry
-                        }
-                    }
-
-                    if ( colNum > 0 )
-                        mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP +
-                                             Integer.toString(colNum));
-
-                    String colName = msg.getColumnName();
-                    if ( colName != null )
-                        mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + colName);
-
-                    // Assign the general message - escape newlines
-                    String checkerMsg = msg.getMessageType().getSummaryMessage(colName).replace("\n", "\\n");
-                    mappings.add(SCMSG_GENERAL_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
-
-                    // Assign the detailed message - escape newlines
-                    checkerMsg = msg.getMessageString().replace("\n", "\\n");
-                    mappings.add(SCMSG_DETAILED_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
-
-                    // Write this array list of key-value strings to file
-                    msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
-
-                    // Create the WOCE flag for this message.
-                    // TODO: Assign the correct WOCE name
-                    if ( rowNum > 0 ) {
-                        if ( msg.isError() ) {
-                            if ( colNum > 0 ) {
-                                woceFours.add(
-                                        new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum - 1, rowNum - 1));
-                            }
-                            else {
-                                woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum - 1));
-                            }
-                        }
-                        else if ( msg.isWarning() ) {
-                            if ( colNum > 0 ) {
-                                woceThrees.add(
-                                        new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum - 1, rowNum - 1));
-                            }
-                            else {
-                                woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum - 1));
-                            }
-                        }
-                    }
+                else if ( QCFlag.Severity.WARNING.equals(severity) ) {
+                    Integer cnt = warnCnt.get(summary);
+                    if ( cnt == null )
+                        cnt = 1;
+                    else
+                        cnt += 1;
+                    warnCnt.put(summary, cnt);
                 }
-
-            } catch (MessageException ex) {
-                throw new RuntimeException(ex);
             }
+            for (Entry<String,Integer> sumCnt : warnCnt.entrySet()) {
+                msgsWriter.println(MSG_SUMMARY_MSG_KEY + MSG_KEY_VALUE_SEP +
+                        sumCnt.getValue() + " errors of type: " + sumCnt.getKey());
+            }
+            for (Entry<String,Integer> sumCnt : errorCnt.entrySet()) {
+                msgsWriter.println(MSG_SUMMARY_MSG_KEY + MSG_KEY_VALUE_SEP +
+                        sumCnt.getValue() + " warnings of type: " + sumCnt.getKey());
+            }
+
+            // WOCE-type QC flags to assign from the automated data check
+            TreeSet<QCFlag> woceFlags = new TreeSet<QCFlag>();
+
+            for (ADCMessage msg : msgList) {
+                // Generate a list of key-value strings describing this message
+                ArrayList<String> mappings = new ArrayList<String>();
+
+                QCFlag.Severity severity = msg.getSeverity();
+                mappings.add(MSG_SEVERITY_KEY + MSG_KEY_VALUE_SEP + severity.name());
+
+                Integer rowNum = msg.getRowNumber();
+                if ( (rowNum > 0) && (rowNum <= numSamples) &&
+                        !DashboardUtils.INT_MISSING_VALUE.equals(rowNum) )
+                    mappings.add(MSG_ROW_NUMBER_KEY + MSG_KEY_VALUE_SEP + rowNum);
+                else
+                    rowNum = null;
+
+                Integer colNumber = msg.getColNumber();
+                if ( (colNumber > 0) && (colNumber <= numUserCols) &&
+                        !DashboardUtils.INT_MISSING_VALUE.equals(colNumber) )
+                    mappings.add(MSG_COLUMN_NUMBER_KEY + MSG_KEY_VALUE_SEP + colNumber);
+                else
+                    colNumber = null;
+
+                String colName = msg.getColName();
+                if ( !DashboardUtils.STRING_MISSING_VALUE.equals(colName) )
+                    mappings.add(MSG_COLUMN_NAME_KEY + MSG_KEY_VALUE_SEP + colName);
+
+                // Assign the general message - escape newlines
+                String summary = msg.getGeneralComment().replace("\n", "\\n");
+                if ( !DashboardUtils.STRING_MISSING_VALUE.equals(summary) )
+                    mappings.add(MSG_GENERAL_MSG_KEY + MSG_KEY_VALUE_SEP + summary);
+
+                // Assign the detailed message - escape newlines
+                String details = msg.getDetailedComment().replace("\n", "\\n");
+                if ( !DashboardUtils.STRING_MISSING_VALUE.equals(details) )
+                    mappings.add(MSG_DETAILED_MSG_KEY + MSG_KEY_VALUE_SEP + details);
+
+                // Write this array list of key-value strings to file
+                msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
+
+                // Create the QC flag for this message.
+                if ( rowNum != null ) {
+                    if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
+                        QCFlag flag;
+                        if ( colNumber != null )
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                    QCFlag.Severity.ERROR, colNumber - 1, rowNum - 1);
+                        else
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                    QCFlag.Severity.ERROR, null, rowNum - 1);
+                        woceFlags.add(flag);
+                    }
+                    else if ( QCFlag.Severity.WARNING.equals(severity) ) {
+                        QCFlag flag;
+                        if ( colNumber > 0 )
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                    QCFlag.Severity.WARNING, colNumber - 1, rowNum - 1);
+                        else
+                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                    QCFlag.Severity.WARNING, null, rowNum - 1);
+                        woceFlags.add(flag);
+                    }
+                }
+            }
+
+            dataset.setCheckerFlags(woceFlags);
 
         } finally {
             msgsWriter.close();
         }
 
-        cruiseData.setCheckerWoceFours(woceFours);
-        cruiseData.setCheckerWoceThrees(woceThrees);
-
-        woceFours.clear();
-        woceThrees.clear();
-
-        // Assign any user-provided WOCE-3 and WOCE-4 flags
-        ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-        for (int k = 0; k < columnTypes.size(); k++) {
-            DataColumnType colType = columnTypes.get(k);
-            if ( !colType.isWoceType() )
+        // Assign any user-provided QC flags.
+        // TODO: get severity from user-provided specification of the type
+        // This assumes QC flags indicating problems have flag values that are integers 3-9.
+        // If "WOCE" (case insensitive) is in the data type description, 3 is WARNING
+        // and 4-9 are ERROR; otherwise 3-9 are all ERROR.
+        TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
+        for (int k = 0; k < numUserCols; k++) {
+            DashDataType<?> colType = stdDataTypes.get(k);
+            if ( !colType.isQCType() )
                 continue;
-            for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
+            // Check for another column associated with this QC column
+            int qcDataIdx = -1;
+            for (int d = 0; d < numUserCols; d++) {
+                if ( colType.isQCTypeFor(stdDataTypes.get(d)) ) {
+                    qcDataIdx = d;
+                    break;
+                }
+            }
+            QCFlag.Severity severityOfThree = QCFlag.Severity.ERROR;
+            if ( colType.getDescription().toUpperCase().contains("WOCE") )
+                severityOfThree = QCFlag.Severity.WARNING;
+            for (int j = 0; j < numSamples; j++) {
                 try {
-                    int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
-                    if ( value == 4 )
-                        woceFours.add(new WoceType(colType.getVarName(), null, rowIdx));
-                    else if ( value == 3 )
-                        woceThrees.add(new WoceType(colType.getVarName(), null, rowIdx));
-                    // Only handle 3 and 4
-                } catch (NumberFormatException ex) {
+                    String flagVal = (String) stdUserData.getStdVal(j, k);
+                    int value = Integer.parseInt(flagVal);
+                    if ( (value >= 3) && (value <= 9) ) {
+                        QCFlag.Severity severity;
+                        if ( value == 3 )
+                            severity = severityOfThree;
+                        else
+                            severity = QCFlag.Severity.ERROR;
+                        QCFlag flag;
+                        if ( qcDataIdx >= 0 )
+                            flag = new QCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, j);
+                        else
+                            flag = new QCFlag(colType.getVarName(), flagVal, severity, null, j);
+                        qcFlags.add(flag);
+                    }
+                } catch ( NumberFormatException ex ) {
                     // Assuming a missing value
                 }
             }
         }
-
-        cruiseData.setUserWoceFours(woceFours);
-        cruiseData.setUserWoceThrees(woceThrees);
-
-        woceFours.clear();
-        woceThrees.clear();
+        dataset.setUserFlags(qcFlags);
     }
 
     /**
-     * Reads the list of messages produced by the SanityChecker from the messages
-     * file written by {@link #processCruiseMessages(DashboardCruiseWithData, Output)}.
+     * Reads the list of messages from the messages file written by
+     * {@link #processCheckerMessages(DashboardDataset, StdUserDataArray)}.
      *
-     * @param expocode
-     *         get messages for the cruise with this expocode
-     * @return the sanity checker messages for the cruise;
-     * never null, but may be empty if there were no sanity
-     * checker messages for the cruise.
-     * The expocode, but not the username, will be assigned
-     * in the returned SCMessageList
+     * @param datasetId
+     *         get messages for the dataset with this ID
+     *
+     * @return the automated data checker messages for the dataset;
+     *         never null, but may be empty if there were no messages.
+     *         The datasetId, but not the username, will be assigned in the returned ADCMessageList
+     *
      * @throws IllegalArgumentException
-     *         if the expocode is invalid, or
-     *         if the messages file is invalid
+     *         if the dataset ID is invalid, or if the messages file is invalid
      * @throws FileNotFoundException
-     *         if there is no messages file for the cruise
+     *         if there is no messages file for the dateset
      */
-    public SCMessageList getCruiseMessages(String expocode)
-            throws IllegalArgumentException, FileNotFoundException {
+    public ADCMessageList getCheckerMessages(String datasetId) throws IllegalArgumentException, FileNotFoundException {
         // Create the list of messages to be returned
-        SCMessageList msgList = new SCMessageList();
-        msgList.setExpocode(expocode);
-        // Directly modify the summary messages in the SCMessageList
+        ADCMessageList msgList = new ADCMessageList();
+        msgList.setDatasetId(datasetId);
+        // Directly modify the summary messages in the ADCMessageList
         ArrayList<String> summaryMsgs = msgList.getSummaries();
         // Read the cruise messages file
-        File msgsFile = cruiseMsgsFile(expocode);
+        File msgsFile = messagesFile(datasetId);
         BufferedReader msgReader;
         msgReader = new BufferedReader(new FileReader(msgsFile));
         try {
             try {
-                String msgline = msgReader.readLine();
-                while ( msgline != null ) {
-                    if ( !msgline.trim().isEmpty() ) {
+                String summmaryStart = MSG_SUMMARY_MSG_KEY + MSG_KEY_VALUE_SEP;
+                String altSummmaryStart = "SC" + summmaryStart;
+                for (String msgline = msgReader.readLine(); msgline != null; msgline = msgReader.readLine()) {
+                    if ( msgline.trim().isEmpty() )
+                        continue;
 
-                        if ( msgline.startsWith(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP) ) {
-                            summaryMsgs.add(msgline.substring(SCMSG_SUMMARY_MSG_KEY.length() +
-                                                                      SCMSG_KEY_VALUE_SEP.length()).trim());
-                            msgline = msgReader.readLine();
-                            continue;
-                        }
+                    if ( msgline.startsWith(summmaryStart) ) {
+                        summaryMsgs.add(msgline.substring(summmaryStart.length()).trim());
+                        continue;
+                    }
+                    // For backwards compatibility
+                    if ( msgline.startsWith(altSummmaryStart) ) {
+                        summaryMsgs.add(msgline.substring(altSummmaryStart.length()).trim());
+                        continue;
+                    }
 
-                        Properties msgProps = new Properties();
+                    Properties msgProps = new Properties();
+                    try {
                         for (String msgPart : DashboardUtils.decodeStringArrayList(msgline)) {
-                            String[] keyValue = msgPart.split(SCMSG_KEY_VALUE_SEP, 2);
+                            String[] keyValue = msgPart.split(MSG_KEY_VALUE_SEP, 2);
                             if ( keyValue.length != 2 )
                                 throw new IOException("Invalid key:value pair '" + msgPart + "'");
                             msgProps.setProperty(keyValue[0], keyValue[1]);
                         }
+                    } catch ( IllegalArgumentException ex ) {
+                        throw new IOException("Invalid saved checker message: " + msgline);
+                    }
 
-                        SCMessage msg = new SCMessage();
+                    ADCMessage msg = new ADCMessage();
 
-                        String propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
-                        try {
-                            msg.setSeverity(SCMsgSeverity.valueOf(propVal));
-                        } catch (Exception ex) {
-                            // leave as the default SCMsgSeverity.UNKNOWN
-                        }
-
-                        propVal = msgProps.getProperty(SCMSG_ROW_NUMBER_KEY);
-                        try {
-                            msg.setRowNumber(Integer.parseInt(propVal));
-                        } catch (Exception ex) {
-                            // leave as the default -1
-                        }
-
-                        propVal = msgProps.getProperty(SCMSG_LONGITUDE_KEY);
-                        try {
-                            msg.setLongitude(Double.valueOf(propVal));
-                        } catch (Exception ex) {
-                            // leave as the default Double.NaN
-                        }
-
-                        propVal = msgProps.getProperty(SCMSG_LATITUDE_KEY);
-                        try {
-                            msg.setLatitude(Double.valueOf(propVal));
-                        } catch (Exception ex) {
-                            // leave as the default Double.NaN
-                        }
-
-                        propVal = msgProps.getProperty(SCMSG_TIMESTAMP_KEY);
-                        if ( propVal != null ) {
-                            msg.setTimestamp(propVal);
-                        }
-                        // default timestamp is an empty string
-
-                        propVal = msgProps.getProperty(SCMSG_COLUMN_NUMBER_KEY);
-                        try {
-                            msg.setColNumber(Integer.parseInt(propVal));
-                        } catch (Exception ex) {
-                            // leave as the default -1
-                        }
-
-                        propVal = msgProps.getProperty(SCMSG_COLUMN_NAME_KEY);
-                        if ( propVal != null ) {
-                            msg.setColName(propVal);
-                        }
-                        // default column name is an empty string
-
-                        propVal = msgProps.getProperty(SCMSG_GENERAL_MSG_KEY);
+                    try {
+                        String propVal = msgProps.getProperty(MSG_SEVERITY_KEY);
                         if ( propVal == null )
-                            propVal = msgProps.getProperty(SCMSG_OLD_MESSAGE_KEY);
+                            propVal = msgProps.getProperty("SC" + MSG_SEVERITY_KEY);
+                        msg.setSeverity(QCFlag.Severity.valueOf(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
+
+                    try {
+                        String propVal = msgProps.getProperty(MSG_ROW_NUMBER_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_ROW_NUMBER_KEY);
+                        msg.setRowNumber(Integer.parseInt(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
+
+                    try {
+                        String propVal = msgProps.getProperty(MSG_COLUMN_NUMBER_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_COLUMN_NUMBER_KEY);
+                        msg.setColNumber(Integer.parseInt(propVal));
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
+
+                    try {
+                        String propVal = msgProps.getProperty(MSG_COLUMN_NAME_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_COLUMN_NAME_KEY);
+                        msg.setColName(propVal);
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
+
+                    try {
+                        String propVal = msgProps.getProperty(MSG_GENERAL_MSG_KEY);
+                        if ( propVal == null )
+                            propVal = msgProps.getProperty("SC" + MSG_GENERAL_MSG_KEY);
+                        // Replace all escaped newlines in the message string
                         if ( propVal != null ) {
-                            // Replace all escaped newlines in the message string
                             propVal = propVal.replace("\\n", "\n");
                             msg.setGeneralComment(propVal);
                         }
-                        // default general explanation is an empty string
+                    } catch ( Exception ex ) {
+                        // leave as the default
+                    }
 
-                        propVal = msgProps.getProperty(SCMSG_DETAILED_MSG_KEY);
+                    try {
+                        String propVal = msgProps.getProperty(MSG_DETAILED_MSG_KEY);
                         if ( propVal == null )
-                            propVal = msgProps.getProperty(SCMSG_OLD_MESSAGE_KEY);
+                            propVal = msgProps.getProperty("SC" + MSG_DETAILED_MSG_KEY);
                         if ( propVal != null ) {
                             // Replace all escaped newlines in the message string
                             propVal = propVal.replace("\\n", "\n");
                             msg.setDetailedComment(propVal);
                         }
-                        // default detailed explanation is an empty string
-
-                        msgList.add(msg);
-
-                        msgline = msgReader.readLine();
+                    } catch ( Exception ex ) {
+                        // leave as the default
                     }
+
+                    msgList.add(msg);
                 }
             } finally {
                 msgReader.close();
             }
-        } catch (IOException ex) {
-            throw new IllegalArgumentException(
-                    "Unexpected problem reading messages from " + msgsFile.getPath() +
-                            "\n    " + ex.getMessage(), ex);
+        } catch ( IOException ex ) {
+            throw new IllegalArgumentException("Unexpected problem reading messages from " +
+                    msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
         }
 
         return msgList;
-    }
-
-    /**
-     * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
-     * messages as well as PI-provided WOCE flags.
-     *
-     * @param cruiseData
-     *         generate SocatWoceEvents for this cruise.  Uses the expocode, version,
-     *         column types, user WOCE flags, and user WOCE comments from this object.
-     *         SanityChecker cruise messages are read from the saved messages file for
-     *         this cruise, and data is read from the saved full-data DSG file for this
-     *         cruise.
-     * @param dsgHandler
-     *         DSG file handler to use to get the full-data DSG file for the cruise
-     * @param knownDataFileTypes
-     *         known types for data files
-     * @return the list of SocatWoceEvents for the cruise; never null but may be empty
-     * @throws IllegalArgumentException
-     *         if the expocode in cruiseData is invalid, or
-     *         if the messages file is invalid
-     * @throws FileNotFoundException
-     *         if there is no messages file for the cruise, or
-     *         if there is no full-data DSG file for the cruise
-     * @throws IOException
-     *         if there is a problem opening or reading the full-data DSG file for the cruise
-     */
-    public ArrayList<WoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData,
-                                                   DsgNcFileHandler dsgHandler, KnownDataTypes knownDataFileTypes)
-            throws IllegalArgumentException, FileNotFoundException, IOException {
-        // Ordered set of all WOCE flags for this dataset
-        TreeSet<WoceFlag> woceFlagSet = new TreeSet<WoceFlag>();
-
-        // Create the flags from the SanityChecker messages
-        String expocode = cruiseData.getExpocode();
-        for (SCMessage msg : getCruiseMessages(expocode)) {
-
-            SCMsgSeverity severity = msg.getSeverity();
-            if ( severity.equals(SCMsgSeverity.UNKNOWN) )
-                continue;
-
-            int rowNum = msg.getRowNumber();
-            if ( rowNum <= 0 )
-                continue;
-
-            // if no specific column associated with this message, the column number is -1
-            int colNum = msg.getColNumber();
-            if ( colNum == 0 )
-                continue;
-
-            // TODO: get the correct WOCE flag name
-            WoceFlag info = new WoceFlag(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum - 1);
-            if ( colNum > 0 )
-                info.setColumnIndex(colNum - 1);
-
-            if ( severity.equals(SCMsgSeverity.ERROR) )
-                info.setFlag(DashboardUtils.WOCE_BAD);
-            else if ( severity.equals(SCMsgSeverity.WARNING) )
-                info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
-            else
-                throw new RuntimeException("Unexpected message severity of " + severity.toString());
-
-            String comment = msg.getGeneralComment();
-            if ( comment.isEmpty() )
-                comment = msg.getDetailedComment();
-            info.setComment(comment);
-
-            // Only add SanityChecker WOCE-4 flags; the SanityChecker marks all
-            // questionable data regardless of whether it is of consequence.
-            if ( DashboardUtils.WOCE_BAD.equals(info.getFlag()) )
-                woceFlagSet.add(info);
-        }
-
-        ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-
-        TreeSet<WoceType> userWoceThrees = cruiseData.getUserWoceThrees();
-        TreeSet<WoceType> userWoceFours = cruiseData.getUserWoceFours();
-        if ( ( userWoceThrees.size() > 0 ) || ( userWoceFours.size() > 0 ) ) {
-
-            HashMap<String,Integer> woceCommentIndex = new HashMap<String,Integer>();
-            for (DataColumnType colType : columnTypes) {
-                if ( colType.isWoceType() ) {
-                    for (int k = 0; k < columnTypes.size(); k++) {
-                        if ( columnTypes.get(k).isWoceCommentFor(colType) ) {
-                            woceCommentIndex.put(colType.getVarName(), Integer.valueOf(k));
-                        }
-                    }
-                }
-            }
-
-            // Need the data values for any WOCE comments
-            ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-
-            // Add any PI WOCE-3 flags
-            for (WoceType uwoce : userWoceThrees) {
-                String woceName = uwoce.getWoceName();
-                // Use Integer.MAX_VALUE as the column index to put these at the end
-                WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
-                info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
-                String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
-                Integer idx = woceCommentIndex.get(woceName);
-                if ( idx != null ) {
-                    comment += " with comment/subflag: " + dataVals.get(uwoce.getRowIndex()).get(idx);
-                }
-                info.setComment(comment);
-                woceFlagSet.add(info);
-            }
-
-            // Add any PI WOCE-4 flags
-            for (WoceType uwoce : userWoceFours) {
-                String woceName = uwoce.getWoceName();
-                // Use Integer.MAX_VALUE as the column index to put these at the end
-                WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
-                info.setFlag(DashboardUtils.WOCE_BAD);
-                String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
-                Integer idx = woceCommentIndex.get(woceName);
-                if ( idx != null ) {
-                    comment += " with comment/subflag: " + dataVals.get(uwoce.getRowIndex()).get(idx);
-                }
-                info.setComment(comment);
-                woceFlagSet.add(info);
-            }
-        }
-
-        ArrayList<WoceEvent> woceList = new ArrayList<WoceEvent>();
-        // If no WOCE flags, return now before we read data from the DSG file
-        if ( woceFlagSet.isEmpty() )
-            return woceList;
-
-        String version = cruiseData.getVersion();
-
-        // Get the longitudes, latitude, times, and regions IDs
-        // from the full-data DSG file for this cruise
-        double[][] lonlattime = dsgHandler.readLonLatTimeDataValues(expocode);
-        double[] longitudes = lonlattime[0];
-        double[] latitudes = lonlattime[1];
-        double[] times = lonlattime[2];
-        char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, SocatTypes.REGION_ID.getVarName());
-        Date now = new Date();
-
-        String lastWoceName = null;
-        Character lastFlag = null;
-        Integer lastColIdx = null;
-        String lastComment = null;
-        double[] dataValues = null;
-        String lastDataVarName = null;
-        String dataVarName = null;
-        ArrayList<DataLocation> locations = null;
-        for (WoceFlag info : woceFlagSet) {
-
-            // Check if a new WOCE event is needed
-            String woceName = info.getWoceName();
-            Character flag = info.getFlag();
-            Integer colIdx = info.getColumnIndex();
-            String comment = info.getComment();
-            if ( ( !woceName.equals(lastWoceName) ) ||
-                    ( !flag.equals(lastFlag) ) ||
-                    ( !colIdx.equals(lastColIdx) ) ||
-                    ( !comment.equals(lastComment) ) ) {
-                lastWoceName = woceName;
-                lastFlag = flag;
-                lastColIdx = colIdx;
-                lastComment = comment;
-
-                WoceEvent woceEvent = new WoceEvent();
-                woceEvent.setWoceName(woceName);
-                woceEvent.setExpocode(expocode);
-                woceEvent.setVersion(version);
-                woceEvent.setFlag(flag);
-                woceEvent.setFlagDate(now);
-                woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-                woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-                woceEvent.setComment(comment);
-
-                // If a column can be identified, assign its name and
-                // get its values if we do not already have them
-                dataVarName = null;
-                if ( ( colIdx >= 0 ) && ( colIdx != Integer.MAX_VALUE ) ) {
-                    DataColumnType dataType = columnTypes.get(colIdx);
-                    // Geoposition is a problem in the combination of lon/lat/time, so no data assignment
-                    if ( DashboardServerUtils.GEOPOSITION.typeNameEquals(dataType) ) {
-                        dataVarName = null;
-                    }
-                    // Associate all time-related data columns with the time file variable
-                    else if ( DashboardServerUtils.TIMESTAMP.typeNameEquals(dataType) ||
-                            DashboardServerUtils.DATE.typeNameEquals(dataType) ||
-                            DashboardServerUtils.YEAR.typeNameEquals(dataType) ||
-                            DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataType) ||
-                            DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataType) ||
-                            DashboardServerUtils.TIME_OF_DAY.typeNameEquals(dataType) ||
-                            DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataType) ||
-                            DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataType) ||
-                            DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataType) ||
-                            DashboardServerUtils.DAY_OF_YEAR.typeNameEquals(dataType) ||
-                            DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(dataType) ) {
-                        dataVarName = DashboardServerUtils.TIME.getVarName();
-                    }
-                    // Check if this type is known in the data file types
-                    else if ( knownDataFileTypes.getDataColumnType(dataType.getVarName()) == null ) {
-                        dataVarName = null;
-                    }
-                    else {
-                        dataVarName = dataType.getVarName();
-                    }
-                    if ( dataVarName != null ) {
-                        if ( !dataVarName.equals(lastDataVarName) ) {
-                            // This should always succeed; but just in case ....
-                            try {
-                                dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
-                                lastDataVarName = dataVarName;
-                            } catch (IllegalArgumentException ex) {
-                                dataVarName = null;
-                            }
-                        }
-                    }
-                    if ( dataVarName != null ) {
-                        woceEvent.setVarName(dataVarName);
-                    }
-                }
-
-                // Directly modify the locations ArrayList in this object
-                locations = woceEvent.getLocations();
-                woceList.add(woceEvent);
-            }
-
-            // Add a location for the current WOCE event
-            DataLocation dataLoc = new DataLocation();
-            int rowIdx = info.getRowIndex();
-            dataLoc.setRowNumber(rowIdx + 1);
-            dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
-            dataLoc.setLatitude(latitudes[rowIdx]);
-            dataLoc.setLongitude(longitudes[rowIdx]);
-            dataLoc.setRegionID(regionIDs[rowIdx]);
-            if ( dataVarName != null )
-                dataLoc.setDataValue(dataValues[rowIdx]);
-            locations.add(dataLoc);
-        }
-
-        return woceList;
     }
 
 }

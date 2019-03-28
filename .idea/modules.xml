@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DashboardApps/DashboardApps.iml" filepath="$PROJECT_DIR$/DashboardApps/DashboardApps.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OmeMetadata/OmeMetadata.iml" filepath="$PROJECT_DIR$/OmeMetadata/OmeMetadata.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SDIMetadata/SDIMetadata.iml" filepath="$PROJECT_DIR$/../SDIMetadata/SDIMetadata.iml" />
+      <module fileurl="file://$PROJECT_DIR$/UploadDashboard/UploadDashboard.iml" filepath="$PROJECT_DIR$/UploadDashboard/UploadDashboard.iml" />
+    </modules>
+  </component>
+</project>

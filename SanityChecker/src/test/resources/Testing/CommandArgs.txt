@@ -1,1 +1,0 @@
--outputdir /local/uuk07qzu/work/projects/SOCAT/Automation/DUP_Testing -outputfilebase test

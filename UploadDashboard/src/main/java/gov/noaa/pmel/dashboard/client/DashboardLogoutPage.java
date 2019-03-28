@@ -3,10 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -16,16 +12,18 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
 /**
- * Logout page with buttons to login again and to go to socat.info
+ * Logout page with a button to go back to the login again
  *
  * @author Karl Smith
  */
 public class DashboardLogoutPage extends CompositeWithUsername {
 
-    private static final String GOODBYE_TITLE =
-            "Thank you for contributing data to SOCAT.";
+    private static final String GOODBYE_TITLE = "Thank you for contributing to SOCAT.";
     private static final String RELOGIN_TEXT = "Log in again";
     private static final String RELOGIN_HREF = "SocatUploadDashboard.html";
 
@@ -47,8 +45,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     private static DashboardLogoutPage singleton = null;
 
     /**
-     * Creates a logout page.  Do not call this constructor;
-     * instead use the showPage static method to show the
+     * Creates a logout page.  Do not call this constructor; instead use the showPage static method to show the
      * singleton instance of this page.
      */
     DashboardLogoutPage() {
@@ -61,8 +58,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     }
 
     /**
-     * Shows the logout page in the RootLayoutPanel and logs out the user.
-     * Adds this page to the page history.
+     * Shows the logout page in the RootLayoutPanel and logs out the user. Adds this page to the page history.
      */
     static void showPage() {
         if ( singleton == null )
@@ -88,11 +84,10 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     }
 
     /**
-     * Shows the logout page in the RootLayoutPanel.
-     * Does not attempt to logout the user.
+     * Shows the logout page in the RootLayoutPanel. Does not attempt to logout the user.
      */
     static void redisplayPage() {
-        // Allow this succeed even if never called before
+        // Allow this to succeed even if never called before
         if ( singleton == null )
             singleton = new DashboardLogoutPage();
         UploadDashboard.updateCurrentPage(singleton);

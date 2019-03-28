@@ -4,7 +4,7 @@
 						http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 
-	<display-name>Socat Upload Dashboard</display-name>
+	<display-name>SOCAT Upload Dashboard</display-name>
 	<session-config>
 		<session-timeout>180</session-timeout>
 	</session-config>
@@ -23,12 +23,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.dashboard.server.CruiseUploadService</servlet-class>
+		<servlet-name>DashboardDataUploadServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.dashboard.server.DataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/CruiseUploadService</url-pattern>
+		<servlet-name>DashboardDataUploadServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/DataUploadService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

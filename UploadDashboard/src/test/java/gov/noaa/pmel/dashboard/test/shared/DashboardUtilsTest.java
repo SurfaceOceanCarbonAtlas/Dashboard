@@ -4,27 +4,120 @@
 package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.WoceType;
-
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Unit tests for method in {@link DashboardUtils}
+ * except for the various {@link java.util.Comparator} methods.
+ *
  * @author Karl Smith
  */
 public class DashboardUtilsTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#closeTo(Double, Double, double, double)}
+     * Simple test of working with the GregorianCalendar
+     * (also a method of getting the value for DATE_MISSING_VALUE)
+     */
+    @Test
+    public void testGregorianCalendar() {
+        TimeZone utc = TimeZone.getTimeZone("UTC");
+        GregorianCalendar cal = new GregorianCalendar(utc);
+        long value;
+
+        // Full settings
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.clear();
+        cal.setTimeZone(utc);
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+
+        // Clear does not remove the time zone
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.clear();
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+
+        // Actually just need to set milliseconds to zero
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.set(1800, GregorianCalendar.JANUARY, 2, 0, 0, 0);
+        cal.set(GregorianCalendar.MILLISECOND, 0);
+        value = cal.getTimeInMillis();
+        assertEquals(-5364576000000L, value);
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#decodeStringArrayList(String)}
+     * and {@link DashboardUtils#encodeStringArrayList(ArrayList)}.
+     */
+    @Test
+    public void testEncodeDecodeStringArrayList() {
+        ArrayList<String> myList = new ArrayList<String>(
+                Arrays.asList("one", "two", "", "four, five, and six", "", ""));
+        String encoded = DashboardUtils.encodeStringArrayList(myList);
+        ArrayList<String> decodedList = DashboardUtils.decodeStringArrayList(encoded);
+        assertEquals(myList, decodedList);
+        decodedList = DashboardUtils.decodeStringArrayList("[]");
+        assertEquals(0, decodedList.size());
+        decodedList = DashboardUtils.decodeStringArrayList("[  ]");
+        assertEquals(0, decodedList.size());
+        decodedList = DashboardUtils.decodeStringArrayList("[\"\"]");
+        assertEquals(new ArrayList<String>(Arrays.asList("")), decodedList);
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#decodeStringTreeSet(String)}
+     * and {@link DashboardUtils#encodeStringTreeSet(TreeSet)}.
+     */
+    @Test
+    public void testEncodeDecodeStringTreeSet() {
+        TreeSet<String> mySet = new TreeSet<String>(
+                Arrays.asList("one", "two", "", "four", "five and six"));
+        String encoded = DashboardUtils.encodeStringTreeSet(mySet);
+        TreeSet<String> decodedSet = DashboardUtils.decodeStringTreeSet(encoded);
+        assertEquals(mySet, decodedSet);
+        decodedSet = DashboardUtils.decodeStringTreeSet("[]");
+        assertEquals(0, decodedSet.size());
+        decodedSet = DashboardUtils.decodeStringTreeSet("[  ]");
+        assertEquals(0, decodedSet.size());
+        decodedSet = DashboardUtils.decodeStringTreeSet("[\"\"]");
+        assertEquals(new TreeSet<String>(Arrays.asList("")), decodedSet);
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#baseName(String)}
+     */
+    @Test
+    public void testBaseName() {
+        String filename = "dataset.tsv";
+        assertEquals(filename, DashboardUtils.baseName("/Some/path/to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my///" + filename));
+        assertEquals(filename, DashboardUtils.baseName("  " + filename + "\n"));
+        assertEquals(filename, DashboardUtils.baseName("\\Some\\path\\to\\my\\" + filename));
+        assertEquals(filename, DashboardUtils.baseName("/Some/path\\to/my/" + filename));
+        assertEquals(filename, DashboardUtils.baseName("relative/path/to/my\\ " + filename));
+        assertEquals("my " + filename, DashboardUtils.baseName("relative/path/to/my " + filename));
+        assertEquals("", DashboardUtils.baseName("/Some/path/to/my/"));
+        assertEquals("", DashboardUtils.baseName(""));
+        assertEquals("", DashboardUtils.baseName("  "));
+        assertEquals("", DashboardUtils.baseName(null));
+    }
+
+    /**
+     * Test method for {@link DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
+     * and {@link DashboardUtils#closeTo(Double, Double, double, double)}
      */
     @Test
     public void testCloseToLongitudeCloseTo() {
@@ -47,122 +140,6 @@ public class DashboardUtilsTest {
         assertFalse(DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0));
         assertTrue(DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0));
         assertFalse(DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0));
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#passhashFromPlainText(String, String)}
-     */
-    @Test
-    public void testPasshashFromPlainText() {
-        String passhash = DashboardUtils.passhashFromPlainText("username", "password");
-        assertTrue(passhash.length() >= 32);
-
-        String otherhash = DashboardUtils.passhashFromPlainText("username", "otherpass");
-        assertTrue(otherhash.length() >= 32);
-        assertFalse(passhash.equals(otherhash));
-
-        otherhash = DashboardUtils.passhashFromPlainText("otheruser", "password");
-        assertTrue(otherhash.length() >= 32);
-        assertFalse(passhash.equals(otherhash));
-
-        passhash = DashboardUtils.passhashFromPlainText("me", "password");
-        assertEquals(0, passhash.length());
-
-        passhash = DashboardUtils.passhashFromPlainText("username", "pass");
-        assertEquals(0, passhash.length());
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeByteArray(java.lang.String)}.
-     */
-    @Test
-    public void testDecodeByteArray() {
-        String expectedStr = "[ 3, 6, -9, 15, 0, 12 ]";
-        byte[] expectedArray = { 3, 6, -9, 15, 0, 12 };
-        String oneStr = "[ 8 ]";
-        byte[] oneArray = { 8 };
-        String emptyStr = "[  ]";
-        byte[] emptyArray = new byte[0];
-
-        byte[] byteArray = DashboardUtils.decodeByteArray(expectedStr);
-        assertArrayEquals(expectedArray, byteArray);
-
-        byteArray = DashboardUtils.decodeByteArray(oneStr);
-        assertArrayEquals(oneArray, byteArray);
-
-        byteArray = DashboardUtils.decodeByteArray(emptyStr);
-        assertArrayEquals(emptyArray, byteArray);
-
-        boolean exceptionCaught = false;
-        try {
-            byteArray = DashboardUtils.decodeByteArray("3, 6, -9, 15, 0, 12");
-        } catch (IllegalArgumentException ex) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
-
-        exceptionCaught = false;
-        try {
-            byteArray = DashboardUtils.decodeByteArray("[ 3, 6, -9, 1115, 0, 12 ]");
-        } catch (IllegalArgumentException ex) {
-            exceptionCaught = true;
-        }
-        assertTrue(exceptionCaught);
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeIntegerArrayList(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeIntegerArrayList(java.util.ArrayList)}.
-     */
-    @Test
-    public void testEncodeDecodeIntegerArrayList() {
-        ArrayList<Integer> myList = new ArrayList<Integer>(
-                Arrays.asList(234, 4563, 90312, -2349));
-        String encoded = DashboardUtils.encodeIntegerArrayList(myList);
-        ArrayList<Integer> decodedList =
-                DashboardUtils.decodeIntegerArrayList(encoded);
-        assertEquals(myList, decodedList);
-        decodedList = DashboardUtils.decodeIntegerArrayList("[]");
-        assertEquals(0, decodedList.size());
-        decodedList = DashboardUtils.decodeIntegerArrayList("[  ]");
-        assertEquals(0, decodedList.size());
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeStringArrayList(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeStringArrayList(java.util.ArrayList)}.
-     */
-    @Test
-    public void testEncodeDecodeStringArrayList() {
-        ArrayList<String> myList = new ArrayList<String>(
-                Arrays.asList("one", "two", "", "four, five, and six", "", ""));
-        String encoded = DashboardUtils.encodeStringArrayList(myList);
-        ArrayList<String> decodedList =
-                DashboardUtils.decodeStringArrayList(encoded);
-        assertEquals(myList, decodedList);
-        decodedList = DashboardUtils.decodeStringArrayList("[]");
-        assertEquals(0, decodedList.size());
-        decodedList = DashboardUtils.decodeStringArrayList("[  ]");
-        assertEquals(0, decodedList.size());
-        decodedList = DashboardUtils.decodeStringArrayList("[\"\"]");
-        assertEquals(new ArrayList<String>(Arrays.asList("")), decodedList);
-    }
-
-    /**
-     * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeWoceTypeSet(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeWoceTypeSet(java.util.TreeSet)}.
-     */
-    @Test
-    public void testEncodeDecodeWoceTypeSet() {
-        TreeSet<WoceType> mySet = new TreeSet<WoceType>(
-                Arrays.asList(new WoceType("WOCE_CO2_water", 3, 7), new WoceType("WOCE_CO2_atm", 9, 2)));
-        String encoded = DashboardUtils.encodeWoceTypeSet(mySet);
-        TreeSet<WoceType> decodedSet = DashboardUtils.decodeWoceTypeSet(encoded);
-        assertEquals(mySet, decodedSet);
-        decodedSet = DashboardUtils.decodeWoceTypeSet("[]");
-        assertEquals(0, decodedSet.size());
-        decodedSet = DashboardUtils.decodeWoceTypeSet("[  ]");
-        assertEquals(0, decodedSet.size());
     }
 
 }

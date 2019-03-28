@@ -1,0 +1,19 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="SocatUploadDashboard:Web exploded">
+    <output-path>$PROJECT_DIR$/target/SocatUploadDashboard</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="UploadDashboard" />
+          <element id="module-output" name="OmeMetadata" />
+          <element id="module-output" name="SDIMetadata" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$USER_HOME$/gwt-2.8.2/gwt-servlet.jar" />
+        </element>
+      </element>
+      <element id="gwt-compiler-output" facet="UploadDashboard/gwt/GWT" />
+      <element id="javaee-facet-resources" facet="UploadDashboard/web/Web" />
+    </root>
+  </artifact>
+</component>

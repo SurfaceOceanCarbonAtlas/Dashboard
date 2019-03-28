@@ -4,7 +4,6 @@
 package gov.noaa.pmel.dashboard.test.server;
 
 import gov.noaa.pmel.dashboard.server.DashboardUserInfo;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class DashboardUserInfoTest {
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.DashboardUserInfo#DashboardUserInfo(java.lang.String)}
+     * Test method for {@link DashboardUserInfo#DashboardUserInfo(String)}
      */
     @Test
     public void testDashboardUserInfoGetAuthorizationHash() {
@@ -32,7 +31,7 @@ public class DashboardUserInfoTest {
         try {
             userInfo = new DashboardUserInfo(badUsername);
             errMissed = true;
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
             ;
         }
@@ -40,8 +39,8 @@ public class DashboardUserInfoTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.DashboardUserInfo#addUserRoles(java.lang.String)}
-     * and {@link gov.noaa.pmel.dashboard.server.DashboardUserInfo#managesOver(gov.noaa.pmel.dashboard.server.DashboardUserInfo)}.
+     * Test method for {@link DashboardUserInfo#addUserRoles(String)}
+     * and {@link DashboardUserInfo#managesOver(DashboardUserInfo)}.
      */
     @Test
     public void testAddUserRolesManagesOver() {
@@ -79,7 +78,7 @@ public class DashboardUserInfoTest {
         try {
             firstInfo.addUserRoles("MemberOf");
             errMissed = true;
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
             ;
         }
@@ -88,7 +87,7 @@ public class DashboardUserInfoTest {
         try {
             firstInfo.addUserRoles("ManagerOf");
             errMissed = true;
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
             ;
         }
@@ -97,7 +96,7 @@ public class DashboardUserInfoTest {
         try {
             firstInfo.addUserRoles("Deity");
             errMissed = true;
-        } catch (IllegalArgumentException ex) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
             ;
         }
@@ -105,8 +104,7 @@ public class DashboardUserInfoTest {
     }
 
     /**
-     * Test method for {@link gov.noaa.pmel.dashboard.server.DashboardUserInfo#equals(java.lang.Object)}
-     * and {@link gov.noaa.pmel.dashboard.server.DashboardUserInfo#hashCode()}.
+     * Test method for {@link DashboardUserInfo#equals(java.lang.Object)} and {@link DashboardUserInfo#hashCode()}.
      */
     @Test
     public void testHashCodeEqualsObject() {

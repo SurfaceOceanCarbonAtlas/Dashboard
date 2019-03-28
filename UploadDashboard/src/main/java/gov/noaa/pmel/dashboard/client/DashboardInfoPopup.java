@@ -38,13 +38,9 @@ public class DashboardInfoPopup extends Composite {
     private PopupPanel parentPanel;
 
     /**
-     * Creates an empty message within a PopupPanel.
-     * The popup includes a dismiss button to hide it.
-     * Use {@link #setInfoMessage(String)} to assign
-     * the message to be displayed.
-     * Use {@link #showRelativeTo(UIObject)}
-     * or {@link #showCentered()}
-     * to show the popup.
+     * Creates an empty message within a PopupPanel. The popup includes a dismiss button to hide it.
+     * Use {@link #setInfoMessage(String)} to assign the message to be displayed.
+     * Use {@link #showRelativeTo(UIObject)} or {@link #showCentered()} to show the popup.
      */
     DashboardInfoPopup() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -55,16 +51,14 @@ public class DashboardInfoPopup extends Composite {
 
     /**
      * @param htmlMessage
-     *         the unchecked HTML message to display.
-     *         For safety, use only known (static) HTML.
+     *         the unchecked HTML message to display. For safety, use only known (static) HTML.
      */
     void setInfoMessage(String htmlMessage) {
         infoHtml.setHTML(htmlMessage);
     }
 
     /**
-     * Show the popup relative to the given object.
-     * See {@link PopupPanel#showRelativeTo(UIObject)}.
+     * Show the popup relative to the given object. See {@link PopupPanel#showRelativeTo(UIObject)}.
      *
      * @param obj
      *         show relative to this UI object

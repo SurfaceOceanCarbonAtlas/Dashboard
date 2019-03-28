@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="true" inheritJdk="true">
+	<output-test url="file://$MODULE_DIR$/../target/test/UploadDashboard"/>
+	<contentEntry url="file://$MODULE_DIR$">
+		<testFolder url="file://$MODULE_DIR$/src/test/java"/>
+		<excludeFolder url="file://$MODULE_DIR$/target"/>
+	</contentEntry>
+	<lib name="gwt-user" scope="PROVIDED"/>
+	<lib name="antlr-runtime-3.4" scope="PROVIDED"/>
+	<lib name="avalon-framework-api-4.3.1" scope="PROVIDED"/>
+	<lib name="avalon-framework-impl-4.3.1" scope="PROVIDED"/>
+	<lib name="bagit-5.1.1" scope="PROVIDED"/>
+	<lib name="batik-all-1.9" scope="PROVIDED"/>
+	<lib name="commons-csv-1.6" scope="PROVIDED"/>
+	<lib name="commons-io-1.3.1" scope="PROVIDED"/>
+	<lib name="commons-logging-1.0.4" scope="PROVIDED"/>
+	<lib name="fontbox-2.0.4" scope="PROVIDED"/>
+	<lib name="fop-2.2" scope="PROVIDED"/>
+	<lib name="gson-2.8.2" scope="PROVIDED"/>
+	<lib name="javax.mail-1.6.1" scope="PROVIDED"/>
+	<lib name="jdom-2.0.6" scope="PROVIDED"/>
+	<lib name="joda-time-2.9.9" scope="PROVIDED"/>
+	<lib name="log4j-api-2.11.0" scope="PROVIDED"/>
+	<lib name="log4j-core-2.11.0" scope="PROVIDED"/>
+	<lib name="log4j-slf4j-impl-2.11.0" scope="PROVIDED"/>
+	<lib name="log4j-web-2.11.0" scope="PROVIDED"/>
+	<lib name="mysql-connector-java-5.1.46" scope="PROVIDED"/>
+	<lib name="sequence-library-1.0.3" scope="PROVIDED"/>
+	<lib name="serializer-2.7.2" scope="PROVIDED"/>
+	<lib name="slf4j-api-1.7.25" scope="PROVIDED"/>
+	<lib name="sqljet-1.1.11" scope="PROVIDED"/>
+	<lib name="svnkit-1.9.2" scope="PROVIDED"/>
+	<lib name="svnkit-cli-1.9.2" scope="PROVIDED"/>
+	<lib name="svnkit-javahl16-1.9.2" scope="PROVIDED"/>
+	<lib name="tomcat-coyote-7.0.86" scope="PROVIDED"/>
+	<lib name="xalan-2.7.2" scope="PROVIDED"/>
+	<lib name="xercesImpl-2.9.1" scope="PROVIDED"/>
+	<lib name="xml-apis-1.3.04" scope="PROVIDED"/>
+	<lib name="xml-apis-ext-1.3.04" scope="PROVIDED"/>
+	<lib name="xmlgraphics-commons-2.2" scope="PROVIDED"/>
+	<lib name="netcdfAll-4.6.11" scope="PROVIDED"/>
+	<lib name="junit:junit:4.12" scope="TEST"/>
+	<levels>
+		<level name="gwt-user" value="project"/>
+		<level name="antlr-runtime-3.4" value="project"/>
+		<level name="avalon-framework-api-4.3.1" value="project"/>
+		<level name="avalon-framework-impl-4.3.1" value="project"/>
+		<level name="bagit-5.1.1" value="project"/>
+		<level name="batik-all-1.9" value="project"/>
+		<level name="commons-csv-1.6" value="project"/>
+		<level name="commons-io-1.3.1" value="project"/>
+		<level name="commons-logging-1.0.4" value="project"/>
+		<level name="fontbox-2.0.4" value="project"/>
+		<level name="fop-2.2" value="project"/>
+		<level name="gson-2.8.2" value="project"/>
+		<level name="javax.mail-1.6.1" value="project"/>
+		<level name="jdom-2.0.6" value="project"/>
+		<level name="joda-time-2.9.9" value="project"/>
+		<level name="log4j-api-2.11.0" value="project"/>
+		<level name="log4j-core-2.11.0" value="project"/>
+		<level name="log4j-slf4j-impl-2.11.0" value="project"/>
+		<level name="log4j-web-2.11.0" value="project"/>
+		<level name="mysql-connector-java-5.1.46" value="project"/>
+		<level name="sequence-library-1.0.3" value="project"/>
+		<level name="serializer-2.7.2" value="project"/>
+		<level name="slf4j-api-1.7.25" value="project"/>
+		<level name="sqljet-1.1.11" value="project"/>
+		<level name="svnkit-1.9.2" value="project"/>
+		<level name="svnkit-cli-1.9.2" value="project"/>
+		<level name="svnkit-javahl16-1.9.2" value="project"/>
+		<level name="tomcat-coyote-7.0.86" value="project"/>
+		<level name="xalan-2.7.2" value="project"/>
+		<level name="xercesImpl-2.9.1" value="project"/>
+		<level name="xml-apis-1.3.04" value="project"/>
+		<level name="xml-apis-ext-1.3.04" value="project"/>
+		<level name="xmlgraphics-commons-2.2" value="project"/>
+		<level name="netcdfAll-4.6.11" value="project"/>
+		<level name="junit:junit:4.12" value="project"/>
+	</levels>
+</component>

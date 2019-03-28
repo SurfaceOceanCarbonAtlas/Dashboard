@@ -3,16 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
-import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.SCMessage;
-import gov.noaa.pmel.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
-
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -34,6 +24,15 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.ADCMessage;
+import gov.noaa.pmel.dashboard.shared.ADCMessageList;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+
+import java.util.List;
 
 /**
  * @author Karl Smith
@@ -53,9 +52,6 @@ public class DataMessagesPage extends CompositeWithUsername {
     private static final String COLUMN_NUMBER_COLUMN_NAME = "Col.";
     private static final String COLUMN_NAME_COLUMN_NAME = "Column Name";
     private static final String ROW_NUMBER_COLUMN_NAME = "Row";
-    private static final String TIMESTAMP_COLUMN_NAME = "Time";
-    private static final String LONGITUDE_COLUMN_NAME = "Lon.";
-    private static final String LATITUDE_COLUMN_NAME = "Lat.";
     private static final String EXPLANATION_COLUMN_NAME = "Explanation";
 
     private static final String ERROR_SEVERITY_TEXT = "Error";
@@ -78,22 +74,20 @@ public class DataMessagesPage extends CompositeWithUsername {
     @UiField
     HTML introHtml;
     @UiField
-    DataGrid<SCMessage> messagesGrid;
+    DataGrid<ADCMessage> messagesGrid;
     @UiField
     Button dismissButton;
     @UiField
     SimplePager messagesPager;
 
-    private ListDataProvider<SCMessage> listProvider;
+    private ListDataProvider<ADCMessage> listProvider;
 
     // The singleton instance of this page
     private static DataMessagesPage singleton;
 
     /**
-     * Creates an empty data messages page.  Do not call this
-     * constructor; instead use the showPage static method
-     * to show the singleton instance of this page with the
-     * latest data messages for a cruise from the server.
+     * Creates an empty data messages page.  Do not call this constructor; instead use the showPage static method to
+     * show the singleton instance of this page with the latest data messages for a cruise from the server.
      */
     DataMessagesPage() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -109,15 +103,19 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Display this page in the RootLayoutPanel showing the
-     * messages for cruise with the provided expocode.
-     * Adds this page to the page history.
+     * Display this page in the RootLayoutPanel showing the messages for the specified dataset.  Adds this page to the
+     * page history.
+     *
+     * @param username
+     *         user requesting the page
+     * @param datasetId
+     *         ID of the dataset to use
      */
-    static void showPage(String username, String cruiseExpocode) {
+    static void showPage(String username, String datasetId) {
         UploadDashboard.showWaitCursor();
-        service.getDataMessages(username, cruiseExpocode, new AsyncCallback<SCMessageList>() {
+        service.getDataMessages(username, datasetId, new AsyncCallback<ADCMessageList>() {
             @Override
-            public void onSuccess(SCMessageList msgList) {
+            public void onSuccess(ADCMessageList msgList) {
                 if ( msgList == null ) {
                     UploadDashboard.showMessage("Unexpected list of data problems returned");
                     UploadDashboard.showAutoCursor();
@@ -142,13 +140,12 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
-        if ( ( username == null ) || username.isEmpty() ||
-                ( singleton == null ) || !singleton.getUsername().equals(username) ) {
-            CruiseListPage.showPage();
+        if ( (username == null) || username.isEmpty() ||
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
+            DatasetListPage.showPage();
         }
         else {
             UploadDashboard.updateCurrentPage(singleton);
@@ -161,20 +158,19 @@ public class DataMessagesPage extends CompositeWithUsername {
     }
 
     /**
-     * Update the cruise expocode and sanity checker messages with
-     * that given in the provided SCMessageList.
+     * Update the automated data checker messages with that given in the provided ADCMessageList.
      *
      * @param msgs
-     *         cruise expocode and set of messages to show
+     *         cruise dataset and set of messages to show
      */
-    private void updateMessages(SCMessageList msgs) {
+    private void updateMessages(ADCMessageList msgs) {
         // Assign the username and introduction message
         setUsername(msgs.getUsername());
         introHtml.setHTML(INTRO_HTML_PROLOGUE +
-                                  SafeHtmlUtils.htmlEscape(msgs.getExpocode()) +
-                                  INTRO_HTML_EPILOGUE);
+                SafeHtmlUtils.htmlEscape(msgs.getDatasetId()) +
+                INTRO_HTML_EPILOGUE);
         // Update the table by resetting the data in the data provider
-        List<SCMessage> msgList = listProvider.getList();
+        List<ADCMessage> msgList = listProvider.getList();
         msgList.clear();
         msgList.addAll(msgs);
         messagesGrid.setRowCount(msgList.size(), true);
@@ -189,56 +185,41 @@ public class DataMessagesPage extends CompositeWithUsername {
      * Creates the messages table for this page.
      */
     private void buildMessageListTable() {
-        TextColumn<SCMessage> severityColumn = buildSeverityColumn();
-        TextColumn<SCMessage> colNumColumn = buildColNumColumn();
-        TextColumn<SCMessage> colNameColumn = buildColNameColumn();
-        TextColumn<SCMessage> rowNumColumn = buildRowNumColumn();
-        TextColumn<SCMessage> timestampColumn = buildTimestampColumn();
-        TextColumn<SCMessage> longitudeColumn = buildLongitudeColumn();
-        TextColumn<SCMessage> latitudeColumn = buildLatitudeColumn();
-        TextColumn<SCMessage> explanationColumn = buildExplanationColumn();
+        TextColumn<ADCMessage> severityColumn = buildSeverityColumn();
+        TextColumn<ADCMessage> colNumColumn = buildColNumColumn();
+        TextColumn<ADCMessage> colNameColumn = buildColNameColumn();
+        TextColumn<ADCMessage> rowNumColumn = buildRowNumColumn();
+        TextColumn<ADCMessage> explanationColumn = buildExplanationColumn();
 
         messagesGrid.addColumn(severityColumn, SEVERITY_COLUMN_NAME);
         messagesGrid.addColumn(colNumColumn, COLUMN_NUMBER_COLUMN_NAME);
         messagesGrid.addColumn(colNameColumn, COLUMN_NAME_COLUMN_NAME);
         messagesGrid.addColumn(rowNumColumn, ROW_NUMBER_COLUMN_NAME);
-        messagesGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
-        messagesGrid.addColumn(longitudeColumn, LONGITUDE_COLUMN_NAME);
-        messagesGrid.addColumn(latitudeColumn, LATITUDE_COLUMN_NAME);
         messagesGrid.addColumn(explanationColumn, EXPLANATION_COLUMN_NAME);
 
         // Set the minimum widths of the columns
         double tableWidth = 0.0;
         messagesGrid.setColumnWidth(severityColumn,
-                                    UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+                UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(colNumColumn,
-                                    UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+                UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(colNameColumn,
-                                    UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+                UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(rowNumColumn,
-                                    UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(timestampColumn,
-                                    UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(longitudeColumn,
-                                    UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-        tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
-        messagesGrid.setColumnWidth(latitudeColumn,
-                                    UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+                UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
         messagesGrid.setColumnWidth(explanationColumn,
-                                    2 * UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+                2 * UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
         tableWidth += 2 * UploadDashboard.FILENAME_COLUMN_WIDTH;
 
         // Set the minimum width of the full table
         messagesGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
 
         // Create the data provider for this table
-        listProvider = new ListDataProvider<SCMessage>();
+        listProvider = new ListDataProvider<ADCMessage>();
         listProvider.addDataDisplay(messagesGrid);
 
         // Make the columns sortable
@@ -246,30 +227,15 @@ public class DataMessagesPage extends CompositeWithUsername {
         colNumColumn.setSortable(true);
         colNameColumn.setSortable(true);
         rowNumColumn.setSortable(true);
-        timestampColumn.setSortable(true);
-        longitudeColumn.setSortable(true);
-        latitudeColumn.setSortable(true);
         explanationColumn.setSortable(true);
 
         // Add a column sorting handler for these columns
-        ListHandler<SCMessage> columnSortHandler =
-                new ListHandler<SCMessage>(listProvider.getList());
-        columnSortHandler.setComparator(severityColumn,
-                                        SCMessage.severityComparator);
-        columnSortHandler.setComparator(colNumColumn,
-                                        SCMessage.colNumComparator);
-        columnSortHandler.setComparator(colNameColumn,
-                                        SCMessage.colNameComparator);
-        columnSortHandler.setComparator(rowNumColumn,
-                                        SCMessage.rowNumComparator);
-        columnSortHandler.setComparator(timestampColumn,
-                                        SCMessage.timestampComparator);
-        columnSortHandler.setComparator(longitudeColumn,
-                                        SCMessage.longitudeComparator);
-        columnSortHandler.setComparator(latitudeColumn,
-                                        SCMessage.latitudeComparator);
-        columnSortHandler.setComparator(explanationColumn,
-                                        SCMessage.explanationComparator);
+        ListHandler<ADCMessage> columnSortHandler = new ListHandler<ADCMessage>(listProvider.getList());
+        columnSortHandler.setComparator(severityColumn, DashboardUtils.severityComparator);
+        columnSortHandler.setComparator(colNumColumn, DashboardUtils.colNumComparator);
+        columnSortHandler.setComparator(colNameColumn, DashboardUtils.colNameComparator);
+        columnSortHandler.setComparator(rowNumColumn, DashboardUtils.rowNumComparator);
+        columnSortHandler.setComparator(explanationColumn, DashboardUtils.explanationComparator);
 
         // Add the sort handler to the table, setting the default sorting
         // first by severity, then column number, and finally row number
@@ -289,95 +255,60 @@ public class DataMessagesPage extends CompositeWithUsername {
 
     private static final NumberFormat INT_NUMBER_FORMAT = NumberFormat.getFormat(
             NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(0);
-    private static final NumberFormat FLT_NUMBER_FORMAT = NumberFormat.getFormat(
-            NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(4);
 
-    private TextColumn<SCMessage> buildSeverityColumn() {
-        return new TextColumn<SCMessage>() {
+    private TextColumn<ADCMessage> buildSeverityColumn() {
+        return new TextColumn<ADCMessage>() {
             @Override
-            public String getValue(SCMessage msg) {
+            public String getValue(ADCMessage msg) {
                 if ( msg == null )
                     return UNKNOWN_SEVERITY_TEXT;
-                SCMsgSeverity severity = msg.getSeverity();
-                if ( severity == SCMsgSeverity.WARNING )
+                Severity severity = msg.getSeverity();
+                if ( severity == Severity.WARNING )
                     return WARNING_SEVERITY_TEXT;
-                if ( severity == SCMsgSeverity.ERROR )
+                if ( severity == Severity.ERROR )
                     return ERROR_SEVERITY_TEXT;
                 return UNKNOWN_SEVERITY_TEXT;
             }
         };
     }
 
-    private TextColumn<SCMessage> buildColNumColumn() {
-        return new TextColumn<SCMessage>() {
+    private TextColumn<ADCMessage> buildColNumColumn() {
+        return new TextColumn<ADCMessage>() {
             @Override
-            public String getValue(SCMessage msg) {
-                if ( ( msg == null ) || ( msg.getColNumber() <= 0 ) )
+            public String getValue(ADCMessage msg) {
+                if ( (msg == null) || (msg.getColNumber() <= 0) )
                     return " --- ";
                 return INT_NUMBER_FORMAT.format(msg.getColNumber());
             }
         };
     }
 
-    private TextColumn<SCMessage> buildColNameColumn() {
-        return new TextColumn<SCMessage>() {
+    private TextColumn<ADCMessage> buildColNameColumn() {
+        return new TextColumn<ADCMessage>() {
             @Override
-            public String getValue(SCMessage msg) {
-                if ( ( msg == null ) || msg.getColName().isEmpty() )
+            public String getValue(ADCMessage msg) {
+                if ( (msg == null) || msg.getColName().isEmpty() )
                     return " --- ";
                 return msg.getColName();
             }
         };
     }
 
-    private TextColumn<SCMessage> buildRowNumColumn() {
-        return new TextColumn<SCMessage>() {
+    private TextColumn<ADCMessage> buildRowNumColumn() {
+        return new TextColumn<ADCMessage>() {
             @Override
-            public String getValue(SCMessage msg) {
-                if ( ( msg == null ) || ( msg.getRowNumber() <= 0 ) )
+            public String getValue(ADCMessage msg) {
+                if ( (msg == null) || (msg.getRowNumber() <= 0) )
                     return "";
                 return INT_NUMBER_FORMAT.format(msg.getRowNumber());
             }
         };
     }
 
-    private TextColumn<SCMessage> buildTimestampColumn() {
-        return new TextColumn<SCMessage>() {
+    private TextColumn<ADCMessage> buildExplanationColumn() {
+        return new TextColumn<ADCMessage>() {
             @Override
-            public String getValue(SCMessage msg) {
-                if ( msg == null )
-                    return "";
-                return msg.getTimestamp();
-            }
-        };
-    }
-
-    private TextColumn<SCMessage> buildLongitudeColumn() {
-        return new TextColumn<SCMessage>() {
-            @Override
-            public String getValue(SCMessage msg) {
-                if ( ( msg == null ) || Double.isNaN(msg.getLongitude()) )
-                    return "";
-                return FLT_NUMBER_FORMAT.format(msg.getLongitude());
-            }
-        };
-    }
-
-    private TextColumn<SCMessage> buildLatitudeColumn() {
-        return new TextColumn<SCMessage>() {
-            @Override
-            public String getValue(SCMessage msg) {
-                if ( ( msg == null ) || Double.isNaN(msg.getLatitude()) )
-                    return "";
-                return FLT_NUMBER_FORMAT.format(msg.getLatitude());
-            }
-        };
-    }
-
-    private TextColumn<SCMessage> buildExplanationColumn() {
-        return new TextColumn<SCMessage>() {
-            @Override
-            public String getValue(SCMessage msg) {
+            public String getValue(ADCMessage msg) {
                 if ( msg == null )
                     return "";
                 return msg.getDetailedComment();

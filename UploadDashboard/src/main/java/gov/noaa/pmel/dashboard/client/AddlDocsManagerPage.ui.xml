@@ -20,7 +20,7 @@
                     <g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
                                   ui:field="docUpload"/>
                     <g:Hidden name="timestamp" ui:field="timestampToken"/>
-                    <g:Hidden name="expocodes" ui:field="expocodesToken"/>
+                    <g:Hidden name="datasetids" ui:field="datasetIdsToken"/>
                     <g:Hidden name="ometoken" ui:field="omeToken"/>
                 </g:FlowPanel>
             </g:FormPanel>

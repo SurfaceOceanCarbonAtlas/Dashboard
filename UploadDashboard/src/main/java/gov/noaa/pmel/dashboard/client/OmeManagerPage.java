@@ -3,13 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
-import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-
-import java.util.Date;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -28,6 +21,12 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.util.Date;
 
 /**
  * @author Karl Smith
@@ -92,7 +91,7 @@ public class OmeManagerPage extends CompositeWithUsername {
     @UiField
     Hidden timestampToken;
     @UiField
-    Hidden expocodesToken;
+    Hidden datasetIdsToken;
     @UiField
     Hidden omeToken;
     @UiField
@@ -100,7 +99,7 @@ public class OmeManagerPage extends CompositeWithUsername {
     @UiField
     Button cancelButton;
 
-    private DashboardCruise cruise;
+    private DashboardDataset cruise;
     private DashboardAskPopup askOverwritePopup;
 
     // Singleton instance of this page
@@ -128,28 +127,27 @@ public class OmeManagerPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the OME metadata upload page in the RootLayoutPanel
-     * for the given cruise.  Adds this page to the page history.
+     * Display the OME metadata upload page in the RootLayoutPanel for the given cruise.  Adds this page to the page
+     * history.
      *
      * @param cruises
      *         add/replace the OME metadata for the cruise in this list
      */
-    static void showPage(DashboardCruiseList cruises) {
+    static void showPage(DashboardDatasetList cruises) {
         if ( singleton == null )
             singleton = new OmeManagerPage();
-        singleton.updateCruise(cruises);
+        singleton.updateDataset(cruises);
         UploadDashboard.updateCurrentPage(singleton);
         History.newItem(PagesEnum.EDIT_METADATA.name(), false);
     }
 
     /**
-     * Redisplays the last version of this page if the username
-     * associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
-        if ( ( username == null ) || username.isEmpty() ||
-                ( singleton == null ) || !singleton.getUsername().equals(username) ) {
-            CruiseListPage.showPage();
+        if ( (username == null) || username.isEmpty() ||
+                (singleton == null) || !singleton.getUsername().equals(username) ) {
+            DatasetListPage.showPage();
         }
         else {
             UploadDashboard.updateCurrentPage(singleton);
@@ -162,7 +160,7 @@ public class OmeManagerPage extends CompositeWithUsername {
      * @param cruises
      *         associate the uploaded OME metadata to the cruise in this set of cruises
      */
-    private void updateCruise(DashboardCruiseList cruises) {
+    private void updateDataset(DashboardDatasetList cruises) {
         // Update the current username
         setUsername(cruises.getUsername());
         userInfoLabel.setText(WELCOME_INTRO + getUsername());
@@ -172,8 +170,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 
         // Update the HTML intro naming the cruise
         introHtml.setHTML(CRUISE_HTML_INTRO_PROLOGUE +
-                                  SafeHtmlUtils.htmlEscape(cruise.getExpocode()) +
-                                  CRUISE_HTML_INTRO_EPILOGUE);
+                SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) +
+                CRUISE_HTML_INTRO_EPILOGUE);
 
         // Clear the hidden tokens just to be safe
         clearTokens();
@@ -184,7 +182,7 @@ public class OmeManagerPage extends CompositeWithUsername {
      */
     private void clearTokens() {
         timestampToken.setValue("");
-        expocodesToken.setValue("");
+        datasetIdsToken.setValue("");
         omeToken.setValue("");
     }
 
@@ -194,7 +192,7 @@ public class OmeManagerPage extends CompositeWithUsername {
     private void assignTokens() {
         String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
         timestampToken.setValue(localTimestamp);
-        expocodesToken.setValue("[ \"" + cruise.getExpocode() + "\" ]");
+        datasetIdsToken.setValue("[ \"" + cruise.getDatasetId() + "\" ]");
         omeToken.setValue("true");
     }
 
@@ -206,7 +204,7 @@ public class OmeManagerPage extends CompositeWithUsername {
     @UiHandler("cancelButton")
     void cancelButtonOnClick(ClickEvent event) {
         // Return to the cruise list page which might have been updated
-        CruiseListPage.showPage();
+        DatasetListPage.showPage();
     }
 
     @UiHandler("uploadButton")
@@ -222,7 +220,7 @@ public class OmeManagerPage extends CompositeWithUsername {
         if ( !cruise.getOmeTimestamp().isEmpty() ) {
             if ( askOverwritePopup == null ) {
                 askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT,
-                                                          OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
+                        OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean result) {
                         // Submit only if yes
@@ -273,15 +271,15 @@ public class OmeManagerPage extends CompositeWithUsername {
             return;
         }
         resultMsg = resultMsg.trim();
-        if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+        if ( resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
             // cruise file created or updated; return to the cruise list,
             // having it request the updated cruises for the user from the server
-            CruiseListPage.showPage();
+            DatasetListPage.showPage();
         }
         else {
             // Unknown response, just display the entire message
             UploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START +
-                                                SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
+                    SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
         }
     }
 
