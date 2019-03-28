@@ -463,8 +463,8 @@ public class StdUserDataArray extends StdDataArray {
             msg = new ADCMessage();
             msg.setSeverity(spdmsg.getSeverity());
             msg.setRowNumber(spdmsg.getRowNumber());
-            msg.setColNumber(longitudeIndex + 1);
-            msg.setColName(userColNames[longitudeIndex]);
+            msg.setColNumber(latitudeIndex + 1);
+            msg.setColName(userColNames[latitudeIndex]);
             msg.setGeneralComment(spdmsg.getGeneralComment());
             msg.setDetailedComment(spdmsg.getDetailedComment());
             stdMsgList.add(msg);

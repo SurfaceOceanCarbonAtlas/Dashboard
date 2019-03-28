@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
@@ -134,7 +133,7 @@ public class DatasetCheckerTest {
         StdUserDataArray badStdUserData = dataChecker.standardizeDataset(badDataset, null);
         ArrayList<ADCMessage> badMsgList = badStdUserData.getStandardizationMessages();
         // Invalid time (Feb 31) in row 3, invalid latitudes (>90) in rows 3-9
-        HashSet<RowColumn> expected = new HashSet<RowColumn>(Arrays.asList(
+        TreeSet<RowColumn> expectedCriticals = new TreeSet<RowColumn>(Arrays.asList(
                 new RowColumn(3, 4),
                 new RowColumn(3, 5),
                 new RowColumn(3, 6),
@@ -149,26 +148,46 @@ public class DatasetCheckerTest {
                 new RowColumn(8, 11),
                 new RowColumn(9, 11)
         ));
+        TreeSet<RowColumn> expectedErrors = new TreeSet<RowColumn>(Arrays.asList(
+                new RowColumn(4, 4),
+                new RowColumn(4, 5),
+                new RowColumn(4, 6),
+                new RowColumn(4, 7),
+                new RowColumn(4, 8),
+                new RowColumn(4, 9),
+                new RowColumn(4, 10),
+                new RowColumn(4, 11),
+                new RowColumn(10, 4),
+                new RowColumn(10, 5),
+                new RowColumn(10, 6),
+                new RowColumn(10, 7),
+                new RowColumn(10, 8),
+                new RowColumn(10, 9),
+                new RowColumn(10, 10),
+                new RowColumn(10, 11),
+                new RowColumn(25, 4),
+                new RowColumn(25, 5),
+                new RowColumn(25, 6),
+                new RowColumn(25, 7),
+                new RowColumn(25, 8),
+                new RowColumn(25, 9),
+                new RowColumn(25, 10),
+                new RowColumn(25, 11)
+        ));
         // The invalid time gives both bad time and mis-ordered messages for each date/time column
         // (not great, but okay for now)
-        assertEquals(expected.size() + 6, badMsgList.size());
-        for (int k = 0; k < badMsgList.size(); k++) {
-            ADCMessage msg = badMsgList.get(k);
-            assertEquals(Severity.CRITICAL, msg.getSeverity());
-            Integer rownum = msg.getRowNumber();
-            Integer colnum = msg.getColNumber();
-            RowColumn rowcol = new RowColumn(rownum, colnum);
-            assertTrue(expected.contains(rowcol));
+        TreeSet<RowColumn> criticals = new TreeSet<RowColumn>();
+        TreeSet<RowColumn> errors = new TreeSet<RowColumn>();
+        for (ADCMessage msg : badMsgList ) {
+            if ( Severity.CRITICAL.equals(msg.getSeverity()) )
+                criticals.add(new RowColumn(msg.getRowNumber(), msg.getColNumber()));
+            else if ( Severity.ERROR.equals(msg.getSeverity()) )
+                errors.add(new RowColumn(msg.getRowNumber(), msg.getColNumber()));
+            else
+                fail("Unexpected severity of " + msg.getSeverity());
         }
-
-/*
-        assertEquals( 342.039, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
-        assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
-        assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
-        assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
-        assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
-        assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
-*/
+        assertEquals(expectedCriticals, criticals);
+        assertEquals(expectedErrors, errors);
     }
 
     /**
@@ -240,21 +259,25 @@ public class DatasetCheckerTest {
         TreeSet<Integer> warnColNums = new TreeSet<Integer>();
         TreeSet<Integer> errRowNums = new TreeSet<Integer>();
         TreeSet<Integer> errColNums = new TreeSet<Integer>();
+        int numWarns = 0;
+        int numErrs = 0;
         for (ADCMessage msg : speedMsgList) {
             if ( Severity.WARNING.equals(msg.getSeverity()) ) {
                 warnRowNums.add(msg.getRowNumber());
                 warnColNums.add(msg.getColNumber());
+                numWarns++;
             }
             else if ( Severity.ERROR.equals(msg.getSeverity()) ) {
                 errRowNums.add(msg.getRowNumber());
                 errColNums.add(msg.getColNumber());
+                numErrs++;
             }
             else {
                 fail("Unexpected severity of " + msg.getSeverity());
             }
         }
 
-        TreeSet<Integer> expectedColNums = new TreeSet<Integer>(Arrays.asList(3, 4, 5));
+        TreeSet<Integer> expectedColNums = new TreeSet<Integer>(Arrays.asList(3, 4, 5, 6));
         TreeSet<Integer> expectedWarnRowNums = new TreeSet<Integer>(Arrays.asList(
                 3, 34, 44, 72, 86, 97, 102, 154, 216
         ));
@@ -269,6 +292,8 @@ public class DatasetCheckerTest {
         assertEquals(expectedColNums, errColNums);
         assertEquals(expectedWarnRowNums, warnRowNums);
         assertEquals(expectedErrRowNums, errRowNums);
+        assertEquals(expectedColNums.size() * expectedWarnRowNums.size(), numWarns);
+        assertEquals(expectedColNums.size() * expectedErrRowNums.size(), numErrs);
     }
 
 
