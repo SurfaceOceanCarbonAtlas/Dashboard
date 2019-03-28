@@ -292,8 +292,8 @@ public class StdUserDataArray extends StdDataArray {
      *         sample times to be used for this data array
      */
     public void checkDataOrder(Double[] times) {
-        Double longitudes[];
-        Double latitudes[];
+        Double[] longitudes;
+        Double[] latitudes;
         try {
             longitudes = getSampleLongitudes();
             latitudes = getSampleLatitudes();
@@ -341,7 +341,7 @@ public class StdUserDataArray extends StdDataArray {
                 if ( lastRowNum > 0 ) {
                     double kmdelta = DashboardServerUtils.distanceBetween(longitudes[actualRowNum - 1],
                             latitudes[actualRowNum - 1], longitudes[lastRowNum - 1], latitudes[lastRowNum - 1]);
-                    double hourdelta = times[actualRowNum - 1] - times[lastRowNum - 1] / 3600.0;
+                    double hourdelta = (times[actualRowNum - 1] - times[lastRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
                     if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
@@ -392,7 +392,7 @@ public class StdUserDataArray extends StdDataArray {
                 if ( lastRowNum > 0 ) {
                     double kmdelta = DashboardServerUtils.distanceBetween(longitudes[lastRowNum - 1],
                             latitudes[lastRowNum - 1], longitudes[actualRowNum - 1], latitudes[actualRowNum - 1]);
-                    double hourdelta = times[lastRowNum - 1] - times[actualRowNum - 1] / 3600.0;
+                    double hourdelta = (times[lastRowNum - 1] - times[actualRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
                     if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
