@@ -368,8 +368,8 @@ public class DatabaseRequestHandler {
      *         the QC event to add
      *
      * @throws SQLException
-     *         if accessing or updating the database throws one, or if the reviewer cannot be found in the reviewers
-     *         table.
+     *         if accessing or updating the database throws one, or
+     *         if the reviewer cannot be found in the reviewers table.
      */
     public void addDatasetQCEvents(Collection<QCEvent> qcEvents) throws SQLException {
         Connection catConn = makeConnection(true);

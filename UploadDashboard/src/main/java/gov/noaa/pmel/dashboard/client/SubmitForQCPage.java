@@ -180,7 +180,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
     @UiField
     Button cancelButton;
 
-    private HashSet<String> expocodes;
+    private TreeSet<String> expocodes;
     private boolean hasSentDataset;
     private DashboardInfoPopup laterArchivePopup;
     private DashboardInfoPopup nowInfoPopup;
@@ -200,7 +200,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
         singleton = this;
 
         setUsername(null);
-        expocodes = new HashSet<String>();
+        expocodes = new TreeSet<String>();
         hasSentDataset = false;
 
         titleLabel.setText(TITLE_TEXT);

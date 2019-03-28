@@ -7,7 +7,6 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -258,7 +257,8 @@ public interface DashboardServicesInterface extends RemoteService {
      * @return true if all the images have been created
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, or if the images cannot be created (probably because of bad data)
+     *         if the dataset ID is invalid, or
+     *         if the images cannot be created (probably because of bad data)
      */
     boolean buildPreviewImages(String username, String datasetId, String timetag, boolean firstCall)
             throws IllegalArgumentException;
@@ -278,10 +278,11 @@ public interface DashboardServicesInterface extends RemoteService {
      *         if the archive request is to send for immediate archival, should datasets already sent be sent again?
      *
      * @throws IllegalArgumentException
-     *         if authentication failed, if the dataset does not exist for any of the given IDs, or if submitting a
-     *         dataset fails
+     *         if authentication failed,
+     *         if the dataset does not exist for any of the given IDs, or
+     *         if submitting a dataset fails
      */
-    void submitDatasetsForQC(String username, HashSet<String> datasetIds, String archiveStatus,
+    void submitDatasetsForQC(String username, TreeSet<String> datasetIds, String archiveStatus,
             String localTimestamp, boolean repeatSend) throws IllegalArgumentException;
 
     /**
@@ -291,14 +292,12 @@ public interface DashboardServicesInterface extends RemoteService {
      *         name of user making this request - for validation
      * @param datasetIds
      *         IDs of the datasets to suspend
-     * @param localTimestamp
-     *         client local timestamp string of this request
      *
      * @throws IllegalArgumentException
-     *         if authentication failed, if the dataset does not exist for any of the given IDs, or if suspending a
-     *         dataset fails
+     *         if authentication failed,
+     *         if the dataset does not exist for any of the given IDs, or
+     *         if suspending a dataset fails
      */
-    void suspendDatasets(String username, HashSet<String> datasetIds, String localTimestamp)
-            throws IllegalArgumentException;
+    void suspendDatasets(String username, TreeSet<String> datasetIds) throws IllegalArgumentException;
 
 }
