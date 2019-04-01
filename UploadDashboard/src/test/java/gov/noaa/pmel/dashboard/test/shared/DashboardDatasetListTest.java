@@ -49,13 +49,31 @@ public class DashboardDatasetListTest {
     }
 
     /**
+     * Test method for {@link DashboardDatasetList#getImageExtension()} and {@link DashboardDatasetList#setImageExtension(String)}
+     */
+    @Test
+    public void testGetSetImageExtension() {
+        String myExtension = ".pdf";
+        DashboardDatasetList cruiseList = new DashboardDatasetList();
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getImageExtension());
+        cruiseList.setImageExtension(myExtension);
+        assertEquals(myExtension, cruiseList.getImageExtension());
+        assertFalse(cruiseList.isManager());
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
+        assertEquals(0, cruiseList.size());
+        cruiseList.setImageExtension(null);
+        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getImageExtension());
+    }
+
+    /**
      * Test method for {@link DashboardDatasetList#hashCode()} and {@link DashboardDatasetList#equals(Object)}.
      */
     @Test
     public void testHashCodeEquals() {
         String myUsername = "User";
-        String myVersion = "4";
         String myExpocode = "ABCD20050728";
+        String myExtension = ".pdf";
+
         DashboardDataset cruise = new DashboardDataset();
         cruise.setOwner(myUsername);
         cruise.setDatasetId(myExpocode);
@@ -84,6 +102,13 @@ public class DashboardDatasetListTest {
         assertNotEquals(firstList.hashCode(), secondList.hashCode());
         assertFalse(firstList.equals(secondList));
         secondList.setManager(true);
+        assertEquals(firstList.hashCode(), secondList.hashCode());
+        assertTrue(firstList.equals(secondList));
+
+        firstList.setImageExtension(myExtension);
+        assertNotEquals(firstList.hashCode(), secondList.hashCode());
+        assertFalse(firstList.equals(secondList));
+        secondList.setImageExtension(myExtension);
         assertEquals(firstList.hashCode(), secondList.hashCode());
         assertTrue(firstList.equals(secondList));
 

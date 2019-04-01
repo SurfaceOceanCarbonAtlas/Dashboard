@@ -23,7 +23,6 @@ import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
@@ -124,6 +123,7 @@ public class DashboardConfigStore {
     private ArchiveFilesBundler archiveFilesBundler;
     private DsgNcFileHandler dsgNcFileHandler;
     private FerretConfig ferretConf;
+    private String imageExtension;
     private DatasetChecker datasetChecker;
     private DatabaseRequestHandler databaseRequestHandler;
     private PreviewPlotsHandler plotsHandler;
@@ -437,7 +437,7 @@ public class DashboardConfigStore {
                 SAXBuilder sb = new SAXBuilder();
                 Document jdom = sb.build(stream);
                 ferretConf = new FerretConfig();
-                ferretConf.setRootElement((Element) jdom.getRootElement().clone());
+                ferretConf.setRootElement(jdom.getRootElement().clone());
             } finally {
                 stream.close();
             }
@@ -446,6 +446,7 @@ public class DashboardConfigStore {
             throw new IOException("Invalid value in the Ferret configuration file specified by the " +
                     FERRET_CONFIG_FILE_NAME_TAG + " value given in " + configFile.getPath() + "\n" + ex.getMessage());
         }
+        imageExtension = ferretConf.getImageFilenameExtension();
 
         // Handler for DSG NC files
         String dsgFileDirName;
@@ -797,6 +798,14 @@ public class DashboardConfigStore {
      */
     public FerretConfig getFerretConfig() {
         return ferretConf;
+    }
+
+    /**
+     * @return the filename extension (including the initial '.') for images produced
+     *         by the version of Ferret/PyFerret used in this configuration
+     */
+    public String getImageExtension() {
+        return imageExtension;
     }
 
     /**

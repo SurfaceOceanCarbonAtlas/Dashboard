@@ -187,6 +187,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 
     String expocode;
     String timetag;
+    String imageExtension;
     AsyncCallback<Boolean> checkStatusCallback;
 
     // The singleton instance of this page
@@ -198,6 +199,8 @@ public class DatasetPreviewPage extends CompositeWithUsername {
 
         setUsername(null);
         expocode = "";
+        timetag = "";
+        imageExtension = "";
         // Callback when generating plots
         checkStatusCallback = new AsyncCallback<Boolean>() {
             @Override
@@ -309,6 +312,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     static void showPage(DashboardDatasetList cruiseList) {
         if ( singleton == null )
             singleton = new DatasetPreviewPage();
+        singleton.imageExtension = cruiseList.getImageExtension();
         UploadDashboard.updateCurrentPage(singleton);
         singleton.updatePreviewPlots(cruiseList.keySet().iterator().next(),
                 cruiseList.getUsername());
@@ -362,16 +366,9 @@ public class DatasetPreviewPage extends CompositeWithUsername {
      * Assigns the URLs to the images. This triggers load events so the page should refresh when this is called.
      */
     private void resetImageUrls() {
-        String imagePrefix;
-        String imageSuffix;
-        if ( expocode.length() > 11 ) {
-            imagePrefix = "preview/plots/" + expocode.substring(0, 4) + "/" + expocode + "_";
-            imageSuffix = "_" + timetag + ".gif";
-        }
-        else {
-            imagePrefix = "preview/plots/invalid_";
-            imageSuffix = ".gif";
-        }
+        String imagePrefix = "preview/plots/" + expocode.substring(0, 4) + "/" + expocode + "_";
+        String imageSuffix = "_" + timetag + imageExtension;
+
         latVsLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_VS_LON_IMAGE_NAME + imageSuffix));
         latLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_LON_IMAGE_NAME + imageSuffix));
         sampleVsTimeImage.setUrl(UriUtils.fromString(imagePrefix + SAMPLE_VS_TIME_IMAGE_NAME + imageSuffix));

@@ -1,7 +1,5 @@
 package gov.noaa.pmel.dashboard.ferret;
 
-import org.jdom2.Element;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -10,18 +8,18 @@ import java.util.List;
 
 public class SocatTool extends Thread {
 
-    FerretConfig ferret = new FerretConfig();
-    ArrayList<String> scriptArgs;
-    String expocode;
-    FerretConfig.Action action;
-    String message;
-    boolean error;
-    boolean done;
+    private FerretConfig ferret;
+    private ArrayList<String> scriptArgs;
+    private String expocode;
+    private FerretConfig.Action action;
+    private String message;
+    private boolean error;
+    private boolean done;
 
 
     public SocatTool(FerretConfig ferretConf) {
         ferret = new FerretConfig();
-        ferret.setRootElement((Element) ferretConf.getRootElement().clone());
+        ferret.setRootElement(ferretConf.getRootElement().clone());
         scriptArgs = new ArrayList<String>(3);
         expocode = null;
         message = null;
@@ -78,8 +76,8 @@ public class SocatTool extends Thread {
             String interpreter = ferret.getInterpreter();
             String executable = ferret.getExecutable();
             String[] fullCmd;
-            int offset = 0;
-            if ( interpreter != null && !interpreter.equals("") ) {
+            int offset;
+            if ( (interpreter != null) && !interpreter.equals("") ) {
                 fullCmd = new String[args.size() + 3];
                 fullCmd[0] = interpreter;
                 fullCmd[1] = executable;
@@ -91,7 +89,7 @@ public class SocatTool extends Thread {
                 offset = 1;
             }
             for (int index = 0; index < args.size(); index++) {
-                String arg = (String) args.get(index);
+                String arg = args.get(index);
                 fullCmd[offset + index] = arg;
             }
 
