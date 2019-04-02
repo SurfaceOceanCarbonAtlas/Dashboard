@@ -197,12 +197,17 @@ public class DashboardConfigStore {
         String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator +
                 "preview" + File.separator;
 
-        // Configure the log4j2 logger
-        System.setProperty("log4j.configurationFile", appConfigDirPath + "log4j2.properties");
-        itsLogger = LogManager.getLogger(serverAppName);
-
         // Record configuration files that should be monitored for changes
         filesToWatch = new HashSet<File>();
+
+        // Configure the log4j2 logger
+        File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
+        if ( !log4jConfigFile.exists() )
+            throw new IllegalStateException("The log4j2 configuration file " +
+                    log4jConfigFile.getPath() + " does not exist");
+        System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
+        filesToWatch.add(log4jConfigFile);
+        itsLogger = LogManager.getLogger(serverAppName);
 
         // Get the properties from the primary configuration file
         Properties configProps = new Properties();
@@ -219,6 +224,7 @@ public class DashboardConfigStore {
             throw new IOException("Problems reading " + configFile.getPath() + "\n" +
                     ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
+
         String propVal;
 
         // Read the SOCAT versions
