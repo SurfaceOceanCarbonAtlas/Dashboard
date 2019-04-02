@@ -77,11 +77,11 @@ public class DataFileHandler extends VersionedFileHandler {
      * Patterns for getting the expocode from the metadata preamble
      */
     private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
-            Pattern.compile("Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Cruise\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Cruise\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE)
     };
 
@@ -228,14 +228,15 @@ public class DataFileHandler extends VersionedFileHandler {
      * Assigns or creates a DashboardDatasetData object with data read from the given Reader.
      * <p>
      * The data read should have a preamble of metadata containing the ID (expocode)
-     * for the dataset on a line such as one of the following (case and space insensitive):
+     * for the dataset on a line such as one of the following (case and space insensitive,
+     * initial '#' characters optional):
      * <pre>
-     * Expocode :
-     * Expocode =
-     * Cruise Expocode :
-     * Cruise Expocode =
-     * Dataset Expocode :
-     * Dataset Expocode =
+     * # Expocode :
+     * # Expocode =
+     * # Cruise Expocode :
+     * # Cruise Expocode =
+     * # Dataset Expocode :
+     * # Dataset Expocode =
      * </pre>
      * Alternatively, the dataset ID can be given in an appropriate data column.
      * In this case, only the first ID in the column is used.
