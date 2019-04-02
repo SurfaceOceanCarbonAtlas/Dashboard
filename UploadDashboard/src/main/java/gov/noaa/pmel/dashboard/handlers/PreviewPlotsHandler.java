@@ -193,6 +193,7 @@ public class PreviewPlotsHandler {
                     datasetId + ": " + tool.getErrorMessage());
 
         itsLogger.debug("preview plots generated in " + cruisePlotsDirname);
+        itsLogger.info("created preview plots for " + stdId + " with time tag " + timetag);
     }
 
 }

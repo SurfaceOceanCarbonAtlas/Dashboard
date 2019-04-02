@@ -447,6 +447,7 @@ public class DashboardConfigStore {
                     FERRET_CONFIG_FILE_NAME_TAG + " value given in " + configFile.getPath() + "\n" + ex.getMessage());
         }
         imageExtension = ferretConf.getImageFilenameExtension();
+        itsLogger.info("image filename extension: '" + imageExtension + "'");
 
         // Handler for DSG NC files
         String dsgFileDirName;
