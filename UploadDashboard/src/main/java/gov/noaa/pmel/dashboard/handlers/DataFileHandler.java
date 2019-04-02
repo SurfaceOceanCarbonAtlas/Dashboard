@@ -209,22 +209,6 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Determines if a dataset properties file exists
-     *
-     * @param datasetId
-     *         ID of the dataset to check
-     *
-     * @return true if the dataset properties file exists
-     *
-     * @throws IllegalArgumentException
-     *         if datasetId is not a valid dataset ID
-     */
-    public boolean infoFileExists(String datasetId) throws IllegalArgumentException {
-        File infoFile = datasetInfoFile(datasetId);
-        return infoFile.exists();
-    }
-
-    /**
      * Determines if a dataset data file exists
      *
      * @param datasetId
@@ -1002,15 +986,15 @@ public class DataFileHandler extends VersionedFileHandler {
         try {
             deleteVersionedFile(datasetDataFile(datasetId), commitMsg);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems deleting the cruise data file: " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems deleting the dataset data file for " +
+                    datasetId + ": " + ex.getMessage());
         }
         // Delete the cruise information file
         try {
             deleteVersionedFile(datasetInfoFile(datasetId), commitMsg);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems deleting the cruise information file: " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems deleting the dataset information file for " +
+                    datasetId + ": " + ex.getMessage());
         }
 
         if ( deleteMetadata ) {

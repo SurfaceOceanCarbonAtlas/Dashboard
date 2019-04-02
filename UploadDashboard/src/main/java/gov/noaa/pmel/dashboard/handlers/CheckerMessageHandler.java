@@ -31,7 +31,7 @@ import java.util.TreeSet;
  *
  * @author Karl Smith
  */
-public class CheckerMessageHandler {
+public class CheckerMessageHandler extends VersionedFileHandler {
 
     private static final String MSGS_FILENAME_EXTENSION = ".messages";
     private static final String MSG_KEY_VALUE_SEP = ":";
@@ -43,18 +43,22 @@ public class CheckerMessageHandler {
     private static final String MSG_DETAILED_MSG_KEY = "MsgDetailedMessage";
     private static final String MSG_SUMMARY_MSG_KEY = "MsgSummaryMessage";
 
-    private File filesDir;
-
     /**
      * Handler for automated data check flags and messages.
      *
      * @param filesDirName
      *         save messages under this directory
+     * @param svnUsername
+     *         username for SVN authentication
+     * @param svnPassword
+     *         password for SVN authentication
+     *
+     * @throws IllegalArgumentException
+     *         if the specified directory does not exist, is not a directory or is not under version control
      */
-    public CheckerMessageHandler(String filesDirName) {
-        filesDir = new File(filesDirName);
-        if ( !filesDir.isDirectory() )
-            throw new IllegalArgumentException(filesDirName + " is not a directory");
+    public CheckerMessageHandler(String filesDirName, String svnUsername, String svnPassword)
+            throws IllegalArgumentException {
+        super(filesDirName, svnUsername, svnPassword);
     }
 
     /**
@@ -100,9 +104,14 @@ public class CheckerMessageHandler {
         if ( !newParent.exists() )
             newParent.mkdirs();
 
-        if ( !oldMsgsFile.renameTo(newMsgsFile) )
-            throw new IllegalArgumentException("Unable to rename messages file from " +
-                    oldId + " to " + newId);
+        // Move the old dataset files to the new location and name
+        String commitMsg = "Rename from " + oldId + " to " + newId;
+        try {
+            moveVersionedFile(oldMsgsFile, newMsgsFile, commitMsg);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems renaming the messages file from " +
+                    oldId + " to " + newId + ": " + ex.getMessage());
+        }
     }
 
     /**
@@ -116,15 +125,17 @@ public class CheckerMessageHandler {
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid, or if the messages file exists but could not be deleted
      */
-    public boolean deleteMsgsFile(String datasetId) throws IllegalArgumentException {
+    public void deleteMsgsFile(String datasetId) throws IllegalArgumentException {
         File msgsFile = messagesFile(datasetId);
-        if ( !msgsFile.exists() )
-            return false;
-        if ( !msgsFile.delete() ) {
-            throw new IllegalArgumentException("Unable to delete " +
-                    "the automated data checker messages file for " + datasetId);
+        if ( msgsFile.exists() ) {
+            String commitMsg = "Deleted messages file for " + datasetId;
+            try {
+                deleteVersionedFile(msgsFile, commitMsg);
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException("Problems deleting the messages file for " +
+                        datasetId + ": " + ex.getMessage());
+            }
         }
-        return true;
     }
 
     /**
@@ -288,6 +299,15 @@ public class CheckerMessageHandler {
 
         } finally {
             msgsWriter.close();
+        }
+
+        // Commit the updated messages file, if possible
+        if ( svnManager != null ) {
+            try {
+                commitVersion(msgsFile, "Updated checker messages for " + dataset.getDatasetId());
+            } catch ( Exception ex ) {
+                // ignore any errors at this time, as the file can be reproduced if needed
+            }
         }
 
         // Assign any user-provided QC flags.

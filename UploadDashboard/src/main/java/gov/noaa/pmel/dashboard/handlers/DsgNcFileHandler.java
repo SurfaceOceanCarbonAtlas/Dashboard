@@ -40,7 +40,6 @@ public class DsgNcFileHandler {
     private File erddapDsgFlagFile;
     private File erddapDecDsgFlagFile;
     private FerretConfig ferretConfig;
-    private KnownDataTypes knownUserDataTypes;
     private KnownDataTypes knownMetadataTypes;
     private KnownDataTypes knownDataFileTypes;
     private WatchService watcher;
@@ -58,14 +57,18 @@ public class DsgNcFileHandler {
      *         name of the flag file to create to notify ERDDAP of updates to the decimated NetCDF DSG files
      * @param ferretConf
      *         configuration document for running Ferret
+     * @param knownMetadataTypes
+     *         metadata types contained in the DSG files
+     * @param knownDataFileTypes
+     *         data types contained in the DSG files
      *
      * @throws IllegalArgumentException
      *         if the specified DSG directories, or the parent directories of the ERDDAP flag files,
      *         do not exist or are not directories
      */
     public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName, String erddapDsgFlagFileName,
-            String erddapDecDsgFlagFileName, FerretConfig ferretConf, KnownDataTypes knownUserDataTypes,
-            KnownDataTypes knownMetadataTypes, KnownDataTypes knownDataFileTypes) {
+            String erddapDecDsgFlagFileName, FerretConfig ferretConf, KnownDataTypes knownMetadataTypes,
+            KnownDataTypes knownDataFileTypes) {
         dsgFilesDir = new File(dsgFilesDirName);
         if ( !dsgFilesDir.isDirectory() )
             throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
@@ -83,7 +86,6 @@ public class DsgNcFileHandler {
             throw new IllegalArgumentException("parent directory of " + erddapDecDsgFlagFile.getPath() +
                     " is not valid");
         ferretConfig = ferretConf;
-        this.knownUserDataTypes = knownUserDataTypes;
         this.knownMetadataTypes = knownMetadataTypes;
         this.knownDataFileTypes = knownDataFileTypes;
 

@@ -342,7 +342,7 @@ public class DashboardConfigStore {
             dataFileHandler = new DataFileHandler(propVal, svnUsername, svnPassword,
                     knownUserDataTypes, userFileHandler, uploadVersion);
             // Put automated data checker message files in the same directory
-            checkerMsgHandler = new CheckerMessageHandler(propVal);
+            checkerMsgHandler = new CheckerMessageHandler(propVal, svnUsername, svnPassword);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -483,8 +483,9 @@ public class DashboardConfigStore {
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         try {
-            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName, erddapDsgFlagFileName,
-                    erddapDecDsgFlagFileName, ferretConf, knownUserDataTypes, knownMetadataTypes, knownDataFileTypes);
+            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
+                    erddapDsgFlagFileName, erddapDecDsgFlagFileName,
+                    ferretConf, knownMetadataTypes, knownDataFileTypes);
         } catch ( Exception ex ) {
             throw new IOException(ex);
         }
