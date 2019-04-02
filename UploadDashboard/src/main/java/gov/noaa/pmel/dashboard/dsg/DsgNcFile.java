@@ -989,13 +989,13 @@ public class DsgNcFile extends File {
      * Updates the all_region_ids metadata variable in this DSG file.
      *
      * @param newValue
-     *         the all_region_ids value to assign; if null, the all_region_ids value is obtained
-     *         from the values of the region_id data variable in this DSG file.
+     *         the all_region_ids value to assign; if null or empty, the all_region_ids value
+     *         is obtained from the values of the region_id data variable in this DSG file.
      *
      * @return the all_region_ids value assigned
      *
      * @throws IllegalArgumentException
-     *         if this DSG file is not valid
+     *         if this DSG file is not valid (including no region_id values, if used)
      * @throws IOException
      *         if opening or writing to the DSG file throws one
      * @throws InvalidRangeException
@@ -1004,7 +1004,7 @@ public class DsgNcFile extends File {
     public String updateAllRegionIDs(String newValue)
             throws IllegalArgumentException, IOException, InvalidRangeException {
         String allRegionIDs;
-        if ( newValue == null ) {
+        if ( (newValue == null) || newValue.trim().isEmpty() ) {
             // Generate the String of sorted unique IDs
             String[] regionIDs = readStringVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
             TreeSet<String> allRegionIDsSet = new TreeSet<String>();
@@ -1013,11 +1013,13 @@ public class DsgNcFile extends File {
             }
             allRegionIDs = "";
             for (String id : allRegionIDsSet) {
-                allRegionIDs += id.toString();
+                allRegionIDs += id;
             }
+            if ( allRegionIDs.isEmpty() )
+                throw new IllegalArgumentException("No region IDs given");
         }
         else
-            allRegionIDs = newValue;
+            allRegionIDs = newValue.trim();
 
         // Write this String of all region IDs to the NetCDF file
         NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
