@@ -340,19 +340,27 @@ public class DsgNcFile extends File {
                 int k = dataTypes.indexOf(dtype);
 
                 if ( dtype instanceof StringDashDataType ) {
+                    String missVal;
+                    // If a WOCE or bottle QC flag, missing values should be interpreted
+                    // as "not check but presumed good" == WOCE acceptable;
+                    // so use "2" (WOCE_ACCEPTABLE) instead of an empty string
+                    if ( dtype.isQCType() )
+                        missVal = DashboardServerUtils.WOCE_ACCEPTABLE;
+                    else
+                        missVal = DashboardUtils.STRING_MISSING_VALUE;
                     // Data Stings
                     ArrayChar.D2 dvar = new ArrayChar.D2(numSamples, maxDataChar);
                     if ( k >= 0 ) {
                         for (int j = 0; j < numSamples; j++) {
                             String dvalue = (String) stddata.getStdVal(j, k);
                             if ( dvalue == null )
-                                dvalue = DashboardUtils.STRING_MISSING_VALUE;
+                                dvalue = missVal;
                             dvar.setString(j, dvalue.trim());
                         }
                     }
                     else {
                         for (int j = 0; j < numSamples; j++) {
-                            dvar.setString(j, DashboardUtils.STRING_MISSING_VALUE);
+                            dvar.setString(j, missVal);
                         }
                     }
                     ncfile.write(var, dvar);
