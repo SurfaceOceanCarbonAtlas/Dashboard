@@ -89,7 +89,8 @@ public class StdUserDataArray extends StdDataArray {
                 userMissVals[k] = null;
             userColNames[k] = names.get(k);
         }
-        // the StdDataArray constructor that was used adds SAMPLE_NUMBER
+        // the StdDataArray constructor that was used adds any required WOCE column types that are missing
+        // as well as SAMPLE_NUMBER
         for (int k = numUserDataCols; k < numDataCols; k++) {
             userUnits[k] = dataTypes[k].getUnits().get(0);
             if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
@@ -143,6 +144,9 @@ public class StdUserDataArray extends StdDataArray {
             for (int k = numUserDataCols; k < numDataCols; k++) {
                 if ( DashboardServerUtils.SAMPLE_NUMBER.typeNameEquals(dataTypes[k]) ) {
                     strDataVals[j][k] = rowNums.get(j).toString();
+                }
+                else if ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(dataTypes[k]) ) {
+                    strDataVals[j][k] = DashboardUtils.STRING_MISSING_VALUE;
                 }
                 else {
                     throw new IllegalArgumentException("unexpected unknown added data types");
@@ -198,11 +202,11 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Check for missing longitude, latitude, and time columns or data values.  Any problems found generate messages
-     * that are added to the internal list of messages.
+     * Check for missing longitude, latitude, and time columns or data values.
+     * Any problems found generate messages that are added to the internal list of messages.
      *
-     * @return the sample times for the data;  may be null if there was incomplete specification of sample time, or may
-     *         contain null values if there were problems computing the sample time
+     * @return the sample times for the data;  may be null if there was incomplete specification of
+     *         sample time, or may contain null values if there were problems computing the sample time
      */
     public Double[] checkMissingLonLatTime() {
         try {
@@ -483,8 +487,8 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Checks that all values given (not missing values) are within the acceptable range for that data type.  Any
-     * problems found generate (error or warning) messages that are added to the internal list of messages.
+     * Checks that all values given (not missing values) are within the acceptable range for that data type.
+     * Any problems found generate (error or warning) messages that are added to the internal list of messages.
      */
     public void checkBounds() {
         for (int k = 0; k < numDataCols; k++) {
@@ -534,18 +538,31 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * @return the list of automated data check messages describing problems detected in the data.  The messages that
-     *         are in this list comes from the constructor as well as any check methods that were called.  Never null.
+     * @return the list of automated data check messages describing problems detected in the data.
+     *         The messages that are in this list comes from the constructor as well as any check
+     *         methods that were called.  Never null.
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;
     }
 
     /**
-     * Adds data QC flags derived from the messages from standardization and automated data checking
-     * to appropriate data QC columns in userStdData.
+     * Adds data QC flags derived from the messages from standardization and
+     * automated data checking to appropriate data QC columns in userStdData.
      */
     public void addAutomatedDataQC() {
+        // For current SOCAT, all the automated data checker flags are put under WOCE_CO2_water.
+        // In general (and possibly future SOCAT), the QC column(s) to assign depend on the error.
+        int qcColIdx = 0;
+        for (DashDataType<?> dtype : dataTypes) {
+            if ( dtype.typeNameEquals(SocatTypes.WOCE_CO2_WATER) ) {
+                break;
+            }
+            qcColIdx++;
+        }
+        if ( qcColIdx >= dataTypes.length )
+            throw new RuntimeException("WOCE_CO2_water not found in StdUserDataArray.addAutomatedDataQC");
+
         for (ADCMessage msg : stdMsgList) {
             // Data QC always has a positive row number.  Dataset QC as well as general and summaries
             // QC messages have a negative row number (DashboardUtils.INT_MISSING_VALUE)
@@ -559,13 +576,13 @@ public class StdUserDataArray extends StdDataArray {
             switch ( severity ) {
                 case UNASSIGNED:
                 case ACCEPTABLE:
-                    flagValue = "";
+                    flagValue = null;
                     break;
                 case WARNING:
                     // flagValue = DashboardServerUtils.WOCE_QUESTIONABLE;
                     // Ignore automated data checker warnings as the are just pointing out
                     // potential issues which may not be a problem or have any consequence
-                    flagValue = "";
+                    flagValue = null;
                     break;
                 case ERROR:
                 case CRITICAL:
@@ -574,19 +591,8 @@ public class StdUserDataArray extends StdDataArray {
                 default:
                     throw new IllegalArgumentException("unexpected messages severity of " + severity);
             }
-            if ( flagValue.isEmpty() )
+            if ( flagValue == null )
                 continue;
-
-            // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
-            int qcColIdx = 0;
-            for (DashDataType<?> dtype : dataTypes) {
-                if ( dtype.typeNameEquals(SocatTypes.WOCE_CO2_WATER) ) {
-                    break;
-                }
-                qcColIdx++;
-            }
-            if ( qcColIdx >= dataTypes.length )
-                throw new RuntimeException("WOCE_CO2_water not found in StdUserDataArray.addAutomatedDataQC");
 
             // Do not worry about any existing flags as this is always a WOCE-4, and thus, more severe
             stdObjects[rowNum - 1][qcColIdx] = flagValue;
@@ -594,8 +600,8 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Determines is this data column is an appropriate index. Checks that the value is in the appropriate range and
-     * that the column with this index has been standardized.
+     * Determines is this data column is an appropriate index. Checks that the value is in
+     * the appropriate range and that the column with this index has been standardized.
      *
      * @param idx
      *         index to test
