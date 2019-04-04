@@ -63,7 +63,7 @@ public class KnownDataTypes {
     /**
      * Adds the default well-known data column types for users to select from:
      * <p>
-     * UNASSIGNED, OTHER,
+     * UNKNOWN, OTHER,
      * DATASET_ID, DATASET_NAME, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
      * SAMPLE_ID, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
      * TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, DAY_OF_YEAR, SECOND_OF_DAY

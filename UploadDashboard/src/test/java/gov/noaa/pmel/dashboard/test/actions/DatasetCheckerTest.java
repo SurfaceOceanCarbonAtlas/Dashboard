@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -41,7 +40,7 @@ public class DatasetCheckerTest {
      */
     @Test
     public void testGoodDatasetCheck() {
-        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
+        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit", null, null);
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
         DashboardDatasetData goodDataset = new DashboardDatasetData();
@@ -72,7 +71,7 @@ public class DatasetCheckerTest {
      */
     @Test
     public void testQuestionableDatasetCheck() {
-        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
+        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit", null, null);
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
         DashboardDatasetData questDataset = new DashboardDatasetData();
@@ -110,7 +109,7 @@ public class DatasetCheckerTest {
      */
     @Test
     public void testBadDatasetCheck() {
-        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
+        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit", null, null);
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
         DashboardDatasetData badDataset = new DashboardDatasetData();
@@ -178,7 +177,7 @@ public class DatasetCheckerTest {
         // (not great, but okay for now)
         TreeSet<RowColumn> criticals = new TreeSet<RowColumn>();
         TreeSet<RowColumn> errors = new TreeSet<RowColumn>();
-        for (ADCMessage msg : badMsgList ) {
+        for (ADCMessage msg : badMsgList) {
             if ( Severity.CRITICAL.equals(msg.getSeverity()) )
                 criticals.add(new RowColumn(msg.getRowNumber(), msg.getColNumber()));
             else if ( Severity.ERROR.equals(msg.getSeverity()) )
@@ -196,7 +195,7 @@ public class DatasetCheckerTest {
      */
     @Test
     public void testDupsDatasetCheck() {
-        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
+        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit", null, null);
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
         DashboardDatasetData dupsDataset = new DashboardDatasetData();
@@ -233,7 +232,7 @@ public class DatasetCheckerTest {
      */
     @Test
     public void testSpeedDatasetCheck() {
-        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit");
+        CheckerMessageHandler msgHandler = new CheckerMessageHandler("/var/tmp/junit", null, null);
         DatasetChecker dataChecker = new DatasetChecker(KnownDataTypesTest.TEST_KNOWN_USER_DATA_TYPES, msgHandler);
 
         DashboardDatasetData speedDataset = new DashboardDatasetData();

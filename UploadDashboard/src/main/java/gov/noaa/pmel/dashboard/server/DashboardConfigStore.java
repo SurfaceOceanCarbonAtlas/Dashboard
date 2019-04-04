@@ -23,7 +23,6 @@ import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Document;
-import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
@@ -108,6 +107,8 @@ public class DashboardConfigStore {
 
     private static final double DEFAULT_MAX_GOOD_CALC_SPEED_KNOTS = 80;
     private static final double DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS = 400;
+    private static final double DEFAULT_MAX_GOOD_TIME_GAP_DAYS = 28;
+    private static final double DEFAULT_MAX_MAYBE_TIME_GAP_DAYS = 84;
 
     private static final Object SINGLETON_SYNC_OBJECT = new Object();
     private static DashboardConfigStore singleton = null;
@@ -124,6 +125,7 @@ public class DashboardConfigStore {
     private ArchiveFilesBundler archiveFilesBundler;
     private DsgNcFileHandler dsgNcFileHandler;
     private FerretConfig ferretConf;
+    private String imageExtension;
     private DatasetChecker datasetChecker;
     private DatabaseRequestHandler databaseRequestHandler;
     private PreviewPlotsHandler plotsHandler;
@@ -134,6 +136,8 @@ public class DashboardConfigStore {
     private KnownDataTypes knownDataFileTypes;
     private double maxGoodCalcSpeedKnots;
     private double maxMaybeCalcSpeedKnots;
+    private double maxGoodTimeGapDays;
+    private double maxMaybeTimeGapDays;
 
     private HashSet<File> filesToWatch;
     private Thread watcherThread;
@@ -197,12 +201,17 @@ public class DashboardConfigStore {
         String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator +
                 "preview" + File.separator;
 
-        // Configure the log4j2 logger
-        System.setProperty("log4j.configurationFile", appConfigDirPath + "log4j2.properties");
-        itsLogger = LogManager.getLogger(serverAppName);
-
         // Record configuration files that should be monitored for changes
         filesToWatch = new HashSet<File>();
+
+        // Configure the log4j2 logger
+        File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
+        if ( !log4jConfigFile.exists() )
+            throw new IllegalStateException("The log4j2 configuration file " +
+                    log4jConfigFile.getPath() + " does not exist");
+        System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
+        filesToWatch.add(log4jConfigFile);
+        itsLogger = LogManager.getLogger(serverAppName);
 
         // Get the properties from the primary configuration file
         Properties configProps = new Properties();
@@ -219,6 +228,7 @@ public class DashboardConfigStore {
             throw new IOException("Problems reading " + configFile.getPath() + "\n" +
                     ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
+
         String propVal;
 
         // Read the SOCAT versions
@@ -315,6 +325,11 @@ public class DashboardConfigStore {
             maxMaybeCalcSpeedKnots = 400;
         }
 
+        // At this time just always use the defaults for time gaps
+        // TODO: configurable time gaps
+        maxGoodTimeGapDays = DEFAULT_MAX_GOOD_TIME_GAP_DAYS;
+        maxMaybeTimeGapDays = DEFAULT_MAX_MAYBE_TIME_GAP_DAYS;
+
         // Read the name of the default-column-names-to-types-with-units configuration file
         String nameKeysToColumnTypesFilename;
         try {
@@ -342,7 +357,7 @@ public class DashboardConfigStore {
             dataFileHandler = new DataFileHandler(propVal, svnUsername, svnPassword,
                     knownUserDataTypes, userFileHandler, uploadVersion);
             // Put automated data checker message files in the same directory
-            checkerMsgHandler = new CheckerMessageHandler(propVal);
+            checkerMsgHandler = new CheckerMessageHandler(propVal, svnUsername, svnPassword);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -437,7 +452,7 @@ public class DashboardConfigStore {
                 SAXBuilder sb = new SAXBuilder();
                 Document jdom = sb.build(stream);
                 ferretConf = new FerretConfig();
-                ferretConf.setRootElement((Element) jdom.getRootElement().clone());
+                ferretConf.setRootElement(jdom.getRootElement().clone());
             } finally {
                 stream.close();
             }
@@ -446,6 +461,8 @@ public class DashboardConfigStore {
             throw new IOException("Invalid value in the Ferret configuration file specified by the " +
                     FERRET_CONFIG_FILE_NAME_TAG + " value given in " + configFile.getPath() + "\n" + ex.getMessage());
         }
+        imageExtension = ferretConf.getImageFilenameExtension();
+        itsLogger.info("image filename extension: '" + imageExtension + "'");
 
         // Handler for DSG NC files
         String dsgFileDirName;
@@ -482,8 +499,9 @@ public class DashboardConfigStore {
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
         try {
-            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName, erddapDsgFlagFileName,
-                    erddapDecDsgFlagFileName, ferretConf, knownUserDataTypes, knownMetadataTypes, knownDataFileTypes);
+            dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
+                    erddapDsgFlagFileName, erddapDecDsgFlagFileName,
+                    ferretConf, knownMetadataTypes, knownDataFileTypes);
         } catch ( Exception ex ) {
             throw new IOException(ex);
         }
@@ -800,6 +818,14 @@ public class DashboardConfigStore {
     }
 
     /**
+     * @return the filename extension (including the initial '.') for images produced
+     *         by the version of Ferret/PyFerret used in this configuration
+     */
+    public String getImageExtension() {
+        return imageExtension;
+    }
+
+    /**
      * @return the database request handler
      */
     public DatabaseRequestHandler getDatabaseRequestHandler() {
@@ -887,6 +913,17 @@ public class DashboardConfigStore {
                 values[1] = DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS;
             }
         }
+        return values;
+    }
+
+    /**
+     * @return the maximum good and questionable time gaps in days.
+     *         At this time the values returned are just the default values.
+     */
+    public static double[] getMaxTimeGapsDays() {
+        double[] values = new double[2];
+        values[0] = DEFAULT_MAX_GOOD_TIME_GAP_DAYS;
+        values[1] = DEFAULT_MAX_MAYBE_TIME_GAP_DAYS;
         return values;
     }
 

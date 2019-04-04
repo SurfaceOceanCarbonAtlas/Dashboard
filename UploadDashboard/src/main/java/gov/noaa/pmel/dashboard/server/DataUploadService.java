@@ -49,6 +49,15 @@ public class DataUploadService extends HttpServlet {
             Pattern.compile("#*\\s*PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
 
+    // Patterns for getting the organization name(s) from the metadata preamble
+    private static final Pattern[] ORG_NAMES_PATTERNS = new Pattern[] {
+            Pattern.compile("#*\\s*Investigator\\s*Organizations?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*PI\\s*Organizations?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Organizations?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*PI\\s*Orgs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Orgs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+    };
+
     // Patterns for getting the platform name from the metadata preamble
     private static final Pattern[] PLATFORM_NAME_PATTERNS = new Pattern[] {
             Pattern.compile("#*\\s*Platform\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
@@ -309,6 +318,7 @@ public class DataUploadService extends HttpServlet {
 
             String platformName = null;
             ArrayList<String> piNames = null;
+            ArrayList<String> organizations = null;
             String platformType = null;
             // Get the ship name and PI names from the metadata preamble
             for (String metaline : dsetData.getPreamble()) {
@@ -342,6 +352,26 @@ public class DataUploadService extends HttpServlet {
                             if ( !piNames.isEmpty() )
                                 break;
                             piNames = null;
+                        }
+                    }
+                }
+                if ( (organizations == null) && !lineMatched ) {
+                    for (Pattern pat : ORG_NAMES_PATTERNS) {
+                        Matcher mat = pat.matcher(metaline);
+                        if ( !mat.matches() )
+                            continue;
+                        lineMatched = true;
+                        String allNames = mat.group(1);
+                        if ( allNames != null ) {
+                            organizations = new ArrayList<String>();
+                            for (String name : allNames.split(";")) {
+                                name = name.trim();
+                                if ( !name.isEmpty() )
+                                    organizations.add(name);
+                            }
+                            if ( !organizations.isEmpty() )
+                                break;
+                            organizations = null;
                         }
                     }
                 }
@@ -397,6 +427,29 @@ public class DataUploadService extends HttpServlet {
                         piNames = null;
                 }
             }
+            // If organizations not found in preamble, check if there is a matching column type
+            if ( organizations == null ) {
+                int colIdx = -1;
+                int k = 0;
+                for (DataColumnType dtype : dsetData.getDataColTypes()) {
+                    if ( DashboardServerUtils.ORGANIZATION_NAME.typeNameEquals(dtype) ) {
+                        colIdx = k;
+                        break;
+                    }
+                    k++;
+                }
+                if ( colIdx >= 0 ) {
+                    organizations = new ArrayList<String>();
+                    for (String name : dsetData.getDataValues().get(0).get(colIdx).split(";")) {
+                        name = name.trim();
+                        if ( !name.isEmpty() )
+                            organizations.add(name);
+                    }
+                    if ( organizations.isEmpty() )
+                        organizations = null;
+                }
+
+            }
             // If platform type not found in preamble, check if there is a matching column type
             if ( platformType == null ) {
                 int colIdx = -1;
@@ -424,6 +477,27 @@ public class DataUploadService extends HttpServlet {
                 messages.add(DashboardUtils.NO_PI_NAMES_HEADER_TAG + " " + filename);
                 continue;
             }
+            // If organization names are given, needs to to be either:
+            //    a single value (associate with to all PIs), or
+            //    same number of values as PIs (one-to-one association)
+            if ( organizations == null ) {
+                organizations = new ArrayList<String>(piNames.size());
+                for (int k = 0; k < piNames.size(); k++) {
+                    organizations.add(DashboardUtils.STRING_MISSING_VALUE);
+                }
+            }
+            else if ( organizations.size() == 1 ) {
+                if ( piNames.size() > 1 ) {
+                    String org = organizations.get(0);
+                    for (int k = 1; k < piNames.size(); k++) {
+                        organizations.add(org);
+                    }
+                }
+            }
+            else if ( organizations.size() != piNames.size() ) {
+                messages.add(DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG + " " + filename);
+                continue;
+            }
             // If the platform type is not given, make an educated guess
             if ( platformType == null ) {
                 platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
@@ -432,10 +506,16 @@ public class DataUploadService extends HttpServlet {
             // Create the OME XML stub file for this dataset
             try {
                 CdiacOmeMetadata omeMData = new CdiacOmeMetadata();
+                // Assign the metadata provided in the data file
                 omeMData.setDatasetId(datasetId);
+                omeMData.setPlatformName(platformName);
+                omeMData.setPlatformType(platformType);
+                omeMData.setInvestigatorsAndOrganizations(piNames, organizations);
                 DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
                         DashboardUtils.OME_FILENAME, timestamp, username, dsetData.getVersion());
-                String msg = "New OME metadata created from data file for " + datasetId + " uploaded by " + username;
+                // This is an known incomplete stub just for SOCAT use, so mark it as okay
+                mdata.setConflicted(false);
+                String msg = "OME metadata created from data file for " + datasetId + " uploaded by " + username;
                 MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
                 mdataHandler.saveMetadataInfo(mdata, msg, false);
                 mdataHandler.saveOmeToFile(mdata, msg);

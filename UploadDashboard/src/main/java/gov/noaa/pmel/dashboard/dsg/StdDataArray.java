@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
 import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -54,7 +55,8 @@ public class StdDataArray {
 
     /**
      * Create and assign the 1-D arrays of data column types from the given user's descriptions
-     * of the data column.  Appends the non-user type {@link DashboardServerUtils#SAMPLE_NUMBER}.
+     * of the data column.  Appends any required WOCE column types not already present, as well
+     * as the non-user type {@link DashboardServerUtils#SAMPLE_NUMBER}.
      * The 2-D array of standard data objects is not created.
      *
      * @param dataColumnTypes
@@ -76,7 +78,17 @@ public class StdDataArray {
         numDataCols = dataColumnTypes.size();
         numSamples = 0;
 
-        dataTypes = new DashDataType<?>[numDataCols + 1];
+        // Check that any required WOCE columns (assigned by automated data checking) are present
+        boolean hasWoceCo2Water = false;
+        for (DataColumnType dtype : dataColumnTypes) {
+            if ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(dtype) ) {
+                hasWoceCo2Water = true;
+            }
+        }
+        if ( !hasWoceCo2Water )
+            dataTypes = new DashDataType<?>[numDataCols + 2];
+        else
+            dataTypes = new DashDataType<?>[numDataCols + 1];
         stdObjects = null;
 
         for (int k = 0; k < numDataCols; k++) {
@@ -84,6 +96,10 @@ public class StdDataArray {
             dataTypes[k] = knownTypes.getDataType(dataColType);
             if ( dataTypes[k] == null )
                 throw new IllegalArgumentException("unknown data column type: " + dataColType.getDisplayName());
+        }
+        if ( !hasWoceCo2Water ) {
+            dataTypes[numDataCols] = SocatTypes.WOCE_CO2_WATER;
+            numDataCols++;
         }
         dataTypes[numDataCols] = DashboardServerUtils.SAMPLE_NUMBER;
         numDataCols++;

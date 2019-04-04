@@ -31,6 +31,7 @@ public class PreviewPlotsHandlerTest {
         PreviewPlotsHandler plotsHandler = configStore.getPreviewPlotsHandler();
         File dsgFilesDir = plotsHandler.getDatasetPreviewDsgDir(EXPOCODE);
         File plotsDir = plotsHandler.getDatasetPreviewPlotsDir(EXPOCODE);
+        String imgext = configStore.getImageExtension();
 
         plotsHandler.createPreviewPlots(EXPOCODE, timetag);
 
@@ -55,7 +56,7 @@ public class PreviewPlotsHandlerTest {
                 DatasetPreviewPage.REPORT_REC_FCO2_IMAGE_NAME,
                 DatasetPreviewPage.REC_FCO2_DELTA_IMAGE_NAME,
                 DatasetPreviewPage.REC_FCO2_SOURCES_IMAGE_NAME }) {
-            plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".png");
+            plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + imgext);
             assertTrue("Plot for " + imgName + " does not exist", plotFile.exists());
             plotFile.delete();
         }

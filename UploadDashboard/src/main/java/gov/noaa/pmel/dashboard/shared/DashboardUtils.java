@@ -35,6 +35,7 @@ public class DashboardUtils {
     public static final String NO_DATASET_ID_HEADER_TAG = "NO DATASET ID HEADER TAG";
     public static final String NO_PI_NAMES_HEADER_TAG = "NO PI NAMES HEADER TAG";
     public static final String NO_PLATFORM_NAME_HEADER_TAG = "NO PLATFORM NAME HEADER TAG";
+    public static final String INVALID_ORG_NAMES_HEADER_TAG = "INVALID ORGANIZATIONS NAME HEADER TAG";
     public static final String UNEXPECTED_FAILURE_HEADER_TAG = "UNEXPECTED FAILURE HEADER TAG";
     public static final String END_OF_ERROR_MESSAGE_TAG = "END_OF_ERROR MESSAGE_TAG";
     public static final String SUCCESS_HEADER_TAG = "SUCCESS HEADER TAG";

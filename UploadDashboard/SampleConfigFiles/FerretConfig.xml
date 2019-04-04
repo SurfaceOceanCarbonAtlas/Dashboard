@@ -20,7 +20,7 @@
         For PyFerret use:
             executable="/usr/bin/python2.7" (or whichever python is to be used)
         and
-            <arg>-c import sys; import pyferret; (errval, errmsg) = pyferret.init(sys.argv[1:], True)</arg>
+            <arg>-cimport sys; import pyferret; (errval, errmsg) = pyferret.init(sys.argv[1:], True)</arg>
             <arg>-png</arg>
             <arg>-server</arg>
             <arg>-script</arg>
@@ -85,17 +85,17 @@
         <variable>
             <!-- for PyFerret -->
             <name>LD_LIBRARY_PATH</name>
-             <value>/home/users/socat/PyFerret/lib/python2.7/site-packages/pyferret</value>
+             <value>PyFerret/lib/python2.7/site-packages/pyferret</value>
         </variable>
         <variable>
-            <!-- for PyFerret -->
+            <!-- for PyFerret on MacOSX-->
             <name>DYLD_FALLBACK_LIBRARY_PATH</name>
-             <value>/home/users/socat/PyFerret/dylibs</value>
+             <value>PyFerret/dylibs</value>
         </variable>
         <variable>
             <!-- for PyFerret -->
             <name>PYTHONPATH</name>
-             <value>/home/users/socat/PyFerret/lib/python2.7/site-packages</value>
+             <value>PyFerret/lib/python2.7/site-packages</value>
         </variable>
     </environment>
 

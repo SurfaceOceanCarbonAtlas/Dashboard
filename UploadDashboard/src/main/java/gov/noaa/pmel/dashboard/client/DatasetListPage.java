@@ -312,7 +312,8 @@ public class DatasetListPage extends CompositeWithUsername {
     private DashboardDatasetList checkSet;
     private TreeSet<String> datasetIdsSet;
     private DashboardAskPopup askDataAutofailPopup;
-    // private boolean managerButtonsShown;
+    private boolean isManager;
+    private String imageExtension;
     private TextColumn<DashboardDataset> timestampColumn;
     private TextColumn<DashboardDataset> expocodeColumn;
 
@@ -456,6 +457,8 @@ public class DatasetListPage extends CompositeWithUsername {
         providerList.clear();
         if ( newList != null ) {
             providerList.addAll(newList.values());
+            isManager = newList.isManager();
+            imageExtension = newList.getImageExtension();
         }
         for (DashboardDataset dataset : providerList) {
             if ( datasetIdsSet.contains(dataset.getDatasetId()) )
@@ -538,9 +541,11 @@ public class DatasetListPage extends CompositeWithUsername {
      * @return if successful
      */
     private boolean getSelectedDatasets(Boolean onlyEditable) {
+        datasetIdsSet.clear();
         datasetsSet.clear();
         datasetsSet.setUsername(getUsername());
-        datasetIdsSet.clear();
+        datasetsSet.setManager(isManager);
+        datasetsSet.setImageExtension(imageExtension);
         for (DashboardDataset dataset : listProvider.getList()) {
             if ( dataset.isSelected() ) {
                 if ( onlyEditable != null ) {
@@ -553,8 +558,8 @@ public class DatasetListPage extends CompositeWithUsername {
                         return false;
                 }
                 String expocode = dataset.getDatasetId();
-                datasetsSet.put(expocode, dataset);
                 datasetIdsSet.add(expocode);
+                datasetsSet.put(expocode, dataset);
             }
         }
         return true;
@@ -657,8 +662,10 @@ public class DatasetListPage extends CompositeWithUsername {
             return;
         }
         checkSet.clear();
-        checkSet.putAll(datasetsSet);
         checkSet.setUsername(getUsername());
+        checkSet.setManager(isManager);
+        checkSet.setImageExtension(imageExtension);
+        checkSet.putAll(datasetsSet);
         checkDatasetsForSubmitting();
     }
 
@@ -1292,6 +1299,8 @@ public class DatasetListPage extends CompositeWithUsername {
                 // Show the OME metadata manager page for this one cruise
                 checkSet.clear();
                 checkSet.setUsername(getUsername());
+                checkSet.setManager(isManager);
+                checkSet.setImageExtension(imageExtension);
                 checkSet.put(cruise.getDatasetId(), cruise);
                 OmeManagerPage.showPage(checkSet);
             }
@@ -1343,6 +1352,8 @@ public class DatasetListPage extends CompositeWithUsername {
                 // Go to the QC page after performing the client-side checks on this one cruise
                 checkSet.clear();
                 checkSet.setUsername(getUsername());
+                checkSet.setManager(isManager);
+                checkSet.setImageExtension(imageExtension);
                 checkSet.put(cruise.getDatasetId(), cruise);
                 AddlDocsManagerPage.showPage(checkSet);
             }
@@ -1405,6 +1416,8 @@ public class DatasetListPage extends CompositeWithUsername {
                     // Go to the QC page after performing the client-side checks on this one cruise
                     checkSet.clear();
                     checkSet.setUsername(getUsername());
+                    checkSet.setManager(isManager);
+                    checkSet.setImageExtension(imageExtension);
                     checkSet.put(cruise.getDatasetId(), cruise);
                     checkDatasetsForSubmitting();
                 }
@@ -1454,6 +1467,8 @@ public class DatasetListPage extends CompositeWithUsername {
                     // Go to the QC page after performing the client-side checks on this one cruise
                     checkSet.clear();
                     checkSet.setUsername(getUsername());
+                    checkSet.setManager(isManager);
+                    checkSet.setImageExtension(imageExtension);
                     checkSet.put(cruise.getDatasetId(), cruise);
                     checkDatasetsForSubmitting();
                 }

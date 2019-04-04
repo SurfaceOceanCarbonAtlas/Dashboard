@@ -77,11 +77,11 @@ public class DataFileHandler extends VersionedFileHandler {
      * Patterns for getting the expocode from the metadata preamble
      */
     private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
-            Pattern.compile("Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Dataset\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Cruise\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Cruise\\s*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE),
-            Pattern.compile("Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
+            Pattern.compile("#*Expocode\\s*[=:]\\s*([\\p{javaUpperCase}\\p{Digit}-]+)",
                     Pattern.CASE_INSENSITIVE)
     };
 
@@ -209,22 +209,6 @@ public class DataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Determines if a dataset properties file exists
-     *
-     * @param datasetId
-     *         ID of the dataset to check
-     *
-     * @return true if the dataset properties file exists
-     *
-     * @throws IllegalArgumentException
-     *         if datasetId is not a valid dataset ID
-     */
-    public boolean infoFileExists(String datasetId) throws IllegalArgumentException {
-        File infoFile = datasetInfoFile(datasetId);
-        return infoFile.exists();
-    }
-
-    /**
      * Determines if a dataset data file exists
      *
      * @param datasetId
@@ -244,14 +228,15 @@ public class DataFileHandler extends VersionedFileHandler {
      * Assigns or creates a DashboardDatasetData object with data read from the given Reader.
      * <p>
      * The data read should have a preamble of metadata containing the ID (expocode)
-     * for the dataset on a line such as one of the following (case and space insensitive):
+     * for the dataset on a line such as one of the following (case and space insensitive,
+     * initial '#' characters optional):
      * <pre>
-     * Expocode :
-     * Expocode =
-     * Cruise Expocode :
-     * Cruise Expocode =
-     * Dataset Expocode :
-     * Dataset Expocode =
+     * # Expocode :
+     * # Expocode =
+     * # Cruise Expocode :
+     * # Cruise Expocode =
+     * # Dataset Expocode :
+     * # Dataset Expocode =
      * </pre>
      * Alternatively, the dataset ID can be given in an appropriate data column.
      * In this case, only the first ID in the column is used.
@@ -1002,15 +987,15 @@ public class DataFileHandler extends VersionedFileHandler {
         try {
             deleteVersionedFile(datasetDataFile(datasetId), commitMsg);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems deleting the cruise data file: " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems deleting the dataset data file for " +
+                    datasetId + ": " + ex.getMessage());
         }
         // Delete the cruise information file
         try {
             deleteVersionedFile(datasetInfoFile(datasetId), commitMsg);
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems deleting the cruise information file: " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems deleting the dataset information file for " +
+                    datasetId + ": " + ex.getMessage());
         }
 
         if ( deleteMetadata ) {

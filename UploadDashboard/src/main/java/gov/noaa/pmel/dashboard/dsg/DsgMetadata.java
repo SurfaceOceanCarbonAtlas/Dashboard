@@ -1,4 +1,5 @@
 /**
+ *
  */
 package gov.noaa.pmel.dashboard.dsg;
 
@@ -14,7 +15,8 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
- * Class for working with metadata values of interest, including those derived from dataset data.
+ * Class for working with metadata values of interest, including those derived from dataset data,
+ * that will be put into the DSG files for this dataset.
  *
  * @author Karl Smith
  */

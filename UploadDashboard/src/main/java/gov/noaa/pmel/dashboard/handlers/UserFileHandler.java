@@ -180,6 +180,8 @@ public class UserFileHandler extends VersionedFileHandler {
         // Create the dataset list (map) for these cruises
         DashboardDatasetList datasetList = new DashboardDatasetList();
         datasetList.setUsername(cleanUsername);
+        datasetList.setManager(configStore.isManager(cleanUsername));
+        datasetList.setImageExtension(configStore.getImageExtension());
         for (String datasetId : dataIdsSet) {
             // Create the DashboardDataset from the info file
             DashboardDataset dataset = dataHandler.getDatasetFromInfoFile(datasetId);
@@ -202,8 +204,6 @@ public class UserFileHandler extends VersionedFileHandler {
         }
         if ( needsCommit )
             saveDatasetListing(datasetList, commitMessage);
-        // Determine whether or not this user is a manager/admin
-        datasetList.setManager(configStore.isManager(cleanUsername));
         // Return the listing of cruises
         return datasetList;
     }

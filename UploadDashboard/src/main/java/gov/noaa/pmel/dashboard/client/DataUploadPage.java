@@ -52,12 +52,13 @@ public class DataUploadPage extends CompositeWithUsername {
                     "<li>a line of data values for each data sample</li>" +
                     "</ul></p>" +
                     "<p>The expocode, vessel (ship) name, and investigators " +
-                    "names must be given (vessel type is optional) in either " +
-                    "the metadata lines (# at start is optional): " +
+                    "names must be given (organization and vessel type are optional) " +
+                    "in either the metadata lines (# at start is optional): " +
                     "<ul style=\"list-style-type: none\">" +
                     "<li># expocode: ZZZZ20051231</li>" +
                     "<li># vessel name: Pacific Minnow</li>" +
                     "<li># PIs: Smith, K.; Doe, J.</li>" +
+                    "<li># Org: Ocean Tours</li>" +
                     "<li># vessel type: Ship</li>" +
                     "</ul> " +
                     "or they can be in columns with appropriate names.  </p>";
@@ -70,6 +71,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     "  <li>Expocode: 33AT20120417</li>" +
                     "  <li>Vessel Name: Atlantis</li>" +
                     "  <li>PI: Wanninkhof, R.</li>" +
+                    "  <li>Org: NOAA-AOML</li>" +
                     "  <li>Vessel Type: Ship</li>" +
                     "  <li></li>" +
                     "  <li>CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...</li>" +
@@ -96,9 +98,15 @@ public class DataUploadPage extends CompositeWithUsername {
                     "'investigator name', 'investigator names', 'PI', 'PIs', 'PI name', and " +
                     "PI names'.  For datasets with multiple investigators, put all names " +
                     "on one metadata line and separate the names with semicolons.  Tags for " +
-                    "the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
-                    "If the vessel type is not specified, an intelligent guess is made " +
-                    "based on the vessel name and/or the NODC code part of the expocode.  " +
+                    "organizations are 'investigator organization', 'investigator organizations' " +
+                    "'PI organization', PI organizations', 'PI org', PI orgs', 'organization', " +
+                    "'organizations', 'org', and 'orgs'.  For multiple investigators, if a " +
+                    "single organization is given, that origanization will be associated " +
+                    "with all investigators; otherwise, the number of organizations listed" +
+                    "(again, separated by semicolons) must match the number of investigators.  " +
+                    "Tags for the vessel type are 'vessel type', 'platform type', or just " +
+                    "'type'.  If the vessel type is not specified, an intelligent guess is " +
+                    "made based on the vessel name and/or the NODC code part of the expocode.  " +
                     "</p><p>" +
                     "Units for the columns can be given on a second column header line, " +
                     "such as the following:" +
@@ -106,6 +114,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     "  <li>Expocode = 33AT20120417</li>" +
                     "  <li>Vessel Name = Atlantis</li>" +
                     "  <li>Investigator = Wanninkhof, R.</li>" +
+                    "  <li>Organization = NOAA-AOML</li>" +
                     "  <li>Vessel Type = Ship</li>" +
                     "  <li></li>" +
                     "  <li>CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...</li>" +
@@ -234,6 +243,13 @@ public class DataUploadPage extends CompositeWithUsername {
                     "page and then click the Preview Data File button.  This will " +
                     "enable you to see how your file appears to this system and " +
                     "change the file encoding type if appropriate." +
+                    "</p>";
+    private static final String INVALID_ORG_NAMES_FAIL_MSG =
+            "<br />Organization(s) specification invalid</h3>" +
+                    "<p>The organization(s) specified in the lines of metadata preceding " +
+                    "the data, or in a data column, needs to either specify a single " +
+                    "organization for all investigators, or needs to specify an organization " +
+                    "for each investigator (repeating values as needed). " +
                     "</p>";
     private static final String DATASET_EXISTS_FAIL_MSG_START =
             "<br />A dataset already exists with this expocode.</h3>";
@@ -597,6 +613,12 @@ public class DataUploadPage extends CompositeWithUsername {
                 String filename = header.substring(
                         DashboardUtils.NO_PI_NAMES_HEADER_TAG.length()).trim();
                 errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + NO_PI_NAMES_FAIL_MSG);
+            }
+            else if ( header.startsWith(DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG) ) {
+                // Invalid entry for organization names
+                String filename = header.substring(
+                        DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG.length()).trim();
+                errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + INVALID_ORG_NAMES_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
                 // Dataset file exists and not permitted to modify

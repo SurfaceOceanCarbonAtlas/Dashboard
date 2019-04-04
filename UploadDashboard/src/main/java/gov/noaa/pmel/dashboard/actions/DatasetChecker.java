@@ -45,17 +45,17 @@ public class DatasetChecker {
     }
 
     /**
-     * Interprets the data string representations and standardizes, if required, these data values for given dataset.
-     * Performs the automated data checks on these data values.  Saves the messages generated from these steps and
-     * assigns the automated data checker WOCE flags from these messages.
+     * Interprets the data string representations and standardizes, if required, these data values
+     * for given dataset.  Performs the automated data checks on these data values.  Saves the messages
+     * generated from these steps and assigns the automated data checker WOCE flags from these messages.
      * <p>
-     * The given dataset object is updated with the set of checker QC flags, the set of user-provided QC flags,
-     * the number of rows with errors (not marked by the PI), the number of rows with warnings (not marked by the PI),
-     * and the current data check status.
+     * The given dataset object is updated with the set of checker QC flags, the set of user-provided
+     * QC flags, the number of rows with errors (not marked by the PI), the number of rows with warnings
+     * (not marked by the PI), and the current data check status.
      * <p>
      * The given metadata object, if not null, it is updated with values that can be derived from the data:
-     * western-most longitude, eastern-most longitude, southern-most latitude, northern-most latitude, start time, and
-     * end time.
+     * western-most longitude, eastern-most longitude, southern-most latitude, northern-most latitude,
+     * start time, and end time.
      *
      * @param dataset
      *         dataset data to check; various fields will be updated by this method
@@ -65,8 +65,11 @@ public class DatasetChecker {
      * @return standardized user data array of checked values
      *
      * @throws IllegalArgumentException
-     *         if there are no data values, if a data column description is not a known user data type, if a required
-     *         unit conversion is not supported, if a standardizer for a given data type is not known, if ....
+     *         if there are no data values,
+     *         if a data column description is not a known user data type,
+     *         if a required unit conversion is not supported,
+     *         if a standardizer for a given data type is not known,
+     *         if ....
      */
     public StdUserDataArray standardizeDataset(DashboardDatasetData dataset, DsgMetadata metadata)
             throws IllegalArgumentException {
@@ -76,12 +79,16 @@ public class DatasetChecker {
         // Check for missing lon/lat/time
         Double[] sampleTimes = stdUserData.checkMissingLonLatTime();
 
-        // Check that the data is ordered in time and speeds not excessive - generate errors if not.
+        // Check that the data is ordered in time; speeds and time gaps are not excessive.
+        // Generate errors where this is not the case.
         if ( sampleTimes != null )
             stdUserData.checkDataOrder(sampleTimes);
 
         // Bounds check the standardized data values
         stdUserData.checkBounds();
+
+        // Any metadata values given in data columns must be consistent (constant or missing)
+        stdUserData.checkMetadataTypeValues();
 
         // TODO: Perform any other data checks?
 

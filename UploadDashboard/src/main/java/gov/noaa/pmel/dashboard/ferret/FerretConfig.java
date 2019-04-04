@@ -1,18 +1,11 @@
-/**
- * This software is provided by NOAA for full, free and open release.  It is understood by the recipient/user that NOAA
- * assumes no liability for any errors contained in the code.  Although this software is released without conditions or
- * restrictions in its use, it is expected that appropriate credit be given to its author and to the National Oceanic
- * and Atmospheric Administration should the software be included by the recipient as an element in other product
- * development.
- */
 package gov.noaa.pmel.dashboard.ferret;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -24,7 +17,7 @@ import java.util.List;
 
 public class FerretConfig extends Document {
 
-    private static final long serialVersionUID = 2688268720506176162L;
+    private static final long serialVersionUID = -9187555458046328313L;
 
     public enum Action {
         /**
@@ -72,40 +65,32 @@ public class FerretConfig extends Document {
         Element environment = this.getRootElement().getChild("environment");
         String base_dir = getBaseDir();
 
-        if ( !base_dir.startsWith("/") ) {
+        if ( !base_dir.startsWith("/") )
             throw new Exception("base_dir " + base_dir + " is not a full path.");
-        }
-        if ( environment != null ) {
-            List<Element> variables = environment.getChildren("variable");
-            for (Iterator<Element> varIt = variables.iterator(); varIt.hasNext(); ) {
-                Element variable = varIt.next();
-                String name = variable.getChildTextTrim("name");
-                List<Element> values = variable.getChildren("value");
-                String value = "";
-                for (Iterator<Element> valueIt = values.iterator(); valueIt.hasNext(); ) {
-                    Element valueE = valueIt.next();
-                    String val = valueE.getTextTrim();
-                    if ( val.startsWith("/") ) {
-                        value = value + val;
-                    }
-                    else {
-                        value = value + base_dir + val;
-                    }
-                    if ( valueIt.hasNext() ) {
-                        value = value + " ";
-                    }
-                }
-                env.put(name, value);
-            }
-            if ( env != null ) {
-                RuntimeEnvironment runenv = new RuntimeEnvironment();
-                runenv.setBaseDir(base_dir);
-                runenv.setParameters(env);
-                return runenv;
+        if ( environment == null )
+            return null;
 
+        List<Element> variables = environment.getChildren("variable");
+        for (Element variable : variables) {
+            String name = variable.getChildTextTrim("name");
+            List<Element> values = variable.getChildren("value");
+            String value = "";
+            for (Element valueE : values) {
+                String val = valueE.getTextTrim();
+                if ( val.startsWith("/") ) {
+                    value += val;
+                }
+                else {
+                    value += base_dir + val;
+                }
+                value += " ";
             }
+            env.put(name, value.trim());
         }
-        return null;
+        RuntimeEnvironment runenv = new RuntimeEnvironment();
+        runenv.setBaseDir(base_dir);
+        runenv.setParameters(env);
+        return runenv;
     }
 
     /**
@@ -113,7 +98,7 @@ public class FerretConfig extends Document {
      *
      * @return String containing the base_dir attribute for the Ferret config.
      */
-    public String getBaseDir() {
+    private String getBaseDir() {
         Element invoker = this.getRootElement().getChild("invoker");
         if ( invoker != null ) {
             String base_dir = invoker.getAttributeValue("base_dir");
@@ -125,13 +110,6 @@ public class FerretConfig extends Document {
             }
         }
         return "";
-    }
-
-    public void setBaseDir(String dir) {
-        Element invoker = this.getRootElement().getChild("invoker");
-        if ( invoker != null ) {
-            invoker.setAttribute("base_dir", dir);
-        }
     }
 
     public String getTempDir() {
@@ -153,12 +131,9 @@ public class FerretConfig extends Document {
         Element invoker = this.getRootElement().getChild("invoker");
         if ( invoker != null ) {
             List<Element> configured_args = invoker.getChildren("arg");
-            for (Iterator<Element> argIt = configured_args.iterator(); argIt.hasNext(); ) {
-                Element arg = argIt.next();
-                String a = arg.getTextTrim();
-                args.add(a);
+            for (Element arg : configured_args) {
+                args.add(arg.getTextTrim());
             }
-
         }
         return args;
     }
@@ -180,22 +155,6 @@ public class FerretConfig extends Document {
     }
 
     /**
-     * Boolean to determine if Ferret should be "niced down" when invoked.
-     *
-     * @return boolean true if use nice; false do not nice
-     */
-    public boolean getUseNice() {
-        Element invoker = this.getRootElement().getChild("invoker");
-        if ( invoker != null ) {
-            String use_nice = invoker.getAttributeValue("use_nice");
-            if ( use_nice != null ) {
-                return Boolean.valueOf(use_nice).booleanValue();
-            }
-        }
-        return false;
-    }
-
-    /**
      * Return the time limit in milliseconds for how long Ferret should be allowed to run on one invocation.
      *
      * @return long with the time in milliseconds.  Defaults to 10000 if not defined in the config.
@@ -204,9 +163,8 @@ public class FerretConfig extends Document {
         Element invoker = this.getRootElement().getChild("invoker");
         if ( invoker != null ) {
             String time_limit = invoker.getAttributeValue("time_limit");
-            if ( time_limit != null ) {
-                return Long.valueOf(time_limit).longValue();
-            }
+            if ( time_limit != null )
+                return Long.valueOf(time_limit);
         }
         return 10000;
     }
@@ -215,8 +173,7 @@ public class FerretConfig extends Document {
         List<Element> messages = getRootElement().getChild("messages").getChildren("message");
         String[] errors = new String[messages.size()];
         int i = 0;
-        for (Iterator<Element> messIt = messages.iterator(); messIt.hasNext(); ) {
-            Element message = messIt.next();
+        for (Element message : messages) {
             errors[i] = message.getChild("key").getTextTrim();
             i++;
         }
@@ -252,7 +209,7 @@ public class FerretConfig extends Document {
     }
 
     /**
-     * This is the first (and only script) that will get run by the tool.
+     * This is the first (and only) script that will get run by the tool.
      *
      * @param actionEnum
      *         the desired action of this configuration
@@ -275,4 +232,22 @@ public class FerretConfig extends Document {
         }
         return "";
     }
+
+    /**
+     * @return the filename extension (including the initial '.') for images created by the version
+     *         of Ferret/PyFerret in this configuration.  If no executable, an empty string is returned.
+     */
+    public String getImageFilenameExtension() {
+        File exeFile = new File(getExecutable());
+        String name = exeFile.getName();
+        if ( name.isEmpty() )
+            return "";
+        // Assume that if the executable filename starts with "python",
+        // it is PyFerret and thus ".png"; otherwise it is Ferret and thus ".gif"
+        if ( name.startsWith("python") )
+            return ".png";
+        else
+            return ".gif";
+    }
+
 }

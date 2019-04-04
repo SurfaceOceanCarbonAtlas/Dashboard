@@ -18,13 +18,13 @@ import java.util.TimeZone;
 
 /**
  * Class for OME files (metadata files of well-known format containing user-provided values needed by the dashboard).
- * Extends DashboardMetadata, but uses {@link OmeMetadataInterface} to work with the actual OME objects.
+ * Extends DashboardMetadata, but contains an {@link OmeMetadataInterface} object to work with the actual OME.
  *
  * @author Karl Smith
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = -5972791331367156492L;
+    private static final long serialVersionUID = 3793004938476629910L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional

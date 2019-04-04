@@ -89,7 +89,8 @@ public class StdUserDataArray extends StdDataArray {
                 userMissVals[k] = null;
             userColNames[k] = names.get(k);
         }
-        // the StdDataArray constructor that was used adds SAMPLE_NUMBER
+        // the StdDataArray constructor that was used adds any required WOCE column types that are missing
+        // as well as SAMPLE_NUMBER
         for (int k = numUserDataCols; k < numDataCols; k++) {
             userUnits[k] = dataTypes[k].getUnits().get(0);
             if ( DashboardUtils.STRING_MISSING_VALUE.equals(userUnits[k]) )
@@ -143,6 +144,9 @@ public class StdUserDataArray extends StdDataArray {
             for (int k = numUserDataCols; k < numDataCols; k++) {
                 if ( DashboardServerUtils.SAMPLE_NUMBER.typeNameEquals(dataTypes[k]) ) {
                     strDataVals[j][k] = rowNums.get(j).toString();
+                }
+                else if ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(dataTypes[k]) ) {
+                    strDataVals[j][k] = DashboardUtils.STRING_MISSING_VALUE;
                 }
                 else {
                     throw new IllegalArgumentException("unexpected unknown added data types");
@@ -198,11 +202,11 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Check for missing longitude, latitude, and time columns or data values.  Any problems found generate messages
-     * that are added to the internal list of messages.
+     * Check for missing longitude, latitude, and time columns or data values.
+     * Any problems found generate messages that are added to the internal list of messages.
      *
-     * @return the sample times for the data;  may be null if there was incomplete specification of sample time, or may
-     *         contain null values if there were problems computing the sample time
+     * @return the sample times for the data;  may be null if there was incomplete specification of
+     *         sample time, or may contain null values if there were problems computing the sample time
      */
     public Double[] checkMissingLonLatTime() {
         try {
@@ -285,8 +289,9 @@ public class StdUserDataArray extends StdDataArray {
 
     /**
      * Verifies data samples are ascending in time (oldest to newest).  Also checks for excessive
-     * speed between two data points.  Any misorderings or excessive speeds detected generate error
-     * messages that are added to the internal list of automated data checker messages.
+     * speed and time gaps between two data points.  Any misorderings, excessive speeds, or excessive
+     * time gaps detected generate error messages that are added to the internal list of automated
+     * data checker messages.
      *
      * @param times
      *         sample times to be used for this data array
@@ -322,6 +327,7 @@ public class StdUserDataArray extends StdDataArray {
         // or if multiple blocks are consistent in the "direction" they are misordered.
 
         double[] maxSpeeds = DashboardConfigStore.getMaxCalcSpeedsKnots();
+        double[] maxTimeGaps = DashboardConfigStore.getMaxTimeGapsDays();
 
         // The following will say:
         // 4,5,6 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
@@ -329,6 +335,7 @@ public class StdUserDataArray extends StdDataArray {
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> forwardErrs = new TreeSet<Integer>();
         ArrayList<ADCMessage> forwardSpeedMsgs = new ArrayList<ADCMessage>();
+        ArrayList<ADCMessage> forwardTimeGapMsgs = new ArrayList<ADCMessage>();
         int lastRowNum = 0;
         int expectedRowNum = 1;
         for (DataLocation dataLoc : orderedSet) {
@@ -343,15 +350,19 @@ public class StdUserDataArray extends StdDataArray {
                             latitudes[actualRowNum - 1], longitudes[lastRowNum - 1], latitudes[lastRowNum - 1]);
                     double hourdelta = (times[actualRowNum - 1] - times[lastRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
-                    if ( speed > maxSpeeds[1] ) {
+                    if ( (speed < 0.0) || (hourdelta < 0.0) ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed or time gap obtained");
+                    }
+                    else if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[1]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[1]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[1]));
                         forwardSpeedMsgs.add(msg);
                     }
                     else if ( speed > maxSpeeds[0] ) {
@@ -359,15 +370,35 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[0]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[0]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         forwardSpeedMsgs.add(msg);
                     }
-                    else if ( speed < 0.0 ) {
-                        // Just to make sure the calculation was done correctly
-                        throw new RuntimeException("Negative calculated speed obtained");
+                    else if ( hourdelta > 24.0 * maxTimeGaps[1] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[1]));
+                        forwardTimeGapMsgs.add(msg);
+                    }
+                    else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[0]));
+                        forwardTimeGapMsgs.add(msg);
                     }
                 }
                 lastRowNum = actualRowNum;
@@ -380,6 +411,7 @@ public class StdUserDataArray extends StdDataArray {
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> reverseErrs = new TreeSet<Integer>();
         ArrayList<ADCMessage> reverseSpeedMsgs = new ArrayList<ADCMessage>();
+        ArrayList<ADCMessage> reverseTimeGapMsgs = new ArrayList<ADCMessage>();
         lastRowNum = 0;
         expectedRowNum = numSamples;
         for (DataLocation dataLoc : orderedSet.descendingSet()) {
@@ -394,15 +426,19 @@ public class StdUserDataArray extends StdDataArray {
                             latitudes[lastRowNum - 1], longitudes[actualRowNum - 1], latitudes[actualRowNum - 1]);
                     double hourdelta = (times[lastRowNum - 1] - times[actualRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
-                    if ( speed > maxSpeeds[1] ) {
+                    if ( (speed < 0.0) || (hourdelta < 0.0) ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed or time gap obtained");
+                    }
+                    else if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[1]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[1]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[1]));
                         reverseSpeedMsgs.add(msg);
                     }
                     else if ( speed > maxSpeeds[0] ) {
@@ -410,15 +446,35 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[0]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[0]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         reverseSpeedMsgs.add(msg);
                     }
-                    else if ( speed < 0.0 ) {
-                        // Just to make sure the calculation was done correctly
-                        throw new RuntimeException("Negative calculated speed obtained");
+                    else if ( hourdelta > 24.0 * maxTimeGaps[1] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[1]));
+                        reverseTimeGapMsgs.add(msg);
+                    }
+                    else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[0]));
+                        reverseTimeGapMsgs.add(msg);
                     }
                 }
                 lastRowNum = actualRowNum;
@@ -428,13 +484,17 @@ public class StdUserDataArray extends StdDataArray {
         // Guess that the set with fewer errors is the correct one
         TreeSet<Integer> errorRowsNums;
         ArrayList<ADCMessage> speedMsgs;
-        if ( (forwardErrs.size() + forwardSpeedMsgs.size()) <= (reverseErrs.size() + reverseSpeedMsgs.size()) ) {
+        ArrayList<ADCMessage> timeGapMsgs;
+        if ( (forwardErrs.size() + forwardSpeedMsgs.size() + forwardTimeGapMsgs.size())
+                <= (reverseErrs.size() + reverseSpeedMsgs.size() + reverseTimeGapMsgs.size()) ) {
             errorRowsNums = forwardErrs;
             speedMsgs = forwardSpeedMsgs;
+            timeGapMsgs = forwardTimeGapMsgs;
         }
         else {
             errorRowsNums = reverseErrs;
             speedMsgs = reverseSpeedMsgs;
+            timeGapMsgs = reverseTimeGapMsgs;
         }
         for (Integer rowNum : errorRowsNums) {
             for (Integer colIdx : indicesForTime) {
@@ -480,11 +540,23 @@ public class StdUserDataArray extends StdDataArray {
                 stdMsgList.add(msg);
             }
         }
+        for (ADCMessage tgmsg : timeGapMsgs) {
+            for (Integer colIdx : indicesForTime) {
+                ADCMessage msg = new ADCMessage();
+                msg.setSeverity(tgmsg.getSeverity());
+                msg.setRowNumber(tgmsg.getRowNumber());
+                msg.setColNumber(colIdx + 1);
+                msg.setColName(userColNames[colIdx]);
+                msg.setGeneralComment(tgmsg.getGeneralComment());
+                msg.setDetailedComment(tgmsg.getDetailedComment());
+                stdMsgList.add(msg);
+            }
+        }
     }
 
     /**
-     * Checks that all values given (not missing values) are within the acceptable range for that data type.  Any
-     * problems found generate (error or warning) messages that are added to the internal list of messages.
+     * Checks that all values given (not missing values) are within the acceptable range for that data type.
+     * Any problems found generate (error or warning) messages that are added to the internal list of messages.
      */
     public void checkBounds() {
         for (int k = 0; k < numDataCols; k++) {
@@ -527,25 +599,131 @@ public class StdUserDataArray extends StdDataArray {
                 }
             }
             else {
-                throw new IllegalArgumentException("unexpected data type encountered " +
-                        "in bounds checking: " + dtype);
+                throw new IllegalArgumentException(
+                        "unexpected data type encountered in bounds checking: " + dtype);
             }
         }
     }
 
     /**
-     * @return the list of automated data check messages describing problems detected in the data.  The messages that
-     *         are in this list comes from the constructor as well as any check methods that were called.  Never null.
+     * Checks that data column values for any metadata items are either all the same value or are missing
+     */
+    public void checkMetadataTypeValues() {
+        for (int k = 0; k < numDataCols; k++) {
+            DashDataType<?> dtype = dataTypes[k];
+            if ( !dtype.hasRole(DashDataType.Role.FILE_METADATA) )
+                continue;
+
+            if ( dtype instanceof StringDashDataType ) {
+                String singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    String thisVal = (String) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(dtype.getDisplayName() + " has differeing given values '" +
+                            singleVal + "' and " + thisVal + "'");
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else if ( dtype instanceof IntDashDataType ) {
+                Integer singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    Integer thisVal = (Integer) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(dtype.getDisplayName() + " has differing given values '" +
+                            singleVal.toString() + "' and '" + thisVal.toString() + "'");
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else if ( dtype instanceof DoubleDashDataType ) {
+                Double singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    Double thisVal = (Double) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+                    if ( Math.abs(singleVal - thisVal) < 1.0E-6 )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(String.format("%s has differing given values '%g' and '%g'",
+                            dtype.getDisplayName(), singleVal, thisVal));
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else {
+                throw new IllegalArgumentException(
+                        "unexpected data type encountered in metadata column checking: " + dtype);
+            }
+        }
+    }
+
+    /**
+     * @return the list of automated data check messages describing problems detected in the data.
+     *         The messages that are in this list comes from the constructor as well as any check
+     *         methods that were called.  Never null.
      */
     public ArrayList<ADCMessage> getStandardizationMessages() {
         return stdMsgList;
     }
 
     /**
-     * Adds data QC flags derived from the messages from standardization and automated data checking
-     * to appropriate data QC columns in userStdData.
+     * Adds data QC flags derived from the messages from standardization and
+     * automated data checking to appropriate data QC columns in userStdData.
      */
     public void addAutomatedDataQC() {
+        // For current SOCAT, all the automated data checker flags are put under WOCE_CO2_water.
+        // In general (and possibly future SOCAT), the QC column(s) to assign depend on the error.
+        int qcColIdx = 0;
+        for (DashDataType<?> dtype : dataTypes) {
+            if ( dtype.typeNameEquals(SocatTypes.WOCE_CO2_WATER) ) {
+                break;
+            }
+            qcColIdx++;
+        }
+        if ( qcColIdx >= dataTypes.length )
+            throw new RuntimeException("WOCE_CO2_water not found in StdUserDataArray.addAutomatedDataQC");
+
         for (ADCMessage msg : stdMsgList) {
             // Data QC always has a positive row number.  Dataset QC as well as general and summaries
             // QC messages have a negative row number (DashboardUtils.INT_MISSING_VALUE)
@@ -559,13 +737,13 @@ public class StdUserDataArray extends StdDataArray {
             switch ( severity ) {
                 case UNASSIGNED:
                 case ACCEPTABLE:
-                    flagValue = "";
+                    flagValue = null;
                     break;
                 case WARNING:
                     // flagValue = DashboardServerUtils.WOCE_QUESTIONABLE;
                     // Ignore automated data checker warnings as the are just pointing out
                     // potential issues which may not be a problem or have any consequence
-                    flagValue = "";
+                    flagValue = null;
                     break;
                 case ERROR:
                 case CRITICAL:
@@ -574,19 +752,8 @@ public class StdUserDataArray extends StdDataArray {
                 default:
                     throw new IllegalArgumentException("unexpected messages severity of " + severity);
             }
-            if ( flagValue.isEmpty() )
+            if ( flagValue == null )
                 continue;
-
-            // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
-            int qcColIdx = 0;
-            for (DashDataType<?> dtype : dataTypes) {
-                if ( dtype.typeNameEquals(SocatTypes.WOCE_CO2_WATER) ) {
-                    break;
-                }
-                qcColIdx++;
-            }
-            if ( qcColIdx >= dataTypes.length )
-                throw new RuntimeException("WOCE_CO2_water not found in StdUserDataArray.addAutomatedDataQC");
 
             // Do not worry about any existing flags as this is always a WOCE-4, and thus, more severe
             stdObjects[rowNum - 1][qcColIdx] = flagValue;
@@ -594,8 +761,8 @@ public class StdUserDataArray extends StdDataArray {
     }
 
     /**
-     * Determines is this data column is an appropriate index. Checks that the value is in the appropriate range and
-     * that the column with this index has been standardized.
+     * Determines is this data column is an appropriate index. Checks that the value is in
+     * the appropriate range and that the column with this index has been standardized.
      *
      * @param idx
      *         index to test

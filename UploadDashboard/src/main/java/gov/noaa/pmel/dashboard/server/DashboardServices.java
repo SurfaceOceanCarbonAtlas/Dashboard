@@ -231,6 +231,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         DashboardDatasetList datasetList = new DashboardDatasetList();
         datasetList.setUsername(username);
         datasetList.setManager(configStore.isManager(username));
+        datasetList.setImageExtension(configStore.getImageExtension());
         for (String datasetId : idsSet) {
             datasetList.put(datasetId, dataHandler.getDatasetFromInfoFile(datasetId));
         }
@@ -334,6 +335,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         DashboardDatasetList datasetList = new DashboardDatasetList();
         datasetList.setUsername(username);
         datasetList.setManager(configStore.isManager(username));
+        datasetList.setImageExtension(configStore.getImageExtension());
         for (String id : allIds) {
             datasetList.put(id, dataHandler.getDatasetFromInfoFile(id));
         }
