@@ -289,8 +289,9 @@ public class StdUserDataArray extends StdDataArray {
 
     /**
      * Verifies data samples are ascending in time (oldest to newest).  Also checks for excessive
-     * speed between two data points.  Any misorderings or excessive speeds detected generate error
-     * messages that are added to the internal list of automated data checker messages.
+     * speed and time gaps between two data points.  Any misorderings, excessive speeds, or excessive
+     * time gaps detected generate error messages that are added to the internal list of automated
+     * data checker messages.
      *
      * @param times
      *         sample times to be used for this data array
@@ -326,6 +327,7 @@ public class StdUserDataArray extends StdDataArray {
         // or if multiple blocks are consistent in the "direction" they are misordered.
 
         double[] maxSpeeds = DashboardConfigStore.getMaxCalcSpeedsKnots();
+        double[] maxTimeGaps = DashboardConfigStore.getMaxTimeGapsDays();
 
         // The following will say:
         // 4,5,6 are misordered in 1,2,3,7,8,9,4,5,6,10,11,12;
@@ -333,6 +335,7 @@ public class StdUserDataArray extends StdDataArray {
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> forwardErrs = new TreeSet<Integer>();
         ArrayList<ADCMessage> forwardSpeedMsgs = new ArrayList<ADCMessage>();
+        ArrayList<ADCMessage> forwardTimeGapMsgs = new ArrayList<ADCMessage>();
         int lastRowNum = 0;
         int expectedRowNum = 1;
         for (DataLocation dataLoc : orderedSet) {
@@ -347,7 +350,11 @@ public class StdUserDataArray extends StdDataArray {
                             latitudes[actualRowNum - 1], longitudes[lastRowNum - 1], latitudes[lastRowNum - 1]);
                     double hourdelta = (times[actualRowNum - 1] - times[lastRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
-                    if ( speed > maxSpeeds[1] ) {
+                    if ( (speed < 0.0) || (hourdelta < 0.0) ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed or time gap obtained");
+                    }
+                    else if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
@@ -369,9 +376,29 @@ public class StdUserDataArray extends StdDataArray {
                                 "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         forwardSpeedMsgs.add(msg);
                     }
-                    else if ( speed < 0.0 ) {
-                        // Just to make sure the calculation was done correctly
-                        throw new RuntimeException("Negative calculated speed obtained");
+                    else if ( hourdelta > 24.0 * maxTimeGaps[1] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[1]));
+                        forwardTimeGapMsgs.add(msg);
+                    }
+                    else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[0]));
+                        forwardTimeGapMsgs.add(msg);
                     }
                 }
                 lastRowNum = actualRowNum;
@@ -384,6 +411,7 @@ public class StdUserDataArray extends StdDataArray {
         // 3 is misordered in 1,2,4,5
         TreeSet<Integer> reverseErrs = new TreeSet<Integer>();
         ArrayList<ADCMessage> reverseSpeedMsgs = new ArrayList<ADCMessage>();
+        ArrayList<ADCMessage> reverseTimeGapMsgs = new ArrayList<ADCMessage>();
         lastRowNum = 0;
         expectedRowNum = numSamples;
         for (DataLocation dataLoc : orderedSet.descendingSet()) {
@@ -398,7 +426,11 @@ public class StdUserDataArray extends StdDataArray {
                             latitudes[lastRowNum - 1], longitudes[actualRowNum - 1], latitudes[actualRowNum - 1]);
                     double hourdelta = (times[lastRowNum - 1] - times[actualRowNum - 1]) / 3600.0;
                     double speed = 0.539957 * kmdelta / hourdelta;
-                    if ( speed > maxSpeeds[1] ) {
+                    if ( (speed < 0.0) || (hourdelta < 0.0) ) {
+                        // Just to make sure the calculation was done correctly
+                        throw new RuntimeException("Negative calculated speed or time gap obtained");
+                    }
+                    else if ( speed > maxSpeeds[1] ) {
                         // Add one message at this time - later repeat with all the columns
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
@@ -420,9 +452,29 @@ public class StdUserDataArray extends StdDataArray {
                                 "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         reverseSpeedMsgs.add(msg);
                     }
-                    else if ( speed < 0.0 ) {
-                        // Just to make sure the calculation was done correctly
-                        throw new RuntimeException("Negative calculated speed obtained");
+                    else if ( hourdelta > 24.0 * maxTimeGaps[1] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.ERROR);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[1]));
+                        reverseTimeGapMsgs.add(msg);
+                    }
+                    else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
+                        // Add one message at this time - later repeat with all the columns
+                        ADCMessage msg = new ADCMessage();
+                        msg.setSeverity(Severity.WARNING);
+                        msg.setRowNumber(actualRowNum);
+                        msg.setGeneralComment(String.format(
+                                "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
+                        msg.setDetailedComment(String.format(
+                                "time between consecutive measurements %g days exceeds %g days",
+                                hourdelta/24.0, maxTimeGaps[0]));
+                        reverseTimeGapMsgs.add(msg);
                     }
                 }
                 lastRowNum = actualRowNum;
@@ -432,13 +484,17 @@ public class StdUserDataArray extends StdDataArray {
         // Guess that the set with fewer errors is the correct one
         TreeSet<Integer> errorRowsNums;
         ArrayList<ADCMessage> speedMsgs;
-        if ( (forwardErrs.size() + forwardSpeedMsgs.size()) <= (reverseErrs.size() + reverseSpeedMsgs.size()) ) {
+        ArrayList<ADCMessage> timeGapMsgs;
+        if ( (forwardErrs.size() + forwardSpeedMsgs.size() + forwardTimeGapMsgs.size())
+                <= (reverseErrs.size() + reverseSpeedMsgs.size() + reverseTimeGapMsgs.size()) ) {
             errorRowsNums = forwardErrs;
             speedMsgs = forwardSpeedMsgs;
+            timeGapMsgs = forwardTimeGapMsgs;
         }
         else {
             errorRowsNums = reverseErrs;
             speedMsgs = reverseSpeedMsgs;
+            timeGapMsgs = reverseTimeGapMsgs;
         }
         for (Integer rowNum : errorRowsNums) {
             for (Integer colIdx : indicesForTime) {
@@ -481,6 +537,18 @@ public class StdUserDataArray extends StdDataArray {
                 msg.setColName(userColNames[colIdx]);
                 msg.setGeneralComment(spdmsg.getGeneralComment());
                 msg.setDetailedComment(spdmsg.getDetailedComment());
+                stdMsgList.add(msg);
+            }
+        }
+        for (ADCMessage tgmsg : timeGapMsgs) {
+            for (Integer colIdx : indicesForTime) {
+                ADCMessage msg = new ADCMessage();
+                msg.setSeverity(tgmsg.getSeverity());
+                msg.setRowNumber(tgmsg.getRowNumber());
+                msg.setColNumber(colIdx + 1);
+                msg.setColName(userColNames[colIdx]);
+                msg.setGeneralComment(tgmsg.getGeneralComment());
+                msg.setDetailedComment(tgmsg.getDetailedComment());
                 stdMsgList.add(msg);
             }
         }

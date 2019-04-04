@@ -107,6 +107,8 @@ public class DashboardConfigStore {
 
     private static final double DEFAULT_MAX_GOOD_CALC_SPEED_KNOTS = 80;
     private static final double DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS = 400;
+    private static final double DEFAULT_MAX_GOOD_TIME_GAP_DAYS = 28;
+    private static final double DEFAULT_MAX_MAYBE_TIME_GAP_DAYS = 84;
 
     private static final Object SINGLETON_SYNC_OBJECT = new Object();
     private static DashboardConfigStore singleton = null;
@@ -134,6 +136,8 @@ public class DashboardConfigStore {
     private KnownDataTypes knownDataFileTypes;
     private double maxGoodCalcSpeedKnots;
     private double maxMaybeCalcSpeedKnots;
+    private double maxGoodTimeGapDays;
+    private double maxMaybeTimeGapDays;
 
     private HashSet<File> filesToWatch;
     private Thread watcherThread;
@@ -320,6 +324,11 @@ public class DashboardConfigStore {
             maxGoodCalcSpeedKnots = 80;
             maxMaybeCalcSpeedKnots = 400;
         }
+
+        // At this time just always use the defaults for time gaps
+        // TODO: configurable time gaps
+        maxGoodTimeGapDays = DEFAULT_MAX_GOOD_TIME_GAP_DAYS;
+        maxMaybeTimeGapDays = DEFAULT_MAX_MAYBE_TIME_GAP_DAYS;
 
         // Read the name of the default-column-names-to-types-with-units configuration file
         String nameKeysToColumnTypesFilename;
@@ -904,6 +913,17 @@ public class DashboardConfigStore {
                 values[1] = DEFAULT_MAX_MAYBE_CALC_SPEED_KNOTS;
             }
         }
+        return values;
+    }
+
+    /**
+     * @return the maximum good and questionable time gaps in days.
+     *         At this time the values returned are just the default values.
+     */
+    public static double[] getMaxTimeGapsDays() {
+        double[] values = new double[2];
+        values[0] = DEFAULT_MAX_GOOD_TIME_GAP_DAYS;
+        values[1] = DEFAULT_MAX_MAYBE_TIME_GAP_DAYS;
         return values;
     }
 

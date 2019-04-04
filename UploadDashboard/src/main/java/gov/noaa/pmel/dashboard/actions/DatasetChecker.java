@@ -79,7 +79,8 @@ public class DatasetChecker {
         // Check for missing lon/lat/time
         Double[] sampleTimes = stdUserData.checkMissingLonLatTime();
 
-        // Check that the data is ordered in time and speeds not excessive - generate errors if not.
+        // Check that the data is ordered in time; speeds and time gaps are not excessive.
+        // Generate errors where this is not the case.
         if ( sampleTimes != null )
             stdUserData.checkDataOrder(sampleTimes);
 
