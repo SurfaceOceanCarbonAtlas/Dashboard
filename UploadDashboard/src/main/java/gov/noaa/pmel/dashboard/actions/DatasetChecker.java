@@ -86,6 +86,9 @@ public class DatasetChecker {
         // Bounds check the standardized data values
         stdUserData.checkBounds();
 
+        // Any metadata values given in data columns must be consistent (constant or missing)
+        stdUserData.checkMetadataTypeValues();
+
         // TODO: Perform any other data checks?
 
         // Save the messages accumulated in stdUserData.

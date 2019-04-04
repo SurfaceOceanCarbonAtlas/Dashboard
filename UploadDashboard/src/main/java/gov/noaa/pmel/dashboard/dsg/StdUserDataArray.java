@@ -352,10 +352,10 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[1]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[1]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[1]));
                         forwardSpeedMsgs.add(msg);
                     }
                     else if ( speed > maxSpeeds[0] ) {
@@ -363,10 +363,10 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[0]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[0]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         forwardSpeedMsgs.add(msg);
                     }
                     else if ( speed < 0.0 ) {
@@ -403,10 +403,10 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.ERROR);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[1]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[1]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[1]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[1]));
                         reverseSpeedMsgs.add(msg);
                     }
                     else if ( speed > maxSpeeds[0] ) {
@@ -414,10 +414,10 @@ public class StdUserDataArray extends StdDataArray {
                         ADCMessage msg = new ADCMessage();
                         msg.setSeverity(Severity.WARNING);
                         msg.setRowNumber(actualRowNum);
-                        msg.setGeneralComment("calculated speed exceeds " +
-                                Double.toString(maxSpeeds[0]) + " knots");
-                        msg.setDetailedComment("calculated speed of " + Double.toString(speed) +
-                                " knots exceeds " + Double.toString(maxSpeeds[0]) + " knots");
+                        msg.setGeneralComment(String.format(
+                                "calculated speed exceeds %g knots", maxSpeeds[0]));
+                        msg.setDetailedComment(String.format(
+                                "calculated speed of %g knots exceeds %g knots", speed, maxSpeeds[0]));
                         reverseSpeedMsgs.add(msg);
                     }
                     else if ( speed < 0.0 ) {
@@ -531,8 +531,101 @@ public class StdUserDataArray extends StdDataArray {
                 }
             }
             else {
-                throw new IllegalArgumentException("unexpected data type encountered " +
-                        "in bounds checking: " + dtype);
+                throw new IllegalArgumentException(
+                        "unexpected data type encountered in bounds checking: " + dtype);
+            }
+        }
+    }
+
+    /**
+     * Checks that data column values for any metadata items are either all the same value or are missing
+     */
+    public void checkMetadataTypeValues() {
+        for (int k = 0; k < numDataCols; k++) {
+            DashDataType<?> dtype = dataTypes[k];
+            if ( !dtype.hasRole(DashDataType.Role.FILE_METADATA) )
+                continue;
+
+            if ( dtype instanceof StringDashDataType ) {
+                String singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    String thisVal = (String) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(dtype.getDisplayName() + " has differeing given values '" +
+                            singleVal + "' and " + thisVal + "'");
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else if ( dtype instanceof IntDashDataType ) {
+                Integer singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    Integer thisVal = (Integer) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(dtype.getDisplayName() + " has differing given values '" +
+                            singleVal.toString() + "' and '" + thisVal.toString() + "'");
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else if ( dtype instanceof DoubleDashDataType ) {
+                Double singleVal = null;
+                for (int j = 0; j < numSamples; j++) {
+                    Double thisVal = (Double) stdObjects[j][k];
+                    if ( thisVal == null )
+                        continue;
+                    if ( singleVal == null ) {
+                        singleVal = thisVal;
+                        continue;
+                    }
+                    if ( singleVal.equals(thisVal) )
+                        continue;
+                    if ( Math.abs(singleVal - thisVal) < 1.0E-6 )
+                        continue;
+
+                    ADCMessage msg = new ADCMessage();
+                    // Metadata in data columns is never required
+                    msg.setSeverity(Severity.ERROR);
+                    msg.setGeneralComment(dtype.getDisplayName() + " has differing given values");
+                    msg.setDetailedComment(String.format("%s has differing given values '%g' and '%g'",
+                            dtype.getDisplayName(), singleVal, thisVal));
+                    msg.setRowNumber(j + 1);
+                    msg.setColNumber(k + 1);
+                    msg.setColName(userColNames[k]);
+                    stdMsgList.add(msg);
+                }
+            }
+            else {
+                throw new IllegalArgumentException(
+                        "unexpected data type encountered in metadata column checking: " + dtype);
             }
         }
     }
