@@ -266,7 +266,7 @@ public class DashboardServerUtils {
      * User-provided name for the dataset
      */
     public static final StringDashDataType DATASET_NAME = new StringDashDataType("dataset_name",
-            100.0, "cruise/dataset name", "investigator's name for this dataset", false,
+            100.0, "cruise/dataset name", "name for this dataset used by investigator", false,
             DashboardUtils.NO_UNITS, "dataset_name", IDENTIFIER_CATEGORY, null,
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
@@ -286,7 +286,7 @@ public class DashboardServerUtils {
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
     public static final StringDashDataType ORGANIZATION_NAME = new StringDashDataType("organization",
-            104.0, "PI organizations", "organization for each PI", false,
+            104.0, "organizations", "organizations", false,
             DashboardUtils.NO_UNITS, "organization", IDENTIFIER_CATEGORY, null,
             null, null, null, null, USER_FILE_METADATA_ROLES);
 
@@ -336,7 +336,7 @@ public class DashboardServerUtils {
             null, null, null, null, FILE_METADATA_ONLY_ROLES);
 
     public static final StringDashDataType VERSION = new StringDashDataType("socat_version",
-            123.0, "socat_version", "SOCAT version", false,
+            123.0, "socat_version", "SOCAT version with status", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
             null, null, null, null, FILE_METADATA_ONLY_ROLES);
 

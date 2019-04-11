@@ -40,12 +40,12 @@ public class SocatTypes {
 
     public static final DoubleDashDataType TEQU = new DoubleDashDataType("Temperature_equi",
             610.0, "T_equ", "equilibrator chamber temperature", false,
-            TEMPERATURE_UNITS, null, TEMPERATURE_CATEGORY, "degrees_C",
+            TEMPERATURE_UNITS, null, TEMPERATURE_CATEGORY, "degrees C",
             "-10.0", "-5.0", "40.0", "50.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType SST = new DoubleDashDataType("temp",
             611.0, "SST", "sea surface temperature", false,
-            TEMPERATURE_UNITS, "sea_surface_temperature", TEMPERATURE_CATEGORY, "degrees_C",
+            TEMPERATURE_UNITS, "sea_surface_temperature", TEMPERATURE_CATEGORY, "degrees C",
             "-10.0", "-5.0", "40.0", "50.0", DashboardServerUtils.USER_FILE_DATA_ROLES);
 
     public static final DoubleDashDataType PEQU = new DoubleDashDataType("Pressure_equi",
@@ -153,7 +153,7 @@ public class SocatTypes {
 
     public static final DoubleDashDataType DELTA_TEMP = new DoubleDashDataType("delta_temp",
             703.0, "delta_temp", "Equilibrator Temp - SST", false,
-            TEMPERATURE_UNITS, null, TEMPERATURE_CATEGORY, "degrees_C",
+            TEMPERATURE_UNITS, null, TEMPERATURE_CATEGORY, "degrees C",
             null, null, null, null, DashboardServerUtils.FILE_DATA_ONLY_ROLES);
 
     // The limits on CALC_SPEED (in knots) are used to check time/location values
