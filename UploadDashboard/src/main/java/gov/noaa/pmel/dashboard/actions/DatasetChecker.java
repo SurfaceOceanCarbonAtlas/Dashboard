@@ -164,8 +164,12 @@ public class DatasetChecker {
         }
 
         if ( metadata != null ) {
-            // TODO:
-            throw new IllegalArgumentException("updating metdata from data values not yet implemented");
+            for (RowColumn rowCol : userErrs) {
+                errRows.add(rowCol.getRow());
+            }
+            Double[] sampleLongitudes = stdUserData.getSampleLongitudes();
+            Double[] sampleLatitudes = stdUserData.getSampleLatitudes();
+            metadata.assignLonLatTimeLimits(sampleLongitudes, sampleLatitudes, sampleTimes, errRows);
         }
 
         return stdUserData;

@@ -10,7 +10,10 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeMap;
 
 import static org.junit.Assert.assertEquals;
@@ -467,6 +470,63 @@ public class DsgMetadataTest {
         assertEquals(64, mdata.getMaxStringLength());
         mdata.setDatasetName("AShortName.tsv");
         assertEquals(32, mdata.getMaxStringLength());
+    }
+
+    /**
+     * Test method for {@link DsgMetadata#assignLonLatTimeLimits(Double[], Double[], Double[], Set)}
+     */
+    @Test
+    public void testAssignLonLatTimeLimits() {
+        HashSet<Integer> errRowIdxs = new HashSet<Integer>(Arrays.asList(0, 3, 14));
+        Double[] sampleLons = new Double[] {
+                145.0, 165.0, 155.0, -999.0, -180.0,
+                160.0, -175.0, 175.0, -170.0, -165.0,
+                -175.0, -180.0, 180.0, 175.0, -999.0
+        };
+        Double[] expectedWestEastLon = new Double[] { 155.0, -165.0 };
+        Double[] sampleLats = new Double[] {
+                20.0, 10.0, 5.0, -999.0, 7.5,
+                10.0, 12.5, 15.0, 12.5, 10.0,
+                5.0, 0.0, -5.0, -10.0, -999.0
+        };
+        Double[] expectedSouthNorthLat = new Double[] { -10.0, 15.0 };
+        Double[] sampleTimes = new Double[] {
+                -99999.0, 105060.0, 105120.0, -99999.0, 105240.0,
+                105300.0, 105360.0, 105420.0, 105480.0, 105540.0,
+                105600.0, 105660.0, 105720.0, 105780.0, 105840.0
+        };
+        Double[] expectedBeginEndTime = new Double[] { 105060.0, 105780.0 };
+
+        KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+        DsgMetadata mdata = new DsgMetadata(knownTypes);
+        mdata.assignLonLatTimeLimits(sampleLons, sampleLats, sampleTimes, errRowIdxs);
+        assertEquals(expectedWestEastLon[0], mdata.getWestmostLongitude());
+        assertEquals(expectedWestEastLon[1], mdata.getEastmostLongitude());
+        assertEquals(expectedSouthNorthLat[0], mdata.getSouthmostLatitude());
+        assertEquals(expectedSouthNorthLat[1], mdata.getNorthmostLatitude());
+        assertEquals(expectedBeginEndTime[0], mdata.getBeginTime());
+        assertEquals(expectedBeginEndTime[1], mdata.getEndTime());
+
+        sampleLons = new Double[] {
+                -999.0, 25.0, 65.0, -999.0, 105.0,
+                145.0, -175.0, -135.0, -95.0, -55.0,
+                -15.0, 20.0, 50.0, 65.0, -999.0
+        };
+        expectedWestEastLon = new Double[] { -180.0, 180.0 };
+        sampleLats = new Double[] {
+                -999.0, 89.0, 88.0, -999.0, 89.5,
+                89.0, 88.5, 89.0, 89.5, 89.0,
+                89.5, 89.0, 88.5, 89.0, -999.0
+        };
+        expectedSouthNorthLat = new Double[] { 88.0, 89.5 };
+
+        mdata.assignLonLatTimeLimits(sampleLons, sampleLats, sampleTimes, errRowIdxs);
+        assertEquals(expectedWestEastLon[0], mdata.getWestmostLongitude());
+        assertEquals(expectedWestEastLon[1], mdata.getEastmostLongitude());
+        assertEquals(expectedSouthNorthLat[0], mdata.getSouthmostLatitude());
+        assertEquals(expectedSouthNorthLat[1], mdata.getNorthmostLatitude());
+        assertEquals(expectedBeginEndTime[0], mdata.getBeginTime());
+        assertEquals(expectedBeginEndTime[1], mdata.getEndTime());
     }
 
     /**

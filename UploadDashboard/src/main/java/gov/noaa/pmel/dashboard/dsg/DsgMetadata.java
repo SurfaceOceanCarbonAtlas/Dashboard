@@ -12,6 +12,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -534,6 +535,105 @@ public class DsgMetadata {
         }
         maxLength = 32 * ((maxLength + 31) / 32);
         return maxLength;
+    }
+
+    public void assignLonLatTimeLimits(Double[] sampleLongitudes, Double[] sampleLatitudes,
+            Double[] sampleTimes, Set<Integer> errRows) throws IllegalArgumentException {
+        int numRows = sampleTimes.length;
+        if ( (sampleLongitudes.length != numRows) || (sampleLatitudes.length != numRows) )
+            throw new IllegalArgumentException("Number of longitudes, latitudes, and times do not match");
+        Double beginTime = null;
+        Double endTime = null;
+        Double southLat = null;
+        Double northLat = null;
+        Double westLon = null;
+        Double eastLon = null;
+        Double lastLon = null;
+        double lonAdjust = 0.0;
+        for (int k = 0; k < numRows; k++) {
+            // Ignore any rows marked as bad
+            if ( errRows.contains(k) )
+                continue;
+            Double mylon = sampleLongitudes[k];
+            Double mylat = sampleLatitudes[k];
+            Double mytime = sampleTimes[k];
+            if ( (mylon == null) || mylon.isInfinite() || mylon.isNaN() )
+                throw new IllegalArgumentException("Invalid longitude on row number " + Integer.toString(k + 1));
+            if ( (mylat == null) || mylat.isInfinite() || mylat.isNaN() )
+                throw new IllegalArgumentException("Invalid longitude on row number " + Integer.toString(k + 1));
+            if ( (mytime == null) || mytime.isInfinite() || mytime.isNaN() )
+                throw new IllegalArgumentException("Invalid longitude on row number " + Integer.toString(k + 1));
+            // These should be ordered from earliest to latest time, but just in case....
+            if ( (beginTime == null) || (beginTime > mytime) )
+                beginTime = mytime;
+            if ( (endTime == null) || (endTime < mytime) )
+                endTime = mytime;
+            if ( (southLat == null) || (southLat > mylat) )
+                southLat = mylat;
+            if ( (northLat == null) || (northLat < mylat) )
+                northLat = mylat;
+            // Initially adjust longitudes to [-180,180]
+            while ( mylon < -180.0 ) {
+                mylon += 360.0;
+            }
+            while ( mylon > 180.0 ) {
+                mylon -= 360.0;
+            }
+            if ( lastLon == null ) {
+                westLon = mylon;
+                eastLon = mylon;
+                lastLon = mylon;
+            }
+            else {
+                double delta = mylon - lastLon;
+                lastLon = mylon;
+                // If crosses the modulo meridian, delta will be close to 360.
+                // Instead adjust the longitudes so they can be compared as if no modulo.
+                if ( delta < -180.0 ) {
+                    // Crossed modulo going east - add 360 to the longitude adjustment
+                    delta += 360.0;
+                    lonAdjust += 360.0;
+                }
+                else if ( delta > 180.0 ) {
+                    // Crossed modulo going west - subtract 360 from the longitude adjustment
+                    delta -= 360.0;
+                    lonAdjust -= 360.0;
+                }
+                if ( delta > 0.0 ) {
+                    // moved east - check adjusted longitude against eastLon limit
+                    if ( eastLon < (mylon + lonAdjust) )
+                        eastLon = mylon + lonAdjust;
+                }
+                else if ( delta < 0.0 ) {
+                    // moved west - check adjusted longitude agains westLon limit
+                    if ( westLon > (mylon + lonAdjust) )
+                        westLon = mylon + lonAdjust;
+                }
+            }
+        }
+        if ( (eastLon != null) && (westLon != null) ) {
+            if ( (eastLon - westLon) >= 360.0 ) {
+                eastLon = 180.0;
+                westLon = -180.0;
+            }
+            else {
+                // return the longitude limits to [-180,180]
+                while ( eastLon < -180.0 )
+                    eastLon += 360.0;
+                while ( eastLon > 180.0 )
+                    eastLon -= 360.0;
+                while ( westLon < -180.0 )
+                    westLon += 360.0;
+                while ( westLon > 180.0 )
+                    westLon -= 360.0;
+            }
+        }
+        setBeginTime(beginTime);
+        setEndTime(endTime);
+        setSouthmostLatitude(southLat);
+        setNorthmostLatitude(northLat);
+        setWestmostLongitude(westLon);
+        setEastmostLongitude(eastLon);
     }
 
     @Override
