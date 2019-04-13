@@ -134,11 +134,14 @@ public class DatasetSubmitter {
                     // depending on whether this dataset is new to this version of SOCAT or an update from a previous
                     // version of SOCAT.  An update within the same version of SOCAT does not change 'N' to 'U'.
                     String versionStatus = databaseHandler.getVersionStatus(datasetId);
+                    String datasetQCFlag;
                     if ( versionStatus.isEmpty() ) {
                         versionStatus = version + "N";
+                        datasetQCFlag = "N";
                     }
                     else if ( "U".equals(versionStatus.substring(versionStatus.length() - 1)) ) {
                         versionStatus = version + "U";
+                        datasetQCFlag = "U";
                     }
                     else {
                         long newVersion;
@@ -154,18 +157,22 @@ public class DatasetSubmitter {
                         } catch ( NumberFormatException ex ) {
                             throw new RuntimeException("Unexpected non-numeric old version number '" + oldNum + "'");
                         }
-                        if ( newVersion > oldVersion )
+                        if ( newVersion > oldVersion ) {
                             versionStatus = version + "U";
-                        else
+                            datasetQCFlag = "U";
+                        }
+                        else {
                             versionStatus = version + "N";
+                            datasetQCFlag = "N";
+                        }
                     }
                     dsgMData.setVersion(versionStatus);
+                    dsgMData.setDatasetQCFlag(datasetQCFlag);
 
                     // Standardize the data and perform the automated data checks.
                     // Saves the messages from the standardization and automated data checks.
                     // Assigns dataCheckStatus, numErrorRows, numWarnRows, checkerFlags, and userFlags in dataset
-                    // TODO: update the metadata with data-derived values
-                    StdUserDataArray userStdData = datasetChecker.standardizeDataset(dataset, null);
+                    StdUserDataArray userStdData = datasetChecker.standardizeDataset(dataset, dsgMData);
                     if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
                         errorMsgs.add(datasetId + ": unacceptable; check data check error messages " +
                                 "(missing lon/lat/time or uninterpretable values)");

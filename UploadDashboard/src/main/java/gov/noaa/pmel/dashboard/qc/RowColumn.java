@@ -8,8 +8,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
  */
 public class RowColumn implements Comparable<RowColumn> {
 
-    Integer row;
-    Integer column;
+    private Integer row;
+    private Integer column;
 
     /**
      * @param rowIndex
@@ -26,6 +26,20 @@ public class RowColumn implements Comparable<RowColumn> {
             column = DashboardUtils.INT_MISSING_VALUE;
         else
             column = columnIndex;
+    }
+
+    /**
+     * @return the row index
+     */
+    public Integer getRow() {
+        return row;
+    }
+
+    /**
+     * @return the column index
+     */
+    public Integer getColumn() {
+        return column;
     }
 
     @Override

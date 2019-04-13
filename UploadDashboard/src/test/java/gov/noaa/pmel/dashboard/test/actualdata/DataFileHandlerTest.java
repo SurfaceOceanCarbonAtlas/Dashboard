@@ -92,7 +92,7 @@ public class DataFileHandlerTest {
     private static final ArrayList<String> META_PREAMBLE = new ArrayList<String>(Arrays.asList(
             "# Expocode: 00KS20120419",
             "#Ship: Atlantis",
-            "\"PI: Wanninkhof, R.\"",
+            "PI: Wanninkhof, R.",
             ""));
 
     private static final ArrayList<String> HEADERS = new ArrayList<String>(Arrays.asList(

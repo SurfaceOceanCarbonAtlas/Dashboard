@@ -143,9 +143,7 @@ public class PreviewPlotsHandler {
         dsgMData.setDatasetId(stdId);
         dsgMData.setVersion(dataset.getVersion());
 
-        // TODO: update DsgMetadata with metadata derived from data
-        // Although probably not important for the preview plots.
-        StdUserDataArray stdUserData = dataChecker.standardizeDataset(dataset, null);
+        StdUserDataArray stdUserData = dataChecker.standardizeDataset(dataset, dsgMData);
         if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) )
             throw new IllegalArgumentException(stdId + ": unacceptable; check data check error messages " +
                     "(missing lon/lat/depth/time or uninterpretable values)");
