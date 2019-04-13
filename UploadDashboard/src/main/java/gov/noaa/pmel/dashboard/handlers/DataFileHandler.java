@@ -342,9 +342,9 @@ public class DataFileHandler extends VersionedFileHandler {
 
                 // Still reading metadata?
                 if ( columnNames == null ) {
-                    // Put this line of metadata back together using spacer
-                    // but since metadata, no need for blank columns with spacers (if any)
-                    String metaline = rebuildDataline(record, spacer, true);
+                    // Put this line of metadata back together with space-characters as spacers,
+                    // without double-quotes, and without blank columns
+                    String metaline = rebuildDataline(record, ' ', true);
 
                     // Examine this metadata line for the expocode
                     if ( (expocode == null) && !metaline.isEmpty() ) {
@@ -1427,7 +1427,8 @@ public class DataFileHandler extends VersionedFileHandler {
      * @param record
      *         record to use
      * @param spacer
-     *         spacer to use
+     *         spacer to use.  If a singe-space character, the columns are not double-quoted;
+     *         otherwise column entries are double-quoted if they contain this character
      * @param trimEmpty
      *         remove empty entries (and spacers for those entries)
      *
@@ -1446,7 +1447,7 @@ public class DataFileHandler extends VersionedFileHandler {
                 builder.append(spacer);
             }
             if ( !val.isEmpty() ) {
-                if ( val.contains(Character.toString(spacer)) ) {
+                if ( (spacer != ' ') && val.contains(Character.toString(spacer)) ) {
                     builder.append('"');
                     builder.append(val);
                     builder.append('"');
