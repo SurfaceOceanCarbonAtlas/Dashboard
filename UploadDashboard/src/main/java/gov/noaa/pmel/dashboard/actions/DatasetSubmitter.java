@@ -223,7 +223,7 @@ public class DatasetSubmitter {
             }
 
             if ( archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) &&
-                    (repeatSend || dataset.getArchiveDate().isEmpty()) ) {
+                    (repeatSend || dataset.getArchiveTimestamps().isEmpty()) ) {
                 // Queue the request to send (or re-send) the data and metadata for archival.
                 // In the future there might be more than one place to send for archival.
                 archiveIds.add(datasetId);
@@ -288,7 +288,7 @@ public class DatasetSubmitter {
                 // When successful, update the archived timestamp
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(datasetId);
                 cruise.setArchiveStatus(archiveStatus);
-                cruise.setArchiveDate(timestamp);
+                cruise.getArchiveTimestamps().add(timestamp);
                 dataHandler.saveDatasetInfoToFile(cruise, commitMsg);
             }
         }

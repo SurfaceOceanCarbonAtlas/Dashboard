@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -60,7 +61,7 @@ public class DataFileHandler extends VersionedFileHandler {
     private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
     private static final String SUBMIT_STATUS_ID = "submitstatus";
     private static final String ARCHIVE_STATUS_ID = "archivestatus";
-    private static final String ARCHIVAL_DATE_ID = "archivaldate";
+    private static final String ARCHIVAL_TIMESTAMPS_ID = "archivaltimestamps";
     private static final String NUM_DATA_ROWS_ID = "numdatarows";
     private static final String NUM_ERROR_ROWS_ID = "numerrrows";
     private static final String NUM_WARN_ROWS_ID = "numwarnrows";
@@ -606,13 +607,15 @@ public class DataFileHandler extends VersionedFileHandler {
         // OME metadata timestamp
         datasetProps.setProperty(OME_TIMESTAMP_ID, dataset.getOmeTimestamp());
         // Metadata documents
-        datasetProps.setProperty(ADDL_DOC_TITLES_ID, DashboardUtils.encodeStringTreeSet(dataset.getAddlDocs()));
+        datasetProps.setProperty(ADDL_DOC_TITLES_ID,
+                DashboardUtils.encodeStringTreeSet(dataset.getAddlDocs()));
         // QC-submission status string
         datasetProps.setProperty(SUBMIT_STATUS_ID, dataset.getSubmitStatus());
         // Archive status string
         datasetProps.setProperty(ARCHIVE_STATUS_ID, dataset.getArchiveStatus());
         // Date of request to archive original data and metadata files
-        datasetProps.setProperty(ARCHIVAL_DATE_ID, dataset.getArchiveDate());
+        datasetProps.setProperty(ARCHIVAL_TIMESTAMPS_ID,
+                DashboardUtils.encodeStringArrayList(dataset.getArchiveTimestamps()));
         // Total number of data measurements (rows of data)
         datasetProps.setProperty(NUM_DATA_ROWS_ID, Integer.toString(dataset.getNumDataRows()));
         // Number of data rows with error messages
@@ -620,7 +623,8 @@ public class DataFileHandler extends VersionedFileHandler {
         // Number of data rows with warning messages
         datasetProps.setProperty(NUM_WARN_ROWS_ID, Integer.toString(dataset.getNumWarnRows()));
         // Data column name in the original upload data file
-        datasetProps.setProperty(USER_COLUMN_NAMES_ID, DashboardUtils.encodeStringArrayList(dataset.getUserColNames()));
+        datasetProps.setProperty(USER_COLUMN_NAMES_ID,
+                DashboardUtils.encodeStringArrayList(dataset.getUserColNames()));
         // Data column type information
         int numCols = dataset.getDataColTypes().size();
         ArrayList<String> colTypeNames = new ArrayList<String>(numCols);
@@ -1137,16 +1141,23 @@ public class DataFileHandler extends VersionedFileHandler {
                     ARCHIVE_STATUS_ID + " given in " + infoFile.getPath());
         dataset.setArchiveStatus(value);
 
-        // Date of request to archive data and metadata
-        value = cruiseProps.getProperty(ARCHIVAL_DATE_ID);
-        if ( value == null )
-            value = cruiseProps.getProperty("ocadsdate");
-        if ( value == null )
-            value = cruiseProps.getProperty("cdiacdate");
-        if ( value == null )
-            throw new IllegalArgumentException("No property value for " +
-                    ARCHIVAL_DATE_ID + " given in " + infoFile.getPath());
-        dataset.setArchiveDate(value);
+        // Timestamps of requests to archive data and metadata
+        value = cruiseProps.getProperty(ARCHIVAL_TIMESTAMPS_ID);
+        if ( value != null ) {
+            dataset.setArchiveTimestamps(DashboardUtils.decodeStringArrayList(value));
+        }
+        else {
+            // Old properties files only had a single (latest) date
+            value = cruiseProps.getProperty("archivaldate");
+            if ( value == null )
+                value = cruiseProps.getProperty("ocadsdate");
+            if ( value == null )
+                value = cruiseProps.getProperty("cdiacdate");
+            if ( value == null )
+                throw new IllegalArgumentException("No property value for " +
+                        ARCHIVAL_TIMESTAMPS_ID + " given in " + infoFile.getPath());
+            dataset.setArchiveTimestamps(new ArrayList<String>(Arrays.asList(value)));
+        }
 
         // Number of rows of data (number of samples)
         value = cruiseProps.getProperty(NUM_DATA_ROWS_ID);
