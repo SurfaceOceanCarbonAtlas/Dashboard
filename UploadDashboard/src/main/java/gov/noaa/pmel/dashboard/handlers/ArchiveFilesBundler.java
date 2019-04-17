@@ -64,7 +64,7 @@ import java.util.zip.ZipOutputStream;
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
-    private static final String OCADS_OME_XML_FILENAME = "OME_to_OCADS.xml";
+    private static final String OCADS_XML_FILENAME = "OCADS.xml";
 
     private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
     private static final String EMAIL_SUBJECT_MSG_MIDDLE = " from SOCAT dashboard user ";
@@ -76,8 +76,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private static final String EMAIL_MSG_END = " \n" +
             "has requested immediate archival of the attached BagIt ZIP file of data and metadata. \n" +
             "\n" +
-            "The metadata file " + OCADS_OME_XML_FILENAME + " is an *experimental* translation of any \n" +
-            "OME metadata (or metadata provided in the data file).  This file was machine-generated \n" +
+            "The metadata file " + OCADS_XML_FILENAME + " is an *experimental* OCADS metadata file generated \n" +
+            "from any OME metadata or metadata provided in the data file.  This file was machine-generated \n" +
             "and added only to assist in the archival, but should *not* be archived. \n" +
             "\n" +
             "Best regards, \n" +
@@ -570,12 +570,15 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
-            // sdimdata always present, even if just stub with history
-            infoMsg += "    " + OCADS_OME_XML_FILENAME + "\n";
-            dest = new File(bundleDir, OCADS_OME_XML_FILENAME);
-            FileWriter xmlwriter = new FileWriter(dest);
-            (new OcadsWriter()).writeOcadsXml(sdimdata, xmlwriter);
-            xmlwriter.close();
+            // The SDIMetadata object is always present, but may just be a minimal stub with history
+            infoMsg += "    " + OCADS_XML_FILENAME + "\n";
+            dest = new File(bundleDir, OCADS_XML_FILENAME);
+            OcadsWriter ocadsWriter = new OcadsWriter(new FileWriter(dest));
+            try {
+                ocadsWriter.writeOcadsXml(sdimdata);
+            } finally {
+                ocadsWriter.close();
+            }
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
         }
