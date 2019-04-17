@@ -265,6 +265,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
 
     /**
      * @return the list of archive submission timestamps; never null but may be empty.
+     *         Any values given in the list will not be blank.
      *         The actual list used in this object is returned.
      */
     public ArrayList<String> getArchiveTimestamps() {
@@ -278,8 +279,15 @@ public class DashboardDataset implements Serializable, IsSerializable {
      */
     public void setArchiveTimestamps(ArrayList<String> archiveTimestamps) {
         this.archiveTimestamps.clear();
-        if ( archiveTimestamps != null )
-            this.archiveTimestamps.addAll(archiveTimestamps);
+        if ( archiveTimestamps != null ) {
+            for (String stamp : archiveTimestamps) {
+                if ( stamp == null )
+                    continue;
+                stamp = stamp.trim();
+                if ( !stamp.isEmpty() )
+                    this.archiveTimestamps.add(stamp);
+            }
+        }
     }
 
     /**
