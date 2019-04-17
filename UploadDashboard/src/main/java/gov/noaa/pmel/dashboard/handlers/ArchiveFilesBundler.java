@@ -297,7 +297,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // Check for any archive timestamps in the dataset info
             for (String datetime : dsetInfo.getArchiveTimestamps()) {
                 // The format of these timestamps are "yyyy-MM-dd HH:mm Z"
-                String[] pieces = datetime.split("[ :-]");
+                String[] pieces = datetime.split("[ :/-]");
                 Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2]);
                 archiveDates.add(datestamp);
             }
