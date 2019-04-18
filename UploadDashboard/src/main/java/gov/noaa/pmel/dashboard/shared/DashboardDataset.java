@@ -27,7 +27,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected TreeSet<String> addlDocs;
     protected String submitStatus;
     protected String archiveStatus;
-    protected String archiveDate;
+    protected ArrayList<String> archiveTimestamps;
     protected String uploadFilename;
     protected String uploadTimestamp;
     protected String sourceDOI;
@@ -56,7 +56,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         addlDocs = new TreeSet<String>();
         submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
         archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
-        archiveDate = DashboardUtils.STRING_MISSING_VALUE;
+        archiveTimestamps = new ArrayList<String>(1);
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
         uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
         sourceDOI = DashboardUtils.STRING_MISSING_VALUE;
@@ -264,23 +264,30 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the archive submission date;
-     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     * @return the list of archive submission timestamps; never null but may be empty.
+     *         Any values given in the list will not be blank.
+     *         The actual list used in this object is returned.
      */
-    public String getArchiveDate() {
-        return archiveDate;
+    public ArrayList<String> getArchiveTimestamps() {
+        return archiveTimestamps;
     }
 
     /**
-     * @param archiveDate
-     *         the archive submission date (after trimming) to set;
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     * @param archiveTimestamps
+     *         the list of archive timestamps to assign.
+     *         The internal list is cleared and the contents of the given list, if not null, are added.
      */
-    public void setArchiveDate(String archiveDate) {
-        if ( archiveDate == null )
-            this.archiveDate = DashboardUtils.STRING_MISSING_VALUE;
-        else
-            this.archiveDate = archiveDate.trim();
+    public void setArchiveTimestamps(ArrayList<String> archiveTimestamps) {
+        this.archiveTimestamps.clear();
+        if ( archiveTimestamps != null ) {
+            for (String stamp : archiveTimestamps) {
+                if ( stamp == null )
+                    continue;
+                stamp = stamp.trim();
+                if ( !stamp.isEmpty() )
+                    this.archiveTimestamps.add(stamp);
+            }
+        }
     }
 
     /**
@@ -499,7 +506,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         result = result * prime + addlDocs.hashCode();
         result = result * prime + submitStatus.hashCode();
         result = result * prime + archiveStatus.hashCode();
-        result = result * prime + archiveDate.hashCode();
+        result = result * prime + archiveTimestamps.hashCode();
         result = result * prime + uploadFilename.hashCode();
         result = result * prime + uploadTimestamp.hashCode();
         result = result * prime + sourceDOI.hashCode();
@@ -543,7 +550,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
             return false;
         if ( !archiveStatus.equals(other.archiveStatus) )
             return false;
-        if ( !archiveDate.equals(other.archiveDate) )
+        if ( !archiveTimestamps.equals(other.archiveTimestamps) )
             return false;
         if ( !uploadFilename.equals(other.uploadFilename) )
             return false;
@@ -582,7 +589,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ";\n    addlDocs=" + addlDocs.toString() +
                 ";\n    submitStatus=" + submitStatus +
                 ";\n    archiveStatus=" + archiveStatus +
-                ";\n    archiveDate=" + archiveDate +
+                ";\n    archiveTimestamps=" + archiveTimestamps +
                 ";\n    uploadFilename=" + uploadFilename +
                 ";\n    uploadTimestamp=" + uploadTimestamp +
                 ";\n    sourceDOI=" + sourceDOI +

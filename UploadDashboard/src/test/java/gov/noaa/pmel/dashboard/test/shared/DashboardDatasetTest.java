@@ -448,15 +448,18 @@ public class DashboardDatasetTest {
     }
 
     /**
-     * Test method for {@link DashboardDataset#getArchiveDate()} and {@link DashboardDataset#setArchiveDate(String)}.
+     * Test method for {@link DashboardDataset#getArchiveTimestamps()} and {@link DashboardDataset#setArchiveTimestamps(ArrayList)}
      */
     @Test
     public void testSetGetArchiveDate() {
-        String myArchiveDate = "15-JAN-2016 13:30-5:00";
+        ArrayList<String> myArchiveTimestamps = new ArrayList<String>(Arrays.asList(
+                "15-JAN-2016 13:30-5:00",
+                "25-JAN-2017 11:30-5:00"
+        ));
         DashboardDataset cruise = new DashboardDataset();
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getArchiveDate());
-        cruise.setArchiveDate(myArchiveDate);
-        assertEquals(myArchiveDate, cruise.getArchiveDate());
+        assertEquals(0, cruise.getArchiveTimestamps().size());
+        cruise.setArchiveTimestamps(myArchiveTimestamps);
+        assertEquals(myArchiveTimestamps, cruise.getArchiveTimestamps());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
         assertEquals(0, cruise.getUserFlags().size());
         assertEquals(0, cruise.getCheckerFlags().size());
@@ -475,8 +478,8 @@ public class DashboardDatasetTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
         assertFalse(cruise.isSelected());
-        cruise.setArchiveDate(null);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getArchiveDate());
+        cruise.setArchiveTimestamps(null);
+        assertEquals(0, cruise.getArchiveTimestamps().size());
     }
 
     /**
@@ -495,7 +498,10 @@ public class DashboardDatasetTest {
                 "ABCD20050728_3.pdf; 2014-02-21 9:25"));
         String myQCStatus = "Submitted";
         String myArchiveStatus = "Next SOCAT release";
-        String myArchiveDate = "15-JAN-2016 13:30-5:00";
+        ArrayList<String> myArchiveTimestamps = new ArrayList<String>(Arrays.asList(
+                "15-JAN-2016 13:30-5:00",
+                "25-JAN-2017 11:30-5:00"
+        ));
         String myFilename = "myUploadFilename.tsv";
         String myUploadTimestamp = "2015-10-20 13:14:15";
         String myOrigDOI = "OrigDOI12345";
@@ -655,10 +661,10 @@ public class DashboardDatasetTest {
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertTrue(firstCruise.equals(secondCruise));
 
-        firstCruise.setArchiveDate(myArchiveDate);
+        firstCruise.setArchiveTimestamps(myArchiveTimestamps);
         assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
-        secondCruise.setArchiveDate(myArchiveDate);
+        secondCruise.setArchiveTimestamps(myArchiveTimestamps);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertTrue(firstCruise.equals(secondCruise));
     }

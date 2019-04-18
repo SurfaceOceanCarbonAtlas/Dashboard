@@ -23,6 +23,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Implementation of OmeMetadataInterface that uses an SDIMetadata object
+ * as its foundation.  Intended to be the working class for OME metadata,
+ * with other metadata formats being converted to or produced from
+ * SDIMetadata objects.
+ */
 public class SdiOmeMetadata implements OmeMetadataInterface {
 
     private SDIMetadata mdata;

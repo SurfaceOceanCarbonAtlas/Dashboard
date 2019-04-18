@@ -9,16 +9,18 @@ import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
-import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
+import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -63,27 +65,24 @@ import java.util.zip.ZipOutputStream;
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
-    private static final String OCADS_OME_XML_FILENAME = "PI_OME_to_OCADS.xml";
+    private static final String OCADS_XML_FILENAME = "OCADS.xml";
 
     private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
     private static final String EMAIL_SUBJECT_MSG_MIDDLE = " from SOCAT dashboard user ";
-    private static final String EMAIL_MSG_START =
-            "Dear OCADS Archival Team, \n" +
-                    "\n" +
-                    "As part of submitting dataset ";
-    private static final String EMAIL_MSG_MIDDLE =
-            " to SOCAT for QC, \n" +
-                    "the SOCAT Upload Dashboard user ";
-    private static final String EMAIL_MSG_END =
-            " \nhas requested immediate OCADS archival of the attached BagIt ZIP file of data and metadata. \n" +
-                    "\n" +
-                    "The metadata file " + OCADS_OME_XML_FILENAME + ", if present, is an *experimental* translation \n" +
-                    "of the PI-provided metadata in " + DashboardUtils.PI_OME_FILENAME + ". \n" +
-                    "The " + OCADS_OME_XML_FILENAME + " file was machine-generated and added only to assist \n" +
-                    "in the archival, but should *not* be archived. \n" +
-                    "\n" +
-                    "Best regards, \n" +
-                    "SOCAT Team \n";
+    private static final String EMAIL_MSG_START = "Dear OCADS Archival Team, \n" +
+            "\n" +
+            "As part of submitting dataset ";
+    private static final String EMAIL_MSG_MIDDLE = " to SOCAT for QC, \n" +
+            "the SOCAT Upload Dashboard user ";
+    private static final String EMAIL_MSG_END = " \n" +
+            "has requested immediate archival of the attached BagIt ZIP file of data and metadata. \n" +
+            "\n" +
+            "The metadata file " + OCADS_XML_FILENAME + " is an *experimental* OCADS metadata file generated \n" +
+            "from any OME metadata or metadata provided in the data file.  This file was machine-generated \n" +
+            "and added only to assist in the archival, but should *not* be archived. \n" +
+            "\n" +
+            "Best regards, \n" +
+            "SOCAT Team \n";
 
     private String[] toEmails;
     private String[] ccEmails;
@@ -262,47 +261,82 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
-        // The platform name needed for the email message - mainly for moorings, which do not have a distinctive NODC code
-        String platformName = "";
-        // The SDIMetadata object created from PI-provided OME metadata - for auto-generating OCADS XML file
+        // The SDIMetadata object created from any metadata provided - for auto-generating OCADS XML file
         SDIMetadata sdimdata = null;
 
+        DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
+        ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
+        ArrayList<String> dataColNames = dsetInfo.getUserColNames();
         MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+
+        // The platform name needed for the email message;
+        // mainly for moorings, which do not have a distinctive NODC code
+        String platformName = "";
+
         // Check if there is a PI-provided OME document
         try {
-            DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.PI_OME_FILENAME);
-            // Get the platform name
-            platformName = omeMetadata.getPlatformName();
-            // Read the PI-provided CDIAC XML
-            File omefile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
-            FileReader xmlReader = new FileReader(omefile);
-            CdiacReader reader;
-            try {
-                reader = new CdiacReader(xmlReader);
-            } finally {
-                xmlReader.close();
-            }
-            // Make sure all data column names used are mapped to the correct CdiacReader.VarType
-            DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
-            ArrayList<String> dataColNames = dsetInfo.getUserColNames();
-            ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
-            for (int k = 0; k < dataColNames.size(); k++) {
-                CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
-                if ( vtype != null )
-                    reader.associateColumnNameWithVarType(dataColNames.get(k), vtype);
-            }
-            // Create an SDIMetadata object from the PI-provided CDIAC XML
-            sdimdata = reader.createSDIMetadata();
+            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+            platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
-            // Probably no PI_OME.xml metadata document
+            // Probably does not exist
         }
-        if ( platformName.isEmpty() ) {
-            // Check if there is a platform name in the OME stub
+        if ( sdimdata == null ) {
+            // Use the OME stub (which should always exist)
             try {
-                DashboardOmeMetadata omeMetadata = mdataHandler.getOmeFromFile(stdId, DashboardUtils.OME_FILENAME);
-                platformName = omeMetadata.getPlatformName();
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
-                // Should always have an OME.xml metadata document, but ignore this problem here
+                throw new RuntimeException(
+                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+            }
+        }
+        else if ( platformName.isEmpty() ) {
+            // PI-provided OME document given, but does not contain the platform name; try to get it
+            // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
+            try {
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                SDIMetadata stub = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                platformName = stub.getPlatform().getPlatformName();
+            } catch ( Exception ex ) {
+                throw new RuntimeException(
+                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+            }
+            if ( !platformName.isEmpty() ) {
+                // Add the platform name to the SDIMetadata object
+                Platform platform = sdimdata.getPlatform();
+                platform.setPlatformName(platformName);
+                sdimdata.setPlatform(platform);
+            }
+        }
+
+
+        // Make sure there is a history entry if this is an update to an archived dataset
+        MiscInfo miscInfo = sdimdata.getMiscInfo();
+        ArrayList<Datestamp> archiveDates = miscInfo.getHistory();
+        if ( archiveDates.isEmpty() ) {
+            // Check for any archive timestamps in the dataset info
+            for (String datetime : dsetInfo.getArchiveTimestamps()) {
+                // The format of these timestamps are "yyyy-MM-dd HH:mm Z"
+                String[] pieces = datetime.split("[ :/-]");
+                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2]);
+                archiveDates.add(datestamp);
+            }
+            if ( archiveDates.isEmpty() ) {
+                // Check if the dataset was archived but no archive date recorded
+                String archiveStatus = dsetInfo.getArchiveStatus();
+                if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) ||
+                        archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ||
+                        archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) )
+                    // Add a datestamp of 1900-01-01 to indicate unknown submission date
+                    archiveDates.add(new Datestamp("1900", "1", "1"));
+            }
+            if ( !archiveDates.isEmpty() ) {
+                // MiscInfo.getHistory returns a copy, so need to update it in the MiscInfo object
+                miscInfo.setHistory(archiveDates);
+                // SDIMetadata.getMiscInfo returns a copy, so need to update it in the SDIMetadata object
+                sdimdata.setMiscInfo(miscInfo);
             }
         }
 
@@ -444,6 +478,47 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
+     * Using the given data column names and types for a datasets, creates an SDIMetadata object
+     * from the contents of a CDIAC OME metadata file.
+     *
+     * @param omeFile
+     *         CDIAC OME metadata file to read
+     * @param dataColNames
+     *         data column names for this dataset
+     * @param dataColTypes
+     *         data column types for this dataset
+     *
+     * @return SDIMetadata object created from the CDIAC OME metadata file contents
+     *
+     * @throws FileNotFoundException
+     *         if the CDIAC OME metadata file does not exist
+     * @throws IOException
+     *         if an error occurs when reading the CDIAC OME metadata file
+     * @throws IllegalArgumentException
+     *         if the contents of the CDIAC OME metadata file are invalid
+     */
+    private SDIMetadata createSdiMetadataFromCdiacOme(File omeFile,
+            ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
+            throws FileNotFoundException, IOException, IllegalArgumentException {
+        // Read the CDIAC XML into an XML Document in memory
+        CdiacReader reader;
+        FileReader xmlReader = new FileReader(omeFile);
+        try {
+            reader = new CdiacReader(xmlReader);
+        } finally {
+            xmlReader.close();
+        }
+        // Make sure all data column names used are mapped to the correct CdiacReader.VarType
+        for (int k = 0; k < dataColNames.size(); k++) {
+            CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
+            if ( vtype != null )
+                reader.associateColumnNameWithVarType(dataColNames.get(k), vtype);
+        }
+        // Create an SDIMetadata object from the contents of the CDIAC XML Document
+        return reader.createSDIMetadata();
+    }
+
+    /**
      * Generates the bagit zip file of the original data file converted to "Excel" CSV format,
      * as well as any appropriate metadata files for a given dataset.
      * Use {@link #getZipBundleFile(String, BundleType)} with {@link BundleType#ORIG_FILE_BAGIT_ZIP}
@@ -452,7 +527,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      * @param expocode
      *         create the bagit zip file for the dataset with this ID
      * @param sdimdata
-     *         metadata to be written as an OCADS XML file; can be null
+     *         metadata to be written as an OCADS XML file; cannot be null
      *
      * @return info message describing this bundle and its contents
      *
@@ -517,12 +592,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
             }
-            if ( sdimdata != null ) {
-                infoMsg += "    " + OCADS_OME_XML_FILENAME + "\n";
-                dest = new File(bundleDir, OCADS_OME_XML_FILENAME);
-                FileWriter xmlwriter = new FileWriter(dest);
-                (new OcadsWriter()).writeOcadsXml(sdimdata, xmlwriter);
-                xmlwriter.close();
+            // The SDIMetadata object is always present, but may just be a minimal stub with history
+            infoMsg += "    " + OCADS_XML_FILENAME + "\n";
+            dest = new File(bundleDir, OCADS_XML_FILENAME);
+            OcadsWriter ocadsWriter = new OcadsWriter(new FileWriter(dest));
+            try {
+                ocadsWriter.writeOcadsXml(sdimdata);
+            } finally {
+                ocadsWriter.close();
             }
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);

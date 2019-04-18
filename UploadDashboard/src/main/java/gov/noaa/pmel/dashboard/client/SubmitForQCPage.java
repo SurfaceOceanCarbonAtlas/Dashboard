@@ -26,8 +26,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -294,7 +294,10 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
             // Add this cruise to the intro list
             String submitStatus = cruise.getSubmitStatus();
-            String cdiacDate = cruise.getArchiveDate();
+            ArrayList<String> archiveTimestamps = cruise.getArchiveTimestamps();
+            String cdiacDate = "";
+            if ( !archiveTimestamps.isEmpty() )
+                cdiacDate = archiveTimestamps.get(archiveTimestamps.size() - 1);
             if ( submitStatus.isEmpty() && cdiacDate.isEmpty() ) {
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         "</li>");

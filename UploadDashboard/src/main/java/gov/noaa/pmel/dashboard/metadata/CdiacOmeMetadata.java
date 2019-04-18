@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
+/**
+ * Implementation of OmeMetadataInterface that uses the legacy OME.xml from CDIAC
+ * as its foundation.  Intended use is for reading these legacy XML files.
+ */
 public class CdiacOmeMetadata implements OmeMetadataInterface {
 
     private static final SimpleDateFormat TIME_PARSER;

@@ -15,16 +15,21 @@ import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * NetCDF DSG file handler for the upload dashboard.
@@ -34,6 +39,7 @@ import java.util.ArrayList;
 public class DsgNcFileHandler {
 
     private static final String DSG_FILE_SUFFIX = ".nc";
+    private static final Object SINGLETON_SYNC_OBJECT = new Object();
 
     private File dsgFilesDir;
     private File decDsgFilesDir;
@@ -42,7 +48,11 @@ public class DsgNcFileHandler {
     private FerretConfig ferretConfig;
     private KnownDataTypes knownMetadataTypes;
     private KnownDataTypes knownDataFileTypes;
+    private DataFileHandler dataFileHandler;
+    private Logger itsLogger;
     private WatchService watcher;
+    private Thread watcherThread;
+    private Pattern nodcCodePattern;
 
     /**
      * Handles storage and retrieval of full and decimated NetCDF discrete geometry files under the given directories.
@@ -57,18 +67,22 @@ public class DsgNcFileHandler {
      *         name of the flag file to create to notify ERDDAP of updates to the decimated NetCDF DSG files
      * @param ferretConf
      *         configuration document for running Ferret
-     * @param knownMetadataTypes
+     * @param knownMDataTypes
      *         metadata types contained in the DSG files
-     * @param knownDataFileTypes
+     * @param knownDFileTypes
      *         data types contained in the DSG files
+     * @param dataHandler
+     *         handler of user-provided data files
+     * @param logger
+     *         log messages here
      *
      * @throws IllegalArgumentException
      *         if the specified DSG directories, or the parent directories of the ERDDAP flag files,
      *         do not exist or are not directories
      */
     public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName, String erddapDsgFlagFileName,
-            String erddapDecDsgFlagFileName, FerretConfig ferretConf, KnownDataTypes knownMetadataTypes,
-            KnownDataTypes knownDataFileTypes) {
+            String erddapDecDsgFlagFileName, FerretConfig ferretConf, KnownDataTypes knownMDataTypes,
+            KnownDataTypes knownDFileTypes, DataFileHandler dataHandler, Logger logger) {
         dsgFilesDir = new File(dsgFilesDirName);
         if ( !dsgFilesDir.isDirectory() )
             throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
@@ -86,9 +100,12 @@ public class DsgNcFileHandler {
             throw new IllegalArgumentException("parent directory of " + erddapDecDsgFlagFile.getPath() +
                     " is not valid");
         ferretConfig = ferretConf;
-        this.knownMetadataTypes = knownMetadataTypes;
-        this.knownDataFileTypes = knownDataFileTypes;
+        knownMetadataTypes = knownMDataTypes;
+        knownDataFileTypes = knownDFileTypes;
+        dataFileHandler = dataHandler;
+        itsLogger = logger;
 
+        // Verify that a watcher can be placed on this directory (but do not yet create it)
         try {
             Path dsgFilesDirPath = dsgFilesDir.toPath();
             watcher = FileSystems.getDefault().newWatchService();
@@ -99,6 +116,8 @@ public class DsgNcFileHandler {
             throw new IllegalArgumentException("Problems creating a watcher for the DSG files directory: " +
                     ex.getMessage(), ex);
         }
+        watcherThread = null;
+        nodcCodePattern = Pattern.compile("\\p{Alnum}\\p{Alnum}\\p{Alnum}\\p{Alnum}");
     }
 
     /**
@@ -180,7 +199,9 @@ public class DsgNcFileHandler {
 
         // Create the NetCDF DSG file
         try {
-            dsgFile.createFromUserData(metadata, stdUserData, knownDataFileTypes);
+            synchronized(SINGLETON_SYNC_OBJECT) {
+                dsgFile.createFromUserData(metadata, stdUserData, knownDataFileTypes);
+            }
         } catch ( Exception ex ) {
             dsgFile.delete();
             throw new IllegalArgumentException("Problems creating the DSG file " +
@@ -524,7 +545,9 @@ public class DsgNcFileHandler {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
-        dsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
+        synchronized(SINGLETON_SYNC_OBJECT) {
+            dsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
+        }
         DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
         if ( !decDsgFile.exists() )
             throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
@@ -549,7 +572,9 @@ public class DsgNcFileHandler {
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
         String allRegionIds;
         try {
-            allRegionIds = dsgFile.updateAllRegionIDs(null);
+            synchronized(SINGLETON_SYNC_OBJECT) {
+                allRegionIds = dsgFile.updateAllRegionIDs(null);
+            }
         } catch ( Exception ex ) {
             throw new IllegalArgumentException(
                     "Problems resetting all_region_ids in the full-data DSG file for " + datasetId);
@@ -592,9 +617,214 @@ public class DsgNcFileHandler {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
-        ArrayList<DataLocation> unidentified = dsgFile.updateDataQCFlags(woceEvent, updateWoceEvent);
+        ArrayList<DataLocation> unidentified;
+        synchronized(SINGLETON_SYNC_OBJECT) {
+            unidentified = dsgFile.updateDataQCFlags(woceEvent, updateWoceEvent);
+        }
         decimateDatasetDsg(datasetId);
         return unidentified;
+    }
+
+    /**
+     * Starts a new Thread monitoring the full-data DSG directory.
+     * If a Thread is currently monitoring the directory, this call does nothing.
+     */
+    public void watchForDsgFileUpdates() {
+        // Make sure the watcher is not already running
+        if ( watcherThread != null )
+            return;
+        watcherThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Create a new watch service for the DSG file directories
+                try {
+                    watcher = FileSystems.getDefault().newWatchService();
+                } catch ( Exception ex ) {
+                    if ( itsLogger != null )
+                        itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
+                    return;
+                }
+                // Watch for directory creation in the root DSG directory
+                WatchKey rootReg;
+                try {
+                    if ( itsLogger != null )
+                        itsLogger.info("Start watching full-data DSG directory " + dsgFilesDir.getPath());
+                    rootReg = dsgFilesDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
+                } catch ( Exception ex ) {
+                    if ( itsLogger != null )
+                        itsLogger.error("Unexpected error registering the root full-data DSG directory " +
+                                "for watching", ex);
+                    try {
+                        watcher.close();
+                    } catch ( Exception e ) {
+                        ;
+                    }
+                    watcher = null;
+                    return;
+                }
+                // Watch for file modification in each of the DSG subdirectories
+                File[] subdirs = dsgFilesDir.listFiles(new FileFilter() {
+                    @Override
+                    public boolean accept(File subfile) {
+                        if ( subfile.isDirectory() )
+                            return true;
+                        return false;
+                    }
+                });
+                ArrayList<WatchKey> subRegs = new ArrayList<WatchKey>(subdirs.length + 4);
+                for (File dsgSubDir : subdirs) {
+                    try {
+                        handleDsgDirChange(subRegs, StandardWatchEventKinds.ENTRY_CREATE, dsgSubDir);
+                    } catch ( Exception ex ) {
+                        if ( itsLogger != null )
+                            itsLogger.error("Unexpected error registering the full-data DSG subdirectory " +
+                                    dsgSubDir.getName() + " for watching", ex);
+                        for (WatchKey reg : subRegs) {
+                            reg.cancel();
+                            reg.pollEvents();
+                        }
+                        rootReg.cancel();
+                        rootReg.pollEvents();
+                        try {
+                            watcher.close();
+                        } catch ( Exception e ) {
+                            ;
+                        }
+                        watcher = null;
+                        return;
+                    }
+                }
+                subdirs = null;
+                // Start watching and handle changes
+                for (; ; ) {
+                    try {
+                        WatchKey key = watcher.take();
+                        Path parentPath = (Path) key.watchable();
+                        File lastFile = null;
+                        WatchEvent.Kind<?> lastKind = null;
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            Path relPath = (Path) event.context();
+                            File thisFile = parentPath.resolve(relPath).toFile();
+                            WatchEvent.Kind<?> thisKind = event.kind();
+                            // Ignore repeated events of what was just handled
+                            if ( thisFile.equals(lastFile) && thisKind.equals(lastKind) )
+                                continue;
+                            // If a DSG file is being saved, block until done saving
+                            synchronized(SINGLETON_SYNC_OBJECT) {
+                                handleDsgDirChange(subRegs, thisKind, thisFile);
+                            }
+                            lastFile = thisFile;
+                            lastKind = thisKind;
+                        }
+                        if ( !key.reset() )
+                            break;
+                        // Sleep a moment to allow multiple updates to coalesce
+                        Thread.sleep(100);
+                    } catch ( Exception ex ) {
+                        // Probably the watcher was closed
+                        break;
+                    }
+                }
+                for (WatchKey reg : subRegs) {
+                    reg.cancel();
+                    reg.pollEvents();
+                }
+                rootReg.cancel();
+                rootReg.pollEvents();
+                try {
+                    watcher.close();
+                } catch ( Exception ex ) {
+                    ;
+                }
+                watcher = null;
+                return;
+            }
+        });
+        if ( itsLogger != null )
+            itsLogger.info("Starting new thread monitoring the full-data DSG directory: " + dsgFilesDir.getPath());
+        watcherThread.start();
+    }
+
+    /**
+     * Handles changes detected by the monitor of the DSG directory.  If the change is the creation of
+     * an appropriately named directory, this will start watching for modifications of files in that
+     * directory.  If the change is the a modification of an appropriately named DSG file, the QC flag
+     * is checked for possible updates to the dashboard status.
+     *
+     * @param subRegs
+     *         add the WatchKey returned from registering a directory to be monitored to this list
+     * @param changeKind
+     *         kind of change to be handled
+     * @param changedFile
+     *         file or directory to be handled
+     * @throws IOException
+     *         if registering a directory to be watched throws one
+     */
+    private void handleDsgDirChange(ArrayList<WatchKey> subRegs, WatchEvent.Kind<?> changeKind, File changedFile)
+            throws IOException {
+        if ( changedFile.isDirectory() ) {
+            if ( StandardWatchEventKinds.ENTRY_CREATE.equals(changeKind) &&
+                    nodcCodePattern.matcher(changedFile.getName()).matches() ) {
+                // new DSG file subdirectory to start watching for modifications to DSG files
+                if ( itsLogger != null )
+                    itsLogger.info("Start watching full-data DSG subdirectory " + changedFile.getName());
+                subRegs.add(changedFile.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
+            }
+        }
+        else if ( StandardWatchEventKinds.ENTRY_MODIFY.equals(changeKind) ) {
+            String filename = changedFile.getName();
+            if ( !filename.endsWith(DSG_FILE_SUFFIX) ) {
+                // Not a DSG file - ignore this call
+                return;
+            }
+            String expocode = filename.substring(0, filename.length() - DSG_FILE_SUFFIX.length());
+            try {
+                String upperExpocode = DashboardServerUtils.checkDatasetID(expocode);
+                if ( !expocode.equals(upperExpocode) )
+                    throw new IllegalArgumentException();
+            } catch ( Exception ex ) {
+                // Not a DSG file used by this system - ignore this call
+                return;
+            }
+            if ( itsLogger != null )
+                itsLogger.info("Checking QC flag given in " + changedFile.getPath());
+            try {
+                DsgNcFile dsgFile = new DsgNcFile(changedFile.getPath());
+                String qcFlag = dsgFile.getDatasetQCFlagAndVersion()[0];
+                if ( dataFileHandler.updateDatasetDashboardStatus(expocode, qcFlag) ) {
+                    if ( itsLogger != null )
+                        itsLogger.info("Updated dashboard status for " + expocode +
+                                " to that for QC flag '" + qcFlag + "'");
+                }
+            } catch ( Exception ex ) {
+                // Caught mid-update?  Another update call should occur, so log only as info
+                if ( itsLogger != null )
+                    itsLogger.info("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Stops the monitoring the full-data DSG directory.
+     * If the full-data DSG directory is not being monitored, this call does nothing.
+     */
+    public void cancelWatch() {
+        try {
+            watcher.close();
+            // Only the thread modifies the value of watcher
+        } catch ( Exception ex ) {
+            // Might be NullPointerException
+        }
+        if ( watcherThread != null ) {
+            try {
+                watcherThread.join();
+            } catch ( Exception ex ) {
+                ;
+            }
+            watcherThread = null;
+            if ( itsLogger != null )
+                itsLogger.info("End of thread monitoring the the full-data DSG directory: " + dsgFilesDir.getPath());
+        }
     }
 
 }
