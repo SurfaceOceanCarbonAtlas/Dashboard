@@ -17,6 +17,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.platform.Platform;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
@@ -268,10 +269,15 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         ArrayList<String> dataColNames = dsetInfo.getUserColNames();
         MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 
+        // The platform name needed for the email message;
+        // mainly for moorings, which do not have a distinctive NODC code
+        String platformName = "";
+
         // Check if there is a PI-provided OME document
         try {
             File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
             sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+            platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
             // Probably does not exist
         }
@@ -280,15 +286,31 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
                 sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
                         "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
             }
         }
+        else if ( platformName.isEmpty() ) {
+            // PI-provided OME document given, but does not contain the platform name; try to get it
+            // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
+            try {
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                SDIMetadata stub = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                platformName = stub.getPlatform().getPlatformName();
+            } catch ( Exception ex ) {
+                throw new RuntimeException(
+                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+            }
+            if ( !platformName.isEmpty() ) {
+                // Add the platform name to the SDIMetadata object
+                Platform platform = sdimdata.getPlatform();
+                platform.setPlatformName(platformName);
+                sdimdata.setPlatform(platform);
+            }
+        }
 
-        // The platform name needed for the email message;
-        // mainly for moorings, which do not have a distinctive NODC code
-        String platformName = sdimdata.getPlatform().getPlatformName();
 
         // Make sure there is a history entry if this is an update to an archived dataset
         MiscInfo miscInfo = sdimdata.getMiscInfo();
