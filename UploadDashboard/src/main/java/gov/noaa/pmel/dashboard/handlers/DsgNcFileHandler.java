@@ -640,17 +640,20 @@ public class DsgNcFileHandler {
                 try {
                     watcher = FileSystems.getDefault().newWatchService();
                 } catch ( Exception ex ) {
-                    itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
+                    if ( itsLogger != null )
+                        itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
                     return;
                 }
                 // Watch for directory creation in the root DSG directory
                 WatchKey rootReg;
                 try {
-                    itsLogger.info("Start watching full-data DSG directory " + dsgFilesDir.getPath());
+                    if ( itsLogger != null )
+                        itsLogger.info("Start watching full-data DSG directory " + dsgFilesDir.getPath());
                     rootReg = dsgFilesDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
                 } catch ( Exception ex ) {
-                    itsLogger.error("Unexpected error registering the root full-data DSG directory " +
-                            "for watching", ex);
+                    if ( itsLogger != null )
+                        itsLogger.error("Unexpected error registering the root full-data DSG directory " +
+                                "for watching", ex);
                     try {
                         watcher.close();
                     } catch ( Exception e ) {
@@ -673,8 +676,9 @@ public class DsgNcFileHandler {
                     try {
                         handleDsgDirChange(subRegs, StandardWatchEventKinds.ENTRY_CREATE, dsgSubDir);
                     } catch ( Exception ex ) {
-                        itsLogger.error("Unexpected error registering the full-data DSG subdirectory " +
-                                dsgSubDir.getName() + " for watching", ex);
+                        if ( itsLogger != null )
+                            itsLogger.error("Unexpected error registering the full-data DSG subdirectory " +
+                                    dsgSubDir.getName() + " for watching", ex);
                         for (WatchKey reg : subRegs) {
                             reg.cancel();
                             reg.pollEvents();
@@ -736,7 +740,8 @@ public class DsgNcFileHandler {
                 return;
             }
         });
-        itsLogger.info("Starting new thread monitoring the full-data DSG directory: " + dsgFilesDir.getPath());
+        if ( itsLogger != null )
+            itsLogger.info("Starting new thread monitoring the full-data DSG directory: " + dsgFilesDir.getPath());
         watcherThread.start();
     }
 
@@ -761,7 +766,8 @@ public class DsgNcFileHandler {
             if ( StandardWatchEventKinds.ENTRY_CREATE.equals(changeKind) &&
                     nodcCodePattern.matcher(changedFile.getName()).matches() ) {
                 // new DSG file subdirectory to start watching for modifications to DSG files
-                itsLogger.info("Start watching full-data DSG subdirectory " + changedFile.getName());
+                if ( itsLogger != null )
+                    itsLogger.info("Start watching full-data DSG subdirectory " + changedFile.getName());
                 subRegs.add(changedFile.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
             }
         }
@@ -780,16 +786,20 @@ public class DsgNcFileHandler {
                 // Not a DSG file used by this system - ignore this call
                 return;
             }
-            itsLogger.info("Checking QC flag given in " + changedFile.getPath());
+            if ( itsLogger != null )
+                itsLogger.info("Checking QC flag given in " + changedFile.getPath());
             try {
                 DsgNcFile dsgFile = new DsgNcFile(changedFile.getPath());
                 String qcFlag = dsgFile.getDatasetQCFlagAndVersion()[0];
-                if ( dataFileHandler.updateDatasetDashboardStatus(expocode, qcFlag) )
-                    itsLogger.info("Updated dashboard status for " + expocode +
-                            " to that for QC flag '" + qcFlag + "'");
+                if ( dataFileHandler.updateDatasetDashboardStatus(expocode, qcFlag) ) {
+                    if ( itsLogger != null )
+                        itsLogger.info("Updated dashboard status for " + expocode +
+                                " to that for QC flag '" + qcFlag + "'");
+                }
             } catch ( Exception ex ) {
                 // Caught mid-update?  Another update call should occur, so log only as info
-                itsLogger.info("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
+                if ( itsLogger != null )
+                    itsLogger.info("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
             }
         }
     }
@@ -812,7 +822,8 @@ public class DsgNcFileHandler {
                 ;
             }
             watcherThread = null;
-            itsLogger.info("End of thread monitoring the the full-data DSG directory: " + dsgFilesDir.getPath());
+            if ( itsLogger != null )
+                itsLogger.info("End of thread monitoring the the full-data DSG directory: " + dsgFilesDir.getPath());
         }
     }
 

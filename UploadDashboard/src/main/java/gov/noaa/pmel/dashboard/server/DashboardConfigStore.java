@@ -204,14 +204,20 @@ public class DashboardConfigStore {
         // Record configuration files that should be monitored for changes
         filesToWatch = new HashSet<File>();
 
-        // Configure the log4j2 logger
-        File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
-        if ( !log4jConfigFile.exists() )
-            throw new IllegalStateException("The log4j2 configuration file " +
-                    log4jConfigFile.getPath() + " does not exist");
-        System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
-        filesToWatch.add(log4jConfigFile);
-        itsLogger = LogManager.getLogger(serverAppName);
+        if ( startMonitors ) {
+            // Configure the log4j2 logger
+            File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
+            if ( !log4jConfigFile.exists() )
+                throw new IllegalStateException("The log4j2 configuration file " +
+                        log4jConfigFile.getPath() + " does not exist");
+            System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
+            filesToWatch.add(log4jConfigFile);
+            itsLogger = LogManager.getLogger(serverAppName);
+        }
+        else {
+            // If no monitors, running this as an app, so do not log
+            itsLogger = null;
+        }
 
         // Get the properties from the primary configuration file
         Properties configProps = new Properties();
@@ -301,7 +307,7 @@ public class DashboardConfigStore {
             throw new IOException("Invalid " + KNOWN_TYPES_PROPS_FILE_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
         }
-        if ( itsLogger.isInfoEnabled() ) {
+        if ( (itsLogger != null) && itsLogger.isInfoEnabled() ) {
             itsLogger.info("Known user-provided data types: ");
             for (DashDataType<?> dtype : knownUserDataTypes.getKnownTypesSet()) {
                 itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());
@@ -416,21 +422,23 @@ public class DashboardConfigStore {
             propVal = getFilePathProperty(configProps, ARCHIVE_BUNDLES_DIR_NAME_TAG, appConfigDir);
             archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, svnPassword, toEmailAddresses,
                     ccEmailAddresses, smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
-            itsLogger.info("Archive files bundler and mailer using:");
-            itsLogger.info("    bundles directory: " + propVal);
-            String emails = toEmailAddresses[0];
-            for (int k = 1; k < toEmailAddresses.length; k++) {
-                emails += ", " + toEmailAddresses[k];
+            if ( (itsLogger != null) && itsLogger.isInfoEnabled() ) {
+                itsLogger.info("Archive files bundler and mailer using:");
+                itsLogger.info("    bundles directory: " + propVal);
+                String emails = toEmailAddresses[0];
+                for (int k = 1; k < toEmailAddresses.length; k++) {
+                    emails += ", " + toEmailAddresses[k];
+                }
+                itsLogger.info("    To: " + emails);
+                emails = ccEmailAddresses[0];
+                for (int k = 1; k < ccEmailAddresses.length; k++) {
+                    emails += ", " + ccEmailAddresses[k];
+                }
+                itsLogger.info("    CC: " + emails);
+                itsLogger.info("    SMTP host: " + smtpHostAddress);
+                itsLogger.info("    SMTP port: " + smtpHostPort);
+                itsLogger.info("    SMTP username: " + smtpUsername);
             }
-            itsLogger.info("    To: " + emails);
-            emails = ccEmailAddresses[0];
-            for (int k = 1; k < ccEmailAddresses.length; k++) {
-                emails += ", " + ccEmailAddresses[k];
-            }
-            itsLogger.info("    CC: " + emails);
-            itsLogger.info("    SMTP host: " + smtpHostAddress);
-            itsLogger.info("    SMTP port: " + smtpHostPort);
-            itsLogger.info("    SMTP username: " + smtpUsername);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + ARCHIVE_BUNDLES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -456,19 +464,22 @@ public class DashboardConfigStore {
             } finally {
                 stream.close();
             }
-            itsLogger.info("read Ferret configuration file " + propVal);
+            if ( itsLogger != null )
+                itsLogger.info("read Ferret configuration file " + propVal);
         } catch ( Exception ex ) {
             throw new IOException("Invalid value in the Ferret configuration file specified by the " +
                     FERRET_CONFIG_FILE_NAME_TAG + " value given in " + configFile.getPath() + "\n" + ex.getMessage());
         }
         imageExtension = ferretConf.getImageFilenameExtension();
-        itsLogger.info("image filename extension: '" + imageExtension + "'");
+        if ( itsLogger != null )
+            itsLogger.info("image filename extension: '" + imageExtension + "'");
 
         // Handler for DSG NC files
         String dsgFileDirName;
         try {
             dsgFileDirName = getFilePathProperty(configProps, DSG_NC_FILES_DIR_NAME_TAG, appConfigDir);
-            itsLogger.info("DSG directory = " + dsgFileDirName);
+            if ( itsLogger != null )
+                itsLogger.info("DSG directory = " + dsgFileDirName);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -476,7 +487,8 @@ public class DashboardConfigStore {
         String decDsgFileDirName;
         try {
             decDsgFileDirName = getFilePathProperty(configProps, DEC_DSG_NC_FILES_DIR_NAME_TAG, appConfigDir);
-            itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
+            if ( itsLogger != null )
+                itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -484,7 +496,8 @@ public class DashboardConfigStore {
         String erddapDsgFlagFileName;
         try {
             erddapDsgFlagFileName = getFilePathProperty(configProps, ERDDAP_DSG_FLAG_FILE_NAME_TAG, appConfigDir);
-            itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
+            if ( itsLogger != null )
+                itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -493,7 +506,8 @@ public class DashboardConfigStore {
         try {
             erddapDecDsgFlagFileName =
                     getFilePathProperty(configProps, ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG, appConfigDir);
-            itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
+            if ( itsLogger != null )
+                itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -511,7 +525,8 @@ public class DashboardConfigStore {
             propVal = getFilePathProperty(configProps, DATABASE_CONFIG_FILE_NAME_TAG, appConfigDir);
             filesToWatch.add(new File(propVal));
             databaseRequestHandler = new DatabaseRequestHandler(propVal);
-            itsLogger.info("read Database configuration file " + propVal);
+            if ( itsLogger != null )
+                itsLogger.info("read Database configuration file " + propVal);
         } catch ( Exception ex ) {
             throw new IOException("Invalid " + DATABASE_CONFIG_FILE_NAME_TAG + " value specified in " +
                     configFile.getPath() + "\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
@@ -556,11 +571,13 @@ public class DashboardConfigStore {
             }
             userInfoMap.put(username, userInfo);
         }
-        for (DashboardUserInfo info : userInfoMap.values()) {
-            itsLogger.info("    user info: " + info.toString());
+        if ( (itsLogger != null) && itsLogger.isInfoEnabled() ) {
+            for (DashboardUserInfo info : userInfoMap.values()) {
+                itsLogger.info("    user info: " + info.toString());
+            }
+            itsLogger.info("read configuration file " + configFile.getPath());
         }
 
-        itsLogger.info("read configuration file " + configFile.getPath());
         watcher = null;
         watcherThread = null;
         needToRestart = false;
@@ -755,7 +772,8 @@ public class DashboardConfigStore {
                 ;
             }
             watcherThread = null;
-            itsLogger.info("End of thread monitoring the dashboard configuration files");
+            if ( itsLogger != null )
+                itsLogger.info("End of thread monitoring the dashboard configuration files");
         }
     }
 
@@ -894,7 +912,8 @@ public class DashboardConfigStore {
     }
 
     /**
-     * @return the logger for this dashboard application
+     * @return the logger for this dashboard application; may be null if monitors were
+     *         not started, indicating this is running from a command-prompt app
      */
     public Logger getLogger() {
         return itsLogger;

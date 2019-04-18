@@ -59,7 +59,7 @@ public class DatasetSubmitter {
     KnownDataTypes fileMetadataTypes;
     KnownDataTypes fileDataTypes;
     String version;
-    Logger logger;
+    Logger itsLogger;
 
     /**
      * @param configStore
@@ -76,7 +76,7 @@ public class DatasetSubmitter {
         fileMetadataTypes = configStore.getKnownMetadataTypes();
         fileDataTypes = configStore.getKnownDataFileTypes();
         version = configStore.getUploadVersion();
-        logger = configStore.getLogger();
+        itsLogger = configStore.getLogger();
     }
 
     /**
@@ -183,11 +183,13 @@ public class DatasetSubmitter {
                     userStdData.addAutomatedDataQC();
 
                     // Generate the NetCDF DSG file, enhanced by Ferret
-                    logger.debug("Generating the full-data DSG file for " + datasetId);
+                    if ( itsLogger != null )
+                        itsLogger.debug("Generating the full-data DSG file for " + datasetId);
                     dsgHandler.saveDatasetDsg(dsgMData, userStdData);
 
                     // Generate the decimated-data DSG file from the full-data DSG file
-                    logger.debug("Generating the decimated-data DSG file for " + datasetId);
+                    if ( itsLogger != null )
+                        itsLogger.debug("Generating the decimated-data DSG file for " + datasetId);
                     dsgHandler.decimateDatasetDsg(datasetId);
 
                     // Update the all_region_ids metadata variable from the Ferret-generated

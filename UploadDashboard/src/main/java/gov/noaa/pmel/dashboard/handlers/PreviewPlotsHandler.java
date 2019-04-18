@@ -131,12 +131,14 @@ public class PreviewPlotsHandler {
      */
     public void createPreviewPlots(String datasetId, String timetag) throws IllegalArgumentException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
-        itsLogger.debug("reading data for " + stdId);
+        if ( itsLogger != null )
+            itsLogger.debug("reading data for " + stdId);
 
         // Get the complete original cruise data
         DashboardDatasetData dataset = dataHandler.getDatasetDataFromFiles(stdId, 0, -1);
 
-        itsLogger.debug("standardizing data for " + stdId);
+        if ( itsLogger != null )
+            itsLogger.debug("standardizing data for " + stdId);
 
         // Just create a minimal DsgMetadata to create the preview DSG file
         DsgMetadata dsgMData = new DsgMetadata(knownMetadataTypes);
@@ -152,7 +154,8 @@ public class PreviewPlotsHandler {
         DsgNcFile dsgFile = new DsgNcFile(getDatasetPreviewDsgDir(stdId),
                 stdId + "_" + timetag + ".nc");
 
-        itsLogger.debug("generating preview DSG file " + dsgFile.getPath());
+        if ( itsLogger != null )
+            itsLogger.debug("generating preview DSG file " + dsgFile.getPath());
 
         // Create the preview NetCDF DSG file
         try {
@@ -163,7 +166,8 @@ public class PreviewPlotsHandler {
                     datasetId + ": " + ex.getMessage(), ex);
         }
 
-        itsLogger.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
+        if ( itsLogger != null )
+            itsLogger.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
 
         // Call Ferret to add the computed variables to the preview DSG file
         SocatTool tool = new SocatTool(ferretConfig);
@@ -175,7 +179,8 @@ public class PreviewPlotsHandler {
             throw new IllegalArgumentException("Failure adding computed variables to the preview DSG file for " +
                     datasetId + ": " + tool.getErrorMessage());
 
-        itsLogger.debug("generating preview plots for " + dsgFile.getPath());
+        if ( itsLogger != null )
+            itsLogger.debug("generating preview plots for " + dsgFile.getPath());
 
         // Get the location for the preview plots, creating the directory if it does not exist
         String cruisePlotsDirname = getDatasetPreviewPlotsDir(stdId).getPath();
@@ -190,8 +195,10 @@ public class PreviewPlotsHandler {
             throw new IllegalArgumentException("Failure generating data preview plots for " +
                     datasetId + ": " + tool.getErrorMessage());
 
-        itsLogger.debug("preview plots generated in " + cruisePlotsDirname);
-        itsLogger.info("created preview plots for " + stdId + " with time tag " + timetag);
+        if ( itsLogger != null ) {
+            itsLogger.debug("preview plots generated in " + cruisePlotsDirname);
+            itsLogger.info("created preview plots for " + stdId + " with time tag " + timetag);
+        }
     }
 
 }
