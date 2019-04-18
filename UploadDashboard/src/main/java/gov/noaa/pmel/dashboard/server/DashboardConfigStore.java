@@ -500,8 +500,8 @@ public class DashboardConfigStore {
         }
         try {
             dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
-                    erddapDsgFlagFileName, erddapDecDsgFlagFileName,
-                    ferretConf, knownMetadataTypes, knownDataFileTypes);
+                    erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf,
+                    knownMetadataTypes, knownDataFileTypes, dataFileHandler, itsLogger);
         } catch ( Exception ex ) {
             throw new IOException(ex);
         }
@@ -565,6 +565,8 @@ public class DashboardConfigStore {
         watcherThread = null;
         needToRestart = false;
         if ( startMonitors ) {
+            // Watch for changes to the DSG files
+            dsgNcFileHandler.watchForDsgFileUpdates();
             // Watch for changes to the configuration file
             watchConfigFiles();
         }
@@ -649,7 +651,10 @@ public class DashboardConfigStore {
         userFileHandler.shutdown();
         dataFileHandler.shutdown();
         metadataFileHandler.shutdown();
+        checkerMsgHandler.shutdown();
         archiveFilesBundler.shutdown();
+        // Stop monitoring changes in the DSG files
+        dsgNcFileHandler.cancelWatch();
         // Stop the configuration watcher
         cancelWatch();
     }
