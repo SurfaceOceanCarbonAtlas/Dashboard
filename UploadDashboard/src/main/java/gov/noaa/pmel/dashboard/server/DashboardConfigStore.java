@@ -204,18 +204,19 @@ public class DashboardConfigStore {
         // Record configuration files that should be monitored for changes
         filesToWatch = new HashSet<File>();
 
+        // Configure the log4j2 logger
+        File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
+        if ( !log4jConfigFile.exists() )
+            throw new IllegalStateException("The log4j2 configuration file " +
+                    log4jConfigFile.getPath() + " does not exist");
+        System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
+        filesToWatch.add(log4jConfigFile);
+
+        // If not monitoring, then this is running as a command-line app, so do not log
         if ( startMonitors ) {
-            // Configure the log4j2 logger
-            File log4jConfigFile = new File(appConfigDir, "log4j2.properties");
-            if ( !log4jConfigFile.exists() )
-                throw new IllegalStateException("The log4j2 configuration file " +
-                        log4jConfigFile.getPath() + " does not exist");
-            System.setProperty("log4j.configurationFile", log4jConfigFile.getPath());
-            filesToWatch.add(log4jConfigFile);
             itsLogger = LogManager.getLogger(serverAppName);
         }
         else {
-            // If no monitors, running this as an app, so do not log
             itsLogger = null;
         }
 
