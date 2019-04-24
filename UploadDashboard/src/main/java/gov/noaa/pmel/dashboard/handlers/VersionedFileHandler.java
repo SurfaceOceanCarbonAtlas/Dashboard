@@ -30,20 +30,20 @@ public class VersionedFileHandler {
     private static final long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
 
     File filesDir;
-    SVNClientManager svnManager;
-    ArrayDeque<File[]> filesToCommit;
-    ArrayDeque<File> parentToUpdate;
-    ArrayDeque<String> commitMessage;
+    private SVNClientManager svnManager;
+    private ArrayDeque<File[]> filesToCommit;
+    private ArrayDeque<File> parentToUpdate;
+    private ArrayDeque<String> commitMessage;
 
     /**
-     * Handles version control for files under the given working copy directory.  Currently, only configured for SVN
-     * version control.
+     * Handles version control for files under the given working copy directory.
+     * Currently, only configured for SVN version control.
      *
      * @param filesDirName
      *         name of the working copy directory
      * @param svnUsername
-     *         username for SVN authentication; if null, the directory is not checked for version control and no version
-     *         control is performed
+     *         username for SVN authentication; if null, the directory is not checked
+     *         for version control and no version control is performed
      * @param svnPassword
      *         password for SVN authentication
      *
@@ -54,10 +54,9 @@ public class VersionedFileHandler {
         filesDir = new File(filesDirName);
         // Check that this is a directory under version control
         if ( !filesDir.isDirectory() )
-            throw new IllegalArgumentException(
-                    filesDirName + " is not a directory");
+            throw new IllegalArgumentException(filesDirName + " is not a directory");
         if ( svnUsername == null ) {
-            // Ordinary directory - not actually version-controlled - for ArchiveFilesBundler when just generating reports
+            // Ordinary directory - not actually version-controlled
             svnManager = null;
             filesToCommit = null;
             parentToUpdate = null;

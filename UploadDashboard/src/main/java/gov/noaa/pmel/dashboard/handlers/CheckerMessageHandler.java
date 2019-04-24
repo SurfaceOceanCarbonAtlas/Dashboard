@@ -302,12 +302,11 @@ public class CheckerMessageHandler extends VersionedFileHandler {
         }
 
         // Commit the updated messages file, if possible
-        if ( svnManager != null ) {
-            try {
-                commitVersion(msgsFile, "Updated checker messages for " + dataset.getDatasetId());
-            } catch ( Exception ex ) {
-                // ignore any errors at this time, as the file can be reproduced if needed
-            }
+        try {
+            commitVersion(msgsFile, "Updated checker messages for " + dataset.getDatasetId());
+        } catch ( Exception ex ) {
+            // ignore any errors at this time, as the file can be reproduced if needed
+            // or may be configured without version control
         }
 
         // Assign any user-provided QC flags.
