@@ -37,9 +37,11 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     private OmeMetadata mdata;
+    private String datasetDOI;
 
     public CdiacOmeMetadata() {
         mdata = new OmeMetadata("");
+        datasetDOI = null;
     }
 
     @Override
@@ -68,6 +70,8 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
                     mdata.getExpocode() + " in metadata file " +
                     mdataFile.getName() + " for dataset " + datasetId);
         }
+        // PI-provided dataset DOI not stored as such in CDIAC OME (may be part of citation)
+        datasetDOI = null;
     }
 
     @Override
@@ -215,13 +219,16 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
 
     @Override
     public String getDatasetDOI() {
-        // TODO: DOI not stored in CDIAC OME XML
-        return null;
+        // DOI not stored as such in CDIAC OME XML (might be part of citation)
+        return datasetDOI;
     }
 
     @Override
     public void setDatasetDOI(String datasetDOI) {
-        // TODO: DOI not stored in CDIAC OME XML
+        if ( datasetDOI != null )
+            this.datasetDOI = datasetDOI.trim();
+        else
+            this.datasetDOI = null;
     }
 
     @Override

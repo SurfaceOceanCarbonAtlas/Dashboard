@@ -25,7 +25,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 3793004938476629910L;
+    private static final long serialVersionUID = -4982616875806647187L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -206,6 +206,10 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             allOrgs = "unassigned";
         scMData.setOrganizationName(allOrgs);
 
+        // Note that CDIAC OME does not store the DOI as such;
+        // must be added to the given DashboardOmeMetadata from data file properties
+        scMData.setSourceDOI(omeMData.getDatasetDOI());
+
         return scMData;
     }
 
@@ -369,13 +373,21 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the DOI(s) for the source dataset; never null but may be empty
+     * @return the DOI(s) of the PI-provided dataset; never null but may be empty
      */
     public String getDatasetDOI() {
         String dataSetDOI = omeMData.getDatasetDOI();
         if ( dataSetDOI == null )
             dataSetDOI = "";
         return dataSetDOI;
+    }
+
+    /**
+     * @param datasetDOI
+     *         the DOI(s) of the PI-provided dataset to assign
+     */
+    public void setDatasetDOI(String datasetDOI) {
+        omeMData.setDatasetDOI(datasetDOI);
     }
 
     /**

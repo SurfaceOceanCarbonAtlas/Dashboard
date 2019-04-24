@@ -122,7 +122,7 @@ public interface OmeMetadataInterface {
 
     /**
      * @param datasetDOI
-     *         the DOI to assign for this dataset
+     *         the DOI of this dataset to assign
      */
     void setDatasetDOI(String datasetDOI);
 
