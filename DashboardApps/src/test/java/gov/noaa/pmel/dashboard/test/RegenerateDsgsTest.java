@@ -3,6 +3,9 @@
  */
 package gov.noaa.pmel.dashboard.test;
 
+import gov.noaa.pmel.dashboard.datatype.DashDataType;
+import gov.noaa.pmel.dashboard.datatype.DoubleDashDataType;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Tests of {@link RegenerateDsgs}
@@ -73,10 +77,38 @@ public class RegenerateDsgsTest {
             assertEquals(origData.getNumSamples(), updatedData.getNumSamples());
             for (int j = 0; j < origData.getNumSamples(); j++) {
                 for (int k = 0; k < origData.getNumDataCols(); k++) {
-                    assertEquals(origData.getStdVal(j, k), updatedData.getStdVal(j, k));
+                    DashDataType<?> dtype = origData.getDataTypes().get(k);
+                    if ( SocatTypes.GVCO2.typeNameEquals(dtype) ) {
+                        // GVCO2 varies slightly as more data is assimilated into the model
+                        double expval = (Double) origData.getStdVal(j, k);
+                        double actval = (Double) updatedData.getStdVal(j, k);
+                        assertEquals(dtype.getDisplayName() + "StdVal(" + j + "," + k + ")",
+                                expval, actval, 1.0);
+                    }
+                    else if ( dtype instanceof DoubleDashDataType ) {
+                        Object expObj = origData.getStdVal(j, k);
+                        Object actObj = updatedData.getStdVal(j, k);
+                        if ( (expObj == null) && (actObj != null) ) {
+                            fail(dtype.getDisplayName() + "StdVal(" + j + "," + k +
+                                    "): expected null, found " + actObj);
+                        }
+                        else if ( (expObj != null) && (actObj == null) ) {
+                            fail(dtype.getDisplayName() + "StdVal(" + j + "," + k +
+                                    "): expected " + expObj + " found null");
+                        }
+                        else if ( (expObj != null) && (actObj != null) ) {
+                            double expval = (Double) expObj;
+                            double actval = (Double) actObj;
+                            assertEquals(dtype.getDisplayName() + "StdVal(" + j + "," + k + ")",
+                                    expval, actval, 1.0E-7);
+                        }
+                    }
+                    else {
+                        assertEquals(dtype.getDisplayName() + "StdVal(" + j + "," + k + ")",
+                                origData.getStdVal(j, k), updatedData.getStdVal(j, k));
+                    }
                 }
             }
-            assertEquals(origData, updatedData);
             assertNotSame(origData, updatedData);
 
         } finally {

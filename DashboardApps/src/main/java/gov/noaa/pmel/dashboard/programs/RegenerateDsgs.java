@@ -86,6 +86,7 @@ public class RegenerateDsgs {
 
             // Get the metadata in the OME XML file
             DashboardOmeMetadata omeMData = metaHandler.getOmeFromFile(stdId, DashboardUtils.OME_FILENAME);
+            omeMData.setDatasetDOI(fullDataMeta.getSourceDOI());
             updatedMeta = omeMData.createDsgMetadata(knownMetadataTypes);
             // Copy over metadata not contained in the XML file
             updatedMeta.setEnhancedDOI(fullDataMeta.getEnhancedDOI());

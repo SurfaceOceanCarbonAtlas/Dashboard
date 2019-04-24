@@ -128,6 +128,8 @@ public class DatasetSubmitter {
                                 version + " with submission of " + datasetId, false);
                     }
                     DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(omeInfo);
+                    // get the DOIs from data file properties; CDIAC OME does save the DOI as such (may be part of citation)
+                    omeMData.setDatasetDOI(dataset.getSourceDOI());
                     DsgMetadata dsgMData = omeMData.createDsgMetadata(fileMetadataTypes);
 
                     // For SOCAT, the version string in the DsgMetadata is the submit version number plus an 'N' or 'U'

@@ -307,6 +307,7 @@ public class SocatCruiseReporter {
 
         // Get the rest of the metadata info from the OME XML
         DashboardOmeMetadata omeMeta = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
+        // DOI of original dataset set from data file properties below
 
         // Get the list of additional document filenames associated with this cruise.
         // Use what the QC-ers see - the directory listing.
@@ -319,12 +320,11 @@ public class SocatCruiseReporter {
 
         // Get the SOCAT-enhanced data document DOI for this cruise
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
+        // Get DOIs from data file properties
+        omeMeta.setDatasetDOI(cruise.getSourceDOI());
         String socatDOI = cruise.getEnhancedDOI();
         if ( socatDOI.isEmpty() )
             socatDOI = SOCAT_ENHANCED_DOI_TAG;
-
-        // Get the computed values of time in seconds since 1970-01-01 00:00:00
-        double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
 
         // Generate the report
         PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
@@ -366,6 +366,7 @@ public class SocatCruiseReporter {
         ArrayList<String> socatDOIList = new ArrayList<String>(numDatasets);
         ArrayList<String> qcFlagList = new ArrayList<String>(numDatasets);
         ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
+        ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
 
         String regionName;
         if ( regionID != null ) {
@@ -424,14 +425,12 @@ public class SocatCruiseReporter {
                 if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDOI) )
                     socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 socatDOIList.add(socatDOI);
+                DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
+                // get the original-data DOI from the data file properties (not part of CDIAC OME as such; might be part of citation)
+                omeMData.setDatasetDOI(cruise.getSourceDOI());
+                omeMetaList.add(omeMData);
                 upperExpoList.add(upperExpo);
             }
-        }
-
-        // Get the rest of the metadata info from the OME XML
-        ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
-        for (String upperExpo : upperExpoList) {
-            omeMetaList.add(metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME));
         }
 
         // Get the list of additional document filenames associated with this cruise.
@@ -585,6 +584,24 @@ public class SocatCruiseReporter {
         return warnMsgs;
     }
 
+    public static final String MULTI_CRUISE_METADATA_REPORT_HEADER = "Expocode\t" +
+            "version\t" +
+            "Dataset Name\t" +
+            "Platform Name\t" +
+            "PI(s)\t" +
+            "Original Data DOI\t" +
+            "Original Data Reference\t" +
+            "SOCAT DOI\t" +
+            "SOCAT Reference\t" +
+            "Westmost Longitude\t" +
+            "Eastmost Longitude\t" +
+            "Southmost Latitude\t" +
+            "Northmost Latitude\t" +
+            "Start Time\t" +
+            "End Time\t" +
+            "QC Flag\t" +
+            "Additional Metadata Document(s)";
+
     /**
      * Prints the metadata preamble for a multi-cruise report.
      * If successful, any warnings about the generated preamble are returned.
@@ -619,23 +636,7 @@ public class SocatCruiseReporter {
         else
             report.println("SOCAT data in SOCAT region \"" +
                     regionName + "\" for the following data sets:");
-        report.println("Expocode\t" +
-                "version\t" +
-                "Dataset Name\t" +
-                "Platform Name\t" +
-                "PI(s)\t" +
-                "Original Data DOI\t" +
-                "Original Data Reference\t" +
-                "SOCAT DOI\t" +
-                "SOCAT Reference\t" +
-                "Westmost Longitude\t" +
-                "Eastmost Longitude\t" +
-                "Southmost Latitude\t" +
-                "Northmost Latitude\t" +
-                "Start Time\t" +
-                "End Time\t" +
-                "QC Flag\t" +
-                "Additional Metadata Document(s)");
+        report.println(MULTI_CRUISE_METADATA_REPORT_HEADER);
         boolean needsFakeHoursMsg = false;
         for (int k = 0; k < omeMetaList.size(); k++) {
             DashboardOmeMetadata omeMeta = omeMetaList.get(k);
@@ -1137,6 +1138,7 @@ public class SocatCruiseReporter {
 
         // For multicruise reports, remove duplicate data points.
         // Region restrictions, if any, only apply to multicruise reports.
+        TreeSet<DataPoint> prevDatPts;
         Integer sectimeIdx;
         Integer regionIdx;
         Integer xco2WaterTEquIdx;
@@ -1145,13 +1147,25 @@ public class SocatCruiseReporter {
         Integer pco2WaterSSTIdx;
         Integer fco2WaterTEquIdx;
         Integer fco2WaterSSTIdx;
-        TreeSet<DataPoint> prevDatPts;
         if ( multicruise ) {
+            prevDatPts = new TreeSet<DataPoint>();
+
             // Need time to tests for duplicates in multicruise reports
             sectimeIdx = dataVals.getIndexOfType(DashboardServerUtils.TIME);
             if ( sectimeIdx == null )
                 throw new IOException("The DSG file for " + expocode +
                         " does not contain the variable " + DashboardServerUtils.TIME.getVarName());
+
+            // Need region_id if region-specific multicruise report
+            if ( regionID != null ) {
+                regionIdx = dataVals.getIndexOfType(DashboardServerUtils.REGION_ID);
+                if ( regionIdx == null )
+                    throw new IOException("The DSG file for " + expocode +
+                            " does not contain the variable " + DashboardServerUtils.REGION_ID.getVarName());
+            }
+            else
+                regionIdx = null;
+
             // These values are not reported in multicruise reports
             xco2WaterTEquIdx = null;
             xco2WaterSSTIdx = null;
@@ -1159,13 +1173,14 @@ public class SocatCruiseReporter {
             pco2WaterSSTIdx = null;
             fco2WaterTEquIdx = null;
             fco2WaterSSTIdx = null;
-            regionIdx = null;
-            prevDatPts = null;
-
         }
         else {
             // Duplicates not checked in single-cruise reports
+            prevDatPts = null;
             sectimeIdx = null;
+            // Single-cruise reports are never region-specific
+            regionIdx = null;
+
             // These values are reported in single-cruise reports
             xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
             if ( xco2WaterTEquIdx == null )
@@ -1196,17 +1211,6 @@ public class SocatCruiseReporter {
             if ( fco2WaterSSTIdx == null )
                 throw new IOException("The DSG file for " + expocode +
                         " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
-
-            if ( regionID != null ) {
-                regionIdx = dataVals.getIndexOfType(DashboardServerUtils.REGION_ID);
-                if ( regionIdx == null )
-                    throw new IOException("The DSG file for " + expocode +
-                            " does not contain the variable " + DashboardServerUtils.REGION_ID.getVarName());
-            }
-            else
-                regionIdx = null;
-
-            prevDatPts = new TreeSet<DataPoint>();
         }
 
         for (int j = 0; j < dataVals.getNumSamples(); j++) {
@@ -1430,8 +1434,8 @@ public class SocatCruiseReporter {
                         fmtr.format(woceVal);
                 }
 
-                report.println(fmtr.toString());
             }
+            report.println(fmtr.toString());
             fmtr.close();
         }
     }
