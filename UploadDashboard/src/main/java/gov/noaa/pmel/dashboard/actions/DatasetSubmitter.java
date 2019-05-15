@@ -211,6 +211,8 @@ public class DatasetSubmitter {
                     databaseHandler.resetDataQCEvents(datasetId);
                     databaseHandler.addDataQCEvent(dataQCEvents);
 
+                    // (re)generate the WOCE flags messages file
+                    metadataHandler.generateWoceFlagMsgsFile(datasetId, databaseHandler);
                 } catch ( Exception ex ) {
                     errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
                     continue;
