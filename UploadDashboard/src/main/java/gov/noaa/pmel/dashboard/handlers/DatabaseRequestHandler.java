@@ -907,7 +907,7 @@ public class DatabaseRequestHandler {
      * @throws SQLException
      *         if username is not a known user, or if accessing or updating the database throws one
      */
-    public void renameCruiseFlags(String oldExpocode, String newExpocode, String version, String username)
+    public void renameQCFlags(String oldExpocode, String newExpocode, String version, String username)
             throws SQLException {
         Connection catConn = makeConnection(true);
         try {
