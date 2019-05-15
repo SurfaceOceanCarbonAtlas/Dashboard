@@ -714,8 +714,8 @@ public class GenerateCruiseReports {
         report.println("The quality assessments given by the QC flag and fCO2rec_flag only apply to");
         report.println("the fCO2rec value.  For more information about the recomputed fCO2 value and");
         report.println("the meaning of the QC flag, fCO2rec_src, and fCO2rec_flag values, see:");
-        for (int k = 0; k < SOCAT_MAIN_CITATION.length; k++) {
-            report.println(SOCAT_MAIN_CITATION[k]);
+        for (String info : SOCAT_MAIN_CITATION) {
+            report.println(info);
         }
         if ( multicruise ) {
             report.println();
