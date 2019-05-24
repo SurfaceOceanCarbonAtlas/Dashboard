@@ -7,7 +7,9 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.dsg.StdDataArray;
+import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
@@ -102,8 +104,8 @@ public class DatasetModifier {
     }
 
     /**
-     * Appropriately renames dashboard dataset files.  If an exception is thrown, the system is likely have a corrupt
-     * mix of renamed and original-name files.
+     * Appropriately renames dashboard dataset files.  If an exception is thrown,
+     * the system is likely have a corrupt mix of renamed and original-name files.
      *
      * @param oldId
      *         current ID for the dataset
@@ -113,26 +115,41 @@ public class DatasetModifier {
      *         user requesting this rename
      *
      * @throws IllegalArgumentException
-     *         if the username is not an admin, if either dataset ID is invalid, if files for the old dataset ID do not
-     *         exist, if any files for the new dataset ID already exist
+     *         if the username is not an admin,
+     *         if either dataset ID is invalid,
+     *         if files for the old dataset ID do not exist, or
+     *         if any files for the new dataset ID already exist
      * @throws IOException
      *         if updating a file with the new ID throws one
      * @throws SQLException
-     *         if username is not a known user, or if accessing or updating the database throws one
+     *         if username is not a known user, or
+     *         if accessing or updating the database throws one
      */
     public void renameDataset(String oldId, String newId, String username)
             throws IllegalArgumentException, IOException, SQLException {
+        DataFileHandler dataHandler = configStore.getDataFileHandler();
+        CheckerMessageHandler msgHandler = configStore.getCheckerMsgHandler();
+        MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
+        DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+        DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+        String version = configStore.getQCVersion();
+
         // check and standardize the dataset IDs
         String oldStdId = DashboardServerUtils.checkDatasetID(oldId);
         String newStdId = DashboardServerUtils.checkDatasetID(newId);
+
         // rename the dataset data and info files, updating the dataset ID
-        configStore.getDataFileHandler().renameDatasetFiles(oldStdId, newStdId);
+        dataHandler.renameDatasetFiles(oldStdId, newStdId);
         // rename the automated data checker messages file, if it exists
-        configStore.getCheckerMsgHandler().renameMsgsFile(oldStdId, newStdId);
+        msgHandler.renameMsgsFile(oldStdId, newStdId);
         // rename metadata files, updating the dataset ID
-        configStore.getMetadataFileHandler().renameMetadataFiles(oldStdId, newStdId);
+        metaHandler.renameMetadataFiles(oldStdId, newStdId);
         // rename the DSG and decimated DSG files, updating the dataset ID
-        configStore.getDsgNcFileHandler().renameDsgFiles(oldStdId, newStdId);
+        dsgHandler.renameDsgFiles(oldStdId, newStdId);
+        // add QCEvents to the database detailing the rename
+        dbHandler.renameQCFlags(oldStdId, newStdId, version, username);
+        // also rename the WOCE_flags.tsv file, if it exists
+        metaHandler.renameWoceFlagMsgsFile(oldStdId, newStdId, dbHandler);
     }
 
     /**

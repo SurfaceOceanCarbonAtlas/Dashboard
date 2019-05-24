@@ -1,13 +1,9 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.loc.repository.bagit.creator.BagCreator;
 import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
-import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -64,7 +60,6 @@ import java.util.zip.ZipOutputStream;
  */
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
-    private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
     private static final String OCADS_XML_FILENAME = "OCADS.xml";
 
     private static final String EMAIL_SUBJECT_MSG_START = "Request for OCADS archival of dataset ";
@@ -91,11 +86,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private PasswordAuthentication auth;
     private boolean debugIt;
     private Pattern nameCleaner;
-
-    public enum BundleType {
-        ORIG_FILE_BAGIT_ZIP,
-        ENHANCED_FILE_PLAIN_ZIP
-    }
 
     private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
 
@@ -178,13 +168,11 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * The zip bundle virtual File for the given dataset of the given type.
+     * Returns the original-data zip bundle virtual File for the given dataset.
      * Creates the parent subdirectory, if it does not already exist, for this File.
      *
      * @param datasetId
      *         return the zip virtual File for the dataset with this ID
-     * @param bundleType
-     *         type of zip bundle
      *
      * @return the zip bundle virtual File for the dataset
      *
@@ -192,7 +180,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if the dataset is invalid, or
      *         if unable to generate the parent subdirectory if it does not already exist
      */
-    public File getZipBundleFile(String datasetId, BundleType bundleType) throws IllegalArgumentException {
+    public File getOrigZipBundleFile(String datasetId) throws IllegalArgumentException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         File parentFile = new File(filesDir, stdId.substring(0, 4));
         if ( !parentFile.isDirectory() ) {
@@ -201,18 +189,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             if ( !parentFile.mkdir() )
                 throw new IllegalArgumentException("Problems creating the directory: " + parentFile.getPath());
         }
-        File bundleFile;
-        switch ( bundleType ) {
-            case ORIG_FILE_BAGIT_ZIP:
-                bundleFile = new File(parentFile, stdId + "_bagit.zip");
-                break;
-            case ENHANCED_FILE_PLAIN_ZIP:
-                bundleFile = new File(parentFile, stdId + "_enhanced.zip");
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown bundle type of " + bundleType);
-        }
-        return bundleFile;
+        return new File(parentFile, stdId + "_bagit.zip");
     }
 
     /**
@@ -352,7 +329,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         }
 
         // Generate the bundle as a zip file
-        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
+        File bundleFile = getOrigZipBundleFile(stdId);
         String infoMsg = createBagitFilesBundle(stdId, sdimdata);
 
         // Commit the bundle to version control
@@ -521,8 +498,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     /**
      * Generates the bagit zip file of the original data file converted to "Excel" CSV format,
      * as well as any appropriate metadata files for a given dataset.
-     * Use {@link #getZipBundleFile(String, BundleType)} with {@link BundleType#ORIG_FILE_BAGIT_ZIP}
-     * bundle type to get the virtual File of the created bundle.
+     * Use {@link #getOrigZipBundleFile(String)} to get the virtual File of the created bundle.
      *
      * @param expocode
      *         create the bagit zip file for the dataset with this ID
@@ -542,7 +518,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private String createBagitFilesBundle(String expocode, SDIMetadata sdimdata)
             throws IllegalArgumentException, IOException {
         String stdId = DashboardServerUtils.checkDatasetID(expocode);
-        File bundleFile = getZipBundleFile(stdId, BundleType.ORIG_FILE_BAGIT_ZIP);
+        File bundleFile = getOrigZipBundleFile(stdId);
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // Get the original data file for this dataset
@@ -655,63 +631,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Generates a single-cruise enhanced data file, then bundles that report with all the metadata documents
-     * for that dataset.  Use {@link #getZipBundleFile(String, BundleType)} with
-     * {@link BundleType#ENHANCED_FILE_PLAIN_ZIP} bundle type to get the virtual File of the created bundle.
-     *
-     * @param expocode
-     *         create the bundle for the dataset with this ID
-     *
-     * @return the warning messages from generating the single-cruise enhanced data file
-     *
-     * @throws IllegalArgumentException
-     *         if the expoocode is invalid
-     * @throws IOException
-     *         if unable to read the default DashboardConfigStore,
-     *         if unable to create the enhanced data file, or
-     *         in unable to create the bundle file
-     */
-    public ArrayList<String> createEnhancedFilesBundle(String expocode) throws
-            IllegalArgumentException, IOException {
-        File bundleFile = getZipBundleFile(expocode, BundleType.ENHANCED_FILE_PLAIN_ZIP);
-        DashboardConfigStore configStore = DashboardConfigStore.get(false);
-
-        // Generate the single-cruise SOCAT-enhanced data file
-        SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
-        File enhancedDataFile = new File(bundleFile.getParent(), expocode + ENHANCED_REPORT_NAME_EXTENSION);
-        ArrayList<String> warnings = reporter.generateReport(expocode, enhancedDataFile);
-
-        // Get the list of metadata documents to be bundled with this data file
-        ArrayList<File> addlDocs = new ArrayList<File>();
-        MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-        for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(expocode)) {
-            // Exclude the (expocode)/OME.xml document at this time;
-            // do include the (expocode)/PI_OME.xml
-            String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
-                addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
-            }
-        }
-
-        // Generate the bundle as a zip file
-        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
-        try {
-            copyFileToZipBundle(zipOut, expocode, enhancedDataFile);
-            for (File metaFile : addlDocs) {
-                copyFileToZipBundle(zipOut, expocode, metaFile);
-            }
-        } finally {
-            zipOut.close();
-        }
-        // No longer need the SOCAT-enhanced data file
-        enhancedDataFile.delete();
-
-        return warnings;
-    }
-
-    /**
-     * Returns all messages in a possibly-nested MessagingException.  The messages are returned as a single String
-     * by joining all the Exception messages together using a comma and space.
+     * Returns all messages in a possibly-nested MessagingException.  The messages are returned
+     * as a single String by joining all the Exception messages together using a comma and space.
      *
      * @param ex
      *         get the error messages from this MessagingException
@@ -719,7 +640,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      * @return all error messages concatenated together using a comma and a space;
      *         if no messages are present, an empty String is returned
      */
-    private String getMessageExceptionMsgs(MessagingException ex) {
+    private static String getMessageExceptionMsgs(MessagingException ex) {
         String fullErrMsg = null;
         Exception nextEx = ex;
         while ( nextEx != null ) {
@@ -761,7 +682,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if reading from the data files throws one, or
      *         if writing to the zip file throws one
      */
-    private void copyFileToZipBundle(ZipOutputStream zipOut, String parentName, File dataFile) throws IOException {
+    public static void copyFileToZipBundle(ZipOutputStream zipOut, String parentName, File dataFile)
+            throws IOException {
         ZipEntry entry = new ZipEntry(parentName + File.separator + dataFile.getName());
         entry.setTime(dataFile.lastModified());
         zipOut.putNextEntry(entry);
@@ -782,7 +704,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      * @throws IOException
      *         if reading from or writing to the files throws one
      */
-    private void copyTsvToCsvFile(File dataFile, File csvFile) throws FileNotFoundException, IOException {
+    private static void copyTsvToCsvFile(File dataFile, File csvFile) throws FileNotFoundException, IOException {
         BufferedReader reader = new BufferedReader(new FileReader(dataFile));
         try {
             CSVPrinter csvout = new CSVPrinter(new FileWriter(csvFile),

@@ -611,8 +611,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Appropriately renames any metadata documents and info files for a change in dataset ID.  Renames the dataset in
-     * the OME metadata file if it exists.
+     * Appropriately renames any metadata documents and info files for a change in dataset ID.
+     * Renames the dataset in the OME metadata file if it exists.
      *
      * @param oldId
      *         standardized old ID of the dataset
@@ -620,7 +620,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         standardized new ID for the dataset
      *
      * @throws IllegalArgumentException
-     *         if a metadata or info file for the new ID already exists, if the OME metadata exists but is invalid, or
+     *         if a metadata or info file for the new ID already exists,
+     *         if the OME metadata exists but is invalid, or
      *         if unable to rename a metadata or info file
      */
     public void renameMetadataFiles(String oldId, String newId) throws IllegalArgumentException {
@@ -811,7 +812,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
     /**
      * Create the WOCE flags messages file from the WOCE flags in the database.
-     * This file is NOT added as a metadata document or committed to version control.
+     * This file is NOT added as a metadata document.
      *
      * @param expocode
      *         create the WOCE flags messages files for the dataset with this ID
@@ -819,7 +820,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         get the WOCE flags from the database using this handler
      *
      * @throws IllegalArgumentException
-     *         if the expocode is invalid or if unable to create the WOCE flags messages file
+     *         if the expocode is invalid,
+     *         if unable to create the WOCE flags messages file, or
+     *         if unable to commit the WOCE flags messages file to version control
      * @throws SQLException
      *         if there are problems getting the WOCE flags from the database
      */
@@ -870,6 +873,56 @@ public class MetadataFileHandler extends VersionedFileHandler {
         } finally {
             msgsWriter.close();
         }
-
+        try {
+            commitVersion(msgsFile, "(re)generating WOCE flags messages file for " + expocode);
+        } catch ( SVNException ex ) {
+            throw new IllegalArgumentException("Problems committing WOCE flag messages file " +
+                    msgsFile.getPath() + ":\n    " + ex.getMessage());
+        }
     }
+
+    /**
+     * Moves and updates the WOCE flag messages file appropriately for a change in the
+     * unique ID for a dataset.  Does nothing (other than check the validity of the old
+     * ID) if the WOCE flag messages file under the old ID does not exist
+     * (for example, when the dataset has not yet been submitted for QC).
+     *
+     * @param oldId
+     *         old unique ID (expocode) of the dataset
+     * @param newId
+     *         new unique ID (expocode) of the dataset
+     * @param dbHandler
+     *         get the WOCE flags from the database using this handler
+     *
+     * @throws IllegalArgumentException
+     *         if either unique ID (expocode) is invalid,
+     *         if a WOCE flag messages file already exists for the new ID,
+     *         if unable to rename or update the WOCE flag messages file,
+     *         if unable to commit the WOCE flags messages file to version control
+     * @throws SQLException
+     *         if there are problems getting the WOCE flags from the database
+     */
+    public void renameWoceFlagMsgsFile(String oldId, String newId, DatabaseRequestHandler dbHandler)
+            throws IllegalArgumentException, SQLException {
+        File oldMsgsFile = getMetadataFile(oldId, FLAG_MSGS_FILENAME);
+        if ( oldMsgsFile.exists() ) {
+            File newMsgsFile = getMetadataFile(newId, FLAG_MSGS_FILENAME);
+            if ( newMsgsFile.exists() )
+                throw new IllegalArgumentException("WOCE flag messages file already exists for " + newId);
+
+            // Make sure the parent directory exists for the new file
+            File parent = newMsgsFile.getParentFile();
+            if ( !parent.exists() )
+                parent.mkdirs();
+
+            String commitMsg = "Move WOCE flag messages file from " + oldId + " to " + newId;
+            try {
+                moveVersionedFile(oldMsgsFile, newMsgsFile, commitMsg);
+            } catch ( SVNException ex ) {
+                throw new IllegalArgumentException(ex);
+            }
+            generateWoceFlagMsgsFile(newId, dbHandler);
+        }
+    }
+
 }

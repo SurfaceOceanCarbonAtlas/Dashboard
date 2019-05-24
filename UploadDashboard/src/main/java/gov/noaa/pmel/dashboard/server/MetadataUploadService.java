@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
@@ -244,13 +241,16 @@ public class MetadataUploadService extends HttpServlet {
                     try {
                         // Add the 'U' QC flags
                         databaseHandler.addDatasetQCEvents(qcEventList);
-                        dsgHandler.updateDatasetQCFlagAndVersion(qcEventList.get(0));
                         // Update the dashboard status for the 'U' QC flag
                         dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);
                         // If archived, reset the archived status so the updated metadata will be archived
                         if ( dataset.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
                             dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
                         dataFileHandler.saveDatasetInfoToFile(dataset, comment);
+                        // Update the DSG files
+                        String versionStatus = databaseHandler.getVersionStatus(id);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id,
+                                DashboardServerUtils.DATASET_QCFLAG_UPDATED, versionStatus);
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.

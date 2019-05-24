@@ -1,11 +1,7 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -79,37 +75,34 @@ public class UpdateQCFlags {
             // update each of these cruises
             for (String expocode : allExpocodes) {
                 String qcFlag;
-                String version;
+                String versionStatus;
                 try {
                     qcFlag = dbHandler.getDatasetQCFlag(expocode);
-                    String versionStatus = dbHandler.getVersionStatus(expocode);
-                    // Remove the 'N' or 'U' on the end to get just the version number
-                    version = versionStatus.substring(0, versionStatus.length() - 1);
+                    versionStatus = dbHandler.getVersionStatus(expocode);
                 } catch ( Exception ex ) {
-                    System.err.println("Error getting the database QC flag or version for " +
+                    System.err.println("Error getting the database QC flag or version with status for " +
                             expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
-                String[] oldFlagVersion;
+                String oldQCFlag;
+                String oldVersionStatus;
                 try {
-                    oldFlagVersion = dsgHandler.getDatasetQCFlagAndVersion(expocode);
+                    String[] oldFlagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expocode);
+                    oldQCFlag = oldFlagVersionStatus[0];
+                    oldVersionStatus = oldFlagVersionStatus[1];
                 } catch ( Exception ex ) {
-                    System.err.println("Error reading the current DSG QC flag or version for " +
+                    System.err.println("Error reading the current DSG QC flag or version with status for " +
                             expocode + " : " + ex.getMessage());
                     success = false;
                     continue;
                 }
                 try {
-                    if ( !(qcFlag.equals(oldFlagVersion[0]) && version.equals(oldFlagVersion[1])) ) {
-                        QCEvent event = new QCEvent();
-                        event.setDatasetId(expocode);
-                        event.setFlagValue(qcFlag);
-                        event.setVersion(version);
+                    if ( !(qcFlag.equals(oldQCFlag) && versionStatus.equals(oldVersionStatus)) ) {
                         // Update the QC flag in the DSG files
-                        dsgHandler.updateDatasetQCFlagAndVersion(event);
-                        System.out.println("Updated QC flag for " + expocode + " from '" + oldFlagVersion[0] +
-                                "', v" + oldFlagVersion[1] + " to '" + qcFlag + "', v" + version);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(expocode, qcFlag, versionStatus);
+                        System.out.println("Updated QC flag for " + expocode + " from '" + oldQCFlag +
+                                "', v" + oldVersionStatus + " to '" + qcFlag + "', v" + versionStatus);
 
                         updated = true;
                     }

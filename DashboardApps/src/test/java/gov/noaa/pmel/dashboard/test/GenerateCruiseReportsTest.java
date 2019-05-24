@@ -1,6 +1,6 @@
-package gov.noaa.pmel.dashboard.test.actualdata;
+package gov.noaa.pmel.dashboard.test;
 
-import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
+import gov.noaa.pmel.dashboard.programs.GenerateCruiseReports;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import org.junit.Test;
 
@@ -9,26 +9,24 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Test methods of {@link SocatCruiseReporter}
- */
-public class SocatCruiseReporterTest {
+public class GenerateCruiseReportsTest {
 
     /**
-     * Test of {@link SocatCruiseReporter#generateReport(String, File)}
+     * Test of {@link GenerateCruiseReports#createEnhancedFilesBundle(String, File)}
      */
     @Test
-    public void testGenerateSingleCruiseReport() throws IOException {
-        final String expocode = "PAT520150211";
-        final File reportFile = new File("/var/tmp/junit/PAT520150211.tsv");
-
+    public void testCreateEnhancedFilesBundle() throws IOException {
+        final List<String> expoList = Arrays.asList("PAT520151021", "26NA20160612", "11SS20150807");
         System.setProperty("CATALINA_BASE", System.getenv("HOME"));
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore configStore = null;
@@ -40,16 +38,43 @@ public class SocatCruiseReporterTest {
             System.exit(1);
         }
 
-        SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
+        GenerateCruiseReports reporter = new GenerateCruiseReports(configStore);
+        File outputDir = new File("/var/tmp/junit");
+        for (String expocode : expoList) {
+            ArrayList<String> warnings = reporter.createEnhancedFilesBundle(expocode, outputDir);
+            assertEquals(0, warnings.size());
+            File zipFile = reporter.getEnhancedZipBundleFile(expocode, outputDir);
+            assertTrue(zipFile.exists());
+        }
+    }
+
+    /**
+     * Test of {@link GenerateCruiseReports#generateReport(String, File)}
+     */
+    @Test
+    public void testGenerateSingleCruiseReport() throws IOException {
+        final String expocode = "PAT520150211";
+        final File reportFile = new File("/var/tmp/junit/PAT520150211.tsv");
+        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
+        DashboardConfigStore configStore = null;
+        try {
+            configStore = DashboardConfigStore.get(false);
+        } catch ( Exception ex ) {
+            System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
+        GenerateCruiseReports reporter = new GenerateCruiseReports(configStore);
         ArrayList<String> msgs = reporter.generateReport(expocode, reportFile);
         assertEquals(0, msgs.size());
 
         BufferedReader reader = new BufferedReader(new FileReader(reportFile));
         try {
-            ArrayList<String> datalines = new ArrayList<String>();
             boolean preamble = true;
-            int expectedNumColumns = SocatCruiseReporter.SINGLE_CRUISE_DATA_REPORT_HEADER.split("\t").length;
-            boolean hasValue[] = new boolean[expectedNumColumns];
+            int expectedNumColumns = GenerateCruiseReports.SINGLE_CRUISE_DATA_REPORT_HEADER.split("\t").length;
+            boolean[] hasValue = new boolean[expectedNumColumns];
             String dataline = reader.readLine();
             int dataLineIdx = 0;
             while ( dataline != null ) {
@@ -58,14 +83,14 @@ public class SocatCruiseReporterTest {
                     // Check if this is the header for the data
                     if ( pieces.length != 1 ) {
                         preamble = false;
-                        assertEquals(SocatCruiseReporter.SINGLE_CRUISE_DATA_REPORT_HEADER, dataline);
+                        assertEquals(GenerateCruiseReports.SINGLE_CRUISE_DATA_REPORT_HEADER, dataline);
                     }
                 }
                 else {
                     assertEquals(expectedNumColumns, pieces.length);
                     // First 12 must always have values
                     for (int k = 0; k < 12; k++) {
-                        assertFalse("NaN".equals(pieces[k]));
+                        assertNotEquals("NaN", pieces[k]);
                     }
                     // Rest may or may not depending on if air sample or water sample
                     for (int k = 0; k < expectedNumColumns; k++) {
@@ -104,7 +129,7 @@ public class SocatCruiseReporterTest {
     }
 
     /**
-     * Test of {@link SocatCruiseReporter#generateReport(TreeSet, String, File)}
+     * Test of {@link GenerateCruiseReports#generateReport(TreeSet, String, File)}
      */
     @Test
     public void testGenerateMultiCruiseReport() throws IOException {
@@ -122,19 +147,19 @@ public class SocatCruiseReporterTest {
             System.exit(1);
         }
 
-        SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
+        GenerateCruiseReports reporter = new GenerateCruiseReports(configStore);
         ArrayList<String> msgs = reporter.generateReport(expocodeList, "C", reportFile);
         assertEquals(0, msgs.size());
 
         BufferedReader reader = new BufferedReader(new FileReader(reportFile));
         try {
-            ArrayList<String> datalines = new ArrayList<String>();
             boolean metadataHeaderFound = false;
             boolean metadataFound = false;
             boolean dataInfoFound = false;
             boolean dataHeaderFound = false;
-            int expectedNumMetadataColumns = SocatCruiseReporter.MULTI_CRUISE_METADATA_REPORT_HEADER.split("\t").length;
-            int expectedNumDataColumns = SocatCruiseReporter.MULTI_CRUISE_DATA_REPORT_HEADER.split("\t").length;
+            int expectedNumMetadataColumns = GenerateCruiseReports.MULTI_CRUISE_METADATA_REPORT_HEADER
+                    .split("\t").length;
+            int expectedNumDataColumns = GenerateCruiseReports.MULTI_CRUISE_DATA_REPORT_HEADER.split("\t").length;
             String dataline = reader.readLine();
             int dataLineIdx = 0;
             while ( dataline != null ) {
@@ -142,7 +167,7 @@ public class SocatCruiseReporterTest {
                 if ( !metadataHeaderFound ) {
                     // Check if this is the header for the metadata
                     if ( pieces.length != 1 ) {
-                        assertEquals(SocatCruiseReporter.MULTI_CRUISE_METADATA_REPORT_HEADER, dataline);
+                        assertEquals(GenerateCruiseReports.MULTI_CRUISE_METADATA_REPORT_HEADER, dataline);
                         metadataHeaderFound = true;
                     }
                 }
@@ -166,7 +191,7 @@ public class SocatCruiseReporterTest {
                 }
                 else if ( !dataHeaderFound ) {
                     if ( pieces.length != 1 ) {
-                        assertEquals(SocatCruiseReporter.MULTI_CRUISE_DATA_REPORT_HEADER, dataline);
+                        assertEquals(GenerateCruiseReports.MULTI_CRUISE_DATA_REPORT_HEADER, dataline);
                         dataHeaderFound = true;
                     }
                 }
@@ -194,7 +219,6 @@ public class SocatCruiseReporterTest {
             reader.close();
         }
     }
-
 
     private static final String[][] EXPECTED_START_SINGLE_CRUISE_REPORT_DATA_STRINGS = {
             { "PAT520150211", "4.0N", "10.1594/PANGAEA.866284", "B", "2015", "02", "11", "04", "50", "00.",
