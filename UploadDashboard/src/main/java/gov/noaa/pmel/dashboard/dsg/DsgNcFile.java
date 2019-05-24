@@ -942,7 +942,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 versionArray = (ArrayChar.D2) var.read();
-            versionStatus = flagArray.getString(0).trim();
+            versionStatus = versionArray.getString(0).trim();
         } finally {
             ncfile.close();
         }
