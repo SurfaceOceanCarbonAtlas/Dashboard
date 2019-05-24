@@ -33,7 +33,7 @@ import java.util.TreeSet;
 
 public class DsgNcFile extends File {
 
-    private static final long serialVersionUID = -4101244523736694568L;
+    private static final long serialVersionUID = 1251710644553980018L;
 
     private static final String DSG_VERSION = "DsgNcFile 2.0";
     private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
@@ -918,16 +918,17 @@ public class DsgNcFile extends File {
     }
 
     /**
-     * @return the dataset QC flag (first element) and the version (second element) contained in this DSG file
+     * @return the dataset QC flag (first element) and the version with status (second element)
+     *         contained in this DSG file
      *
      * @throws IllegalArgumentException
      *         if this DSG file is not valid
      * @throws IOException
      *         if opening or reading from the DSG file throws one
      */
-    public String[] getDatasetQCFlagAndVersion() throws IllegalArgumentException, IOException {
+    public String[] getDatasetQCFlagAndVersionStatus() throws IllegalArgumentException, IOException {
         String flag;
-        String version;
+        String versionStatus;
         NetcdfFile ncfile = NetcdfFile.open(getPath());
         try {
             String varName = DashboardServerUtils.DATASET_QC_FLAG.getVarName();
@@ -941,27 +942,27 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 versionArray = (ArrayChar.D2) var.read();
-            version = flagArray.getString(0).trim();
+            versionStatus = flagArray.getString(0).trim();
         } finally {
             ncfile.close();
         }
-        return new String[] { flag, version };
+        return new String[] { flag, versionStatus };
     }
 
     /**
-     * Updates this DSG file with the given QC flag and version number
+     * Updates this DSG file with the given QC flag and version number with status
      *
      * @param qcFlag
      *         the QC flag to assign
-     * @param version
-     *         version to assign
+     * @param versionStatus
+     *         version with status to assign
      *
      * @throws IllegalArgumentException
      *         if this DSG file is not valid
      * @throws IOException
      *         if opening or writing to the DSG file throws one
      */
-    public void updateDatasetQCFlagAndVersion(String qcFlag, String version)
+    public void updateDatasetQCFlagAndVersionStatus(String qcFlag, String versionStatus)
             throws IllegalArgumentException, IOException {
         NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
         try {
@@ -982,7 +983,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 versionArray = new ArrayChar.D2(1, var.getShape(1));
-            versionArray.setString(0, version.trim());
+            versionArray.setString(0, versionStatus.trim());
             try {
                 ncfile.write(var, versionArray);
             } catch ( InvalidRangeException ex ) {

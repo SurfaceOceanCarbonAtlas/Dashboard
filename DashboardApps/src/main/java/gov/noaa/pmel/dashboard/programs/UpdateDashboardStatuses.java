@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -77,8 +74,8 @@ public class UpdateDashboardStatuses {
             for (String expocode : allExpocodes) {
                 String qcFlag;
                 try {
-                    String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expocode);
-                    qcFlag = flagVersion[0];
+                    String[] flagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expocode);
+                    qcFlag = flagVersionStatus[0];
                 } catch ( Exception ex ) {
                     System.err.println("Error reading the QC flag for " + expocode + " : " + ex.getMessage());
                     success = false;

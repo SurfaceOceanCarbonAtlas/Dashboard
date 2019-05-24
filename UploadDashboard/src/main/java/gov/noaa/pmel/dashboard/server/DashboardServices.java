@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.server;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -314,15 +311,19 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 qcEventList.add(qcEvent);
             }
             try {
+                DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
                 // Add the 'U' QC flag with the current upload version
-                configStore.getDatabaseRequestHandler().addDatasetQCEvents(qcEventList);
-                dsgHandler.updateDatasetQCFlagAndVersion(qcEventList.get(0));
+                dbHandler.addDatasetQCEvents(qcEventList);
                 // Update the dashboard status
                 dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
                 if ( dataset.isEditable() == null ) {
                     dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
                 }
                 dataHandler.saveDatasetInfoToFile(dataset, comment);
+                // Update the DSG files
+                String versionStatus = dbHandler.getVersionStatus(datasetId);
+                dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId,
+                        DashboardServerUtils.DATASET_QCFLAG_UPDATED, versionStatus);
                 itsLogger.info("updated QC status for " + datasetId);
             } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
@@ -610,12 +611,14 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     qc.setDatasetId(datasetId);
                     //  add the global suspend QCFlag to database
                     dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
-                    //  update the DSG files
-                    dsgHandler.updateDatasetQCFlagAndVersion(qc);
                     //  update the dataset properties file
                     String message = "dataset " + datasetId + " suspended by " + username;
                     dset.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
                     dataHandler.saveDatasetInfoToFile(dset, message);
+                    //  update the DSG files
+                    String versionStatus = dbHandler.getVersionStatus(datasetId);
+                    dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId,
+                            DashboardServerUtils.DATASET_QCFLAG_SUSPEND, versionStatus);
                     itsLogger.info(message);
                 }
             } catch ( Exception ex ) {

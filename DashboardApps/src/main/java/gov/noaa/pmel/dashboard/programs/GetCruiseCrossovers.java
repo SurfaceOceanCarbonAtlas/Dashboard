@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
@@ -92,15 +89,16 @@ public class GetCruiseCrossovers {
             TreeSet<String> notActuallyAExpos = new TreeSet<String>();
             for (String expo : givenExpocodes) {
                 try {
-                    String[] flagVersion = dsgHandler.getDatasetQCFlagAndVersion(expo);
-                    if ( ACCEPTABLE_FLAGS_SET.contains(flagVersion[0]) ) {
-                        datasetFlagsMap.put(expo, flagVersion[0]);
+                    String[] flagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expo);
+                    String qcFlag = flagVersionStatus[0];
+                    if ( ACCEPTABLE_FLAGS_SET.contains(qcFlag) ) {
+                        datasetFlagsMap.put(expo, qcFlag);
                     }
                     else {
-                        throw new Exception("QC flag is " + flagVersion[0]);
+                        throw new Exception("QC flag is " + qcFlag);
                     }
                     // Add all flag-A expocodes, then remove those that actually do have crossovers
-                    if ( DashboardServerUtils.DATASET_QCFLAG_A.equals(flagVersion[0]) )
+                    if ( DashboardServerUtils.DATASET_QCFLAG_A.equals(qcFlag) )
                         notActuallyAExpos.add(expo);
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());

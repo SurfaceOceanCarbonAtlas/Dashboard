@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -12,7 +9,6 @@ import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
-import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.apache.logging.log4j.Logger;
@@ -512,46 +508,51 @@ public class DsgNcFileHandler {
      * @param datasetId
      *         get the dataset QC flag and version for the dataset with this ID
      *
-     * @return the dataset QC flag (first element) and version (second element) for the indicated dataset
+     * @return the dataset QC flag (first element) and version with status (second element)
+     *         for the indicated dataset
      *
      * @throws IllegalArgumentException
      *         if the dataset ID is invalid or if the full-data DSG file does not exist or is invalid
      * @throws IOException
      *         if opening or reading from the full-data DSG file throws one
      */
-    public String[] getDatasetQCFlagAndVersion(String datasetId) throws IllegalArgumentException, IOException {
+    public String[] getDatasetQCFlagAndVersionStatus(String datasetId) throws IllegalArgumentException, IOException {
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
-        String[] flagVersion = dsgFile.getDatasetQCFlagAndVersion();
-        return flagVersion;
+        String[] flagVersionStatus = dsgFile.getDatasetQCFlagAndVersionStatus();
+        return flagVersionStatus;
     }
 
     /**
-     * Updates the dataset QC flag and version number in the full-data and decimated-data DSG files
-     * for a dataset.  Flags ERDDAP after making these updates.
+     * Updates the dataset QC flag and version number with status in the full-data and
+     * decimated-data DSG files for a dataset.  Flags ERDDAP after making these updates.
      *
-     * @param qcEvent
-     *         get the dataset ID, dataset QC flag, and version number to assign from this QC event
+     * @param datasetId
+     *         update the dataset DSG files with this unique ID (expocode)
+     * @param qcFlag
+     *         dataset QC flag to assign in the DSG files
+     * @param versionStatus
+     *         version with status (e.g., "2019.0N") to assign in the DSG files
      *
      * @throws IllegalArgumentException
      *         if the DSG files are not valid
      * @throws IOException
      *         if problems opening or writing to a DSG file
      */
-    public void updateDatasetQCFlagAndVersion(QCEvent qcEvent) throws IllegalArgumentException, IOException {
+    public void updateDatasetQCFlagAndVersionStatus(String datasetId, String qcFlag, String versionStatus)
+            throws IllegalArgumentException, IOException {
         // Get the location and name for the NetCDF DSG file
-        String datasetId = qcEvent.getDatasetId();
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
         synchronized(SINGLETON_SYNC_OBJECT) {
-            dsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
+            dsgFile.updateDatasetQCFlagAndVersionStatus(qcFlag, versionStatus);
         }
         DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
         if ( !decDsgFile.exists() )
             throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
-        decDsgFile.updateDatasetQCFlagAndVersion(qcEvent.getFlagValue(), qcEvent.getVersion());
+        decDsgFile.updateDatasetQCFlagAndVersionStatus(qcFlag, versionStatus);
         flagErddap(true, true);
     }
 
@@ -757,6 +758,7 @@ public class DsgNcFileHandler {
      *         kind of change to be handled
      * @param changedFile
      *         file or directory to be handled
+     *
      * @throws IOException
      *         if registering a directory to be watched throws one
      */
@@ -790,7 +792,7 @@ public class DsgNcFileHandler {
                 itsLogger.info("Checking QC flag given in " + changedFile.getPath());
             try {
                 DsgNcFile dsgFile = new DsgNcFile(changedFile.getPath());
-                String qcFlag = dsgFile.getDatasetQCFlagAndVersion()[0];
+                String qcFlag = dsgFile.getDatasetQCFlagAndVersionStatus()[0];
                 if ( dataFileHandler.updateDatasetDashboardStatus(expocode, qcFlag) ) {
                     if ( itsLogger != null )
                         itsLogger.info("Updated dashboard status for " + expocode +
