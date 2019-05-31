@@ -3,9 +3,9 @@ package gov.noaa.pmel.dashboard.shared;
 /**
  * Represents a QC flag along with a comment about the flag.
  */
-public class CommentedQCFlag extends QCFlag {
+public class CommentedDataQCFlag extends DataQCFlag {
 
-    private static final long serialVersionUID = 4473792492507538463L;
+    private static final long serialVersionUID = 6129255299969059445L;
 
     String comment;
 
@@ -20,31 +20,31 @@ public class CommentedQCFlag extends QCFlag {
      * <li> comment of {@link DashboardUtils#STRING_MISSING_VALUE} </li>
      * </ul>
      */
-    public CommentedQCFlag() {
+    public CommentedDataQCFlag() {
         super();
         this.comment = DashboardUtils.STRING_MISSING_VALUE;
     }
 
     /**
      * Create with given values for flag name, flag value, severity, column index, row index, and comment as described
-     * by {@link #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(QCFlag.Severity)},
+     * by {@link #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(DataQCFlag.Severity)},
      * {@link #setColumnIndex(Integer)}, {@link #setRowIndex(Integer)}, and {@link #setComment(String)}
      */
-    public CommentedQCFlag(String flagName, String flagValue, Severity severity,
+    public CommentedDataQCFlag(String flagName, String flagValue, Severity severity,
             Integer colIdx, Integer rowIdx, String comment) {
         super(flagName, flagValue, severity, colIdx, rowIdx);
         setComment(comment);
     }
 
     /**
-     * Created with the values in the given {@link QCFlag} along with the given comment.
+     * Created with the values in the given {@link DataQCFlag} along with the given comment.
      *
      * @param qcflag
      *         get the flag value from here; cannot be null
      * @param comment
      *         comment to assign as described by {@link #setComment(String)}
      */
-    public CommentedQCFlag(QCFlag qcflag, String comment) {
+    public CommentedDataQCFlag(DataQCFlag qcflag, String comment) {
         super(qcflag.flagName, qcflag.flagValue, qcflag.severity, qcflag.columnIndex, qcflag.rowIndex);
         setComment(comment);
     }
@@ -69,18 +69,18 @@ public class CommentedQCFlag extends QCFlag {
     }
 
     /**
-     * @see {@link QCFlag#compareTo(QCFlag)}
+     * @see {@link DataQCFlag#compareTo(DataQCFlag)}
      *         <p>
-     *         If other is a CommentedQCFlag, the comment strings are also compared;
+     *         If other is a CommentedDataQCFlag, the comment strings are also compared;
      *         otherwise this comment string is compared to {@link DashboardUtils#STRING_MISSING_VALUE}
      */
     @Override
-    public int compareTo(QCFlag other) {
+    public int compareTo(DataQCFlag other) {
         int result = super.compareTo(other);
         if ( result != 0 )
             return result;
-        if ( other instanceof CommentedQCFlag ) {
-            CommentedQCFlag commqc = (CommentedQCFlag) other;
+        if ( other instanceof CommentedDataQCFlag ) {
+            CommentedDataQCFlag commqc = (CommentedDataQCFlag) other;
             result = comment.compareTo(commqc.comment);
         }
         else {
@@ -95,7 +95,7 @@ public class CommentedQCFlag extends QCFlag {
     public int hashCode() {
         final int prime = 37;
         int result = super.hashCode();
-        // A CommentedQCFlag without a comment is equal to its superclass QCFlag
+        // A CommentedDataQCFlag without a comment is equal to its superclass DataQCFlag
         // so do not alter the superclass hash code; otherwise the comments must
         // be the same so factor in the comment hash code.
         if ( !DashboardUtils.STRING_MISSING_VALUE.equals(comment) )
@@ -104,10 +104,10 @@ public class CommentedQCFlag extends QCFlag {
     }
 
     /**
-     * @see {@link QCFlag#equals(Object)}
+     * @see {@link DataQCFlag#equals(Object)}
      *         <p>
      *         Note that if this CommentQCFlag does not have a comment,
-     *         it will be considered equal to its superclass QCFlag object.
+     *         it will be considered equal to its superclass DataQCFlag object.
      */
     @Override
     public boolean equals(Object obj) {
@@ -124,10 +124,10 @@ public class CommentedQCFlag extends QCFlag {
             return true;
 
         // Otherwise must be a CommentQCFlag with the same comment
-        if ( !(obj instanceof CommentedQCFlag) )
+        if ( !(obj instanceof CommentedDataQCFlag) )
             return false;
 
-        CommentedQCFlag other = (CommentedQCFlag) obj;
+        CommentedDataQCFlag other = (CommentedDataQCFlag) obj;
         if ( !comment.equals(other.comment) )
             return false;
 

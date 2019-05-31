@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -9,8 +6,8 @@ import gov.noaa.pmel.dashboard.datatype.IntDashDataType;
 import gov.noaa.pmel.dashboard.datatype.StringDashDataType;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -558,18 +555,18 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Encodes a set of QCFlag objects suitable for decoding with {@link #decodeQCFlagSet(String)}.
+     * Encodes a set of DataQCFlag objects suitable for decoding with {@link #decodeDataQCFlagSet(String)}.
      *
      * @param qcSet
-     *         set of QCFlag values to encode
+     *         set of DataQCFlag values to encode
      *
-     * @return the encoded list of QCFlag values
+     * @return the encoded list of DataQCFlag values
      */
-    public static String encodeQCFlagSet(TreeSet<QCFlag> qcSet) {
+    public static String encodeDataQCFlagSet(TreeSet<DataQCFlag> qcSet) {
         StringBuilder sb = new StringBuilder();
         sb.append("[ ");
         boolean firstValue = true;
-        for (QCFlag flag : qcSet) {
+        for (DataQCFlag flag : qcSet) {
             if ( firstValue )
                 firstValue = false;
             else
@@ -591,38 +588,39 @@ public class DashboardServerUtils {
     }
 
     /**
-     * Decodes an encoded QCFlag set produced by {@link #encodeQCFlagSet(java.util.TreeSet)}, into a TreeSet of
-     * QCFlags.
+     * Decodes an encoded DataQCFlag set produced by {@link #encodeDataQCFlagSet(java.util.TreeSet)},
+     * into a TreeSet of DataQCFlags.
      *
      * @param qcFlagSetStr
-     *         the encoded set of QCFlag objects
+     *         the encoded set of DataQCFlag objects
      *
-     * @return the decoded TreeSet ofQCFlag objects; never null, but may be empty (if the encoded set does not specify
-     *         any QCFlag objects)
+     * @return the decoded TreeSet of DataQCFlag objects; never null, but may be empty
+     *         (if the encoded set does not specify any DataQCFlag objects)
      *
      * @throws IllegalArgumentException
-     *         if qcFlagSetStr does not start with '[', does not end with ']', or contains an invalid encoded QCFlag.
+     *         if qcFlagSetStr does not start with '[', does not end with ']', or
+     *         contains an invalid encoded DataQCFlag.
      */
-    public static TreeSet<QCFlag> decodeQCFlagSet(String qcFlagSetStr) {
+    public static TreeSet<DataQCFlag> decodeDataQCFlagSet(String qcFlagSetStr) {
         if ( !(qcFlagSetStr.startsWith("[") && qcFlagSetStr.endsWith("]")) )
-            throw new IllegalArgumentException("Encoded QCFlag set not enclosed in brackets");
+            throw new IllegalArgumentException("Encoded DataQCFlag set not enclosed in brackets");
         String contents = qcFlagSetStr.substring(1, qcFlagSetStr.length() - 1);
         if ( contents.trim().isEmpty() )
-            return new TreeSet<QCFlag>();
+            return new TreeSet<DataQCFlag>();
         int firstIndex = contents.indexOf("[");
         int lastIndex = contents.lastIndexOf("]");
         if ( (firstIndex < 0) || (lastIndex < 0) ||
                 (!contents.substring(0, firstIndex).trim().isEmpty()) ||
                 (!contents.substring(lastIndex + 1).trim().isEmpty()) )
-            throw new IllegalArgumentException("A QCFlag encoding is not enclosed in brackets");
+            throw new IllegalArgumentException("A DataQCFlag encoding is not enclosed in brackets");
         String[] pieces = contents.substring(firstIndex + 1, lastIndex)
                                   .split("\\]\\s*,\\s*\\[", -1);
-        TreeSet<QCFlag> flagSet = new TreeSet<QCFlag>();
+        TreeSet<DataQCFlag> flagSet = new TreeSet<DataQCFlag>();
         for (String encFlag : pieces) {
             String[] flagParts = encFlag.split(",", 5);
             try {
                 if ( flagParts.length != 5 )
-                    throw new IllegalArgumentException("incomplete QCFlag description");
+                    throw new IllegalArgumentException("incomplete DataQCFlag description");
 
                 Integer rowIndex = Integer.parseInt(flagParts[0].trim());
 
@@ -652,9 +650,9 @@ public class DashboardServerUtils {
                     throw new IllegalArgumentException("flag name not enclosed in double quotes");
                 String flagName = flagParts[4].substring(firstIndex + 1, lastIndex);
 
-                flagSet.add(new QCFlag(flagName, flagValue, severity, colIndex, rowIndex));
+                flagSet.add(new DataQCFlag(flagName, flagValue, severity, colIndex, rowIndex));
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException("Invalid encoding of a set of QCFlag objects: " +
+                throw new IllegalArgumentException("Invalid encoding of a set of DataQCFlag objects: " +
                         ex.getMessage(), ex);
             }
         }

@@ -1,13 +1,10 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -353,10 +350,10 @@ public class DashboardDatasetTest {
      */
     @Test
     public void testSetGetCheckerFlags() {
-        TreeSet<QCFlag> checkerFlags = new TreeSet<QCFlag>(Arrays.asList(
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 2),
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 8, 12),
-                new QCFlag("WOCE_CO2_water", "4", Severity.ERROR, 3, 22)
+        TreeSet<DataQCFlag> checkerFlags = new TreeSet<DataQCFlag>(Arrays.asList(
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 2),
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 8, 12),
+                new DataQCFlag("WOCE_CO2_water", "4", Severity.ERROR, 3, 22)
         ));
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(0, cruise.getCheckerFlags().size());
@@ -386,10 +383,10 @@ public class DashboardDatasetTest {
      */
     @Test
     public void testSetGetUserFlags() {
-        TreeSet<QCFlag> userFlags = new TreeSet<QCFlag>(Arrays.asList(
-                new QCFlag("WOCE_CO2_water", "4", Severity.ERROR, 4, 31),
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 35),
-                new QCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 12, 35)
+        TreeSet<DataQCFlag> userFlags = new TreeSet<DataQCFlag>(Arrays.asList(
+                new DataQCFlag("WOCE_CO2_water", "4", Severity.ERROR, 4, 31),
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 35),
+                new DataQCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 12, 35)
         ));
         DashboardDataset cruise = new DashboardDataset();
         assertEquals(0, cruise.getUserFlags().size());
@@ -517,15 +514,15 @@ public class DashboardDatasetTest {
                 ));
         ArrayList<String> myUserColNames = new ArrayList<String>(
                 Arrays.asList("time", "lon", "lat", "depth"));
-        TreeSet<QCFlag> checkerFlags = new TreeSet<QCFlag>(Arrays.asList(
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 2),
-                new QCFlag("WOCE_CO2_water", "4", Severity.ERROR, 8, 12),
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 3, 22)
+        TreeSet<DataQCFlag> checkerFlags = new TreeSet<DataQCFlag>(Arrays.asList(
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 2),
+                new DataQCFlag("WOCE_CO2_water", "4", Severity.ERROR, 8, 12),
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 3, 22)
         ));
-        TreeSet<QCFlag> userFlags = new TreeSet<QCFlag>(Arrays.asList(
-                new QCFlag("WOCE_CO2_water", "4", Severity.ERROR, 4, 31),
-                new QCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 35),
-                new QCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 12, 35)
+        TreeSet<DataQCFlag> userFlags = new TreeSet<DataQCFlag>(Arrays.asList(
+                new DataQCFlag("WOCE_CO2_water", "4", Severity.ERROR, 4, 31),
+                new DataQCFlag("WOCE_CO2_water", "3", Severity.WARNING, 5, 35),
+                new DataQCFlag("WOCE_CO2_atm", "3", Severity.WARNING, 12, 35)
         ));
 
         DashboardDataset firstCruise = new DashboardDataset();

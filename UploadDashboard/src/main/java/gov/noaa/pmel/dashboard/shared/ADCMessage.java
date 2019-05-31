@@ -1,10 +1,7 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 
 import java.io.Serializable;
 
@@ -15,7 +12,7 @@ import java.io.Serializable;
  */
 public class ADCMessage implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7102386783315203802L;
+    private static final long serialVersionUID = -4122235902295671704L;
 
     protected Severity severity;
     protected Integer rowNumber;

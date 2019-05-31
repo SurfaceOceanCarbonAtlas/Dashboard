@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -11,7 +8,7 @@ import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -201,9 +198,9 @@ public class CheckerMessageHandler extends VersionedFileHandler {
             TreeMap<String,Integer> warnCnt = new TreeMap<String,Integer>();
             for (ADCMessage msg : msgList) {
                 // Start with a summary giving the counts of each general message/severity
-                QCFlag.Severity severity = msg.getSeverity();
+                DataQCFlag.Severity severity = msg.getSeverity();
                 String summary = msg.getGeneralComment();
-                if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
+                if ( DataQCFlag.Severity.CRITICAL.equals(severity) || DataQCFlag.Severity.ERROR.equals(severity) ) {
                     Integer cnt = errorCnt.get(summary);
                     if ( cnt == null )
                         cnt = 1;
@@ -211,7 +208,7 @@ public class CheckerMessageHandler extends VersionedFileHandler {
                         cnt += 1;
                     errorCnt.put(summary, cnt);
                 }
-                else if ( QCFlag.Severity.WARNING.equals(severity) ) {
+                else if ( DataQCFlag.Severity.WARNING.equals(severity) ) {
                     Integer cnt = warnCnt.get(summary);
                     if ( cnt == null )
                         cnt = 1;
@@ -230,13 +227,13 @@ public class CheckerMessageHandler extends VersionedFileHandler {
             }
 
             // WOCE-type QC flags to assign from the automated data check
-            TreeSet<QCFlag> woceFlags = new TreeSet<QCFlag>();
+            TreeSet<DataQCFlag> woceFlags = new TreeSet<DataQCFlag>();
 
             for (ADCMessage msg : msgList) {
                 // Generate a list of key-value strings describing this message
                 ArrayList<String> mappings = new ArrayList<String>();
 
-                QCFlag.Severity severity = msg.getSeverity();
+                DataQCFlag.Severity severity = msg.getSeverity();
                 mappings.add(MSG_SEVERITY_KEY + MSG_KEY_VALUE_SEP + severity.name());
 
                 Integer rowNum = msg.getRowNumber();
@@ -272,24 +269,24 @@ public class CheckerMessageHandler extends VersionedFileHandler {
 
                 // Create the QC flag for this message.
                 if ( rowNum != null ) {
-                    if ( QCFlag.Severity.CRITICAL.equals(severity) || QCFlag.Severity.ERROR.equals(severity) ) {
-                        QCFlag flag;
+                    if ( DataQCFlag.Severity.CRITICAL.equals(severity) || DataQCFlag.Severity.ERROR.equals(severity) ) {
+                        DataQCFlag flag;
                         if ( colNumber != null )
-                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
-                                    QCFlag.Severity.ERROR, colNumber - 1, rowNum - 1);
+                            flag = new DataQCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                    DataQCFlag.Severity.ERROR, colNumber - 1, rowNum - 1);
                         else
-                            flag = new QCFlag(null, DashboardServerUtils.WOCE_BAD,
-                                    QCFlag.Severity.ERROR, null, rowNum - 1);
+                            flag = new DataQCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                    DataQCFlag.Severity.ERROR, null, rowNum - 1);
                         woceFlags.add(flag);
                     }
-                    else if ( QCFlag.Severity.WARNING.equals(severity) ) {
-                        QCFlag flag;
+                    else if ( DataQCFlag.Severity.WARNING.equals(severity) ) {
+                        DataQCFlag flag;
                         if ( colNumber > 0 )
-                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
-                                    QCFlag.Severity.WARNING, colNumber - 1, rowNum - 1);
+                            flag = new DataQCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                    DataQCFlag.Severity.WARNING, colNumber - 1, rowNum - 1);
                         else
-                            flag = new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
-                                    QCFlag.Severity.WARNING, null, rowNum - 1);
+                            flag = new DataQCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                    DataQCFlag.Severity.WARNING, null, rowNum - 1);
                         woceFlags.add(flag);
                     }
                 }
@@ -314,7 +311,7 @@ public class CheckerMessageHandler extends VersionedFileHandler {
         // This assumes QC flags indicating problems have flag values that are integers 3-9.
         // If "WOCE" (case insensitive) is in the data type description, 3 is WARNING
         // and 4-9 are ERROR; otherwise 3-9 are all ERROR.
-        TreeSet<QCFlag> qcFlags = new TreeSet<QCFlag>();
+        TreeSet<DataQCFlag> dataQcFlags = new TreeSet<DataQCFlag>();
         for (int k = 0; k < numUserCols; k++) {
             DashDataType<?> colType = stdDataTypes.get(k);
             if ( !colType.isQCType() )
@@ -327,32 +324,32 @@ public class CheckerMessageHandler extends VersionedFileHandler {
                     break;
                 }
             }
-            QCFlag.Severity severityOfThree = QCFlag.Severity.ERROR;
+            DataQCFlag.Severity severityOfThree = DataQCFlag.Severity.ERROR;
             if ( colType.getDescription().toUpperCase().contains("WOCE") )
-                severityOfThree = QCFlag.Severity.WARNING;
+                severityOfThree = DataQCFlag.Severity.WARNING;
             for (int j = 0; j < numSamples; j++) {
                 try {
                     String flagVal = (String) stdUserData.getStdVal(j, k);
                     int value = Integer.parseInt(flagVal);
                     if ( (value >= 3) && (value <= 9) ) {
-                        QCFlag.Severity severity;
+                        DataQCFlag.Severity severity;
                         if ( value == 3 )
                             severity = severityOfThree;
                         else
-                            severity = QCFlag.Severity.ERROR;
-                        QCFlag flag;
+                            severity = DataQCFlag.Severity.ERROR;
+                        DataQCFlag flag;
                         if ( qcDataIdx >= 0 )
-                            flag = new QCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, j);
+                            flag = new DataQCFlag(colType.getVarName(), flagVal, severity, qcDataIdx, j);
                         else
-                            flag = new QCFlag(colType.getVarName(), flagVal, severity, null, j);
-                        qcFlags.add(flag);
+                            flag = new DataQCFlag(colType.getVarName(), flagVal, severity, null, j);
+                        dataQcFlags.add(flag);
                     }
                 } catch ( NumberFormatException ex ) {
                     // Assuming a missing value
                 }
             }
         }
-        dataset.setUserFlags(qcFlags);
+        dataset.setUserFlags(dataQcFlags);
     }
 
     /**
@@ -417,7 +414,7 @@ public class CheckerMessageHandler extends VersionedFileHandler {
                         String propVal = msgProps.getProperty(MSG_SEVERITY_KEY);
                         if ( propVal == null )
                             propVal = msgProps.getProperty("SC" + MSG_SEVERITY_KEY);
-                        msg.setSeverity(QCFlag.Severity.valueOf(propVal));
+                        msg.setSeverity(DataQCFlag.Severity.valueOf(propVal));
                     } catch ( Exception ex ) {
                         // leave as the default
                     }

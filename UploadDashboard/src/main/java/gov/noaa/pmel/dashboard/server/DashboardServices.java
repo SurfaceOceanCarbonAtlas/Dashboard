@@ -589,7 +589,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        //  Global suspend QCFlag to add to the database (after adding the dataset ID)
+        //  Global suspend DataQCFlag to add to the database (after adding the dataset ID)
         QCEvent qc = new QCEvent();
         qc.setUsername(username);
         qc.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_SUSPEND);
@@ -609,7 +609,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 // Only update if not already editable; ignore if already editable
                 if ( !Boolean.TRUE.equals(dset.isEditable()) ) {
                     qc.setDatasetId(datasetId);
-                    //  add the global suspend QCFlag to database
+                    //  add the global suspend DataQCFlag to database
                     dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
                     //  update the dataset properties file
                     String message = "dataset " + datasetId + " suspended by " + username;

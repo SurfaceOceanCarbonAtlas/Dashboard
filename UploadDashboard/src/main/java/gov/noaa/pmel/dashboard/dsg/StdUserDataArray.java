@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.dsg;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -17,8 +14,8 @@ import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -385,7 +382,7 @@ public class StdUserDataArray extends StdDataArray {
                                 "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
                         msg.setDetailedComment(String.format(
                                 "time between consecutive measurements %g days exceeds %g days",
-                                hourdelta/24.0, maxTimeGaps[1]));
+                                hourdelta / 24.0, maxTimeGaps[1]));
                         forwardTimeGapMsgs.add(msg);
                     }
                     else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
@@ -397,7 +394,7 @@ public class StdUserDataArray extends StdDataArray {
                                 "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
                         msg.setDetailedComment(String.format(
                                 "time between consecutive measurements %g days exceeds %g days",
-                                hourdelta/24.0, maxTimeGaps[0]));
+                                hourdelta / 24.0, maxTimeGaps[0]));
                         forwardTimeGapMsgs.add(msg);
                     }
                 }
@@ -461,7 +458,7 @@ public class StdUserDataArray extends StdDataArray {
                                 "time between consecutive measurements exceeds %g days", maxTimeGaps[1]));
                         msg.setDetailedComment(String.format(
                                 "time between consecutive measurements %g days exceeds %g days",
-                                hourdelta/24.0, maxTimeGaps[1]));
+                                hourdelta / 24.0, maxTimeGaps[1]));
                         reverseTimeGapMsgs.add(msg);
                     }
                     else if ( hourdelta > 24.0 * maxTimeGaps[0] ) {
@@ -473,7 +470,7 @@ public class StdUserDataArray extends StdDataArray {
                                 "time between consecutive measurements exceeds %g days", maxTimeGaps[0]));
                         msg.setDetailedComment(String.format(
                                 "time between consecutive measurements %g days exceeds %g days",
-                                hourdelta/24.0, maxTimeGaps[0]));
+                                hourdelta / 24.0, maxTimeGaps[0]));
                         reverseTimeGapMsgs.add(msg);
                     }
                 }
@@ -733,7 +730,7 @@ public class StdUserDataArray extends StdDataArray {
 
             // TODO: in the general case, get the correct data QC column and flag value
             String flagValue;
-            QCFlag.Severity severity = msg.getSeverity();
+            DataQCFlag.Severity severity = msg.getSeverity();
             switch ( severity ) {
                 case UNASSIGNED:
                 case ACCEPTABLE:

@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -8,13 +5,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.io.Serializable;
 
 /**
- * Represents a QC flag for either a dataset or data values.
+ * Represents a QC flag for data values.
  *
  * @author Karl Smith
  */
-public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable {
+public class DataQCFlag implements Comparable<DataQCFlag>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5519675665366522436L;
+    private static final long serialVersionUID = 6930673578522302314L;
 
     /**
      * WOCE-like enumerated type indicating the severity of a QC flag value
@@ -43,7 +40,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
      * <li> row of {@link DashboardUtils#INT_MISSING_VALUE} </li>
      * </ul>
      */
-    public QCFlag() {
+    public DataQCFlag() {
         flagName = DashboardUtils.STRING_MISSING_VALUE;
         flagValue = DashboardUtils.STRING_MISSING_VALUE;
         severity = Severity.UNASSIGNED;
@@ -53,10 +50,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * Create with given values for flag name, flag value, column index, and row index as described by
-     * {@link #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(QCFlag.Severity)},
+     * {@link #setFlagName(String)}, {@link #setFlagValue(String)}, {@link #setSeverity(DataQCFlag.Severity)},
      * {@link #setColumnIndex(Integer)}, and {@link #setRowIndex(Integer)}.
      */
-    public QCFlag(String flagName, String flagValue, Severity severity, Integer columnIndex, Integer rowIndex) {
+    public DataQCFlag(String flagName, String flagValue, Severity severity, Integer columnIndex, Integer rowIndex) {
         setFlagName(flagName);
         setFlagValue(flagValue);
         setSeverity(severity);
@@ -101,7 +98,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     /**
-     * @return the severity of the QC flag; never null but may be {@link QCFlag.Severity#UNASSIGNED} if not assigned
+     * @return the severity of the QC flag; never null but may be {@link DataQCFlag.Severity#UNASSIGNED} if not assigned
      */
     public Severity getSeverity() {
         return severity;
@@ -109,7 +106,8 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     /**
      * @param severity
-     *         the severity to set for this QC flag value; if null, {@link QCFlag.Severity#UNASSIGNED} will be assigned
+     *         the severity to set for this QC flag value; if null, {@link DataQCFlag.Severity#UNASSIGNED} will be
+     *         assigned
      */
     public void setSeverity(Severity severity) {
         if ( severity != null )
@@ -159,7 +157,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
     }
 
     @Override
-    public int compareTo(QCFlag other) {
+    public int compareTo(DataQCFlag other) {
         int result = this.flagName.compareTo(other.flagName);
         if ( result != 0 )
             return result;
@@ -197,10 +195,10 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
             return true;
         if ( obj == null )
             return false;
-        if ( !(obj instanceof QCFlag) )
+        if ( !(obj instanceof DataQCFlag) )
             return false;
 
-        QCFlag other = (QCFlag) obj;
+        DataQCFlag other = (DataQCFlag) obj;
         if ( !columnIndex.equals(other.columnIndex) )
             return false;
         if ( !rowIndex.equals(other.rowIndex) )
@@ -216,7 +214,7 @@ public class QCFlag implements Comparable<QCFlag>, Serializable, IsSerializable 
 
     @Override
     public String toString() {
-        return "QCFlag[ " +
+        return "DataQCFlag[ " +
                 "flagName=" + flagName + ", " +
                 "flagValue=" + flagValue + ", " +
                 "severity=" + severity.toString() + ", " +

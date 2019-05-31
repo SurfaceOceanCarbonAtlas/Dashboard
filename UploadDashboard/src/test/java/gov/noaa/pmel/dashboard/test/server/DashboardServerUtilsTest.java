@@ -1,11 +1,8 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.server;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -84,20 +81,20 @@ public class DashboardServerUtilsTest {
     }
 
     /**
-     * Test method for {@link DashboardServerUtils#decodeQCFlagSet(String)}
-     * and {@link DashboardServerUtils#encodeQCFlagSet(TreeSet)}.
+     * Test method for {@link DashboardServerUtils#decodeDataQCFlagSet(String)}
+     * and {@link DashboardServerUtils#encodeDataQCFlagSet(TreeSet)}.
      */
     @Test
     public void testEncodeDecodeWoceTypeSet() {
-        TreeSet<QCFlag> mySet = new TreeSet<QCFlag>(Arrays.asList(
-                new QCFlag("WOCE_CO2_water", "4", QCFlag.Severity.ERROR, 3, 7),
-                new QCFlag("WOCE_CO2_atm", "3", QCFlag.Severity.WARNING, 9, 2)));
-        String encoded = DashboardServerUtils.encodeQCFlagSet(mySet);
-        TreeSet<QCFlag> decodedSet = DashboardServerUtils.decodeQCFlagSet(encoded);
+        TreeSet<DataQCFlag> mySet = new TreeSet<DataQCFlag>(Arrays.asList(
+                new DataQCFlag("WOCE_CO2_water", "4", DataQCFlag.Severity.ERROR, 3, 7),
+                new DataQCFlag("WOCE_CO2_atm", "3", DataQCFlag.Severity.WARNING, 9, 2)));
+        String encoded = DashboardServerUtils.encodeDataQCFlagSet(mySet);
+        TreeSet<DataQCFlag> decodedSet = DashboardServerUtils.decodeDataQCFlagSet(encoded);
         assertEquals(mySet, decodedSet);
-        decodedSet = DashboardServerUtils.decodeQCFlagSet("[]");
+        decodedSet = DashboardServerUtils.decodeDataQCFlagSet("[]");
         assertEquals(0, decodedSet.size());
-        decodedSet = DashboardServerUtils.decodeQCFlagSet("[  ]");
+        decodedSet = DashboardServerUtils.decodeDataQCFlagSet("[  ]");
         assertEquals(0, decodedSet.size());
     }
 

@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import com.google.gson.JsonArray;
@@ -18,7 +15,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -643,8 +640,8 @@ public class DataFileHandler extends VersionedFileHandler {
         datasetProps.setProperty(MISSING_VALUES_ID, DashboardUtils.encodeStringArrayList(colMissValues));
 
         // Flags
-        datasetProps.setProperty(CHECKER_FLAGS, DashboardServerUtils.encodeQCFlagSet(dataset.getCheckerFlags()));
-        datasetProps.setProperty(USER_FLAGS, DashboardServerUtils.encodeQCFlagSet(dataset.getUserFlags()));
+        datasetProps.setProperty(CHECKER_FLAGS, DashboardServerUtils.encodeDataQCFlagSet(dataset.getCheckerFlags()));
+        datasetProps.setProperty(USER_FLAGS, DashboardServerUtils.encodeDataQCFlagSet(dataset.getUserFlags()));
 
         // Save the properties to the cruise information file
         try {
@@ -1254,13 +1251,13 @@ public class DataFileHandler extends VersionedFileHandler {
         value = cruiseProps.getProperty(CHECKER_FLAGS);
         if ( value != null ) {
             // Automated data checker flags
-            dataset.setCheckerFlags(DashboardServerUtils.decodeQCFlagSet(value));
+            dataset.setCheckerFlags(DashboardServerUtils.decodeDataQCFlagSet(value));
             // PI-provided data QC flags
             value = cruiseProps.getProperty(USER_FLAGS);
             if ( value == null )
                 throw new IllegalArgumentException("No property value for " +
                         USER_FLAGS + " given in " + infoFile.getPath());
-            dataset.setUserFlags(DashboardServerUtils.decodeQCFlagSet(value));
+            dataset.setUserFlags(DashboardServerUtils.decodeDataQCFlagSet(value));
             return;
         }
 
@@ -1268,25 +1265,27 @@ public class DataFileHandler extends VersionedFileHandler {
         value = cruiseProps.getProperty("checkerwocefours");
         if ( value != null ) {
             // Automated data checker flags
-            TreeSet<QCFlag> qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            TreeSet<DataQCFlag> qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD,
+                    DataQCFlag.Severity.ERROR);
             value = cruiseProps.getProperty("checkerwocethrees");
             if ( value == null )
                 throw new IllegalArgumentException(
                         "No property value checkerwocethrees to go along with checkerwocefours");
-            qcflags.addAll(decodeWoceTypeSet(value, DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
+            qcflags.addAll(
+                    decodeWoceTypeSet(value, DashboardServerUtils.WOCE_QUESTIONABLE, DataQCFlag.Severity.WARNING));
             dataset.setCheckerFlags(qcflags);
             // PI-provided data QC flags
             value = cruiseProps.getProperty("userwocefours");
             if ( value == null )
                 throw new IllegalArgumentException(
                         "No property value userwocefours to go along with checkerwocefours");
-            qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD, QCFlag.Severity.ERROR);
+            qcflags = decodeWoceTypeSet(value, DashboardServerUtils.WOCE_BAD, DataQCFlag.Severity.ERROR);
             value = cruiseProps.getProperty("userwocethrees");
             if ( value == null )
                 throw new IllegalArgumentException(
                         "No property value userwocethrees to go along with userwocefours");
             qcflags.addAll(decodeWoceTypeSet(value,
-                    DashboardServerUtils.WOCE_QUESTIONABLE, QCFlag.Severity.WARNING));
+                    DashboardServerUtils.WOCE_QUESTIONABLE, DataQCFlag.Severity.WARNING));
             dataset.setUserFlags(qcflags);
             return;
         }
@@ -1294,14 +1293,14 @@ public class DataFileHandler extends VersionedFileHandler {
         // Try earlier version's encoding of automated data checker WOCE flags
         value = cruiseProps.getProperty("wocefourrows");
         if ( value != null ) {
-            TreeSet<QCFlag> qcflags = new TreeSet<QCFlag>();
+            TreeSet<DataQCFlag> qcflags = new TreeSet<DataQCFlag>();
             try {
                 int colIdx = 0;
                 for (JsonElement colElem : (JsonArray) (new JsonParser().parse(value))) {
                     for (JsonElement rowElem : (JsonArray) colElem) {
                         int rowIdx = ((JsonPrimitive) rowElem).getAsInt();
-                        qcflags.add(new QCFlag(null, DashboardServerUtils.WOCE_BAD,
-                                QCFlag.Severity.ERROR, colIdx, rowIdx));
+                        qcflags.add(new DataQCFlag(null, DashboardServerUtils.WOCE_BAD,
+                                DataQCFlag.Severity.ERROR, colIdx, rowIdx));
                     }
                     colIdx++;
                 }
@@ -1316,8 +1315,8 @@ public class DataFileHandler extends VersionedFileHandler {
                 for (JsonElement colElem : (JsonArray) (new JsonParser().parse(value))) {
                     for (JsonElement rowElem : (JsonArray) colElem) {
                         int rowIdx = ((JsonPrimitive) rowElem).getAsInt();
-                        qcflags.add(new QCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
-                                QCFlag.Severity.WARNING, colIdx, rowIdx));
+                        qcflags.add(new DataQCFlag(null, DashboardServerUtils.WOCE_QUESTIONABLE,
+                                DataQCFlag.Severity.WARNING, colIdx, rowIdx));
                     }
                     colIdx++;
                 }
@@ -1391,13 +1390,13 @@ public class DataFileHandler extends VersionedFileHandler {
      * @throws IllegalArgumentException
      *         is the WOCE-type property value string is invalid
      */
-    private TreeSet<QCFlag> decodeWoceTypeSet(String woceSetStr, String flagValue, QCFlag.Severity severity)
+    private TreeSet<DataQCFlag> decodeWoceTypeSet(String woceSetStr, String flagValue, DataQCFlag.Severity severity)
             throws IllegalArgumentException {
         if ( !(woceSetStr.startsWith("[") && woceSetStr.endsWith("]")) )
             throw new IllegalArgumentException("Encoded WoceType set not enclosed in brackets");
         String contents = woceSetStr.substring(1, woceSetStr.length() - 1);
         if ( contents.trim().isEmpty() )
-            return new TreeSet<QCFlag>();
+            return new TreeSet<DataQCFlag>();
         int firstIndex = contents.indexOf("[");
         int lastIndex = contents.lastIndexOf("]");
         if ( (firstIndex < 0) || (lastIndex < 0) ||
@@ -1407,7 +1406,7 @@ public class DataFileHandler extends VersionedFileHandler {
                     "Invalid encoding of a set of WoceTypes: a WoceType not enclosed in brackets");
         String[] pieces = contents.substring(firstIndex + 1, lastIndex)
                                   .split("\\]\\s*,\\s*\\[", -1);
-        TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
+        TreeSet<DataQCFlag> woceSet = new TreeSet<DataQCFlag>();
         for (String encWoce : pieces) {
             String[] woceParts = encWoce.split(",", 3);
             try {
@@ -1422,7 +1421,7 @@ public class DataFileHandler extends VersionedFileHandler {
                         (!woceParts[2].substring(lastIndex + 1).trim().isEmpty()) )
                     throw new IllegalArgumentException("WOCE name not enclosed in double quotes");
                 String woceName = woceParts[2].substring(firstIndex + 1, lastIndex);
-                woceSet.add(new QCFlag(woceName, flagValue, severity, colIndex, rowIndex));
+                woceSet.add(new DataQCFlag(woceName, flagValue, severity, colIndex, rowIndex));
             } catch ( Exception ex ) {
                 throw new IllegalArgumentException("Invalid encoding of a set of WoceTypes: " +
                         ex.getMessage(), ex);

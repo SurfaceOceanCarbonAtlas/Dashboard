@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -16,7 +13,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7059048686537302765L;
+    private static final long serialVersionUID = -2882736218085816338L;
 
     protected boolean selected;
     protected String version;
@@ -39,9 +36,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
     // For each data column, a DataColumnType with type, unit, and missing value
     protected ArrayList<DataColumnType> dataColTypes;
     // Checker-generated QC flags without comments
-    protected TreeSet<QCFlag> checkerFlags;
+    protected TreeSet<DataQCFlag> checkerFlags;
     // PI-provided QC flags without comments
-    protected TreeSet<QCFlag> userFlags;
+    protected TreeSet<DataQCFlag> userFlags;
 
     /**
      * Create an empty dashboard dataset
@@ -66,8 +63,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
         numWarnRows = 0;
         userColNames = new ArrayList<String>();
         dataColTypes = new ArrayList<DataColumnType>();
-        checkerFlags = new TreeSet<QCFlag>();
-        userFlags = new TreeSet<QCFlag>();
+        checkerFlags = new TreeSet<DataQCFlag>();
+        userFlags = new TreeSet<DataQCFlag>();
     }
 
     /**
@@ -458,7 +455,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return the set of automated data checker data QC flags; never null but may be empty.
      *         The actual set in this object is returned.
      */
-    public TreeSet<QCFlag> getCheckerFlags() {
+    public TreeSet<DataQCFlag> getCheckerFlags() {
         return checkerFlags;
     }
 
@@ -466,9 +463,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @param checkerFlags
      *         the set of automated data checker data QC flags to assign.
      *         The set in this object is cleared and all the contents of the given collection, if not null, are added.
-     *         Note that this is a shallow copy; the given QCFlag objects are reused.
+     *         Note that this is a shallow copy; the given DataQCFlag objects are reused.
      */
-    public void setCheckerFlags(TreeSet<QCFlag> checkerFlags) {
+    public void setCheckerFlags(TreeSet<DataQCFlag> checkerFlags) {
         this.checkerFlags.clear();
         if ( checkerFlags != null )
             this.checkerFlags.addAll(checkerFlags);
@@ -478,7 +475,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return The set of user-provided QC flags; never null but may be empty.
      *         The actual set in this object is returned.
      */
-    public TreeSet<QCFlag> getUserFlags() {
+    public TreeSet<DataQCFlag> getUserFlags() {
         return userFlags;
     }
 
@@ -486,9 +483,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @param userFlags
      *         The set user-provided QC flags to assign.
      *         The set in this object is cleared and all the contents of the given Collection, if not null, are added.
-     *         Note that this is a shallow copy; the given QCFlag objects are reused.
+     *         Note that this is a shallow copy; the given DataQCFlag objects are reused.
      */
-    public void setUserFlags(TreeSet<QCFlag> userFlags) {
+    public void setUserFlags(TreeSet<DataQCFlag> userFlags) {
         this.userFlags.clear();
         if ( userFlags != null )
             this.userFlags.addAll(userFlags);
