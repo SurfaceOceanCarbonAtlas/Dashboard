@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -29,14 +30,14 @@ public class ReportOverlaps {
      * QC flags of datasets to report any overlaps
      */
     static final TreeSet<String> ACCEPTABLE_FLAGS_SET = new TreeSet<String>(Arrays.asList(
-            DashboardServerUtils.DATASET_QCFLAG_A,
-            DashboardServerUtils.DATASET_QCFLAG_B,
-            DashboardServerUtils.DATASET_QCFLAG_C,
-            DashboardServerUtils.DATASET_QCFLAG_D,
-            DashboardServerUtils.DATASET_QCFLAG_E,
-            DashboardServerUtils.DATASET_QCFLAG_NEW,
-            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
-            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
+            DatasetQCFlag.DATASET_QCFLAG_A,
+            DatasetQCFlag.DATASET_QCFLAG_B,
+            DatasetQCFlag.DATASET_QCFLAG_C,
+            DatasetQCFlag.DATASET_QCFLAG_D,
+            DatasetQCFlag.DATASET_QCFLAG_E,
+            DatasetQCFlag.DATASET_QCFLAG_NEW,
+            DatasetQCFlag.DATASET_QCFLAG_CONFLICT,
+            DatasetQCFlag.DATASET_QCFLAG_UPDATED));
 
     /**
      * @param args

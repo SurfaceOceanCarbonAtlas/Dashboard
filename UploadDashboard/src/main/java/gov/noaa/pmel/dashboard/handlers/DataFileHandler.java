@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -1356,12 +1357,12 @@ public class DataFileHandler extends VersionedFileHandler {
         DashboardDataset dset = getDatasetFromInfoFile(expocode);
         String oldStatus = dset.getSubmitStatus();
         String newStatus;
-        // Special check for nul or blank QC flag == no submitted
+        // Special check for null or blank QC flag == not submitted
         if ( (datasetQCFlag == null) || datasetQCFlag.trim().isEmpty() ) {
-            newStatus = DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED;
+            newStatus = DatasetQCFlag.DATASET_STATUS_NOT_SUBMITTED;
         }
         else {
-            newStatus = DashboardServerUtils.DATASET_FLAG_STATUS_MAP.get(datasetQCFlag);
+            newStatus = DatasetQCFlag.DATASET_FLAG_STATUS_MAP.get(datasetQCFlag);
             if ( newStatus == null )
                 throw new IllegalArgumentException("Unexpected dataset QC flag of '" +
                         datasetQCFlag + "' given to updateDatasetDashboardStatus");

@@ -2,8 +2,8 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 
 import java.io.BufferedReader;
@@ -22,14 +22,14 @@ import java.util.TreeSet;
 public class GetCruiseCrossovers {
 
     private static final TreeSet<String> ACCEPTABLE_FLAGS_SET = new TreeSet<String>(Arrays.asList(
-            DashboardServerUtils.DATASET_QCFLAG_A,
-            DashboardServerUtils.DATASET_QCFLAG_B,
-            DashboardServerUtils.DATASET_QCFLAG_C,
-            DashboardServerUtils.DATASET_QCFLAG_D,
-            DashboardServerUtils.DATASET_QCFLAG_E,
-            DashboardServerUtils.DATASET_QCFLAG_NEW,
-            DashboardServerUtils.DATASET_QCFLAG_CONFLICT,
-            DashboardServerUtils.DATASET_QCFLAG_UPDATED));
+            DatasetQCFlag.DATASET_QCFLAG_A,
+            DatasetQCFlag.DATASET_QCFLAG_B,
+            DatasetQCFlag.DATASET_QCFLAG_C,
+            DatasetQCFlag.DATASET_QCFLAG_D,
+            DatasetQCFlag.DATASET_QCFLAG_E,
+            DatasetQCFlag.DATASET_QCFLAG_NEW,
+            DatasetQCFlag.DATASET_QCFLAG_CONFLICT,
+            DatasetQCFlag.DATASET_QCFLAG_UPDATED));
 
     /**
      * @param args
@@ -98,7 +98,7 @@ public class GetCruiseCrossovers {
                         throw new Exception("QC flag is " + qcFlag);
                     }
                     // Add all flag-A expocodes, then remove those that actually do have crossovers
-                    if ( DashboardServerUtils.DATASET_QCFLAG_A.equals(qcFlag) )
+                    if ( DatasetQCFlag.DATASET_QCFLAG_A.equals(qcFlag) )
                         notActuallyAExpos.add(expo);
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());
@@ -131,7 +131,7 @@ public class GetCruiseCrossovers {
             System.out.println();
 
             System.out.println(Integer.toString(notActuallyAExpos.size()) +
-                    " datasets with a QC flag of " + DashboardServerUtils.DATASET_QCFLAG_A +
+                    " datasets with a QC flag of " + DatasetQCFlag.DATASET_QCFLAG_A +
                     " but without a high-quality crossover: ");
             for (String expo : notActuallyAExpos) {
                 System.out.println(expo);

@@ -12,6 +12,9 @@ import java.util.Date;
  */
 public class QCEvent {
 
+    // QC flag name used for dataset QC flag events
+    public static final String DATASET_QCFLAG_NAME = "dataset";
+
     protected Long id;
     protected Date flagDate;
     protected String flagName;

@@ -6,6 +6,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -230,7 +231,7 @@ public class MetadataUploadService extends HttpServlet {
                     for (int k = 0; k < allRegionIds.length(); k++) {
                         QCEvent qcEvent = new QCEvent();
                         qcEvent.setDatasetId(id);
-                        qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
+                        qcEvent.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_UPDATED);
                         qcEvent.setFlagDate(now);
                         qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                         qcEvent.setVersion(version);
@@ -242,7 +243,7 @@ public class MetadataUploadService extends HttpServlet {
                         // Add the 'U' QC flags
                         databaseHandler.addDatasetQCEvents(qcEventList);
                         // Update the dashboard status for the 'U' QC flag
-                        dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);
+                        dataset.setSubmitStatus(DatasetQCFlag.DATASET_STATUS_SUBMITTED);
                         // If archived, reset the archived status so the updated metadata will be archived
                         if ( dataset.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
                             dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
@@ -250,7 +251,7 @@ public class MetadataUploadService extends HttpServlet {
                         // Update the DSG files
                         String versionStatus = databaseHandler.getVersionStatus(id);
                         dsgHandler.updateDatasetQCFlagAndVersionStatus(id,
-                                DashboardServerUtils.DATASET_QCFLAG_UPDATED, versionStatus);
+                                DatasetQCFlag.DATASET_QCFLAG_UPDATED, versionStatus);
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.

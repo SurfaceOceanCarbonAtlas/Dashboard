@@ -14,6 +14,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -331,12 +332,12 @@ public class DatasetSubmitter {
         // Start with the initial new/updated dataset QC flags
         String flagValue;
         String comment;
-        if ( DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus()) ) {
-            flagValue = DashboardServerUtils.DATASET_QCFLAG_NEW;
+        if ( DatasetQCFlag.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus()) ) {
+            flagValue = DatasetQCFlag.DATASET_QCFLAG_NEW;
             comment = "Initial QC flag for new dataset";
         }
         else {
-            flagValue = DashboardServerUtils.DATASET_QCFLAG_UPDATED;
+            flagValue = DatasetQCFlag.DATASET_QCFLAG_UPDATED;
             comment = "Initial QC flag for updated dataset";
         }
         // First add a global flag, then flag for each region
@@ -365,7 +366,7 @@ public class DatasetSubmitter {
         initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
         initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
         initQC.setFlagDate(new Date());
-        initQC.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_COMMENT);
+        initQC.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_COMMENT);
         initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
         initQC.setComment("Automated data check found " +
                 Integer.toString(dataset.getNumErrorRows()) + " data points with errors and " +

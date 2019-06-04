@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
+import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -302,7 +303,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             for (int k = 0; k < allRegionIds.length(); k++) {
                 QCEvent qcEvent = new QCEvent();
                 qcEvent.setDatasetId(datasetId);
-                qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
+                qcEvent.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_UPDATED);
                 qcEvent.setFlagDate(now);
                 qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                 qcEvent.setVersion(version);
@@ -323,7 +324,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 // Update the DSG files
                 String versionStatus = dbHandler.getVersionStatus(datasetId);
                 dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId,
-                        DashboardServerUtils.DATASET_QCFLAG_UPDATED, versionStatus);
+                        DatasetQCFlag.DATASET_QCFLAG_UPDATED, versionStatus);
                 itsLogger.info("updated QC status for " + datasetId);
             } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
@@ -592,7 +593,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         //  Global suspend DataQCFlag to add to the database (after adding the dataset ID)
         QCEvent qc = new QCEvent();
         qc.setUsername(username);
-        qc.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_SUSPEND);
+        qc.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_SUSPEND);
         qc.setFlagDate(new Date());
         qc.setVersion(configStore.getQCVersion());
         qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
@@ -618,7 +619,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     //  update the DSG files
                     String versionStatus = dbHandler.getVersionStatus(datasetId);
                     dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId,
-                            DashboardServerUtils.DATASET_QCFLAG_SUSPEND, versionStatus);
+                            DatasetQCFlag.DATASET_QCFLAG_SUSPEND, versionStatus);
                     itsLogger.info(message);
                 }
             } catch ( Exception ex ) {
