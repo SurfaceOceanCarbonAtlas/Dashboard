@@ -31,7 +31,7 @@ public class GenerateOrigFileBundles {
      *         where IDsFile is a file of IDs of datasets to generating original data file bundles for.
      */
     public static void main(String[] args) {
-        if ( args.length != 2 ) {
+        if ( args.length != 1 ) {
             System.err.println("Arguments:  IDsFile");
             System.err.println();
             System.err.println("Generates original data file bundles for the dataset IDs specified ");

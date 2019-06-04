@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -531,17 +532,23 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         csvFilename = csvFilename.substring(0, csvFilename.length() - 4) + ".csv";
 
         // Get the list of metadata documents to be bundled with this data file
-        ArrayList<File> addlDocs = new ArrayList<File>();
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+        TreeSet<File> metaDocs = new TreeSet<File>();
+
+        // If it exists, include the (dataset)/PI_OME.xml file (which is not listed as an additional document);
+        // the (dataset)/PI_OME.pdf file, if it exists, should be in the additional documents list
+        File piOmeXml = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+        if ( piOmeXml.exists() )
+            metaDocs.add(piOmeXml);
+
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
-            // Exclude the (dataset)/OME.xml document at this time;
-            // do include the (dataset)/PI_OME.xml
+            // Exclude the (dataset)/OME.xml stub document
             String filename = mdata.getFilename();
             if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
-                addlDocs.add(metadataHandler.getMetadataFile(stdId, filename));
+                metaDocs.add(metadataHandler.getMetadataFile(stdId, filename));
             }
         }
-        if ( addlDocs.isEmpty() )
+        if ( metaDocs.isEmpty() )
             throw new IOException("No metadata/supplemental documents for " + stdId);
 
         // Create the bagit bundle directory
@@ -563,7 +570,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             infoMsg += "    " + csvFilename + "\n";
             File dest = new File(bundleDir, csvFilename);
             copyTsvToCsvFile(dataFile, dest);
-            for (File metaFile : addlDocs) {
+            for (File metaFile : metaDocs) {
                 infoMsg += "    " + metaFile.getName() + "\n";
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
