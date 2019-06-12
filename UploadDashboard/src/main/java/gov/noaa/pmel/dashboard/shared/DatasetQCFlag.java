@@ -10,9 +10,9 @@ import java.util.HashMap;
  * This class provides the possibility of more flexibility that is needed for automated QC
  * as well as the possibility of using values indicating the accuracy in the fCO2 values.
  */
-public class DatasetQCFlag implements Serializable, IsSerializable, Comparable<DatasetQCFlag>, Cloneable {
+public class DatasetQCFlag implements Serializable, IsSerializable, Comparable<DatasetQCFlag> {
 
-    private static final long serialVersionUID = -1411902288407548600L;
+    private static final long serialVersionUID = -1515101157313114699L;
 
     /**
      * Values for the flags in DatasetQCFlag
@@ -176,12 +176,25 @@ public class DatasetQCFlag implements Serializable, IsSerializable, Comparable<D
      *         if null, {@link Status#NOT_GIVEN} is assigned
      */
     public DatasetQCFlag(Status flag) {
-        if ( flag == null )
-            actualFlag = Status.NOT_GIVEN;
-        else
+        this();
+        if ( flag != null )
             actualFlag = flag;
-        piFlag = Status.NOT_GIVEN;
-        autoFlag = Status.NOT_GIVEN;
+    }
+
+    /**
+     * Create a duplicate of the given dataset QC flag.
+     * (Cloneable and Object.clone not supported by GWT.)
+     *
+     * @param qcFlag
+     *         dataset QC flag to duplicate
+     */
+    public DatasetQCFlag(DatasetQCFlag qcFlag) {
+        this();
+        if ( qcFlag != null ) {
+            actualFlag = qcFlag.actualFlag;
+            piFlag = qcFlag.piFlag;
+            autoFlag = qcFlag.autoFlag;
+        }
     }
 
     /**
@@ -465,14 +478,6 @@ public class DatasetQCFlag implements Serializable, IsSerializable, Comparable<D
             return value;
 
         return 0;
-    }
-
-    @Override
-    public DatasetQCFlag clone() {
-        DatasetQCFlag dup = new DatasetQCFlag(actualFlag);
-        dup.setPiFlag(piFlag);
-        dup.setAutoFlag(autoFlag);
-        return dup;
     }
 
     @Override

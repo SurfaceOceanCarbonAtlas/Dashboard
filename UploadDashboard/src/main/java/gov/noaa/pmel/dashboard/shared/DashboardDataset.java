@@ -220,7 +220,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return the submission status; never null
      */
     public DatasetQCFlag getSubmitStatus() {
-        return submitStatus.clone();
+        return new DatasetQCFlag(submitStatus);
     }
 
     /**
@@ -232,7 +232,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         if ( submitStatus == null )
             this.submitStatus = new DatasetQCFlag();
         else
-            this.submitStatus = submitStatus.clone();
+            this.submitStatus = new DatasetQCFlag(submitStatus);
     }
 
     /**

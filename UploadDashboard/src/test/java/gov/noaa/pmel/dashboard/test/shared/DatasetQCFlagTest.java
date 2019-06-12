@@ -6,7 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -352,20 +351,6 @@ public class DatasetQCFlagTest {
     }
 
     /**
-     * Test of {@link DatasetQCFlag#clone()}
-     */
-    @Test
-    public void testClone() {
-        DatasetQCFlag flag = new DatasetQCFlag(ACTUAL_FLAG);
-        flag.setPiFlag(PI_FLAG);
-        flag.setAutoFlag(AUTO_FLAG);
-
-        DatasetQCFlag dup = flag.clone();
-        assertNotSame(flag, dup);
-        assertEquals(flag, dup);
-    }
-
-    /**
      * Test of {@link DatasetQCFlag#hashCode()} and {@link DatasetQCFlag#equals(Object)}
      */
     @Test
@@ -398,6 +383,28 @@ public class DatasetQCFlagTest {
         second.setAutoFlag(AUTO_FLAG);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+    }
+
+    /**
+     * Test of {@link DatasetQCFlag#DatasetQCFlag(DatasetQCFlag.Status)}
+     * and {@link DatasetQCFlag#DatasetQCFlag(DatasetQCFlag)}
+     */
+    @Test
+    public void testDatasetQCFlag() {
+        DatasetQCFlag flag = new DatasetQCFlag();
+        DatasetQCFlag other = new DatasetQCFlag((DatasetQCFlag.Status) null);
+        assertEquals(flag, other);
+        other = new DatasetQCFlag((DatasetQCFlag) null);
+        assertEquals(flag, other);
+
+        flag.setActualFlag(ACTUAL_FLAG);
+        other = new DatasetQCFlag(ACTUAL_FLAG);
+        assertEquals(flag, other);
+
+        flag.setPiFlag(PI_FLAG);
+        flag.setAutoFlag(AUTO_FLAG);
+        other = new DatasetQCFlag(flag);
+        assertEquals(flag, other);
     }
 
 }
