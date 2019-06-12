@@ -5,6 +5,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -145,15 +147,19 @@ public class DashboardDatasetTest {
     }
 
     /**
-     * Test method for {@link DashboardDataset#getSubmitStatus()} and {@link DashboardDataset#setSubmitStatus(String)}.
+     * Test method for {@link DashboardDataset#getSubmitStatus()} and {@link DashboardDataset#setSubmitStatus(DatasetQCFlag)}
      */
     @Test
     public void testSetGetSubmitStatus() {
-        String mySumbitStatus = "Considering it";
+        DatasetQCFlag emptyFlag = new DatasetQCFlag();
+        DatasetQCFlag mySubmitStatus = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+        mySubmitStatus.setPiFlag(DatasetQCFlag.Status.ACCEPTED_A);
+        mySubmitStatus.setAutoFlag(DatasetQCFlag.Status.ACCEPTED_B);
         DashboardDataset cruise = new DashboardDataset();
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
-        cruise.setSubmitStatus(mySumbitStatus);
-        assertEquals(mySumbitStatus, cruise.getSubmitStatus());
+        assertEquals(emptyFlag, cruise.getSubmitStatus());
+        cruise.setSubmitStatus(mySubmitStatus);
+        assertNotSame(mySubmitStatus, cruise.getSubmitStatus());
+        assertEquals(mySubmitStatus, cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -162,7 +168,7 @@ public class DashboardDatasetTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getVersion());
         assertFalse(cruise.isSelected());
         cruise.setSubmitStatus(null);
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(emptyFlag, cruise.getSubmitStatus());
     }
 
     /**
@@ -176,7 +182,7 @@ public class DashboardDatasetTest {
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
         cruise.setArchiveStatus(myArchiveStatus);
         assertEquals(myArchiveStatus, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -200,7 +206,7 @@ public class DashboardDatasetTest {
         cruise.setUploadFilename(myFilename);
         assertEquals(myFilename, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -224,7 +230,7 @@ public class DashboardDatasetTest {
         assertEquals(myNumDataRows, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -253,7 +259,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -281,7 +287,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -308,7 +314,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -334,7 +340,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -366,7 +372,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -400,7 +406,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -432,7 +438,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -467,7 +473,7 @@ public class DashboardDatasetTest {
         assertEquals(0, cruise.getNumDataRows());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
         assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-        assertEquals(DashboardUtils.STATUS_NOT_SUBMITTED, cruise.getSubmitStatus());
+        assertEquals(new DatasetQCFlag(), cruise.getSubmitStatus());
         assertEquals(0, cruise.getAddlDocs().size());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -493,7 +499,9 @@ public class DashboardDatasetTest {
                 "ABCD20050728.txt; 2014-02-21 9:23",
                 "ABCD20050728_2.doc; 2014-02-21 9:24",
                 "ABCD20050728_3.pdf; 2014-02-21 9:25"));
-        String myQCStatus = "Submitted";
+        DatasetQCFlag mySubmitStatus = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+        mySubmitStatus.setPiFlag(DatasetQCFlag.Status.ACCEPTED_A);
+        mySubmitStatus.setAutoFlag(DatasetQCFlag.Status.ACCEPTED_B);
         String myArchiveStatus = "Next SOCAT release";
         ArrayList<String> myArchiveTimestamps = new ArrayList<String>(Arrays.asList(
                 "15-JAN-2016 13:30-5:00",
@@ -581,10 +589,10 @@ public class DashboardDatasetTest {
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertTrue(firstCruise.equals(secondCruise));
 
-        firstCruise.setSubmitStatus(myQCStatus);
+        firstCruise.setSubmitStatus(mySubmitStatus);
         assertNotEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertFalse(firstCruise.equals(secondCruise));
-        secondCruise.setSubmitStatus(myQCStatus);
+        secondCruise.setSubmitStatus(mySubmitStatus);
         assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
         assertTrue(firstCruise.equals(secondCruise));
 
@@ -667,44 +675,86 @@ public class DashboardDatasetTest {
     }
 
     /**
-     * Test method for {@link DashboardDataset#isSelected()} and {@link DashboardDataset#setSelected(boolean)}.
+     * Test method for {@link DashboardDataset#isEditable()}
      */
     @Test
-    public void testSetIsEditable() {
+    public void testIsEditable() {
         DashboardDataset cruise = new DashboardDataset();
         assertTrue(cruise.isEditable());
 
         cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_NOT_SUBMITTED);
+        cruise.setSubmitStatus(null);
         assertNotNull(cruise.isEditable());
         assertTrue(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_EXCLUDED);
+        DatasetQCFlag flag = new DatasetQCFlag();
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertTrue(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_SUSPENDED);
+        flag.setActualFlag(DatasetQCFlag.Status.EXCLUDED);
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertTrue(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
+        flag.setActualFlag(DatasetQCFlag.Status.SUSPENDED);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertTrue(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.NEW_AWAITING_QC);
+        assertTrue(cruise.isEditable());
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_ACCEPTED);
+        flag.setActualFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_CONFLICT);
+        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_A);
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_RENAMED);
+        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_B);
+        cruise.setSubmitStatus(flag);
         assertNotNull(cruise.isEditable());
         assertFalse(cruise.isEditable());
 
-        cruise.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
+        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_C);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_D);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_E);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.CONFLICTED);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.RENAMED);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
+
+        flag.setActualFlag(DatasetQCFlag.Status.NEW_AWAITING_QC);
+        flag.setPiFlag(DatasetQCFlag.Status.SUSPENDED);
+        flag.setAutoFlag(DatasetQCFlag.Status.SUSPENDED);
+        cruise.setSubmitStatus(flag);
+        assertNotNull(cruise.isEditable());
+        assertFalse(cruise.isEditable());
 
         cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED);
         assertNotNull(cruise.isEditable());

@@ -2,17 +2,16 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.shared.Overlap;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimeZone;
@@ -25,19 +24,6 @@ import java.util.TreeSet;
  * @author Karl Smith
  */
 public class ReportOverlaps {
-
-    /**
-     * QC flags of datasets to report any overlaps
-     */
-    static final TreeSet<String> ACCEPTABLE_FLAGS_SET = new TreeSet<String>(Arrays.asList(
-            DatasetQCFlag.DATASET_QCFLAG_A,
-            DatasetQCFlag.DATASET_QCFLAG_B,
-            DatasetQCFlag.DATASET_QCFLAG_C,
-            DatasetQCFlag.DATASET_QCFLAG_D,
-            DatasetQCFlag.DATASET_QCFLAG_E,
-            DatasetQCFlag.DATASET_QCFLAG_NEW,
-            DatasetQCFlag.DATASET_QCFLAG_CONFLICT,
-            DatasetQCFlag.DATASET_QCFLAG_UPDATED));
 
     /**
      * @param args
@@ -103,12 +89,12 @@ public class ReportOverlaps {
             for (String expo : givenExpocodes) {
                 try {
                     String[] flagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expo);
-                    String qcFlag = flagVersionStatus[0];
-                    if ( ACCEPTABLE_FLAGS_SET.contains(qcFlag) ) {
+                    DatasetQCFlag qcFlag = DatasetQCFlag.fromString(flagVersionStatus[0]);
+                    if ( qcFlag.isAcceptable() || qcFlag.isAwaitingQC() ) {
                         expoSet.add(expo);
                     }
                     else {
-                        throw new Exception("QC flag is " + qcFlag);
+                        throw new Exception("QC flag is " + flagVersionStatus[0]);
                     }
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());

@@ -14,7 +14,6 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
-import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -25,6 +24,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -79,9 +79,7 @@ public class DatasetSubmitter {
 
     /**
      * Submit a dataset.  This standardized the data using the automated data checker and generates DSG and decimated
-     * DSG files for datasets which are editable (have a QC status of {@link DashboardUtils#STATUS_NOT_SUBMITTED},
-     * {@link DashboardUtils#STATUS_SUSPENDED}, or {@link DashboardUtils#STATUS_EXCLUDED}.  For all datasets, the
-     * archive status is updated to the given value.
+     * DSG files for datasets which are editable. For all datasets, the archive status is updated to the given value.
      * <p>
      * If the archive status begins with {@link DashboardUtils#ARCHIVE_STATUS_SENT_TO_START}, the archive request
      * is sent for dataset which have not already been sent, or for all datasets if repeatSend is true.
@@ -217,7 +215,10 @@ public class DatasetSubmitter {
                 }
 
                 // Now mark the dataset as submitted in this version
-                dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
+                if ( dataset.getSubmitStatus().isUnsubmitted() )
+                    dataset.setSubmitStatus(new DatasetQCFlag(DatasetQCFlag.Status.NEW_AWAITING_QC));
+                else
+                    dataset.setSubmitStatus(new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC));
                 dataset.setVersion(version);
 
                 // Set up to save changes to version control
@@ -330,14 +331,14 @@ public class DatasetSubmitter {
         String expocode = dataset.getDatasetId();
 
         // Start with the initial new/updated dataset QC flags
-        String flagValue;
+        DatasetQCFlag flag;
         String comment;
-        if ( DatasetQCFlag.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus()) ) {
-            flagValue = DatasetQCFlag.DATASET_QCFLAG_NEW;
+        if ( dataset.getSubmitStatus().isUnsubmitted() ) {
+            flag = new DatasetQCFlag(DatasetQCFlag.Status.NEW_AWAITING_QC);
             comment = "Initial QC flag for new dataset";
         }
         else {
-            flagValue = DatasetQCFlag.DATASET_QCFLAG_UPDATED;
+            flag = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
             comment = "Initial QC flag for updated dataset";
         }
         // First add a global flag, then flag for each region
@@ -353,7 +354,7 @@ public class DatasetSubmitter {
             initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
             initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
             initQC.setFlagDate(new Date());
-            initQC.setFlagValue(flagValue);
+            initQC.setFlagValue(flag.flagString());
             initQC.setRegionId(regionId);
             initQC.setComment(comment);
             qclist.add(initQC);
@@ -366,7 +367,7 @@ public class DatasetSubmitter {
         initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
         initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
         initQC.setFlagDate(new Date());
-        initQC.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_COMMENT);
+        initQC.setFlagValue(DatasetQCFlag.FLAG_COMMENT);
         initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
         initQC.setComment("Automated data check found " +
                 Integer.toString(dataset.getNumErrorRows()) + " data points with errors and " +

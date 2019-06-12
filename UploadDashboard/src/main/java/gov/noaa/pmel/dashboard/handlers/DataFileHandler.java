@@ -8,7 +8,6 @@ import gov.noaa.pmel.dashboard.datatype.DashDataType;
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -17,6 +16,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -608,7 +608,7 @@ public class DataFileHandler extends VersionedFileHandler {
         datasetProps.setProperty(ADDL_DOC_TITLES_ID,
                 DashboardUtils.encodeStringTreeSet(dataset.getAddlDocs()));
         // QC-submission status string
-        datasetProps.setProperty(SUBMIT_STATUS_ID, dataset.getSubmitStatus());
+        datasetProps.setProperty(SUBMIT_STATUS_ID, dataset.getSubmitStatus().statusString());
         // Archive status string
         datasetProps.setProperty(ARCHIVE_STATUS_ID, dataset.getArchiveStatus());
         // Date of request to archive original data and metadata files
@@ -1130,7 +1130,7 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     SUBMIT_STATUS_ID + " given in " + infoFile.getPath());
-        dataset.setSubmitStatus(value);
+        dataset.setSubmitStatus(DatasetQCFlag.fromString(value));
 
         // Archive status
         value = cruiseProps.getProperty(ARCHIVE_STATUS_ID);
@@ -1355,23 +1355,13 @@ public class DataFileHandler extends VersionedFileHandler {
     public boolean updateDatasetDashboardStatus(String expocode, String datasetQCFlag)
             throws IllegalArgumentException {
         DashboardDataset dset = getDatasetFromInfoFile(expocode);
-        String oldStatus = dset.getSubmitStatus();
-        String newStatus;
-        // Special check for null or blank QC flag == not submitted
-        if ( (datasetQCFlag == null) || datasetQCFlag.trim().isEmpty() ) {
-            newStatus = DatasetQCFlag.DATASET_STATUS_NOT_SUBMITTED;
-        }
-        else {
-            newStatus = DatasetQCFlag.DATASET_FLAG_STATUS_MAP.get(datasetQCFlag);
-            if ( newStatus == null )
-                throw new IllegalArgumentException("Unexpected dataset QC flag of '" +
-                        datasetQCFlag + "' given to updateDatasetDashboardStatus");
-        }
+        DatasetQCFlag oldStatus = dset.getSubmitStatus();
+        DatasetQCFlag newStatus = DatasetQCFlag.fromString(datasetQCFlag);
         if ( oldStatus.equals(newStatus) )
             return false;
         dset.setSubmitStatus(newStatus);
         saveDatasetInfoToFile(dset, "Update dataset dashboard status for " + expocode +
-                "from '" + oldStatus + "' to '" + newStatus + "'");
+                "from '" + oldStatus.statusString() + "' to '" + newStatus.statusString() + "'");
         return true;
     }
 

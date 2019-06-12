@@ -13,7 +13,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2882736218085816338L;
+    private static final long serialVersionUID = -5853649069551633895L;
 
     protected boolean selected;
     protected String version;
@@ -22,7 +22,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected String dataCheckStatus;
     protected String omeTimestamp;
     protected TreeSet<String> addlDocs;
-    protected String submitStatus;
+    protected DatasetQCFlag submitStatus;
     protected String archiveStatus;
     protected ArrayList<String> archiveTimestamps;
     protected String uploadFilename;
@@ -51,7 +51,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         dataCheckStatus = DashboardUtils.CHECK_STATUS_NOT_CHECKED;
         omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
         addlDocs = new TreeSet<String>();
-        submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
+        submitStatus = new DatasetQCFlag();
         archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
         archiveTimestamps = new ArrayList<String>(1);
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
@@ -74,14 +74,10 @@ public class DashboardDataset implements Serializable, IsSerializable {
      */
     public Boolean isEditable() {
         // true for datasets that are suspended, excluded, or not yet submitted
-        String status = getSubmitStatus();
-        if ( status.equals(DashboardUtils.STATUS_NOT_SUBMITTED) ||
-                status.equals(DashboardUtils.STATUS_SUSPENDED) ||
-                status.equals(DashboardUtils.STATUS_EXCLUDED) )
+        if ( submitStatus.isEditable() )
             return Boolean.TRUE;
         // null for published datasets
-        status = getArchiveStatus();
-        if ( status.equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
+        if ( DashboardUtils.ARCHIVE_STATUS_ARCHIVED.equals(archiveStatus) )
             return null;
         // false for submitted or QC-ed but not published
         return Boolean.FALSE;
@@ -221,23 +217,22 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the submission status;
-     *         never null but may be {@link DashboardUtils#STATUS_NOT_SUBMITTED} if not assigned
+     * @return the submission status; never null
      */
-    public String getSubmitStatus() {
-        return submitStatus;
+    public DatasetQCFlag getSubmitStatus() {
+        return submitStatus.clone();
     }
 
     /**
      * @param submitStatus
-     *         the  submission status (after trimming) to set;
-     *         if null, {@link DashboardUtils#STATUS_NOT_SUBMITTED} is assigned
+     *         the submission status (after trimming) to set;
+     *         if null, a default DatasetQCFlag (all {@link DatasetQCFlag.Status#NOT_GIVEN}) is assigned
      */
-    public void setSubmitStatus(String submitStatus) {
+    public void setSubmitStatus(DatasetQCFlag submitStatus) {
         if ( submitStatus == null )
-            this.submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
+            this.submitStatus = new DatasetQCFlag();
         else
-            this.submitStatus = submitStatus.trim();
+            this.submitStatus = submitStatus.clone();
     }
 
     /**
@@ -584,7 +579,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ";\n    dataCheckStatus=" + dataCheckStatus +
                 ";\n    omeTimestamp=" + omeTimestamp +
                 ";\n    addlDocs=" + addlDocs.toString() +
-                ";\n    submitStatus=" + submitStatus +
+                ";\n    submitStatus=" + submitStatus.toString() +
                 ";\n    archiveStatus=" + archiveStatus +
                 ";\n    archiveTimestamps=" + archiveTimestamps +
                 ";\n    uploadFilename=" + uploadFilename +

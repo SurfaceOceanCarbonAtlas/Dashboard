@@ -77,7 +77,7 @@ public class UpdateQCFlags {
                 String qcFlag;
                 String versionStatus;
                 try {
-                    qcFlag = dbHandler.getDatasetQCFlag(expocode);
+                    qcFlag = dbHandler.getDatasetQCFlag(expocode).flagString();
                     versionStatus = dbHandler.getVersionStatus(expocode);
                 } catch ( Exception ex ) {
                     System.err.println("Error getting the database QC flag or version with status for " +

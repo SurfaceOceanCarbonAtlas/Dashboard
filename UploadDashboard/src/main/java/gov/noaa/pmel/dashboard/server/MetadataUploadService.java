@@ -6,11 +6,11 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
-import gov.noaa.pmel.dashboard.qc.DatasetQCFlag;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
@@ -226,12 +226,13 @@ public class MetadataUploadService extends HttpServlet {
                         throw new RuntimeException("Unexpect failure to obtain all the region IDs for " +
                                 id + ": " + ex.getMessage());
                     }
+                    DatasetQCFlag flag = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
                     // Add the update flags to global, then all the regions
                     ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
                     for (int k = 0; k < allRegionIds.length(); k++) {
                         QCEvent qcEvent = new QCEvent();
                         qcEvent.setDatasetId(id);
-                        qcEvent.setFlagValue(DatasetQCFlag.DATASET_QCFLAG_UPDATED);
+                        qcEvent.setFlagValue(flag.flagString());
                         qcEvent.setFlagDate(now);
                         qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                         qcEvent.setVersion(version);
@@ -243,15 +244,14 @@ public class MetadataUploadService extends HttpServlet {
                         // Add the 'U' QC flags
                         databaseHandler.addDatasetQCEvents(qcEventList);
                         // Update the dashboard status for the 'U' QC flag
-                        dataset.setSubmitStatus(DatasetQCFlag.DATASET_STATUS_SUBMITTED);
+                        dataset.setSubmitStatus(flag);
                         // If archived, reset the archived status so the updated metadata will be archived
                         if ( dataset.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
                             dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
                         dataFileHandler.saveDatasetInfoToFile(dataset, comment);
                         // Update the DSG files
                         String versionStatus = databaseHandler.getVersionStatus(id);
-                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id,
-                                DatasetQCFlag.DATASET_QCFLAG_UPDATED, versionStatus);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id, flag.flagString(), versionStatus);
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.

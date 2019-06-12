@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.cell.client.Cell;
@@ -1383,7 +1380,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 new Column<DashboardDataset,String>(new ClickableTextCell()) {
                     @Override
                     public String getValue(DashboardDataset cruise) {
-                        String status = cruise.getSubmitStatus();
+                        String status = cruise.getSubmitStatus().statusString();
                         if ( status.isEmpty() )
                             status = NO_QC_STATUS_STRING;
                         return status;

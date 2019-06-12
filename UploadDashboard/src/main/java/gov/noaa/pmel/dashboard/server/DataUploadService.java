@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -12,6 +9,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
@@ -280,14 +278,14 @@ public class DataUploadService extends HttpServlet {
                 // Read the original dataset info to get the current owner and QC status
                 DashboardDataset dset;
                 String owner;
-                String status;
+                DatasetQCFlag status;
                 try {
                     dset = datasetHandler.getDatasetFromInfoFile(datasetId);
                     owner = dset.getOwner();
                     status = dset.getSubmitStatus();
                 } catch ( Exception ex ) {
                     owner = "";
-                    status = "";
+                    status = new DatasetQCFlag();
                 }
                 // Make sure this user has permission to overwrite this cruise,
                 // and the request was for an overwrite

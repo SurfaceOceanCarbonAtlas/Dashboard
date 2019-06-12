@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import java.util.ArrayList;
@@ -53,16 +50,6 @@ public class DashboardUtils {
     public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
     public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
     public static final String GEOPOSITION_ERRORS_MSG = "(lat/lon/time errors!)";
-
-    // Status strings - datasets that can be modified
-    public static final String STATUS_NOT_SUBMITTED = "";
-    public static final String STATUS_SUSPENDED = "Suspended";
-    public static final String STATUS_EXCLUDED = "Excluded";
-    // Status strings - datasets that cannot be modified
-    public static final String STATUS_SUBMITTED = "Submitted";
-    public static final String STATUS_ACCEPTED = "Accepted";
-    public static final String STATUS_CONFLICT = "Conflict";
-    public static final String STATUS_RENAMED = "Renamed";
 
     // Archival options
     public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
