@@ -6,7 +6,7 @@ import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -411,7 +411,7 @@ public class DatabaseRequestHandler {
      *         if a problem occurs getting all QC events for the data set, or
      *         if the QC flags in the dataset are corrupt.
      */
-    public DatasetQCFlag getDatasetQCFlag(String expocode) throws SQLException {
+    public DatasetQCStatus getDatasetQCFlag(String expocode) throws SQLException {
         HashMap<String,QCEvent> regionFlags = new HashMap<String,QCEvent>();
         long lastUpdateTime = MIN_FLAG_SEC_TIME * 1000L;
         Connection catConn = makeConnection(false);
@@ -431,7 +431,7 @@ public class DatabaseRequestHandler {
                     // Should not be blank, but might be from older code for a comment
                     if ( flagValue.length() < 1 )
                         continue;
-                    DatasetQCFlag flag = DatasetQCFlag.fromString(flagValue);
+                    DatasetQCStatus flag = DatasetQCStatus.fromString(flagValue);
                     if ( flag.isCommentFlag() || flag.isRenameFlag() )
                         continue;
                     long time = rslts.getLong(2);
@@ -465,15 +465,15 @@ public class DatabaseRequestHandler {
 
         // Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
         QCEvent globalEvent = regionFlags.get(DashboardUtils.REGION_ID_GLOBAL);
-        DatasetQCFlag globalFlag;
+        DatasetQCStatus globalFlag;
         long globalTime;
         if ( globalEvent == null ) {
             // Some v1 cruises do not have global flags
-            globalFlag = new DatasetQCFlag(DatasetQCFlag.Status.NEW_AWAITING_QC);
+            globalFlag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC);
             globalTime = lastUpdateTime;
         }
         else {
-            globalFlag = DatasetQCFlag.fromString(globalEvent.getFlagValue());
+            globalFlag = DatasetQCStatus.fromString(globalEvent.getFlagValue());
             globalTime = globalEvent.getFlagDate().getTime();
         }
 
@@ -481,7 +481,7 @@ public class DatabaseRequestHandler {
         // (1) global flag is last, or
         // (2) all region flags are after global flag and match, or
         // (3) region flags after global flag match global flag
-        DatasetQCFlag latestFlag = null;
+        DatasetQCStatus latestFlag = null;
         for (Entry<String,QCEvent> regionEntry : regionFlags.entrySet()) {
             // Just compare non-global entries
             if ( DashboardUtils.REGION_ID_GLOBAL.equals(regionEntry.getKey()) )
@@ -491,10 +491,10 @@ public class DatabaseRequestHandler {
             long time = qcEvent.getFlagDate().getTime();
             if ( time - lastUpdateTime < -1000L )
                 continue;
-            DatasetQCFlag flag;
+            DatasetQCStatus flag;
             if ( time > globalTime ) {
                 // last flag for this region set after the last global flag; its flag applies
-                flag = DatasetQCFlag.fromString(qcEvent.getFlagValue());
+                flag = DatasetQCStatus.fromString(qcEvent.getFlagValue());
             }
             else {
                 // last flag for this region set before the last global flag; the global flag applies
@@ -503,9 +503,9 @@ public class DatabaseRequestHandler {
             if ( latestFlag == null ) {
                 latestFlag = flag;
             }
-            else if ( !latestFlag.getActualFlag().equals(flag.getActualFlag()) ) {
+            else if ( !latestFlag.getActual().equals(flag.getActual()) ) {
                 // conflicts only occur with mismatches in the actual flag
-                return new DatasetQCFlag(DatasetQCFlag.Status.CONFLICTED);
+                return new DatasetQCStatus(DatasetQCStatus.Status.CONFLICTED);
             }
         }
         if ( latestFlag == null ) {
@@ -538,8 +538,8 @@ public class DatabaseRequestHandler {
             PreparedStatement getPrepStmt = catConn.prepareStatement(
                     "SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME +
                             "` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.REGION_ID_GLOBAL +
-                            "' AND ( `qc_flag` LIKE '" + DatasetQCFlag.FLAG_NEW_AWAITING_QC +
-                            "%' OR `qc_flag` LIKE '" + DatasetQCFlag.FLAG_UPDATED_AWAITING_QC + "%' );");
+                            "' AND ( `qc_flag` LIKE '" + DatasetQCStatus.FLAG_NEW_AWAITING_QC +
+                            "%' OR `qc_flag` LIKE '" + DatasetQCStatus.FLAG_UPDATED_AWAITING_QC + "%' );");
             getPrepStmt.setString(1, expocode);
             ResultSet rslts = getPrepStmt.executeQuery();
             try {
@@ -919,7 +919,7 @@ public class DatabaseRequestHandler {
                             "WHERE `expocode` = ? AND `qc_flag` <> ?;");
             modifyQcPrepStmt.setString(1, newExpocode);
             modifyQcPrepStmt.setString(2, oldExpocode);
-            modifyQcPrepStmt.setString(3, DatasetQCFlag.FLAG_RENAMED);
+            modifyQcPrepStmt.setString(3, DatasetQCStatus.FLAG_RENAMED);
             modifyQcPrepStmt.executeUpdate();
             int updateCount = modifyQcPrepStmt.getUpdateCount();
             if ( updateCount < 0 )
@@ -936,9 +936,9 @@ public class DatabaseRequestHandler {
                     "INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
                             "`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
-            addQcPrepStmt.setString(1, DatasetQCFlag.FLAG_RENAMED);
-            addQcPrepStmt.setString(8, DatasetQCFlag.FLAG_RENAMED);
-            addQcPrepStmt.setString(15, DatasetQCFlag.FLAG_COMMENT);
+            addQcPrepStmt.setString(1, DatasetQCStatus.FLAG_RENAMED);
+            addQcPrepStmt.setString(8, DatasetQCStatus.FLAG_RENAMED);
+            addQcPrepStmt.setString(15, DatasetQCStatus.FLAG_COMMENT);
             addQcPrepStmt.setLong(2, nowSec);
             addQcPrepStmt.setLong(9, nowSec);
             addQcPrepStmt.setLong(16, nowSec);
@@ -965,7 +965,7 @@ public class DatabaseRequestHandler {
                             "WHERE `expocode` = ? AND `woce_flag` <> ?;");
             modifyWocePrepStmt.setString(1, newExpocode);
             modifyWocePrepStmt.setString(2, oldExpocode);
-            modifyWocePrepStmt.setString(3, DatasetQCFlag.FLAG_RENAMED);
+            modifyWocePrepStmt.setString(3, DatasetQCStatus.FLAG_RENAMED);
             modifyWocePrepStmt.executeUpdate();
 
             // Add two rename WOCE events; one for the old expocode and one for the new expocode
@@ -975,8 +975,8 @@ public class DatabaseRequestHandler {
                     "VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
             addWocePrepStmt.setString(1, SocatTypes.WOCE_CO2_WATER.getVarName());
             addWocePrepStmt.setString(8, SocatTypes.WOCE_CO2_WATER.getVarName());
-            addWocePrepStmt.setString(2, DatasetQCFlag.FLAG_RENAMED);
-            addWocePrepStmt.setString(9, DatasetQCFlag.FLAG_RENAMED);
+            addWocePrepStmt.setString(2, DatasetQCStatus.FLAG_RENAMED);
+            addWocePrepStmt.setString(9, DatasetQCStatus.FLAG_RENAMED);
             addWocePrepStmt.setLong(3, nowSec);
             addWocePrepStmt.setLong(10, nowSec);
             addWocePrepStmt.setString(4, oldExpocode);

@@ -1,6 +1,6 @@
 package gov.noaa.pmel.dashboard.test.shared;
 
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -9,66 +9,66 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DatasetQCFlagTest {
+public class DatasetQCStatusTest {
 
-    private static final DatasetQCFlag.Status DEFAULT_FLAG = DatasetQCFlag.Status.NOT_GIVEN;
-    private static final DatasetQCFlag.Status ACTUAL_FLAG = DatasetQCFlag.Status.UPDATED_AWAITING_QC;
-    private static final DatasetQCFlag.Status PI_FLAG = DatasetQCFlag.Status.ACCEPTED_A;
-    private static final DatasetQCFlag.Status AUTO_FLAG = DatasetQCFlag.Status.ACCEPTED_B;
+    private static final DatasetQCStatus.Status DEFAULT_FLAG = DatasetQCStatus.Status.PRIVATE;
+    private static final DatasetQCStatus.Status ACTUAL_FLAG = DatasetQCStatus.Status.UPDATED_AWAITING_QC;
+    private static final DatasetQCStatus.Status PI_FLAG = DatasetQCStatus.Status.ACCEPTED_A;
+    private static final DatasetQCStatus.Status AUTO_FLAG = DatasetQCStatus.Status.ACCEPTED_B;
 
     /**
-     * Test of {@link DatasetQCFlag#getActualFlag()} and {@link DatasetQCFlag#setActualFlag(DatasetQCFlag.Status)}
+     * Test of {@link DatasetQCStatus#getActual()} and {@link DatasetQCStatus#setActual(DatasetQCStatus.Status)}
      */
     @Test
     public void testGetSetActualFlag() {
-        DatasetQCFlag flag = new DatasetQCFlag();
-        assertEquals(DEFAULT_FLAG, flag.getActualFlag());
-        flag.setActualFlag(ACTUAL_FLAG);
-        assertEquals(ACTUAL_FLAG, flag.getActualFlag());
-        flag.setActualFlag(null);
-        assertEquals(DEFAULT_FLAG, flag.getActualFlag());
+        DatasetQCStatus flag = new DatasetQCStatus();
+        assertEquals(DEFAULT_FLAG, flag.getActual());
+        flag.setActual(ACTUAL_FLAG);
+        assertEquals(ACTUAL_FLAG, flag.getActual());
+        flag.setActual(null);
+        assertEquals(DEFAULT_FLAG, flag.getActual());
     }
 
     /**
-     * Test of {@link DatasetQCFlag#getPiFlag()} and {@link DatasetQCFlag#setPiFlag(DatasetQCFlag.Status)}
+     * Test of {@link DatasetQCStatus#getPiSuggested()} and {@link DatasetQCStatus#setPiSuggested(DatasetQCStatus.Status)}
      */
     @Test
     public void testGetSetPiFlag() {
-        DatasetQCFlag flag = new DatasetQCFlag();
-        assertEquals(DEFAULT_FLAG, flag.getPiFlag());
-        flag.setPiFlag(PI_FLAG);
-        assertEquals(PI_FLAG, flag.getPiFlag());
-        assertEquals(DEFAULT_FLAG, flag.getActualFlag());
-        flag.setPiFlag(null);
-        assertEquals(DEFAULT_FLAG, flag.getPiFlag());
+        DatasetQCStatus flag = new DatasetQCStatus();
+        assertEquals(DEFAULT_FLAG, flag.getPiSuggested());
+        flag.setPiSuggested(PI_FLAG);
+        assertEquals(PI_FLAG, flag.getPiSuggested());
+        assertEquals(DEFAULT_FLAG, flag.getActual());
+        flag.setPiSuggested(null);
+        assertEquals(DEFAULT_FLAG, flag.getPiSuggested());
     }
 
     /**
-     * Test of {@link DatasetQCFlag#getAutoFlag()} and {@link DatasetQCFlag#setAutoFlag(DatasetQCFlag.Status)}
+     * Test of {@link DatasetQCStatus#getAutoSuggested()} and {@link DatasetQCStatus#setAutoSuggested(DatasetQCStatus.Status)}
      */
     @Test
     public void testGetSetAutoFlag() {
-        DatasetQCFlag flag = new DatasetQCFlag();
-        assertEquals(DEFAULT_FLAG, flag.getAutoFlag());
-        flag.setAutoFlag(AUTO_FLAG);
-        assertEquals(AUTO_FLAG, flag.getAutoFlag());
-        assertEquals(DEFAULT_FLAG, flag.getPiFlag());
-        assertEquals(DEFAULT_FLAG, flag.getActualFlag());
-        flag.setAutoFlag(null);
-        assertEquals(DEFAULT_FLAG, flag.getAutoFlag());
+        DatasetQCStatus flag = new DatasetQCStatus();
+        assertEquals(DEFAULT_FLAG, flag.getAutoSuggested());
+        flag.setAutoSuggested(AUTO_FLAG);
+        assertEquals(AUTO_FLAG, flag.getAutoSuggested());
+        assertEquals(DEFAULT_FLAG, flag.getPiSuggested());
+        assertEquals(DEFAULT_FLAG, flag.getActual());
+        flag.setAutoSuggested(null);
+        assertEquals(DEFAULT_FLAG, flag.getAutoSuggested());
     }
 
     /**
-     * Test of {@link DatasetQCFlag#flagString()} and {@link DatasetQCFlag#statusString()}.
+     * Test of {@link DatasetQCStatus#flagString()} and {@link DatasetQCStatus#statusString()}.
      */
     @Test
     public void testFlagStatusStrings() {
-        DatasetQCFlag flag = new DatasetQCFlag();
-        assertEquals("", flag.flagString());
-        assertEquals("", flag.statusString());
+        DatasetQCStatus flag = new DatasetQCStatus();
+        assertEquals("P", flag.flagString());
+        assertEquals("Private", flag.statusString());
 
-        flag.setPiFlag(DatasetQCFlag.Status.ACCEPTED_A);
-        flag.setAutoFlag(DatasetQCFlag.Status.ACCEPTED_B);
+        flag.setPiSuggested(DatasetQCStatus.Status.NEW_AWAITING_QC);
+        flag.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
         boolean caughtError;
         try {
             flag.flagString();
@@ -77,7 +77,9 @@ public class DatasetQCFlagTest {
             caughtError = true;
         }
         if ( !caughtError )
-            fail("IllegalArgumentException not thrown in flagString() with actual flag not given");
+            fail("IllegalArgumentException not thrown in flagString() with invalid PI-suggested status");
+        flag.setPiSuggested(DatasetQCStatus.Status.ACCEPTED_A);
+        flag.setAutoSuggested(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
         try {
             flag.statusString();
             caughtError = false;
@@ -85,89 +87,74 @@ public class DatasetQCFlagTest {
             caughtError = true;
         }
         if ( !caughtError )
-            fail("IllegalArgumentException not thrown in statusString() with actual flag not given");
+            fail("IllegalArgumentException not thrown in statusString() with invalid automation-suggested status");
 
-        flag.setActualFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+        flag.setActual(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
+        flag.setPiSuggested(DatasetQCStatus.Status.ACCEPTED_A);
+        flag.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
         assertEquals("U-piA-autoB", flag.flagString());
         assertEquals("Submitted update; PI suggested Flag A; automation suggested Flag B", flag.statusString());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_A);
-        try {
-            flag.flagString();
-            caughtError = false;
-        } catch ( IllegalArgumentException ex ) {
-            caughtError = true;
-        }
-        if ( !caughtError )
-            fail("IllegalArgumentException not thrown in flagString() with flag A");
-        try {
-            flag.statusString();
-            caughtError = false;
-        } catch ( IllegalArgumentException ex ) {
-            caughtError = true;
-        }
-        if ( !caughtError )
-            fail("IllegalArgumentException not thrown in statusString() with flag A");
-
-        flag.setPiFlag(null);
-        flag.setAutoFlag(null);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_A);
+        flag.setPiSuggested(null);
+        flag.setAutoSuggested(null);
         assertEquals("A", flag.flagString());
         assertEquals("Flag A", flag.statusString());
     }
 
     /**
-     * Test of {@link DatasetQCFlag#fromString(String)}
+     * Test of {@link DatasetQCStatus#fromString(String)}
      */
     @Test
-    public void testFromFlagString() {
-        DatasetQCFlag flag = new DatasetQCFlag(ACTUAL_FLAG);
+    public void testFromString() {
+        DatasetQCStatus flag = new DatasetQCStatus(ACTUAL_FLAG);
         String flagString = flag.flagString();
-        DatasetQCFlag other = DatasetQCFlag.fromString(flagString);
+        DatasetQCStatus other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
         flagString = flag.statusString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
 
-        flag.setPiFlag(PI_FLAG);
+        flag.setPiSuggested(PI_FLAG);
         flagString = flag.flagString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
         flagString = flag.statusString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
 
-        flag.setAutoFlag(AUTO_FLAG);
+        flag.setAutoSuggested(AUTO_FLAG);
         flagString = flag.flagString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
         flagString = flag.statusString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
 
-        flag.setPiFlag(null);
+        flag.setPiSuggested(null);
         flagString = flag.flagString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
         flagString = flag.statusString();
-        other = DatasetQCFlag.fromString(flagString);
+        other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
     }
 
     /**
-     * Test of {@link DatasetQCFlag#isAcceptable()}, {@link DatasetQCFlag#isAwaitingQC()},
-     * {@link DatasetQCFlag#isCommentFlag()}, {@link DatasetQCFlag#isConflicted()},
-     * {@link DatasetQCFlag#isEditable()}, {@link DatasetQCFlag#isNewAwaitingQC()},
-     * {@link DatasetQCFlag#isRenameFlag()}, {@link DatasetQCFlag#isUnsubmitted()},
-     * and {@link DatasetQCFlag#isUpdatedAwaitingQC()}
+     * Test of {@link DatasetQCStatus#isAcceptable()}, {@link DatasetQCStatus#isAwaitingQC()},
+     * {@link DatasetQCStatus#isCommentFlag()}, {@link DatasetQCStatus#isConflicted()},
+     * {@link DatasetQCStatus#isEditable()}, {@link DatasetQCStatus#isNewAwaitingQC()},
+     * {@link DatasetQCStatus#isRenameFlag()}, {@link DatasetQCStatus#isPrivate()},
+     * and {@link DatasetQCStatus#isUpdatedAwaitingQC()}
      */
     @Test
     public void testBooleans() {
-        DatasetQCFlag flag = new DatasetQCFlag();
+        DatasetQCStatus flag = new DatasetQCStatus();
         // Values of PI and automated flags should not affect any of these
-        flag.setPiFlag(PI_FLAG);
-        flag.setAutoFlag(AUTO_FLAG);
+        flag.setPiSuggested(PI_FLAG);
+        flag.setAutoSuggested(AUTO_FLAG);
 
-        flag.setActualFlag(DatasetQCFlag.Status.NOT_GIVEN);
+        flag.setActual(DatasetQCStatus.Status.PRIVATE);
         assertFalse(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -175,10 +162,10 @@ public class DatasetQCFlagTest {
         assertTrue(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertTrue(flag.isUnsubmitted());
+        assertTrue(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.SUSPENDED);
+        flag.setActual(DatasetQCStatus.Status.SUSPENDED);
         assertFalse(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -186,10 +173,10 @@ public class DatasetQCFlagTest {
         assertTrue(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.EXCLUDED);
+        flag.setActual(DatasetQCStatus.Status.EXCLUDED);
         assertFalse(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -197,10 +184,10 @@ public class DatasetQCFlagTest {
         assertTrue(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.NEW_AWAITING_QC);
+        flag.setActual(DatasetQCStatus.Status.NEW_AWAITING_QC);
         assertFalse(flag.isAcceptable());
         assertTrue(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -208,10 +195,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertTrue(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+        flag.setActual(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
         assertFalse(flag.isAcceptable());
         assertTrue(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -219,10 +206,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertTrue(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.CONFLICTED);
+        flag.setActual(DatasetQCStatus.Status.CONFLICTED);
         assertFalse(flag.isAcceptable());
         assertTrue(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -230,10 +217,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_A);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_A);
         assertTrue(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -241,10 +228,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_B);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_B);
         assertTrue(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -252,10 +239,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_C);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_C);
         assertTrue(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -263,10 +250,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_D);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_D);
         assertTrue(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -274,10 +261,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.ACCEPTED_E);
+        flag.setActual(DatasetQCStatus.Status.ACCEPTED_E);
         assertTrue(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -285,10 +272,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.COMMENT);
+        flag.setActual(DatasetQCStatus.Status.COMMENT);
         assertFalse(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertTrue(flag.isCommentFlag());
@@ -296,10 +283,10 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertFalse(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
 
-        flag.setActualFlag(DatasetQCFlag.Status.RENAMED);
+        flag.setActual(DatasetQCStatus.Status.RENAMED);
         assertFalse(flag.isAcceptable());
         assertFalse(flag.isAwaitingQC());
         assertFalse(flag.isCommentFlag());
@@ -307,103 +294,103 @@ public class DatasetQCFlagTest {
         assertFalse(flag.isEditable());
         assertFalse(flag.isNewAwaitingQC());
         assertTrue(flag.isRenameFlag());
-        assertFalse(flag.isUnsubmitted());
+        assertFalse(flag.isPrivate());
         assertFalse(flag.isUpdatedAwaitingQC());
     }
 
 
     /**
-     * Test of {@link DatasetQCFlag#compareTo(DatasetQCFlag)}
+     * Test of {@link DatasetQCStatus#compareTo(DatasetQCStatus)}
      */
     @Test
     public void testCompareTo() {
-        DatasetQCFlag first = new DatasetQCFlag();
-        DatasetQCFlag second = new DatasetQCFlag();
+        DatasetQCStatus first = new DatasetQCStatus();
+        DatasetQCStatus second = new DatasetQCStatus();
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
 
-        first.setActualFlag(ACTUAL_FLAG);
+        first.setActual(ACTUAL_FLAG);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        first.setPiFlag(PI_FLAG);
-        first.setAutoFlag(AUTO_FLAG);
+        first.setPiSuggested(PI_FLAG);
+        first.setAutoSuggested(AUTO_FLAG);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        second.setActualFlag(ACTUAL_FLAG);
+        second.setActual(ACTUAL_FLAG);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        second.setPiFlag(PI_FLAG);
+        second.setPiSuggested(PI_FLAG);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        second.setAutoFlag(AUTO_FLAG);
+        second.setAutoSuggested(AUTO_FLAG);
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
 
-        first.setActualFlag(DatasetQCFlag.Status.SUSPENDED);
-        second.setPiFlag(DatasetQCFlag.Status.NOT_GIVEN);
-        second.setAutoFlag(DatasetQCFlag.Status.NOT_GIVEN);
+        first.setActual(DatasetQCStatus.Status.SUSPENDED);
+        second.setPiSuggested(DatasetQCStatus.Status.PRIVATE);
+        second.setAutoSuggested(DatasetQCStatus.Status.PRIVATE);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
     }
 
     /**
-     * Test of {@link DatasetQCFlag#hashCode()} and {@link DatasetQCFlag#equals(Object)}
+     * Test of {@link DatasetQCStatus#hashCode()} and {@link DatasetQCStatus#equals(Object)}
      */
     @Test
     public void testHashCodeEquals() {
-        DatasetQCFlag first = new DatasetQCFlag();
-        assertFalse(first.equals(DatasetQCFlag.Status.NOT_GIVEN));
+        DatasetQCStatus first = new DatasetQCStatus();
+        assertFalse(first.equals(DatasetQCStatus.Status.PRIVATE));
         assertFalse(first.equals(null));
 
-        DatasetQCFlag second = new DatasetQCFlag();
+        DatasetQCStatus second = new DatasetQCStatus();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setActualFlag(ACTUAL_FLAG);
+        first.setActual(ACTUAL_FLAG);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setActualFlag(ACTUAL_FLAG);
+        second.setActual(ACTUAL_FLAG);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setPiFlag(PI_FLAG);
+        first.setPiSuggested(PI_FLAG);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setPiFlag(PI_FLAG);
+        second.setPiSuggested(PI_FLAG);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setAutoFlag(AUTO_FLAG);
+        first.setAutoSuggested(AUTO_FLAG);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setAutoFlag(AUTO_FLAG);
+        second.setAutoSuggested(AUTO_FLAG);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
 
     /**
-     * Test of {@link DatasetQCFlag#DatasetQCFlag(DatasetQCFlag.Status)}
-     * and {@link DatasetQCFlag#DatasetQCFlag(DatasetQCFlag)}
+     * Test of {@link DatasetQCStatus#DatasetQCStatus(DatasetQCStatus.Status)}
+     * and {@link DatasetQCStatus#DatasetQCStatus(DatasetQCStatus)}
      */
     @Test
     public void testDatasetQCFlag() {
-        DatasetQCFlag flag = new DatasetQCFlag();
-        DatasetQCFlag other = new DatasetQCFlag((DatasetQCFlag.Status) null);
+        DatasetQCStatus flag = new DatasetQCStatus();
+        DatasetQCStatus other = new DatasetQCStatus((DatasetQCStatus.Status) null);
         assertEquals(flag, other);
-        other = new DatasetQCFlag((DatasetQCFlag) null);
-        assertEquals(flag, other);
-
-        flag.setActualFlag(ACTUAL_FLAG);
-        other = new DatasetQCFlag(ACTUAL_FLAG);
+        other = new DatasetQCStatus((DatasetQCStatus) null);
         assertEquals(flag, other);
 
-        flag.setPiFlag(PI_FLAG);
-        flag.setAutoFlag(AUTO_FLAG);
-        other = new DatasetQCFlag(flag);
+        flag.setActual(ACTUAL_FLAG);
+        other = new DatasetQCStatus(ACTUAL_FLAG);
+        assertEquals(flag, other);
+
+        flag.setPiSuggested(PI_FLAG);
+        flag.setAutoSuggested(AUTO_FLAG);
+        other = new DatasetQCStatus(flag);
         assertEquals(flag, other);
     }
 

@@ -19,7 +19,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 import org.apache.logging.log4j.Logger;
 
@@ -300,7 +300,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
             }
             ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
-            DatasetQCFlag flag = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+            DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
             for (int k = 0; k < allRegionIds.length(); k++) {
                 QCEvent qcEvent = new QCEvent();
                 qcEvent.setDatasetId(datasetId);
@@ -590,7 +590,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        DatasetQCFlag flag = new DatasetQCFlag(DatasetQCFlag.Status.SUSPENDED);
+        DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED);
         // Global suspend QC event to add to the database (after adding the dataset ID)
         QCEvent qc = new QCEvent();
         qc.setUsername(username);

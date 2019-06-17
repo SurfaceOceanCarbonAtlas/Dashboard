@@ -16,7 +16,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -1130,7 +1130,7 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     SUBMIT_STATUS_ID + " given in " + infoFile.getPath());
-        dataset.setSubmitStatus(DatasetQCFlag.fromString(value));
+        dataset.setSubmitStatus(DatasetQCStatus.fromString(value));
 
         // Archive status
         value = cruiseProps.getProperty(ARCHIVE_STATUS_ID);
@@ -1148,13 +1148,11 @@ public class DataFileHandler extends VersionedFileHandler {
             // Old properties files only had a single (latest) date
             value = cruiseProps.getProperty("archivaldate");
             if ( value == null )
-                value = cruiseProps.getProperty("ocadsdate");
-            if ( value == null )
                 value = cruiseProps.getProperty("cdiacdate");
             if ( value == null )
                 throw new IllegalArgumentException("No property value for " +
                         ARCHIVAL_TIMESTAMPS_ID + " given in " + infoFile.getPath());
-            dataset.setArchiveTimestamps(new ArrayList<String>(Arrays.asList(value)));
+            dataset.setArchiveTimestamps(new ArrayList<String>(Collections.singletonList(value)));
         }
 
         // Number of rows of data (number of samples)
@@ -1355,8 +1353,8 @@ public class DataFileHandler extends VersionedFileHandler {
     public boolean updateDatasetDashboardStatus(String expocode, String datasetQCFlag)
             throws IllegalArgumentException {
         DashboardDataset dset = getDatasetFromInfoFile(expocode);
-        DatasetQCFlag oldStatus = dset.getSubmitStatus();
-        DatasetQCFlag newStatus = DatasetQCFlag.fromString(datasetQCFlag);
+        DatasetQCStatus oldStatus = dset.getSubmitStatus();
+        DatasetQCStatus newStatus = DatasetQCStatus.fromString(datasetQCFlag);
         if ( oldStatus.equals(newStatus) )
             return false;
         dset.setSubmitStatus(newStatus);

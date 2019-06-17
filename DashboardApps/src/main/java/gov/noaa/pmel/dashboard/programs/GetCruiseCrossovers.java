@@ -4,7 +4,7 @@ import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.Crossover;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -79,16 +79,16 @@ public class GetCruiseCrossovers {
             for (String expo : givenExpocodes) {
                 try {
                     String[] flagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expo);
-                    DatasetQCFlag qcFlag = DatasetQCFlag.fromString(flagVersionStatus[0]);
-                    if ( DatasetQCFlag.Status.ACCEPTED_A.equals(qcFlag.getActualFlag()) ||
-                            DatasetQCFlag.Status.ACCEPTED_B.equals(qcFlag.getActualFlag()) ) {
+                    DatasetQCStatus qcFlag = DatasetQCStatus.fromString(flagVersionStatus[0]);
+                    if ( DatasetQCStatus.Status.ACCEPTED_A.equals(qcFlag.getActual()) ||
+                            DatasetQCStatus.Status.ACCEPTED_B.equals(qcFlag.getActual()) ) {
                         datasetFlagsMap.put(expo, flagVersionStatus[0]);
                     }
                     else {
                         throw new Exception("QC flag is " + flagVersionStatus[0]);
                     }
                     // Add all flag-A expocodes, then remove those that actually do have crossovers
-                    if ( DatasetQCFlag.Status.ACCEPTED_A.equals(qcFlag.getActualFlag()) )
+                    if ( DatasetQCStatus.Status.ACCEPTED_A.equals(qcFlag.getActual()) )
                         notActuallyAExpos.add(expo);
                 } catch ( Exception ex ) {
                     System.err.println("Problems with expocode " + expo + ": " + ex.getMessage());

@@ -10,7 +10,7 @@ import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
@@ -226,7 +226,7 @@ public class MetadataUploadService extends HttpServlet {
                         throw new RuntimeException("Unexpect failure to obtain all the region IDs for " +
                                 id + ": " + ex.getMessage());
                     }
-                    DatasetQCFlag flag = new DatasetQCFlag(DatasetQCFlag.Status.UPDATED_AWAITING_QC);
+                    DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
                     // Add the update flags to global, then all the regions
                     ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
                     for (int k = 0; k < allRegionIds.length(); k++) {

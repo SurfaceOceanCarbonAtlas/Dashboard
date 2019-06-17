@@ -3,7 +3,7 @@ package gov.noaa.pmel.dashboard.test.shared;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class TypesDatasetDataPairTest {
     public void testGetSetDatasetData() {
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         cruiseData.setDatasetId("ABCD20161003");
-        cruiseData.setSubmitStatus(new DatasetQCFlag(DatasetQCFlag.Status.SUSPENDED));
+        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED));
 
         TypesDatasetDataPair cruiseTypes = new TypesDatasetDataPair();
         assertNull(cruiseTypes.getDatasetData());
@@ -75,7 +75,7 @@ public class TypesDatasetDataPairTest {
 
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         cruiseData.setDatasetId("ABCD20161003");
-        cruiseData.setSubmitStatus(new DatasetQCFlag(DatasetQCFlag.Status.SUSPENDED));
+        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED));
 
         TypesDatasetDataPair cruiseTypes = new TypesDatasetDataPair();
         assertFalse(cruiseTypes.equals(null));

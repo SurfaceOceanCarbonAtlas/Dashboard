@@ -22,7 +22,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -291,12 +291,12 @@ public class SubmitForQCPage extends CompositeWithUsername {
             expocodes.add(expo);
 
             // Add this cruise to the intro list
-            DatasetQCFlag submitStatus = cruise.getSubmitStatus();
+            DatasetQCStatus submitStatus = cruise.getSubmitStatus();
             ArrayList<String> archiveTimestamps = cruise.getArchiveTimestamps();
             String cdiacDate = "";
             if ( !archiveTimestamps.isEmpty() )
                 cdiacDate = archiveTimestamps.get(archiveTimestamps.size() - 1);
-            if ( submitStatus.isUnsubmitted() && cdiacDate.isEmpty() ) {
+            if ( submitStatus.isPrivate() && cdiacDate.isEmpty() ) {
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         "</li>");
             }
@@ -305,7 +305,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
                         CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
                         submitStatus + CRUISE_INFO_EPILOGUE + "</li>");
             }
-            else if ( submitStatus.isUnsubmitted() ) {
+            else if ( submitStatus.isPrivate() ) {
                 hasSentDataset = true;
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         CRUISE_INFO_PROLOGUE + ARCHIVE_STATUS_INTRO +

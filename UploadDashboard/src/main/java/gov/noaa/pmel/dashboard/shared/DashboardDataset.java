@@ -13,7 +13,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5853649069551633895L;
+    private static final long serialVersionUID = 8032325269484692750L;
 
     protected boolean selected;
     protected String version;
@@ -22,7 +22,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected String dataCheckStatus;
     protected String omeTimestamp;
     protected TreeSet<String> addlDocs;
-    protected DatasetQCFlag submitStatus;
+    protected DatasetQCStatus submitStatus;
     protected String archiveStatus;
     protected ArrayList<String> archiveTimestamps;
     protected String uploadFilename;
@@ -51,7 +51,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         dataCheckStatus = DashboardUtils.CHECK_STATUS_NOT_CHECKED;
         omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
         addlDocs = new TreeSet<String>();
-        submitStatus = new DatasetQCFlag();
+        submitStatus = new DatasetQCStatus();
         archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
         archiveTimestamps = new ArrayList<String>(1);
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
@@ -219,20 +219,17 @@ public class DashboardDataset implements Serializable, IsSerializable {
     /**
      * @return the submission status; never null
      */
-    public DatasetQCFlag getSubmitStatus() {
-        return new DatasetQCFlag(submitStatus);
+    public DatasetQCStatus getSubmitStatus() {
+        return new DatasetQCStatus(submitStatus);
     }
 
     /**
      * @param submitStatus
      *         the submission status (after trimming) to set;
-     *         if null, a default DatasetQCFlag (all {@link DatasetQCFlag.Status#NOT_GIVEN}) is assigned
+     *         if null, a default DatasetQCStatus (all {@link DatasetQCStatus.Status#PRIVATE}) is assigned
      */
-    public void setSubmitStatus(DatasetQCFlag submitStatus) {
-        if ( submitStatus == null )
-            this.submitStatus = new DatasetQCFlag();
-        else
-            this.submitStatus = new DatasetQCFlag(submitStatus);
+    public void setSubmitStatus(DatasetQCStatus submitStatus) {
+        this.submitStatus = new DatasetQCStatus(submitStatus);
     }
 
     /**

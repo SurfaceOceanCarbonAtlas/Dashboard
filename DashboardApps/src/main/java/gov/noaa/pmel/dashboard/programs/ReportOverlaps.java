@@ -5,7 +5,7 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DatasetQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.Overlap;
 
 import java.io.BufferedReader;
@@ -89,7 +89,7 @@ public class ReportOverlaps {
             for (String expo : givenExpocodes) {
                 try {
                     String[] flagVersionStatus = dsgHandler.getDatasetQCFlagAndVersionStatus(expo);
-                    DatasetQCFlag qcFlag = DatasetQCFlag.fromString(flagVersionStatus[0]);
+                    DatasetQCStatus qcFlag = DatasetQCStatus.fromString(flagVersionStatus[0]);
                     if ( qcFlag.isAcceptable() || qcFlag.isAwaitingQC() ) {
                         expoSet.add(expo);
                     }
