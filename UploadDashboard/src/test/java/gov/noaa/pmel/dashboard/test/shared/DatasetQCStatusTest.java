@@ -103,10 +103,14 @@ public class DatasetQCStatusTest {
     }
 
     /**
-     * Test of {@link DatasetQCStatus#fromString(String)}
+     * Test of {@link DatasetQCStatus.Status#fromString(String)} and {@link DatasetQCStatus#fromString(String)}
      */
     @Test
     public void testFromString() {
+        assertEquals(ACTUAL_FLAG, DatasetQCStatus.Status.fromString(ACTUAL_FLAG.toString()));
+        assertEquals(PI_FLAG, DatasetQCStatus.Status.fromString(PI_FLAG.toString()));
+        assertEquals(AUTO_FLAG, DatasetQCStatus.Status.fromString(AUTO_FLAG.toString()));
+
         DatasetQCStatus flag = new DatasetQCStatus(ACTUAL_FLAG);
         String flagString = flag.flagString();
         DatasetQCStatus other = DatasetQCStatus.fromString(flagString);

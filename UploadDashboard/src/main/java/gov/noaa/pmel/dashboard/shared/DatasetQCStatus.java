@@ -31,7 +31,46 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         ACCEPTED_D,
         ACCEPTED_E,
         COMMENT,
-        RENAMED
+        RENAMED;
+
+        /**
+         * Returns the "key" for the given string.  The "key" is the string with all lowercase
+         * characters converted to uppercase, and then only preserving alphanumeric characters;
+         * i.e., repr.toUpperCase.replaceAll("[^A-Z0-9]", "")
+         *
+         * @param repr
+         *         string to use; if null, null is returned
+         *
+         * @return key for the given string; can be null (if repr is null) or
+         *         empty (if repr does not contain any alphanumeric characters)
+         */
+        static String keyString(String repr) {
+            if ( repr == null )
+                return null;
+            return repr.toUpperCase().replaceAll("[^A-Z0-9]", "");
+        }
+
+        /**
+         * Returns the status value represented in a variety of string forms: status
+         * flag (one-character strings), status strings (human-friendly strings),
+         * and {@link #toString()} strings.  String matching is case-insensitive and
+         * ignores any characters that are not alphanumeric.
+         *
+         * @param repr
+         *         string representation of the status; if null or does not contain
+         *         any alphanumeric characters, {@link #PRIVATE} is returned
+         *
+         * @return status value of the string representations, or
+         *         null if the string representation is not valid
+         */
+        public static Status fromString(String repr) {
+            if ( repr == null )
+                return PRIVATE;
+            String key = keyString(repr);
+            if ( key.isEmpty() )
+                return PRIVATE;
+            return KEYSTRING_STATUS_MAP.get(key);
+        }
     }
 
     private static final String FLAG_SEPARATOR = "-";
@@ -93,10 +132,11 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
     private static final HashMap<Status,String> STATUS_STRING_MAP;
 
     /**
-     * Map of status flags (one-character strings) and status strings
-     * (human-readable strings) to Status values.
+     * Map of key strings generated from status flags (one-character strings), status strings
+     * (human-readable strings), and {@link Status#toString()} values to Status values.
+     * The key strings are generated from these string using {@link Status#keyString(String)}.
      */
-    private static final HashMap<String,Status> STRING_STATUS_MAP;
+    private static final HashMap<String,Status> KEYSTRING_STATUS_MAP;
 
     static {
         SUGGESTED_STATUS_VALUES = new HashSet<Status>();
@@ -139,34 +179,38 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         STATUS_STRING_MAP.put(Status.RENAMED, STATUS_STRING_RENAMED);
         STATUS_STRING_MAP.put(Status.COMMENT, STATUS_STRING_COMMENT);
 
-        STRING_STATUS_MAP = new HashMap<String,Status>();
-        STRING_STATUS_MAP.put(FLAG_PRIVATE, Status.PRIVATE);
-        STRING_STATUS_MAP.put(FLAG_SUSPENDED, Status.SUSPENDED);
-        STRING_STATUS_MAP.put(FLAG_EXCLUDED, Status.EXCLUDED);
-        STRING_STATUS_MAP.put(FLAG_NEW_AWAITING_QC, Status.NEW_AWAITING_QC);
-        STRING_STATUS_MAP.put(FLAG_UPDATED_AWAITING_QC, Status.UPDATED_AWAITING_QC);
-        STRING_STATUS_MAP.put(FLAG_ACCEPTED_A, Status.ACCEPTED_A);
-        STRING_STATUS_MAP.put(FLAG_ACCEPTED_B, Status.ACCEPTED_B);
-        STRING_STATUS_MAP.put(FLAG_ACCEPTED_C, Status.ACCEPTED_C);
-        STRING_STATUS_MAP.put(FLAG_ACCEPTED_D, Status.ACCEPTED_D);
-        STRING_STATUS_MAP.put(FLAG_ACCEPTED_E, Status.ACCEPTED_E);
-        STRING_STATUS_MAP.put(FLAG_CONFLICTED, Status.CONFLICTED);
-        STRING_STATUS_MAP.put(FLAG_RENAMED, Status.RENAMED);
-        STRING_STATUS_MAP.put(FLAG_COMMENT, Status.COMMENT);
+        KEYSTRING_STATUS_MAP = new HashMap<String,Status>();
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_PRIVATE), Status.PRIVATE);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_SUSPENDED), Status.SUSPENDED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_EXCLUDED), Status.EXCLUDED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_NEW_AWAITING_QC), Status.NEW_AWAITING_QC);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_UPDATED_AWAITING_QC), Status.UPDATED_AWAITING_QC);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_ACCEPTED_A), Status.ACCEPTED_A);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_ACCEPTED_B), Status.ACCEPTED_B);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_ACCEPTED_C), Status.ACCEPTED_C);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_ACCEPTED_D), Status.ACCEPTED_D);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_ACCEPTED_E), Status.ACCEPTED_E);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_CONFLICTED), Status.CONFLICTED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_RENAMED), Status.RENAMED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_COMMENT), Status.COMMENT);
 
-        STRING_STATUS_MAP.put(STATUS_STRING_PRIVATE, Status.PRIVATE);
-        STRING_STATUS_MAP.put(STATUS_STRING_SUSPENDED, Status.SUSPENDED);
-        STRING_STATUS_MAP.put(STATUS_STRING_EXCLUDED, Status.EXCLUDED);
-        STRING_STATUS_MAP.put(STATUS_STRING_NEW_AWAITING_QC, Status.NEW_AWAITING_QC);
-        STRING_STATUS_MAP.put(STATUS_STRING_UPDATED_AWAITING_QC, Status.UPDATED_AWAITING_QC);
-        STRING_STATUS_MAP.put(STATUS_STRING_ACCEPTED_A, Status.ACCEPTED_A);
-        STRING_STATUS_MAP.put(STATUS_STRING_ACCEPTED_B, Status.ACCEPTED_B);
-        STRING_STATUS_MAP.put(STATUS_STRING_ACCEPTED_C, Status.ACCEPTED_C);
-        STRING_STATUS_MAP.put(STATUS_STRING_ACCEPTED_D, Status.ACCEPTED_D);
-        STRING_STATUS_MAP.put(STATUS_STRING_ACCEPTED_E, Status.ACCEPTED_E);
-        STRING_STATUS_MAP.put(STATUS_STRING_CONFLICTED, Status.CONFLICTED);
-        STRING_STATUS_MAP.put(STATUS_STRING_RENAMED, Status.RENAMED);
-        STRING_STATUS_MAP.put(STATUS_STRING_COMMENT, Status.COMMENT);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_PRIVATE), Status.PRIVATE);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_SUSPENDED), Status.SUSPENDED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_EXCLUDED), Status.EXCLUDED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_NEW_AWAITING_QC), Status.NEW_AWAITING_QC);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_UPDATED_AWAITING_QC), Status.UPDATED_AWAITING_QC);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_ACCEPTED_A), Status.ACCEPTED_A);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_ACCEPTED_B), Status.ACCEPTED_B);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_ACCEPTED_C), Status.ACCEPTED_C);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_ACCEPTED_D), Status.ACCEPTED_D);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_ACCEPTED_E), Status.ACCEPTED_E);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_CONFLICTED), Status.CONFLICTED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_RENAMED), Status.RENAMED);
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_COMMENT), Status.COMMENT);
+
+        for (Status status : Status.values()) {
+            KEYSTRING_STATUS_MAP.put(Status.keyString(status.toString()), status);
+        }
     }
 
     private Status actual;
@@ -359,7 +403,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         for (String strval : pieces) {
             if ( strval.startsWith(PISTATUS_STRING_PREFIX) ) {
                 String substr = strval.substring(PISTATUS_STRING_PREFIX.length());
-                Status value = STRING_STATUS_MAP.get(substr);
+                Status value = Status.fromString(substr);
                 if ( value == null )
                     throw new IllegalArgumentException("Unable to interpret the PI-suggested status string '" +
                             substr + "' in '" + reprString + "'");
@@ -369,7 +413,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             }
             else if ( strval.startsWith(AUTOSTATUS_STRING_PREFIX) ) {
                 String substr = strval.substring(AUTOSTATUS_STRING_PREFIX.length());
-                Status value = STRING_STATUS_MAP.get(substr);
+                Status value = Status.fromString(substr);
                 if ( value == null )
                     throw new IllegalArgumentException("Unable to interpret the automation-suggested status string '" +
                             substr + "' in '" + reprString + "'");
@@ -379,7 +423,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             }
             else if ( strval.startsWith(PIFLAG_PREFIX) ) {
                 String substr = strval.substring(PIFLAG_PREFIX.length());
-                Status value = STRING_STATUS_MAP.get(substr);
+                Status value = Status.fromString(substr);
                 if ( value == null )
                     throw new IllegalArgumentException("Unable to interpret the PI-suggested status flag '" +
                             substr + "' in '" + reprString + "'");
@@ -389,7 +433,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             }
             else if ( strval.startsWith(AUTOFLAG_PREFIX) ) {
                 String substr = strval.substring(AUTOFLAG_PREFIX.length());
-                Status value = STRING_STATUS_MAP.get(substr);
+                Status value = Status.fromString(substr);
                 if ( value == null )
                     throw new IllegalArgumentException("Unable to interpret the automation-suggested status flag '" +
                             substr + "' in '" + reprString + "'");
@@ -398,11 +442,10 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
                 flag.setAutoSuggested(value);
             }
             else {
-                Status value = STRING_STATUS_MAP.get(strval);
+                Status value = Status.fromString(strval);
                 if ( value == null )
-                    throw new IllegalArgumentException(
-                            "Unable to interpret actual status flag or status string '" + strval +
-                                    "' in '" + reprString + "'");
+                    throw new IllegalArgumentException("Unable to interpret actual status flag or status string '" +
+                            strval + "' in '" + reprString + "'");
                 flag.setActual(value);
             }
         }
