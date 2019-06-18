@@ -145,14 +145,29 @@ public class DatasetQCStatusTest {
     }
 
     /**
-     * Test of {@link DatasetQCStatus#isAcceptable()}, {@link DatasetQCStatus#isAwaitingQC()},
-     * {@link DatasetQCStatus#isCommentFlag()}, {@link DatasetQCStatus#isConflicted()},
-     * {@link DatasetQCStatus#isEditable()}, {@link DatasetQCStatus#isNewAwaitingQC()},
-     * {@link DatasetQCStatus#isRenameFlag()}, {@link DatasetQCStatus#isPrivate()},
-     * and {@link DatasetQCStatus#isUpdatedAwaitingQC()}
+     * Test of {@link DatasetQCStatus.Status#isAcceptable()}, {@link DatasetQCStatus#isAcceptable()},
+     * {@link DatasetQCStatus#isAwaitingQC()}, {@link DatasetQCStatus#isCommentFlag()},
+     * {@link DatasetQCStatus#isConflicted()}, {@link DatasetQCStatus#isEditable()},
+     * {@link DatasetQCStatus#isNewAwaitingQC()}, {@link DatasetQCStatus#isRenameFlag()},
+     * {@link DatasetQCStatus#isPrivate()}, and {@link DatasetQCStatus#isUpdatedAwaitingQC()}
      */
     @Test
     public void testBooleans() {
+        assertFalse(DatasetQCStatus.Status.isAcceptable(null));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.PRIVATE));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.SUSPENDED));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.EXCLUDED));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.NEW_AWAITING_QC));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.UPDATED_AWAITING_QC));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.CONFLICTED));
+        assertTrue(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.ACCEPTED_A));
+        assertTrue(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.ACCEPTED_B));
+        assertTrue(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.ACCEPTED_C));
+        assertTrue(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.ACCEPTED_D));
+        assertTrue(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.ACCEPTED_E));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.COMMENT));
+        assertFalse(DatasetQCStatus.Status.isAcceptable(DatasetQCStatus.Status.RENAMED));
+
         DatasetQCStatus flag = new DatasetQCStatus();
         // Values of PI and automated flags should not affect any of these
         flag.setPiSuggested(PI_FLAG);

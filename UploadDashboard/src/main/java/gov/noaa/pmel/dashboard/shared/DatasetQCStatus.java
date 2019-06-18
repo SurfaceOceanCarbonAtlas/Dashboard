@@ -71,6 +71,20 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
                 return PRIVATE;
             return KEYSTRING_STATUS_MAP.get(key);
         }
+
+        /**
+         * @param value
+         *         Status value to check; can be null
+         *
+         * @return if the given Status value is one of the Accepted_* values
+         */
+        public static boolean isAcceptable(Status value) {
+            return (ACCEPTED_A.equals(value) ||
+                    ACCEPTED_B.equals(value) ||
+                    ACCEPTED_C.equals(value) ||
+                    ACCEPTED_D.equals(value) ||
+                    ACCEPTED_E.equals(value));
+        }
     }
 
     private static final String FLAG_SEPARATOR = "-";
@@ -511,17 +525,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
      * @return if this dataset QC status indicates the dataset is acceptable for the next release
      */
     public boolean isAcceptable() {
-        if ( Status.ACCEPTED_A.equals(actual) )
-            return true;
-        if ( Status.ACCEPTED_B.equals(actual) )
-            return true;
-        if ( Status.ACCEPTED_C.equals(actual) )
-            return true;
-        if ( Status.ACCEPTED_D.equals(actual) )
-            return true;
-        if ( Status.ACCEPTED_E.equals(actual) )
-            return true;
-        return false;
+        return Status.isAcceptable(actual);
     }
 
     /**

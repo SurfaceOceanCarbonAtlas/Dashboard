@@ -251,6 +251,11 @@ public class DataUploadPage extends CompositeWithUsername {
                     "organization for all investigators, or needs to specify an organization " +
                     "for each investigator (repeating values as needed). " +
                     "</p>";
+    private static final String INVALID_SUGGESTED_QC_STATUS_FAIL_MSG =
+            "<br />Suggested dataset QC flag invalid</h3>" +
+                    "<p>The suggested dataset QC flag in the lines of metadata preceding " +
+                    "the data needs to specify a flag of A, B, C, D, or E. " +
+                    "</p>";
     private static final String DATASET_EXISTS_FAIL_MSG_START =
             "<br />A dataset already exists with this expocode.</h3>";
     private static final String DATASET_EXISTS_FAIL_MSG_END =
@@ -616,9 +621,13 @@ public class DataUploadPage extends CompositeWithUsername {
             }
             else if ( header.startsWith(DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG) ) {
                 // Invalid entry for organization names
-                String filename = header.substring(
-                        DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG.length()).trim();
+                String filename = header.substring(DashboardUtils.INVALID_ORG_NAMES_HEADER_TAG.length()).trim();
                 errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + INVALID_ORG_NAMES_FAIL_MSG);
+            }
+            else if ( header.startsWith(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG) ) {
+                // Invalid entry for organization names
+                String filename = header.substring(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG.length()).trim();
+                errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + INVALID_SUGGESTED_QC_STATUS_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
                 // Dataset file exists and not permitted to modify

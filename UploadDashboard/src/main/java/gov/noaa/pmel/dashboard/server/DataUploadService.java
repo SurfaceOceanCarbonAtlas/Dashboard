@@ -73,6 +73,13 @@ public class DataUploadService extends HttpServlet {
             Pattern.compile("#*\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
     };
 
+    //Patterns for getting the PI-suggested QC from the metadata preamble
+    private static final Pattern[] PI_SUGGESTED_QC_PATTERNS = new Pattern[] {
+            Pattern.compile("#*\\s*PI\\s*Suggested\\s*QC\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*Suggested\\s*QC\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("#*\\s*PI\\s*QC\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+    };
+
     private ServletFileUpload datafileUpload;
 
     public DataUploadService() {
@@ -318,6 +325,7 @@ public class DataUploadService extends HttpServlet {
             ArrayList<String> piNames = null;
             ArrayList<String> organizations = null;
             String platformType = null;
+            String suggestedFlagString = null;
             // Get the ship name and PI names from the metadata preamble
             for (String metaline : dsetData.getPreamble()) {
                 boolean lineMatched = false;
@@ -383,6 +391,18 @@ public class DataUploadService extends HttpServlet {
                         if ( (platformType != null) && !platformType.isEmpty() )
                             break;
                         platformType = null;
+                    }
+                }
+                if ( (suggestedFlagString == null) && !lineMatched ) {
+                    for (Pattern pat : PI_SUGGESTED_QC_PATTERNS) {
+                        Matcher mat = pat.matcher(metaline);
+                        if ( !mat.matches() )
+                            continue;
+                        lineMatched = true;
+                        suggestedFlagString = mat.group(1);
+                        if ( (suggestedFlagString != null) && !suggestedFlagString.isEmpty() )
+                            break;
+                        suggestedFlagString = null;
                     }
                 }
             }
@@ -499,6 +519,19 @@ public class DataUploadService extends HttpServlet {
             // If the platform type is not given, make an educated guess
             if ( platformType == null ) {
                 platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
+            }
+
+            // Validate, if given, the PI suggested dataset QC status
+            if ( suggestedFlagString != null ) {
+                DatasetQCStatus.Status suggestedStatus = DatasetQCStatus.Status.fromString(suggestedFlagString);
+                if ( (suggestedStatus == null) || !DatasetQCStatus.Status.isAcceptable(suggestedStatus) ) {
+                    messages.add(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG + " " + filename);
+                    continue;
+                }
+                // Update the PI-suggested status to the existing submit status
+                DatasetQCStatus status = dsetData.getSubmitStatus();
+                status.setPiSuggested(suggestedStatus);
+                dsetData.setSubmitStatus(status);
             }
 
             // Create the OME XML stub file for this dataset
