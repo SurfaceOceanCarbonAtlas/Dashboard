@@ -25,11 +25,8 @@ public interface OmeMetadataInterface {
      *         if the contents of the metadata files are invalid for assigning this OME object
      * @throws FileNotFoundException
      *         if the metadata file does not exist
-     * @throws IOException
-     *         if there are problems reading from the metadata file
      */
-    void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException;
+    void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException;
 
     /**
      * Saves the contents of the OME object in the specified metadata file.

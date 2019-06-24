@@ -38,8 +38,7 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException {
+    public void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         XMLDecoder xdec = new XMLDecoder(new FileInputStream(mdataFile));
         try {

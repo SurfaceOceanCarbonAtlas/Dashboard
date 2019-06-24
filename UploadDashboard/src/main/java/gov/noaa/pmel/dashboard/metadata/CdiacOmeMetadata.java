@@ -2,7 +2,6 @@ package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -45,21 +44,20 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException {
+    public void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException {
         if ( !mdataFile.exists() )
             throw new FileNotFoundException("Metadata file " + mdataFile.getName() +
                     " does not exist for dataset " + datasetId);
         Document omeDoc;
         try {
             omeDoc = (new SAXBuilder()).build(mdataFile);
-        } catch ( JDOMException ex ) {
-            throw new IOException(ex);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(ex);
         }
         try {
             mdata.assignFromOmeXmlDoc(omeDoc);
         } catch ( Exception ex ) {
-            throw new IOException(ex);
+            throw new IllegalArgumentException(ex);
         }
         try {
             String stdId = DashboardServerUtils.checkDatasetID(mdata.getExpocode());
