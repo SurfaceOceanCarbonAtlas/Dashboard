@@ -1,6 +1,9 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -11,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -409,6 +414,27 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         } catch ( Exception ex ) {
             // Should not happen
         }
+    }
+
+    @Override
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+        SDIMetadata sdiMData;
+        try {
+            Document omeDoc = mdata.createOmeXmlDoc();
+            StringWriter writer = new StringWriter();
+            try {
+                (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, writer);
+            } finally {
+                writer.close();
+            }
+            StringReader xmlReader = new StringReader(writer.toString());
+            sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
+                    xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
+        } catch ( Exception ex ) {
+            return DatasetQCStatus.Status.PRIVATE;
+        }
+
+        return OmeUtils.suggestDatasetQCFlag(sdiMData);
     }
 
 }

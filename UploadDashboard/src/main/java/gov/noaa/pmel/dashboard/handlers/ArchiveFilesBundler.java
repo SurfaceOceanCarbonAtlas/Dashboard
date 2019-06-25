@@ -4,7 +4,7 @@ import gov.loc.repository.bagit.creator.BagCreator;
 import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
-import gov.noaa.pmel.dashboard.metadata.OmeTranslator;
+import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -227,7 +227,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Check if there is a PI-provided OME document
         try {
             File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
-            sdimdata = OmeTranslator.createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+            FileReader xmlReader = new FileReader(mdataFile);
+            sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
             platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
             // Probably does not exist
@@ -236,7 +237,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // Use the OME stub (which should always exist)
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
-                sdimdata = OmeTranslator.createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                FileReader xmlReader = new FileReader(mdataFile);
+                sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -248,7 +250,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
-                SDIMetadata stub = OmeTranslator.createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                FileReader xmlReader = new FileReader(mdataFile);
+                SDIMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -509,7 +512,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // The SDIMetadata object is always present, but may just be a minimal stub with history
             infoMsg += "    " + OCADS_XML_FILENAME + "\n";
             dest = new File(bundleDir, OCADS_XML_FILENAME);
-            OmeTranslator.createOcadsOmeFromSdiMetadata(dest, sdimdata);
+            OmeUtils.createOcadsOmeFromSdiMetadata(dest, sdimdata);
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
         }

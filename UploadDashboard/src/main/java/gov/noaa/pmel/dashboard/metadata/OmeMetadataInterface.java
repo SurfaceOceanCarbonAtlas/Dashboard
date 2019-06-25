@@ -1,5 +1,8 @@
 package gov.noaa.pmel.dashboard.metadata;
 
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -199,5 +202,19 @@ public interface OmeMetadataInterface {
      *         the UTC time, in units of seconds since Jan 1 1970 00:00:00, to set as the latest (ending) data point
      */
     void setDataEndTime(Double dataEndTime);
+
+    /**
+     * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     * If successful, the returned status will be an appropriate acceptable status
+     * ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     * If there are problems, {@link DatasetQCStatus.Status#PRIVATE} is returned.
+     *
+     * @param dataset
+     *         information about the dataset associated with this OME document
+     *
+     * @return the automation-suggested dataset QC flag, or
+     *         {@link DatasetQCStatus.Status#PRIVATE} if there are problems.
+     */
+    DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset);
 
 }

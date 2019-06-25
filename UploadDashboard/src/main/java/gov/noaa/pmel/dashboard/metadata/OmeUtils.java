@@ -2,19 +2,19 @@ package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class OmeTranslator {
+public class OmeUtils {
 
     private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
 
@@ -43,10 +43,10 @@ public class OmeTranslator {
 
     /**
      * Using the given data column names and types for a datasets, creates an SDIMetadata object
-     * from the contents of a CDIAC OME metadata file.
+     * from CDIAC OME metadata XML.
      *
-     * @param omeFile
-     *         CDIAC OME metadata file to read
+     * @param xmlReader
+     *         read CDIAC OME metadata XML from here
      * @param dataColNames
      *         data column names for this dataset
      * @param dataColTypes
@@ -54,19 +54,16 @@ public class OmeTranslator {
      *
      * @return SDIMetadata object created from the CDIAC OME metadata file contents
      *
-     * @throws FileNotFoundException
-     *         if the CDIAC OME metadata file does not exist
      * @throws IOException
      *         if an error occurs when reading the CDIAC OME metadata file
      * @throws IllegalArgumentException
      *         if the contents of the CDIAC OME metadata file are invalid
      */
-    public static SDIMetadata createSdiMetadataFromCdiacOme(File omeFile,
+    public static SDIMetadata createSdiMetadataFromCdiacOme(Reader xmlReader,
             ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
-            throws FileNotFoundException, IOException, IllegalArgumentException {
+            throws IOException, IllegalArgumentException {
         // Read the CDIAC XML into an XML Document in memory
         CdiacReader reader;
-        FileReader xmlReader = new FileReader(omeFile);
         try {
             reader = new CdiacReader(xmlReader);
         } finally {
@@ -100,6 +97,23 @@ public class OmeTranslator {
         } finally {
             ocadsWriter.close();
         }
+    }
+
+    /**
+     * Using the contents of the give SDIMetadata, recommend a QC flag/status for this dataset.
+     * If successful, the returned status will be an appropriate acceptable status
+     * ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     * If there are problems, {@link DatasetQCStatus.Status#PRIVATE} is returned.
+     *
+     * @param sdiMData
+     *         metadata to examine
+     *
+     * @return the automation-suggested dataset QC flag, or
+     *         {@link DatasetQCStatus.Status#PRIVATE} if there are problems.
+     */
+    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData) {
+        // TODO: implement
+        return DatasetQCStatus.Status.PRIVATE;
     }
 
 }

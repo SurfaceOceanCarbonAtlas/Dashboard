@@ -1,6 +1,8 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.Coverage;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
@@ -298,6 +300,11 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
         else
             coverage.setLatestDataTime(new Date(Math.round(dataEndTime * 1000.0)));
         mdata.setCoverage(coverage);
+    }
+
+    @Override
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+        return OmeUtils.suggestDatasetQCFlag(mdata);
     }
 
 }

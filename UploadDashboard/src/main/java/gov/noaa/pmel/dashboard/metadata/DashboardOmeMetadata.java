@@ -7,7 +7,9 @@ import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgMetadata;
 import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -25,7 +27,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = -4982616875806647187L;
+    private static final long serialVersionUID = 6474058539002011239L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -398,6 +400,22 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         if ( dataSetLink == null )
             dataSetLink = "";
         return dataSetLink;
+    }
+
+    /**
+     * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     * If successful, the returned status will be an appropriate acceptable status
+     * ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     * If there are problems, {@link DatasetQCStatus.Status#PRIVATE} is returned.
+     *
+     * @param dataset
+     *         information about the dataset associated with this OME document
+     *
+     * @return the automation-suggested dataset QC flag, or
+     *         {@link DatasetQCStatus.Status#PRIVATE} if there are problems.
+     */
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+        return omeMData.suggestedDatasetStatus(dataset);
     }
 
 }
