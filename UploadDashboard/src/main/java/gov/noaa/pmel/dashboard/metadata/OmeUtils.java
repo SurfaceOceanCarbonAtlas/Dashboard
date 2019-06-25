@@ -4,15 +4,23 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
+import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
+import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
+import gov.noaa.pmel.sdimetadata.util.NumericString;
+import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.Variable;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class OmeUtils {
 
@@ -99,21 +107,95 @@ public class OmeUtils {
         }
     }
 
+    private static final HashSet<String> ALLOWED_UNITS = new HashSet<String>(Arrays.asList(
+            "microatmospheres",
+            "microatmosphere",
+            "uatm",
+            "µatm",
+            "umol/mol",
+            "µmol/mol",
+            "ppm"
+    ));
+
     /**
      * Using the contents of the give SDIMetadata, recommend a QC flag/status for this dataset.
-     * If successful, the returned status will be an appropriate acceptable status
-     * ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
-     * If there are problems, {@link DatasetQCStatus.Status#PRIVATE} is returned.
      *
      * @param sdiMData
      *         metadata to examine
      *
-     * @return the automation-suggested dataset QC flag, or
-     *         {@link DatasetQCStatus.Status#PRIVATE} if there are problems.
+     * @return the automation-suggested dataset QC flag, an appropriate acceptable status
+     *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems with the given Metadata, or
+     *         if the metadata indicates the dataset in unacceptable
      */
-    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData) {
-        // TODO: implement
-        return DatasetQCStatus.Status.PRIVATE;
+    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData) throws IllegalArgumentException {
+        DatasetQCStatus.Status autoSuggest;
+        HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
+        for (Instrument instrument : sdiMData.getInstruments()) {
+            if ( instrument instanceof GasSensor ) {
+                GasSensor sensor = (GasSensor) instrument;
+                for (CalibrationGas gas : sensor.getCalibrationGases()) {
+                    if ( "CO2".equals(gas.getType()) ) {
+                        if ( co2SensorsMap.put(sensor.getName(), sensor) != null )
+                            throw new IllegalArgumentException("Unexpected duplicate name '" +
+                                    sensor.getName() + "' for a CO2 sensor");
+                        break;
+                    }
+                }
+            }
+        }
+        ArrayList<AquGasConc> co2vars = new ArrayList<AquGasConc>();
+        ArrayList<GasSensor> co2sensors = new ArrayList<GasSensor>();
+        for (Variable variable : sdiMData.getVariables()) {
+            if ( variable instanceof AquGasConc ) {
+                AquGasConc gasConc = (AquGasConc) variable;
+                GasSensor gasSensor = null;
+                for (String instName : gasConc.getInstrumentNames()) {
+                    GasSensor sensor = co2SensorsMap.get(instName);
+                    if ( sensor != null ) {
+                        if ( gasSensor != null )
+                            throw new IllegalArgumentException("More than one CO2 sensor (" + instName +
+                                    " and " + gasSensor.getName() + ") for aqueous CO2 measurement variable " +
+                                    gasConc.getFullName());
+                        gasSensor = sensor;
+                    }
+                }
+                if ( gasSensor != null ) {
+                    co2vars.add(gasConc);
+                    co2sensors.add(gasSensor);
+                }
+            }
+        }
+        if ( co2vars.size() < 1 )
+            throw new IllegalArgumentException("No aqueous CO2 measurement variable found");
+        double minAccuracy = 100.0;
+        for (AquGasConc gasConc : co2vars) {
+            NumericString accuracy = gasConc.getAccuracy();
+            if ( !ALLOWED_UNITS.contains(accuracy.getUnitString()) )
+                throw new IllegalArgumentException("Unexpected units of '" + accuracy.getUnitString() +
+                        "' for the accuracy of an aqueous CO2 measurement variable ");
+            if ( minAccuracy > accuracy.getNumericValue() )
+                minAccuracy = accuracy.getNumericValue();
+        }
+        // Start guess using the accuracy of CO2 measurements
+        if ( minAccuracy <= 2.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
+        else if ( minAccuracy <= 5.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
+        else if ( minAccuracy <= 10.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_E;
+        else
+            throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
+
+        // TODO: Check the number of non-zero standard gasses
+        // TODO: Check the frequency of calibration
+        // TODO: Check the accuracy of water temperature measurements
+        // TODO: Check the accuracy of air pressure measurements
+        // TODO: other checks?
+
+        return autoSuggest;
     }
 
 }
