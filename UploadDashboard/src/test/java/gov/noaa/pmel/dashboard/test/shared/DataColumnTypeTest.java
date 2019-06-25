@@ -94,7 +94,7 @@ public class DataColumnTypeTest {
     }
 
     /**
-     * Test method for {@link DataColumnType#setCritical(boolean)} and {@link DataColumnType#isCritical}
+     * Test method for {@link DataColumnType#setCritical(boolean)} and {@link DataColumnType#isCritical()}
      */
     @Test
     public void testIsSetCritical() {
