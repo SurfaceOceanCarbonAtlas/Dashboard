@@ -4,14 +4,8 @@ import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
-import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
-import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
-import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -131,6 +125,8 @@ public class OmeUtils {
      *         if the metadata indicates the dataset in unacceptable
      */
     public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData) throws IllegalArgumentException {
+        throw new IllegalArgumentException("Not yet implemented");
+        /*
         DatasetQCStatus.Status autoSuggest;
         HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
         for (Instrument instrument : sdiMData.getInstruments()) {
@@ -196,6 +192,7 @@ public class OmeUtils {
         // TODO: other checks?
 
         return autoSuggest;
+        */
     }
 
 }

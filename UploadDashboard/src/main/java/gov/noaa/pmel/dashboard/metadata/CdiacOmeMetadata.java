@@ -431,7 +431,7 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
             sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
                     xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
         } catch ( Exception ex ) {
-            return DatasetQCStatus.Status.PRIVATE;
+            throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
         }
 
         return OmeUtils.suggestDatasetQCFlag(sdiMData);

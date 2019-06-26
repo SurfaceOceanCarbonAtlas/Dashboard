@@ -209,8 +209,11 @@ public class MetadataUploadService extends HttpServlet {
                     try {
                         autoSuggest = omedata.suggestedDatasetStatus(dataset);
                     } catch ( Exception ex ) {
-                        // Either there is a problem with the metadata or the metadata indicates
-                        // the dataset is unacceptable; either way, do not make a recommendation
+                        /*
+                         * Either there is a problem with the metadata, the metadata indicates
+                         * the dataset is unacceptable, or the code to recommend a dataset QC
+                         * flag is faulty; whatever the reason, do not make a recommendation.
+                         */
                         autoSuggest = DatasetQCStatus.Status.PRIVATE;
                     }
                     DatasetQCStatus status = dataset.getSubmitStatus();

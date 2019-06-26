@@ -469,11 +469,14 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
         TreeSet<File> metaDocs = new TreeSet<File>();
 
-        // If it exists, include the (dataset)/PI_OME.xml file (which is not listed as an additional document);
-        // the (dataset)/PI_OME.pdf file, if it exists, should be in the additional documents list
-        File piOmeXml = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
-        if ( piOmeXml.exists() )
-            metaDocs.add(piOmeXml);
+        // If it exists, include the (dataset)/PI_OME.xml and PI_OME.pdf files
+        // (which are not listed as supplemental documents)
+        File piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+        if ( piOme.exists() )
+            metaDocs.add(piOme);
+        piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_PDF_FILENAME);
+        if ( piOme.exists() )
+            metaDocs.add(piOme);
 
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
             // Exclude the (dataset)/OME.xml stub document
