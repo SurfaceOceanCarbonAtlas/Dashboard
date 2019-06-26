@@ -417,7 +417,7 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
         SDIMetadata sdiMData;
         try {
             Document omeDoc = mdata.createOmeXmlDoc();

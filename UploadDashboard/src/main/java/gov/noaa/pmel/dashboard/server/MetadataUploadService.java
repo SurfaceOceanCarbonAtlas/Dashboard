@@ -205,15 +205,20 @@ public class MetadataUploadService extends HttpServlet {
                         throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " +
                                 ex.getMessage());
                     }
-                    DatasetQCStatus.Status autoSuggest = omedata.suggestedDatasetStatus(dataset);
-                    if ( DatasetQCStatus.Status.isAcceptable(autoSuggest) ) {
-                        DatasetQCStatus status = dataset.getSubmitStatus();
-                        if ( !autoSuggest.equals(status.getAutoSuggested()) ) {
-                            status.setAutoSuggested(autoSuggest);
-                            dataset.setSubmitStatus(status);
-                            dataFileHandler.saveDatasetInfoToFile(dataset,
-                                    "Update of automation-suggested dataset QC flag");
-                        }
+                    DatasetQCStatus.Status autoSuggest;
+                    try {
+                        autoSuggest = omedata.suggestedDatasetStatus(dataset);
+                    } catch ( Exception ex ) {
+                        // Either there is a problem with the metadata or the metadata indicates
+                        // the dataset is unacceptable; either way, do not make a recommendation
+                        autoSuggest = DatasetQCStatus.Status.PRIVATE;
+                    }
+                    DatasetQCStatus status = dataset.getSubmitStatus();
+                    if ( !autoSuggest.equals(status.getAutoSuggested()) ) {
+                        status.setAutoSuggested(autoSuggest);
+                        dataset.setSubmitStatus(status);
+                        dataFileHandler.saveDatasetInfoToFile(dataset,
+                                "Update of automation-suggested dataset QC flag");
                     }
                 }
                 else {

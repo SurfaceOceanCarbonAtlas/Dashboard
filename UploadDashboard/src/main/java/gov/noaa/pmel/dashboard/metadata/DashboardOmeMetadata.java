@@ -404,17 +404,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * Using the contents of this OME document, recommend a QC flag/status for this dataset.
-     * If successful, the returned status will be an appropriate acceptable status
-     * ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
-     * If there are problems, {@link DatasetQCStatus.Status#PRIVATE} is returned.
      *
      * @param dataset
      *         information about the dataset associated with this OME document
      *
-     * @return the automation-suggested dataset QC flag, or
-     *         {@link DatasetQCStatus.Status#PRIVATE} if there are problems.
+     * @return the automation-suggested dataset QC flag, an appropriate acceptable status
+     *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems with the given Metadata, or
+     *         if the metadata indicates the dataset in unacceptable
      */
-    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
         return omeMData.suggestedDatasetStatus(dataset);
     }
 

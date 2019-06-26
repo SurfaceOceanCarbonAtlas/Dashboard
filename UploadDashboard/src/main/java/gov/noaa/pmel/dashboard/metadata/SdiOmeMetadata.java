@@ -303,7 +303,7 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) {
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
         return OmeUtils.suggestDatasetQCFlag(mdata);
     }
 
