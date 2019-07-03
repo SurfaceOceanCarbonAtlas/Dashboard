@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
@@ -10,7 +11,9 @@ import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
 import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
+import gov.noaa.pmel.sdimetadata.variable.AirPressure;
 import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 
 import java.io.File;
@@ -123,10 +126,12 @@ public class OmeUtils {
     ));
 
     /**
-     * Using the contents of the give SDIMetadata, recommend a QC flag/status for this dataset.
+     * Using the contents of the given SDIMetadata, recommend a QC flag/status for this dataset.
      *
      * @param sdiMData
      *         metadata to examine
+     * @param dataset
+     *         dataset associated with this metadata
      *
      * @return the automation-suggested dataset QC flag, an appropriate acceptable status
      *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
@@ -135,8 +140,8 @@ public class OmeUtils {
      *         if there are problems with the given Metadata, or
      *         if the metadata indicates the dataset in unacceptable
      */
-    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData) throws IllegalArgumentException {
-        DatasetQCStatus.Status autoSuggest;
+    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData,
+            DashboardDataset dataset) throws IllegalArgumentException {
         HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
         for (Instrument instrument : sdiMData.getInstruments()) {
             if ( instrument instanceof GasSensor ) {
@@ -151,10 +156,22 @@ public class OmeUtils {
                 }
             }
         }
+        HashSet<String> varColNames = new HashSet<String>();
+        ArrayList<AirPressure> pressvars = new ArrayList<AirPressure>();
+        ArrayList<Temperature> tempvars = new ArrayList<Temperature>();
         ArrayList<AquGasConc> co2vars = new ArrayList<AquGasConc>();
         ArrayList<GasSensor> co2sensors = new ArrayList<GasSensor>();
         for (Variable variable : sdiMData.getVariables()) {
-            if ( variable instanceof AquGasConc ) {
+            if ( !varColNames.add(variable.getColName()) )
+                throw new IllegalArgumentException(
+                        "A column name is used to describe multiple columns the OME metadata");
+            if ( variable instanceof AirPressure ) {
+                pressvars.add((AirPressure) variable);
+            }
+            else if ( variable instanceof Temperature ) {
+                tempvars.add((Temperature) variable);
+            }
+            else if ( variable instanceof AquGasConc ) {
                 AquGasConc gasConc = (AquGasConc) variable;
                 GasSensor gasSensor = null;
                 for (String instName : gasConc.getInstrumentNames()) {
@@ -175,7 +192,7 @@ public class OmeUtils {
         }
         if ( co2vars.size() < 1 )
             throw new IllegalArgumentException("No aqueous CO2 measurement variable found");
-        double co2Accuracy = 100.0;
+        double co2Accuracy = 999.0;
         for (AquGasConc gasConc : co2vars) {
             NumericString accuracy = gasConc.getAccuracy();
             if ( !ALLOWED_UNITS.contains(accuracy.getUnitString()) )
@@ -184,8 +201,35 @@ public class OmeUtils {
             if ( co2Accuracy > accuracy.getNumericValue() )
                 co2Accuracy = accuracy.getNumericValue();
         }
+        double tempAccuracy = 999.0;
+        for (Temperature temperature : tempvars) {
+            NumericString accuracy = temperature.getAccuracy();
+            // Temperature variables must units of deg C
+            if ( tempAccuracy > accuracy.getNumericValue() )
+                tempAccuracy = accuracy.getNumericValue();
+        }
+        double pressAccuracy = 999.0;
+        for (AirPressure pressure : pressvars) {
+            NumericString accuracy = pressure.getAccuracy();
+            // AirPressures variables must units of hPa
+            if ( pressAccuracy > accuracy.getNumericValue() )
+                pressAccuracy = accuracy.getNumericValue();
+        }
+        boolean acceptable = true;
+        if ( sdiMData.invalidFieldNames().size() > 0 ) {
+            acceptable = false;
+        }
+        else {
+            for (String name : dataset.getUserColNames()) {
+                if ( !varColNames.contains(name) ) {
+                    acceptable = false;
+                    break;
+                }
+            }
+        }
 
         // Start guess using the accuracy of CO2 measurements
+        DatasetQCStatus.Status autoSuggest;
         if ( co2Accuracy <= 2.0 )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
         else if ( co2Accuracy <= 5.0 )
@@ -195,16 +239,31 @@ public class OmeUtils {
         else
             throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
 
+        // Rough judgement on whether metadata is complete
+        if ( !acceptable ) {
+            if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) ||
+                    autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_C) )
+                autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
+            else
+                throw new IllegalArgumentException(
+                        "Unacceptably large accuracy for the aqueous CO2 measurements without complete metadata");
+        }
+
+        if ( tempAccuracy > 0.2 )
+            throw new IllegalArgumentException("Unacceptably large accuracy in temperature measurements");
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (tempAccuracy > 0.05) )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+
+        if ( pressAccuracy > 5.0 )
+            throw new IllegalArgumentException("Unacceptably large accuracy in pressure measurements");
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (pressAccuracy > 2.0) )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+
         // ACCEPTED_B must be:
         // from IR, GC, or Spectroscopy,
         // continuously measured and frequently calibrated,
         // at least two non-zero concentration calibration gasses spanning the entire range of fCO2 values
-        // accuracy of temperatures within 0.05 deg C,
-        // pressures within 2 hPa,
         // warming between SST and Tequ less than 1 deg C
-        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) ) {
-            // TODO:
-        }
 
         // ACCEPTED_C must be either (1):
         //     from IR, GC, or Spectroscopy,
@@ -212,8 +271,6 @@ public class OmeUtils {
         //     at least two calibration gasses (one of which can be zero concentration),
         //     the non-zero gasses span nearly the entire range of fCO2 values
         //         (fCO2 values within [0.8,1.2] of the gas concentrations)
-        //     accuracy of temperatures within 0.2 deg C,
-        //     pressures within 5 hPa,
         //     warming between SST and Tequ less than 3 deg C
         // or (2):
         //     from "alternative" sensor,
@@ -222,14 +279,6 @@ public class OmeUtils {
         //     the non-zero gasses span nearly the entire range of fCO2 values
         //         (fCO2 values within [0.8,1.2] of the gas concentrations)
         //      clear and detailed description of calibration, including frequency
-
-        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_C) ) {
-            // TODO:
-        }
-
-        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_E) ) {
-            // TODO:
-        }
 
         return autoSuggest;
     }
