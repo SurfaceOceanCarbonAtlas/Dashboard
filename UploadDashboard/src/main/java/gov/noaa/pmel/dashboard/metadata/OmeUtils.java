@@ -109,9 +109,14 @@ public class OmeUtils {
 
     private static final HashSet<String> ALLOWED_UNITS = new HashSet<String>(Arrays.asList(
             "microatmospheres",
-            "microatmosphere",
+            "uatmospheres",
+            "µatmospheres",
             "uatm",
             "µatm",
+            "umole_per_mole",
+            "µmole_per_mole",
+            "umol_per_mol",
+            "µmol_per_mol",
             "umol/mol",
             "µmol/mol",
             "ppm"
@@ -170,30 +175,61 @@ public class OmeUtils {
         }
         if ( co2vars.size() < 1 )
             throw new IllegalArgumentException("No aqueous CO2 measurement variable found");
-        double minAccuracy = 100.0;
+        double co2Accuracy = 100.0;
         for (AquGasConc gasConc : co2vars) {
             NumericString accuracy = gasConc.getAccuracy();
             if ( !ALLOWED_UNITS.contains(accuracy.getUnitString()) )
                 throw new IllegalArgumentException("Unexpected units of '" + accuracy.getUnitString() +
                         "' for the accuracy of an aqueous CO2 measurement variable ");
-            if ( minAccuracy > accuracy.getNumericValue() )
-                minAccuracy = accuracy.getNumericValue();
+            if ( co2Accuracy > accuracy.getNumericValue() )
+                co2Accuracy = accuracy.getNumericValue();
         }
+
         // Start guess using the accuracy of CO2 measurements
-        if ( minAccuracy <= 2.0 )
+        if ( co2Accuracy <= 2.0 )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
-        else if ( minAccuracy <= 5.0 )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
-        else if ( minAccuracy <= 10.0 )
+        else if ( co2Accuracy <= 5.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        else if ( co2Accuracy <= 10.0 )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_E;
         else
             throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
 
-        // TODO: Check the number of non-zero standard gasses
-        // TODO: Check the frequency of calibration
-        // TODO: Check the accuracy of water temperature measurements
-        // TODO: Check the accuracy of air pressure measurements
-        // TODO: other checks?
+        // ACCEPTED_B must be:
+        // from IR, GC, or Spectroscopy,
+        // continuously measured and frequently calibrated,
+        // at least two non-zero concentration calibration gasses spanning the entire range of fCO2 values
+        // accuracy of temperatures within 0.05 deg C,
+        // pressures within 2 hPa,
+        // warming between SST and Tequ less than 1 deg C
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) ) {
+            // TODO:
+        }
+
+        // ACCEPTED_C must be either (1):
+        //     from IR, GC, or Spectroscopy,
+        //     continuously measured and frequently calibrated,
+        //     at least two calibration gasses (one of which can be zero concentration),
+        //     the non-zero gasses span nearly the entire range of fCO2 values
+        //         (fCO2 values within [0.8,1.2] of the gas concentrations)
+        //     accuracy of temperatures within 0.2 deg C,
+        //     pressures within 5 hPa,
+        //     warming between SST and Tequ less than 3 deg C
+        // or (2):
+        //     from "alternative" sensor,
+        //     continuously measured and at least daily in situ calibration,
+        //     at least two calibration gasses (one of which can be zero concentration),
+        //     the non-zero gasses span nearly the entire range of fCO2 values
+        //         (fCO2 values within [0.8,1.2] of the gas concentrations)
+        //      clear and detailed description of calibration, including frequency
+
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_C) ) {
+            // TODO:
+        }
+
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_E) ) {
+            // TODO:
+        }
 
         return autoSuggest;
     }
