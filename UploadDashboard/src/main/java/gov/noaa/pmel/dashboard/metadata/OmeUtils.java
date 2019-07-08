@@ -192,6 +192,8 @@ public class OmeUtils {
         }
         if ( co2vars.size() < 1 )
             throw new IllegalArgumentException("No aqueous CO2 measurement variable found");
+
+        // Start guess using the accuracy of CO2 measurements
         double co2Accuracy = 999.0;
         for (AquGasConc gasConc : co2vars) {
             NumericString accuracy = gasConc.getAccuracy();
@@ -201,20 +203,17 @@ public class OmeUtils {
             if ( co2Accuracy > accuracy.getNumericValue() )
                 co2Accuracy = accuracy.getNumericValue();
         }
-        double tempAccuracy = 999.0;
-        for (Temperature temperature : tempvars) {
-            NumericString accuracy = temperature.getAccuracy();
-            // Temperature variables must units of deg C
-            if ( tempAccuracy > accuracy.getNumericValue() )
-                tempAccuracy = accuracy.getNumericValue();
-        }
-        double pressAccuracy = 999.0;
-        for (AirPressure pressure : pressvars) {
-            NumericString accuracy = pressure.getAccuracy();
-            // AirPressures variables must units of hPa
-            if ( pressAccuracy > accuracy.getNumericValue() )
-                pressAccuracy = accuracy.getNumericValue();
-        }
+        DatasetQCStatus.Status autoSuggest;
+        if ( co2Accuracy <= 2.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
+        else if ( co2Accuracy <= 5.0 )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        else
+            throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
+        // Alternative sensors with CO2 accuracy within 10.0 could be ACCEPTED_E.  However, they need a clear
+        // and detailed description of the calibration, so an automation-suggested flag is not possible.
+
+        // Rough judgement on whether metadata is complete
         boolean acceptable = true;
         if ( sdiMData.invalidFieldNames().size() > 0 ) {
             acceptable = false;
@@ -227,58 +226,99 @@ public class OmeUtils {
                 }
             }
         }
+        if ( !acceptable )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
 
-        // Start guess using the accuracy of CO2 measurements
-        DatasetQCStatus.Status autoSuggest;
-        if ( co2Accuracy <= 2.0 )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
-        else if ( co2Accuracy <= 5.0 )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
-        else if ( co2Accuracy <= 10.0 )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_E;
-        else
-            throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
+        // Alternative sensors with CO2 accuracy within 5.0 are not subject to the temperature
+        // and pressure restrictions.  However, they need a clear and detailed description of
+        // the calibration, so an automation-suggested flag is not possible.  So failing to give
+        // a flag is an acceptable action.
 
-        // Rough judgement on whether metadata is complete
-        if ( !acceptable ) {
-            if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) ||
-                    autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_C) )
-                autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
-            else
-                throw new IllegalArgumentException(
-                        "Unacceptably large accuracy for the aqueous CO2 measurements without complete metadata");
+        // Accuracy of temperatures within 0.2 ºC (0.05 ºC for ACCEPTED_B)
+        double tempAccuracy = 999.0;
+        for (Temperature temperature : tempvars) {
+            NumericString accuracy = temperature.getAccuracy();
+            // Temperature variables must units of ºC
+            if ( tempAccuracy > accuracy.getNumericValue() )
+                tempAccuracy = accuracy.getNumericValue();
         }
-
         if ( tempAccuracy > 0.2 )
             throw new IllegalArgumentException("Unacceptably large accuracy in temperature measurements");
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (tempAccuracy > 0.05) )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
 
+        // Accuracy of air pressure within 5.0 hPa (2.0 hPa for ACCEPTED_B)
+        // TODO: If equilibrator pressure is the sum of an external pressure sensor and
+        //  a differential pressure sensor, the accuracy should be combined (root sum of squares).
+        double pressAccuracy = 999.0;
+        for (AirPressure pressure : pressvars) {
+            NumericString accuracy = pressure.getAccuracy();
+            // AirPressures variables must units of hPa
+            if ( pressAccuracy > accuracy.getNumericValue() )
+                pressAccuracy = accuracy.getNumericValue();
+        }
         if ( pressAccuracy > 5.0 )
             throw new IllegalArgumentException("Unacceptably large accuracy in pressure measurements");
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (pressAccuracy > 2.0) )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
 
-        // ACCEPTED_B must be:
-        // from IR, GC, or Spectroscopy,
-        // continuously measured and frequently calibrated,
-        // at least two non-zero concentration calibration gasses spanning the entire range of fCO2 values
-        // warming between SST and Tequ less than 1 deg C
+        int numNonZeroCalibGases = -1;
+        int numCalibGases = -1;
+        double minGasConc = -999.0;
+        double maxGasConc = -999.0;
+        for (GasSensor sensor : co2sensors) {
+            ArrayList<CalibrationGas> calibGasList = sensor.getCalibrationGases();
+            int numNonZeroGases = 0;
+            double minConc = -999.0;
+            double maxConc = -999.0;
+            for (CalibrationGas gas : calibGasList) {
+                try {
+                    if ( gas.isNonZero() )
+                        numNonZeroGases++;
+                    double conc = gas.getConcentration().getNumericValue();
+                    if ( maxConc < 0.0 ) {
+                        maxConc = conc;
+                        minConc = conc;
+                    }
+                    else if ( maxConc < conc ) {
+                        maxConc = conc;
+                    }
+                    else if ( minConc > conc ) {
+                        minConc = conc;
+                    }
+                } catch ( Exception ex ) {
+                    // No concentration or no accuracy - ignore this gas
+                }
+            }
+            if ( numNonZeroCalibGases < numNonZeroGases ) {
+                numNonZeroCalibGases = numNonZeroGases;
+                numCalibGases = calibGasList.size();
+                minGasConc = minConc;
+                maxGasConc = maxConc;
+            }
+        }
+        // For ACCEPTED_B, at least two non-zero concentration calibration gases spanning entire range of fCO2 values
+        // For ACCEPTED_C or ACCEPTED_D, at least two calibration gases, one of which can be zero concentration
+        if ( numCalibGases < 2 )
+            throw new IllegalArgumentException("Not enough calibration gases");
+        if ( numNonZeroCalibGases < 1 )
+            throw new IllegalArgumentException("Not enough non-zero concentration calibration gases");
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (numNonZeroCalibGases < 2) )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        // TODO: check range of calibration gas concentrations against range of fCO2 values
+        //  (after removing bad data and 2.0 * std. dev. outliers)
+        //  B = spanning the entire range of fCO2 values
+        //  C and D = [0.8,1.2] times concentration spans entire range of fCO2 values
 
-        // ACCEPTED_C must be either (1):
+        // ACCEPTED_B must be:
         //     from IR, GC, or Spectroscopy,
         //     continuously measured and frequently calibrated,
-        //     at least two calibration gasses (one of which can be zero concentration),
-        //     the non-zero gasses span nearly the entire range of fCO2 values
-        //         (fCO2 values within [0.8,1.2] of the gas concentrations)
+        //     warming between SST and Tequ less than 1 deg C
+
+        // ACCEPTED_C (not alternative sensor) must be either:
+        //     from IR, GC, or Spectroscopy,
+        //     continuously measured and frequently calibrated,
         //     warming between SST and Tequ less than 3 deg C
-        // or (2):
-        //     from "alternative" sensor,
-        //     continuously measured and at least daily in situ calibration,
-        //     at least two calibration gasses (one of which can be zero concentration),
-        //     the non-zero gasses span nearly the entire range of fCO2 values
-        //         (fCO2 values within [0.8,1.2] of the gas concentrations)
-        //      clear and detailed description of calibration, including frequency
 
         return autoSuggest;
     }
