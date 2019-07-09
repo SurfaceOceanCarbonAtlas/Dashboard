@@ -127,6 +127,9 @@ public class OmeUtils {
 
     /**
      * Using the contents of the given SDIMetadata, recommend a QC flag/status for this dataset.
+     * This does NOT check actual data values that affect the dataset QC flag (e.g., the range
+     * of fCO2 values to compare against calibration gas concentrations, or amount of warming
+     * between in-situ temperatures and equilibrator temperatures).
      *
      * @param sdiMData
      *         metadata to examine
@@ -264,28 +267,13 @@ public class OmeUtils {
 
         int numNonZeroCalibGases = -1;
         int numCalibGases = -1;
-        double minGasConc = -999.0;
-        double maxGasConc = -999.0;
         for (GasSensor sensor : co2sensors) {
             ArrayList<CalibrationGas> calibGasList = sensor.getCalibrationGases();
             int numNonZeroGases = 0;
-            double minConc = -999.0;
-            double maxConc = -999.0;
             for (CalibrationGas gas : calibGasList) {
                 try {
                     if ( gas.isNonZero() )
                         numNonZeroGases++;
-                    double conc = gas.getConcentration().getNumericValue();
-                    if ( maxConc < 0.0 ) {
-                        maxConc = conc;
-                        minConc = conc;
-                    }
-                    else if ( maxConc < conc ) {
-                        maxConc = conc;
-                    }
-                    else if ( minConc > conc ) {
-                        minConc = conc;
-                    }
                 } catch ( Exception ex ) {
                     // No concentration or no accuracy - ignore this gas
                 }
@@ -293,8 +281,6 @@ public class OmeUtils {
             if ( numNonZeroCalibGases < numNonZeroGases ) {
                 numNonZeroCalibGases = numNonZeroGases;
                 numCalibGases = calibGasList.size();
-                minGasConc = minConc;
-                maxGasConc = maxConc;
             }
         }
         // For ACCEPTED_B, at least two non-zero concentration calibration gases spanning entire range of fCO2 values
@@ -305,19 +291,17 @@ public class OmeUtils {
             throw new IllegalArgumentException("Not enough non-zero concentration calibration gases");
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (numNonZeroCalibGases < 2) )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
-        // TODO: check range of calibration gas concentrations against range of fCO2 values
-        //  (after removing bad data and 2.0 * std. dev. outliers)
-        //  B = spanning the entire range of fCO2 values
-        //  C and D = [0.8,1.2] times concentration spans entire range of fCO2 values
 
         // ACCEPTED_B must be:
         //     from IR, GC, or Spectroscopy,
         //     continuously measured and frequently calibrated,
+        //     calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 1 deg C
 
         // ACCEPTED_C (not alternative sensor) must be either:
         //     from IR, GC, or Spectroscopy,
         //     continuously measured and frequently calibrated,
+        //     [0.8,1.2] times the calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 3 deg C
 
         return autoSuggest;
