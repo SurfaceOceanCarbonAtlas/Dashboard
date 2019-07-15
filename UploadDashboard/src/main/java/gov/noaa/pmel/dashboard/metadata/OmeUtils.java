@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
@@ -113,15 +114,14 @@ public class OmeUtils {
     private static final HashSet<String> ALLOWED_UNITS = new HashSet<String>(Arrays.asList(
             "microatmospheres",
             "uatmospheres",
-            "µatmospheres",
+            SpellingHandler.mu + "atmospheres",
             "uatm",
-            "µatm",
-            "umole_per_mole",
-            "µmole_per_mole",
+            SpellingHandler.mu + "atm",
+            "micromole_per_mole",
             "umol_per_mol",
-            "µmol_per_mol",
+            SpellingHandler.mu + "mol_per_mol",
             "umol/mol",
-            "µmol/mol",
+            SpellingHandler.mu + "mol/mol",
             "ppm"
     ));
 
@@ -218,7 +218,8 @@ public class OmeUtils {
 
         // Rough judgement on whether metadata is complete
         boolean acceptable = true;
-        if ( sdiMData.invalidFieldNames().size() > 0 ) {
+        HashSet<String> invalids = sdiMData.invalidFieldNames();
+        if ( invalids.size() > 0 ) {
             acceptable = false;
         }
         else {

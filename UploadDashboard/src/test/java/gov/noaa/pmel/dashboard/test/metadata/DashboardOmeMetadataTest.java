@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.test.metadata;
 
 import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.OmeMetadataInterface;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -89,6 +90,18 @@ public class DashboardOmeMetadataTest {
         aomlOmeObj.assignFromOmeXmlDoc(doc);
     }
 
+    /**
+     * Test of {@link DashboardOmeMetadata#DashboardOmeMetadata(OmeMetadataInterface, String, String, String, String)}
+     * (using {@link CdiacOmeMetadata} as the {@link OmeMetadataInterface} object), as well as
+     * {@link DashboardOmeMetadata#getUploadTimestamp()}, {@link DashboardOmeMetadata#getOwner()},
+     * {@link DashboardOmeMetadata#getVersion()}, {@link DashboardOmeMetadata#getDatasetId()},
+     * {@link DashboardOmeMetadata#getDatasetName()}, {@link DashboardOmeMetadata#getPlatformName()},
+     * {@link DashboardOmeMetadata#getPINames()}, {@link DashboardOmeMetadata#getInvestigators()},
+     * {@link DashboardOmeMetadata#getOrganizations()}, {@link DashboardOmeMetadata#getWestmostLongitude()},
+     * {@link DashboardOmeMetadata#getEastmostLongitude()}, {@link DashboardOmeMetadata#getSouthmostLatitude()},
+     * {@link DashboardOmeMetadata#getNorthmostLatitude()}, {@link DashboardOmeMetadata#getBeginDatestamp()},
+     * {@link DashboardOmeMetadata#getEndDatestamp()}, and {@link DashboardOmeMetadata#getDatasetLink()}
+     */
     @Test
     public void testDashboardOmeMetadataFromOmeObject() {
         DashboardOmeMetadata mdata;
@@ -132,6 +145,9 @@ public class DashboardOmeMetadataTest {
         assertEquals(AOML_DATASET_LINK, mdata.getDatasetLink());
     }
 
+    /**
+     * Test of {@link DashboardOmeMetadata#changeDatasetID(String)}
+     */
     @Test
     public void testChangeDatasetID() {
         DashboardOmeMetadata aomlMData = new DashboardOmeMetadata(aomlCdiacXmlMData,
@@ -148,6 +164,9 @@ public class DashboardOmeMetadataTest {
         assertEquals(STUB_EXPOCODE, elem.getText());
     }
 
+    /**
+     * Test of {@link DashboardOmeMetadata#getPlatformName()} and {@link DashboardOmeMetadata#setPlatformName(String)}
+     */
     @Test
     public void testGetSetPlatformName() {
         final String anotherName = "USS Minnow";
@@ -161,6 +180,10 @@ public class DashboardOmeMetadataTest {
 
     }
 
+    /**
+     * Test of {@link DashboardOmeMetadata#getInvestigators()}, {@link DashboardOmeMetadata#getOrganizations()},
+     * and {@link DashboardOmeMetadata#setInvestigatorsAndOrganizations(ArrayList, ArrayList)}
+     */
     @Test
     public void testGetSetInvestigatorsAndOrganizations() {
         DashboardOmeMetadata stubMData = new DashboardOmeMetadata(cdiacXmlStubMData,
