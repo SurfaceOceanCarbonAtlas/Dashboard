@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
@@ -125,6 +126,30 @@ public class OmeUtils {
             "ppm"
     ));
 
+    private static final HashSet<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = new HashSet<DataColumnType>(Arrays.asList(
+            DashboardServerUtils.DATASET_ID.duplicate(),
+            DashboardServerUtils.DATASET_NAME.duplicate(),
+            DashboardServerUtils.INVESTIGATOR_NAMES.duplicate(),
+            DashboardServerUtils.ORGANIZATION_NAME.duplicate(),
+            DashboardServerUtils.PLATFORM_NAME.duplicate(),
+            DashboardServerUtils.PLATFORM_TYPE.duplicate(),
+            DashboardServerUtils.SOURCE_DOI.duplicate(),
+            DashboardServerUtils.LONGITUDE.duplicate(),
+            DashboardServerUtils.LATITUDE.duplicate(),
+            DashboardServerUtils.SAMPLE_DEPTH.duplicate(),
+            DashboardServerUtils.TIMESTAMP.duplicate(),
+            DashboardServerUtils.DATE.duplicate(),
+            DashboardServerUtils.YEAR.duplicate(),
+            DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
+            DashboardServerUtils.DAY_OF_MONTH.duplicate(),
+            DashboardServerUtils.TIME_OF_DAY.duplicate(),
+            DashboardServerUtils.HOUR_OF_DAY.duplicate(),
+            DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
+            DashboardServerUtils.SECOND_OF_MINUTE.duplicate(),
+            DashboardServerUtils.DAY_OF_YEAR.duplicate(),
+            DashboardServerUtils.SECOND_OF_DAY.duplicate()
+    ));
+
     /**
      * Using the contents of the given SDIMetadata, recommend a QC flag/status for this dataset.
      * This does NOT check actual data values that affect the dataset QC flag (e.g., the range
@@ -223,7 +248,16 @@ public class OmeUtils {
             acceptable = false;
         }
         else {
-            for (String name : dataset.getUserColNames()) {
+            ArrayList<DataColumnType> colTypes = dataset.getDataColTypes();
+            ArrayList<String> colNames = dataset.getUserColNames();
+            for (int k = 0; k < colNames.size(); k++) {
+                // Some columns containing (repeated) metadata may have been added
+                // only for the dashboard - instead of adding it in the prologue.
+                // At this time, do not worry about these not being described as well as
+                // the "obvious" names/types, although ideally all columns should be described.
+                if ( OBVIOUS_DATA_COLUMN_TYPES.contains(colTypes.get(k)) )
+                    continue;
+                String name = colNames.get(k);
                 if ( !varColNames.contains(name) ) {
                     acceptable = false;
                     break;
