@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.cell.client.Cell;
@@ -33,8 +30,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 
 import java.text.ParseException;
@@ -393,15 +390,16 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
         cruise.setUserColNames(cruiseSpecs.getUserColNames());
         cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 
-        TreeSet<QCFlag> woceSet = new TreeSet<QCFlag>();
-        for (QCFlag chkwoce : cruiseSpecs.getCheckerFlags()) {
-            woceSet.add(new QCFlag(null, null, chkwoce.getSeverity(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+        TreeSet<DataQCFlag> woceSet = new TreeSet<DataQCFlag>();
+        for (DataQCFlag chkwoce : cruiseSpecs.getCheckerFlags()) {
+            woceSet.add(
+                    new DataQCFlag(null, null, chkwoce.getSeverity(), chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
         }
         cruise.setCheckerFlags(woceSet);
 
         woceSet.clear();
-        for (QCFlag uwoce : cruiseSpecs.getUserFlags()) {
-            woceSet.add(new QCFlag(null, null, uwoce.getSeverity(), null, uwoce.getRowIndex()));
+        for (DataQCFlag uwoce : cruiseSpecs.getUserFlags()) {
+            woceSet.add(new DataQCFlag(null, null, uwoce.getSeverity(), null, uwoce.getRowIndex()));
         }
         cruise.setUserFlags(woceSet);
 
@@ -911,11 +909,11 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                 sb.appendHtmlConstant("</div>");
                 return;
             }
-            TreeSet<QCFlag> checkerFlags = cruise.getCheckerFlags();
+            TreeSet<DataQCFlag> checkerFlags = cruise.getCheckerFlags();
             Integer rowIdx = ctx.getIndex();
-            QCFlag woceCell = new QCFlag(null, null, Severity.ERROR, colNum - 1, rowIdx);
-            QCFlag woceRow = new QCFlag(null, null, Severity.ERROR, null, rowIdx);
-            QCFlag woceCol = new QCFlag(null, null, Severity.ERROR, colNum - 1, null);
+            DataQCFlag woceCell = new DataQCFlag(null, null, Severity.ERROR, colNum - 1, rowIdx);
+            DataQCFlag woceRow = new DataQCFlag(null, null, Severity.ERROR, null, rowIdx);
+            DataQCFlag woceCol = new DataQCFlag(null, null, Severity.ERROR, colNum - 1, null);
             if ( checkerFlags.contains(woceCell) ||
                     checkerFlags.contains(woceRow) ||
                     checkerFlags.contains(woceCol) ) {
@@ -925,7 +923,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
                 sb.appendHtmlConstant("</div>");
                 return;
             }
-            TreeSet<QCFlag> userFlags = cruise.getUserFlags();
+            TreeSet<DataQCFlag> userFlags = cruise.getUserFlags();
             if ( userFlags.contains(woceCell) ||
                     userFlags.contains(woceRow) ||
                     userFlags.contains(woceCol) ) {

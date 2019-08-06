@@ -4,7 +4,7 @@ import gov.loc.repository.bagit.creator.BagCreator;
 import gov.loc.repository.bagit.domain.Bag;
 import gov.loc.repository.bagit.hash.StandardSupportedAlgorithms;
 import gov.loc.repository.bagit.verify.BagVerifier;
-import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -14,8 +14,6 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.platform.Platform;
-import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
-import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -47,8 +45,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Properties;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -87,30 +85,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     private boolean debugIt;
     private Pattern nameCleaner;
 
-    private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
-
-    static {
-        DASH_TYPE_TO_CDIAC_TYPE = new HashMap<String,CdiacReader.VarType>();
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_WATER_TEQU_WET.getVarName(), CdiacReader.VarType.FCO2_WATER_EQU);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_WATER_SST_WET.getVarName(), CdiacReader.VarType.FCO2_WATER_SST);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(), CdiacReader.VarType.PCO2_WATER_EQU);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_WATER_SST_WET.getVarName(), CdiacReader.VarType.PCO2_WATER_SST);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(), CdiacReader.VarType.XCO2_WATER_EQU);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_WATER_SST_DRY.getVarName(), CdiacReader.VarType.XCO2_WATER_SST);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.FCO2_ATM_ACTUAL);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.FCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.FCO2_ATM_INTERP);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.PCO2_ATM_ACTUAL);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.PCO2_ATM_INTERP);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_ATM_DRY_ACTUAL.getVarName(), CdiacReader.VarType.XCO2_ATM_ACTUAL);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.XCO2_ATM_DRY_INTERP.getVarName(), CdiacReader.VarType.XCO2_ATM_INTERP);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.SST.getVarName(), CdiacReader.VarType.SEA_SURFACE_TEMPERATURE);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.TEQU.getVarName(), CdiacReader.VarType.EQUILIBRATOR_TEMPERATURE);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PATM.getVarName(), CdiacReader.VarType.SEA_LEVEL_PRESSURE);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.PEQU.getVarName(), CdiacReader.VarType.EQUILIBRATOR_PRESSURE);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.SALINITY.getVarName(), CdiacReader.VarType.SALINITY);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.WOCE_CO2_WATER.getVarName(), CdiacReader.VarType.WOCE_CO2_WATER);
-        DASH_TYPE_TO_CDIAC_TYPE.put(SocatTypes.WOCE_CO2_ATM.getVarName(), CdiacReader.VarType.WOCE_CO2_ATM);
-    }
 
     /**
      * A file bundler that saves the file bundles under the given directory and sends an email with the bundle
@@ -253,7 +227,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         // Check if there is a PI-provided OME document
         try {
             File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
-            sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+            FileReader xmlReader = new FileReader(mdataFile);
+            sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
             platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
             // Probably does not exist
@@ -262,7 +237,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // Use the OME stub (which should always exist)
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
-                sdimdata = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                FileReader xmlReader = new FileReader(mdataFile);
+                sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -274,7 +250,8 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
-                SDIMetadata stub = createSdiMetadataFromCdiacOme(mdataFile, dataColNames, dataColTypes);
+                FileReader xmlReader = new FileReader(mdataFile);
+                SDIMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -287,7 +264,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                 sdimdata.setPlatform(platform);
             }
         }
-
 
         // Make sure there is a history entry if this is an update to an archived dataset
         MiscInfo miscInfo = sdimdata.getMiscInfo();
@@ -455,47 +431,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
     }
 
     /**
-     * Using the given data column names and types for a datasets, creates an SDIMetadata object
-     * from the contents of a CDIAC OME metadata file.
-     *
-     * @param omeFile
-     *         CDIAC OME metadata file to read
-     * @param dataColNames
-     *         data column names for this dataset
-     * @param dataColTypes
-     *         data column types for this dataset
-     *
-     * @return SDIMetadata object created from the CDIAC OME metadata file contents
-     *
-     * @throws FileNotFoundException
-     *         if the CDIAC OME metadata file does not exist
-     * @throws IOException
-     *         if an error occurs when reading the CDIAC OME metadata file
-     * @throws IllegalArgumentException
-     *         if the contents of the CDIAC OME metadata file are invalid
-     */
-    private SDIMetadata createSdiMetadataFromCdiacOme(File omeFile,
-            ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
-            throws FileNotFoundException, IOException, IllegalArgumentException {
-        // Read the CDIAC XML into an XML Document in memory
-        CdiacReader reader;
-        FileReader xmlReader = new FileReader(omeFile);
-        try {
-            reader = new CdiacReader(xmlReader);
-        } finally {
-            xmlReader.close();
-        }
-        // Make sure all data column names used are mapped to the correct CdiacReader.VarType
-        for (int k = 0; k < dataColNames.size(); k++) {
-            CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
-            if ( vtype != null )
-                reader.associateColumnNameWithVarType(dataColNames.get(k), vtype);
-        }
-        // Create an SDIMetadata object from the contents of the CDIAC XML Document
-        return reader.createSDIMetadata();
-    }
-
-    /**
      * Generates the bagit zip file of the original data file converted to "Excel" CSV format,
      * as well as any appropriate metadata files for a given dataset.
      * Use {@link #getOrigZipBundleFile(String)} to get the virtual File of the created bundle.
@@ -531,17 +466,26 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         csvFilename = csvFilename.substring(0, csvFilename.length() - 4) + ".csv";
 
         // Get the list of metadata documents to be bundled with this data file
-        ArrayList<File> addlDocs = new ArrayList<File>();
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+        TreeSet<File> metaDocs = new TreeSet<File>();
+
+        // If it exists, include the (dataset)/PI_OME.xml and PI_OME.pdf files
+        // (which are not listed as supplemental documents)
+        File piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+        if ( piOme.exists() )
+            metaDocs.add(piOme);
+        piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_PDF_FILENAME);
+        if ( piOme.exists() )
+            metaDocs.add(piOme);
+
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
-            // Exclude the (dataset)/OME.xml document at this time;
-            // do include the (dataset)/PI_OME.xml
+            // Exclude the (dataset)/OME.xml stub document
             String filename = mdata.getFilename();
             if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
-                addlDocs.add(metadataHandler.getMetadataFile(stdId, filename));
+                metaDocs.add(metadataHandler.getMetadataFile(stdId, filename));
             }
         }
-        if ( addlDocs.isEmpty() )
+        if ( metaDocs.isEmpty() )
             throw new IOException("No metadata/supplemental documents for " + stdId);
 
         // Create the bagit bundle directory
@@ -563,7 +507,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             infoMsg += "    " + csvFilename + "\n";
             File dest = new File(bundleDir, csvFilename);
             copyTsvToCsvFile(dataFile, dest);
-            for (File metaFile : addlDocs) {
+            for (File metaFile : metaDocs) {
                 infoMsg += "    " + metaFile.getName() + "\n";
                 dest = new File(bundleDir, metaFile.getName());
                 Files.copy(metaFile.toPath(), dest.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
@@ -571,12 +515,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // The SDIMetadata object is always present, but may just be a minimal stub with history
             infoMsg += "    " + OCADS_XML_FILENAME + "\n";
             dest = new File(bundleDir, OCADS_XML_FILENAME);
-            OcadsWriter ocadsWriter = new OcadsWriter(new FileWriter(dest));
-            try {
-                ocadsWriter.writeOcadsXml(sdimdata);
-            } finally {
-                ocadsWriter.close();
-            }
+            OmeUtils.createOcadsOmeFromSdiMetadata(dest, sdimdata);
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
         }

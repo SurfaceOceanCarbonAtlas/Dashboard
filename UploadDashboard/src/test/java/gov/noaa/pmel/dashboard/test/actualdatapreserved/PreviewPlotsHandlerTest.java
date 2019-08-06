@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.test.actualdata;
+package gov.noaa.pmel.dashboard.test.actualdatapreserved;
 
 import gov.noaa.pmel.dashboard.client.DatasetPreviewPage;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
@@ -58,6 +58,7 @@ public class PreviewPlotsHandlerTest {
                 DatasetPreviewPage.REC_FCO2_SOURCES_IMAGE_NAME }) {
             plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + imgext);
             assertTrue("Plot for " + imgName + " does not exist", plotFile.exists());
+            assertTrue("Plot for " + imgName + " is too small", plotFile.length() > 30720);
             plotFile.delete();
         }
     }

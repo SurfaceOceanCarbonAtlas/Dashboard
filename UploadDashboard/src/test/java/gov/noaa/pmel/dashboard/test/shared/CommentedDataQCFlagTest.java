@@ -1,8 +1,8 @@
 package gov.noaa.pmel.dashboard.test.shared;
 
-import gov.noaa.pmel.dashboard.shared.CommentedQCFlag;
+import gov.noaa.pmel.dashboard.shared.CommentedDataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,27 +11,27 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit tests for methods of {@link CommentedQCFlag}
+ * Unit tests for methods of {@link CommentedDataQCFlag}
  */
-public class CommentedQCFlagTest {
+public class CommentedDataQCFlagTest {
 
     public static final String MY_FLAG_NAME = "WOCE_CO2_atm";
     public static final String MY_FLAG_VALUE = "4";
-    public static final QCFlag.Severity MY_SEVERITY = QCFlag.Severity.ERROR;
+    public static final DataQCFlag.Severity MY_SEVERITY = DataQCFlag.Severity.ERROR;
     public static final Integer MY_COLUMN_INDEX = 5;
     public static final Integer MY_ROW_INDEX = 25;
     public static final String MY_COMMENT = "This is a weird looking value";
 
     public void testCommentedQCFlag() {
-        CommentedQCFlag commqc = new CommentedQCFlag();
+        CommentedDataQCFlag commqc = new CommentedDataQCFlag();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagName());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagValue());
-        assertEquals(QCFlag.Severity.UNASSIGNED, commqc.getSeverity());
+        assertEquals(DataQCFlag.Severity.UNASSIGNED, commqc.getSeverity());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getColumnIndex());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getRowIndex());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getComment());
 
-        commqc = new CommentedQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE,
+        commqc = new CommentedDataQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE,
                 MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX, MY_COMMENT);
         assertEquals(MY_FLAG_NAME, commqc.getFlagName());
         assertEquals(MY_FLAG_VALUE, commqc.getFlagValue());
@@ -40,16 +40,16 @@ public class CommentedQCFlagTest {
         assertEquals(MY_ROW_INDEX, commqc.getRowIndex());
         assertEquals(MY_COMMENT, commqc.getComment());
 
-        commqc = new CommentedQCFlag(null, null, QCFlag.Severity.UNASSIGNED, null, null, null);
+        commqc = new CommentedDataQCFlag(null, null, DataQCFlag.Severity.UNASSIGNED, null, null, null);
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagName());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagValue());
-        assertEquals(QCFlag.Severity.UNASSIGNED, commqc.getSeverity());
+        assertEquals(DataQCFlag.Severity.UNASSIGNED, commqc.getSeverity());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getColumnIndex());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getRowIndex());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getComment());
 
-        QCFlag qcflag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
-        commqc = new CommentedQCFlag(qcflag, MY_COMMENT);
+        DataQCFlag qcflag = new DataQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
+        commqc = new CommentedDataQCFlag(qcflag, MY_COMMENT);
         assertEquals(MY_FLAG_NAME, commqc.getFlagName());
         assertEquals(MY_FLAG_VALUE, commqc.getFlagValue());
         assertEquals(MY_SEVERITY, commqc.getSeverity());
@@ -59,17 +59,17 @@ public class CommentedQCFlagTest {
     }
 
     /**
-     * Test of {@link CommentedQCFlag}
+     * Test of {@link CommentedDataQCFlag}
      */
     @Test
     public void testGetSetComment() {
-        CommentedQCFlag commqc = new CommentedQCFlag();
+        CommentedDataQCFlag commqc = new CommentedDataQCFlag();
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getComment());
         commqc.setComment(MY_COMMENT);
         assertEquals(MY_COMMENT, commqc.getComment());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getRowIndex());
         assertEquals(DashboardUtils.INT_MISSING_VALUE, commqc.getColumnIndex());
-        assertEquals(QCFlag.Severity.UNASSIGNED, commqc.getSeverity());
+        assertEquals(DataQCFlag.Severity.UNASSIGNED, commqc.getSeverity());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, commqc.getFlagName());
         commqc.setComment(null);
@@ -78,18 +78,18 @@ public class CommentedQCFlagTest {
 
     @Test
     public void testHashCodeEquals() {
-        CommentedQCFlag first = new CommentedQCFlag();
+        CommentedDataQCFlag first = new CommentedDataQCFlag();
         assertFalse(first.equals(null));
         assertFalse(first.equals(DashboardUtils.STRING_MISSING_VALUE));
 
-        // CommentedQCFlag without a comment equals its superclass QCFlag
-        QCFlag qcflag = new QCFlag();
+        // CommentedDataQCFlag without a comment equals its superclass DataQCFlag
+        DataQCFlag qcflag = new DataQCFlag();
         assertTrue(first.equals(qcflag));
-        // but the superclass QCFlag object must match
-        qcflag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
+        // but the superclass DataQCFlag object must match
+        qcflag = new DataQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
         assertFalse(first.equals(qcflag));
 
-        CommentedQCFlag second = new CommentedQCFlag();
+        CommentedDataQCFlag second = new CommentedDataQCFlag();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
@@ -128,12 +128,12 @@ public class CommentedQCFlagTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        // CommentedQCFlag without a comment equals its superclass QCFlag
-        qcflag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
+        // CommentedDataQCFlag without a comment equals its superclass DataQCFlag
+        qcflag = new DataQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
         assertEquals(first.hashCode(), qcflag.hashCode());
         assertTrue(first.equals(qcflag));
-        // but the superclass QCFlag object must match
-        qcflag = new QCFlag();
+        // but the superclass DataQCFlag object must match
+        qcflag = new DataQCFlag();
         assertNotEquals(first.hashCode(), qcflag.hashCode());
         assertFalse(first.equals(qcflag));
 
@@ -147,17 +147,17 @@ public class CommentedQCFlagTest {
 
     @Test
     public void testCompareTo() {
-        QCFlag firstFlag = new QCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
-        CommentedQCFlag first = new CommentedQCFlag(firstFlag, null);
-        CommentedQCFlag second = new CommentedQCFlag("WOCE_CO2_water", "2", QCFlag.Severity.ACCEPTABLE,
+        DataQCFlag firstFlag = new DataQCFlag(MY_FLAG_NAME, MY_FLAG_VALUE, MY_SEVERITY, MY_COLUMN_INDEX, MY_ROW_INDEX);
+        CommentedDataQCFlag first = new CommentedDataQCFlag(firstFlag, null);
+        CommentedDataQCFlag second = new CommentedDataQCFlag("WOCE_CO2_water", "2", DataQCFlag.Severity.ACCEPTABLE,
                 4, 15, "And this as well");
 
-        // A CommentedQCFlag with no comment is the same as its superclass QCFlag
+        // A CommentedDataQCFlag with no comment is the same as its superclass DataQCFlag
         assertEquals(0, first.compareTo(firstFlag));
         assertEquals(0, firstFlag.compareTo(first));
         first.setComment(MY_COMMENT);
         assertTrue(first.compareTo(firstFlag) > 0);
-        // But of course, QCFlag.compareTo ignores the comment
+        // But of course, DataQCFlag.compareTo ignores the comment
         assertEquals(0, firstFlag.compareTo(first));
 
         // flag name first comparison
@@ -179,7 +179,7 @@ public class CommentedQCFlagTest {
         // severity next comparison
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
-        second.setSeverity(QCFlag.Severity.CRITICAL);
+        second.setSeverity(DataQCFlag.Severity.CRITICAL);
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
         second.setSeverity(MY_SEVERITY);

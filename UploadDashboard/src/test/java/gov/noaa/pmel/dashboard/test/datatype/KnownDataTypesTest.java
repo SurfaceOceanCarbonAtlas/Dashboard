@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -334,7 +333,7 @@ public class KnownDataTypesTest {
     }
 
     /**
-     * Test method for {@link KnownDataTypes#addTypesFromProperties(Properties, DashDataType.Role, Logger)}
+     * Test method for {@link KnownDataTypes#addTypesFromProperties(Properties, DashDataType.Role, org.apache.logging.log4j.Logger)}
      */
     @Test
     public void testAddTypesFromProperties() throws IOException {

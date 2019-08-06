@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
@@ -30,7 +27,7 @@ import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 
 import java.util.List;
 

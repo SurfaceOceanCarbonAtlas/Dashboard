@@ -1,5 +1,8 @@
 package gov.noaa.pmel.dashboard.metadata;
 
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,11 +28,8 @@ public interface OmeMetadataInterface {
      *         if the contents of the metadata files are invalid for assigning this OME object
      * @throws FileNotFoundException
      *         if the metadata file does not exist
-     * @throws IOException
-     *         if there are problems reading from the metadata file
      */
-    void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException;
+    void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException;
 
     /**
      * Saves the contents of the OME object in the specified metadata file.
@@ -202,5 +202,20 @@ public interface OmeMetadataInterface {
      *         the UTC time, in units of seconds since Jan 1 1970 00:00:00, to set as the latest (ending) data point
      */
     void setDataEndTime(Double dataEndTime);
+
+    /**
+     * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     *
+     * @param dataset
+     *         information about the dataset associated with this OME document
+     *
+     * @return the automation-suggested dataset QC flag, an appropriate acceptable status
+     *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems with the given Metadata, or
+     *         if the metadata indicates the dataset in unacceptable
+     */
+    DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException;
 
 }

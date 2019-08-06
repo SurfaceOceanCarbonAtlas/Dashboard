@@ -1,11 +1,8 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.datatype;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -140,7 +137,7 @@ public class LonLatConverter extends ValueConverter<Double> {
         // if longitude, if not an outrageous value, convert to (-180,180]
         if ( toUnit.endsWith("E") || toUnit.endsWith("e") ) {
             ADCMessage msg = DashboardServerUtils.LONGITUDE.boundsCheckStandardValue(value);
-            if ( (msg == null) || msg.getSeverity().equals(QCFlag.Severity.WARNING) ) {
+            if ( (msg == null) || msg.getSeverity().equals(DataQCFlag.Severity.WARNING) ) {
                 while ( value <= -180.0 ) {
                     value += 360.0;
                 }

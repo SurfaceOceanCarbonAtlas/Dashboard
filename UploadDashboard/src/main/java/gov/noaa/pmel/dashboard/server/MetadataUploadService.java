@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
@@ -71,7 +72,7 @@ public class MetadataUploadService extends HttpServlet {
         try {
             username = DashboardServerUtils.cleanUsername(request.getUserPrincipal().getName().trim());
         } catch ( Exception ex ) {
-            ; // leave username null for error message later
+            // leave username null for error message later
         }
 
         // Get the contents from the post request
@@ -204,6 +205,24 @@ public class MetadataUploadService extends HttpServlet {
                         throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " +
                                 ex.getMessage());
                     }
+                    DatasetQCStatus.Status autoSuggest;
+                    try {
+                        autoSuggest = omedata.suggestedDatasetStatus(dataset);
+                    } catch ( Exception ex ) {
+                        /*
+                         * Either there is a problem with the metadata, the metadata indicates
+                         * the dataset is unacceptable, or the code to recommend a dataset QC
+                         * flag is faulty; whatever the reason, do not make a recommendation.
+                         */
+                        autoSuggest = DatasetQCStatus.Status.PRIVATE;
+                    }
+                    DatasetQCStatus status = dataset.getSubmitStatus();
+                    if ( !autoSuggest.equals(status.getAutoSuggested()) ) {
+                        status.setAutoSuggested(autoSuggest);
+                        dataset.setSubmitStatus(status);
+                        dataFileHandler.saveDatasetInfoToFile(dataset,
+                                "Update of automation-suggested dataset QC flag");
+                    }
                 }
                 else {
                     dataset = dataFileHandler.addAddlDocTitleToDataset(id, metadata);
@@ -225,12 +244,15 @@ public class MetadataUploadService extends HttpServlet {
                         throw new RuntimeException("Unexpect failure to obtain all the region IDs for " +
                                 id + ": " + ex.getMessage());
                     }
+                    DatasetQCStatus status = dataset.getSubmitStatus();
+                    status.setActual(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
+                    dataset.setSubmitStatus(status);
                     // Add the update flags to global, then all the regions
                     ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
                     for (int k = 0; k < allRegionIds.length(); k++) {
                         QCEvent qcEvent = new QCEvent();
                         qcEvent.setDatasetId(id);
-                        qcEvent.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_UPDATED);
+                        qcEvent.setFlagValue(status.flagString());
                         qcEvent.setFlagDate(now);
                         qcEvent.setRegionId(allRegionIds.substring(k, k + 1));
                         qcEvent.setVersion(version);
@@ -241,16 +263,13 @@ public class MetadataUploadService extends HttpServlet {
                     try {
                         // Add the 'U' QC flags
                         databaseHandler.addDatasetQCEvents(qcEventList);
-                        // Update the dashboard status for the 'U' QC flag
-                        dataset.setSubmitStatus(DashboardServerUtils.DATASET_STATUS_SUBMITTED);
                         // If archived, reset the archived status so the updated metadata will be archived
                         if ( dataset.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
                             dataset.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
                         dataFileHandler.saveDatasetInfoToFile(dataset, comment);
                         // Update the DSG files
                         String versionStatus = databaseHandler.getVersionStatus(id);
-                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id,
-                                DashboardServerUtils.DATASET_QCFLAG_UPDATED, versionStatus);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id, status.flagString(), versionStatus);
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.

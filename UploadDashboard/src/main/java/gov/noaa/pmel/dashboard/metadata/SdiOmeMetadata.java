@@ -1,6 +1,8 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.sdimetadata.Coverage;
 import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
@@ -38,8 +40,7 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException {
+    public void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         XMLDecoder xdec = new XMLDecoder(new FileInputStream(mdataFile));
         try {
@@ -299,6 +300,11 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
         else
             coverage.setLatestDataTime(new Date(Math.round(dataEndTime * 1000.0)));
         mdata.setCoverage(coverage);
+    }
+
+    @Override
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
+        return OmeUtils.suggestDatasetQCFlag(mdata, dataset);
     }
 
 }

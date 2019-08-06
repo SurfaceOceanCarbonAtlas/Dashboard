@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -16,7 +13,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7059048686537302765L;
+    private static final long serialVersionUID = 8032325269484692750L;
 
     protected boolean selected;
     protected String version;
@@ -25,7 +22,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected String dataCheckStatus;
     protected String omeTimestamp;
     protected TreeSet<String> addlDocs;
-    protected String submitStatus;
+    protected DatasetQCStatus submitStatus;
     protected String archiveStatus;
     protected ArrayList<String> archiveTimestamps;
     protected String uploadFilename;
@@ -39,9 +36,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
     // For each data column, a DataColumnType with type, unit, and missing value
     protected ArrayList<DataColumnType> dataColTypes;
     // Checker-generated QC flags without comments
-    protected TreeSet<QCFlag> checkerFlags;
+    protected TreeSet<DataQCFlag> checkerFlags;
     // PI-provided QC flags without comments
-    protected TreeSet<QCFlag> userFlags;
+    protected TreeSet<DataQCFlag> userFlags;
 
     /**
      * Create an empty dashboard dataset
@@ -54,7 +51,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
         dataCheckStatus = DashboardUtils.CHECK_STATUS_NOT_CHECKED;
         omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
         addlDocs = new TreeSet<String>();
-        submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
+        submitStatus = new DatasetQCStatus();
         archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
         archiveTimestamps = new ArrayList<String>(1);
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
@@ -66,8 +63,8 @@ public class DashboardDataset implements Serializable, IsSerializable {
         numWarnRows = 0;
         userColNames = new ArrayList<String>();
         dataColTypes = new ArrayList<DataColumnType>();
-        checkerFlags = new TreeSet<QCFlag>();
-        userFlags = new TreeSet<QCFlag>();
+        checkerFlags = new TreeSet<DataQCFlag>();
+        userFlags = new TreeSet<DataQCFlag>();
     }
 
     /**
@@ -77,14 +74,10 @@ public class DashboardDataset implements Serializable, IsSerializable {
      */
     public Boolean isEditable() {
         // true for datasets that are suspended, excluded, or not yet submitted
-        String status = getSubmitStatus();
-        if ( status.equals(DashboardUtils.STATUS_NOT_SUBMITTED) ||
-                status.equals(DashboardUtils.STATUS_SUSPENDED) ||
-                status.equals(DashboardUtils.STATUS_EXCLUDED) )
+        if ( submitStatus.isEditable() )
             return Boolean.TRUE;
         // null for published datasets
-        status = getArchiveStatus();
-        if ( status.equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
+        if ( DashboardUtils.ARCHIVE_STATUS_ARCHIVED.equals(archiveStatus) )
             return null;
         // false for submitted or QC-ed but not published
         return Boolean.FALSE;
@@ -224,23 +217,19 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
-     * @return the submission status;
-     *         never null but may be {@link DashboardUtils#STATUS_NOT_SUBMITTED} if not assigned
+     * @return the submission status; never null
      */
-    public String getSubmitStatus() {
-        return submitStatus;
+    public DatasetQCStatus getSubmitStatus() {
+        return new DatasetQCStatus(submitStatus);
     }
 
     /**
      * @param submitStatus
-     *         the  submission status (after trimming) to set;
-     *         if null, {@link DashboardUtils#STATUS_NOT_SUBMITTED} is assigned
+     *         the submission status (after trimming) to set;
+     *         if null, a default DatasetQCStatus (all {@link DatasetQCStatus.Status#PRIVATE}) is assigned
      */
-    public void setSubmitStatus(String submitStatus) {
-        if ( submitStatus == null )
-            this.submitStatus = DashboardUtils.STATUS_NOT_SUBMITTED;
-        else
-            this.submitStatus = submitStatus.trim();
+    public void setSubmitStatus(DatasetQCStatus submitStatus) {
+        this.submitStatus = new DatasetQCStatus(submitStatus);
     }
 
     /**
@@ -458,7 +447,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return the set of automated data checker data QC flags; never null but may be empty.
      *         The actual set in this object is returned.
      */
-    public TreeSet<QCFlag> getCheckerFlags() {
+    public TreeSet<DataQCFlag> getCheckerFlags() {
         return checkerFlags;
     }
 
@@ -466,9 +455,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @param checkerFlags
      *         the set of automated data checker data QC flags to assign.
      *         The set in this object is cleared and all the contents of the given collection, if not null, are added.
-     *         Note that this is a shallow copy; the given QCFlag objects are reused.
+     *         Note that this is a shallow copy; the given DataQCFlag objects are reused.
      */
-    public void setCheckerFlags(TreeSet<QCFlag> checkerFlags) {
+    public void setCheckerFlags(TreeSet<DataQCFlag> checkerFlags) {
         this.checkerFlags.clear();
         if ( checkerFlags != null )
             this.checkerFlags.addAll(checkerFlags);
@@ -478,7 +467,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @return The set of user-provided QC flags; never null but may be empty.
      *         The actual set in this object is returned.
      */
-    public TreeSet<QCFlag> getUserFlags() {
+    public TreeSet<DataQCFlag> getUserFlags() {
         return userFlags;
     }
 
@@ -486,9 +475,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
      * @param userFlags
      *         The set user-provided QC flags to assign.
      *         The set in this object is cleared and all the contents of the given Collection, if not null, are added.
-     *         Note that this is a shallow copy; the given QCFlag objects are reused.
+     *         Note that this is a shallow copy; the given DataQCFlag objects are reused.
      */
-    public void setUserFlags(TreeSet<QCFlag> userFlags) {
+    public void setUserFlags(TreeSet<DataQCFlag> userFlags) {
         this.userFlags.clear();
         if ( userFlags != null )
             this.userFlags.addAll(userFlags);
@@ -587,7 +576,7 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ";\n    dataCheckStatus=" + dataCheckStatus +
                 ";\n    omeTimestamp=" + omeTimestamp +
                 ";\n    addlDocs=" + addlDocs.toString() +
-                ";\n    submitStatus=" + submitStatus +
+                ";\n    submitStatus=" + submitStatus.toString() +
                 ";\n    archiveStatus=" + archiveStatus +
                 ";\n    archiveTimestamps=" + archiveTimestamps +
                 ";\n    uploadFilename=" + uploadFilename +

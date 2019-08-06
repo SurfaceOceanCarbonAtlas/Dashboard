@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import java.util.ArrayList;
@@ -36,6 +33,7 @@ public class DashboardUtils {
     public static final String NO_PI_NAMES_HEADER_TAG = "NO PI NAMES HEADER TAG";
     public static final String NO_PLATFORM_NAME_HEADER_TAG = "NO PLATFORM NAME HEADER TAG";
     public static final String INVALID_ORG_NAMES_HEADER_TAG = "INVALID ORGANIZATIONS NAME HEADER TAG";
+    public static final String INVALID_SUGGESTED_QC_STATUS_HEADER_TAG = "INVALID SUGGESTED QC STATUS HEADER TAG";
     public static final String UNEXPECTED_FAILURE_HEADER_TAG = "UNEXPECTED FAILURE HEADER TAG";
     public static final String END_OF_ERROR_MESSAGE_TAG = "END_OF_ERROR MESSAGE_TAG";
     public static final String SUCCESS_HEADER_TAG = "SUCCESS HEADER TAG";
@@ -53,16 +51,6 @@ public class DashboardUtils {
     public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
     public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
     public static final String GEOPOSITION_ERRORS_MSG = "(lat/lon/time errors!)";
-
-    // Status strings - datasets that can be modified
-    public static final String STATUS_NOT_SUBMITTED = "";
-    public static final String STATUS_SUSPENDED = "Suspended";
-    public static final String STATUS_EXCLUDED = "Excluded";
-    // Status strings - datasets that cannot be modified
-    public static final String STATUS_SUBMITTED = "Submitted";
-    public static final String STATUS_ACCEPTED = "Accepted";
-    public static final String STATUS_CONFLICT = "Conflict";
-    public static final String STATUS_RENAMED = "Renamed";
 
     // Archival options
     public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";

@@ -1,8 +1,10 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -12,6 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,21 +49,20 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public void read(String datasetId, File mdataFile)
-            throws IllegalArgumentException, FileNotFoundException, IOException {
+    public void read(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException {
         if ( !mdataFile.exists() )
             throw new FileNotFoundException("Metadata file " + mdataFile.getName() +
                     " does not exist for dataset " + datasetId);
         Document omeDoc;
         try {
             omeDoc = (new SAXBuilder()).build(mdataFile);
-        } catch ( JDOMException ex ) {
-            throw new IOException(ex);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException(ex);
         }
         try {
             mdata.assignFromOmeXmlDoc(omeDoc);
         } catch ( Exception ex ) {
-            throw new IOException(ex);
+            throw new IllegalArgumentException(ex);
         }
         try {
             String stdId = DashboardServerUtils.checkDatasetID(mdata.getExpocode());
@@ -411,6 +414,27 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         } catch ( Exception ex ) {
             // Should not happen
         }
+    }
+
+    @Override
+    public DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
+        SDIMetadata sdiMData;
+        try {
+            Document omeDoc = mdata.createOmeXmlDoc();
+            StringWriter writer = new StringWriter();
+            try {
+                (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, writer);
+            } finally {
+                writer.close();
+            }
+            StringReader xmlReader = new StringReader(writer.toString());
+            sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
+                    xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
+        }
+
+        return OmeUtils.suggestDatasetQCFlag(sdiMData, dataset);
     }
 
 }

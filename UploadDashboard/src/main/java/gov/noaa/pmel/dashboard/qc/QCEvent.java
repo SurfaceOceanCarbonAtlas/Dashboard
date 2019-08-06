@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.qc;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -14,6 +11,9 @@ import java.util.Date;
  * @author Karl Smith
  */
 public class QCEvent {
+
+    // QC flag name used for dataset QC flag events
+    public static final String DATASET_QCFLAG_NAME = "dataset";
 
     protected Long id;
     protected Date flagDate;

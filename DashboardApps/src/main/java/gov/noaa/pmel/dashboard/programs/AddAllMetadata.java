@@ -88,9 +88,9 @@ public class AddAllMetadata {
                     TreeSet<String> addlDocs = new TreeSet<String>();
                     // Add all existing metadata documents for this dataset
                     for (DashboardMetadata mdata : metaHandler.getMetadataFiles(datasetId)) {
-                        if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
-                            // Ignore the OME.xml stub
-                            ;
+                        if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ||
+                                mdata.getFilename().equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
+                            // Ignore the OME.xml stub and the PI_OME.pdf file
                         }
                         else if ( mdata.getFilename().equals(DashboardUtils.PI_OME_FILENAME) ) {
                             // PI-provided OME.xml file - set the OME upload timestamp

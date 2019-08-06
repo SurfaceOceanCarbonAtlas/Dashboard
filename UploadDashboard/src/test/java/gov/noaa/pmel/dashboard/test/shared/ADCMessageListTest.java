@@ -1,12 +1,9 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.ADCMessageList;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 import org.junit.Test;
 
 import java.util.ArrayList;

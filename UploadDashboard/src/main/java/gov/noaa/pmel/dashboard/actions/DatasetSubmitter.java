@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -21,12 +18,13 @@ import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
-import gov.noaa.pmel.dashboard.shared.CommentedQCFlag;
+import gov.noaa.pmel.dashboard.shared.CommentedDataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.logging.log4j.Logger;
 
 import java.io.FileNotFoundException;
@@ -81,9 +79,7 @@ public class DatasetSubmitter {
 
     /**
      * Submit a dataset.  This standardized the data using the automated data checker and generates DSG and decimated
-     * DSG files for datasets which are editable (have a QC status of {@link DashboardUtils#STATUS_NOT_SUBMITTED},
-     * {@link DashboardUtils#STATUS_SUSPENDED}, or {@link DashboardUtils#STATUS_EXCLUDED}.  For all datasets, the
-     * archive status is updated to the given value.
+     * DSG files for datasets which are editable. For all datasets, the archive status is updated to the given value.
      * <p>
      * If the archive status begins with {@link DashboardUtils#ARCHIVE_STATUS_SENT_TO_START}, the archive request
      * is sent for dataset which have not already been sent, or for all datasets if repeatSend is true.
@@ -219,7 +215,10 @@ public class DatasetSubmitter {
                 }
 
                 // Now mark the dataset as submitted in this version
-                dataset.setSubmitStatus(DashboardUtils.STATUS_SUBMITTED);
+                if ( dataset.getSubmitStatus().isPrivate() )
+                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC));
+                else
+                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC));
                 dataset.setVersion(version);
 
                 // Set up to save changes to version control
@@ -332,14 +331,14 @@ public class DatasetSubmitter {
         String expocode = dataset.getDatasetId();
 
         // Start with the initial new/updated dataset QC flags
-        String flagValue;
+        DatasetQCStatus flag;
         String comment;
-        if ( DashboardServerUtils.DATASET_STATUS_NOT_SUBMITTED.equals(dataset.getSubmitStatus()) ) {
-            flagValue = DashboardServerUtils.DATASET_QCFLAG_NEW;
+        if ( dataset.getSubmitStatus().isPrivate() ) {
+            flag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC);
             comment = "Initial QC flag for new dataset";
         }
         else {
-            flagValue = DashboardServerUtils.DATASET_QCFLAG_UPDATED;
+            flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
             comment = "Initial QC flag for updated dataset";
         }
         // First add a global flag, then flag for each region
@@ -355,7 +354,7 @@ public class DatasetSubmitter {
             initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
             initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
             initQC.setFlagDate(new Date());
-            initQC.setFlagValue(flagValue);
+            initQC.setFlagValue(flag.flagString());
             initQC.setRegionId(regionId);
             initQC.setComment(comment);
             qclist.add(initQC);
@@ -368,7 +367,7 @@ public class DatasetSubmitter {
         initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
         initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
         initQC.setFlagDate(new Date());
-        initQC.setFlagValue(DashboardServerUtils.DATASET_QCFLAG_COMMENT);
+        initQC.setFlagValue(DatasetQCStatus.FLAG_COMMENT);
         initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
         initQC.setComment("Automated data check found " +
                 Integer.toString(dataset.getNumErrorRows()) + " data points with errors and " +
@@ -409,7 +408,7 @@ public class DatasetSubmitter {
         List<DashDataType<?>> columnTypes = stdUserData.getDataTypes();
 
         // Add the automated-data-checker data QC flags from the saved messages
-        TreeSet<CommentedQCFlag> dataqc = new TreeSet<CommentedQCFlag>();
+        TreeSet<CommentedDataQCFlag> dataqc = new TreeSet<CommentedDataQCFlag>();
         for (ADCMessage msg : stdUserData.getStandardizationMessages()) {
 
             // Data QC always has a positive row number.  Dataset QC as well as general and summaries
@@ -423,7 +422,7 @@ public class DatasetSubmitter {
             String flagName = SocatTypes.WOCE_CO2_WATER.getVarName();
 
             String flagValue;
-            QCFlag.Severity severity = msg.getSeverity();
+            DataQCFlag.Severity severity = msg.getSeverity();
             switch ( severity ) {
                 case UNASSIGNED:
                 case ACCEPTABLE:
@@ -451,15 +450,16 @@ public class DatasetSubmitter {
 
             int colNum = msg.getColNumber();
             Integer colIdx = (colNum > 0) ? (colNum - 1) : null;
-            CommentedQCFlag info = new CommentedQCFlag(flagName, flagValue, severity, colIdx, rowNum - 1, comment);
+            CommentedDataQCFlag info = new CommentedDataQCFlag(flagName, flagValue, severity, colIdx, rowNum - 1,
+                    comment);
             dataqc.add(info);
         }
 
         // Add the PI-provided data QC flags from values in the dataset
-        TreeSet<QCFlag> userFlags = dataset.getUserFlags();
+        TreeSet<DataQCFlag> userFlags = dataset.getUserFlags();
         if ( userFlags.size() > 0 ) {
             // Map any QC comment columns to their QC flag names
-            // Note that the column index in the QCFlag should be for the data value being QC'ed
+            // Note that the column index in the DataQCFlag should be for the data value being QC'ed
             HashMap<String,Integer> flagCommentIndex = new HashMap<String,Integer>();
             for (int qcIdx = 0; qcIdx < columnTypes.size(); qcIdx++) {
                 DashDataType<?> colType = columnTypes.get(qcIdx);
@@ -475,7 +475,7 @@ public class DatasetSubmitter {
 
             // PI-provided comments are in the datavals stored in dataset
             ArrayList<ArrayList<String>> dataVals = dataset.getDataValues();
-            for (QCFlag uflag : userFlags) {
+            for (DataQCFlag uflag : userFlags) {
                 String comment;
                 if ( uflag.getFlagName().toUpperCase().contains("WOCE)") )
                     comment = PI_PROVIDED_WOCE_COMMENT_START + uflag.getFlagValue() + " flag";
@@ -485,7 +485,7 @@ public class DatasetSubmitter {
                 if ( idx != null ) {
                     comment += " with comment/subflag: " + dataVals.get(uflag.getRowIndex()).get(idx);
                 }
-                dataqc.add(new CommentedQCFlag(uflag, comment));
+                dataqc.add(new CommentedDataQCFlag(uflag, comment));
             }
         }
 
@@ -509,7 +509,7 @@ public class DatasetSubmitter {
         String lastDataVarName = null;
         String dataVarName = null;
         ArrayList<DataLocation> locations = null;
-        for (CommentedQCFlag info : dataqc) {
+        for (CommentedDataQCFlag info : dataqc) {
 
             // Check if a new DataQCEvent is needed
             String flagName = info.getFlagName();

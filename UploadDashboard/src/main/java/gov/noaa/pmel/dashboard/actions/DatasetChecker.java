@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -10,8 +7,8 @@ import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.qc.RowColumn;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCFlag;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 
 import java.util.HashSet;
 
@@ -101,7 +98,7 @@ public class DatasetChecker {
         boolean hasCriticalError = false;
         HashSet<RowColumn> userErrs = new HashSet<RowColumn>();
         HashSet<RowColumn> userWarns = new HashSet<RowColumn>();
-        for (QCFlag wtype : dataset.getUserFlags()) {
+        for (DataQCFlag wtype : dataset.getUserFlags()) {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
                 userErrs.add(new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex()));
@@ -116,7 +113,7 @@ public class DatasetChecker {
         // Get the indices of data rows the automated data checker
         // found having errors not not detected by the PI.
         HashSet<Integer> errRows = new HashSet<Integer>();
-        for (QCFlag wtype : dataset.getCheckerFlags()) {
+        for (DataQCFlag wtype : dataset.getCheckerFlags()) {
             if ( Severity.CRITICAL.equals(wtype.getSeverity()) ) {
                 hasCriticalError = true;
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
@@ -132,7 +129,7 @@ public class DatasetChecker {
         // Get the indices of data rows the automated data checker
         // found having only warnings but not detected by the PI.
         HashSet<Integer> warnRows = new HashSet<Integer>();
-        for (QCFlag wtype : dataset.getCheckerFlags()) {
+        for (DataQCFlag wtype : dataset.getCheckerFlags()) {
             if ( Severity.WARNING.equals(wtype.getSeverity()) ) {
                 RowColumn rowCol = new RowColumn(wtype.getRowIndex(), wtype.getColumnIndex());
                 Integer rowIdx = wtype.getRowIndex();

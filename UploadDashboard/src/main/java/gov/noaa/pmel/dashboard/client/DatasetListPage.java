@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.cell.client.Cell;
@@ -251,7 +248,6 @@ public class DatasetListPage extends CompositeWithUsername {
     private static final String NO_TIMESTAMP_STRING = "(unknown)";
     private static final String NO_DATA_CHECK_STATUS_STRING = "Not checked";
     private static final String NO_OME_METADATA_STATUS_STRING = "(no metadata)";
-    private static final String NO_QC_STATUS_STRING = "Private";
     private static final String NO_ARCHIVE_STATUS_STRING = "Not specified";
     private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
     private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
@@ -1383,10 +1379,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 new Column<DashboardDataset,String>(new ClickableTextCell()) {
                     @Override
                     public String getValue(DashboardDataset cruise) {
-                        String status = cruise.getSubmitStatus();
-                        if ( status.isEmpty() )
-                            status = NO_QC_STATUS_STRING;
-                        return status;
+                        return cruise.getSubmitStatus().statusString();
                     }
 
                     @Override

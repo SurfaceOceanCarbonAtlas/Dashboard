@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.actions;
 
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
@@ -14,7 +11,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.ADCMessage;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCFlag.Severity;
+import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 import gov.noaa.pmel.dashboard.test.datatype.KnownDataTypesTest;
 import org.junit.Test;
 
