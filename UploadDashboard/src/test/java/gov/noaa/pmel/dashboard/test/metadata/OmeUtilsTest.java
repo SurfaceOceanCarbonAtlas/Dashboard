@@ -12,8 +12,6 @@ import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
 
 import java.io.Reader;
@@ -89,20 +87,6 @@ public class OmeUtilsTest {
             }
         }
         mdata.setInstruments(instruments);
-
-        ArrayList<Variable> variables = mdata.getVariables();
-        for (Variable dvar : variables) {
-            if ( dvar instanceof AquGasConc ) {
-                AquGasConc gasConc = (AquGasConc) dvar;
-                if ( "xCO2_EQU_ppm".equals(gasConc.getColName()) ) {
-                    gasConc.setReportTemperature("equilibrator temperature");
-                }
-                else if ( "fCO2_SW@SST_uatm".equals(gasConc.getColName()) ) {
-                    gasConc.setReportTemperature("SST");
-                }
-            }
-        }
-        mdata.setVariables(variables);
 
         DatasetQCStatus.Status status = null;
         try {
