@@ -7,13 +7,10 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
 import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
 import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
 import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.util.Datestamp;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
@@ -51,11 +48,6 @@ public class OmeUtilsTest {
 
         // Translation from CDIAC OME cannot pick apart all the details from free-text fields,
         // so fix some things to give acceptable metadata
-        MiscInfo misc = mdata.getMiscInfo();
-        misc.setStartDatestamp(new Datestamp("2018", "11", "10"));
-        misc.setEndDatestamp(new Datestamp("2018", "12", "04"));
-        mdata.setMiscInfo(misc);
-
         ArrayList<Instrument> instruments = mdata.getInstruments();
         for (Instrument inst : instruments) {
             if ( inst instanceof GasSensor ) {
@@ -94,11 +86,6 @@ public class OmeUtilsTest {
                     }
                 }
                 sensor.setCalibrationGases(gases);
-            }
-            else if ( inst instanceof Equilibrator ) {
-                Equilibrator equil = (Equilibrator) inst;
-                equil.setChamberGasVol("0.55 L");
-                equil.setChamberWaterVol("0.4 L");
             }
         }
         mdata.setInstruments(instruments);
