@@ -270,7 +270,7 @@ public class OmeUtils {
         // Alternative sensors with CO2 accuracy within 5.0 are not subject to the temperature
         // and pressure restrictions.  However, they need a clear and detailed description of
         // the calibration, so an automation-suggested flag is not possible.  So failing to give
-        // a flag is an acceptable action.
+        // a flag (raising an exception) is an acceptable response.
 
         // Accuracy of temperatures within 0.2 ºC (0.05 ºC for ACCEPTED_B)
         double tempAccuracy = 999.0;

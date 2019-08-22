@@ -7,16 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.MiscInfo;
 import gov.noaa.pmel.sdimetadata.SDIMetadata;
-import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.sdimetadata.instrument.Equilibrator;
-import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
-import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.util.Datestamp;
-import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
 import org.junit.Test;
 
 import java.io.Reader;
@@ -48,74 +39,6 @@ public class OmeUtilsTest {
             fail("Unable to create the SDIMetadata object from CDIAC OME XML: " + ex.getMessage());
         }
         assertNotNull(mdata);
-
-        // Translation from CDIAC OME cannot pick apart all the details from free-text fields,
-        // so fix some things to give acceptable metadata
-        MiscInfo misc = mdata.getMiscInfo();
-        misc.setStartDatestamp(new Datestamp("2018", "11", "10"));
-        misc.setEndDatestamp(new Datestamp("2018", "12", "04"));
-        mdata.setMiscInfo(misc);
-
-        ArrayList<Instrument> instruments = mdata.getInstruments();
-        for (Instrument inst : instruments) {
-            if ( inst instanceof GasSensor ) {
-                GasSensor sensor = (GasSensor) inst;
-                ArrayList<CalibrationGas> gases = sensor.getCalibrationGases();
-                for (CalibrationGas gas : gases) {
-                    if ( "CO2".equals(gas.getType()) ) {
-                        if ( gas.getId().startsWith("Std 1: LL100000, 0.00 ppm") ) {
-                            gas.setId("LL100000");
-                            gas.setConcentration(new NumericString("0.00", "ppm"));
-                            gas.setAccuracy(new NumericString("0.01", "ppm"));
-                            gas.setSupplier("AOML");
-                            gas.setUseFrequency("every ~4.5 hours");
-                        }
-                        else if ( gas.getId().startsWith("Std 2: JA02140, 234.21 ppm") ) {
-                            gas.setId("JA02140");
-                            gas.setConcentration(new NumericString("234.21", "ppm"));
-                            gas.setAccuracy(new NumericString("0.01", "ppm"));
-                            gas.setSupplier("AOML");
-                            gas.setUseFrequency("every ~4.5 hours");
-                        }
-                        else if ( gas.getId().startsWith("Std 3: JA02689, 406.90 ppm") ) {
-                            gas.setId("JA02689");
-                            gas.setConcentration(new NumericString("406.90", "ppm"));
-                            gas.setAccuracy(new NumericString("0.01", "ppm"));
-                            gas.setSupplier("AOML");
-                            gas.setUseFrequency("every ~4.5 hours");
-                        }
-                        else if ( gas.getId().startsWith("Std 4: JB03276, 471.65 ppm") ) {
-                            gas.setId("JB03276");
-                            gas.setConcentration(new NumericString("471.65", "ppm"));
-                            gas.setAccuracy(new NumericString("0.01", "ppm"));
-                            gas.setSupplier("AOML");
-                            gas.setUseFrequency("every ~4.5 hours");
-                        }
-                    }
-                }
-                sensor.setCalibrationGases(gases);
-            }
-            else if ( inst instanceof Equilibrator ) {
-                Equilibrator equil = (Equilibrator) inst;
-                equil.setChamberGasVol("0.55 L");
-                equil.setChamberWaterVol("0.4 L");
-            }
-        }
-        mdata.setInstruments(instruments);
-
-        ArrayList<Variable> variables = mdata.getVariables();
-        for (Variable dvar : variables) {
-            if ( dvar instanceof AquGasConc ) {
-                AquGasConc gasConc = (AquGasConc) dvar;
-                if ( "xCO2_EQU_ppm".equals(gasConc.getColName()) ) {
-                    gasConc.setReportTemperature("equilibrator temperature");
-                }
-                else if ( "fCO2_SW@SST_uatm".equals(gasConc.getColName()) ) {
-                    gasConc.setReportTemperature("SST");
-                }
-            }
-        }
-        mdata.setVariables(variables);
 
         DatasetQCStatus.Status status = null;
         try {
