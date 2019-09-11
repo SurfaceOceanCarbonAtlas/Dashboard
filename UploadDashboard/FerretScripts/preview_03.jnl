@@ -1,6 +1,6 @@
 ! Year and day-of-year
 
-go preview_setup
+! GO preview_setup
 
 ! Plot  Year and day-of-year, each with its own vertical axis
 

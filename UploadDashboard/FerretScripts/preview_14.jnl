@@ -2,7 +2,7 @@
 !
 ! Sample number vs time
 
-go preview_setup
+! GO preview_setup
 
 let samp = L[gt=tt]
 

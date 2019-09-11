@@ -2,7 +2,7 @@
 !
 ! Difference between reported and recalculated fCO_2
 
-GO preview_setup.jnl
+! GO preview_setup.jnl
 
 ! Show the difference between our fCO2 and the end value reported by the PI 
 ! (typically reported fCO2 or pCO2). So if the PI also reports fCO2 at SST, 

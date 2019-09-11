@@ -2,10 +2,10 @@
 !
 ! Map with trajectory track
 
-GO preview_setup
+! GO preview_setup
 
 SET VIEW full
-!GO margins 1,0.7,0.7,0.7
+! GO margins 1,0.7,0.7,0.7
 
 GO preview_map
 

@@ -2,7 +2,7 @@
 !
 ! fCO2_rec
 
-go preview_setup
+! GO preview_setup
 
 let fco2 =  reshape(fCO2_recommended, tt)
 

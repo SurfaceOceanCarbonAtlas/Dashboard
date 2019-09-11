@@ -2,9 +2,7 @@
 !
 ! sources
 
-GO preview_setup.jnl
-
-
+! GO preview_setup.jnl
 
 ! We compute the fco2_source in calcSOCAT.jnl
 !  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even

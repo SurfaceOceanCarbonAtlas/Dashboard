@@ -2,7 +2,7 @@
 !
 ! Temperatures
 
-go preview_setup
+! GO preview_setup
 
 ! Plot together to get scale for LHS axis
 PLOT reshape(temperature_equi, tt), reshape(temp, tt)

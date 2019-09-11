@@ -2,7 +2,7 @@
 !
 ! Tdiff and fco2_insitu temp
 
-go preview_setup
+! GO preview_setup
 
 
 ! Plot delta-temperature using left axis and xco2's using right axis

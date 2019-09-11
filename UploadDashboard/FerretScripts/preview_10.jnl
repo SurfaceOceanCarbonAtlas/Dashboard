@@ -2,8 +2,7 @@
 !
 ! fCO2_rec vs salinity
 
-go preview_setup
-
+! GO preview_setup
 
 let/units="`sal,return=units`"/title="`sal,return=title`" salinity = reshape(sal,tt)
 let/title="fCO_2 recommended" fco2 = reshape(fco2_recommended, tt)

@@ -4,7 +4,7 @@
 ! 9/2017. Check for no-valid fco2_recommended
 !         Previously checked fco2_source. It is set to -1 for no valid data
 
-GO preview_setup.jnl
+! GO preview_setup.jnl
 
 ! We compute the fco2_source in calcSOCAT.jnl
 !  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
