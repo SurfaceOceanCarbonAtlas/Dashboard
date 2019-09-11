@@ -1,0 +1,21 @@
+Updating files for SOCAT: gvco2, NCEP pressure
+
+GVco2, Data is at
+ http://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php
+downloading the "surface" reference type (save to file if displayed).
+Make a new version of the script GVCO2_2017.jnl and follow the comments in that script.
+
+NCEP data
+https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+Follow the links to get Sea Level Pressure 4 times daily.
+Put the new file in /home/data/socat/ncep_slp_data/
+Update and run the script make_ncep_slp.jnl to refer to the current data.
+Using the script check_ncep_slp.jnl, compare output from the annual files and the merged file.
+Copy the local ncep_slp.nc to /home/data/socat/ncep_slp_data/ as well as tmap@xtra:socat/Datasets/data/
+
+WOA Salinity.  Not updated regularly (monthly climatology).
+https://www.nodc.noaa.gov/OC5/WOA05/woa05nc.html
+We have it here,
+ use "http://ferret.pmel.noaa.gov/pmel/thredds/dodsC/data/PMEL/WOA05nc/monthly/s0112an1.nc"
+
+

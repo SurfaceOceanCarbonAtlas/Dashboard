@@ -2,7 +2,7 @@
 !
 ! Difference between reported and recalculated fCO_2
 
-GO preview_setup.jnl ($infile_dsg) 13
+GO preview_setup.jnl
 
 ! Show the difference between our fCO2 and the end value reported by the PI 
 ! (typically reported fCO2 or pCO2). So if the PI also reports fCO2 at SST, 
@@ -99,5 +99,5 @@ label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Reported 
 GO keybox ($style2) "`fCO2_recommended,return=title`" ($style1) "Reported `reported,return=title`" ($style3) "Difference"
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
 

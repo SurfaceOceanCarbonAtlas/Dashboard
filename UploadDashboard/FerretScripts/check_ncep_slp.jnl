@@ -1,0 +1,19 @@
+! check_ncep_slp.jnl
+!
+
+set mem/siz=200
+def sym finalyear = 2019
+
+repeat/range=1948:($finalyear)/name=yr (\
+   use "/home/data/socat/ncep_slp_data/slp.`yr`.nc";\
+   stat slp[T="01-JAN-`yr`:00:00":"31-DEC-`yr`:18:00"];\
+   can dat/all;\
+)
+
+use "ncep_slp.nc"
+show grid slp
+
+repeat/range=1948:($finalyear)/name=yr (\
+   stat slp[T="01-JAN-`yr`:00:00":"31-DEC-`yr`:18:00"];\
+)
+

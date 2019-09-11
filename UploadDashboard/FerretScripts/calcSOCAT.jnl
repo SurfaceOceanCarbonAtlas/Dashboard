@@ -38,7 +38,12 @@ define symbol cruise_filename "($1)"
 set mem/siz=300 ! for sampling from etopo2
 
 
-use "($cruise_filename)"
+IF `($FERRET_VERSION) GE 7.51` THEN
+    USE /FEATURE=NONE "($cruise_filename)"
+ELSE
+    USE "($cruise_filename)"
+ENDIF
+
 define symbol keep_history = `..History`
 define symbol keep_conventions = `..conventions`
 

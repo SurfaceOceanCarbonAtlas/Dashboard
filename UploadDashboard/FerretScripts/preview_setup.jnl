@@ -7,20 +7,10 @@
 can view
 
 ! Open the input dataset
-use "$1"
+use "($infile_dsg)"
 
 ! Define the plot file name
 DEFINE SYMBOL expocode_str = `expocode`
-DEFINE SYMBOL nplt = $2
-IF `($nplt) LT 10` then DEFINE SYMBOL nplt = 0($nplt)
-
-DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($expocode_str)_($nplt).png
-
-! Redefine the GIF-image file name, which prevents name clashes when there
-! are multiple sessions.
-
-DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
-SET GIFFILE "($gifplot_name)"
 
 ! Further setup, done once for all the outputs
 IF ($preview_setup_done"0|*>1") THEN exit/script

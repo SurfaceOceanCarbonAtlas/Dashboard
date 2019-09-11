@@ -2,7 +2,7 @@
 !
 ! Tdiff and fco2_insitu temp
 
-go preview_setup ($infile_dsg) 15
+go preview_setup
 
 
 ! Plot delta-temperature using left axis and xco2's using right axis
@@ -89,6 +89,6 @@ IF `dtemp[L=@ngd] + teq[L=@ngd] + fco2[L=@ngd]  EQ 0` THEN \
 GO keybox ($style1) "xCO_2 Teq" ($style2) "`fCO2_recommended,return=title`" ($style3) "`delta_temp,return=title`"
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
 
 

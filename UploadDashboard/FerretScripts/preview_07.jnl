@@ -1,7 +1,7 @@
 ! preview_07.jnl
 !
 ! Salinity
-go preview_setup ($infile_dsg) 7
+go preview_setup
 
 
 ! Plot Salinity variables with a common vertical axis
@@ -58,5 +58,5 @@ IF `woa[L=@ngd] + sal_t[L=@ngd] EQ 0` THEN \
 
 go keybox ($style1) "($leglab1)" ($style2) "($leglab2)" 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
 

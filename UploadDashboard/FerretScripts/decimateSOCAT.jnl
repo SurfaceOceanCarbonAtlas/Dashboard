@@ -41,7 +41,11 @@ let tol3 = ($tol_var)
 
 LET control = 2
 
-USE "($infile)"
+IF `($FERRET_VERSION) GE 7.51` THEN
+    USE /FEATURE=NONE "($infile)"
+ELSE
+    USE "($infile)"
+ENDIF
 
 ! The names in the input and output file must match.
 ! To accomplish that we will rename the variables in the input file.
