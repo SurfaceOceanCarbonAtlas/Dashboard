@@ -2,7 +2,7 @@
 !
 ! Pressure variables
 
-go preview_setup ($infile_dsg) 4
+! GO preview_setup
 
 ! Plot pressure variables each with its own vertical axis
 
@@ -60,4 +60,4 @@ IF `P_NCEP[L=@ngd] + patm[L=@ngd] + pequi[L=@ngd]  EQ 0` THEN \
 go keybox ($style1) "P NCEP" ($style2) patm ($style3) pequi
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

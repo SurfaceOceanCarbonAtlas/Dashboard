@@ -1,0 +1,57 @@
+! make_ncep_slp.jnl
+!
+! Data downloaded from http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+! Add an offset and fix the missing-value flag so that the data can be saved as SHORT
+! Note that as long as the time origins are year 1800 (as they are in these datasets),
+! we do not need to worry about Ferret introducing a 2-day time shift.
+
+set mem/siz=300
+def sym offst = 101000
+def sym newbadint = 32766
+def sym newbad = `($newbadint)+($offst)`
+def sym finalyear = 2019
+def sym firstmissday = 15-AUG
+
+! Rewrite the whole set.  This only takes a couple minutes.
+
+use "/home/data/socat/ncep_slp_data/slp.1948.nc"
+
+! Replace the bad-flag
+set var/name=slp_in slp
+let/bad=($newbadint)/units="`slp_in,return=units`"/title="`slp_in,return=title`"  slp = missing(slp_in, ($newbad))
+
+! set up scale and offset
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+
+! keep the input attributes; title, units, etc
+set att/output=all slp
+save/clobber/file="ncep_slp.nc"/outtype=short slp
+
+repeat/range=1949:($finalyear)/name=yr (\
+   can var/all;\
+   can dat/all;\
+   use "/home/data/socat/ncep_slp_data/slp.`yr`.nc";\
+   set var/name=slp_in slp;\
+   let/bad=($newbadint) slp = missing(slp_in, ($newbad));\
+   def att/output slp.scale_factor = 1;\
+   def att/output slp.add_offset = ($offst);\
+   set att/output=all slp;\
+   save/append/file= "ncep_slp.nc"/outtype=short slp;\
+)
+
+! Still using the last partial-year data set with slp renamed to slp_in
+
+! Finish out the year with missing values.
+set axis/name=time1 time
+define axis/t="($firstmissday)-($finalyear):00:00":"31-DEC-($finalyear):18:00":6/t0=1-JAN-1800/units=hours time
+
+let/bad=($newbadint)/units="`slp_in,return=units`"/title="`slp_in,return=title`" slp = ($newbad) + 0*x[gx=slp_in] + 0*y[gy=slp_in] + 0*t[gt=time]
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+set att/output=all slp
+save/append/outtype=short/file="ncep_slp.nc" slp
+
+can var/all
+can dat/all
+

@@ -2,7 +2,7 @@
 !
 ! fCO2_rec
 
-go preview_setup ($infile_dsg) 8
+! GO preview_setup
 
 let fco2 =  reshape(fCO2_recommended, tt)
 
@@ -27,4 +27,4 @@ IF `fco2[L=@ngd] EQ 0` THEN \
    LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

@@ -2,7 +2,7 @@
 !
 ! fCO_2_rec vs temperature
 
-go preview_setup ($infile_dsg) 9
+! GO preview_setup
 
 let/units="`temp,return=units`"/title="`temp,return=title`" temperature = reshape(temp,tt)
 let/title="fCO_2 recommended" fco2 = reshape(fco2_recommended, tt)
@@ -33,4 +33,4 @@ IF `fco2[L=@ngd] EQ 0` THEN \
    LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data: `fco2,return=title`
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

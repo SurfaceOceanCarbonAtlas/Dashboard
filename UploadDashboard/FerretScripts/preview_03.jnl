@@ -1,6 +1,6 @@
 ! Year and day-of-year
 
-go preview_setup ($infile_dsg) 3
+! GO preview_setup
 
 ! Plot  Year and day-of-year, each with its own vertical axis
 
@@ -61,6 +61,6 @@ label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Year and 
 ! Make the color key
 Go keybox ($style1) Year ($style2) "Day of Year"
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
 
 

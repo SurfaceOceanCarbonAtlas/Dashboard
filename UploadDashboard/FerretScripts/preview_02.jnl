@@ -2,7 +2,7 @@
 !
 ! Latitude, Longitude vs time and sample number
 
-go preview_setup ($infile_dsg) 2
+! GO preview_setup
 
 let/title=Latitude lat = reshape(latitude, tt)
 let/title=Longitude lon = reshape(longitude, tt)
@@ -43,4 +43,4 @@ label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Latitude 
 ! Make the color key
 Go keybox ($style1) Latitude ($style2) Longitude
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

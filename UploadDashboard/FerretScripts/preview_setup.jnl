@@ -4,26 +4,15 @@
 ! Open the dataset, define the output file name
 ! Make definitions used by all the scripts
 
-can view
-
 ! Open the input dataset
-use "$1"
+IF `($FERRET_VERSION) GE 7.51` THEN
+    USE /FEATURE=NONE "($infile_dsg)"
+ELSE
+    USE "($infile_dsg)"
+ENDIF
 
 ! Define the plot file name
 DEFINE SYMBOL expocode_str = `expocode`
-DEFINE SYMBOL nplt = $2
-IF `($nplt) LT 10` then DEFINE SYMBOL nplt = 0($nplt)
-
-DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($expocode_str)_($nplt).png
-
-! Redefine the GIF-image file name, which prevents name clashes when there
-! are multiple sessions.
-
-DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
-SET GIFFILE "($gifplot_name)"
-
-! Further setup, done once for all the outputs
-IF ($preview_setup_done"0|*>1") THEN exit/script
 
 SET VAR/TITLE="WOCE flag for water CO_2" WOCE_CO2_water
 SET VAR/TITLE="fCO_2 recommended" fCO2_recommended
@@ -125,4 +114,3 @@ DEFINE SYMBOL linestyle = /LINE/SYMBOL=21/siz=0.02
 ! Style for marking WOCE 4 locations
 DEFINE SYMBOL woce4style = /SYMBOL=18/thick=1/siz=0.08/color=6
 
-DEFINE SYMBOL preview_setup_done = 1

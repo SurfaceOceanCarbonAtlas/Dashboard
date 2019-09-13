@@ -1,9 +1,8 @@
 ! preview_11.jnl
 !
 ! Time Series plots
-set mem/siz=60
 
-go preview_setup ($infile_dsg) 11
+! GO preview_setup
 
 define view/axes/x=0.1:0.9/y=0.07:0.20 y1
 define view/axes/x=0.1:0.9/y=0.25:0.38 y2
@@ -21,7 +20,7 @@ let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
 
 set view y1
 ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set lat, WOCE_CO2_water
-  ppl ylab lat
+  ppl ylab " "
   ppl xlab " "
   ppl axatic,,3
   ($taxis_setting)
@@ -29,6 +28,7 @@ ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
+LABEL/nouser -0.7, `($ppl$ylen)/2`, 0, 90, 0.12, lat
 
 ! If no data, add a label
 IF `lat[L=@ngd]  EQ 0` THEN \
@@ -37,7 +37,7 @@ IF `lat[L=@ngd]  EQ 0` THEN \
 
 set view y2
 ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set lon, WOCE_CO2_water
-  ppl ylab lon
+  ppl ylab " "
   ppl xlab " "
   ppl axatic,,3
   ppl txlabp,0
@@ -45,6 +45,7 @@ ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
+LABEL/nouser -0.7, `($ppl$ylen)/2`, 0, 90, 0.12, lon
 
 ! If no data, add a label
 IF `lon[L=@ngd]  EQ 0` THEN \
@@ -53,7 +54,7 @@ IF `lon[L=@ngd]  EQ 0` THEN \
 
 set view y3
 ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set salin, WOCE_CO2_water
-  ppl ylab sal
+  ppl ylab " "
   ppl xlab " "
   ppl axatic,,3
   ppl txlabp,0
@@ -61,6 +62,7 @@ ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
+LABEL/nouser -0.7, `($ppl$ylen)/2`, 0, 90, 0.12, sal
 
 ! If no data, add a label
 IF `salin[L=@ngd]  EQ 0` THEN \
@@ -69,7 +71,7 @@ IF `salin[L=@ngd]  EQ 0` THEN \
 
 set view y4
 ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set temper, WOCE_CO2_water
-  ppl ylab temp
+  ppl ylab " "
   ppl xlab " "
   ppl axatic,,3
   ppl txlabp,0
@@ -77,6 +79,7 @@ ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
+LABEL/nouser -0.7, `($ppl$ylen)/2`, 0, 90, 0.12, temp
 
 ! If no data, add a label
 IF `temper[L=@ngd]  EQ 0` THEN \
@@ -85,7 +88,7 @@ IF `temper[L=@ngd]  EQ 0` THEN \
 
 set view y5
 ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title=" "/line/set fco2, WOCE_CO2_water
-  ppl ylab fCO_2 rec
+  ppl ylab " "
   ppl xlab " "
   ppl axatic,,3
   ppl txlabp,0
@@ -93,6 +96,7 @@ ribbon($linestyle)/noy/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
+LABEL/nouser -0.7, `($ppl$ylen)/2`, 0, 90, 0.12, fCO_2 rec
 
 ! If no data, add a label
 IF `fco2[L=@ngd]  EQ 0` THEN \
@@ -111,4 +115,4 @@ label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.12, \
 ppl txlabp,-1
 ppl axatic,5,5
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

@@ -2,7 +2,7 @@
 !
 ! Temperatures
 
-go preview_setup ($infile_dsg) 5
+! GO preview_setup
 
 ! Plot together to get scale for LHS axis
 PLOT reshape(temperature_equi, tt), reshape(temp, tt)
@@ -92,6 +92,6 @@ IF `tempr[L=@ngd] + dtemp[L=@ngd] + itemp[L=@ngd]  EQ 0` THEN \
 GO keybox ($style1) "Temp intake" ($style2) "Temp equ" ($style3) "Difference"
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
 
 

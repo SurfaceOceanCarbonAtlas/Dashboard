@@ -2,8 +2,7 @@
 !
 ! fCO2_rec vs salinity
 
-go preview_setup ($infile_dsg) 10
-
+! GO preview_setup
 
 let/units="`sal,return=units`"/title="`sal,return=title`" salinity = reshape(sal,tt)
 let/title="fCO_2 recommended" fco2 = reshape(fco2_recommended, tt)
@@ -34,4 +33,4 @@ IF `salinity[L=@ngd] EQ 0` THEN \
 IF `fco2[L=@ngd] EQ 0` THEN \
    LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data: `fco2,return=title`
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"

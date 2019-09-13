@@ -2,7 +2,7 @@
 !
 ! Sample number vs time
 
-go preview_setup ($infile_dsg) 2
+! GO preview_setup
 
 let samp = L[gt=tt]
 
@@ -29,4 +29,4 @@ label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
   Sample number vs time.  `nobs` locations Colored by `WOCE_CO2_water_in,return=title`
 
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+FRAME/FILE="($result_plot_image_filename)"
