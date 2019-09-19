@@ -272,11 +272,11 @@ public class OmeUtils {
         // the calibration, so an automation-suggested flag is not possible.  So failing to give
         // a flag (raising an exception) is an acceptable response.
 
-        // Accuracy of temperatures within 0.2 ºC (0.05 ºC for ACCEPTED_B)
+        // Accuracy of temperatures within 0.2 °C (0.05 °C for ACCEPTED_B)
         double tempAccuracy = 999.0;
         for (Temperature temperature : tempvars) {
             NumericString accuracy = temperature.getAccuracy();
-            // Temperature variables must units of ºC
+            // Temperature variables must units of °C
             if ( tempAccuracy > accuracy.getNumericValue() )
                 tempAccuracy = accuracy.getNumericValue();
         }
