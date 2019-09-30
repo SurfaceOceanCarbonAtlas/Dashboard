@@ -15,6 +15,7 @@ import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.AirPressure;
 import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OmeUtils {
 
@@ -149,6 +152,29 @@ public class OmeUtils {
             DashboardServerUtils.DAY_OF_YEAR.duplicate(),
             DashboardServerUtils.SECOND_OF_DAY.duplicate()
     ));
+
+    /**
+     * List of recognized acceptable CO2 measurement method descriptions for Dataset QC flag A-C
+     * after lowercasing all letters and trimming whitespace and punctuation from the ends.
+     */
+    private static final HashSet<String> ACCEPTABLE_CO2_MEASURE_METHOD_DESCRIPTIONS = new HashSet<String>(Arrays.asList(
+            "absolute, non-dispersive infrared (ndir) gas analyzer",
+            "co2 mole fraction in dry air (non-dispersive infrared gas analyser), stopped flow",
+            "gas permeable membrane and spectrophotometric dye detection",
+            "gc",
+            "infrared absorption of dry gas",
+            "infrared absorption of dry sample gas",
+            "infrared analysis on dry gas",
+            "ir",
+            "spectrophotometric determinations of ph at multiple wavelengths using sulfonephthalein indicators",
+            "spectroscopy"
+    ));
+
+    /**
+     * Pattern to extract a string (in group 1) with whitespace and punctuation trimmed from the ends.
+     */
+    private static final Pattern PUNCTIONATION_STRIP_PATTERN = Pattern
+            .compile("[\\p{Space}\\p{Punct}]*(.*?)[\\p{Space}\\p{Punct}]*");
 
     /**
      * Using the contents of the given SDIMetadata, recommend a QC flag/status for this dataset.
@@ -327,15 +353,31 @@ public class OmeUtils {
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (numNonZeroCalibGases < 2) )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
 
+        // For ACCEPTED_B or ACCEPTED_C (not alternative sensor),
+        // CO2 must be measured continuously using IR, GC, or spectroscopy.
+        acceptable = false;
+        for (AquGasConc gasConc : co2vars) {
+            if ( gasConc.getMeasureMethod() == MethodType.MEASURED_INSITU ) {
+                String descr = gasConc.getMethodDescription().toLowerCase();
+                // Trim space and punctuation off the ends.
+                // This should always match as all characters in the regex are optional
+                Matcher matcher = PUNCTIONATION_STRIP_PATTERN.matcher(descr);
+                if ( matcher.matches() )
+                    descr = matcher.group(1);
+                if ( ACCEPTABLE_CO2_MEASURE_METHOD_DESCRIPTIONS.contains(descr) ) {
+                    acceptable = true;
+                    break;
+                }
+            }
+        }
+        if ( !acceptable )
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
+
         // ACCEPTED_B must be:
-        //     from IR, GC, or Spectroscopy,
-        //     continuously measured and frequently calibrated,
         //     calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 1 deg C
 
         // ACCEPTED_C (not alternative sensor) must be either:
-        //     from IR, GC, or Spectroscopy,
-        //     continuously measured and frequently calibrated,
         //     [0.8,1.2] times the calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 3 deg C
 
