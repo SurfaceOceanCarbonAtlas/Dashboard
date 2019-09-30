@@ -152,7 +152,7 @@ public class DashboardDatasetTest {
     @Test
     public void testSetGetSubmitStatus() {
         DatasetQCStatus emptyFlag = new DatasetQCStatus();
-        DatasetQCStatus mySubmitStatus = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
+        DatasetQCStatus mySubmitStatus = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, "");
         mySubmitStatus.setPiSuggested(DatasetQCStatus.Status.ACCEPTED_A);
         mySubmitStatus.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
         DashboardDataset cruise = new DashboardDataset();
@@ -499,7 +499,7 @@ public class DashboardDatasetTest {
                 "ABCD20050728.txt; 2014-02-21 9:23",
                 "ABCD20050728_2.doc; 2014-02-21 9:24",
                 "ABCD20050728_3.pdf; 2014-02-21 9:25"));
-        DatasetQCStatus mySubmitStatus = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
+        DatasetQCStatus mySubmitStatus = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, "");
         mySubmitStatus.setPiSuggested(DatasetQCStatus.Status.ACCEPTED_A);
         mySubmitStatus.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
         String myArchiveStatus = "Next SOCAT release";

@@ -13,7 +13,7 @@ import java.util.HashSet;
  */
 public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2087355116417187766L;
+    private static final long serialVersionUID = 4778510861926574708L;
 
     /**
      * Values for the DatasetQCStatus fields
@@ -230,28 +230,35 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
     private Status actual;
     private Status piSuggested;
     private Status autoSuggested;
+    private String comment;
 
     /**
-     * Create with all QC status fields set to {@link Status#PRIVATE}
+     * Create with all QC status fields set to {@link Status#PRIVATE} and no comment
      */
     public DatasetQCStatus() {
         actual = Status.PRIVATE;
         piSuggested = Status.PRIVATE;
         autoSuggested = Status.PRIVATE;
+        comment = "";
     }
 
     /**
      * Create with the given Status as the actual QC status field.
+     * The given comment is assigned as the comment associated with this flag.
      * The PI-suggested and automation-suggested fields are set to {@link Status#PRIVATE}
      *
      * @param flag
      *         actual dataset QC status to assign;
      *         if null, {@link Status#PRIVATE} is assigned
+     * @param comment
+     *         comment associated with this flag; if null or empty, there will be no comment
      */
-    public DatasetQCStatus(Status flag) {
+    public DatasetQCStatus(Status flag, String comment) {
         this();
         if ( flag != null )
             actual = flag;
+        if ( comment != null )
+            this.comment = comment.trim();
     }
 
     /**
@@ -268,6 +275,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             actual = qcFlag.actual;
             piSuggested = qcFlag.piSuggested;
             autoSuggested = qcFlag.autoSuggested;
+            comment = qcFlag.comment;
         }
     }
 
@@ -323,6 +331,25 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             autoSuggested = Status.PRIVATE;
         else
             autoSuggested = flag;
+    }
+
+    /**
+     * @return the comment associated with this QC; never null but could be empty
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment
+     *         the comment associated with this QC to assign;
+     *         if null or empty, there will be no comment associated with this QC
+     */
+    public void setComment(String comment) {
+        if ( comment == null )
+            this.comment = "";
+        else
+            this.comment = comment.trim();
     }
 
     /**
@@ -553,7 +580,9 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         value = piSuggested.compareTo(other.piSuggested);
         if ( value != 0 )
             return value;
-
+        value = comment.compareTo(other.comment);
+        if ( value != 0 )
+            return value;
         return 0;
     }
 
@@ -572,6 +601,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             return false;
         if ( !piSuggested.equals(other.piSuggested) )
             return false;
+        if ( !comment.equals(other.comment) )
+            return false;
 
         return true;
     }
@@ -582,6 +613,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         int value = actual.hashCode();
         value = value * prime + autoSuggested.hashCode();
         value = value * prime + piSuggested.hashCode();
+        value = value * prime + comment.hashCode();
         return value;
     }
 
@@ -591,6 +623,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
                 "[ actual=" + actual +
                 ", autoSuggested=" + autoSuggested +
                 ", piSuggested=" + piSuggested +
+                ", comment=" + comment +
                 " ]";
     }
 

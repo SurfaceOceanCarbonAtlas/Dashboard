@@ -216,9 +216,9 @@ public class DatasetSubmitter {
 
                 // Now mark the dataset as submitted in this version
                 if ( dataset.getSubmitStatus().isPrivate() )
-                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC));
+                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC, ""));
                 else
-                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC));
+                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, ""));
                 dataset.setVersion(version);
 
                 // Set up to save changes to version control
@@ -334,12 +334,12 @@ public class DatasetSubmitter {
         DatasetQCStatus flag;
         String comment;
         if ( dataset.getSubmitStatus().isPrivate() ) {
-            flag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC);
             comment = "Initial QC flag for new dataset";
+            flag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC, comment);
         }
         else {
-            flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
             comment = "Initial QC flag for updated dataset";
+            flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, comment);
         }
         // First add a global flag, then flag for each region
         ArrayList<String> regions = new ArrayList<String>(allRegionIds.length() + 1);

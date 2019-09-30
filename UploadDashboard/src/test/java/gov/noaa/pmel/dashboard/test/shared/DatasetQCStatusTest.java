@@ -15,6 +15,7 @@ public class DatasetQCStatusTest {
     private static final DatasetQCStatus.Status ACTUAL_FLAG = DatasetQCStatus.Status.UPDATED_AWAITING_QC;
     private static final DatasetQCStatus.Status PI_FLAG = DatasetQCStatus.Status.ACCEPTED_A;
     private static final DatasetQCStatus.Status AUTO_FLAG = DatasetQCStatus.Status.ACCEPTED_B;
+    private static final String COMMENT_STRING = "This is a comment about the QC flag";
 
     /**
      * Test of {@link DatasetQCStatus#getActual()} and {@link DatasetQCStatus#setActual(DatasetQCStatus.Status)}
@@ -56,6 +57,22 @@ public class DatasetQCStatusTest {
         assertEquals(DEFAULT_FLAG, flag.getActual());
         flag.setAutoSuggested(null);
         assertEquals(DEFAULT_FLAG, flag.getAutoSuggested());
+    }
+
+    /**
+     * Test of {@link DatasetQCStatus#getComment()} and {@link DatasetQCStatus#setComment(String)}
+     */
+    @Test
+    public void testGetSetComment() {
+        DatasetQCStatus flag = new DatasetQCStatus();
+        assertEquals("", flag.getComment());
+        flag.setComment(COMMENT_STRING);
+        assertEquals(COMMENT_STRING, flag.getComment());
+        assertEquals(DEFAULT_FLAG, flag.getAutoSuggested());
+        assertEquals(DEFAULT_FLAG, flag.getPiSuggested());
+        assertEquals(DEFAULT_FLAG, flag.getActual());
+        flag.setComment(null);
+        assertEquals("", flag.getComment());
     }
 
     /**
@@ -111,7 +128,7 @@ public class DatasetQCStatusTest {
         assertEquals(PI_FLAG, DatasetQCStatus.Status.fromString(PI_FLAG.toString()));
         assertEquals(AUTO_FLAG, DatasetQCStatus.Status.fromString(AUTO_FLAG.toString()));
 
-        DatasetQCStatus flag = new DatasetQCStatus(ACTUAL_FLAG);
+        DatasetQCStatus flag = new DatasetQCStatus(ACTUAL_FLAG, "");
         String flagString = flag.flagString();
         DatasetQCStatus other = DatasetQCStatus.fromString(flagString);
         assertEquals(flag, other);
@@ -317,7 +334,6 @@ public class DatasetQCStatusTest {
         assertFalse(flag.isUpdatedAwaitingQC());
     }
 
-
     /**
      * Test of {@link DatasetQCStatus#compareTo(DatasetQCStatus)}
      */
@@ -334,6 +350,7 @@ public class DatasetQCStatusTest {
 
         first.setPiSuggested(PI_FLAG);
         first.setAutoSuggested(AUTO_FLAG);
+        first.setComment(COMMENT_STRING);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
@@ -346,6 +363,10 @@ public class DatasetQCStatusTest {
         assertTrue(second.compareTo(first) < 0);
 
         second.setAutoSuggested(AUTO_FLAG);
+        assertTrue(first.compareTo(second) > 0);
+        assertTrue(second.compareTo(first) < 0);
+
+        second.setComment(COMMENT_STRING);
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
 
@@ -389,22 +410,30 @@ public class DatasetQCStatusTest {
         second.setAutoSuggested(AUTO_FLAG);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
+
+        first.setComment(COMMENT_STRING);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setComment(COMMENT_STRING);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
     }
 
     /**
-     * Test of {@link DatasetQCStatus#DatasetQCStatus(DatasetQCStatus.Status)}
+     * Test of {@link DatasetQCStatus#DatasetQCStatus(DatasetQCStatus.Status, String)}
      * and {@link DatasetQCStatus#DatasetQCStatus(DatasetQCStatus)}
      */
     @Test
     public void testDatasetQCFlag() {
         DatasetQCStatus flag = new DatasetQCStatus();
-        DatasetQCStatus other = new DatasetQCStatus((DatasetQCStatus.Status) null);
+        DatasetQCStatus other = new DatasetQCStatus((DatasetQCStatus.Status) null, "");
         assertEquals(flag, other);
         other = new DatasetQCStatus((DatasetQCStatus) null);
         assertEquals(flag, other);
 
         flag.setActual(ACTUAL_FLAG);
-        other = new DatasetQCStatus(ACTUAL_FLAG);
+        flag.setComment(COMMENT_STRING);
+        other = new DatasetQCStatus(ACTUAL_FLAG, COMMENT_STRING);
         assertEquals(flag, other);
 
         flag.setPiSuggested(PI_FLAG);
