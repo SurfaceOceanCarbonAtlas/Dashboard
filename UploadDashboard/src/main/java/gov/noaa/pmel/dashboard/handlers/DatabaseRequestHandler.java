@@ -469,7 +469,7 @@ public class DatabaseRequestHandler {
         long globalTime;
         if ( globalEvent == null ) {
             // Some v1 cruises do not have global flags
-            globalFlag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC);
+            globalFlag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC, "");
             globalTime = lastUpdateTime;
         }
         else {
@@ -505,7 +505,7 @@ public class DatabaseRequestHandler {
             }
             else if ( !latestFlag.getActual().equals(flag.getActual()) ) {
                 // conflicts only occur with mismatches in the actual flag
-                return new DatasetQCStatus(DatasetQCStatus.Status.CONFLICTED);
+                return new DatasetQCStatus(DatasetQCStatus.Status.CONFLICTED, "");
             }
         }
         if ( latestFlag == null ) {

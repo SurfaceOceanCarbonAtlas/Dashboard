@@ -50,7 +50,7 @@ public class TypesDatasetDataPairTest {
     public void testGetSetDatasetData() {
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         cruiseData.setDatasetId("ABCD20161003");
-        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED));
+        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED, ""));
 
         TypesDatasetDataPair cruiseTypes = new TypesDatasetDataPair();
         assertNull(cruiseTypes.getDatasetData());
@@ -75,7 +75,7 @@ public class TypesDatasetDataPairTest {
 
         DashboardDatasetData cruiseData = new DashboardDatasetData();
         cruiseData.setDatasetId("ABCD20161003");
-        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED));
+        cruiseData.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED, ""));
 
         TypesDatasetDataPair cruiseTypes = new TypesDatasetDataPair();
         assertFalse(cruiseTypes.equals(null));

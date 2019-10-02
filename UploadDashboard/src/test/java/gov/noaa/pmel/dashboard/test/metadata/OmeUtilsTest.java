@@ -40,13 +40,13 @@ public class OmeUtilsTest {
         }
         assertNotNull(mdata);
 
-        DatasetQCStatus.Status status = null;
+        DatasetQCStatus status = null;
         try {
             status = OmeUtils.suggestDatasetQCFlag(mdata, dset);
         } catch ( Exception ex ) {
             fail("Unable to make an automation-suggested dataset QC flag: " + ex.getMessage());
         }
-        assertEquals(DatasetQCStatus.Status.ACCEPTED_B, status);
+        assertEquals(DatasetQCStatus.Status.ACCEPTED_B, status.getAutoSuggested());
     }
 
     private static final ArrayList<String> DATA_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
@@ -250,7 +250,7 @@ public class OmeUtilsTest {
             "    </CO2_in_Marine_Air>\n" +
             "    <CO2_Sensors>\n" +
             "      <CO2_Sensor>\n" +
-            "        <Measurement_Method>IR</Measurement_Method>\n" +
+            "        <Measurement_Method> ... IR ... </Measurement_Method>\n" +
             "        <Manufacturer>LI-COR</Manufacturer>\n" +
             "        <Model>7000</Model>\n" +
             "        <Frequency>Every 140 seconds, except during calibration</Frequency>\n" +

@@ -205,23 +205,22 @@ public class MetadataUploadService extends HttpServlet {
                         throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " +
                                 ex.getMessage());
                     }
-                    DatasetQCStatus.Status autoSuggest;
+                    DatasetQCStatus autoSuggestedQC;
                     try {
-                        autoSuggest = omedata.suggestedDatasetStatus(dataset);
+                        autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
+                        DatasetQCStatus status = dataset.getSubmitStatus();
+                        if ( !autoSuggestedQC.getAutoSuggested().equals(status.getAutoSuggested()) ) {
+                            status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
+                            status.addComment(autoSuggestedQC.getComments().get(0));
+                            dataset.setSubmitStatus(status);
+                            dataFileHandler.saveDatasetInfoToFile(dataset,
+                                    "Update of automation-suggested dataset QC flag");
+                        }
                     } catch ( Exception ex ) {
                         /*
-                         * Either there is a problem with the metadata, the metadata indicates
-                         * the dataset is unacceptable, or the code to recommend a dataset QC
-                         * flag is faulty; whatever the reason, do not make a recommendation.
+                         * Either there is a problem with the metadata or the code to recommend
+                         * a dataset QC flag is faulty; whatever the reason, do not make a recommendation.
                          */
-                        autoSuggest = DatasetQCStatus.Status.PRIVATE;
-                    }
-                    DatasetQCStatus status = dataset.getSubmitStatus();
-                    if ( !autoSuggest.equals(status.getAutoSuggested()) ) {
-                        status.setAutoSuggested(autoSuggest);
-                        dataset.setSubmitStatus(status);
-                        dataFileHandler.saveDatasetInfoToFile(dataset,
-                                "Update of automation-suggested dataset QC flag");
                     }
                 }
                 else {

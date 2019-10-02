@@ -205,17 +205,18 @@ public interface OmeMetadataInterface {
 
     /**
      * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     * The returned dataset QC will have the autoSuggested flag assigned as well as
+     * a single comment documenting the reason for this suggested Status.
      *
      * @param dataset
      *         information about the dataset associated with this OME document
      *
-     * @return the automation-suggested dataset QC flag, an appropriate acceptable status
-     *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     * @return the automation-suggested dataset QC
      *
      * @throws IllegalArgumentException
-     *         if there are problems with the given Metadata, or
-     *         if the metadata indicates the dataset in unacceptable
+     *         if there are problems with the given Metadata
      */
-    DatasetQCStatus.Status suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException;
+
+    DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException;
 
 }

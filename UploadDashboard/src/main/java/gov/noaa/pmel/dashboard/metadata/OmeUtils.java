@@ -15,6 +15,7 @@ import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
 import gov.noaa.pmel.sdimetadata.util.NumericString;
 import gov.noaa.pmel.sdimetadata.variable.AirPressure;
 import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
+import gov.noaa.pmel.sdimetadata.variable.MethodType;
 import gov.noaa.pmel.sdimetadata.variable.Temperature;
 import gov.noaa.pmel.sdimetadata.variable.Variable;
 
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OmeUtils {
 
@@ -151,24 +154,44 @@ public class OmeUtils {
     ));
 
     /**
-     * Using the contents of the given SDIMetadata, recommend a QC flag/status for this dataset.
-     * This does NOT check actual data values that affect the dataset QC flag (e.g., the range
-     * of fCO2 values to compare against calibration gas concentrations, or amount of warming
-     * between in-situ temperatures and equilibrator temperatures).
+     * List of recognized acceptable CO2 measurement method descriptions for Dataset QC flag A-C
+     * after lowercasing all letters and trimming whitespace and punctuation from the ends.
+     */
+    private static final HashSet<String> ACCEPTABLE_CO2_MEASURE_METHOD_DESCRIPTIONS = new HashSet<String>(Arrays.asList(
+            "absolute, non-dispersive infrared (ndir) gas analyzer",
+            "co2 mole fraction in dry air (non-dispersive infrared gas analyser), stopped flow",
+            "gas permeable membrane and spectrophotometric dye detection",
+            "gc",
+            "infrared absorption of dry gas",
+            "infrared absorption of dry sample gas",
+            "infrared analysis on dry gas",
+            "ir",
+            "spectrophotometric determinations of ph at multiple wavelengths using sulfonephthalein indicators",
+            "spectroscopy"
+    ));
+
+    /**
+     * Pattern to extract a string (in group 1) with whitespace and punctuation trimmed from the ends.
+     */
+    private static final Pattern PUNCTIONATION_STRIP_PATTERN = Pattern
+            .compile("[\\p{Space}\\p{Punct}]*(.*?)[\\p{Space}\\p{Punct}]*");
+
+    /**
+     * Using the contents of the given SDIMetadata, recommend a QC status/flag for this dataset.
+     * The returned dataset QC will have the autoSuggested flag assigned as well as
+     * a single comment documenting the reason for this suggested Status.
      *
      * @param sdiMData
      *         metadata to examine
      * @param dataset
      *         dataset associated with this metadata
      *
-     * @return the automation-suggested dataset QC flag, an appropriate acceptable status
-     *         ({@link DatasetQCStatus.Status#isAcceptable(DatasetQCStatus.Status)} returns true).
+     * @return the automation-suggested dataset QC
      *
      * @throws IllegalArgumentException
-     *         if there are problems with the given Metadata, or
-     *         if the metadata indicates the dataset in unacceptable
+     *         if there are problems with the given Metadata
      */
-    public static DatasetQCStatus.Status suggestDatasetQCFlag(SDIMetadata sdiMData,
+    public static DatasetQCStatus suggestDatasetQCFlag(SDIMetadata sdiMData,
             DashboardDataset dataset) throws IllegalArgumentException {
         HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
         for (Instrument instrument : sdiMData.getInstruments()) {
@@ -232,19 +255,34 @@ public class OmeUtils {
                 co2Accuracy = accuracy.getNumericValue();
         }
         DatasetQCStatus.Status autoSuggest;
-        if ( co2Accuracy <= 2.0 )
+        String comment;
+        if ( co2Accuracy <= 2.0 ) {
+            comment = "Accuracy of aqueous CO2 less than 2 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
-        else if ( co2Accuracy <= 5.0 )
+        }
+        else if ( co2Accuracy <= 5.0 ) {
+            comment = "Accuracy of aqueous CO2 less than 5 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
-        else
-            throw new IllegalArgumentException("Unacceptably large accuracy for the aqueous CO2 measurements");
-        // Alternative sensors with CO2 accuracy within 10.0 could be ACCEPTED_E.  However, they need a clear
-        // and detailed description of the calibration, so an automation-suggested flag is not possible.
+        }
+        else {
+            // Alternative sensors with CO2 accuracy within 10.0 could be ACCEPTED_E.  However, they need a clear
+            // and detailed description of the calibration, so an automation-suggested flag is not possible.
+            comment = "Accuracy of aqueous CO2 coould not be determined or was greater than 5 uatm; " +
+                    "alternate sensors (flag E) were not considered.";
+            DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+            status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
+            return status;
+        }
 
         // Rough judgement on whether metadata is complete
         boolean acceptable = true;
         HashSet<String> invalids = sdiMData.invalidFieldNames();
         if ( invalids.size() > 0 ) {
+            comment += "Metadata incomplete: ";
+            for (String expl : invalids) {
+                comment += expl + "; ";
+            }
+            comment += ".  ";
             acceptable = false;
         }
         else {
@@ -259,31 +297,44 @@ public class OmeUtils {
                     continue;
                 String name = colNames.get(k);
                 if ( !varColNames.contains(name) ) {
+                    comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
                     acceptable = false;
                     break;
                 }
             }
         }
-        if ( !acceptable )
+        if ( !acceptable ) {
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
+        }
 
         // Alternative sensors with CO2 accuracy within 5.0 are not subject to the temperature
         // and pressure restrictions.  However, they need a clear and detailed description of
         // the calibration, so an automation-suggested flag is not possible.  So failing to give
         // a flag (raising an exception) is an acceptable response.
 
-        // Accuracy of temperatures within 0.2 ºC (0.05 ºC for ACCEPTED_B)
+        // Accuracy of temperatures within 0.2 °C (0.05 °C for ACCEPTED_B)
         double tempAccuracy = 999.0;
         for (Temperature temperature : tempvars) {
             NumericString accuracy = temperature.getAccuracy();
-            // Temperature variables must units of ºC
+            // Temperature variables must units of °C
             if ( tempAccuracy > accuracy.getNumericValue() )
                 tempAccuracy = accuracy.getNumericValue();
         }
-        if ( tempAccuracy > 0.2 )
-            throw new IllegalArgumentException("Unacceptably large accuracy in temperature measurements");
-        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (tempAccuracy > 0.05) )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        if ( tempAccuracy <= 0.05 ) {
+            comment += "Accuracy of temperature measurements 0.05 °C or less.  ";
+        }
+        else if ( tempAccuracy <= 0.2 ) {
+            comment += "Accuracy of temperature measurements between 0.05 and 0.2 °C.  ";
+            if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
+                autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        }
+        else {
+            comment += "Accuracy of temperature measurements could not be determined or exceeds 0.2 °C; " +
+                    "alternatve sensors (flag E) were not considered.";
+            DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+            status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
+            return status;
+        }
 
         // Accuracy of air pressure within 5.0 hPa (2.0 hPa for ACCEPTED_B)
         // TODO: If equilibrator pressure is the sum of an external pressure sensor and
@@ -295,10 +346,27 @@ public class OmeUtils {
             if ( pressAccuracy > accuracy.getNumericValue() )
                 pressAccuracy = accuracy.getNumericValue();
         }
-        if ( pressAccuracy > 5.0 )
-            throw new IllegalArgumentException("Unacceptably large accuracy in pressure measurements");
-        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (pressAccuracy > 2.0) )
-            autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        if ( pressAccuracy <= 2.0 ) {
+            comment += "Accuracy of pressure measurements 2.0 hPa or less";
+            if ( pressvars.size() > 1 )
+                comment += " (total accuracy using differential pressure instruments not considered)";
+            comment += ".  ";
+        }
+        else if ( pressAccuracy <= 5.0 ) {
+            comment += "Accuracy of pressure measurements between 2.0 and 5.0 hPa";
+            if ( pressvars.size() > 1 )
+                comment += " (total accuracy using differential pressure instruments not considered)";
+            comment += ".  ";
+            if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
+                autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
+        }
+        else {
+            comment += "Accuracy of pressure measurements could not be determined or exceeds 5.0 hPa; " +
+                    "alternatve sensors (flag E) were not considered.";
+            DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+            status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
+            return status;
+        }
 
         int numNonZeroCalibGases = -1;
         int numCalibGases = -1;
@@ -320,26 +388,63 @@ public class OmeUtils {
         }
         // For ACCEPTED_B, at least two non-zero concentration calibration gases spanning entire range of fCO2 values
         // For ACCEPTED_C or ACCEPTED_D, at least two calibration gases, one of which can be zero concentration
-        if ( numCalibGases < 2 )
-            throw new IllegalArgumentException("Not enough calibration gases");
-        if ( numNonZeroCalibGases < 1 )
-            throw new IllegalArgumentException("Not enough non-zero concentration calibration gases");
+        if ( numCalibGases > 0 ) {
+            comment += numCalibGases + " calibration gasses";
+            if ( numNonZeroCalibGases >= 0 )
+                comment += " ," + numNonZeroCalibGases + " of which have non-zero concentrations";
+            comment += ".  ";
+        }
+        if ( numCalibGases < 2 ) {
+            comment += "Not enough calibration gasses.";
+            DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+            status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
+            return status;
+        }
+        if ( numNonZeroCalibGases < 1 ) {
+            comment += "Not enough non-zero concentration calibration gasses.";
+            DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+            status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
+            return status;
+        }
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) && (numNonZeroCalibGases < 2) )
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
 
+        // For ACCEPTED_B or ACCEPTED_C (not alternative sensor),
+        // CO2 must be measured continuously using IR, GC, or spectroscopy.
+        acceptable = false;
+        for (AquGasConc gasConc : co2vars) {
+            if ( gasConc.getMeasureMethod() == MethodType.MEASURED_INSITU ) {
+                String descr = gasConc.getMethodDescription().toLowerCase();
+                // Trim space and punctuation off the ends.
+                // This should always match as all characters in the regex are optional
+                Matcher matcher = PUNCTIONATION_STRIP_PATTERN.matcher(descr);
+                if ( matcher.matches() )
+                    descr = matcher.group(1);
+                if ( ACCEPTABLE_CO2_MEASURE_METHOD_DESCRIPTIONS.contains(descr) ) {
+                    acceptable = true;
+                    break;
+                }
+            }
+        }
+        if ( !acceptable ) {
+            comment += "CO2 measurements not continuous or not made by a method recognized as acceptable.  ";
+            autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
+        }
+
+        // TODO: If standardized data is provided, check acceptable ranges and variations
+
         // ACCEPTED_B must be:
-        //     from IR, GC, or Spectroscopy,
-        //     continuously measured and frequently calibrated,
         //     calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 1 deg C
-
         // ACCEPTED_C (not alternative sensor) must be either:
-        //     from IR, GC, or Spectroscopy,
-        //     continuously measured and frequently calibrated,
         //     [0.8,1.2] times the calibration gas concentrations spans the entire range of fCO2 values
         //     warming between SST and Tequ less than 3 deg C
 
-        return autoSuggest;
+        if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
+            comment += "  No attempt was made to find high-quality crossovers.";
+        DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
+        status.setAutoSuggested(autoSuggest);
+        return status;
     }
 
 }

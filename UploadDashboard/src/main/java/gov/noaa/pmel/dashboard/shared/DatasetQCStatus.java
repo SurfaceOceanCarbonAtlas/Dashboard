@@ -3,6 +3,7 @@ package gov.noaa.pmel.dashboard.shared;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -13,7 +14,7 @@ import java.util.HashSet;
  */
 public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2087355116417187766L;
+    private static final long serialVersionUID = -5185613156609609049L;
 
     /**
      * Values for the DatasetQCStatus fields
@@ -230,28 +231,38 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
     private Status actual;
     private Status piSuggested;
     private Status autoSuggested;
+    private ArrayList<String> comments;
 
     /**
-     * Create with all QC status fields set to {@link Status#PRIVATE}
+     * Create with all QC status fields set to {@link Status#PRIVATE} and no comment
      */
     public DatasetQCStatus() {
         actual = Status.PRIVATE;
         piSuggested = Status.PRIVATE;
         autoSuggested = Status.PRIVATE;
+        comments = new ArrayList<String>();
     }
 
     /**
      * Create with the given Status as the actual QC status field.
+     * The given comment is assigned as the comment associated with this flag.
      * The PI-suggested and automation-suggested fields are set to {@link Status#PRIVATE}
      *
      * @param flag
      *         actual dataset QC status to assign;
      *         if null, {@link Status#PRIVATE} is assigned
+     * @param comment
+     *         comment associated with this flag; if null or empty, there will be no comments
      */
-    public DatasetQCStatus(Status flag) {
+    public DatasetQCStatus(Status flag, String comment) {
         this();
         if ( flag != null )
             actual = flag;
+        if ( comment != null ) {
+            String trimmedComment = comment.trim();
+            if ( !trimmedComment.isEmpty() )
+                comments.add(trimmedComment);
+        }
     }
 
     /**
@@ -268,6 +279,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             actual = qcFlag.actual;
             piSuggested = qcFlag.piSuggested;
             autoSuggested = qcFlag.autoSuggested;
+            comments.clear();
+            comments.addAll(qcFlag.comments);
         }
     }
 
@@ -323,6 +336,48 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             autoSuggested = Status.PRIVATE;
         else
             autoSuggested = flag;
+    }
+
+    /**
+     * @return a copy of the list of comments associated with this QC; never null but could be empty
+     */
+    public ArrayList<String> getComments() {
+        return new ArrayList<String>(comments);
+    }
+
+    /**
+     * @param comments
+     *         the comments associated with this QC to assign;
+     *         if null or empty, there will be no comments associated with this QC.
+     *         Any null or blank comments will be ignored.
+     */
+    public void setComments(ArrayList<String> comments) {
+        this.comments.clear();
+        if ( comments != null ) {
+            for (String comment : comments) {
+                if ( comment != null ) {
+                    comment = comment.trim();
+                    if ( !comment.isEmpty() )
+                        this.comments.add(comment);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param comment
+     *         comment to add to the beginning of the list of comments (so the latest comments are seen first).
+     *
+     * @throws IllegalArgumentException
+     *         if comment is null or blank
+     */
+    public void addComment(String comment) throws IllegalArgumentException {
+        if ( comment == null )
+            throw new IllegalArgumentException("null comment given to addComment");
+        String trimmedComment = comment.trim();
+        if ( trimmedComment.isEmpty() )
+            throw new IllegalArgumentException("blank comment given to addComment");
+        comments.add(0, trimmedComment);
     }
 
     /**
@@ -553,7 +608,15 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         value = piSuggested.compareTo(other.piSuggested);
         if ( value != 0 )
             return value;
-
+        Integer numComments = comments.size();
+        value = numComments.compareTo(other.comments.size());
+        if ( value != 0 )
+            return value;
+        for (int k = 0; k < numComments; k++) {
+            value = comments.get(k).compareTo(other.comments.get(k));
+            if ( value != 0 )
+                return value;
+        }
         return 0;
     }
 
@@ -572,7 +635,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
             return false;
         if ( !piSuggested.equals(other.piSuggested) )
             return false;
-
+        if ( !comments.equals(other.comments) )
+            return false;
         return true;
     }
 
@@ -582,6 +646,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         int value = actual.hashCode();
         value = value * prime + autoSuggested.hashCode();
         value = value * prime + piSuggested.hashCode();
+        value = value * prime + comments.hashCode();
         return value;
     }
 
@@ -591,6 +656,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
                 "[ actual=" + actual +
                 ", autoSuggested=" + autoSuggested +
                 ", piSuggested=" + piSuggested +
+                ", comments=" + comments.toString() +
                 " ]";
     }
 

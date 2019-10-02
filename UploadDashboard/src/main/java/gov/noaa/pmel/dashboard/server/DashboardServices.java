@@ -300,7 +300,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
             }
             ArrayList<QCEvent> qcEventList = new ArrayList<>(allRegionIds.length());
-            DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
+            DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, comment);
             for (int k = 0; k < allRegionIds.length(); k++) {
                 QCEvent qcEvent = new QCEvent();
                 qcEvent.setDatasetId(datasetId);
@@ -590,7 +590,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED);
+        String comment = "suspended for update from the SOCAT Dashboard";
+        DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED, comment);
         // Global suspend QC event to add to the database (after adding the dataset ID)
         QCEvent qc = new QCEvent();
         qc.setUsername(username);
@@ -598,7 +599,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         qc.setFlagDate(new Date());
         qc.setVersion(configStore.getQCVersion());
         qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
-        qc.setComment("suspended for update from the SOCAT Dashboard");
+        qc.setComment(comment);
 
         DataFileHandler dataHandler = configStore.getDataFileHandler();
         DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
