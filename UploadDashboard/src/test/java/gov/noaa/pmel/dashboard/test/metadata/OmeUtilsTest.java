@@ -40,13 +40,13 @@ public class OmeUtilsTest {
         }
         assertNotNull(mdata);
 
-        DatasetQCStatus.Status status = null;
+        DatasetQCStatus status = null;
         try {
             status = OmeUtils.suggestDatasetQCFlag(mdata, dset);
         } catch ( Exception ex ) {
             fail("Unable to make an automation-suggested dataset QC flag: " + ex.getMessage());
         }
-        assertEquals(DatasetQCStatus.Status.ACCEPTED_B, status);
+        assertEquals(DatasetQCStatus.Status.ACCEPTED_B, status.getAutoSuggested());
     }
 
     private static final ArrayList<String> DATA_COLUMN_NAMES = new ArrayList<String>(Arrays.asList(
