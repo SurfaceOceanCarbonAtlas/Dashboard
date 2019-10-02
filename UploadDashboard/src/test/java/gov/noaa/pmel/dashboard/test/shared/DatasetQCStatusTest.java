@@ -3,9 +3,13 @@ package gov.noaa.pmel.dashboard.test.shared;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,7 +19,10 @@ public class DatasetQCStatusTest {
     private static final DatasetQCStatus.Status ACTUAL_FLAG = DatasetQCStatus.Status.UPDATED_AWAITING_QC;
     private static final DatasetQCStatus.Status PI_FLAG = DatasetQCStatus.Status.ACCEPTED_A;
     private static final DatasetQCStatus.Status AUTO_FLAG = DatasetQCStatus.Status.ACCEPTED_B;
-    private static final String COMMENT_STRING = "This is a comment about the QC flag";
+    private static final String FIRST_COMMENT_STRING = "This is a comment about the QC flag";
+    private static final String SECOND_COMMENT_STRING = "This is another comment about the QC flag";
+    private static final ArrayList<String> COMMENTS_LIST =
+            new ArrayList<String>(Arrays.asList(SECOND_COMMENT_STRING, FIRST_COMMENT_STRING));
 
     /**
      * Test of {@link DatasetQCStatus#getActual()} and {@link DatasetQCStatus#setActual(DatasetQCStatus.Status)}
@@ -60,19 +67,25 @@ public class DatasetQCStatusTest {
     }
 
     /**
-     * Test of {@link DatasetQCStatus#getComment()} and {@link DatasetQCStatus#setComment(String)}
+     * Test of {@link DatasetQCStatus#getComments()}, {@link DatasetQCStatus#setComments(java.util.ArrayList)},
+     * and {@link DatasetQCStatus#addComment(String)}
      */
     @Test
-    public void testGetSetComment() {
+    public void testGetSetComments() {
         DatasetQCStatus flag = new DatasetQCStatus();
-        assertEquals("", flag.getComment());
-        flag.setComment(COMMENT_STRING);
-        assertEquals(COMMENT_STRING, flag.getComment());
+        assertEquals(0, flag.getComments().size());
+        flag.setComments(COMMENTS_LIST);
+        ArrayList<String> comments = flag.getComments();
+        assertNotSame(comments, flag.getComments());
+        assertEquals(COMMENTS_LIST, comments);
         assertEquals(DEFAULT_FLAG, flag.getAutoSuggested());
         assertEquals(DEFAULT_FLAG, flag.getPiSuggested());
         assertEquals(DEFAULT_FLAG, flag.getActual());
-        flag.setComment(null);
-        assertEquals("", flag.getComment());
+        flag.setComments(null);
+        assertEquals(0, flag.getComments().size());
+        flag.addComment(FIRST_COMMENT_STRING);
+        flag.addComment(SECOND_COMMENT_STRING);
+        assertEquals(COMMENTS_LIST, flag.getComments());
     }
 
     /**
@@ -350,7 +363,7 @@ public class DatasetQCStatusTest {
 
         first.setPiSuggested(PI_FLAG);
         first.setAutoSuggested(AUTO_FLAG);
-        first.setComment(COMMENT_STRING);
+        first.setComments(COMMENTS_LIST);
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
@@ -366,7 +379,7 @@ public class DatasetQCStatusTest {
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        second.setComment(COMMENT_STRING);
+        second.setComments(COMMENTS_LIST);
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
 
@@ -411,10 +424,10 @@ public class DatasetQCStatusTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setComment(COMMENT_STRING);
+        first.setComments(COMMENTS_LIST);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setComment(COMMENT_STRING);
+        second.setComments(COMMENTS_LIST);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
@@ -432,8 +445,8 @@ public class DatasetQCStatusTest {
         assertEquals(flag, other);
 
         flag.setActual(ACTUAL_FLAG);
-        flag.setComment(COMMENT_STRING);
-        other = new DatasetQCStatus(ACTUAL_FLAG, COMMENT_STRING);
+        flag.addComment(FIRST_COMMENT_STRING);
+        other = new DatasetQCStatus(ACTUAL_FLAG, FIRST_COMMENT_STRING);
         assertEquals(flag, other);
 
         flag.setPiSuggested(PI_FLAG);
