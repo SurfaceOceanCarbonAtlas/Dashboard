@@ -58,6 +58,7 @@ public class DataFileHandler extends VersionedFileHandler {
     private static final String OME_TIMESTAMP_ID = "ometimestamp";
     private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
     private static final String SUBMIT_STATUS_ID = "submitstatus";
+    private static final String SUBMIT_STATUS_COMMENTS_ID = "submitstatuscomments";
     private static final String ARCHIVE_STATUS_ID = "archivestatus";
     private static final String ARCHIVAL_TIMESTAMPS_ID = "archivaltimestamps";
     private static final String NUM_DATA_ROWS_ID = "numdatarows";
@@ -607,8 +608,10 @@ public class DataFileHandler extends VersionedFileHandler {
         // Metadata documents
         datasetProps.setProperty(ADDL_DOC_TITLES_ID,
                 DashboardUtils.encodeStringTreeSet(dataset.getAddlDocs()));
-        // QC-submission status string
-        datasetProps.setProperty(SUBMIT_STATUS_ID, dataset.getSubmitStatus().statusString());
+        // Dataset QC status string and comments
+        DatasetQCStatus status = dataset.getSubmitStatus();
+        datasetProps.setProperty(SUBMIT_STATUS_ID, status.statusString());
+        datasetProps.setProperty(SUBMIT_STATUS_COMMENTS_ID, DashboardUtils.encodeStringArrayList(status.getComments()));
         // Archive status string
         datasetProps.setProperty(ARCHIVE_STATUS_ID, dataset.getArchiveStatus());
         // Date of request to archive original data and metadata files
@@ -1123,14 +1126,18 @@ public class DataFileHandler extends VersionedFileHandler {
                     ADDL_DOC_TITLES_ID + " given in " + infoFile.getPath());
         dataset.setAddlDocs(DashboardUtils.decodeStringTreeSet(value));
 
-        // Submit status
+        // Submit status and comments
         value = cruiseProps.getProperty(SUBMIT_STATUS_ID);
         if ( value == null )
             value = cruiseProps.getProperty("qcstatus");
         if ( value == null )
             throw new IllegalArgumentException("No property value for " +
                     SUBMIT_STATUS_ID + " given in " + infoFile.getPath());
-        dataset.setSubmitStatus(DatasetQCStatus.fromString(value));
+        DatasetQCStatus status = DatasetQCStatus.fromString(value);
+        value = cruiseProps.getProperty(SUBMIT_STATUS_COMMENTS_ID);
+        if ( value != null )
+            status.setComments(DashboardUtils.decodeStringArrayList(value));
+        dataset.setSubmitStatus(status);
 
         // Archive status
         value = cruiseProps.getProperty(ARCHIVE_STATUS_ID);

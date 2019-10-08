@@ -255,19 +255,19 @@ public class OmeUtils {
                 co2Accuracy = accuracy.getNumericValue();
         }
         DatasetQCStatus.Status autoSuggest;
-        String comment;
+        String comment = "(from automated QC) ";
         if ( co2Accuracy <= 2.0 ) {
-            comment = "Accuracy of aqueous CO2 less than 2 uatm.  ";
+            comment += "Accuracy of aqueous CO2 less than 2 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
         }
         else if ( co2Accuracy <= 5.0 ) {
-            comment = "Accuracy of aqueous CO2 less than 5 uatm.  ";
+            comment += "Accuracy of aqueous CO2 less than 5 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
         }
         else {
             // Alternative sensors with CO2 accuracy within 10.0 could be ACCEPTED_E.  However, they need a clear
             // and detailed description of the calibration, so an automation-suggested flag is not possible.
-            comment = "Accuracy of aqueous CO2 coould not be determined or was greater than 5 uatm; " +
+            comment += "Accuracy of aqueous CO2 could not be determined or was greater than 5 uatm; " +
                     "alternate sensors (flag E) were not considered.";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
@@ -349,13 +349,13 @@ public class OmeUtils {
         if ( pressAccuracy <= 2.0 ) {
             comment += "Accuracy of pressure measurements 2.0 hPa or less";
             if ( pressvars.size() > 1 )
-                comment += " (total accuracy using differential pressure instruments not considered)";
+                comment += " (no attempt was made to adjust accuracy for differential pressure instruments)";
             comment += ".  ";
         }
         else if ( pressAccuracy <= 5.0 ) {
             comment += "Accuracy of pressure measurements between 2.0 and 5.0 hPa";
             if ( pressvars.size() > 1 )
-                comment += " (total accuracy using differential pressure instruments not considered)";
+                comment += " (no attempt was made to adjust accuracy for differential pressure instruments)";
             comment += ".  ";
             if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
                 autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
@@ -427,7 +427,7 @@ public class OmeUtils {
             }
         }
         if ( !acceptable ) {
-            comment += "CO2 measurements not continuous or not made by a method recognized as acceptable.  ";
+            comment += "CO2 measurements not continuous or not made by a method recognized as IR, GC, or spectroscopy.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
         }
 
