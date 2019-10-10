@@ -331,31 +331,48 @@ public class DatasetSubmitter {
         String expocode = dataset.getDatasetId();
 
         // Start with the initial new/updated dataset QC flags
-        DatasetQCStatus flag;
+        DatasetQCStatus flag = dataset.getSubmitStatus();
         String comment;
-        if ( dataset.getSubmitStatus().isPrivate() ) {
+        if ( flag.isPrivate() ) {
             comment = "Initial QC flag for new dataset";
-            flag = new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC, comment);
+            flag.setActual(DatasetQCStatus.Status.NEW_AWAITING_QC);
         }
         else {
             comment = "Initial QC flag for updated dataset";
-            flag = new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, comment);
+            flag.setActual(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
         }
-        // First add a global flag, then flag for each region
-        ArrayList<String> regions = new ArrayList<String>(allRegionIds.length() + 1);
-        regions.add(DashboardUtils.REGION_ID_GLOBAL);
-        for (int k = 0; k < allRegionIds.length(); k++) {
-            regions.add(allRegionIds.substring(k, k + 1));
+        String fullComment = comment;
+        for (String piece : flag.getComments()) {
+            fullComment += "; " + piece;
         }
-        for (String regionId : regions) {
+        flag.addComment(comment);
+        Date now = new Date();
+        String flagString = flag.flagString();
+
+        // First add a global flag with all the comments (presumably any auto-QC comments)
+        {
             QCEvent initQC = new QCEvent();
             initQC.setDatasetId(expocode);
             initQC.setVersion(version);
             initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
             initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
-            initQC.setFlagDate(new Date());
-            initQC.setFlagValue(flag.flagString());
-            initQC.setRegionId(regionId);
+            initQC.setFlagDate(now);
+            initQC.setFlagValue(flagString);
+            initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+            initQC.setComment(fullComment);
+            qclist.add(initQC);
+        }
+
+        // Then add flags for each region with just the initial QC flag comment
+        for (char regionId : allRegionIds.toCharArray()) {
+            QCEvent initQC = new QCEvent();
+            initQC.setDatasetId(expocode);
+            initQC.setVersion(version);
+            initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
+            initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
+            initQC.setFlagDate(now);
+            initQC.setFlagValue(flagString);
+            initQC.setRegionId(String.valueOf(regionId));
             initQC.setComment(comment);
             qclist.add(initQC);
         }
@@ -366,7 +383,7 @@ public class DatasetSubmitter {
         initQC.setVersion(version);
         initQC.setUsername(DashboardServerUtils.AUTOMATED_DATA_CHECKER_USERNAME);
         initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
-        initQC.setFlagDate(new Date());
+        initQC.setFlagDate(now);
         initQC.setFlagValue(DatasetQCStatus.FLAG_COMMENT);
         initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
         initQC.setComment("Automated data check found " +
