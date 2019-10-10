@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,7 +116,7 @@ public class OmeUtils {
         }
     }
 
-    private static final HashSet<String> ALLOWED_UNITS = new HashSet<String>(Arrays.asList(
+    private static final List<String> ALLOWED_UNITS = Arrays.asList(
             "microatmospheres",
             "uatmospheres",
             SpellingHandler.mu + "atmospheres",
@@ -127,7 +128,7 @@ public class OmeUtils {
             "umol/mol",
             SpellingHandler.mu + "mol/mol",
             "ppm"
-    ));
+    );
 
     private static final HashSet<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = new HashSet<DataColumnType>(Arrays.asList(
             DashboardServerUtils.DATASET_ID.duplicate(),
@@ -248,8 +249,16 @@ public class OmeUtils {
         double co2Accuracy = 999.0;
         for (AquGasConc gasConc : co2vars) {
             NumericString accuracy = gasConc.getAccuracy();
-            if ( !ALLOWED_UNITS.contains(accuracy.getUnitString()) )
-                throw new IllegalArgumentException("Unexpected units of '" + accuracy.getUnitString() +
+            String units = accuracy.getUnitString();
+            boolean okay = false;
+            for (String allowed : ALLOWED_UNITS) {
+                if ( units.startsWith(allowed) ) {
+                    okay = true;
+                    break;
+                }
+            }
+            if ( !okay )
+                throw new IllegalArgumentException("Unexpected units of '" + units +
                         "' for the accuracy of an aqueous CO2 measurement variable ");
             if ( co2Accuracy > accuracy.getNumericValue() )
                 co2Accuracy = accuracy.getNumericValue();
