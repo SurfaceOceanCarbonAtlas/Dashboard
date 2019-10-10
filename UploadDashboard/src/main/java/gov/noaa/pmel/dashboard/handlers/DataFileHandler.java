@@ -931,7 +931,7 @@ public class DataFileHandler extends VersionedFileHandler {
         DashboardDataset dataset = getDatasetFromInfoFile(datasetId);
         // Check if the dataset is in a submitted or published state
         if ( !Boolean.TRUE.equals(dataset.isEditable()) )
-            throw new IllegalArgumentException("dataset status is " + dataset.getSubmitStatus());
+            throw new IllegalArgumentException("dataset status is " + dataset.getSubmitStatus().statusString());
         // Check if the user has permission to delete the dataset
         try {
             String owner = dataset.getOwner();
