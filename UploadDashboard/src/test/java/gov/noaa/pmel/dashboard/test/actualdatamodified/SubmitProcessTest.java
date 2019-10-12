@@ -1,18 +1,25 @@
 package gov.noaa.pmel.dashboard.test.actualdatamodified;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
+import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.MetadataUploadService;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -59,6 +66,7 @@ public class SubmitProcessTest {
                 reader.close();
             }
             String msg = "Adding test dataset " + EXPOCODE;
+            dsetData.setDataColTypes(DATA_COLUMN_TYPES);
             datasetHandler.saveDatasetInfoToFile(dsetData, msg);
             datasetHandler.saveDatasetDataToFile(dsetData, msg);
         } catch ( Exception ex ) {
@@ -73,19 +81,35 @@ public class SubmitProcessTest {
             for (String str : OME_METADATA_XML_STRING) {
                 strBuilder.append(str);
             }
-            ByteArrayInputStream reader = new ByteArrayInputStream(strBuilder.toString().getBytes());
-            try {
-                metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                        DashboardUtils.OME_FILENAME, TIMESTAMP, version, reader, true);
-            } finally {
-                reader.close();
+            {
+                final StringReader reader = new StringReader(strBuilder.toString());
+                InputStream inputStream = new InputStream() {
+                    @Override
+                    public int read() throws IOException {
+                        return reader.read();
+                    }
+                };
+                try {
+                    metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
+                            DashboardUtils.OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                } finally {
+                    reader.close();
+                }
             }
-            reader = new ByteArrayInputStream(strBuilder.toString().getBytes());
-            try {
-                metadata = metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                        DashboardUtils.PI_OME_FILENAME, TIMESTAMP, version, reader, true);
-            } finally {
-                reader.close();
+            {
+                final StringReader reader = new StringReader(strBuilder.toString());
+                InputStream inputStream = new InputStream() {
+                    @Override
+                    public int read() throws IOException {
+                        return reader.read();
+                    }
+                };
+                try {
+                    metadata = metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
+                            DashboardUtils.PI_OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                } finally {
+                    reader.close();
+                }
             }
         } catch ( Exception ex ) {
             System.err.println("Problems saving the metadata for " + EXPOCODE + ": " + ex.getMessage());
@@ -103,8 +127,16 @@ public class SubmitProcessTest {
             ex.printStackTrace();
             System.exit(1);
         }
+        DatasetQCStatus expectedStatus = new DatasetQCStatus();
+        expectedStatus.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
+        expectedStatus.addComment("(from automated QC) Accuracy of aqueous CO2 less than 2 uatm.  " +
+                "Accuracy of temperature measurements 0.05 deg C or less.  " +
+                "Accuracy of pressure measurements 2.0 hPa or less " +
+                "(no attempt was made to adjust accuracy for differential pressure instruments).  " +
+                "4 calibration gasses, 3 of which have non-zero concentrations.  " +
+                "No attempt was made to find high-quality crossovers.");
 
-        assertEquals("Private; automation suggested QC flag of B", dataset.getSubmitStatus().statusString());
+        assertEquals(expectedStatus, dataset.getSubmitStatus());
 
         // TODO: continue on
         // Ideally this should detect that it completely overlaps with 33GG20181110
@@ -118,6 +150,33 @@ public class SubmitProcessTest {
     private static final String USERNAME = "k.smith";
     private static final String FILENAME = "00KS20181110.tsv";
     private static final String TIMESTAMP = "2019-10-09 15:00 +8:00";
+
+    private static final ArrayList<DataColumnType> DATA_COLUMN_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
+            DashboardServerUtils.DATASET_ID.duplicate(),
+            DashboardServerUtils.DAY_OF_YEAR.duplicate(),
+            DashboardServerUtils.DATE.duplicate(),
+            DashboardServerUtils.TIME_OF_DAY.duplicate(),
+            DashboardServerUtils.LATITUDE.duplicate(),
+            DashboardServerUtils.LONGITUDE.duplicate(),
+            SocatTypes.XCO2_WATER_TEQU_DRY.duplicate(),
+            SocatTypes.XCO2_ATM_DRY_ACTUAL.duplicate(),
+            SocatTypes.XCO2_ATM_DRY_INTERP.duplicate(),
+            SocatTypes.PEQU.duplicate(),
+            SocatTypes.PATM.duplicate(),
+            SocatTypes.TEQU.duplicate(),
+            SocatTypes.SST.duplicate(),
+            SocatTypes.SALINITY.duplicate(),
+            SocatTypes.FCO2_WATER_SST_WET.duplicate(),
+            SocatTypes.FCO2_ATM_DRY_INTERP.duplicate(),
+            DashboardServerUtils.OTHER.duplicate(),
+            SocatTypes.WOCE_CO2_WATER.duplicate(),
+            SocatTypes.COMMENT_WOCE_CO2_WATER.duplicate()
+    ));
+
+    static {
+        if ( !DATA_COLUMN_TYPES.get(2).setSelectedUnit("dd-mm-yyyy") )
+            throw new RuntimeException("Failed to assign the DATE unit ofr DATA_COLUMN_TYPES");
+    }
 
     private static final String[] TSV_DATA_STRINGS = new String[] {
             "Expocode: 00KS20181110\n",

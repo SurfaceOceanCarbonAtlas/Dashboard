@@ -1,5 +1,7 @@
 package gov.noaa.pmel.dashboard.metadata;
 
+import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
@@ -13,9 +15,8 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -417,17 +418,20 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
+    public DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
+            throws IllegalArgumentException {
+        // Read the CDIAC XML directly from the file associated with this metadata
+        File cdiacOmeFile;
+        try {
+            DashboardConfigStore configStore = DashboardConfigStore.get(false);
+            MetadataFileHandler metaFileHandler = configStore.getMetadataFileHandler();
+            cdiacOmeFile = metaFileHandler.getMetadataFile(metadata.getDatasetId(), metadata.getFilename());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems getting the CDIAC OME XML file: " + ex.getMessage(), ex);
+        }
         SDIMetadata sdiMData;
         try {
-            Document omeDoc = mdata.createOmeXmlDoc();
-            StringWriter writer = new StringWriter();
-            try {
-                (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, writer);
-            } finally {
-                writer.close();
-            }
-            StringReader xmlReader = new StringReader(writer.toString());
+            FileReader xmlReader = new FileReader(cdiacOmeFile);
             sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
                     xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
         } catch ( Exception ex ) {

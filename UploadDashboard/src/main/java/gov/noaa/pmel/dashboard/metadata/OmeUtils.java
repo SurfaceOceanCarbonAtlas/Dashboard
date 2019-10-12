@@ -130,7 +130,7 @@ public class OmeUtils {
             "ppm"
     );
 
-    private static final HashSet<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = new HashSet<DataColumnType>(Arrays.asList(
+    private static final List<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = Arrays.asList(
             DashboardServerUtils.DATASET_ID.duplicate(),
             DashboardServerUtils.DATASET_NAME.duplicate(),
             DashboardServerUtils.INVESTIGATOR_NAMES.duplicate(),
@@ -152,7 +152,7 @@ public class OmeUtils {
             DashboardServerUtils.SECOND_OF_MINUTE.duplicate(),
             DashboardServerUtils.DAY_OF_YEAR.duplicate(),
             DashboardServerUtils.SECOND_OF_DAY.duplicate()
-    ));
+    );
 
     /**
      * List of recognized acceptable CO2 measurement method descriptions for Dataset QC flag A-C
@@ -302,13 +302,20 @@ public class OmeUtils {
                 // only for the dashboard - instead of adding it in the prologue.
                 // At this time, do not worry about these not being described as well as
                 // the "obvious" names/types, although ideally all columns should be described.
-                if ( OBVIOUS_DATA_COLUMN_TYPES.contains(colTypes.get(k)) )
-                    continue;
-                String name = colNames.get(k);
-                if ( !varColNames.contains(name) ) {
-                    comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
-                    acceptable = false;
-                    break;
+                boolean obvious = false;
+                for (DataColumnType obvType : OBVIOUS_DATA_COLUMN_TYPES) {
+                    if ( obvType.typeNameEquals(colTypes.get(k)) ) {
+                        obvious = true;
+                        break;
+                    }
+                }
+                if ( !obvious ) {
+                    String name = colNames.get(k);
+                    if ( !varColNames.contains(name) ) {
+                        comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
+                        acceptable = false;
+                        break;
+                    }
                 }
             }
         }
@@ -330,15 +337,15 @@ public class OmeUtils {
                 tempAccuracy = accuracy.getNumericValue();
         }
         if ( tempAccuracy <= 0.05 ) {
-            comment += "Accuracy of temperature measurements 0.05 °C or less.  ";
+            comment += "Accuracy of temperature measurements 0.05 deg C or less.  ";
         }
         else if ( tempAccuracy <= 0.2 ) {
-            comment += "Accuracy of temperature measurements between 0.05 and 0.2 °C.  ";
+            comment += "Accuracy of temperature measurements between 0.05 and 0.2 deg C.  ";
             if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
                 autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
         }
         else {
-            comment += "Accuracy of temperature measurements could not be determined or exceeds 0.2 °C; " +
+            comment += "Accuracy of temperature measurements could not be determined or exceeds 0.2 deg C; " +
                     "alternatve sensors (flag E) were not considered.";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
@@ -371,7 +378,7 @@ public class OmeUtils {
         }
         else {
             comment += "Accuracy of pressure measurements could not be determined or exceeds 5.0 hPa; " +
-                    "alternatve sensors (flag E) were not considered.";
+                    "alternatve sensors (flag E) were not considered.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
@@ -400,17 +407,17 @@ public class OmeUtils {
         if ( numCalibGases > 0 ) {
             comment += numCalibGases + " calibration gasses";
             if ( numNonZeroCalibGases >= 0 )
-                comment += " ," + numNonZeroCalibGases + " of which have non-zero concentrations";
+                comment += ", " + numNonZeroCalibGases + " of which have non-zero concentrations";
             comment += ".  ";
         }
         if ( numCalibGases < 2 ) {
-            comment += "Not enough calibration gasses.";
+            comment += "Not enough calibration gasses.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
         }
         if ( numNonZeroCalibGases < 1 ) {
-            comment += "Not enough non-zero concentration calibration gasses.";
+            comment += "Not enough non-zero concentration calibration gasses.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
@@ -450,7 +457,7 @@ public class OmeUtils {
         //     warming between SST and Tequ less than 3 deg C
 
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
-            comment += "  No attempt was made to find high-quality crossovers.";
+            comment += "No attempt was made to find high-quality crossovers.";
         DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
         status.setAutoSuggested(autoSuggest);
         return status;
