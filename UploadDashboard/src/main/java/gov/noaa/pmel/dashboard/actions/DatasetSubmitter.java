@@ -194,11 +194,6 @@ public class DatasetSubmitter {
                     // region_id data variable in the full-data DSG file.
                     String allRegionIds = dsgHandler.updateAllRegionIds(datasetId);
 
-                    // Add new or update (regardless of version) dataset QC flags to the database
-                    // Uses the submitStatus from dataset to determine if new or updated
-                    ArrayList<QCEvent> datasetQCEvents = generateDatasetQCEvents(dataset, allRegionIds);
-                    databaseHandler.addDatasetQCEvents(datasetQCEvents);
-
                     // Generate the set of data QC events for the data QC flags from standardization
                     // and automated data checking as well as for user-provided data QC flags
                     ArrayList<DataQCEvent> dataQCEvents = generateDataQCEvents(dataset, userStdData);
@@ -209,17 +204,17 @@ public class DatasetSubmitter {
 
                     // (re)generate the WOCE flags messages file
                     metadataHandler.generateWoceFlagMsgsFile(datasetId, databaseHandler);
+
+                    // Add new or update (regardless of version) dataset QC flags to the database.
+                    // Uses the submit status from dataset to determine if new or updated,
+                    // then updates the submit status appropriately.
+                    ArrayList<QCEvent> datasetQCEvents = generateDatasetQCEvents(dataset, allRegionIds);
+                    databaseHandler.addDatasetQCEvents(datasetQCEvents);
+
                 } catch ( Exception ex ) {
                     errorMsgs.add(datasetId + ": unacceptable; " + ex.getMessage());
                     continue;
                 }
-
-                // Now mark the dataset as submitted in this version
-                if ( dataset.getSubmitStatus().isPrivate() )
-                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.NEW_AWAITING_QC, ""));
-                else
-                    dataset.setSubmitStatus(new DatasetQCStatus(DatasetQCStatus.Status.UPDATED_AWAITING_QC, ""));
-                dataset.setVersion(version);
 
                 // Set up to save changes to version control
                 changed = true;
@@ -320,6 +315,7 @@ public class DatasetSubmitter {
      *
      * @param dataset
      *         generate dataset QC events for this dataset
+     *         and update the submit QC status of this dataset
      * @param allRegionIds
      *         string of concatenated IDs of regions this dataset occupies;
      *         this assumes region IDs are Strings of length one
@@ -341,16 +337,13 @@ public class DatasetSubmitter {
             comment = "Initial QC flag for updated dataset";
             flag.setActual(DatasetQCStatus.Status.UPDATED_AWAITING_QC);
         }
-        String fullComment = comment;
-        for (String piece : flag.getComments()) {
-            fullComment += "; " + piece;
-        }
         flag.addComment(comment);
+        dataset.setSubmitStatus(flag);
         Date now = new Date();
         String flagString = flag.flagString();
 
-        // First add a global flag with all the comments (presumably any auto-QC comments)
-        {
+        // First add global flags with all the comments
+        for (String msg : flag.getComments()) {
             QCEvent initQC = new QCEvent();
             initQC.setDatasetId(expocode);
             initQC.setVersion(version);
@@ -359,7 +352,7 @@ public class DatasetSubmitter {
             initQC.setFlagDate(now);
             initQC.setFlagValue(flagString);
             initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
-            initQC.setComment(fullComment);
+            initQC.setComment(msg);
             qclist.add(initQC);
         }
 

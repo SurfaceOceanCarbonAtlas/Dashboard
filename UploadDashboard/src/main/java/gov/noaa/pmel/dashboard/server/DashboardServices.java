@@ -591,11 +591,9 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             throw new IllegalArgumentException("Invalid user request");
 
         String comment = "suspended for update from the SOCAT Dashboard";
-        DatasetQCStatus flag = new DatasetQCStatus(DatasetQCStatus.Status.SUSPENDED, comment);
         // Global suspend QC event to add to the database (after adding the dataset ID)
         QCEvent qc = new QCEvent();
         qc.setUsername(username);
-        qc.setFlagValue(flag.flagString());
         qc.setFlagDate(new Date());
         qc.setVersion(configStore.getQCVersion());
         qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
@@ -611,16 +609,19 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 DashboardDataset dset = dataHandler.getDatasetFromInfoFile(datasetId);
                 // Only update if not already editable; ignore if already editable
                 if ( !Boolean.TRUE.equals(dset.isEditable()) ) {
+                    DatasetQCStatus status = dset.getSubmitStatus();
+                    status.setActual(DatasetQCStatus.Status.SUSPENDED);
+                    dset.setSubmitStatus(status);
+                    //  add the global suspend dataset QC flag to database
+                    qc.setFlagValue(status.flagString());
                     qc.setDatasetId(datasetId);
-                    //  add the global suspend DataQCFlag to database
                     dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
                     //  update the dataset properties file
                     String message = "dataset " + datasetId + " suspended by " + username;
-                    dset.setSubmitStatus(flag);
                     dataHandler.saveDatasetInfoToFile(dset, message);
                     //  update the DSG files
                     String versionStatus = dbHandler.getVersionStatus(datasetId);
-                    dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, flag.flagString(), versionStatus);
+                    dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, status.flagString(), versionStatus);
                     itsLogger.info(message);
                 }
             } catch ( Exception ex ) {

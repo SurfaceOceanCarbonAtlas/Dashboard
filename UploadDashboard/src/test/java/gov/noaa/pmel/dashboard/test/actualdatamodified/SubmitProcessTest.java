@@ -1,9 +1,15 @@
 package gov.noaa.pmel.dashboard.test.actualdatamodified;
 
+import gov.noaa.pmel.dashboard.actions.DatasetChecker;
+import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
+import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.qc.QCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.MetadataUploadService;
@@ -20,6 +26,8 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,11 +55,17 @@ public class SubmitProcessTest {
 
         DataFileHandler datasetHandler = configStore.getDataFileHandler();
         MetadataFileHandler metaFileHandler = configStore.getMetadataFileHandler();
+        DatasetChecker dataChecker = configStore.getDashboardDatasetChecker();
         OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
         String version = configStore.getUploadVersion();
+        DatasetSubmitter datasetSubmitter = configStore.getDashboardDatasetSubmitter();
+        DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+        DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+
+        DashboardDatasetData dsetData = null;
+        DatasetQCStatus expectedStatus = new DatasetQCStatus();
 
         try {
-            DashboardDatasetData dsetData = null;
             StringBuilder strBuilder = new StringBuilder();
             for (String str : TSV_DATA_STRINGS) {
                 strBuilder.append(str);
@@ -60,20 +74,34 @@ public class SubmitProcessTest {
             try {
                 dsetData = datasetHandler.assignDatasetDataFromInput(null, reader,
                         DashboardUtils.TAB_FORMAT_TAG, USERNAME, 0, -1);
+                // The following are done by the DataUploadService (as well as creating an OME.xml stub)
                 dsetData.setUploadFilename(FILENAME);
                 dsetData.setUploadTimestamp(TIMESTAMP);
+                expectedStatus.setPiSuggested(DatasetQCStatus.Status.ACCEPTED_A);
+                expectedStatus.addComment("PI-recommended QC flag: A");
+                dsetData.setSubmitStatus(expectedStatus);
             } finally {
                 reader.close();
             }
-            String msg = "Adding test dataset " + EXPOCODE;
-            dsetData.setDataColTypes(DATA_COLUMN_TYPES);
-            datasetHandler.saveDatasetInfoToFile(dsetData, msg);
-            datasetHandler.saveDatasetDataToFile(dsetData, msg);
         } catch ( Exception ex ) {
             System.err.println("Problems interpreting/adding the data for " + EXPOCODE + ": " + ex.getMessage());
             ex.printStackTrace();
             System.exit(1);
         }
+
+        try {
+            String msg = "Adding test dataset " + EXPOCODE;
+            dsetData.setDataColTypes(DATA_COLUMN_TYPES);
+            datasetHandler.saveDatasetInfoToFile(dsetData, msg);
+            datasetHandler.saveDatasetDataToFile(dsetData, msg);
+            dataChecker.standardizeDataset(dsetData, null);
+        } catch ( Exception ex ) {
+            System.err.println("Problems with the data check for " + EXPOCODE + ": " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
+        assertEquals(DashboardUtils.CHECK_STATUS_ACCEPTABLE, dsetData.getDataCheckStatus());
+        assertEquals(expectedStatus, dsetData.getSubmitStatus());
 
         DashboardMetadata metadata = null;
         try {
@@ -127,7 +155,7 @@ public class SubmitProcessTest {
             ex.printStackTrace();
             System.exit(1);
         }
-        DatasetQCStatus expectedStatus = new DatasetQCStatus();
+
         expectedStatus.setAutoSuggested(DatasetQCStatus.Status.ACCEPTED_B);
         expectedStatus.addComment("(from automated QC) Accuracy of aqueous CO2 less than 2 uatm.  " +
                 "Accuracy of temperature measurements 0.05 deg C or less.  " +
@@ -135,15 +163,66 @@ public class SubmitProcessTest {
                 "(no attempt was made to adjust accuracy for differential pressure instruments).  " +
                 "4 calibration gasses, 3 of which have non-zero concentrations.  " +
                 "No attempt was made to find high-quality crossovers.");
-
         assertEquals(expectedStatus, dataset.getSubmitStatus());
 
-        // TODO: continue on
         // Ideally this should detect that it completely overlaps with 33GG20181110
+        try {
+            datasetSubmitter.submitDatasets(Collections.singleton(EXPOCODE),
+                    DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE, TIMESTAMP, false, USERNAME);
+        } catch ( Exception ex ) {
+            System.err.println("Problems submitting " + EXPOCODE + " for QC: " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
 
-        // Remove the data and metadata files
-        // The database will still have changes, and the parent directories will still exist
-        datasetHandler.deleteDatasetFiles(EXPOCODE, USERNAME, true);
+        dataset = datasetHandler.getDatasetFromInfoFile(EXPOCODE);
+        expectedStatus.setActual(DatasetQCStatus.Status.NEW_AWAITING_QC);
+        expectedStatus.addComment("Initial QC flag for new dataset");
+        assertEquals(expectedStatus, dataset.getSubmitStatus());
+
+        String comment = "suspending test dataset";
+        try {
+            DatasetQCStatus flag = dataset.getSubmitStatus();
+            flag.setActual(DatasetQCStatus.Status.SUSPENDED);
+            flag.addComment(comment);
+            dataset.setSubmitStatus(flag);
+            QCEvent qc = new QCEvent();
+            qc.setUsername(USERNAME);
+            qc.setFlagValue(flag.flagString());
+            qc.setFlagDate(new Date());
+            qc.setVersion(version);
+            qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+            qc.setComment(comment);
+            qc.setDatasetId(EXPOCODE);
+            dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
+            datasetHandler.saveDatasetInfoToFile(dataset, comment);
+            dsgHandler.updateDatasetQCFlagAndVersionStatus(EXPOCODE, flag.flagString(), version + "N");
+        } catch ( Exception ex ) {
+            System.err.println("Problems suspending " + EXPOCODE + " from QC: " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
+        dataset = datasetHandler.getDatasetFromInfoFile(EXPOCODE);
+        expectedStatus.setActual(DatasetQCStatus.Status.SUSPENDED);
+        expectedStatus.addComment(comment);
+        assertEquals(expectedStatus, dataset.getSubmitStatus());
+
+        try {
+            // Remove the data and metadata files
+            // The database will still have changes, and the parent directories will still exist
+            datasetHandler.deleteDatasetFiles(EXPOCODE, USERNAME, true);
+            // Remove the DSG files
+            DsgNcFile dsgFile = dsgHandler.getDsgNcFile(EXPOCODE);
+            dsgFile.delete();
+            dsgFile = dsgHandler.getDecDsgNcFile(EXPOCODE);
+            dsgFile.delete();
+            dsgHandler.flagErddap(true, true);
+        } catch ( Exception ex ) {
+            System.err.println("Problems deleting data files for " + EXPOCODE + ": " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static final String EXPOCODE = "00KS20181110";
@@ -184,6 +263,7 @@ public class SubmitProcessTest {
             "Platform Type: Ship\n",
             "Group: TESTERS\n",
             "Investigators: TESTERS\n",
+            "PI QC: A\n",
             "\n",
             "Expocode\tYD_UTC\tDATE_UTC__ddmmyyyy\tTIME_UTC_hh:mm:ss\tLAT_dec_degree\tLONG_dec_degree\txCO2_EQU_ppm\txCO2_ATM_ppm\txCO2_ATM_interpolated_ppm\tPRES_EQU_hPa\tPRES_ATM@SSP_hPa\tTEMP_EQU_C\tSST_C\tSAL_permil\tfCO2_SW@SST_uatm\tfCO2_ATM_interpolated_uatm\tdfCO2_uatm\tWOCE_QC_FLAG\tQC_SUBFLAG\n",
             "00KS20181110\t314.78848\t10112018\t18:55:25\t30.26070\t-88.50960\t-999\t410.672\t-999\t-999\t-999\t-999\t-999\t-999\t-999\t-999\t-999\t2\t\n",

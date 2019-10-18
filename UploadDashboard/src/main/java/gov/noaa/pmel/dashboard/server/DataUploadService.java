@@ -521,18 +521,20 @@ public class DataUploadService extends HttpServlet {
                 platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
             }
 
-            // Validate, if given, the PI suggested dataset QC status
+            // Clear any dataset QC comments as they were for previous data,
+            // then validate and add, if given, the PI suggested dataset QC status
+            DatasetQCStatus status = dsetData.getSubmitStatus();
+            status.setComments(null);
             if ( suggestedFlagString != null ) {
                 DatasetQCStatus.Status suggestedStatus = DatasetQCStatus.Status.fromString(suggestedFlagString);
                 if ( (suggestedStatus == null) || !DatasetQCStatus.Status.isAcceptable(suggestedStatus) ) {
                     messages.add(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG + " " + filename);
                     continue;
                 }
-                // Update the PI-suggested status to the existing submit status
-                DatasetQCStatus status = dsetData.getSubmitStatus();
                 status.setPiSuggested(suggestedStatus);
-                dsetData.setSubmitStatus(status);
+                status.addComment("PI-recommended dataset QC flag: " + suggestedFlagString);
             }
+            dsetData.setSubmitStatus(status);
 
             // Create the OME XML stub file for this dataset
             try {

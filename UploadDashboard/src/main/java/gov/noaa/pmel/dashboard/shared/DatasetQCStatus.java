@@ -366,7 +366,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
 
     /**
      * @param comment
-     *         comment to add to the beginning of the list of comments (so the latest comments are seen first).
+     *         comment to add to the end of the list of comments
      *
      * @throws IllegalArgumentException
      *         if comment is null or blank
@@ -377,7 +377,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         String trimmedComment = comment.trim();
         if ( trimmedComment.isEmpty() )
             throw new IllegalArgumentException("blank comment given to addComment");
-        comments.add(0, trimmedComment);
+        comments.add(trimmedComment);
     }
 
     /**

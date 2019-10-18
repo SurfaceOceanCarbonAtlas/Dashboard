@@ -1010,13 +1010,16 @@ public class DataFileHandler extends VersionedFileHandler {
                 metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
-                ;
             }
             try {
                 metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.PI_OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
-                ;
+            }
+            try {
+                metadataHandler.deleteWoceFlagMsgsFile(username, datasetId);
+            } catch ( Exception ex ) {
+                // Ignore - may not exist
             }
             for (String mdataTitle : dataset.getAddlDocs()) {
                 String filename = DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0];
