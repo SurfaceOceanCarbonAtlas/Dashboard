@@ -315,7 +315,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
                 hasSentDataset = true;
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
-                        submitStatus + "; " + ARCHIVE_STATUS_INTRO +
+                        submitStatus.statusString() + "; " + ARCHIVE_STATUS_INTRO +
                         cdiacDate + CRUISE_INFO_EPILOGUE + "</li>");
             }
         }

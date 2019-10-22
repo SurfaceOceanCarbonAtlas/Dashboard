@@ -432,6 +432,7 @@ public class DatabaseRequestHandler {
                     if ( flagValue.length() < 1 )
                         continue;
                     DatasetQCStatus flag = DatasetQCStatus.fromString(flagValue);
+                    // Note: Status.SUBMITTED cannot be returned from the single-character representation
                     if ( flag.isCommentFlag() || flag.isRenameFlag() )
                         continue;
                     long time = rslts.getLong(2);
