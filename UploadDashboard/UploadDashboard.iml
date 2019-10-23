@@ -57,9 +57,9 @@
     <orderEntry type="library" scope="PROVIDED" name="serializer-2.7.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="slf4j-api-1.7.25" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="sqljet-1.1.11" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="svnkit-1.9.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="svnkit-cli-1.9.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="svnkit-javahl16-1.9.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="svnkit-1.7.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="svnkit-cli-1.7.14" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="svnkit-javahl16-1.7.14" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="tomcat-coyote-7.0.86" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="xalan-2.7.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="xercesImpl-2.9.1" level="project" />

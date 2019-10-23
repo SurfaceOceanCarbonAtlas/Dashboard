@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="svnkit-javahl16-1.9.2">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/UploadDashboard/src/main/webapp/WEB-INF/lib/svnkit-javahl16-1.9.2.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
