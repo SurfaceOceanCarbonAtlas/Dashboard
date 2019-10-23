@@ -22,7 +22,7 @@ public class DatasetQCStatusTest {
     private static final String FIRST_COMMENT_STRING = "This is a comment about the QC flag";
     private static final String SECOND_COMMENT_STRING = "This is another comment about the QC flag";
     private static final ArrayList<String> COMMENTS_LIST =
-            new ArrayList<String>(Arrays.asList(SECOND_COMMENT_STRING, FIRST_COMMENT_STRING));
+            new ArrayList<String>(Arrays.asList(FIRST_COMMENT_STRING, SECOND_COMMENT_STRING));
 
     /**
      * Test of {@link DatasetQCStatus#getActual()} and {@link DatasetQCStatus#setActual(DatasetQCStatus.Status)}

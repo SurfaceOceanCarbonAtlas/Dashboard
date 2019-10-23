@@ -925,4 +925,21 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
     }
 
+    /**
+     * Deletes the WOCE flags messages file and its properties file for a dataset
+     *
+     * @param username
+     *         name of the user wanting to remove the WOCE flags messages
+     * @param datasetId
+     *         ID of the dataset associated with this WOCE flags messages file
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid,
+     *         if the user is not permitted to delete the WOCE flags messages file, or
+     *         if there are problems deleting the document.
+     */
+    public void deleteWoceFlagMsgsFile(String username, String datasetId) throws IllegalArgumentException {
+        deleteMetadata(username, datasetId, FLAG_MSGS_FILENAME);
+    }
+
 }

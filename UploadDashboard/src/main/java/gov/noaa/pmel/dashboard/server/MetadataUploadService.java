@@ -35,7 +35,7 @@ import java.util.TreeSet;
  */
 public class MetadataUploadService extends HttpServlet {
 
-    private static final long serialVersionUID = -1458504704372812166L;
+    private static final long serialVersionUID = 3482482593306147686L;
 
     private ServletFileUpload metadataUpload;
 
@@ -188,39 +188,13 @@ public class MetadataUploadService extends HttpServlet {
                 // Update the metadata documents associated with this cruise
                 DashboardDataset dataset;
                 if ( isOme ) {
-                    // Make sure the contents are valid OME XML
-                    DashboardOmeMetadata omedata;
                     try {
-                        omedata = metadataHandler.getOmeFromFile(metadata);
+                        dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
                     } catch ( IllegalArgumentException ex ) {
-                        // Problems with the file - delete it
+                        // Problem with this OME metadata - delete it
                         metadataHandler.deleteMetadata(username, id, metadata.getFilename());
-                        throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
-                    }
-                    dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
-                    try {
-                        // This is using the PI OME XML file at this time
-                        omePdfGenerator.createPiOmePdf(id);
-                    } catch ( Exception ex ) {
-                        throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " +
-                                ex.getMessage());
-                    }
-                    DatasetQCStatus autoSuggestedQC;
-                    try {
-                        autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
-                        DatasetQCStatus status = dataset.getSubmitStatus();
-                        if ( !autoSuggestedQC.getAutoSuggested().equals(status.getAutoSuggested()) ) {
-                            status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
-                            status.addComment(autoSuggestedQC.getComments().get(0));
-                            dataset.setSubmitStatus(status);
-                            dataFileHandler.saveDatasetInfoToFile(dataset,
-                                    "Update of automation-suggested dataset QC flag");
-                        }
-                    } catch ( Exception ex ) {
-                        /*
-                         * Either there is a problem with the metadata or the code to recommend
-                         * a dataset QC flag is faulty; whatever the reason, do not make a recommendation.
-                         */
+                        // And just throw the exception again
+                        throw ex;
                     }
                 }
                 else {
@@ -292,6 +266,68 @@ public class MetadataUploadService extends HttpServlet {
         PrintWriter respWriter = response.getWriter();
         respWriter.println(DashboardUtils.SUCCESS_HEADER_TAG);
         response.flushBuffer();
+    }
+
+    /**
+     * Validates the OME metadata contents, generates the PDF of this metadata, and
+     * evaluates the metadata to assign an automated dataset QC.
+     *
+     * @param id
+     *         dataset ID (expocode) associated with this metadata
+     * @param metadata
+     *         metadata information about this OME metadata
+     * @param metadataHandler
+     *         metadata file handler to obtain the OME metadata from the metadata information
+     * @param dataFileHandler
+     *         data file handler to obtain the data file information
+     * @param omePdfGenerator
+     *         handler to generate the PDF from the OME metadata
+     *
+     * @return the updated dataset information after adding this OME metadata
+     *
+     * @throws IllegalArgumentException
+     *         if the OME metadata is invalid, or if there is a problem generating the PDF from the OME metadata
+     */
+    public static DashboardDataset processOmeMetadata(String id, DashboardMetadata metadata,
+            MetadataFileHandler metadataHandler, DataFileHandler dataFileHandler,
+            OmePdfGenerator omePdfGenerator) throws IllegalArgumentException {
+
+        // Make sure the contents are valid OME XML
+        DashboardOmeMetadata omedata;
+        try {
+            omedata = metadataHandler.getOmeFromFile(metadata);
+        } catch ( IllegalArgumentException ex ) {
+            throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
+        }
+        // Generate the PDF from this PI_OME.xml file; this adds the PDF file as a "supplemental document"
+        try {
+            omePdfGenerator.createPiOmePdf(id);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
+        }
+        // "Add" this OME metadata file by assigning the OME timestamp, and get the dataset information
+        DashboardDataset dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
+
+        DatasetQCStatus autoSuggestedQC;
+        try {
+            autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
+            DatasetQCStatus status = dataset.getSubmitStatus();
+            if ( !autoSuggestedQC.getAutoSuggested().equals(status.getAutoSuggested()) ) {
+                status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
+                status.addComment(autoSuggestedQC.getComments().get(0));
+                dataset.setSubmitStatus(status);
+                dataFileHandler.saveDatasetInfoToFile(dataset,
+                        "Update of automation-suggested dataset QC flag");
+            }
+        } catch ( Exception ex ) {
+            /*
+             * Either there is a problem with the metadata or the code to recommend
+             * a dataset QC flag is faulty; whatever the reason, do not make a recommendation,
+             * but keep this OME metadata (so squash this exception).
+             */
+            ;
+        }
+        return dataset;
     }
 
     /**

@@ -32,7 +32,9 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         ACCEPTED_D,
         ACCEPTED_E,
         COMMENT,
-        RENAMED;
+        RENAMED,
+        SUBMITTED;
+        // SUBMITTED is only for backwards compatibility with dashboard dataset properties file
 
         /**
          * Returns the "key" for the given string.  The "key" is the string with all lowercase
@@ -130,6 +132,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
     // Not actually used at this time, but for completeness....
     private static final String STATUS_STRING_COMMENT = "Comment";
     private static final String STATUS_STRING_RENAMED = "Renamed";
+    // the following is only for backwards compatibility
+    private static final String STATUS_STRING_SUBMITTED = "Submitted";
 
     /**
      * Status values that can be assigned to the suggested fields.
@@ -193,6 +197,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         STATUS_STRING_MAP.put(Status.CONFLICTED, STATUS_STRING_CONFLICTED);
         STATUS_STRING_MAP.put(Status.RENAMED, STATUS_STRING_RENAMED);
         STATUS_STRING_MAP.put(Status.COMMENT, STATUS_STRING_COMMENT);
+        // SUBMITTED is only for backwards compatibility with dashboard dataset properties file
+        STATUS_STRING_MAP.put(Status.SUBMITTED, STATUS_STRING_SUBMITTED);
 
         KEYSTRING_STATUS_MAP = new HashMap<String,Status>();
         KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_PRIVATE), Status.PRIVATE);
@@ -222,6 +228,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_CONFLICTED), Status.CONFLICTED);
         KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_RENAMED), Status.RENAMED);
         KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_COMMENT), Status.COMMENT);
+        // SUBMITTED is only for backwards compatibility with dashboard dataset properties file
+        KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_SUBMITTED), Status.SUBMITTED);
 
         for (Status status : Status.values()) {
             KEYSTRING_STATUS_MAP.put(Status.keyString(status.toString()), status);
@@ -366,7 +374,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
 
     /**
      * @param comment
-     *         comment to add to the beginning of the list of comments (so the latest comments are seen first).
+     *         comment to add to the end of the list of comments
      *
      * @throws IllegalArgumentException
      *         if comment is null or blank
@@ -377,7 +385,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         String trimmedComment = comment.trim();
         if ( trimmedComment.isEmpty() )
             throw new IllegalArgumentException("blank comment given to addComment");
-        comments.add(0, trimmedComment);
+        comments.add(trimmedComment);
     }
 
     /**
@@ -552,6 +560,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         if ( Status.UPDATED_AWAITING_QC.equals(actual) )
             return true;
         if ( Status.CONFLICTED.equals(actual) )
+            return true;
+        if ( Status.SUBMITTED.equals(actual) )
             return true;
         return false;
     }

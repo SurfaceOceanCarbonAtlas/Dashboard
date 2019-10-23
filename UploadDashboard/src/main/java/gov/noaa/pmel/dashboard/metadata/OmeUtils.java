@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,7 +116,7 @@ public class OmeUtils {
         }
     }
 
-    private static final HashSet<String> ALLOWED_UNITS = new HashSet<String>(Arrays.asList(
+    private static final List<String> ALLOWED_UNITS = Arrays.asList(
             "microatmospheres",
             "uatmospheres",
             SpellingHandler.mu + "atmospheres",
@@ -127,9 +128,9 @@ public class OmeUtils {
             "umol/mol",
             SpellingHandler.mu + "mol/mol",
             "ppm"
-    ));
+    );
 
-    private static final HashSet<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = new HashSet<DataColumnType>(Arrays.asList(
+    private static final List<DataColumnType> OBVIOUS_DATA_COLUMN_TYPES = Arrays.asList(
             DashboardServerUtils.DATASET_ID.duplicate(),
             DashboardServerUtils.DATASET_NAME.duplicate(),
             DashboardServerUtils.INVESTIGATOR_NAMES.duplicate(),
@@ -151,7 +152,7 @@ public class OmeUtils {
             DashboardServerUtils.SECOND_OF_MINUTE.duplicate(),
             DashboardServerUtils.DAY_OF_YEAR.duplicate(),
             DashboardServerUtils.SECOND_OF_DAY.duplicate()
-    ));
+    );
 
     /**
      * List of recognized acceptable CO2 measurement method descriptions for Dataset QC flag A-C
@@ -248,26 +249,34 @@ public class OmeUtils {
         double co2Accuracy = 999.0;
         for (AquGasConc gasConc : co2vars) {
             NumericString accuracy = gasConc.getAccuracy();
-            if ( !ALLOWED_UNITS.contains(accuracy.getUnitString()) )
-                throw new IllegalArgumentException("Unexpected units of '" + accuracy.getUnitString() +
+            String units = accuracy.getUnitString();
+            boolean okay = false;
+            for (String allowed : ALLOWED_UNITS) {
+                if ( units.startsWith(allowed) ) {
+                    okay = true;
+                    break;
+                }
+            }
+            if ( !okay )
+                throw new IllegalArgumentException("Unexpected units of '" + units +
                         "' for the accuracy of an aqueous CO2 measurement variable ");
             if ( co2Accuracy > accuracy.getNumericValue() )
                 co2Accuracy = accuracy.getNumericValue();
         }
         DatasetQCStatus.Status autoSuggest;
-        String comment;
+        String comment = "(from automated QC) ";
         if ( co2Accuracy <= 2.0 ) {
-            comment = "Accuracy of aqueous CO2 less than 2 uatm.  ";
+            comment += "Accuracy of aqueous CO2 less than 2 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_B;
         }
         else if ( co2Accuracy <= 5.0 ) {
-            comment = "Accuracy of aqueous CO2 less than 5 uatm.  ";
+            comment += "Accuracy of aqueous CO2 less than 5 uatm.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
         }
         else {
             // Alternative sensors with CO2 accuracy within 10.0 could be ACCEPTED_E.  However, they need a clear
             // and detailed description of the calibration, so an automation-suggested flag is not possible.
-            comment = "Accuracy of aqueous CO2 coould not be determined or was greater than 5 uatm; " +
+            comment += "Accuracy of aqueous CO2 could not be determined or was greater than 5 uatm; " +
                     "alternate sensors (flag E) were not considered.";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
@@ -293,13 +302,20 @@ public class OmeUtils {
                 // only for the dashboard - instead of adding it in the prologue.
                 // At this time, do not worry about these not being described as well as
                 // the "obvious" names/types, although ideally all columns should be described.
-                if ( OBVIOUS_DATA_COLUMN_TYPES.contains(colTypes.get(k)) )
-                    continue;
-                String name = colNames.get(k);
-                if ( !varColNames.contains(name) ) {
-                    comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
-                    acceptable = false;
-                    break;
+                boolean obvious = false;
+                for (DataColumnType obvType : OBVIOUS_DATA_COLUMN_TYPES) {
+                    if ( obvType.typeNameEquals(colTypes.get(k)) ) {
+                        obvious = true;
+                        break;
+                    }
+                }
+                if ( !obvious ) {
+                    String name = colNames.get(k);
+                    if ( !varColNames.contains(name) ) {
+                        comment += "Metadata incomplete: data column '" + name + "' is not described in the metadata.  ";
+                        acceptable = false;
+                        break;
+                    }
                 }
             }
         }
@@ -321,15 +337,15 @@ public class OmeUtils {
                 tempAccuracy = accuracy.getNumericValue();
         }
         if ( tempAccuracy <= 0.05 ) {
-            comment += "Accuracy of temperature measurements 0.05 °C or less.  ";
+            comment += "Accuracy of temperature measurements 0.05 deg C or less.  ";
         }
         else if ( tempAccuracy <= 0.2 ) {
-            comment += "Accuracy of temperature measurements between 0.05 and 0.2 °C.  ";
+            comment += "Accuracy of temperature measurements between 0.05 and 0.2 deg C.  ";
             if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
                 autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
         }
         else {
-            comment += "Accuracy of temperature measurements could not be determined or exceeds 0.2 °C; " +
+            comment += "Accuracy of temperature measurements could not be determined or exceeds 0.2 deg C; " +
                     "alternatve sensors (flag E) were not considered.";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
@@ -349,20 +365,20 @@ public class OmeUtils {
         if ( pressAccuracy <= 2.0 ) {
             comment += "Accuracy of pressure measurements 2.0 hPa or less";
             if ( pressvars.size() > 1 )
-                comment += " (total accuracy using differential pressure instruments not considered)";
+                comment += " (no attempt was made to adjust accuracy for differential pressure instruments)";
             comment += ".  ";
         }
         else if ( pressAccuracy <= 5.0 ) {
             comment += "Accuracy of pressure measurements between 2.0 and 5.0 hPa";
             if ( pressvars.size() > 1 )
-                comment += " (total accuracy using differential pressure instruments not considered)";
+                comment += " (no attempt was made to adjust accuracy for differential pressure instruments)";
             comment += ".  ";
             if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
                 autoSuggest = DatasetQCStatus.Status.ACCEPTED_C;
         }
         else {
             comment += "Accuracy of pressure measurements could not be determined or exceeds 5.0 hPa; " +
-                    "alternatve sensors (flag E) were not considered.";
+                    "alternatve sensors (flag E) were not considered.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
@@ -391,17 +407,17 @@ public class OmeUtils {
         if ( numCalibGases > 0 ) {
             comment += numCalibGases + " calibration gasses";
             if ( numNonZeroCalibGases >= 0 )
-                comment += " ," + numNonZeroCalibGases + " of which have non-zero concentrations";
+                comment += ", " + numNonZeroCalibGases + " of which have non-zero concentrations";
             comment += ".  ";
         }
         if ( numCalibGases < 2 ) {
-            comment += "Not enough calibration gasses.";
+            comment += "Not enough calibration gasses.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
         }
         if ( numNonZeroCalibGases < 1 ) {
-            comment += "Not enough non-zero concentration calibration gasses.";
+            comment += "Not enough non-zero concentration calibration gasses.  ";
             DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
             status.setAutoSuggested(DatasetQCStatus.Status.SUSPENDED);
             return status;
@@ -427,7 +443,7 @@ public class OmeUtils {
             }
         }
         if ( !acceptable ) {
-            comment += "CO2 measurements not continuous or not made by a method recognized as acceptable.  ";
+            comment += "CO2 measurements not continuous or not made by a method recognized as IR, GC, or spectroscopy.  ";
             autoSuggest = DatasetQCStatus.Status.ACCEPTED_D;
         }
 
@@ -441,7 +457,7 @@ public class OmeUtils {
         //     warming between SST and Tequ less than 3 deg C
 
         if ( autoSuggest.equals(DatasetQCStatus.Status.ACCEPTED_B) )
-            comment += "  No attempt was made to find high-quality crossovers.";
+            comment += "No attempt was made to find high-quality crossovers.";
         DatasetQCStatus status = new DatasetQCStatus(DatasetQCStatus.Status.PRIVATE, comment);
         status.setAutoSuggested(autoSuggest);
         return status;

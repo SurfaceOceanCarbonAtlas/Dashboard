@@ -204,19 +204,23 @@ public interface OmeMetadataInterface {
     void setDataEndTime(Double dataEndTime);
 
     /**
-     * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     * Using the contents of this OME metadata, recommend a QC flag/status for this dataset.
      * The returned dataset QC will have the autoSuggested flag assigned as well as
      * a single comment documenting the reason for this suggested Status.
      *
+     * @param metadata
+     *         OME metadata XML file associated with this metadata.  The XML from this file
+     *         may be read instead of using the contents of this object.
      * @param dataset
      *         information about the dataset associated with this OME document
      *
      * @return the automation-suggested dataset QC
      *
      * @throws IllegalArgumentException
-     *         if there are problems with the given Metadata
+     *         if there are problems with the given metadata
      */
 
-    DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException;
+    DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
+            throws IllegalArgumentException;
 
 }

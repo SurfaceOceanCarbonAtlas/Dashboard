@@ -303,7 +303,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
             else if ( cdiacDate.isEmpty() ) {
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
-                        submitStatus + CRUISE_INFO_EPILOGUE + "</li>");
+                        submitStatus.statusString() + CRUISE_INFO_EPILOGUE + "</li>");
             }
             else if ( submitStatus.isPrivate() ) {
                 hasSentDataset = true;
@@ -315,7 +315,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
                 hasSentDataset = true;
                 cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) +
                         CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
-                        submitStatus + "; " + ARCHIVE_STATUS_INTRO +
+                        submitStatus.statusString() + "; " + ARCHIVE_STATUS_INTRO +
                         cdiacDate + CRUISE_INFO_EPILOGUE + "</li>");
             }
         }

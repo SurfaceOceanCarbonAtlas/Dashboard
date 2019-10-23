@@ -168,7 +168,7 @@ public class DatabaseRequestHandler {
     private void testConnections(String sqlDriverName) throws SQLException {
         // Register the SQL driver - no harm if already registered
         try {
-            Class.forName(sqlDriverName).newInstance();
+            Class.forName(sqlDriverName).getDeclaredConstructor().newInstance();
         } catch ( Exception ex ) {
             throw new SQLException("Unable to register the SQL driver " +
                     sqlDriverName + "\n" + ex.getMessage());
@@ -432,6 +432,7 @@ public class DatabaseRequestHandler {
                     if ( flagValue.length() < 1 )
                         continue;
                     DatasetQCStatus flag = DatasetQCStatus.fromString(flagValue);
+                    // Note: Status.SUBMITTED cannot be returned from the single-character representation
                     if ( flag.isCommentFlag() || flag.isRenameFlag() )
                         continue;
                     long time = rslts.getLong(2);

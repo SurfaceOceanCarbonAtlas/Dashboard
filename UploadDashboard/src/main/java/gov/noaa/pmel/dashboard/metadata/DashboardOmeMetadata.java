@@ -73,7 +73,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
         // Create the OME object for this instance
         try {
-            this.omeMData = omeClass.newInstance();
+            this.omeMData = omeClass.getDeclaredConstructor().newInstance();
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unable to create an instance of " +
                     omeClass.getSimpleName() + ": " + ex.getMessage());
@@ -403,7 +403,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * Using the contents of this OME document, recommend a QC flag/status for this dataset.
+     * Using the contents of this OME metadata, recommend a QC flag/status for this dataset.
      * The returned dataset QC will have the autoSuggested flag assigned as well as
      * a single comment documenting the reason for this suggested Status.
      *
@@ -416,7 +416,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      *         if there are problems with the given Metadata
      */
     public DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
-        return omeMData.suggestedDatasetStatus(dataset);
+        return omeMData.suggestedDatasetStatus(this, dataset);
     }
 
 }
