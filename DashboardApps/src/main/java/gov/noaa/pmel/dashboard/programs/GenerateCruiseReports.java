@@ -41,10 +41,10 @@ public class GenerateCruiseReports {
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
     private static final String NOT_AVAILABLE_TAG = "N/A";
     private static final String SOCAT_ENHANCED_DOI_TAG = "SOCATENHANCEDDOI";
-    private static final String SOCAT_ENHANCED_HREF_PREFIX = "http://doi.pangaea.de/";
+    private static final String SOCAT_ENHANCED_HREF_PREFIX = "https://doi.pangaea.de/";
 
     // SOCAT main DOI, DOI HRef, and publication citation
-    private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.890974";
+    private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.905654";
     private static final String[] SOCAT_MAIN_CITATION = {
             "  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade ",
             "record of high quality fCO2 data in version 3 of the Surface Ocean ",
