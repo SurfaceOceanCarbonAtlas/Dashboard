@@ -393,7 +393,7 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
      *         PI-suggested and automation-suggested substrings are added only if their values
      *         are not {@link Status#PRIVATE}.  Examples: <br />
      *         "N-piB" (submitted new with PI-suggested flag of B) <br />
-     *         "U-auB" (submitted update with automation-suggested flag of B) <br />
+     *         "U-autoB" (submitted update with automation-suggested flag of B) <br />
      *         "P" (all QC status fields {@link Status#PRIVATE})
      *
      * @throws IllegalArgumentException
