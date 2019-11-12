@@ -779,7 +779,9 @@ public class DashboardUtils {
                 return -1;
             if ( d2 == null )
                 return 1;
-            return d1.getVersion().compareTo(d2.getVersion());
+            Double d1version = Double.valueOf(d1.getVersion());
+            Double d2version = Double.valueOf(d2.getVersion());
+            return d1version.compareTo(d2version);
         }
     };
 
