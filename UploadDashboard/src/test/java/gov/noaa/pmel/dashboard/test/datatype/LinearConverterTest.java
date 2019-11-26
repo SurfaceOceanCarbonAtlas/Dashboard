@@ -96,6 +96,9 @@ public class LinearConverterTest {
 
         converter = new LinearConverter("km", "m", null);
         assertEquals(100.0, converter.convertValueOf("0.1"), 1.0E-6);
+
+        converter = new LinearConverter("m/s", "knots", null);
+        assertEquals(10.0, converter.convertValueOf("5.14444444"), 1.0E-6);
     }
 
 }

@@ -70,6 +70,16 @@ public class LinearConverter extends ValueConverter<Double> {
         SLOPES_MAP.put(key, 0.689475728);
         INTERCEPTS_MAP.put(key, 0.0);
 
+        key = "from \"m/s\" to \"knots\"";
+        SLOPES_MAP.put(key, 1.943844492441);
+        INTERCEPTS_MAP.put(key, 0.0);
+        key = "from \"km/h\" to \"knots\"";
+        SLOPES_MAP.put(key, 0.5399568034557);
+        INTERCEPTS_MAP.put(key, 0.0);
+        key = "from \"mph\" to \"knots\"";
+        SLOPES_MAP.put(key, 0.8689762419006);
+        INTERCEPTS_MAP.put(key, 0.0);
+
         // TODO: add more linear unit conversions
     }
 
