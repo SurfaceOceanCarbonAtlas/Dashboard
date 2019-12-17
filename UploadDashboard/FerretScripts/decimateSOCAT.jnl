@@ -41,7 +41,7 @@ let tol3 = ($tol_var)
 
 LET control = 2
 
-IF `($FERRET_VERSION) GE 7.51` THEN
+IF `($FERRET_VERSION) GE 7.6` THEN
     USE /FEATURE=NONE "($infile)"
 ELSE
     USE "($infile)"

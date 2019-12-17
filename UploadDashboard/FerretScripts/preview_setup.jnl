@@ -5,7 +5,7 @@
 ! Make definitions used by all the scripts
 
 ! Open the input dataset
-IF `($FERRET_VERSION) GE 7.51` THEN
+IF `($FERRET_VERSION) GE 7.6` THEN
     USE /FEATURE=NONE "($infile_dsg)"
 ELSE
     USE "($infile_dsg)"
