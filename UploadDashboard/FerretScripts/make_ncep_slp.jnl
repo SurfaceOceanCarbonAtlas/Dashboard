@@ -10,7 +10,7 @@ def sym offst = 101000
 def sym newbadint = 32766
 def sym newbad = `($newbadint)+($offst)`
 def sym finalyear = 2019
-def sym firstmissday = 15-AUG
+def sym firstmissday = 03-DEC
 
 ! Rewrite the whole set.  This only takes a couple minutes.
 

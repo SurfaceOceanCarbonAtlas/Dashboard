@@ -158,7 +158,7 @@ public class WoceOverlapTail {
 
                 // Add the WOCE event to the database
                 configStore.getDatabaseRequestHandler().addDataQCEvent(Arrays.asList(woceEvent));
-                // Assign the WOCE-4 flags in the full-data DSG file
+                // Assign the WOCE-4 flags in the full-data DSG file, then regenerate the decimated dataset
                 ArrayList<DataLocation> unidentified = dsgHandler.updateDataQCFlags(woceEvent, false);
                 if ( !unidentified.isEmpty() ) {
                     for (DataLocation loc : unidentified) {
@@ -166,7 +166,6 @@ public class WoceOverlapTail {
                     }
                     throw new RuntimeException("unexpected error");
                 }
-                configStore.getDsgNcFileHandler().decimateDatasetDsg(firstExpo);
                 // Report WOCE-4 of duplicates
                 System.out.println("WOCE-4 assigned to duplicate datapoints in " +
                         firstExpo + ": " + firstRowNums.toString());
