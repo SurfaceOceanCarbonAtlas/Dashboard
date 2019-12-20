@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -530,8 +531,8 @@ public class DsgNcFileHandler {
      *
      * @param datasetId
      *         update the dataset DSG files with this unique ID (expocode)
-     * @param qcFlag
-     *         dataset QC flag to assign in the DSG files
+     * @param qcStatus
+     *         dataset QC status to use to assign the dataset QC flag in the DSG file
      * @param versionStatus
      *         version with status (e.g., "2019.0N") to assign in the DSG files
      *
@@ -540,19 +541,19 @@ public class DsgNcFileHandler {
      * @throws IOException
      *         if problems opening or writing to a DSG file
      */
-    public void updateDatasetQCFlagAndVersionStatus(String datasetId, String qcFlag, String versionStatus)
+    public void updateDatasetQCFlagAndVersionStatus(String datasetId, DatasetQCStatus qcStatus, String versionStatus)
             throws IllegalArgumentException, IOException {
         // Get the location and name for the NetCDF DSG file
         DsgNcFile dsgFile = getDsgNcFile(datasetId);
         if ( !dsgFile.exists() )
             throw new IllegalArgumentException("Full-data DSG file for " + datasetId + " does not exist");
         synchronized(SINGLETON_SYNC_OBJECT) {
-            dsgFile.updateDatasetQCFlagAndVersionStatus(qcFlag, versionStatus);
+            dsgFile.updateDatasetQCFlagAndVersionStatus(qcStatus, versionStatus);
         }
         DsgNcFile decDsgFile = getDecDsgNcFile(datasetId);
         if ( !decDsgFile.exists() )
             throw new IllegalArgumentException("Decimated DSG file for " + datasetId + " does not exist");
-        decDsgFile.updateDatasetQCFlagAndVersionStatus(qcFlag, versionStatus);
+        decDsgFile.updateDatasetQCFlagAndVersionStatus(qcStatus, versionStatus);
         flagErddap(true, true);
     }
 

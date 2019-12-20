@@ -324,7 +324,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                 dataHandler.saveDatasetInfoToFile(dataset, comment);
                 // Update the DSG files
                 String versionStatus = dbHandler.getVersionStatus(datasetId);
-                dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, flag.flagString(), versionStatus);
+                dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, flag, versionStatus);
                 itsLogger.info("updated QC status for " + datasetId);
             } catch ( Exception ex ) {
                 // Should not fail.  If does, record but otherwise ignore the failure.
@@ -621,7 +621,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
                     dataHandler.saveDatasetInfoToFile(dset, message);
                     //  update the DSG files
                     String versionStatus = dbHandler.getVersionStatus(datasetId);
-                    dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, status.flagString(), versionStatus);
+                    dsgHandler.updateDatasetQCFlagAndVersionStatus(datasetId, status, versionStatus);
                     itsLogger.info(message);
                 }
             } catch ( Exception ex ) {

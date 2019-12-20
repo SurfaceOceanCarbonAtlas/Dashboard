@@ -242,7 +242,7 @@ public class MetadataUploadService extends HttpServlet {
                         dataFileHandler.saveDatasetInfoToFile(dataset, comment);
                         // Update the DSG files
                         String versionStatus = databaseHandler.getVersionStatus(id);
-                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id, status.flagString(), versionStatus);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(id, status, versionStatus);
                     } catch ( Exception ex ) {
                         // Should not fail. If does, do not delete the file since it is okay;
                         // just record but otherwise ignore the failure.

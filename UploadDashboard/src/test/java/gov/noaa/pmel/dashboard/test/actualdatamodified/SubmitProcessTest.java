@@ -196,7 +196,7 @@ public class SubmitProcessTest {
             qc.setDatasetId(EXPOCODE);
             dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
             datasetHandler.saveDatasetInfoToFile(dataset, comment);
-            dsgHandler.updateDatasetQCFlagAndVersionStatus(EXPOCODE, flag.flagString(), version + "N");
+            dsgHandler.updateDatasetQCFlagAndVersionStatus(EXPOCODE, flag, version + "N");
         } catch ( Exception ex ) {
             System.err.println("Problems suspending " + EXPOCODE + " from QC: " + ex.getMessage());
             ex.printStackTrace();

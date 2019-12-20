@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
@@ -33,7 +34,7 @@ import java.util.TreeSet;
 
 public class DsgNcFile extends File {
 
-    private static final long serialVersionUID = 1251710644553980018L;
+    private static final long serialVersionUID = 9104295509280903806L;
 
     private static final String DSG_VERSION = "DsgNcFile 2.0";
     private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
@@ -952,8 +953,8 @@ public class DsgNcFile extends File {
     /**
      * Updates this DSG file with the given QC flag and version number with status
      *
-     * @param qcFlag
-     *         the QC flag to assign
+     * @param qcStatus
+     *         dataset QC status to use to assign the dataset QC flag in this DSG file
      * @param versionStatus
      *         version with status to assign
      *
@@ -962,7 +963,7 @@ public class DsgNcFile extends File {
      * @throws IOException
      *         if opening or writing to the DSG file throws one
      */
-    public void updateDatasetQCFlagAndVersionStatus(String qcFlag, String versionStatus)
+    public void updateDatasetQCFlagAndVersionStatus(DatasetQCStatus qcStatus, String versionStatus)
             throws IllegalArgumentException, IOException {
         NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
         try {
@@ -971,7 +972,7 @@ public class DsgNcFile extends File {
             if ( var == null )
                 throw new IllegalArgumentException("Unable to find variable '" + varName + "' in " + getName());
             ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
-            flagArray.setString(0, qcFlag.trim());
+            flagArray.setString(0, qcStatus.dsgFlagString());
             try {
                 ncfile.write(var, flagArray);
             } catch ( InvalidRangeException ex ) {
