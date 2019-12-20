@@ -3,6 +3,7 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -74,10 +75,12 @@ public class UpdateQCFlags {
 
             // update each of these cruises
             for (String expocode : allExpocodes) {
+                DatasetQCStatus qcStatus;
                 String qcFlag;
                 String versionStatus;
                 try {
-                    qcFlag = dbHandler.getDatasetQCFlag(expocode).flagString();
+                    qcStatus = dbHandler.getDatasetQCFlag(expocode);
+                    qcFlag = qcStatus.dsgFlagString();
                     versionStatus = dbHandler.getVersionStatus(expocode);
                 } catch ( Exception ex ) {
                     System.err.println("Error getting the database QC flag or version with status for " +
@@ -100,7 +103,7 @@ public class UpdateQCFlags {
                 try {
                     if ( !(qcFlag.equals(oldQCFlag) && versionStatus.equals(oldVersionStatus)) ) {
                         // Update the QC flag in the DSG files
-                        dsgHandler.updateDatasetQCFlagAndVersionStatus(expocode, qcFlag, versionStatus);
+                        dsgHandler.updateDatasetQCFlagAndVersionStatus(expocode, qcStatus, versionStatus);
                         System.out.println("Updated QC flag for " + expocode + " from '" + oldQCFlag +
                                 "', v" + oldVersionStatus + " to '" + qcFlag + "', v" + versionStatus);
 

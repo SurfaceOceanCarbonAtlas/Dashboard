@@ -14,7 +14,7 @@ import java.util.HashSet;
  */
 public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5185613156609609049L;
+    private static final long serialVersionUID = 8281099561773635785L;
 
     /**
      * Values for the DatasetQCStatus fields
@@ -419,6 +419,22 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
                 throw new IllegalArgumentException("Invalid automation-suggested QC status " + autoSuggested);
             valueString += FLAG_SEPARATOR + AUTOFLAG_PREFIX + autoVal;
         }
+        return valueString;
+    }
+
+    /**
+     * @return the dataset QC status flag to assign as to the DSG file; never null or empty.
+     *         At this time, just the actual status flag string (N, U, A, B, C, D, E, Q, S, X)
+     *
+     * @throws IllegalArgumentException
+     *         if the QC status is invalid for assigning to a DSG file
+     */
+    public String dsgFlagString() throws IllegalArgumentException {
+        if ( Status.PRIVATE.equals(actual) || Status.RENAMED.equals(actual) || Status.COMMENT.equals(actual) )
+            throw new IllegalArgumentException("Invalid actual QC status " + actual + " for DSG files");
+        String valueString = STATUS_FLAG_MAP.get(actual);
+        if ( valueString == null )
+            throw new IllegalArgumentException("Unknown actual QC status " + actual);
         return valueString;
     }
 
