@@ -51,15 +51,16 @@ public class DataUploadPage extends CompositeWithUsername {
                     "<li>a line of data column units (optional),</li>" +
                     "<li>a line of data values for each data sample</li>" +
                     "</ul></p>" +
-                    "<p>The expocode, vessel (ship) name, and investigators " +
-                    "names must be given (organization and vessel type are optional) " +
+                    "<p>The expocode, vessel (ship) name, and investigators names must be given " +
+                    "(organization, vessel type, and suggest flag are optional) " +
                     "in either the metadata lines (# at start is optional): " +
                     "<ul style=\"list-style-type: none\">" +
-                    "<li># expocode: ZZZZ20051231</li>" +
-                    "<li># vessel name: Pacific Minnow</li>" +
+                    "<li># Expocode: ZZZZ20051231</li>" +
+                    "<li># Vessel name: Pacific Minnow</li>" +
                     "<li># PIs: Smith, K.; Doe, J.</li>" +
                     "<li># Org: Ocean Tours</li>" +
-                    "<li># vessel type: Ship</li>" +
+                    "<li># Vessel type: Ship</li>" +
+                    "<li># Suggested QC: C</li>" +
                     "</ul> " +
                     "or they can be in columns with appropriate names.  </p>";
 
@@ -73,6 +74,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     "  <li>PI: Wanninkhof, R.</li>" +
                     "  <li>Org: NOAA-AOML</li>" +
                     "  <li>Vessel Type: Ship</li>" +
+                    "  <li>Suggested QC: B</li>" +
                     "  <li></li>" +
                     "  <li>CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...</li>" +
                     "  <li>20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...</li>" +
@@ -107,6 +109,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     "Tags for the vessel type are 'vessel type', 'platform type', or just " +
                     "'type'.  If the vessel type is not specified, an intelligent guess is " +
                     "made based on the vessel name and/or the NODC code part of the expocode.  " +
+                    "Tags for the PI-suggest dataset QC flag are 'PI-suggested QC', 'Suggested QC', or 'PI QC'." +
                     "</p><p>" +
                     "Units for the columns can be given on a second column header line, " +
                     "such as the following:" +
@@ -116,6 +119,7 @@ public class DataUploadPage extends CompositeWithUsername {
                     "  <li>Investigator = Wanninkhof, R.</li>" +
                     "  <li>Organization = NOAA-AOML</li>" +
                     "  <li>Vessel Type = Ship</li>" +
+                    "  <li>PI-suggested QC: B</li>" +
                     "  <li></li>" +
                     "  <li>CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...</li>" +
                     "  <li>,Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...</li>" +
@@ -626,7 +630,8 @@ public class DataUploadPage extends CompositeWithUsername {
             }
             else if ( header.startsWith(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG) ) {
                 // Invalid entry for organization names
-                String filename = header.substring(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG.length()).trim();
+                String filename = header.substring(DashboardUtils.INVALID_SUGGESTED_QC_STATUS_HEADER_TAG.length())
+                                        .trim();
                 errMsgs.add(FAIL_MSG_START + SafeHtmlUtils.htmlEscape(filename) + INVALID_SUGGESTED_QC_STATUS_FAIL_MSG);
             }
             else if ( header.startsWith(DashboardUtils.DATASET_EXISTS_HEADER_TAG) ) {
