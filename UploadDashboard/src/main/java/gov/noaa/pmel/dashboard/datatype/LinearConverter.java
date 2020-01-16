@@ -80,7 +80,17 @@ public class LinearConverter extends ValueConverter<Double> {
         SLOPES_MAP.put(key, 0.8689762419006);
         INTERCEPTS_MAP.put(key, 0.0);
 
-        // TODO: add more linear unit conversions
+        // xH2O
+        key = "from \"umol/mol\" to \"mmol/mol\"";
+        SLOPES_MAP.put(key, 0.001);
+        INTERCEPTS_MAP.put(key, 0.0);
+
+        // day of year
+        key = "from \"Jan1=0.0\" to \"Jan1=1.0\"";
+        SLOPES_MAP.put(key, 1.0);
+        INTERCEPTS_MAP.put(key, 1.0);
+
+        // TODO: add more linear unit conversions as needed
     }
 
     Double slope;
