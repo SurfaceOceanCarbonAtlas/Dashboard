@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -27,7 +24,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 353927270709646644L;
+    private static final long serialVersionUID = 6113847974011933801L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -327,8 +324,30 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         return platformName;
     }
 
+    /**
+     * @param platformName
+     *     the platform name to assign for this dataset
+     */
     public void setPlatformName(String platformName) {
         omeMData.setPlatformName(platformName);
+    }
+
+    /**
+     * @return the platform type for this dataset; never null but may be empty
+     */
+    public String getPlatformType() {
+        String platformType = omeMData.getPlatformType();
+        if ( platformType == null )
+            return "";
+        return platformType;
+    }
+
+    /**
+     * @param platformType
+     *     the platform type to assign for this dataset
+     */
+    public void setPlatformType(String platformType) {
+        omeMData.setPlatformType(platformType);
     }
 
     /**
