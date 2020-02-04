@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
@@ -27,6 +24,7 @@ public class FixPIsOrgsPlatforms {
     HashMap<String,ArrayList<String>> piNameFixMap;
     HashMap<String,String> piNameOrgMap;
     HashMap<String,String> platformNameFixMap;
+    HashMap<String,String> platformTypeFixMap;
 
     /**
      * Corrects names of PIs and platforms, and adds organizations, in OME metadata
@@ -41,12 +39,15 @@ public class FixPIsOrgsPlatforms {
      * @param platformNameFixesFile
      *         TSV file of erroneous and correct platform names;
      *         each line consists of the erroneous platform name, a tab, and the correct platform name
+     * @param platformTypeFixesFile
+     *         TSV file of erroneous and correct platform types;
+     *         each line consists of the erroneous platform type, a tab, and the correct platform type
      *
      * @throws IllegalArgumentException
      *         if problems reading either of the files
      */
-    public FixPIsOrgsPlatforms(File piNameFixesFile, File piNameOrgFile, File platformNameFixesFile)
-            throws IllegalArgumentException {
+    public FixPIsOrgsPlatforms(File piNameFixesFile, File piNameOrgFile,
+            File platformNameFixesFile, File platformTypeFixesFile) throws IllegalArgumentException {
         BufferedReader reader;
 
         piNameFixMap = new HashMap<String,ArrayList<String>>();
@@ -129,7 +130,8 @@ public class FixPIsOrgsPlatforms {
                     if ( fixName.isEmpty() )
                         throw new IllegalArgumentException("empty corrected platform name in '" + dataline + "'");
                     if ( platformNameFixMap.put(errName, fixName) != null )
-                        throw new IllegalArgumentException("more than one correction for platform '" + errName + "'");
+                        throw new IllegalArgumentException(
+                                "more than one correction for platform name '" + errName + "'");
 
                     dataline = reader.readLine();
                 }
@@ -138,6 +140,36 @@ public class FixPIsOrgsPlatforms {
             }
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems with " + platformNameFixesFile.getPath() +
+                    ": " + ex.getMessage(), ex);
+        }
+
+        platformTypeFixMap = new HashMap<String,String>();
+        try {
+            reader = new BufferedReader(new FileReader(platformTypeFixesFile));
+            try {
+                String dataline = reader.readLine();
+                while ( dataline != null ) {
+
+                    String[] pieces = dataline.trim().split("\\t");
+                    if ( pieces.length != 2 )
+                        throw new IllegalArgumentException("not two values separated by a tab in '" + dataline + "'");
+                    String errType = pieces[0].trim();
+                    if ( errType.isEmpty() )
+                        throw new IllegalArgumentException("empty erroneous platform type in '" + dataline + "'");
+                    String fixType = pieces[1].trim();
+                    if ( fixType.isEmpty() )
+                        throw new IllegalArgumentException("empty corrected platform type in '" + dataline + "'");
+                    if ( platformTypeFixMap.put(errType, fixType) != null )
+                        throw new IllegalArgumentException(
+                                "more than one correction for platform type '" + errType + "'");
+
+                    dataline = reader.readLine();
+                }
+            } finally {
+                reader.close();
+            }
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems with " + platformTypeFixesFile.getPath() +
                     ": " + ex.getMessage(), ex);
         }
 
@@ -158,10 +190,10 @@ public class FixPIsOrgsPlatforms {
         boolean changed = false;
         ArrayList<String> errNames = omeMData.getInvestigators();
         ArrayList<String> errOrgs = omeMData.getOrganizations();
-        String errPlatform = omeMData.getPlatformName();
+        String errPlatformName = omeMData.getPlatformName();
+        String errPlatformType = omeMData.getPlatformType();
         int numNames = errNames.size();
 
-        // TODO: match ? in error name correction template with any letter in err name
         ArrayList<String> piNames = new ArrayList<String>(numNames);
         ArrayList<String> piOrgs = new ArrayList<String>(numNames);
         for (int k = 0; k < numNames; k++) {
@@ -173,39 +205,55 @@ public class FixPIsOrgsPlatforms {
                 // Name correction
                 changed = true;
                 piNames.addAll(replacement);
-                // Get the organization of the new name(s)
-                for (String newName : replacement) {
-                    String newOrg = piNameOrgMap.get(newName);
-                    if ( newOrg == null ) {
-                        newOrg = org;
+                // Get the organization for each new name
+                if ( org.isEmpty() ) {
+                    for (String newName : replacement) {
+                        String newOrg = piNameOrgMap.get(newName);
+                        if ( newOrg != null )
+                            piOrgs.add(newOrg);
+                        else
+                            piOrgs.add("");
                     }
-                    piOrgs.add(newOrg);
+                }
+                else {
+                    for (String ignored : replacement) {
+                        piOrgs.add(org);
+                    }
                 }
             }
             else {
                 // No correction to the name; check the organization
                 piNames.add(name);
-                String newOrg = piNameOrgMap.get(name);
-                if ( newOrg == null ) {
-                    newOrg = org;
+                if ( org.isEmpty() ) {
+                    String newOrg = piNameOrgMap.get(name);
+                    if ( newOrg != null ) {
+                        piOrgs.add(newOrg);
+                        changed = true;
+                    }
+                    else
+                        piOrgs.add("");
                 }
-                else if ( !newOrg.equals(org) ) {
-                    changed = true;
-                }
-                piOrgs.add(newOrg);
+                else
+                    piOrgs.add(org);
             }
         }
-        String platformName = platformNameFixMap.get(errPlatform);
-        if ( platformName != null ) {
+
+        String platformName = platformNameFixMap.get(errPlatformName);
+        if ( platformName != null )
             changed = true;
-        }
-        else {
-            platformName = errPlatform;
-        }
+        else
+            platformName = errPlatformName;
+
+        String platformType = platformTypeFixMap.get(errPlatformType);
+        if ( platformType != null )
+            changed = true;
+        else
+            platformType = errPlatformType;
 
         if ( changed ) {
             omeMData.setInvestigatorsAndOrganizations(piNames, piOrgs);
             omeMData.setPlatformName(platformName);
+            omeMData.setPlatformType(platformType);
         }
         return changed;
     }
@@ -215,16 +263,30 @@ public class FixPIsOrgsPlatforms {
      *         ExpocodesFile.txt  PINameCorrections.tsv  PINameOrganization.tsv  PlatformNameCorrections.tsv
      */
     public static void main(String[] args) {
-        if ( args.length != 4 ) {
-            System.err.println("Arguments:  Expocodes.txt  PINameFixes.tsv  PINameOrgs.tsv PlatformNameFixes.tsv");
+        if ( args.length != 5 ) {
+            System.err.println("Arguments:  " +
+                    "Expocodes.txt  PINameFixes.tsv  PINameOrgs.tsv  PlatformNameFixes.tsv  PlatformTypeFixes.tsv ");
             System.err.println();
-            System.err.println("Corrects PI and platform names, and adds organization names, in the OME.xml ");
-            System.err.println("files for datasets whose expocodes are given in Expocodes.txt, one expocode ");
-            System.err.println("per line.  Each line of PINameFixes.tsv contains the misspelled PI 'name', ");
-            System.err.println("a tab, and the correct name(s), where multiple correct names are be separated ");
-            System.err.println("by semicolons.  Each line of PINameOrgs.tsv contains the (correct) PI name, ");
-            System.err.println("a tab, and the organization name.  Each line of PlatformNameFixes.tsv ");
-            System.err.println("contains the misspelled platform name, a tab, and the correct platform name. ");
+            System.err.println("Modifies the OME.xml document for datasets, correcting PI names, platform names, and ");
+            System.err.println("platform types, as well as adding organization names.  No changes are made to the ");
+            System.err.println("original data files or any DSG files. ");
+            System.err.println();
+            System.err.println("Expocodes.txt - file of expocodes, one per line, identifying the datasets to examine");
+            System.err.println();
+            System.err.println("PINameFixes.tsv - file of PI name corrections; each line contains the misspelled ");
+            System.err.println("    PI name', a tab, and the correct name(s), where multiple correct names are ");
+            System.err.println("    separated by semicolons. ");
+            System.err.println();
+            System.err.println("PINameOrgs.tsv  - file of organization names to associate with PI names without an ");
+            System.err.println("    organization specified; each line contains a (correct) PI name, a tab, and the ");
+            System.err.println("    organization name to associate with this PI. ");
+            System.err.println();
+            System.err.println("PlatformNameFixes.tsv - file of platform name corrections; each line contains the ");
+            System.err.println("    misspelled platform name, a tab, and the correct platform name. ");
+            System.err.println();
+            System.err.println("PlatformTypeFixes.tsv - file of platform type corrections; each line contains the ");
+            System.err.println("    misspelled platform type, a tab, and the correct platform type. ");
+
             System.err.println();
             System.exit(1);
         }
@@ -232,10 +294,12 @@ public class FixPIsOrgsPlatforms {
         File piNameFixesFile = new File(args[1]);
         File piNameOrgFile = new File(args[2]);
         File platformNameFixesFile = new File(args[3]);
+        File platformTypeFixesFile = new File(args[4]);
 
         FixPIsOrgsPlatforms fixer = null;
         try {
-            fixer = new FixPIsOrgsPlatforms(piNameFixesFile, piNameOrgFile, platformNameFixesFile);
+            fixer = new FixPIsOrgsPlatforms(piNameFixesFile, piNameOrgFile,
+                    platformNameFixesFile, platformTypeFixesFile);
         } catch ( Exception ex ) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();

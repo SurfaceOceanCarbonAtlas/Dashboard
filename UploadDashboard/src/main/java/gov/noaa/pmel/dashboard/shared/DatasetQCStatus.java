@@ -115,6 +115,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
     public static final String FLAG_COMMENT = "H";
     // Flag recording the renaming of a dataset (to and from)
     public static final String FLAG_RENAMED = "R";
+    // Flag F no longer used - map to Suspend
+    private static final String FLAG_FAILED = "F";
 
     // Dataset status strings - datasets that can be modified
     private static final String STATUS_STRING_PRIVATE = "Private";
@@ -214,6 +216,8 @@ public class DatasetQCStatus implements Comparable<DatasetQCStatus>, Serializabl
         KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_CONFLICTED), Status.CONFLICTED);
         KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_RENAMED), Status.RENAMED);
         KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_COMMENT), Status.COMMENT);
+        // Add F flag for old QC in database, but map to Suspended
+        KEYSTRING_STATUS_MAP.put(Status.keyString(FLAG_FAILED), Status.SUSPENDED);
 
         KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_PRIVATE), Status.PRIVATE);
         KEYSTRING_STATUS_MAP.put(Status.keyString(STATUS_STRING_SUSPENDED), Status.SUSPENDED);
