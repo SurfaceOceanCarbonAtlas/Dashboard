@@ -27,16 +27,19 @@ public class ReportOverlaps {
 
     /**
      * @param args
-     *         ExpocodesFile - a file containing expocodes of the set
-     *         of datasets to examine for overlaps
+     *         ExpocodesFile - a file of expocodes specifying the datasets to examine for overlaps
      */
     public static void main(String[] args) {
         if ( args.length != 1 ) {
             System.err.println("Arguments:  ExpocodesFile");
             System.err.println();
+            System.err.println("Checks for overlaps within and between datasets.  Overlaps are duplications of ");
+            System.err.println("location and time values.  Extensive overlaps are very likely to be erroneous ");
+            System.err.println("duplication of data, although there is the rare possibility of two instruments ");
+            System.err.println("on the same platform. ");
+            System.err.println();
             System.err.println("ExpocodesFile");
-            System.err.println("    is a file containing expocodes, one per line, of the set ");
-            System.err.println("    of datasets to examine for overlaps. ");
+            System.err.println("    a file of expocodes, one per line, specifying the datasets to examine ");
             System.err.println();
             System.exit(1);
         }
