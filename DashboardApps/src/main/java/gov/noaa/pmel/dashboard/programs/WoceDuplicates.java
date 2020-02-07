@@ -38,12 +38,13 @@ public class WoceDuplicates {
             System.err.println("Arguments: expocode");
             System.err.println("");
             System.err.println("Search for lon/lat/time/fCO2_rec duplicates within the dataset ");
-            System.err.println("with the given expocode.  Any duplicates found are assigned a ");
-            System.err.println("WOCE-4 flag by the automated data checker with an appropriate ");
-            System.err.println("message.  If duplicates are found, the database and full-data DSG");
-            System.err.println("file are updated and the decimated-data DSG file is regenerated. ");
-            System.err.println("ERDDAP is NOT notified of any changes since this program may ");
-            System.err.println("be run repeatedly for a number of different expocodes. ");
+            System.err.println("with the given expocode.  Any data points with a WOCE-4 flag or ");
+            System.err.println("with fCO2_rec missing are ignored.  Any duplicates found are ");
+            System.err.println("assigned a WOCE-4 flag by the automated data checker with an ");
+            System.err.println("appropriate message.  If duplicates are found, the database and ");
+            System.err.println("full-data DSG file are updated and the decimated-data DSG file is ");
+            System.err.println("regenerated.  ERDDAP is NOT notified of any changes since this ");
+            System.err.println("program may be run repeatedly for a number of different expocodes. ");
             System.err.println("");
             System.exit(1);
         }

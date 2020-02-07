@@ -600,7 +600,8 @@ public class DashboardServerUtils {
         double maxVal = DashboardUtils.FP_MISSING_VALUE;
         double minVal = DashboardUtils.FP_MISSING_VALUE;
         for (double val : data) {
-            if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+            if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val,
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) || (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
                 maxVal = val;

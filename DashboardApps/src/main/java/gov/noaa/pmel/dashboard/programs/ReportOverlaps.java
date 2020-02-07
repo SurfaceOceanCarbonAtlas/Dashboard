@@ -36,7 +36,7 @@ public class ReportOverlaps {
             System.err.println("Checks for overlaps within and between datasets.  Overlaps are duplications of ");
             System.err.println("location and time values.  Extensive overlaps are very likely to be erroneous ");
             System.err.println("duplication of data, although there is the rare possibility of two instruments ");
-            System.err.println("on the same platform. ");
+            System.err.println("on the same platform.  Data points with a WOCE-4 flag or missing fCO2_rec are ignored. ");
             System.err.println();
             System.err.println("ExpocodesFile");
             System.err.println("    a file of expocodes, one per line, specifying the datasets to examine ");

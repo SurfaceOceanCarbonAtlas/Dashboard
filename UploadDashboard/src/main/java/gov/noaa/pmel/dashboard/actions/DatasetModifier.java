@@ -20,6 +20,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -154,6 +155,7 @@ public class DatasetModifier {
 
     /**
      * Applies WOCE-4 flags to any duplicated lon/lat/depth/time/fCO2_rec data points found within a data set.
+     * Data points with a WOCE-4 flag or missing fCO2_rec are ignored.
      * Add the WOCE event to the database, modifies the full-data DSG file, and recreates the decimated-data DSG file.
      * Does not flag ERDDAP as this may be called repeatedly with different expocodes.
      *
@@ -223,9 +225,15 @@ public class DatasetModifier {
         TreeSet<DataLocation> prevDatInf = new TreeSet<DataLocation>(DataLocation.IGNORE_ROW_NUM_COMPARATOR);
         // Create a list for holding any duplicate lon/lat/depth/time/fCO2_rec data
         ArrayList<DataLocation> dupDatInf = new ArrayList<DataLocation>();
-        // Process all the data points that are not already WOCE-4,
-        // looking for duplicate lon/lat/depth/time/fCO2_rec
+        // Generate a set of lon/lat/depth/time/fCO2_rec data points,
+        // recording where duplicates are found
         for (int j = 0; j < dataArray.getNumSamples(); j++) {
+            // Ignore data points with missing fCO2_rec
+            Double fco2Rec = (Double) dataArray.getStdVal(j, fco2RecIdx);
+            if ( DashboardUtils.closeTo(fco2Rec, DashboardUtils.FP_MISSING_VALUE,
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                continue;
+            // Only consider WOCE-2 and WOCE-3 data points (ignore those already WOCE-4)
             String woceFlag = (String) dataArray.getStdVal(j, woceWaterIdx);
             if ( DashboardServerUtils.WOCE_ACCEPTABLE.equals(woceFlag) ||
                     DashboardServerUtils.WOCE_QUESTIONABLE.equals(woceFlag) ) {
@@ -235,7 +243,7 @@ public class DatasetModifier {
                 datinf.setLatitude((Double) dataArray.getStdVal(j, latIdx));
                 datinf.setDepth((Double) dataArray.getStdVal(j, depthIdx));
                 datinf.setDataDate(new Date(Math.round(1000.0 * (Double) dataArray.getStdVal(j, timeIdx))));
-                datinf.setDataValue((Double) dataArray.getStdVal(j, fco2RecIdx));
+                datinf.setDataValue(fco2Rec);
                 if ( !prevDatInf.add(datinf) ) {
                     dupDatInf.add(datinf);
                 }

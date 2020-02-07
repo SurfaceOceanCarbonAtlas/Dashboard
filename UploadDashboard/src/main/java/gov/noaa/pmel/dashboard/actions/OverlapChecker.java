@@ -49,9 +49,10 @@ public class OverlapChecker {
     }
 
     /**
-     * Checks for overlaps between a data set and a collection of other data sets.  Reads the data once for the primary
-     * data set, then reads the data as needed for the other data sets.  Ignores any data points with a {@link
-     * SocatTypes#WOCE_CO2_WATER} value of {@link DashboardServerUtils#WOCE_BAD}.
+     * Checks for overlaps between a data set and a collection of other data sets.  Reads the data once
+     * for the primary data set, then reads the data as needed for the other data sets.  Ignores any
+     * data points with a {@link SocatTypes#WOCE_CO2_WATER} value of {@link DashboardServerUtils#WOCE_BAD}
+     * or where the fCO2_rec value is missing.
      *
      * @param expocode
      *         the expocode of the primary data set to examine
@@ -60,8 +61,8 @@ public class OverlapChecker {
      * @param progressPrinter
      *         if not null, progress messages with timings are printed using this PrintStream
      * @param progStartMilliTime
-     *         System.getCurrentTimeMillis() start time of the program for reporting times to progressWriter; only used
-     *         if progressWriter is not null
+     *         System.getCurrentTimeMillis() start time of the program for reporting times to progressWriter;
+     *         only used if progressPrinter is not null
      *
      * @return the list of overlaps found; never null but may be empty.
      *
@@ -72,9 +73,8 @@ public class OverlapChecker {
      * @throws IOException
      *         if problems reading from any full-data DSG file
      */
-    public ArrayList<Overlap> getOverlaps(String expocode,
-            Iterable<String> checkExpos, PrintStream progressPrinter,
-            long progStartMilliTime)
+    public ArrayList<Overlap> getOverlaps(String expocode, Iterable<String> checkExpos,
+            PrintStream progressPrinter, long progStartMilliTime)
             throws IllegalArgumentException, FileNotFoundException, IOException {
         ArrayList<Overlap> overlapList = new ArrayList<Overlap>();
 
@@ -99,7 +99,7 @@ public class OverlapChecker {
         ignores[0] = new boolean[dataVals[4].length];
         for (int k = 0; k < dataVals[4].length; k++) {
             ignores[0][k] = DashboardUtils.closeTo(dataVals[4][k], DashboardUtils.FP_MISSING_VALUE,
-                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR);
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR);
         }
 
         for (String otherExpo : checkExpos) {
@@ -124,7 +124,7 @@ public class OverlapChecker {
                 ignores[1] = new boolean[dataVals[4].length];
                 for (int k = 0; k < dataVals[4].length; k++) {
                     ignores[1][k] = DashboardUtils.closeTo(dataVals[4][k], DashboardUtils.FP_MISSING_VALUE,
-                            0.0, DashboardUtils.MAX_ABSOLUTE_ERROR);
+                            DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR);
                 }
             }
 
@@ -156,9 +156,9 @@ public class OverlapChecker {
     }
 
     /**
-     * Reads and returns the longitudes, latitudes, times, SSTs, and fCO2s for the data points in a data set.  The
-     * values for any data points with a {@link SocatTypes#WOCE_CO2_WATER} value of {@link
-     * DashboardServerUtils#WOCE_BAD} are set to {@link DashboardUtils#FP_MISSING_VALUE}.
+     * Reads and returns the longitudes, latitudes, times, SSTs, and fCO2s for the data points
+     * in a data set.  The values for any data points with a {@link SocatTypes#WOCE_CO2_WATER}
+     * value of {@link DashboardServerUtils#WOCE_BAD} are set to {@link DashboardUtils#FP_MISSING_VALUE}.
      *
      * @param upperExpo
      *         get the data from the dataset with this expocode
@@ -252,34 +252,36 @@ public class OverlapChecker {
         boolean sameExpo = expocodes[0].equals(expocodes[1]);
         int kStart = 0;
         for (int j = 0; j < numRows[0]; j++) {
+            // Skip any points already WOCE-4 or with missing fCO2_rec
             if ( ignore[0][j] )
                 continue;
-            // Skip this point if any missing values
+            // Skip this point if missing lon, lat, or time value
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j],
-                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j],
-                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
             if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j],
-                    0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                    DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                 continue;
 
             if ( sameExpo )
                 kStart = j + 1;
 
             for (int k = kStart; k < numRows[1]; k++) {
+                // Skip any points already WOCE-4 or with missing fCO2_rec
                 if ( ignore[1][k] )
                     continue;
-                // Skip this point if any missing values
+                // Skip this point if missing lon, lat, or time value
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k],
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k],
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
                 if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k],
-                        0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                        DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
                     continue;
 
                 if ( times[1][k] >= times[0][j] + TIME_WINDOW ) {

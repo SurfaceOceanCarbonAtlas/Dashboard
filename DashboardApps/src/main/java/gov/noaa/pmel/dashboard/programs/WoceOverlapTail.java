@@ -15,6 +15,7 @@ import gov.noaa.pmel.dashboard.shared.Overlap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -67,14 +68,12 @@ public class WoceOverlapTail {
 
             Overlap oerlap = null;
             try {
-                ArrayList<String> others = new ArrayList<String>(1);
-                others.add(secondExpo);
-                ArrayList<Overlap> overlapList = oerlapChecker.getOverlaps(firstExpo, others, null, 0);
+                ArrayList<Overlap> overlapList = oerlapChecker.getOverlaps(firstExpo,
+                        Collections.singletonList(secondExpo), null, 0);
                 if ( overlapList == null )
                     throw new IllegalArgumentException("no overlap found");
                 if ( overlapList.size() != 1 )
-                    throw new RuntimeException("unexpected overlap list size of " +
-                            Integer.toString(overlapList.size()));
+                    throw new RuntimeException("unexpected overlap list size of " + overlapList.size());
                 oerlap = overlapList.get(0);
             } catch ( Exception ex ) {
                 System.err.println("Problems getting the overlap between " + firstExpo +
@@ -111,8 +110,8 @@ public class WoceOverlapTail {
                     secondOverlapFCO2.add(secondFCO2[num - 1]);
                 }
                 for (int k = 0; k < firstOverlapFCO2.size(); k++) {
-                    if ( !DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k), 0.0,
-                            MIN_FCO2_DIFF) ) {
+                    if ( !DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k),
+                            0.0, MIN_FCO2_DIFF) ) {
                         System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
                         System.err.println("           " + secondOverlapFCO2.toString());
                         throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() +
