@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
@@ -14,7 +11,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.Overlap;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 
@@ -26,11 +22,6 @@ import java.util.Date;
 public class WoceOverlapTail {
 
     /**
-     * Minimum fCO2_rec difference for two values to be considered different
-     */
-    private static final double MIN_FCO2_DIFF = 3.0;
-
-    /**
      * @param args
      *         firstExpo  secondExpo
      *         <p>
@@ -39,19 +30,21 @@ public class WoceOverlapTail {
      *         another, then the tail duplicates are all given a WOCE-4 flag on aqueous fCO2.
      */
     public static void main(String[] args) {
-        if ( args.length != 2 ) {
+        if ( args.length != 3 ) {
             System.err.println();
-            System.err.println("Usage:  firstExpo  secondExpo");
+            System.err.println("Usage:  firstExpo  secondExpo  maxFCO2RecDiff");
             System.err.println();
             System.err.println("Computes the overlaps between the two datasets indicated by the expocodes. ");
             System.err.println("If the overlap is one where the tail of the first dataset is a duplicate ");
             System.err.println("of the start of the second dataset, then the tail duplicates in the first ");
-            System.err.println("dataset are all given a WOCE-4 flag on aqueous fCO2. ");
+            System.err.println("dataset are all given a WOCE-4 flag on aqueous fCO2.  The value maxFCO2RecDiff ");
+            System.err.println("is the maximum allowed difference of fCO2_rec values in duplicates. ");
             System.err.println();
             System.exit(1);
         }
         String firstExpo = DashboardServerUtils.checkDatasetID(args[0]);
         String secondExpo = DashboardServerUtils.checkDatasetID(args[1]);
+        double maxFCO2RecDiff = Double.parseDouble(args[2]);
 
         DashboardConfigStore configStore = null;
         try {
@@ -78,6 +71,7 @@ public class WoceOverlapTail {
             } catch ( Exception ex ) {
                 System.err.println("Problems getting the overlap between " + firstExpo +
                         " and " + secondExpo + ": " + ex.getMessage());
+                ex.printStackTrace();
                 System.exit(1);
             }
 
@@ -111,7 +105,7 @@ public class WoceOverlapTail {
                 }
                 for (int k = 0; k < firstOverlapFCO2.size(); k++) {
                     if ( !DashboardUtils.closeTo(firstOverlapFCO2.get(k), secondOverlapFCO2.get(k),
-                            0.0, MIN_FCO2_DIFF) ) {
+                            0.0, maxFCO2RecDiff) ) {
                         System.err.println(" fCO2_rec: " + firstOverlapFCO2.toString());
                         System.err.println("           " + secondOverlapFCO2.toString());
                         throw new IllegalArgumentException("overlap fCO2_rec " + firstOverlapFCO2.get(k).toString() +
@@ -121,6 +115,7 @@ public class WoceOverlapTail {
             } catch ( Exception ex ) {
                 System.err.println("Invalid overlap between " + firstExpo +
                         " and " + secondExpo + ": " + ex.getMessage());
+                ex.printStackTrace();
                 System.exit(1);
             }
 
@@ -156,7 +151,7 @@ public class WoceOverlapTail {
                 woceEvent.setLocations(locations);
 
                 // Add the WOCE event to the database
-                configStore.getDatabaseRequestHandler().addDataQCEvent(Arrays.asList(woceEvent));
+                configStore.getDatabaseRequestHandler().addDataQCEvent(Collections.singletonList(woceEvent));
                 // Assign the WOCE-4 flags in the full-data DSG file, then regenerate the decimated dataset
                 ArrayList<DataLocation> unidentified = dsgHandler.updateDataQCFlags(woceEvent, false);
                 if ( !unidentified.isEmpty() ) {
@@ -170,6 +165,7 @@ public class WoceOverlapTail {
                         firstExpo + ": " + firstRowNums.toString());
             } catch ( Exception ex ) {
                 System.err.println("Problems assigning WOCE flags to " + firstExpo + ": " + ex.getMessage());
+                ex.printStackTrace();
             }
         } finally {
             DashboardConfigStore.shutdown();
