@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
@@ -25,12 +22,13 @@ public class OverlapChecker {
 
     /**
      * Minimum time difference, in seconds, for two values to be considered different
+     * Duplicate times in some datases were "fixed" by using fractional seconds, so go to milliseconds.
      */
-    public static final double MIN_TIME_DIFF = 1.0;
+    public static final double MIN_TIME_DIFF = 0.001;
     /**
      * Minimum longitude or latitude difference, in degrees, for two value to be considered different
      */
-    public static final double MIN_LONLAT_DIFF = 0.001;
+    public static final double MIN_LONLAT_DIFF = 0.0001;
     /**
      * Cutoff time window, in seconds, for still considering data points - to allow some time disorder
      */
