@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -36,7 +37,8 @@ public class ReportOverlaps {
             System.err.println("Checks for overlaps within and between datasets.  Overlaps are duplications of ");
             System.err.println("location and time values.  Extensive overlaps are very likely to be erroneous ");
             System.err.println("duplication of data, although there is the rare possibility of two instruments ");
-            System.err.println("on the same platform.  Data points with a WOCE-4 flag or missing fCO2_rec are ignored. ");
+            System.err.println("on the same platform.  Data points with a WOCE-4 flag or missing fCO2_rec are ");
+            System.err.println("ignored. ");
             System.err.println();
             System.err.println("ExpocodesFile");
             System.err.println("    a file of expocodes, one per line, specifying the datasets to examine ");
@@ -148,13 +150,13 @@ public class ReportOverlaps {
                     }
                     // Check that there is some overlap in time
                     double[] secondTimeMinMax = timeMinMaxMap.get(secondExpo);
-                    if ( (firstTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
-                            (secondTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < firstTimeMinMax[0]) )
+                    if ( (firstTimeMinMax[1] + DsgNcFile.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
+                            (secondTimeMinMax[1] + DsgNcFile.MIN_TIME_DIFF < firstTimeMinMax[0]) )
                         continue;
                     // Check that there is some overlap in latitude
                     double[] secondLatMinMax = latMinMaxMap.get(secondExpo);
-                    if ( (firstLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < secondLatMinMax[0]) ||
-                            (secondLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < firstLatMinMax[0]) )
+                    if ( (firstLatMinMax[1] + DsgNcFile.MIN_LAT_DIFF < secondLatMinMax[0]) ||
+                            (secondLatMinMax[1] + DsgNcFile.MIN_LON_DIFF < firstLatMinMax[0]) )
                         continue;
                     checkExpos.add(secondExpo);
                 }

@@ -34,7 +34,21 @@ import java.util.TreeSet;
 
 public class DsgNcFile extends File {
 
-    private static final long serialVersionUID = 9104295509280903806L;
+    private static final long serialVersionUID = 6945081126586572333L;
+
+    /**
+     * Minimum time difference, in seconds, for two values to be considered different
+     * Duplicate times in some datases were "fixed" by using fractional seconds, so go to milliseconds.
+     */
+    public static final double MIN_TIME_DIFF = 0.001;
+    /**
+     * Minimum longitude difference, in degrees, for two value to be considered different
+     */
+    public static final double MIN_LON_DIFF = 0.0001;
+    /**
+     * Minimum latitude difference, in degrees, for two value to be considered different
+     */
+    public static final double MIN_LAT_DIFF = 0.0001;
 
     private static final String DSG_VERSION = "DsgNcFile 2.0";
     private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
@@ -1183,16 +1197,16 @@ public class DsgNcFile extends File {
      */
     private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes, ArrayDouble.D1 latitudes,
             ArrayDouble.D1 times, ArrayDouble.D1 datavalues, int idx) {
-        // Check if longitude is within 0.001 degrees of each other
-        if ( !DashboardUtils.longitudeCloseTo(dataloc.getLongitude(), longitudes.get(idx), 0.0, 0.001) )
+        // Check if longitudes are close enough (taking modulo 360.0 into account)
+        if ( !DashboardUtils.longitudeCloseTo(dataloc.getLongitude(), longitudes.get(idx), 0.0, MIN_LON_DIFF) )
             return false;
 
-        // Check if latitude is within 0.0001 degrees of each other
-        if ( !DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), 0.0, 0.0001) )
+        // Check if latitudes are close enough
+        if ( !DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), 0.0, MIN_LAT_DIFF) )
             return false;
 
-        // Check if times are within a second of each other
-        if ( !DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), 0.0, 1.0) )
+        // Check if times are close enough
+        if ( !DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), 0.0, MIN_TIME_DIFF) )
             return false;
 
         // If given, check if data values are close to each other

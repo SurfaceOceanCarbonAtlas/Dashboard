@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -20,15 +21,6 @@ import java.util.ArrayList;
  */
 public class OverlapChecker {
 
-    /**
-     * Minimum time difference, in seconds, for two values to be considered different
-     * Duplicate times in some datases were "fixed" by using fractional seconds, so go to milliseconds.
-     */
-    public static final double MIN_TIME_DIFF = 0.001;
-    /**
-     * Minimum longitude or latitude difference, in degrees, for two value to be considered different
-     */
-    public static final double MIN_LONLAT_DIFF = 0.0001;
     /**
      * Cutoff time window, in seconds, for still considering data points - to allow some time disorder
      */
@@ -301,14 +293,21 @@ public class OverlapChecker {
                     continue;
                 }
 
-                if ( DashboardUtils.closeTo(times[0][j], times[1][k], 0.0, MIN_TIME_DIFF) &&
-                        DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, MIN_LONLAT_DIFF) &&
-                        DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k], 0.0, MIN_LONLAT_DIFF) ) {
-                    // order of row nums to match datasetIds above
+                if ( DashboardUtils.closeTo(times[0][j], times[1][k], 0.0, DsgNcFile.MIN_TIME_DIFF) &&
+                        DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, DsgNcFile.MIN_LAT_DIFF) &&
+                        DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k],
+                                0.0, DsgNcFile.MIN_LON_DIFF) ) {
                     if ( swapped ) {
-                        oerlap.addDuplicatePoint(k + 1, j + 1, longitudes[0][j], latitudes[0][j], times[0][j]);
+                        // swap row number to match datasetIds above
+                        // different expocodes; report first expocode's data point for WOCE-4
+                        oerlap.addDuplicatePoint(k + 1, j + 1, longitudes[0][k], latitudes[0][k], times[0][k]);
+                    }
+                    else if ( sameExpo ) {
+                        // internal overlap; report second occurrence for WOCE-4
+                        oerlap.addDuplicatePoint(j + 1, k + 1, longitudes[0][k], latitudes[0][k], times[0][k]);
                     }
                     else {
+                        // different expocodes; report first expocode's data point for WOCE-4
                         oerlap.addDuplicatePoint(j + 1, k + 1, longitudes[0][j], latitudes[0][j], times[0][j]);
                     }
                 }
