@@ -185,23 +185,31 @@ public class ReportOverlaps {
             else {
                 System.out.println("ExternalOverlap[ expocodes=[" + expos[0] + ", " + expos[1] + "],");
             }
-            ArrayList<Double> times = oerlap.getTimes();
-            System.out.println("    numRows=" + Integer.toString(times.size()) + ",");
             ArrayList<Integer>[] rowNums = oerlap.getRowNums();
+            ArrayList<Double>[] lons = oerlap.getLons();
+            ArrayList<Double>[] lats = oerlap.getLats();
+            ArrayList<Double>[] times = oerlap.getTimes();
+            System.out.println("    numRows=" + rowNums[0].size() + ",");
             System.out.println("    rowNums=[ " + rowNums[0].toString() + ",");
             System.out.println("              " + rowNums[1].toString() + " ],");
-            System.out.println("    lons=" + oerlap.getLons().toString());
-            System.out.println("    lats=" + oerlap.getLats().toString());
-            System.out.print("    times=[");
-            boolean first = true;
-            for (Double tval : times) {
-                if ( first )
-                    first = false;
-                else
+            System.out.println("    lons=[ " + lons[0].toString() + ",");
+            System.out.println("           " + lons[1].toString() + " ],");
+            System.out.println("    lats=[ " + lats[0].toString() + ",");
+            System.out.println("           " + lats[1].toString() + " ],");
+            System.out.print("    times=[[");
+            for (int k = 0; k < times[0].size(); k++) {
+                if ( k > 0 )
                     System.out.print(", ");
-                System.out.print(dateFmtr.format(new Date(Math.round(tval * 1000.0))));
+                System.out.print(dateFmtr.format(new Date(Math.round(times[0].get(k) * 1000.0))));
             }
-            System.out.println("]");
+            System.out.println("],");
+            System.out.print("           [");
+            for (int k = 0; k < times[1].size(); k++) {
+                if ( k > 0 )
+                    System.out.print(", ");
+                System.out.print(dateFmtr.format(new Date(Math.round(times[1].get(k) * 1000.0))));
+            }
+            System.out.println("]]");
             System.out.println("]");
         }
         System.exit(0);

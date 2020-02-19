@@ -127,7 +127,7 @@ public class OverlapChecker {
 
             // Check for an overlap
             Overlap oerlap = checkForOverlaps(upperExpos, lons, lats, times, ignores);
-            if ( oerlap != null ) {
+            if ( !oerlap.isEmpty() ) {
                 overlapList.add(oerlap);
                 if ( progressPrinter != null ) {
                     double checkDeltaSecs = (System.currentTimeMillis() - checkStartMilliTime) / 1000.0;
@@ -194,15 +194,15 @@ public class OverlapChecker {
      * @param ignore
      *         if true for a data point, any overlaps with that data point is ignored
      *
-     * @return the overlap found between the two datasets, or null if no overlaps were found
+     * @return the overlap found between the two datasets; never null but may be empty.
      *
      * @throws IllegalArgumentException
-     *         if any of the arguments or argument array values is null, if any of the arguments is not an array of two
-     *         objects, or if there is not the same number of longitudes, latitudes, and times for a dataset
+     *         if any of the arguments or argument array values is null,
+     *         if any of the arguments is not an array of two objects, or
+     *         if there is not the same number of longitudes, latitudes, and times for a dataset
      */
     private Overlap checkForOverlaps(String[] expocodes, double[][] longitudes,
-            double[][] latitudes, double[][] times, boolean[][] ignore)
-            throws IllegalArgumentException {
+            double[][] latitudes, double[][] times, boolean[][] ignore) throws IllegalArgumentException {
         if ( (expocodes == null) || (expocodes.length != 2) ||
                 (expocodes[0] == null) || (expocodes[1] == null) )
             throw new IllegalArgumentException("Invalid datasetIds given to checkForOverlaps");
@@ -297,25 +297,16 @@ public class OverlapChecker {
                         DashboardUtils.closeTo(latitudes[0][j], latitudes[1][k], 0.0, DsgNcFile.MIN_LAT_DIFF) &&
                         DashboardUtils.longitudeCloseTo(longitudes[0][j], longitudes[1][k],
                                 0.0, DsgNcFile.MIN_LON_DIFF) ) {
-                    if ( swapped ) {
+                    if ( swapped )
                         // swap row number to match datasetIds above
-                        // different expocodes; report first expocode's data point for WOCE-4
-                        oerlap.addDuplicatePoint(k + 1, j + 1, longitudes[0][k], latitudes[0][k], times[0][k]);
-                    }
-                    else if ( sameExpo ) {
-                        // internal overlap; report second occurrence for WOCE-4
-                        oerlap.addDuplicatePoint(j + 1, k + 1, longitudes[0][k], latitudes[0][k], times[0][k]);
-                    }
-                    else {
-                        // different expocodes; report first expocode's data point for WOCE-4
-                        oerlap.addDuplicatePoint(j + 1, k + 1, longitudes[0][j], latitudes[0][j], times[0][j]);
-                    }
+                        oerlap.addDuplicatePoint(k + 1, j + 1, longitudes[1][k], longitudes[0][j],
+                                latitudes[1][k], latitudes[0][j], times[1][k], times[0][j]);
+                    else
+                        oerlap.addDuplicatePoint(j + 1, k + 1, longitudes[0][j], longitudes[1][k],
+                                latitudes[0][j], latitudes[1][k], times[0][j], times[1][k]);
                 }
             }
         }
-
-        if ( oerlap.getLons().isEmpty() )
-            return null;
 
         return oerlap;
     }

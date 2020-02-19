@@ -113,7 +113,14 @@ public class WoceDuplicates {
                     int tooBig = 0;
                     for (int q = 0; q < numPts; q++) {
                         int j = rowNums[0].get(q) - 1;
+                        // Ignore if either data point is already (or will be) WOCE-4 or is missing fCO2_rec
+                        if ( DashboardUtils.closeTo(fco2s[j], DashboardUtils.FP_MISSING_VALUE,
+                                DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                            continue;
                         int k = rowNums[1].get(q) - 1;
+                        if ( DashboardUtils.closeTo(fco2s[k], DashboardUtils.FP_MISSING_VALUE,
+                                DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+                            continue;
                         if ( DashboardUtils.closeTo(fco2s[j], fco2s[k], 0.0, maxFCO2RecDiff) ) {
                             // WOCE-4 the latter of the two; if there are multiple duplications, only the first will be kept
                             if ( k < j )
@@ -125,6 +132,8 @@ public class WoceDuplicates {
                             datinf.setDataDate(new Date(Math.round(1000.0 * times[k])));
                             datinf.setDataValue(fco2s[k]);
                             dupDatInf.add(datinf);
+                            // This data point will be WOCE-4 so mark it as such in case it is in other duplicate pairs
+                            fco2s[k] = DashboardUtils.FP_MISSING_VALUE;
                         }
                         else {
                             System.err.println(expocode + ": overlap has too large of a difference in fCO2_rec - [" +
