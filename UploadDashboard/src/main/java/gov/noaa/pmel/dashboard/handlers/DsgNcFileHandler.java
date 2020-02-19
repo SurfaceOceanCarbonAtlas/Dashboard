@@ -595,7 +595,7 @@ public class DsgNcFileHandler {
     }
 
     /**
-     * Updates the full-data DSG file with the given data QC flags, then regenerates the decimated DSG file.
+     * Updates the full-data DSG file with the given data QC flags, and then regenerates the decimated DSG file.
      * Optionally, will also update the row number in the data QC flags from the data in the full-data DSG file.
      *
      * @param woceEvent

@@ -152,7 +152,7 @@ public class WoceDuplicates {
                     // Add the WOCE event to the database
                     configStore.getDatabaseRequestHandler().addDataQCEvent(Collections.singletonList(woceEvent));
 
-                    // Assign the WOCE-4 flags in the full-data DSG file
+                    // Assign the WOCE-4 flags in the full-data DSG file, and then regenerate the decimated dataset
                     ArrayList<DataLocation> unidentified = dsgFileHandler.updateDataQCFlags(woceEvent, false);
                     if ( !unidentified.isEmpty() ) {
                         System.out.println(expocode + ": unexpected " +
@@ -163,9 +163,6 @@ public class WoceDuplicates {
                         dupDatInf.removeAll(unidentified);
                         successful = false;
                     }
-
-                    // Re-create the decimated-data DSG file
-                    dsgFileHandler.decimateDatasetDsg(expocode);
 
                     if ( !dupDatInf.isEmpty() )
                         System.out.println(expocode + ": WOCE-4 applied to " +
