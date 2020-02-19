@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
@@ -15,6 +12,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
@@ -42,7 +40,26 @@ public class UpdateWOCEFlags {
         }
 
         String expocodesFilename = args[0];
-        boolean success = true;
+
+        // Get the expocode of the cruises to update
+        TreeSet<String> allExpocodes = new TreeSet<String>();
+        try {
+            BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
+            try {
+                String dataline = expoReader.readLine();
+                while ( dataline != null ) {
+                    dataline = dataline.trim();
+                    if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
+                        allExpocodes.add(dataline);
+                    dataline = expoReader.readLine();
+                }
+            } finally {
+                expoReader.close();
+            }
+        } catch ( Exception ex ) {
+            System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
+            System.exit(1);
+        }
 
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
@@ -50,32 +67,11 @@ public class UpdateWOCEFlags {
             configStore = DashboardConfigStore.get(false);
         } catch ( Exception ex ) {
             System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
-            ex.printStackTrace();
             System.exit(1);
         }
-        try {
-            // Get the expocode of the cruises to update
-            TreeSet<String> allExpocodes = new TreeSet<String>();
-            try {
-                BufferedReader expoReader =
-                        new BufferedReader(new FileReader(expocodesFilename));
-                try {
-                    String dataline = expoReader.readLine();
-                    while ( dataline != null ) {
-                        dataline = dataline.trim();
-                        if ( !(dataline.isEmpty() || dataline.startsWith("#")) )
-                            allExpocodes.add(dataline);
-                        dataline = expoReader.readLine();
-                    }
-                } finally {
-                    expoReader.close();
-                }
-            } catch ( Exception ex ) {
-                System.err.println("Error getting expocodes from " + expocodesFilename + ": " + ex.getMessage());
-                ex.printStackTrace();
-                System.exit(1);
-            }
 
+        boolean success = true;
+        try {
             DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
             DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
@@ -83,10 +79,10 @@ public class UpdateWOCEFlags {
             for (String expocode : allExpocodes) {
                 System.err.println(expocode + " start");
 
-                DsgNcFile dsgFile = null;
+                DsgNcFile dsgFile;
                 // Clear all the WOCE flags in the DSG file
-                String[] currentWaterWoceFlags = null;
-                String[] currentAtmWoceFlags = null;
+                String[] currentWaterWoceFlags;
+                String[] currentAtmWoceFlags;
                 try {
                     dsgFile = dsgHandler.getDsgNcFile(expocode);
                     currentWaterWoceFlags = dsgFile.readStringVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
@@ -97,12 +93,8 @@ public class UpdateWOCEFlags {
                     success = false;
                     continue;
                 }
-                for (int k = 0; k < currentWaterWoceFlags.length; k++) {
-                    currentWaterWoceFlags[k] = DashboardServerUtils.WOCE_ACCEPTABLE;
-                }
-                for (int k = 0; k < currentAtmWoceFlags.length; k++) {
-                    currentAtmWoceFlags[k] = DashboardServerUtils.WOCE_ACCEPTABLE;
-                }
+                Arrays.fill(currentWaterWoceFlags, DashboardServerUtils.WOCE_ACCEPTABLE);
+                Arrays.fill(currentAtmWoceFlags, DashboardServerUtils.WOCE_ACCEPTABLE);
                 try {
                     dsgFile.writeStringVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), currentWaterWoceFlags);
                     dsgFile.writeStringVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName(), currentWaterWoceFlags);

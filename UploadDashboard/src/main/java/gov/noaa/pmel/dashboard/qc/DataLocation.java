@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.qc;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -20,7 +17,6 @@ public class DataLocation implements Comparable<DataLocation> {
     protected Date dataDate;
     protected Double longitude;
     protected Double latitude;
-    protected Double depth;
     protected Double dataValue;
 
     /**
@@ -31,7 +27,6 @@ public class DataLocation implements Comparable<DataLocation> {
         dataDate = DashboardUtils.DATE_MISSING_VALUE;
         longitude = DashboardUtils.FP_MISSING_VALUE;
         latitude = DashboardUtils.FP_MISSING_VALUE;
-        depth = DashboardUtils.FP_MISSING_VALUE;
         dataValue = DashboardUtils.FP_MISSING_VALUE;
     }
 
@@ -118,24 +113,6 @@ public class DataLocation implements Comparable<DataLocation> {
     }
 
     /**
-     * @return the sample depth; never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
-     */
-    public Double getDepth() {
-        return depth;
-    }
-
-    /**
-     * @param depth
-     *         the sample depth to set; if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
-     */
-    public void setDepth(Double depth) {
-        if ( depth == null )
-            this.depth = DashboardUtils.FP_MISSING_VALUE;
-        else
-            this.depth = depth;
-    }
-
-    /**
      * @return the data value; never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
      */
     public Double getDataValue() {
@@ -159,7 +136,6 @@ public class DataLocation implements Comparable<DataLocation> {
      * <li>date</li>
      * <li>longitude</li>
      * <li>latitude</li>
-     * <li>depth</li>
      * <li>data value</li>
      * <li>row number</li>
      * </ol>
@@ -177,9 +153,6 @@ public class DataLocation implements Comparable<DataLocation> {
         if ( result != 0 )
             return result;
         result = latitude.compareTo(other.latitude);
-        if ( result != 0 )
-            return result;
-        result = depth.compareTo(other.depth);
         if ( result != 0 )
             return result;
         result = dataValue.compareTo(other.dataValue);
@@ -219,8 +192,6 @@ public class DataLocation implements Comparable<DataLocation> {
         if ( !DashboardUtils.closeTo(dataValue, other.dataValue,
                 DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
-        if ( !DashboardUtils.closeTo(depth, other.depth, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-            return false;
         if ( !DashboardUtils.closeTo(latitude, other.latitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
             return false;
         if ( !DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
@@ -236,7 +207,6 @@ public class DataLocation implements Comparable<DataLocation> {
                 ", dataTime=" + Long.toString(Math.round((dataDate.getTime() / 1000.0))) +
                 ", longitude=" + longitude.toString() +
                 ", latitude=" + latitude.toString() +
-                ", depth=" + depth.toString() +
                 ", dataValue=" + dataValue.toString() +
                 "]";
     }
@@ -257,9 +227,6 @@ public class DataLocation implements Comparable<DataLocation> {
             if ( result != 0 )
                 return result;
             result = first.latitude.compareTo(second.latitude);
-            if ( result != 0 )
-                return result;
-            result = first.depth.compareTo(second.depth);
             if ( result != 0 )
                 return result;
             result = first.dataValue.compareTo(second.dataValue);

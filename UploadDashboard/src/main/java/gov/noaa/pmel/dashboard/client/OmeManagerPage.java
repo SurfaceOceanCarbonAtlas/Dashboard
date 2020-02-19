@@ -39,18 +39,19 @@ public class OmeManagerPage extends CompositeWithUsername {
     private static final String UPLOAD_TEXT = "Upload";
     private static final String CANCEL_TEXT = "Cancel";
 
-    private static final String CRUISE_HTML_INTRO_PROLOGUE =
-            "<p>At this time, the system only uploads SOCAT OME XML metadata files.</p>" +
-                    "<p>To generate a SOCAT OME XML metadata file to upload: <ul>" +
-                    "<li>Go to the Online Metadata Editor site " +
-                    "<a href=\"http://mercury.ornl.gov/socatome/\" target=\"_blank\">" +
-                    "http://mercury.ornl.gov/socatome/</a></li>" +
-                    "<li>Fill in the appropriate metadata</li>" +
-                    "<li>Save a local copy (preferrably with validation)</li>" +
-                    "</ul>" +
-                    "This will create a SOCAT OME XML metadata file on your system that can be uploaded here. " +
-                    "</p><p>" +
-                    "Dataset: <ul><li>";
+    private static final String CRUISE_HTML_INTRO_PROLOGUE = "<p>" +
+            "At this time, the system only uploads CDIAC-style OME XML metadata files. " +
+            "Unfortunately, the CDIAC Online Metadata Editor no longer exists. " +
+            "A new Online Metadata Editor is being built and tested, but is not available at this time. " +
+            "</p>" +
+            "<p>" +
+            "Please upload whatever metadata files you have as \"Supplemental Documents\". " +
+            "A spreadsheet for providing metadata can be obtained using the \"metadata template\" " +
+            "link on the SOCAT info page at <a href=\"https://www.socat.info/index.php/data-upload-and-quality-control/\" " +
+            "target=\"_blank\">https://www.socat.info/index.php/data-upload-and-quality-control/</a> " +
+            "</p>" +
+            "<p>" +
+            "Dataset: <ul><li>";
     private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
     private static final String NO_FILE_ERROR_MSG =

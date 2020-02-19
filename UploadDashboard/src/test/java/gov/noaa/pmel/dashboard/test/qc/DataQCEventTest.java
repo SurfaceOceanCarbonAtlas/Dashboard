@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.qc;
 
 import gov.noaa.pmel.dashboard.qc.DataLocation;
@@ -46,7 +43,6 @@ public class DataQCEventTest {
         loc.setDataDate(new Date(3458139048000L));
         loc.setLongitude(-179.5);
         loc.setLatitude(3.5);
-        loc.setDepth(5.0);
         loc.setDataValue(1105.450);
         MY_LOCATIONS.add(loc);
         loc = new DataLocation();
@@ -54,7 +50,6 @@ public class DataQCEventTest {
         loc.setDataDate(new Date(3458139203000L));
         loc.setLongitude(-179.6);
         loc.setLatitude(3.4);
-        loc.setDepth(7.5);
         loc.setDataValue(1105.453);
         MY_LOCATIONS.add(loc);
     }

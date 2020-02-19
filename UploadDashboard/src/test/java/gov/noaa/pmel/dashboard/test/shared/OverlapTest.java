@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.shared;
 
 import gov.noaa.pmel.dashboard.shared.Overlap;
@@ -89,15 +86,19 @@ public class OverlapTest {
     /**
      * Test method for {@link Overlap#getLons} and {@link Overlap#setLons}.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSetLons() {
         Overlap olap = new Overlap();
-        ArrayList<Double> mylons = olap.getLons();
-        assertEquals(0, mylons.size());
+        ArrayList<Double>[] mylons = olap.getLons();
+        assertEquals(2, mylons.length);
+        assertEquals(0, mylons[0].size());
+        assertEquals(0, mylons[1].size());
 
-        olap.setLons(lons);
-        mylons = olap.getLons();
-        assertEquals(lons, mylons);
+        olap.setLons(new ArrayList[] { lons, lons });
+        assertEquals(2, mylons.length);
+        assertEquals(lons, mylons[0]);
+        assertEquals(lons, mylons[1]);
 
         ArrayList<Integer>[] rowNums = olap.getRowNums();
         assertEquals(2, rowNums.length);
@@ -111,24 +112,33 @@ public class OverlapTest {
 
         olap.setLons(null);
         mylons = olap.getLons();
-        assertEquals(0, mylons.size());
+        assertEquals(2, mylons.length);
+        assertEquals(0, mylons[0].size());
+        assertEquals(0, mylons[1].size());
     }
 
     /**
      * Test method for {@link Overlap#getLats} and {@link Overlap#setLats}.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSetLats() {
         Overlap olap = new Overlap();
-        ArrayList<Double> mylats = olap.getLats();
-        assertEquals(0, mylats.size());
+        ArrayList<Double>[] mylats = olap.getLats();
+        assertEquals(2, mylats.length);
+        assertEquals(0, mylats[0].size());
+        assertEquals(0, mylats[1].size());
 
-        olap.setLats(lats);
+        olap.setLats(new ArrayList[] { lats, lats });
         mylats = olap.getLats();
-        assertEquals(lats, mylats);
+        assertEquals(2, mylats.length);
+        assertEquals(lats, mylats[0]);
+        assertEquals(lats, mylats[1]);
 
-        ArrayList<Double> mylons = olap.getLons();
-        assertEquals(0, mylons.size());
+        ArrayList<Double>[] mylons = olap.getLons();
+        assertEquals(2, mylons.length);
+        assertEquals(0, mylons[0].size());
+        assertEquals(0, mylons[1].size());
 
         ArrayList<Integer>[] rowNums = olap.getRowNums();
         assertEquals(2, rowNums.length);
@@ -142,27 +152,38 @@ public class OverlapTest {
 
         olap.setLats(null);
         mylats = olap.getLats();
-        assertEquals(0, mylats.size());
+        assertEquals(2, mylats.length);
+        assertEquals(0, mylats[0].size());
+        assertEquals(0, mylats[1].size());
     }
 
     /**
      * Test method for {@link Overlap#getTimes} and {@link Overlap#setTimes}.
      */
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetSetTimes() {
         Overlap olap = new Overlap();
-        ArrayList<Double> mytimes = olap.getTimes();
-        assertEquals(0, mytimes.size());
+        ArrayList<Double>[] mytimes = olap.getTimes();
+        assertEquals(2, mytimes.length);
+        assertEquals(0, mytimes[0].size());
+        assertEquals(0, mytimes[1].size());
 
-        olap.setTimes(times);
+        olap.setTimes(new ArrayList[] { times, times });
         mytimes = olap.getTimes();
-        assertEquals(times, mytimes);
+        assertEquals(2, mytimes.length);
+        assertEquals(times, mytimes[0]);
+        assertEquals(times, mytimes[1]);
 
-        ArrayList<Double> mylats = olap.getLats();
-        assertEquals(0, mylats.size());
+        ArrayList<Double>[] mylats = olap.getLats();
+        assertEquals(2, mylats.length);
+        assertEquals(0, mylats[0].size());
+        assertEquals(0, mylats[1].size());
 
-        ArrayList<Double> mylons = olap.getLons();
-        assertEquals(0, mylons.size());
+        ArrayList<Double>[] mylons = olap.getLons();
+        assertEquals(2, mylons.length);
+        assertEquals(0, mylons[0].size());
+        assertEquals(0, mylons[1].size());
 
         ArrayList<Integer>[] rowNums = olap.getRowNums();
         assertEquals(2, rowNums.length);
@@ -176,7 +197,42 @@ public class OverlapTest {
 
         olap.setTimes(null);
         mytimes = olap.getTimes();
-        assertEquals(0, mytimes.size());
+        assertEquals(2, mytimes.length);
+        assertEquals(0, mytimes[0].size());
+        assertEquals(0, mytimes[1].size());
+    }
+
+    /**
+     * Test method for {@link Overlap#isEmpty()}.
+     */
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testIsEmpty() {
+        Overlap oerlap = new Overlap();
+        assertTrue(oerlap.isEmpty());
+
+        oerlap = new Overlap(firstExpo, secondExpo);
+        assertTrue(oerlap.isEmpty());
+
+        oerlap.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0),
+                lons.get(0), lons.get(0), lats.get(0), lats.get(0), times.get(0), times.get(0));
+        assertFalse(oerlap.isEmpty());
+
+        oerlap = new Overlap(firstExpo, secondExpo);
+        oerlap.setRowNums(new ArrayList[] { firstRowNums, secondRowNums });
+        assertFalse(oerlap.isEmpty());
+
+        oerlap = new Overlap(firstExpo, secondExpo);
+        oerlap.setLons(new ArrayList[] { lons, lons });
+        assertFalse(oerlap.isEmpty());
+
+        oerlap = new Overlap(firstExpo, secondExpo);
+        oerlap.setLats(new ArrayList[] { lats, lats });
+        assertFalse(oerlap.isEmpty());
+
+        oerlap = new Overlap(firstExpo, secondExpo);
+        oerlap.setTimes(new ArrayList[] { times, times });
+        assertFalse(oerlap.isEmpty());
     }
 
     /**
@@ -207,26 +263,26 @@ public class OverlapTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setLons(lons);
+        first.setLons(new ArrayList[] { lons, lons });
         // hashCode ignores floating-point values but pays attention to the number of values
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setLons(lons);
+        second.setLons(new ArrayList[] { lons, lons });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setLats(lats);
+        first.setLats(new ArrayList[] { lats, lats });
         // hashCode ignores floating-point values but pays attention to the number of values
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setLats(lats);
+        second.setLats(new ArrayList[] { lats, lats });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setTimes(times);
+        first.setTimes(new ArrayList[] { times, times });
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setTimes(times);
+        second.setTimes(new ArrayList[] { times, times });
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
     }
@@ -240,14 +296,14 @@ public class OverlapTest {
         Overlap first = new Overlap();
         first.setDatasetIds(new String[] { firstExpo, secondExpo });
         first.setRowNums(new ArrayList[] { firstRowNums, secondRowNums });
-        first.setLats(lats);
-        first.setLons(lons);
-        first.setTimes(times);
+        first.setLons(new ArrayList[] { lons, lons });
+        first.setLats(new ArrayList[] { lats, lats });
+        first.setTimes(new ArrayList[] { times, times });
 
         Overlap second = new Overlap(firstExpo, secondExpo);
         for (int k = 0; k < firstRowNums.size(); k++) {
             second.addDuplicatePoint(firstRowNums.get(k), secondRowNums.get(k),
-                    lons.get(k), lats.get(k), times.get(k));
+                    lons.get(k), lons.get(k), lats.get(k), lats.get(k), times.get(k), times.get(k));
         }
 
         assertEquals(first, second);
@@ -267,7 +323,8 @@ public class OverlapTest {
         assertTrue(first.compareTo(second) < 0);
         second = new Overlap(secondExpo, firstExpo);
         assertTrue(first.compareTo(second) < 0);
-        second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), lons.get(0), lats.get(0), times.get(0));
+        second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0),
+                lons.get(0), lons.get(0), lats.get(0), lats.get(0), times.get(0), times.get(0));
         assertTrue(first.compareTo(second) < 0);
         second = new Overlap(secondExpo, secondExpo);
         assertEquals(firstExpo.compareTo(secondExpo), first.compareTo(second));
@@ -276,12 +333,15 @@ public class OverlapTest {
         second = new Overlap(secondExpo, firstExpo);
         assertEquals(firstExpo.compareTo(secondExpo), first.compareTo(second));
 
-        first.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), lons.get(0), lats.get(0), times.get(0));
+        first.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0),
+                lons.get(0), lons.get(0), lats.get(0), lats.get(0), times.get(0), times.get(0));
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
 
-        second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0), lons.get(0), lats.get(0), times.get(0));
-        second.addDuplicatePoint(firstRowNums.get(1), secondRowNums.get(1), lons.get(1), lats.get(1), times.get(1));
+        second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0),
+                lons.get(0), lons.get(0), lats.get(0), lats.get(0), times.get(0), times.get(0));
+        second.addDuplicatePoint(firstRowNums.get(1), secondRowNums.get(1),
+                lons.get(1), lons.get(1), lats.get(1), lats.get(1), times.get(1), times.get(1));
         assertTrue(first.compareTo(second) < 0);
         assertTrue(second.compareTo(first) > 0);
 
@@ -289,7 +349,7 @@ public class OverlapTest {
         assertTrue(first.compareTo(second) > 0);
         assertTrue(second.compareTo(first) < 0);
         second.addDuplicatePoint(firstRowNums.get(0), secondRowNums.get(0),
-                lons.get(0) + 360.0, lats.get(0) + 1.0E-8, times.get(0));
+                lons.get(0), lons.get(0) + 360.0, lats.get(0), lats.get(0) + 1.0E-8, times.get(0), times.get(0));
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
     }

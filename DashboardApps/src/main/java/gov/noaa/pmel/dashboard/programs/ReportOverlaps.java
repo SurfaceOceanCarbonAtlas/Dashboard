@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.OverlapChecker;
+import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -27,16 +28,20 @@ public class ReportOverlaps {
 
     /**
      * @param args
-     *         ExpocodesFile - a file containing expocodes of the set
-     *         of datasets to examine for overlaps
+     *         ExpocodesFile - a file of expocodes specifying the datasets to examine for overlaps
      */
     public static void main(String[] args) {
         if ( args.length != 1 ) {
             System.err.println("Arguments:  ExpocodesFile");
             System.err.println();
+            System.err.println("Checks for overlaps within and between datasets.  Overlaps are duplications of ");
+            System.err.println("location and time values.  Extensive overlaps are very likely to be erroneous ");
+            System.err.println("duplication of data, although there is the rare possibility of two instruments ");
+            System.err.println("on the same platform.  Data points with a WOCE-4 flag or missing fCO2_rec are ");
+            System.err.println("ignored. ");
+            System.err.println();
             System.err.println("ExpocodesFile");
-            System.err.println("    is a file containing expocodes, one per line, of the set ");
-            System.err.println("    of datasets to examine for overlaps. ");
+            System.err.println("    a file of expocodes, one per line, specifying the datasets to examine ");
             System.err.println();
             System.exit(1);
         }
@@ -145,13 +150,13 @@ public class ReportOverlaps {
                     }
                     // Check that there is some overlap in time
                     double[] secondTimeMinMax = timeMinMaxMap.get(secondExpo);
-                    if ( (firstTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
-                            (secondTimeMinMax[1] + OverlapChecker.MIN_TIME_DIFF < firstTimeMinMax[0]) )
+                    if ( (firstTimeMinMax[1] + DsgNcFile.MIN_TIME_DIFF < secondTimeMinMax[0]) ||
+                            (secondTimeMinMax[1] + DsgNcFile.MIN_TIME_DIFF < firstTimeMinMax[0]) )
                         continue;
                     // Check that there is some overlap in latitude
                     double[] secondLatMinMax = latMinMaxMap.get(secondExpo);
-                    if ( (firstLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < secondLatMinMax[0]) ||
-                            (secondLatMinMax[1] + OverlapChecker.MIN_LONLAT_DIFF < firstLatMinMax[0]) )
+                    if ( (firstLatMinMax[1] + DsgNcFile.MIN_LAT_DIFF < secondLatMinMax[0]) ||
+                            (secondLatMinMax[1] + DsgNcFile.MIN_LON_DIFF < firstLatMinMax[0]) )
                         continue;
                     checkExpos.add(secondExpo);
                 }
@@ -180,23 +185,31 @@ public class ReportOverlaps {
             else {
                 System.out.println("ExternalOverlap[ expocodes=[" + expos[0] + ", " + expos[1] + "],");
             }
-            ArrayList<Double> times = oerlap.getTimes();
-            System.out.println("    numRows=" + Integer.toString(times.size()) + ",");
             ArrayList<Integer>[] rowNums = oerlap.getRowNums();
+            ArrayList<Double>[] lons = oerlap.getLons();
+            ArrayList<Double>[] lats = oerlap.getLats();
+            ArrayList<Double>[] times = oerlap.getTimes();
+            System.out.println("    numRows=" + rowNums[0].size() + ",");
             System.out.println("    rowNums=[ " + rowNums[0].toString() + ",");
             System.out.println("              " + rowNums[1].toString() + " ],");
-            System.out.println("    lons=" + oerlap.getLons().toString());
-            System.out.println("    lats=" + oerlap.getLats().toString());
-            System.out.print("    times=[");
-            boolean first = true;
-            for (Double tval : times) {
-                if ( first )
-                    first = false;
-                else
+            System.out.println("    lons=[ " + lons[0].toString() + ",");
+            System.out.println("           " + lons[1].toString() + " ],");
+            System.out.println("    lats=[ " + lats[0].toString() + ",");
+            System.out.println("           " + lats[1].toString() + " ],");
+            System.out.print("    times=[[");
+            for (int k = 0; k < times[0].size(); k++) {
+                if ( k > 0 )
                     System.out.print(", ");
-                System.out.print(dateFmtr.format(new Date(Math.round(tval * 1000.0))));
+                System.out.print(dateFmtr.format(new Date(Math.round(times[0].get(k) * 1000.0))));
             }
-            System.out.println("]");
+            System.out.println("],");
+            System.out.print("           [");
+            for (int k = 0; k < times[1].size(); k++) {
+                if ( k > 0 )
+                    System.out.print(", ");
+                System.out.print(dateFmtr.format(new Date(Math.round(times[1].get(k) * 1000.0))));
+            }
+            System.out.println("]]");
             System.out.println("]");
         }
         System.exit(0);

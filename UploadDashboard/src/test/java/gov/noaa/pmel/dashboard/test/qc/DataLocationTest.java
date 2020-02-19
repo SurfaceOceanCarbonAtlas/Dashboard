@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.qc;
 
 import gov.noaa.pmel.dashboard.qc.DataLocation;
@@ -26,7 +23,6 @@ public class DataLocationTest {
     private static final Date MY_DATA_DATE = new Date(3458139048000L);
     private static final Double MY_LONGITUDE = -179.45;
     private static final Double MY_LATITUDE = -2.65;
-    private static final Double MY_DEPTH = 50.0;
     private static final Double MY_DATA_VALUE = 1002.97;
 
     /**
@@ -85,23 +81,6 @@ public class DataLocationTest {
         assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
         myflag.setLatitude(null);
         assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
-    }
-
-    /**
-     * Test method for {@link DataLocation#getDepth()} and {@link DataLocation#setDepth(Double)}.
-     */
-    @Test
-    public void testGetSetDepth() {
-        DataLocation myflag = new DataLocation();
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getDepth());
-        myflag.setDepth(MY_DEPTH);
-        assertEquals(MY_DEPTH, myflag.getDepth());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
-        assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
-        assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
-        myflag.setDepth(null);
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getDepth());
     }
 
     /**
