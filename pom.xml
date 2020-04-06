@@ -15,6 +15,7 @@
 
     <modules>
         <module>OmeMetadata</module>
+        <module>SocatMetadata</module>
         <module>UploadDashboard</module>
         <module>DashboardApps</module>
     </modules>

@@ -92,8 +92,8 @@ public class OmeUtils {
             if ( vtype != null )
                 reader.associateColumnNameWithVarType(dataColNames.get(k), vtype);
         }
-        // Create an SDIMetadata object from the contents of the CDIAC XML Document
-        return reader.createSDIMetadata();
+        // Create an SocatMetadata object from the contents of the CDIAC XML Document
+        return reader.createSocatMetadata();
     }
 
     /**
