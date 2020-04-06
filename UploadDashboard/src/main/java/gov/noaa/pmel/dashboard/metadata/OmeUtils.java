@@ -6,18 +6,18 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
-import gov.noaa.pmel.sdimetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.sdimetadata.instrument.GasSensor;
-import gov.noaa.pmel.sdimetadata.instrument.Instrument;
-import gov.noaa.pmel.sdimetadata.translate.CdiacReader;
-import gov.noaa.pmel.sdimetadata.translate.OcadsWriter;
-import gov.noaa.pmel.sdimetadata.util.NumericString;
-import gov.noaa.pmel.sdimetadata.variable.AirPressure;
-import gov.noaa.pmel.sdimetadata.variable.AquGasConc;
-import gov.noaa.pmel.sdimetadata.variable.MethodType;
-import gov.noaa.pmel.sdimetadata.variable.Temperature;
-import gov.noaa.pmel.sdimetadata.variable.Variable;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
+import gov.noaa.pmel.socatmetadata.instrument.GasSensor;
+import gov.noaa.pmel.socatmetadata.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
+import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;
+import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.variable.AquGasConc;
+import gov.noaa.pmel.socatmetadata.variable.MethodType;
+import gov.noaa.pmel.socatmetadata.variable.Temperature;
+import gov.noaa.pmel.socatmetadata.variable.Variable;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -76,7 +76,7 @@ public class OmeUtils {
      * @throws IllegalArgumentException
      *         if the contents of the CDIAC OME metadata file are invalid
      */
-    public static SDIMetadata createSdiMetadataFromCdiacOme(Reader xmlReader,
+    public static SocatMetadata createSdiMetadataFromCdiacOme(Reader xmlReader,
             ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
             throws IOException, IllegalArgumentException {
         // Read the CDIAC XML into an XML Document in memory
@@ -107,7 +107,7 @@ public class OmeUtils {
      * @throws IOException
      *         if there is a problem writing the file
      */
-    public static void createOcadsOmeFromSdiMetadata(File omeFile, SDIMetadata sdiMData) throws IOException {
+    public static void createOcadsOmeFromSdiMetadata(File omeFile, SocatMetadata sdiMData) throws IOException {
         OcadsWriter ocadsWriter = new OcadsWriter(new FileWriter(omeFile));
         try {
             ocadsWriter.writeOcadsXml(sdiMData);
@@ -192,7 +192,7 @@ public class OmeUtils {
      * @throws IllegalArgumentException
      *         if there are problems with the given Metadata
      */
-    public static DatasetQCStatus suggestDatasetQCFlag(SDIMetadata sdiMData,
+    public static DatasetQCStatus suggestDatasetQCFlag(SocatMetadata sdiMData,
             DashboardDataset dataset) throws IllegalArgumentException {
         HashMap<String,GasSensor> co2SensorsMap = new HashMap<String,GasSensor>();
         for (Instrument instrument : sdiMData.getInstruments()) {

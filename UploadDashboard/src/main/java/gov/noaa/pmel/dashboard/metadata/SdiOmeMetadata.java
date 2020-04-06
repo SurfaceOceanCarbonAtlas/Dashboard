@@ -3,15 +3,15 @@ package gov.noaa.pmel.dashboard.metadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.Coverage;
-import gov.noaa.pmel.sdimetadata.MiscInfo;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
-import gov.noaa.pmel.sdimetadata.person.Investigator;
-import gov.noaa.pmel.sdimetadata.person.Person;
-import gov.noaa.pmel.sdimetadata.platform.Platform;
-import gov.noaa.pmel.sdimetadata.platform.PlatformType;
-import gov.noaa.pmel.sdimetadata.translate.DocumentHandler;
-import gov.noaa.pmel.sdimetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.Coverage;
+import gov.noaa.pmel.socatmetadata.MiscInfo;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.person.Investigator;
+import gov.noaa.pmel.socatmetadata.person.Person;
+import gov.noaa.pmel.socatmetadata.platform.Platform;
+import gov.noaa.pmel.socatmetadata.platform.PlatformType;
+import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
+import gov.noaa.pmel.socatmetadata.util.NumericString;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -33,10 +33,10 @@ import java.util.List;
  */
 public class SdiOmeMetadata implements OmeMetadataInterface {
 
-    private SDIMetadata mdata;
+    private SocatMetadata mdata;
 
     public SdiOmeMetadata() {
-        mdata = new SDIMetadata();
+        mdata = new SocatMetadata();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
         String stdId = DashboardServerUtils.checkDatasetID(datasetId);
         XMLDecoder xdec = new XMLDecoder(new FileInputStream(mdataFile));
         try {
-            mdata = (SDIMetadata) xdec.readObject();
+            mdata = (SocatMetadata) xdec.readObject();
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems reading the SDIMetadata object from the metadata file " +
                     mdataFile.getName() + " for dataset " + datasetId + ": " + ex.getMessage());

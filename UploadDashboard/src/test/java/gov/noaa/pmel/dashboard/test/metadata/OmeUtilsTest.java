@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
 import org.junit.Test;
 
 import java.io.Reader;
@@ -23,7 +23,7 @@ public class OmeUtilsTest {
 
     /**
      * Test of {@link OmeUtils#createSdiMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
-     * {@link OmeUtils#suggestDatasetQCFlag(SDIMetadata, DashboardDataset)}
+     * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
     public void testSuggestDatasetQCFlag() {
@@ -32,7 +32,7 @@ public class OmeUtilsTest {
         dset.setDataColTypes(DATA_COLUMN_TYPES);
 
         StringReader reader = new StringReader(AOML_CDIAC_XML_DATA_STRING);
-        SDIMetadata mdata = null;
+        SocatMetadata mdata = null;
         try {
             mdata = OmeUtils.createSdiMetadataFromCdiacOme(reader, dset.getUserColNames(), dset.getDataColTypes());
         } catch ( Exception ex ) {

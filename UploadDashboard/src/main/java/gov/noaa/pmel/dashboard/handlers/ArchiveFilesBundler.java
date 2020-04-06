@@ -11,10 +11,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.sdimetadata.MiscInfo;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
-import gov.noaa.pmel.sdimetadata.platform.Platform;
-import gov.noaa.pmel.sdimetadata.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.MiscInfo;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.platform.Platform;
+import gov.noaa.pmel.socatmetadata.util.Datestamp;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -213,7 +213,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
         // The SDIMetadata object created from any metadata provided - for auto-generating OCADS XML file
-        SDIMetadata sdimdata = null;
+        SocatMetadata sdimdata = null;
 
         DashboardDataset dsetInfo = configStore.getDataFileHandler().getDatasetFromInfoFile(datasetId);
         ArrayList<DataColumnType> dataColTypes = dsetInfo.getDataColTypes();
@@ -251,7 +251,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
-                SDIMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                SocatMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -450,7 +450,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
      *         if there were problems copying files to the bagit bundle directory, or
      *         if there were problems creating the bagit zip file from the bagit bundle directory
      */
-    private String createBagitFilesBundle(String expocode, SDIMetadata sdimdata)
+    private String createBagitFilesBundle(String expocode, SocatMetadata sdimdata)
             throws IllegalArgumentException, IOException {
         String stdId = DashboardServerUtils.checkDatasetID(expocode);
         File bundleFile = getOrigZipBundleFile(stdId);

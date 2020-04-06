@@ -5,7 +5,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -429,7 +429,7 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems getting the CDIAC OME XML file: " + ex.getMessage(), ex);
         }
-        SDIMetadata sdiMData;
+        SocatMetadata sdiMData;
         try {
             FileReader xmlReader = new FileReader(cdiacOmeFile);
             sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(

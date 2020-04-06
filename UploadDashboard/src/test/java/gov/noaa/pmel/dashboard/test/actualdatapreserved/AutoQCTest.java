@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.sdimetadata.SDIMetadata;
+import gov.noaa.pmel.socatmetadata.SocatMetadata;
 import org.junit.Test;
 
 import java.io.File;
@@ -22,7 +22,7 @@ public class AutoQCTest {
 
     /**
      * Test of {@link OmeUtils#createSdiMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
-     * {@link OmeUtils#suggestDatasetQCFlag(SDIMetadata, DashboardDataset)}
+     * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
     public void testSuggestDatasetQCFlag() throws Exception {
@@ -50,7 +50,7 @@ public class AutoQCTest {
             DashboardDataset dset = dataHandler.getDatasetFromInfoFile(expocode);
             File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardUtils.PI_OME_FILENAME);
             FileReader cdiacReader = new FileReader(cdiacFile);
-            SDIMetadata mdata = OmeUtils.createSdiMetadataFromCdiacOme(cdiacReader,
+            SocatMetadata mdata = OmeUtils.createSdiMetadataFromCdiacOme(cdiacReader,
                     dset.getUserColNames(), dset.getDataColTypes());
             DatasetQCStatus status = OmeUtils.suggestDatasetQCFlag(mdata, dset);
             DatasetQCStatus.Status auto = status.getAutoSuggested();
