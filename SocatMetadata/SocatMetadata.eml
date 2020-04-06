@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="true" inheritJdk="true">
+	<output-test url="file://$MODULE_DIR$/target/test/SocatMetadata"/>
+	<contentEntry url="file://$MODULE_DIR$">
+		<testFolder url="file://$MODULE_DIR$/src/test/java"/>
+		<excludeFolder url="file://$MODULE_DIR$/target"/>
+	</contentEntry>
+	<lib name="jdom-2.0.6" scope="PROVIDED"/>
+	<lib name="junit:junit:4.12" scope="TEST"/>
+	<levels>
+		<level name="jdom-2.0.6" value="project"/>
+		<level name="junit:junit:4.12" value="project"/>
+	</levels>
+</component>

@@ -6,7 +6,7 @@
         <element id="directory" name="classes">
           <element id="module-output" name="UploadDashboard" />
           <element id="module-output" name="OmeMetadata" />
-          <element id="module-output" name="SDIMetadata" />
+          <element id="module-output" name="SocatMetadata" />
         </element>
         <element id="directory" name="lib">
           <element id="file-copy" path="$USER_HOME$/gwt-2.8.2/gwt-servlet.jar" />
