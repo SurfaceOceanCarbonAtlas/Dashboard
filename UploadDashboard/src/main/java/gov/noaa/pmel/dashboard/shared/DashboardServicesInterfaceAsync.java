@@ -235,6 +235,30 @@ public interface DashboardServicesInterfaceAsync {
             AsyncCallback<Boolean> callback);
 
     /**
+     * Client side request for the IDs of datasets which have associated SocatMetadata objects
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param callback
+     *         callback to make with the list of dataset IDs
+     */
+    void getAllDatasetIdsForMetadata(String username, AsyncCallback<ArrayList<String>> callback);
+
+    /**
+     * Client side request to copy the SocatMetadata, with appropriate adjustments, from one dataset to another.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param toId
+     *         copy the SocatMetadata to the dataset with this ID
+     * @param fromId
+     *         copy the SocatMetadata from the dataset with this ID
+     * @param callback
+     *         callback to make on success or failure
+     */
+    void copySocatMetadata(String username, String toId, String fromId, AsyncCallback<Void> callback);
+
+    /**
      * Client-side interface for submitting datasets for QC.
      *
      * @param username

@@ -190,6 +190,7 @@ public class MetadataUploadService extends HttpServlet {
                 if ( isOme ) {
                     try {
                         dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
+                        // TODO: needs to create a file for generating a SocatMetadata object
                     } catch ( IllegalArgumentException ex ) {
                         // Problem with this OME metadata - delete it
                         metadataHandler.deleteMetadata(username, id, metadata.getFilename());

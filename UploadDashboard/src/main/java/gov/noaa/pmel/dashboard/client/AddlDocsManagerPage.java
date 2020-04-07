@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.cell.client.ButtonCell;
@@ -338,7 +335,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                     @Override
                     public void onSuccess(Boolean result) {
                         // Submit only if yes
-                        if ( result == true ) {
+                        if ( result == Boolean.TRUE ) {
                             assignTokens();
                             uploadForm.submit();
                         }
@@ -547,7 +544,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                             @Override
                             public void onSuccess(Boolean result) {
                                 // Only continue if yes returned; ignore if no or null
-                                if ( result == true ) {
+                                if ( result == Boolean.TRUE ) {
                                     continueDelete(deleteFilename, deleteId);
                                 }
                             }

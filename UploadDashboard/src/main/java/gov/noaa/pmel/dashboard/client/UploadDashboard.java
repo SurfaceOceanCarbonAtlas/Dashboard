@@ -240,7 +240,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         }
         else if ( token.equals(PagesEnum.EDIT_METADATA.name()) ) {
             // OME metadata manager page from history
-            OmeManagerPage.redisplayPage(currentPage.getUsername());
+            EditMetadataPage.redisplayPage(currentPage.getUsername());
         }
         else if ( token.equals(PagesEnum.MANAGE_DOCUMENTS.name()) ) {
             // Additional data manager page from history
