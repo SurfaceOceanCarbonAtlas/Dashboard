@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Investigator;
-import gov.noaa.pmel.socatmetadata.person.Submitter;
+import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
+import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import org.junit.Test;
 
 import java.util.ArrayList;

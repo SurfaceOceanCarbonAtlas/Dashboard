@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.platform.Platform;
-import gov.noaa.pmel.socatmetadata.platform.PlatformType;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import org.junit.Test;
 
 import java.util.Arrays;

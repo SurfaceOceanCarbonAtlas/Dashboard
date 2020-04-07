@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
-import gov.noaa.pmel.socatmetadata.instrument.PressureSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.instrument.PressureSensor;
 import org.junit.Test;
 
 import java.util.ArrayList;

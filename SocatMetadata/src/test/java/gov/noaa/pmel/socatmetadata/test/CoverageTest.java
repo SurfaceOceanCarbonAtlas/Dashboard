@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.Coverage;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.Coverage;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import org.junit.Test;
 
 import java.text.DateFormat;

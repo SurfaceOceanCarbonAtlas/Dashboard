@@ -576,6 +576,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
+        // TODO: implement
         throw new IllegalArgumentException("Not yet implemented");
     }
 
@@ -585,6 +586,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
+        // TODO: implement
         throw new IllegalArgumentException("Not yet implemented");
     }
 

@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.Variable;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
 import java.util.ArrayList;

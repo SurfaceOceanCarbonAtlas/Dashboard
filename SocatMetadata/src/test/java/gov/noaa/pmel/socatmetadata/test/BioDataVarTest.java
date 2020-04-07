@@ -1,11 +1,11 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.BioDataVar;
-import gov.noaa.pmel.socatmetadata.variable.DataVar;
-import gov.noaa.pmel.socatmetadata.variable.MethodType;
-import gov.noaa.pmel.socatmetadata.variable.Variable;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
 import java.util.ArrayList;

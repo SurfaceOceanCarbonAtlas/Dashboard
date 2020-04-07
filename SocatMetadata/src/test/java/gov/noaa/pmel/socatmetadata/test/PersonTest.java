@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import org.junit.Test;
 
 import java.util.Arrays;

@@ -1,10 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
-import gov.noaa.pmel.socatmetadata.platform.PlatformType;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;

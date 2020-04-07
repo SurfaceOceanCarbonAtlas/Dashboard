@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
 import org.junit.Test;
 
 import java.util.Date;

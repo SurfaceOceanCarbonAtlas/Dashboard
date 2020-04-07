@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.Temperature;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

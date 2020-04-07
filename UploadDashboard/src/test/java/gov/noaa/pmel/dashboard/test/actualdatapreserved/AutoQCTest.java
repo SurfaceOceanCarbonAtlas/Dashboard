@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 import org.junit.Test;
 
 import java.io.File;

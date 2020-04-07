@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.Equilibrator;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
 import org.junit.Test;
 
 import java.util.ArrayList;

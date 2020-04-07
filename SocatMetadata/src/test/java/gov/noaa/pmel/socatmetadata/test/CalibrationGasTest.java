@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
+import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import org.junit.Test;
 
 import java.util.Arrays;

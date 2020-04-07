@@ -11,10 +11,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socatmetadata.MiscInfo;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
-import gov.noaa.pmel.socatmetadata.platform.Platform;
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
