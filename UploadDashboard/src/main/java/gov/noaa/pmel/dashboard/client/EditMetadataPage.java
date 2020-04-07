@@ -10,6 +10,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -40,6 +41,7 @@ public class EditMetadataPage extends CompositeWithUsername {
     private static final String TITLE_TEXT = "View and Edit Metadata";
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
+    private static final String SOURCE_CAPTION_TITLE = "Source of SOCAT Metadata";
     private static final String EDIT_TEXT = "View/Edit";
     private static final String CANCEL_TEXT = "Cancel";
 
@@ -47,25 +49,25 @@ public class EditMetadataPage extends CompositeWithUsername {
             "Dataset: <ul><li>";
     private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
-    private static final String EXISTING_RADIO_TEXT_PROLOGUE = "Use existing metdata (";
+    private static final String EXISTING_RADIO_TEXT_PROLOGUE = " Use existing SOCAT metdata (";
     private static final String EXISTING_RADIO_TEXT_EPILOGUE = ")";
     private static final String EXISTING_IS_STUB_TEXT = "minimal metadata derived from data";
     private static final String EXISTING_LAST_MODIFIED = "last modified ";
 
-    private static final String COPY_RADIO_TEXT = "Start with minimally-modified metadata for dataset: ";
+    private static final String COPY_RADIO_TEXT = " Derive from SOCAT metadata for dataset: ";
 
     private static final String GET_DATASET_IDS_FAILURE_MSG = "Unexpected failure to retrieve the list of expocodes";
     private static final String NO_COPY_SELECTION_MADE = "Please select an expocode from which to copy metadata";
 
     private static final String NO_SELECTION_MSG = "Please select a source of the metadata to view";
 
-    private static final String UPLOAD_RADIO_TEXT = "Upload a metadata XML file";
+    private static final String UPLOAD_RADIO_TEXT = " Generate from uploaded metadata XML file: ";
 
     private static final String NO_FILE_ERROR_MSG =
             "Please select a metadata XML file to upload";
 
     private static final String OVERWRITE_WARNING_MSG =
-            "The metadata for this dataset will be overwritten.  Do you wish to proceed?";
+            "The SOCAT metadata for this dataset will be overwritten.  Do you wish to proceed?";
     private static final String OVERWRITE_YES_TEXT = "Yes";
     private static final String OVERWRITE_NO_TEXT = "No";
 
@@ -98,6 +100,8 @@ public class EditMetadataPage extends CompositeWithUsername {
     @UiField
     HTML introHtml;
     @UiField
+    CaptionPanel sourceCaption;
+    @UiField
     RadioButton existingRadio;
     @UiField
     RadioButton copyRadio;
@@ -108,7 +112,7 @@ public class EditMetadataPage extends CompositeWithUsername {
     @UiField
     FormPanel uploadForm;
     @UiField
-    FileUpload omeUpload;
+    FileUpload xmlUpload;
     @UiField
     Hidden timestampToken;
     @UiField
@@ -141,6 +145,7 @@ public class EditMetadataPage extends CompositeWithUsername {
         titleLabel.setText(TITLE_TEXT);
         logoutButton.setText(LOGOUT_TEXT);
 
+        sourceCaption.setCaptionText(SOURCE_CAPTION_TITLE);
         copyRadio.setText(COPY_RADIO_TEXT);
         uploadRadio.setText(UPLOAD_RADIO_TEXT);
 
@@ -337,7 +342,7 @@ public class EditMetadataPage extends CompositeWithUsername {
         }
         else if ( uploadRadio.getValue() ) {
             // Make sure a file was selected
-            String uploadFilename = DashboardUtils.baseName(omeUpload.getFilename());
+            String uploadFilename = DashboardUtils.baseName(xmlUpload.getFilename());
             if ( uploadFilename.isEmpty() ) {
                 UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
                 return;
@@ -443,7 +448,7 @@ public class EditMetadataPage extends CompositeWithUsername {
      * Show the pages for viewing and editing the SocatMetadata for the current dataset.
      */
     private void showMetadataForDataset() {
-        UploadDashboard.showMessage("Show metadata stubbed out at this time");
+        UploadDashboard.showMessage("Edit metadata stubbed out at this time");
         DatasetListPage.showPage();
     }
 

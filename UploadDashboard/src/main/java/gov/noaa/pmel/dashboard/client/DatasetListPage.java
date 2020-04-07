@@ -66,9 +66,9 @@ public class DatasetListPage extends CompositeWithUsername {
             "review and modify data column type assignments for the " +
                     "selected dataset; identify issues in the data";
 
-    static final String OME_METADATA_TEXT = "Edit OME Metadata";
-    private static final String OME_METADATA_HOVER_HELP =
-            "edit the OME metadata for the selected datasets";
+    static final String SOCAT_METADATA_TEXT = "Edit SOCAT Metadata";
+    private static final String SOCAT_METADATA_HOVER_HELP =
+            "edit the SOCAT metadata for the selected datasets";
 
     private static final String ADDL_DOCS_TEXT = "Supplemental Documents";
     private static final String ADDL_DOCS_HOVER_HELP =
@@ -124,7 +124,7 @@ public class DatasetListPage extends CompositeWithUsername {
     // Ends of error messages for improper cruise selections
     private static final String FOR_REVIEWING_ERR_END =
             "for reviewing data.";
-    private static final String FOR_OME_ERR_END =
+    private static final String FOR_METADATA_ERR_END =
             "for managing metadata.";
     private static final String FOR_ADDL_DOCS_ERR_END =
             "for managing supplemental documents.";
@@ -234,7 +234,7 @@ public class DatasetListPage extends CompositeWithUsername {
     private static final String DATASET_ID_COLUMN_NAME = "Dataset ID";
     private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
     private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
-    private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
+    private static final String SOCAT_METADATA_COLUMN_NAME = "SOCAT Metadata";
     private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
     private static final String VERSION_COLUMN_NAME = "Version";
     private static final String SUBMITTED_COLUMN_NAME = "QC Status";
@@ -247,7 +247,7 @@ public class DatasetListPage extends CompositeWithUsername {
     private static final String NO_DATASET_ID_STRING = "(unknown)";
     private static final String NO_TIMESTAMP_STRING = "(unknown)";
     private static final String NO_DATA_CHECK_STATUS_STRING = "Not checked";
-    private static final String NO_OME_METADATA_STATUS_STRING = "(no metadata)";
+    private static final String NO_SOCAT_METADATA_STATUS_STRING = "(no metadata)";
     private static final String NO_ARCHIVE_STATUS_STRING = "Not specified";
     private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
     private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
@@ -342,8 +342,8 @@ public class DatasetListPage extends CompositeWithUsername {
         viewDataButton.setText(VIEW_DATA_TEXT);
         viewDataButton.setTitle(VIEW_DATA_HOVER_HELP);
 
-        omeMetadataButton.setText(OME_METADATA_TEXT);
-        omeMetadataButton.setTitle(OME_METADATA_HOVER_HELP);
+        omeMetadataButton.setText(SOCAT_METADATA_TEXT);
+        omeMetadataButton.setTitle(SOCAT_METADATA_HOVER_HELP);
 
         addlDocsButton.setText(ADDL_DOCS_TEXT);
         addlDocsButton.setTitle(ADDL_DOCS_HOVER_HELP);
@@ -594,13 +594,13 @@ public class DatasetListPage extends CompositeWithUsername {
         getSelectedDatasets(null);
         if ( datasetsSet.size() < 1 ) {
             UploadDashboard.showMessage(
-                    NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
+                    NO_DATASET_SELECTED_ERR_START + FOR_METADATA_ERR_END);
             return;
         }
-        // Until the OME is in place, only accept one cruise
+        // Until the SOCAT Metadata is in place, only accept one cruise
         if ( datasetsSet.size() > 1 ) {
             UploadDashboard.showMessage(
-                    MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
+                    MANY_DATASETS_SELECTED_ERR_START + FOR_METADATA_ERR_END);
             return;
         }
         EditMetadataPage.showPage(datasetsSet);
@@ -977,7 +977,7 @@ public class DatasetListPage extends CompositeWithUsername {
         datasetsGrid.addColumn(dataCheckColumn,
                 SafeHtmlUtils.fromSafeConstant(DATA_CHECK_COLUMN_NAME));
         datasetsGrid.addColumn(omeMetadataColumn,
-                SafeHtmlUtils.fromSafeConstant(OME_METADATA_COLUMN_NAME));
+                SafeHtmlUtils.fromSafeConstant(SOCAT_METADATA_COLUMN_NAME));
         datasetsGrid.addColumn(addlDocsColumn,
                 SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
         datasetsGrid.addColumn(versionColumn,
@@ -1266,7 +1266,7 @@ public class DatasetListPage extends CompositeWithUsername {
     }
 
     /**
-     * @return the OME metadata filename column for the table
+     * @return the SOCAT Metadata filename column for the table
      */
     private Column<DashboardDataset,String> buildOmeMetadataColumn() {
         Column<DashboardDataset,String> omeMetadataColumn =
@@ -1275,7 +1275,7 @@ public class DatasetListPage extends CompositeWithUsername {
                     public String getValue(DashboardDataset cruise) {
                         String omeTimestamp = cruise.getOmeTimestamp();
                         if ( omeTimestamp.isEmpty() )
-                            omeTimestamp = NO_OME_METADATA_STATUS_STRING;
+                            omeTimestamp = NO_SOCAT_METADATA_STATUS_STRING;
                         return omeTimestamp;
                     }
 
@@ -1292,7 +1292,7 @@ public class DatasetListPage extends CompositeWithUsername {
             public void update(int index, DashboardDataset cruise, String value) {
                 // Save the currently selected cruises
                 getSelectedDatasets(null);
-                // Show the OME metadata manager page for this one cruise
+                // Show the SOCAT metadata manager page for this one cruise
                 checkSet.clear();
                 checkSet.setUsername(getUsername());
                 checkSet.setManager(isManager);
@@ -1506,7 +1506,7 @@ public class DatasetListPage extends CompositeWithUsername {
 
     /**
      * Checks the cruises given in checkSet in this instance for metadata compatibility for submitting for QC.
-     * At this time this only checks that an OME metadata document or an additional document is associated with
+     * At this time this only checks that an SOCAT metadata document or an additional document is associated with
      * each cruise.
      * <p>
      * Then checks the cruises given in checkSet in this instance for data compatibility for submitting for QC.

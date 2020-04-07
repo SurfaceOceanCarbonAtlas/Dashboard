@@ -155,10 +155,38 @@ body {
     margin-left: 0.5em;
 }
 
+.metadatacaptionpanel {
+    display: block;
+    margin: 1em;
+}
+
 .metadatalistbox {
-     display: inline;
-     margin-left: 0.75em;
- }
+    display: inline;
+    width: 16em;
+    margin-left: 1em;
+}
+
+.metadatapanel {
+    display: block;
+    margin-top: 0.25em;
+    margin-bottom: 0.5em;
+}
+
+.metadataradiobutton {
+    display: inline;
+    margin-left: 0.25em;
+}
+
+.metadatauploadfile {
+    display: inline;
+    width: 50%;
+    font-size: 100%;
+}
+
+.metadatauploadpanel {
+    display: inline;
+    margin-left: 0.5em;
+}
 
 .morehelpanchor {
     display: block;
