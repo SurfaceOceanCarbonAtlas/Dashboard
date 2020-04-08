@@ -603,7 +603,7 @@ public class DatasetListPage extends CompositeWithUsername {
                     MANY_DATASETS_SELECTED_ERR_START + FOR_METADATA_ERR_END);
             return;
         }
-        EditMetadataPage.showPage(datasetsSet);
+        SelectSocatMetadataPage.showPage(datasetsSet);
     }
 
     @UiHandler("addlDocsButton")
@@ -1298,7 +1298,7 @@ public class DatasetListPage extends CompositeWithUsername {
                 checkSet.setManager(isManager);
                 checkSet.setImageExtension(imageExtension);
                 checkSet.put(cruise.getDatasetId(), cruise);
-                EditMetadataPage.showPage(checkSet);
+                SelectSocatMetadataPage.showPage(checkSet);
             }
         });
         return omeMetadataColumn;

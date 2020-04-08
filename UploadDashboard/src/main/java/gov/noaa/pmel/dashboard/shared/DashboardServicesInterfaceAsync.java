@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

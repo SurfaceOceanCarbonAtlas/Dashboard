@@ -32,22 +32,22 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Page for preparing to view and edit standard SOCAT metadata.
+ * Page for selecting the standard SOCAT metadata to view and edit.
  *
  * @author Karl Smith
  */
-public class EditMetadataPage extends CompositeWithUsername {
+public class SelectSocatMetadataPage extends CompositeWithUsername {
 
-    private static final String TITLE_TEXT = "View and Edit Metadata";
+    private static final String TITLE_TEXT = "Select SOCAT Metadata Source";
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
     private static final String SOURCE_CAPTION_TITLE = "Source of SOCAT Metadata";
     private static final String EDIT_TEXT = "View/Edit";
     private static final String CANCEL_TEXT = "Cancel";
 
-    private static final String CRUISE_HTML_INTRO_PROLOGUE = "<p>" +
+    private static final String HTML_INTRO_PROLOGUE = "<p>" +
             "Dataset: <ul><li>";
-    private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
+    private static final String HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
     private static final String EXISTING_RADIO_TEXT_PROLOGUE = " Use existing SOCAT metdata (";
     private static final String EXISTING_RADIO_TEXT_EPILOGUE = ")";
@@ -82,11 +82,11 @@ public class EditMetadataPage extends CompositeWithUsername {
     private static final String EXPLAINED_FAIL_MSG_END =
             "</pre></p>";
 
-    interface OmeManagerPageUiBinder extends UiBinder<Widget,EditMetadataPage> {
+    interface SelectSocatMetadataPageUiBinder extends UiBinder<Widget,SelectSocatMetadataPage> {
     }
 
-    private static OmeManagerPageUiBinder uiBinder =
-            GWT.create(OmeManagerPageUiBinder.class);
+    private static SelectSocatMetadataPageUiBinder uiBinder =
+            GWT.create(SelectSocatMetadataPageUiBinder.class);
 
     private static DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
@@ -131,9 +131,9 @@ public class EditMetadataPage extends CompositeWithUsername {
 
 
     // Singleton instance of this page
-    private static EditMetadataPage singleton;
+    private static SelectSocatMetadataPage singleton;
 
-    EditMetadataPage() {
+    SelectSocatMetadataPage() {
         initWidget(uiBinder.createAndBindUi(this));
         singleton = this;
 
@@ -161,18 +161,18 @@ public class EditMetadataPage extends CompositeWithUsername {
     }
 
     /**
-     * Display the edit metadata page in the RootLayoutPanel for the given cruise.
+     * Display the SelectSocatMetadataPage in the RootLayoutPanel for the given dataset.
      * Adds this page to the page history.
      *
      * @param cruises
-     *         ask about editing the metadata for the first cruise in this list
+     *         ask about editing the metadata for the first dataset in this set
      */
     static void showPage(DashboardDatasetList cruises) {
         if ( singleton == null )
-            singleton = new EditMetadataPage();
+            singleton = new SelectSocatMetadataPage();
         singleton.updateDataset(cruises);
         UploadDashboard.updateCurrentPage(singleton);
-        History.newItem(PagesEnum.EDIT_METADATA.name(), false);
+        History.newItem(PagesEnum.SELECT_SOCAT_METADATA.name(), false);
     }
 
     /**
@@ -189,10 +189,10 @@ public class EditMetadataPage extends CompositeWithUsername {
     }
 
     /**
-     * Updates this page with the username and the first cruise in the given set of cruise.
+     * Updates this page with the username and the first dataset in the given dataset set.
      *
      * @param cruises
-     *         ask about editing the metadata for the first cruise in this list
+     *         ask about editing the metadata for the first dataset in this set
      */
     private void updateDataset(DashboardDatasetList cruises) {
         // Update the current username
@@ -207,9 +207,7 @@ public class EditMetadataPage extends CompositeWithUsername {
         cruise = cruises.values().iterator().next();
 
         // Update the HTML intro naming the cruise
-        introHtml.setHTML(CRUISE_HTML_INTRO_PROLOGUE +
-                SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) +
-                CRUISE_HTML_INTRO_EPILOGUE);
+        introHtml.setHTML(HTML_INTRO_PROLOGUE + SafeHtmlUtils.htmlEscape(cruise.getDatasetId()) + HTML_INTRO_EPILOGUE);
 
         // Briefly describe existing metadata
         String omeTimestamp = cruise.getOmeTimestamp();
@@ -448,8 +446,10 @@ public class EditMetadataPage extends CompositeWithUsername {
      * Show the pages for viewing and editing the SocatMetadata for the current dataset.
      */
     private void showMetadataForDataset() {
-        UploadDashboard.showMessage("Edit metadata stubbed out at this time");
-        DatasetListPage.showPage();
+        DashboardDatasetList datasetList = new DashboardDatasetList();
+        datasetList.setUsername(getUsername());
+        datasetList.put(cruise.getDatasetId(), cruise);
+        EditSocatMetadataPage.showPage(datasetList);
     }
 
 }

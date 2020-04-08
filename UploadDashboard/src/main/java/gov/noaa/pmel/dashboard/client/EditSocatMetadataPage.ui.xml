@@ -1,0 +1,27 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+>
+
+    <ui:style src="FullWidth.css"/>
+
+    <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.titlepanel}">
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
+            </g:FlowPanel>
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
+            <g:TabLayoutPanel barHeight="1.5" barUnit="EM" addStyleNames="{style.metaviewtabpanel}" ui:field="metaviewTabPanel">
+            </g:TabLayoutPanel>
+            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="saveButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:ScrollPanel>
+
+</ui:UiBinder>

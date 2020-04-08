@@ -4,7 +4,7 @@
     <facet type="gwt" name="GWT">
       <configuration>
         <setting name="compilerMaxHeapSize" value="1024" />
-        <setting name="gwtScriptOutputStyle" value="DETAILED" />
+        <setting name="gwtScriptOutputStyle" value="OBF" />
         <setting name="gwtSdkUrl" value="file://$USER_HOME$/gwt-2.8.2" />
         <setting name="webFacet" value="Web" />
       </configuration>

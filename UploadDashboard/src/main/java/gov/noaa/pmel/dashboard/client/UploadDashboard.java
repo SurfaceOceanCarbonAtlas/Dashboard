@@ -42,9 +42,14 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         SHOW_DATA_MESSAGES,
 
         /**
-         * History tag for OmeManagerPage
+         * History tag for SelectSocatMetadataPage
          */
-        EDIT_METADATA,
+        SELECT_SOCAT_METADATA,
+
+        /**
+         * History tag for EditSocatMetadataPage
+         */
+        EDIT_SOCAT_METADATA,
 
         /**
          * History tag for AddlDocsManagerPage
@@ -64,7 +69,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         /**
          * History tag for DashboardLogoutPage
          */
-        LOGOUT
+        LOGOUT;
     }
 
     // Column widths in em's
@@ -238,9 +243,17 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
             // Data column specs page from history
             DataColumnSpecsPage.redisplayPage(currentPage.getUsername());
         }
-        else if ( token.equals(PagesEnum.EDIT_METADATA.name()) ) {
-            // OME metadata manager page from history
-            EditMetadataPage.redisplayPage(currentPage.getUsername());
+        else if ( token.equals(PagesEnum.SHOW_DATA_MESSAGES.name()) ) {
+            // Select show data messages page from history
+            DataMessagesPage.redisplayPage(currentPage.getUsername());
+        }
+        else if ( token.equals(PagesEnum.SELECT_SOCAT_METADATA.name()) ) {
+            // Select SOCAT metadata page from history
+            SelectSocatMetadataPage.redisplayPage(currentPage.getUsername());
+        }
+        else if ( token.equals(PagesEnum.EDIT_SOCAT_METADATA.name()) ) {
+            // Edit SOCAT metadata page from history
+            EditSocatMetadataPage.redisplayPage(currentPage.getUsername());
         }
         else if ( token.equals(PagesEnum.MANAGE_DOCUMENTS.name()) ) {
             // Additional data manager page from history

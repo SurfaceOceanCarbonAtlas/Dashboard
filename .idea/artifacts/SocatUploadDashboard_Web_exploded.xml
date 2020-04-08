@@ -14,6 +14,7 @@
       </element>
       <element id="gwt-compiler-output" facet="UploadDashboard/gwt/GWT" />
       <element id="javaee-facet-resources" facet="UploadDashboard/web/Web" />
+      <element id="gwt-compiler-output" facet="SocatMetadata/gwt/GWT" />
     </root>
   </artifact>
 </component>
