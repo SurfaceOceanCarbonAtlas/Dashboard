@@ -144,7 +144,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             @Override
             public void onSuccess(SocatMetadata result) {
                 UploadDashboard.showAutoCursor();
-                metadata = result.duplicate(null);
+                metadata = (SocatMetadata) (result.duplicate(null));
                 showSocatMetadata();
             }
 
