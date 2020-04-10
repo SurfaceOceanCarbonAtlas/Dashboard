@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import java.util.HashSet;
 /**
  * Base class for instruments (eg, sensors, equilibrators)
  */
-public class Instrument implements Serializable, IsSerializable {
+public class Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7328563202377294092L;
+    private static final long serialVersionUID = -6339512187742983054L;
 
     protected String name;
     protected String id;
@@ -147,24 +148,19 @@ public class Instrument implements Serializable, IsSerializable {
         }
     }
 
-    /**
-     * Deeply copies the values in this Instrument object to the given Instrument object.
-     *
-     * @param dup
-     *         the Instrument object to copy values into;
-     *         if null, a new Instrument object is created for copying values into
-     *
-     * @return the updated Instrument object
-     */
-    public Instrument duplicate(Instrument dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Instrument inst;
         if ( dup == null )
-            dup = new Instrument();
-        dup.name = name;
-        dup.id = id;
-        dup.manufacturer = manufacturer;
-        dup.model = model;
-        dup.addnInfo = new ArrayList<String>(addnInfo);
-        return dup;
+            inst = new Instrument();
+        else
+            inst = (Instrument) dup;
+        inst.name = name;
+        inst.id = id;
+        inst.manufacturer = manufacturer;
+        inst.model = model;
+        inst.addnInfo = new ArrayList<String>(addnInfo);
+        return inst;
     }
 
     @Override

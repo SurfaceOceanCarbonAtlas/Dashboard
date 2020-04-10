@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -183,7 +183,7 @@ public class CalibrationGasTest {
     @Test
     public void testDuplicate() {
         CalibrationGas gas = new CalibrationGas();
-        CalibrationGas dup = gas.duplicate(null);
+        CalibrationGas dup = (CalibrationGas) (gas.duplicate(null));
         assertEquals(gas, dup);
         assertNotSame(gas, dup);
 
@@ -195,7 +195,7 @@ public class CalibrationGasTest {
         gas.setAccuracy(ACCURACY);
         assertNotEquals(gas, dup);
 
-        dup = gas.duplicate(null);
+        dup = (CalibrationGas) (gas.duplicate(null));
         assertEquals(gas, dup);
         assertNotSame(gas, dup);
     }

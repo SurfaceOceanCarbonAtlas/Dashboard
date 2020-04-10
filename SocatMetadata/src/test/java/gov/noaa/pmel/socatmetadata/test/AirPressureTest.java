@@ -116,7 +116,7 @@ public class AirPressureTest {
     @Test
     public void testDuplicate() {
         AirPressure pressure = new AirPressure();
-        AirPressure dup = pressure.duplicate(null);
+        AirPressure dup = (AirPressure) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -127,7 +127,7 @@ public class AirPressureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.duplicate(null);
+        dup = (AirPressure) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Base class for a sampling instrument.
  */
-public class Sampler extends Instrument implements Serializable, IsSerializable {
+public class Sampler extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 4446059962387017147L;
+    private static final long serialVersionUID = -6667356833643169854L;
 
     HashSet<String> instrumentNames;
 
@@ -76,21 +77,16 @@ public class Sampler extends Instrument implements Serializable, IsSerializable 
         return invalids;
     }
 
-    /**
-     * Deeply copies the values in this Sampler object to the given Sampler object.
-     *
-     * @param dup
-     *         the Sampler object to copy values into;
-     *         if null, a new Sampler object is created for copying values into
-     *
-     * @return the updated Sampler object
-     */
-    public Sampler duplicate(Sampler dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Sampler sampler;
         if ( dup == null )
-            dup = new Sampler();
-        super.duplicate(dup);
-        dup.instrumentNames = new HashSet<String>(instrumentNames);
-        return dup;
+            sampler = new Sampler();
+        else
+            sampler = (Sampler) dup;
+        super.duplicate(sampler);
+        sampler.instrumentNames = new HashSet<String>(instrumentNames);
+        return sampler;
     }
 
     @Override

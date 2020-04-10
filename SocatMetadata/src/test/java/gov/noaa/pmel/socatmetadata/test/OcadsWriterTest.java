@@ -286,7 +286,8 @@ public class OcadsWriterTest {
             assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
             assertEquals("Sprayhead above dynamic pool, with thermal jacket",
                     docHandler.getElementText(var, equilibratorType));
-            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L",
+                    docHandler.getElementText(var, equilibratorVolume));
             assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
             assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
             assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
@@ -779,7 +780,8 @@ public class OcadsWriterTest {
             assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
             assertEquals("Sprayhead above dynamic pool, with thermal jacket",
                     docHandler.getElementText(var, equilibratorType));
-            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L",
+                    docHandler.getElementText(var, equilibratorVolume));
             assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
             assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
             assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));

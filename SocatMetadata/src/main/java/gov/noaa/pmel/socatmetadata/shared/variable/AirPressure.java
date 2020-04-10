@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
@@ -10,9 +11,9 @@ import java.io.Serializable;
  * The default unit is hectopascals instead of empty.
  * Also provides a pressure correction field.
  */
-public class AirPressure extends DataVar implements Serializable, IsSerializable {
+public class AirPressure extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7149799335885804693L;
+    private static final long serialVersionUID = 5104578066431658285L;
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
@@ -107,21 +108,16 @@ public class AirPressure extends DataVar implements Serializable, IsSerializable
             this.precision = new NumericString(null, HECTOPASCALS_UNIT);
     }
 
-    /**
-     * Deeply copies the values in this AirPressure object to the given AirPressure object.
-     *
-     * @param dup
-     *         the AirPressure object to copy values into;
-     *         if null, a new AirPressure object is created for copying values into
-     *
-     * @return the updated AirPressure object
-     */
-    public AirPressure duplicate(AirPressure dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        AirPressure press;
         if ( dup == null )
-            dup = new AirPressure();
-        super.duplicate(dup);
-        dup.pressureCorrection = pressureCorrection;
-        return dup;
+            press = new AirPressure();
+        else
+            press = (AirPressure) dup;
+        super.duplicate(press);
+        press.pressureCorrection = pressureCorrection;
+        return press;
     }
 
     @Override

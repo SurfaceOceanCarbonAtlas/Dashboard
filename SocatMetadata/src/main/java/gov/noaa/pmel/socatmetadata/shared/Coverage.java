@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
@@ -11,9 +12,9 @@ import java.util.TreeSet;
 /**
  * Information about the longitude, latitude, and time coverage of data in a dataset
  */
-public class Coverage implements Serializable, IsSerializable {
+public class Coverage implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -226275457956374757L;
+    private static final long serialVersionUID = 5188155841477831513L;
 
     public static final String LONGITUDE_UNITS = "dec deg E";
     public static final String LATITUDE_UNITS = "dec deg N";
@@ -124,7 +125,7 @@ public class Coverage implements Serializable, IsSerializable {
      *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}.
      */
     public NumericString getWesternLongitude() {
-        return westernLongitude.duplicate(null);
+        return (NumericString) (westernLongitude.duplicate(null));
     }
 
     /**
@@ -142,7 +143,7 @@ public class Coverage implements Serializable, IsSerializable {
                 throw new IllegalArgumentException("westernmost longitude is not in [-360.0,360.0]");
             if ( !LONGITUDE_UNITS.equals(westernLongitude.getUnitString()) )
                 throw new IllegalArgumentException("westernmost longitude units are not " + LONGITUDE_UNITS);
-            this.westernLongitude = westernLongitude.duplicate(null);
+            this.westernLongitude = (NumericString) (westernLongitude.duplicate(null));
         }
         else
             this.westernLongitude = new NumericString(null, LONGITUDE_UNITS);
@@ -153,7 +154,7 @@ public class Coverage implements Serializable, IsSerializable {
      *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}
      */
     public NumericString getEasternLongitude() {
-        return easternLongitude.duplicate(null);
+        return (NumericString) (easternLongitude.duplicate(null));
     }
 
     /**
@@ -171,7 +172,7 @@ public class Coverage implements Serializable, IsSerializable {
                 throw new IllegalArgumentException("easternmost longitude is not in [-360.0,360.0]");
             if ( !LONGITUDE_UNITS.equals(easternLongitude.getUnitString()) )
                 throw new IllegalArgumentException("easternmost longitude units are not " + LONGITUDE_UNITS);
-            this.easternLongitude = easternLongitude.duplicate(null);
+            this.easternLongitude = (NumericString) (easternLongitude.duplicate(null));
         }
         else
             this.easternLongitude = new NumericString(null, LONGITUDE_UNITS);
@@ -182,7 +183,7 @@ public class Coverage implements Serializable, IsSerializable {
      *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
     public NumericString getSouthernLatitude() {
-        return southernLatitude.duplicate(null);
+        return (NumericString) (southernLatitude.duplicate(null));
     }
 
     /**
@@ -200,7 +201,7 @@ public class Coverage implements Serializable, IsSerializable {
                 throw new IllegalArgumentException("southernmost latitude is not in [-90.0,90.0]");
             if ( !LATITUDE_UNITS.equals(southernLatitude.getUnitString()) )
                 throw new IllegalArgumentException("southernLatitude longitude units are not " + LATITUDE_UNITS);
-            this.southernLatitude = southernLatitude.duplicate(null);
+            this.southernLatitude = (NumericString) (southernLatitude.duplicate(null));
         }
         else
             this.southernLatitude = new NumericString(null, LATITUDE_UNITS);
@@ -211,7 +212,7 @@ public class Coverage implements Serializable, IsSerializable {
      *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
     public NumericString getNorthernLatitude() {
-        return northernLatitude.duplicate(null);
+        return (NumericString) (northernLatitude.duplicate(null));
     }
 
     /**
@@ -229,7 +230,7 @@ public class Coverage implements Serializable, IsSerializable {
                 throw new IllegalArgumentException("northernmost latitude is not in [-90.0,90.0]");
             if ( !LATITUDE_UNITS.equals(northernLatitude.getUnitString()) )
                 throw new IllegalArgumentException("northernLatitude longitude units are not " + LATITUDE_UNITS);
-            this.northernLatitude = northernLatitude.duplicate(null);
+            this.northernLatitude = (NumericString) (northernLatitude.duplicate(null));
         }
         else
             this.northernLatitude = new NumericString(null, LATITUDE_UNITS);
@@ -239,7 +240,7 @@ public class Coverage implements Serializable, IsSerializable {
      * @return the earliest (oldest) data time value; never null but may be an invalid date
      */
     public Datestamp getEarliestDataDate() {
-        return earliestDataDate.duplicate(null);
+        return (Datestamp) (earliestDataDate.duplicate(null));
     }
 
     /**
@@ -249,7 +250,7 @@ public class Coverage implements Serializable, IsSerializable {
      */
     public void setEarliestDataDate(Datestamp earliestDataDate) {
         if ( earliestDataDate != null )
-            this.earliestDataDate = earliestDataDate.duplicate(null);
+            this.earliestDataDate = (Datestamp) (earliestDataDate.duplicate(null));
         else
             this.earliestDataDate = new Datestamp();
     }
@@ -258,7 +259,7 @@ public class Coverage implements Serializable, IsSerializable {
      * @return the latest (newest) data time value; never null but may be an invalid date
      */
     public Datestamp getLatestDataDate() {
-        return latestDataDate.duplicate(null);
+        return (Datestamp) (latestDataDate.duplicate(null));
     }
 
     /**
@@ -268,7 +269,7 @@ public class Coverage implements Serializable, IsSerializable {
      */
     public void setLatestDataDate(Datestamp latestDataDate) {
         if ( latestDataDate != null )
-            this.latestDataDate = latestDataDate.duplicate(null);
+            this.latestDataDate = (Datestamp) (latestDataDate.duplicate(null));
         else
             this.latestDataDate = new Datestamp();
     }
@@ -332,27 +333,22 @@ public class Coverage implements Serializable, IsSerializable {
         }
     }
 
-    /**
-     * Deeply copies the values in this Coverage object to the given Coverage object.
-     *
-     * @param dup
-     *         the Coverage object to copy values into;
-     *         if null, a new Coverage object is created for copying values into
-     *
-     * @return the updated Coverage object
-     */
-    public Coverage duplicate(Coverage dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Coverage coverage;
         if ( dup == null )
-            dup = new Coverage();
-        dup.westernLongitude = westernLongitude.duplicate(null);
-        dup.easternLongitude = easternLongitude.duplicate(null);
-        dup.southernLatitude = southernLatitude.duplicate(null);
-        dup.northernLatitude = northernLatitude.duplicate(null);
-        dup.earliestDataDate = earliestDataDate.duplicate(null);
-        dup.latestDataDate = latestDataDate.duplicate(null);
-        dup.spatialReference = spatialReference;
-        dup.geographicNames = new TreeSet<String>(geographicNames);
-        return dup;
+            coverage = new Coverage();
+        else
+            coverage = (Coverage) dup;
+        coverage.westernLongitude = (NumericString) (westernLongitude.duplicate(null));
+        coverage.easternLongitude = (NumericString) (easternLongitude.duplicate(null));
+        coverage.southernLatitude = (NumericString) (southernLatitude.duplicate(null));
+        coverage.northernLatitude = (NumericString) (northernLatitude.duplicate(null));
+        coverage.earliestDataDate = (Datestamp) (earliestDataDate.duplicate(null));
+        coverage.latestDataDate = (Datestamp) (latestDataDate.duplicate(null));
+        coverage.spatialReference = spatialReference;
+        coverage.geographicNames = new TreeSet<String>(geographicNames);
+        return coverage;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
@@ -9,9 +10,9 @@ import java.io.Serializable;
  * Information about a temperature measurement.
  * The default unit is set to degrees Celsius.
  */
-public class Temperature extends DataVar implements Serializable, IsSerializable {
+public class Temperature extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6032699872309505299L;
+    private static final long serialVersionUID = -1245868639486173639L;
 
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
@@ -83,20 +84,15 @@ public class Temperature extends DataVar implements Serializable, IsSerializable
             this.precision = new NumericString(null, DEGREES_CELSIUS_UNIT);
     }
 
-    /**
-     * Deeply copies the values in this Temperature object to the given Temperature object.
-     *
-     * @param dup
-     *         the Temperature object to copy values into;
-     *         if null, a new Temperature object is created for copying values into
-     *
-     * @return the updated Temperature object
-     */
-    public Temperature duplicate(Temperature dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Temperature temp;
         if ( dup == null )
-            dup = new Temperature();
-        super.duplicate(dup);
-        return dup;
+            temp = new Temperature();
+        else
+            temp = (Temperature) dup;
+        super.duplicate(temp);
+        return temp;
     }
 
     @Override

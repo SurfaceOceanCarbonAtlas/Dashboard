@@ -1,13 +1,14 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
 
-public class BioDataVar extends DataVar implements Serializable, IsSerializable {
+public class BioDataVar extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2015788276473614396L;
+    private static final long serialVersionUID = 9043720457493998136L;
 
     String biologicalSubject;
     String speciesId;
@@ -96,23 +97,18 @@ public class BioDataVar extends DataVar implements Serializable, IsSerializable 
         this.lifeStage = (lifeStage != null) ? lifeStage.trim() : "";
     }
 
-    /**
-     * Deeply copies the values in this BioDataVar object to the given BioDataVar object.
-     *
-     * @param dup
-     *         the BioDataVar object to copy values into;
-     *         if null, a new BioDataVar object is created for copying values into
-     *
-     * @return the updated BioDataVar object
-     */
-    public BioDataVar duplicate(BioDataVar dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        BioDataVar var;
         if ( dup == null )
-            dup = new BioDataVar();
-        super.duplicate(dup);
-        dup.biologicalSubject = biologicalSubject;
-        dup.speciesId = speciesId;
-        dup.lifeStage = lifeStage;
-        return dup;
+            var = new BioDataVar();
+        else
+            var = (BioDataVar) dup;
+        super.duplicate(var);
+        var.biologicalSubject = biologicalSubject;
+        var.speciesId = speciesId;
+        var.lifeStage = lifeStage;
+        return var;
     }
 
     @Override

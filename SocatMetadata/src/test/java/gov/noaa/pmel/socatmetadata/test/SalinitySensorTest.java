@@ -29,7 +29,7 @@ public class SalinitySensorTest {
     @Test
     public void testDuplicate() {
         SalinitySensor sensor = new SalinitySensor();
-        SalinitySensor dup = sensor.duplicate(null);
+        SalinitySensor dup = (SalinitySensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -41,7 +41,7 @@ public class SalinitySensorTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.duplicate(null);
+        dup = (SalinitySensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

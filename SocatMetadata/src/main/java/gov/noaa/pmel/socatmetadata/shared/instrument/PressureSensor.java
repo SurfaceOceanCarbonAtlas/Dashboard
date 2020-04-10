@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
 
 import java.io.Serializable;
@@ -9,24 +10,19 @@ import java.io.Serializable;
  * Basic information about an instrument that is a pressure sensor.  Specific details about values measured
  * by the sensor are part of {@link DataVar}.
  */
-public class PressureSensor extends Analyzer implements Serializable, IsSerializable {
+public class PressureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -310572386325156332L;
+    private static final long serialVersionUID = -5025452549008862907L;
 
-    /**
-     * Deeply copies the values in this PressureSensor object to the given PressureSensor object.
-     *
-     * @param dup
-     *         the PressureSensor object to copy values into;
-     *         if null, a new PressureSensor object is created for copying values into
-     *
-     * @return the updated PressureSensor object
-     */
-    public PressureSensor duplicate(PressureSensor dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        PressureSensor sensor;
         if ( dup == null )
-            dup = new PressureSensor();
-        super.duplicate(dup);
-        return dup;
+            sensor = new PressureSensor();
+        else
+            sensor = (PressureSensor) dup;
+        super.duplicate(sensor);
+        return sensor;
     }
 
     @Override

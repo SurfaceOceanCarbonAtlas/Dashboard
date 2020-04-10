@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Base class for an analyzing instrument.
  */
-public class Analyzer extends Instrument implements Serializable, IsSerializable {
+public class Analyzer extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7541206728125008817L;
+    private static final long serialVersionUID = -3186287287463623663L;
 
     protected String calibration;
 
@@ -46,21 +47,16 @@ public class Analyzer extends Instrument implements Serializable, IsSerializable
         return invalids;
     }
 
-    /**
-     * Deeply copies the values in this Analyzer object to the given Analyzer object.
-     *
-     * @param dup
-     *         the Analyzer object to copy values into;
-     *         if null, a new Analyzer object is created for copying values into
-     *
-     * @return the updated Analyzer object
-     */
-    public Analyzer duplicate(Analyzer dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Analyzer analyzer;
         if ( dup == null )
-            dup = new Analyzer();
-        super.duplicate(dup);
-        dup.calibration = calibration;
-        return dup;
+            analyzer = new Analyzer();
+        else
+            analyzer = (Analyzer) dup;
+        super.duplicate(analyzer);
+        analyzer.calibration = calibration;
+        return analyzer;
     }
 
     @Override

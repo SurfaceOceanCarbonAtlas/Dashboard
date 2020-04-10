@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Information about measurements of a gas concentration in a body of water.
  */
-public class AquGasConc extends GasConc implements Serializable, IsSerializable {
+public class AquGasConc extends GasConc implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5753890210224741680L;
+    private static final long serialVersionUID = 7263970059747709607L;
 
     protected String reportTemperature;
     protected String temperatureCorrection;
@@ -82,22 +83,17 @@ public class AquGasConc extends GasConc implements Serializable, IsSerializable 
         this.temperatureCorrection = (temperatureCorrection != null) ? temperatureCorrection.trim() : "";
     }
 
-    /**
-     * Deeply copies the values in this AquGasConc object to the given AquGasConc object.
-     *
-     * @param dup
-     *         the AquGasConc object to copy values into;
-     *         if null, a new AquGasConc object is created for copying values into
-     *
-     * @return the updated AquGasConc object
-     */
-    public AquGasConc duplicate(AquGasConc dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        AquGasConc conc;
         if ( dup == null )
-            dup = new AquGasConc();
-        super.duplicate(dup);
-        dup.reportTemperature = reportTemperature;
-        dup.temperatureCorrection = temperatureCorrection;
-        return dup;
+            conc = new AquGasConc();
+        else
+            conc = (AquGasConc) dup;
+        super.duplicate(conc);
+        conc.reportTemperature = reportTemperature;
+        conc.temperatureCorrection = temperatureCorrection;
+        return conc;
     }
 
     @Override

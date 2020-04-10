@@ -71,7 +71,7 @@ public class SamplerTest {
     @Test
     public void testDuplicate() {
         Sampler sampler = new Sampler();
-        Sampler dup = sampler.duplicate(null);
+        Sampler dup = (Sampler) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
 
@@ -83,7 +83,7 @@ public class SamplerTest {
         sampler.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(sampler, dup);
 
-        dup = sampler.duplicate(null);
+        dup = (Sampler) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
         assertNotSame(sampler.getAddnInfo(), dup.getAddnInfo());

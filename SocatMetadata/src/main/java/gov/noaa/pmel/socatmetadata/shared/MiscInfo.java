@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,9 +11,9 @@ import java.util.HashSet;
 /**
  * Miscellaneous information about a dataset.
  */
-public class MiscInfo implements Serializable, IsSerializable {
+public class MiscInfo implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 4566533439594737699L;
+    private static final long serialVersionUID = -7489028558999466560L;
 
     protected String datasetId;
     protected String datasetName;
@@ -435,7 +436,7 @@ public class MiscInfo implements Serializable, IsSerializable {
      * @return the starting date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getStartDatestamp() {
-        return startDatestamp.duplicate(null);
+        return (Datestamp) (startDatestamp.duplicate(null));
     }
 
     /**
@@ -444,14 +445,14 @@ public class MiscInfo implements Serializable, IsSerializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setStartDatestamp(Datestamp startDatestamp) {
-        this.startDatestamp = (startDatestamp != null) ? startDatestamp.duplicate(null) : new Datestamp();
+        this.startDatestamp = (startDatestamp != null) ? (Datestamp) (startDatestamp.duplicate(null)) : new Datestamp();
     }
 
     /**
      * @return the ending date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getEndDatestamp() {
-        return endDatestamp.duplicate(null);
+        return (Datestamp) (endDatestamp.duplicate(null));
     }
 
     /**
@@ -460,7 +461,7 @@ public class MiscInfo implements Serializable, IsSerializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setEndDatestamp(Datestamp endDatestamp) {
-        this.endDatestamp = (endDatestamp != null) ? endDatestamp.duplicate(null) : new Datestamp();
+        this.endDatestamp = (endDatestamp != null) ? (Datestamp) (endDatestamp.duplicate(null)) : new Datestamp();
     }
 
     /**
@@ -470,7 +471,7 @@ public class MiscInfo implements Serializable, IsSerializable {
     public ArrayList<Datestamp> getHistory() {
         ArrayList<Datestamp> dup = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            dup.add(datestamp.duplicate(null));
+            dup.add((Datestamp) (datestamp.duplicate(null)));
         }
         return dup;
     }
@@ -503,47 +504,42 @@ public class MiscInfo implements Serializable, IsSerializable {
                     throw new IllegalArgumentException("null datestamp given");
                 if ( !datestamp.isValid(null) )
                     throw new IllegalArgumentException("invalid datestamp given");
-                this.history.add(datestamp.duplicate(null));
+                this.history.add((Datestamp) (datestamp.duplicate(null)));
             }
         }
     }
 
-    /**
-     * Deeply copies the values in this MiscInfo object to the given MiscInfo object.
-     *
-     * @param dup
-     *         the MiscInfo object to copy values into;
-     *         if null, a new MiscInfo object is created for copying values into
-     *
-     * @return the updated MiscInfo object
-     */
-    public MiscInfo duplicate(MiscInfo dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        MiscInfo info;
         if ( dup == null )
-            dup = new MiscInfo();
-        dup.datasetId = datasetId;
-        dup.datasetName = datasetName;
-        dup.sectionName = sectionName;
-        dup.fundingAgency = fundingAgency;
-        dup.fundingTitle = fundingTitle;
-        dup.fundingId = fundingId;
-        dup.researchProject = researchProject;
-        dup.datasetDoi = datasetDoi;
-        dup.accessId = accessId;
-        dup.website = website;
-        dup.downloadUrl = downloadUrl;
-        dup.citation = citation;
-        dup.synopsis = synopsis;
-        dup.purpose = purpose;
-        dup.references = new ArrayList<String>(references);
-        dup.portsOfCall = new ArrayList<String>(portsOfCall);
-        dup.addnInfo = new ArrayList<String>(addnInfo);
-        dup.startDatestamp = startDatestamp.duplicate(null);
-        dup.endDatestamp = endDatestamp.duplicate(null);
-        dup.history = new ArrayList<Datestamp>(history.size());
+            info = new MiscInfo();
+        else
+            info = (MiscInfo) dup;
+        info.datasetId = datasetId;
+        info.datasetName = datasetName;
+        info.sectionName = sectionName;
+        info.fundingAgency = fundingAgency;
+        info.fundingTitle = fundingTitle;
+        info.fundingId = fundingId;
+        info.researchProject = researchProject;
+        info.datasetDoi = datasetDoi;
+        info.accessId = accessId;
+        info.website = website;
+        info.downloadUrl = downloadUrl;
+        info.citation = citation;
+        info.synopsis = synopsis;
+        info.purpose = purpose;
+        info.references = new ArrayList<String>(references);
+        info.portsOfCall = new ArrayList<String>(portsOfCall);
+        info.addnInfo = new ArrayList<String>(addnInfo);
+        info.startDatestamp = (Datestamp) (startDatestamp.duplicate(null));
+        info.endDatestamp = (Datestamp) (endDatestamp.duplicate(null));
+        info.history = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            dup.history.add(datestamp.duplicate(null));
+            info.history.add((Datestamp) (datestamp.duplicate(null)));
         }
-        return dup;
+        return info;
     }
 
     @Override

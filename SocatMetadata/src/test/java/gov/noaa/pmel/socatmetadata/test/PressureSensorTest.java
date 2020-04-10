@@ -29,7 +29,7 @@ public class PressureSensorTest {
     @Test
     public void testDuplicate() {
         PressureSensor sensor = new PressureSensor();
-        PressureSensor dup = sensor.duplicate(null);
+        PressureSensor dup = (PressureSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -41,7 +41,7 @@ public class PressureSensorTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.duplicate(null);
+        dup = (PressureSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

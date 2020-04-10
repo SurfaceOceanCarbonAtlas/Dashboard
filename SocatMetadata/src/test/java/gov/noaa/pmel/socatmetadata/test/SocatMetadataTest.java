@@ -7,8 +7,8 @@ import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
-import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
+import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +57,7 @@ public class SocatMetadataTest {
     @Test
     public void testDuplicate() {
         SocatMetadata mdata = new SocatMetadata();
-        SocatMetadata dup = mdata.duplicate(null);
+        SocatMetadata dup = (SocatMetadata) (mdata.duplicate(null));
         assertEquals(mdata, dup);
         assertNotSame(mdata, dup);
 
@@ -70,7 +70,7 @@ public class SocatMetadataTest {
         mdata.setMiscInfo(miscInfo);
         assertNotEquals(mdata, dup);
 
-        dup = mdata.duplicate(null);
+        dup = (SocatMetadata) (mdata.duplicate(null));
         assertEquals(mdata, dup);
         assertNotSame(mdata, dup);
         assertNotSame(mdata.getSubmitter(), dup.getSubmitter());

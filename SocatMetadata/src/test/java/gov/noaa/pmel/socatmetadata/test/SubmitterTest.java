@@ -55,7 +55,7 @@ public class SubmitterTest {
     @Test
     public void testDuplicate() {
         Submitter submitter = new Submitter();
-        Submitter dup = submitter.duplicate(null);
+        Submitter dup = (Submitter) (submitter.duplicate(null));
         assertEquals(submitter, dup);
         assertNotSame(submitter, dup);
 
@@ -74,7 +74,7 @@ public class SubmitterTest {
         submitter.setEmail(EMAIL);
         assertNotEquals(submitter, dup);
 
-        dup = submitter.duplicate(null);
+        dup = (Submitter) (submitter.duplicate(null));
         assertEquals(submitter, dup);
         assertNotSame(submitter, dup);
     }

@@ -203,14 +203,14 @@ public class DatestampTest {
     @Test
     public void testDuplicate() {
         Datestamp datestamp = new Datestamp();
-        Datestamp clone = datestamp.duplicate(null);
+        Datestamp clone = (Datestamp) (datestamp.duplicate(null));
         assertEquals(datestamp, clone);
         assertNotSame(datestamp, clone);
 
         datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND);
         assertNotEquals(datestamp, clone);
 
-        clone = datestamp.duplicate(null);
+        clone = (Datestamp) (datestamp.duplicate(null));
         assertEquals(datestamp, clone);
         assertNotSame(datestamp, clone);
     }

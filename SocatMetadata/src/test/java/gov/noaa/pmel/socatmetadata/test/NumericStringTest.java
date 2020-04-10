@@ -169,7 +169,7 @@ public class NumericStringTest {
     @Test
     public void testDuplicate() {
         NumericString numstr = new NumericString();
-        NumericString dup = numstr.duplicate(null);
+        NumericString dup = (NumericString) (numstr.duplicate(null));
         assertEquals(numstr, dup);
         assertNotSame(numstr, dup);
 
@@ -177,7 +177,7 @@ public class NumericStringTest {
         numstr.setUnitString(UNIT_STR);
         assertNotEquals(numstr, dup);
 
-        dup = numstr.duplicate(null);
+        dup = (NumericString) (numstr.duplicate(null));
         assertEquals(numstr, dup);
         assertNotSame(numstr, dup);
         assertTrue(dup.isNegative());

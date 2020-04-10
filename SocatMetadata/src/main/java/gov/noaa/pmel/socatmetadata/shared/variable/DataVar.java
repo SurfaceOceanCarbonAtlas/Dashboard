@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 
 import java.io.Serializable;
@@ -9,9 +10,9 @@ import java.util.HashSet;
 /**
  * Information about a generic data variable in a dataset.
  */
-public class DataVar extends Variable implements Serializable, IsSerializable {
+public class DataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5272347977578431299L;
+    private static final long serialVersionUID = -6320986210965720061L;
 
     protected String observeType;
     protected MethodType measureMethod;
@@ -65,7 +66,7 @@ public class DataVar extends Variable implements Serializable, IsSerializable {
             duration = other.duration;
             analysisTemperature = other.analysisTemperature;
             replication = other.replication;
-            researcher = other.researcher.duplicate(null);
+            researcher = (Person) (other.researcher.duplicate(null));
             instrumentNames = new HashSet<String>(other.instrumentNames);
         }
         else {
@@ -288,7 +289,7 @@ public class DataVar extends Variable implements Serializable, IsSerializable {
      *         never null but may not be a valid investigator reference
      */
     public Person getResearcher() {
-        return researcher.duplicate(null);
+        return (Person) (researcher.duplicate(null));
     }
 
     /**
@@ -297,7 +298,7 @@ public class DataVar extends Variable implements Serializable, IsSerializable {
      *         if null, an invalid reference (a Person with all-empty fields) is assigned
      */
     public void setResearcher(Person researcher) {
-        this.researcher = (researcher != null) ? researcher.duplicate(null) : new Person();
+        this.researcher = (researcher != null) ? (Person) (researcher.duplicate(null)) : new Person();
     }
 
     /**
@@ -344,33 +345,28 @@ public class DataVar extends Variable implements Serializable, IsSerializable {
         }
     }
 
-    /**
-     * Deeply copies the values in this DataVar object to the given DataVar object.
-     *
-     * @param dup
-     *         the DataVar object to copy values into;
-     *         if null, a new DataVar object is created for copying values into
-     *
-     * @return the updated DataVar object
-     */
-    public DataVar duplicate(DataVar dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        DataVar var;
         if ( dup == null )
-            dup = new DataVar();
-        super.duplicate(dup);
-        dup.observeType = observeType;
-        dup.measureMethod = measureMethod;
-        dup.methodDescription = methodDescription;
-        dup.methodReference = methodReference;
-        dup.manipulationDescription = manipulationDescription;
-        dup.samplingLocation = samplingLocation;
-        dup.samplingElevation = samplingElevation;
-        dup.storageMethod = storageMethod;
-        dup.duration = duration;
-        dup.analysisTemperature = analysisTemperature;
-        dup.replication = replication;
-        dup.researcher = researcher.duplicate(null);
-        dup.instrumentNames = new HashSet<String>(instrumentNames);
-        return dup;
+            var = new DataVar();
+        else
+            var = (DataVar) dup;
+        super.duplicate(var);
+        var.observeType = observeType;
+        var.measureMethod = measureMethod;
+        var.methodDescription = methodDescription;
+        var.methodReference = methodReference;
+        var.manipulationDescription = manipulationDescription;
+        var.samplingLocation = samplingLocation;
+        var.samplingElevation = samplingElevation;
+        var.storageMethod = storageMethod;
+        var.duration = duration;
+        var.analysisTemperature = analysisTemperature;
+        var.replication = replication;
+        var.researcher = (Person) (researcher.duplicate(null));
+        var.instrumentNames = new HashSet<String>(instrumentNames);
+        return var;
     }
 
     @Override

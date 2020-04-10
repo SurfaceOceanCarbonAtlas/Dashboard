@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
@@ -156,7 +156,7 @@ public class GasConcTest {
     @Test
     public void testDuplicate() {
         GasConc var = new GasConc();
-        GasConc dup = var.duplicate(null);
+        GasConc dup = (GasConc) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -185,7 +185,7 @@ public class GasConcTest {
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertNotEquals(var, dup);
 
-        dup = var.duplicate(null);
+        dup = (GasConc) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
 
 import java.io.Serializable;
@@ -12,9 +13,9 @@ import java.util.HashSet;
  * measured by the sensor are part of {@link DataVar} since a sensor can be used to measure
  * more than one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., accuracy).
  */
-public class GasSensor extends Analyzer implements Serializable, IsSerializable {
+public class GasSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2656836964235855123L;
+    private static final long serialVersionUID = -8312332943645091996L;
 
     protected ArrayList<CalibrationGas> calibrationGases;
 
@@ -30,7 +31,7 @@ public class GasSensor extends Analyzer implements Serializable, IsSerializable 
     public ArrayList<CalibrationGas> getCalibrationGases() {
         ArrayList<CalibrationGas> gasList = new ArrayList<CalibrationGas>(calibrationGases.size());
         for (CalibrationGas gas : calibrationGases) {
-            gasList.add(gas.duplicate(null));
+            gasList.add((CalibrationGas) gas.duplicate(null));
         }
         return gasList;
     }
@@ -61,7 +62,7 @@ public class GasSensor extends Analyzer implements Serializable, IsSerializable 
             for (CalibrationGas gas : calibrationGases) {
                 if ( null == gas )
                     throw new IllegalArgumentException("null gas given");
-                this.calibrationGases.add(gas.duplicate(null));
+                this.calibrationGases.add((CalibrationGas) gas.duplicate(null));
             }
         }
     }
@@ -82,24 +83,19 @@ public class GasSensor extends Analyzer implements Serializable, IsSerializable 
         return invalid;
     }
 
-    /**
-     * Deeply copies the values in this GasSensor object to the given GasSensor object.
-     *
-     * @param dup
-     *         the GasSensor object to copy values into;
-     *         if null, a new GasSensor object is created for copying values into
-     *
-     * @return the updated GasSensor object
-     */
-    public GasSensor duplicate(GasSensor dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        GasSensor gasSensor;
         if ( dup == null )
-            dup = new GasSensor();
-        super.duplicate(dup);
-        dup.calibrationGases = new ArrayList<CalibrationGas>(calibrationGases.size());
+            gasSensor = new GasSensor();
+        else
+            gasSensor = (GasSensor) dup;
+        super.duplicate(gasSensor);
+        gasSensor.calibrationGases = new ArrayList<CalibrationGas>(calibrationGases.size());
         for (CalibrationGas gas : calibrationGases) {
-            dup.calibrationGases.add(gas.duplicate(null));
+            gasSensor.calibrationGases.add((CalibrationGas) gas.duplicate(null));
         }
-        return dup;
+        return gasSensor;
     }
 
     @Override

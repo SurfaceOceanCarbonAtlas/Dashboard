@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
@@ -209,7 +209,7 @@ public class BioDataVarTest {
     @Test
     public void testDuplicate() {
         BioDataVar var = new BioDataVar();
-        BioDataVar dup = var.duplicate(null);
+        BioDataVar dup = (BioDataVar) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -230,7 +230,7 @@ public class BioDataVarTest {
         var.setLifeStage(LIFE_STAGE);
         assertNotEquals(var, dup);
 
-        dup = var.duplicate(null);
+        dup = (BioDataVar) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
     }

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 
@@ -8,9 +9,9 @@ import java.io.Serializable;
  * Information about measurements of a gas concentration.  Instances of this class are assumed
  * to be atmospheric gas concentration as aqueous gas concentrations should be the subclass AquGasConc.
  */
-public class GasConc extends DataVar implements Serializable, IsSerializable {
+public class GasConc extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7215341143268280879L;
+    private static final long serialVersionUID = 6153853587820137758L;
 
     protected String dryingMethod;
     protected String waterVaporCorrection;
@@ -71,22 +72,17 @@ public class GasConc extends DataVar implements Serializable, IsSerializable {
         this.waterVaporCorrection = (waterVaporCorrection != null) ? waterVaporCorrection.trim() : "";
     }
 
-    /**
-     * Deeply copies the values in this GasConc object to the given GasConc object.
-     *
-     * @param dup
-     *         the GasConc object to copy values into;
-     *         if null, a new GasConc object is created for copying values into
-     *
-     * @return the updated GasConc object
-     */
-    public GasConc duplicate(GasConc dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        GasConc conc;
         if ( dup == null )
-            dup = new GasConc();
-        super.duplicate(dup);
-        dup.dryingMethod = dryingMethod;
-        dup.waterVaporCorrection = waterVaporCorrection;
-        return dup;
+            conc = new GasConc();
+        else
+            conc = (GasConc) dup;
+        super.duplicate(conc);
+        conc.dryingMethod = dryingMethod;
+        conc.waterVaporCorrection = waterVaporCorrection;
+        return conc;
     }
 
     @Override

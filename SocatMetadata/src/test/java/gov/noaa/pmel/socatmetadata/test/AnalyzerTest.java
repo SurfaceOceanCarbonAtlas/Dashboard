@@ -47,7 +47,7 @@ public class AnalyzerTest {
     @Test
     public void testDuplicate() {
         Analyzer analyzer = new Analyzer();
-        Analyzer dup = analyzer.duplicate(null);
+        Analyzer dup = (Analyzer) (analyzer.duplicate(null));
         assertEquals(analyzer, dup);
         assertNotSame(analyzer, dup);
 
@@ -59,7 +59,7 @@ public class AnalyzerTest {
         analyzer.setCalibration(CALIBRATION);
         assertNotEquals(analyzer, dup);
 
-        dup = analyzer.duplicate(null);
+        dup = (Analyzer) (analyzer.duplicate(null));
         assertEquals(analyzer, dup);
         assertNotSame(analyzer, dup);
         assertNotSame(analyzer.getAddnInfo(), dup.getAddnInfo());

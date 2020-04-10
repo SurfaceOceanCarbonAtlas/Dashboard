@@ -126,7 +126,7 @@ public class InstrumentTest {
     @Test
     public void testDuplicate() {
         Instrument sensor = new Instrument();
-        Instrument dup = sensor.duplicate(null);
+        Instrument dup = (Instrument) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -137,7 +137,7 @@ public class InstrumentTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.duplicate(null);
+        dup = (Instrument) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
     }

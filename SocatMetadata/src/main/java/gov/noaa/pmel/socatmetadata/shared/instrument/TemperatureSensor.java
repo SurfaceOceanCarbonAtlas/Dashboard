@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
 
 import java.io.Serializable;
@@ -9,24 +10,19 @@ import java.io.Serializable;
  * Basic information about an instrument that is a temperature sensor.  Specific details about values measured
  * by the sensor are part of {@link DataVar}.
  */
-public class TemperatureSensor extends Analyzer implements Serializable, IsSerializable {
+public class TemperatureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2523382927819320769L;
+    private static final long serialVersionUID = -3711132123163488056L;
 
-    /**
-     * Deeply copies the values in this Person object to the given Person object.
-     *
-     * @param dup
-     *         the Person object to copy values into;
-     *         if null, a new Person object is created for copying values into
-     *
-     * @return the updated Person object
-     */
-    public TemperatureSensor duplicate(TemperatureSensor dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        TemperatureSensor sensor;
         if ( dup == null )
-            dup = new TemperatureSensor();
-        super.duplicate(dup);
-        return dup;
+            sensor = new TemperatureSensor();
+        else
+            sensor = (TemperatureSensor) dup;
+        super.duplicate(sensor);
+        return sensor;
     }
 
     @Override

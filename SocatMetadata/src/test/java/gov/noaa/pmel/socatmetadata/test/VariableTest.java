@@ -215,7 +215,7 @@ public class VariableTest {
     @Test
     public void testDuplicate() {
         Variable var = new Variable();
-        Variable dup = var.duplicate(null);
+        Variable dup = (Variable) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -229,7 +229,7 @@ public class VariableTest {
         var.setAddnInfo(ADDN_INFO);
         assertNotEquals(var, dup);
 
-        dup = var.duplicate(null);
+        dup = (Variable) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());

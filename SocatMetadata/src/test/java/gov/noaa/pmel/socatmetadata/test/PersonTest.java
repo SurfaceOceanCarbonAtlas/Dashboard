@@ -141,7 +141,7 @@ public class PersonTest {
     @Test
     public void testDuplicate() {
         Person person = new Person();
-        Person dup = person.duplicate(null);
+        Person dup = (Person) (person.duplicate(null));
         assertEquals(person, dup);
         assertNotSame(person, dup);
 
@@ -153,7 +153,7 @@ public class PersonTest {
         person.setOrganization(ORGANIZATION);
         assertNotEquals(person, dup);
 
-        dup = person.duplicate(null);
+        dup = (Person) (person.duplicate(null));
         assertEquals(person, dup);
         assertNotSame(person, dup);
     }

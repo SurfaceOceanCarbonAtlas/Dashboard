@@ -99,7 +99,7 @@ public class TemperatureTest {
     @Test
     public void testDuplicate() {
         Temperature pressure = new Temperature();
-        Temperature dup = pressure.duplicate(null);
+        Temperature dup = (Temperature) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -109,7 +109,7 @@ public class TemperatureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.duplicate(null);
+        dup = (Temperature) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());

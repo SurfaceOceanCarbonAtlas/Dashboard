@@ -29,7 +29,7 @@ public class TemperatureSensorTest {
     @Test
     public void testDuplicate() {
         TemperatureSensor sensor = new TemperatureSensor();
-        TemperatureSensor dup = sensor.duplicate(null);
+        TemperatureSensor dup = (TemperatureSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -41,7 +41,7 @@ public class TemperatureSensorTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.duplicate(null);
+        dup = (TemperatureSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

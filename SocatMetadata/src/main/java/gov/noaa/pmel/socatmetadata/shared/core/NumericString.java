@@ -8,9 +8,9 @@ import java.io.Serializable;
  * Represents a numeric string value with units (optional).
  * Used when the numeric value of the string needs to be validated and used.
  */
-public final class NumericString implements Serializable, IsSerializable {
+public final class NumericString implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5568773018614693753L;
+    private static final long serialVersionUID = 5784369588906401122L;
 
     private String valueString;
     private String unitString;
@@ -156,22 +156,17 @@ public final class NumericString implements Serializable, IsSerializable {
         return repr.trim();
     }
 
-    /**
-     * Deeply copies the values in this NumericString object to the given NumericString object.
-     *
-     * @param dup
-     *         the NumericString object to copy values into;
-     *         if null, a new NumericString object is created for copying values into
-     *
-     * @return the updated NumericString object
-     */
-    public NumericString duplicate(NumericString dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        NumericString numstr;
         if ( dup == null )
-            dup = new NumericString();
-        dup.valueString = valueString;
-        dup.unitString = unitString;
-        dup.numericValue = numericValue;
-        return dup;
+            numstr = new NumericString();
+        else
+            numstr = (NumericString) dup;
+        numstr.valueString = valueString;
+        numstr.unitString = unitString;
+        numstr.numericValue = numericValue;
+        return numstr;
     }
 
     @Override

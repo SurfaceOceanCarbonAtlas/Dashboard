@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Describes an equilibrator for measuring the amount of a dissolved gas in water.
  */
-public class Equilibrator extends Sampler implements Serializable, IsSerializable {
+public class Equilibrator extends Sampler implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6167799176172993211L;
+    private static final long serialVersionUID = 6908117739724188551L;
 
     protected String equilibratorType;
     protected String chamberVol;
@@ -157,27 +158,22 @@ public class Equilibrator extends Sampler implements Serializable, IsSerializabl
         this.venting = (venting != null) ? venting.trim() : "";
     }
 
-    /**
-     * Deeply copies the values in this Equilibrator object to the given Equilibrator object.
-     *
-     * @param dup
-     *         the Equilibrator object to copy values into;
-     *         if null, a new Equilibrator object is created for copying values into
-     *
-     * @return the updated Equilibrator object
-     */
-    public Equilibrator duplicate(Equilibrator dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Equilibrator equilibrator;
         if ( dup == null )
-            dup = new Equilibrator();
-        super.duplicate(dup);
-        dup.equilibratorType = equilibratorType;
-        dup.chamberVol = chamberVol;
-        dup.chamberWaterVol = chamberWaterVol;
-        dup.chamberGasVol = chamberGasVol;
-        dup.waterFlowRate = waterFlowRate;
-        dup.gasFlowRate = gasFlowRate;
-        dup.venting = venting;
-        return dup;
+            equilibrator = new Equilibrator();
+        else
+            equilibrator = (Equilibrator) dup;
+        super.duplicate(equilibrator);
+        equilibrator.equilibratorType = equilibratorType;
+        equilibrator.chamberVol = chamberVol;
+        equilibrator.chamberWaterVol = chamberWaterVol;
+        equilibrator.chamberGasVol = chamberGasVol;
+        equilibrator.waterFlowRate = waterFlowRate;
+        equilibrator.gasFlowRate = gasFlowRate;
+        equilibrator.venting = venting;
+        return equilibrator;
     }
 
     @Override

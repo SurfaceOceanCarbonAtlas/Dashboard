@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.platform;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Basic information about the platform (ship, mooring) used by the dataset.
  */
-public class Platform implements Serializable, IsSerializable {
+public class Platform implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -860855083651939499L;
+    private static final long serialVersionUID = -3633399373959840559L;
 
     protected String platformId;
     protected String platformName;
@@ -120,25 +121,19 @@ public class Platform implements Serializable, IsSerializable {
         this.platformCountry = (platformCountry != null) ? platformCountry.trim() : "";
     }
 
-
-    /**
-     * Deeply copies the values in this Platform object to the given Platform object.
-     *
-     * @param dup
-     *         the Platform object to copy values into;
-     *         if null, a new Platform object is created for copying values into
-     *
-     * @return the updated Platform object
-     */
-    public Platform duplicate(Platform dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Platform platform;
         if ( dup == null )
-            dup = new Platform();
-        dup.platformId = platformId;
-        dup.platformName = platformName;
-        dup.platformType = platformType;
-        dup.platformOwner = platformOwner;
-        dup.platformCountry = platformCountry;
-        return dup;
+            platform = new Platform();
+        else
+            platform = (Platform) dup;
+        platform.platformId = platformId;
+        platform.platformName = platformName;
+        platform.platformType = platformType;
+        platform.platformOwner = platformOwner;
+        platform.platformCountry = platformCountry;
+        return platform;
     }
 
     @Override

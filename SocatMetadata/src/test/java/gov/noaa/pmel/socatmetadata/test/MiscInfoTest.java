@@ -606,7 +606,7 @@ public class MiscInfoTest {
     @Test
     public void testDuplicate() {
         MiscInfo miscInfo = new MiscInfo();
-        MiscInfo dup = miscInfo.duplicate(null);
+        MiscInfo dup = (MiscInfo) (miscInfo.duplicate(null));
         assertEquals(miscInfo, dup);
         assertNotSame(miscInfo, dup);
 
@@ -632,7 +632,7 @@ public class MiscInfoTest {
         miscInfo.setHistory(HISTORY_LIST);
         assertNotEquals(miscInfo, dup);
 
-        dup = miscInfo.duplicate(null);
+        dup = (MiscInfo) (miscInfo.duplicate(null));
         assertEquals(miscInfo, dup);
         assertNotSame(miscInfo, dup);
 

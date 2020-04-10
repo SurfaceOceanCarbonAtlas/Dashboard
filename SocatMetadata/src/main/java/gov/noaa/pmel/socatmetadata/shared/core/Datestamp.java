@@ -8,9 +8,9 @@ import java.io.Serializable;
  * Represents a simple UTC date and time as year, month, day, hour, minute, second
  * with minimal support.
  */
-public final class Datestamp implements Serializable, IsSerializable {
+public final class Datestamp implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3324033462558122150L;
+    private static final long serialVersionUID = 2505776058379883322L;
 
     public static final Datestamp MIN_VALID_DATESTAMP = new Datestamp(1900, 1, 1, 0, 0, 0);
     public static final Datestamp DEFAULT_TODAY_DATESTAMP = new Datestamp(2099, 12, 31, 23, 59, 59);
@@ -359,25 +359,20 @@ public final class Datestamp implements Serializable, IsSerializable {
         return false;
     }
 
-    /**
-     * Deeply copies the values in this Datestamp object to the given Datestamp object.
-     *
-     * @param dup
-     *         the Datestamp object to copy values into;
-     *         if null, a new Datestamp object is created for copying values into
-     *
-     * @return the updated Datestamp object
-     */
-    public Datestamp duplicate(Datestamp dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Datestamp stamp;
         if ( dup == null )
-            dup = new Datestamp();
-        dup.year = year;
-        dup.month = month;
-        dup.day = day;
-        dup.hour = hour;
-        dup.minute = minute;
-        dup.second = second;
-        return dup;
+            stamp = new Datestamp();
+        else
+            stamp = (Datestamp) dup;
+        stamp.year = year;
+        stamp.month = month;
+        stamp.day = day;
+        stamp.hour = hour;
+        stamp.minute = minute;
+        stamp.second = second;
+        return stamp;
     }
 
     @Override

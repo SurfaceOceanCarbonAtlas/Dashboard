@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
@@ -10,9 +11,9 @@ import java.util.HashSet;
 /**
  * Describes a standard gas mixture used for calibration of instruments.
  */
-public class CalibrationGas implements Serializable, IsSerializable {
+public class CalibrationGas implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1269010561016655437L;
+    private static final long serialVersionUID = -7465872060159352093L;
 
     public static final String GAS_CONCENTRATION_UNIT = "ppm";
 
@@ -149,7 +150,7 @@ public class CalibrationGas implements Serializable, IsSerializable {
      *         If not empty, guaranteed to represent a non-negative finite number.
      */
     public NumericString getConcentration() {
-        return concentration.duplicate(null);
+        return (NumericString) (concentration.duplicate(null));
     }
 
     /**
@@ -163,7 +164,7 @@ public class CalibrationGas implements Serializable, IsSerializable {
         if ( concentration != null ) {
             if ( !concentration.isNonNegative() )
                 throw new IllegalArgumentException("concentration specified is not a finite non-negative number");
-            this.concentration = concentration.duplicate(null);
+            this.concentration = (NumericString) (concentration.duplicate(null));
         }
         else
             this.concentration = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -174,7 +175,7 @@ public class CalibrationGas implements Serializable, IsSerializable {
      *         If not empty, guaranteed to represent a positive finite number.
      */
     public NumericString getAccuracy() {
-        return accuracy.duplicate(null);
+        return (NumericString) (accuracy.duplicate(null));
     }
 
     /**
@@ -193,7 +194,7 @@ public class CalibrationGas implements Serializable, IsSerializable {
             if ( !GAS_CONCENTRATION_UNIT.equals(accuracy.getUnitString()) )
                 throw new IllegalArgumentException(
                         "accuracy specified is not in units of " + GAS_CONCENTRATION_UNIT);
-            this.accuracy = accuracy.duplicate(null);
+            this.accuracy = (NumericString) (accuracy.duplicate(null));
         }
         else
             this.accuracy = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -215,25 +216,20 @@ public class CalibrationGas implements Serializable, IsSerializable {
         return (concentration.getNumericValue() > accuracy.getNumericValue());
     }
 
-    /**
-     * Deeply copies the values in this CalibrationGas object to the given CalibrationGas object.
-     *
-     * @param dup
-     *         the CalibrationGas object to copy values into;
-     *         if null, a new CalibrationGas object is created for copying values into
-     *
-     * @return the updated CalibrationGas object
-     */
-    public CalibrationGas duplicate(CalibrationGas dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        CalibrationGas gas;
         if ( dup == null )
-            dup = new CalibrationGas();
-        dup.id = id;
-        dup.type = type;
-        dup.supplier = supplier;
-        dup.useFrequency = useFrequency;
-        dup.concentration = concentration.duplicate(null);
-        dup.accuracy = accuracy.duplicate(null);
-        return dup;
+            gas = new CalibrationGas();
+        else
+            gas = (CalibrationGas) dup;
+        gas.id = id;
+        gas.type = type;
+        gas.supplier = supplier;
+        gas.useFrequency = useFrequency;
+        gas.concentration = (NumericString) (concentration.duplicate(null));
+        gas.accuracy = (NumericString) (accuracy.duplicate(null));
+        return gas;
     }
 
     @Override

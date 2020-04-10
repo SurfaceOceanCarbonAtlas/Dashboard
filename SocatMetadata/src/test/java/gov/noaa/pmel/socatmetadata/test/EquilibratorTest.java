@@ -216,7 +216,7 @@ public class EquilibratorTest {
     @Test
     public void testDuplicate() {
         Equilibrator sampler = new Equilibrator();
-        Equilibrator dup = sampler.duplicate(null);
+        Equilibrator dup = (Equilibrator) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
 
@@ -234,7 +234,7 @@ public class EquilibratorTest {
         sampler.setVenting(VENTING);
         assertNotEquals(sampler, dup);
 
-        dup = sampler.duplicate(null);
+        dup = (Equilibrator) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
     }

@@ -362,7 +362,7 @@ public class CoverageTest {
     @Test
     public void testDuplicate() {
         Coverage coverage = new Coverage();
-        Coverage dup = coverage.duplicate(null);
+        Coverage dup = (Coverage) (coverage.duplicate(null));
         assertEquals(coverage, dup);
         assertNotSame(coverage, dup);
 
@@ -376,7 +376,7 @@ public class CoverageTest {
         coverage.setGeographicNames(GEOGRAPHIC_NAMES);
         assertNotEquals(coverage, dup);
 
-        dup = coverage.duplicate(null);
+        dup = (Coverage) (coverage.duplicate(null));
         assertEquals(coverage, dup);
         assertNotSame(coverage, dup);
         assertNotSame(coverage.getWesternLongitude(), dup.getWesternLongitude());

@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
@@ -10,9 +11,9 @@ import java.util.HashSet;
 /**
  * Basic variable information; is the base class for all variable types.
  */
-public class Variable implements Serializable, IsSerializable {
+public class Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 3842268615490949746L;
+    private static final long serialVersionUID = -5472958616941321533L;
 
     protected String colName;
     protected String fullName;
@@ -40,7 +41,7 @@ public class Variable implements Serializable, IsSerializable {
     /**
      * Create using values in the given variable.
      * This exists only for calling from constructors of subclasses;
-     * use {@link Variable#duplicate(Variable)} for normal uses.
+     * use {@link Variable#duplicate(Object)} for normal uses.
      */
     protected Variable(Variable var) {
         if ( var != null ) {
@@ -49,8 +50,8 @@ public class Variable implements Serializable, IsSerializable {
             varUnit = var.varUnit;
             missVal = var.missVal;
             flagColName = var.flagColName;
-            accuracy = var.accuracy.duplicate(null);
-            precision = var.precision.duplicate(null);
+            accuracy = (NumericString) (var.accuracy.duplicate(null));
+            precision = (NumericString) (var.precision.duplicate(null));
             addnInfo = new ArrayList<String>(var.addnInfo);
         }
         else {
@@ -161,7 +162,7 @@ public class Variable implements Serializable, IsSerializable {
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getAccuracy() {
-        return accuracy.duplicate(null);
+        return (NumericString) (accuracy.duplicate(null));
     }
 
     /**
@@ -177,7 +178,7 @@ public class Variable implements Serializable, IsSerializable {
             // Empty numeric strings return false
             if ( accuracy.isNonPositive() )
                 throw new IllegalArgumentException("accuracy numeric string given is not a finite positive number");
-            this.accuracy = accuracy.duplicate(null);
+            this.accuracy = (NumericString) (accuracy.duplicate(null));
         }
         else
             this.accuracy = new NumericString();
@@ -188,7 +189,7 @@ public class Variable implements Serializable, IsSerializable {
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getPrecision() {
-        return precision.duplicate(null);
+        return (NumericString) (precision.duplicate(null));
     }
 
     /**
@@ -204,7 +205,7 @@ public class Variable implements Serializable, IsSerializable {
             // Empty numeric strings return false
             if ( precision.isNonPositive() )
                 throw new IllegalArgumentException("precision numeric string given is not a finite positive number");
-            this.precision = precision.duplicate(null);
+            this.precision = (NumericString) (precision.duplicate(null));
         }
         else
             this.precision = new NumericString();
@@ -252,27 +253,22 @@ public class Variable implements Serializable, IsSerializable {
         }
     }
 
-    /**
-     * Deeply copies the values in this Variable object to the given Variable object.
-     *
-     * @param dup
-     *         the Variable object to copy values into;
-     *         if null, a new Variable object is created for copying values into
-     *
-     * @return the updated Variable object
-     */
-    public Variable duplicate(Variable dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Variable var;
         if ( dup == null )
-            dup = new Variable();
-        dup.colName = colName;
-        dup.fullName = fullName;
-        dup.varUnit = varUnit;
-        dup.missVal = missVal;
-        dup.flagColName = flagColName;
-        dup.accuracy = accuracy.duplicate(null);
-        dup.precision = precision.duplicate(null);
-        dup.addnInfo = new ArrayList<String>(addnInfo);
-        return dup;
+            var = new Variable();
+        else
+            var = (Variable) dup;
+        var.colName = colName;
+        var.fullName = fullName;
+        var.varUnit = varUnit;
+        var.missVal = missVal;
+        var.flagColName = flagColName;
+        var.accuracy = (NumericString) (accuracy.duplicate(null));
+        var.precision = (NumericString) (precision.duplicate(null));
+        var.addnInfo = new ArrayList<String>(addnInfo);
+        return var;
     }
 
     @Override

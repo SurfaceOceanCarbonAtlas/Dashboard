@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.person;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Basic information to uniquely describe an investigator.
  */
-public class Person implements Serializable, IsSerializable {
+public class Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2110907216984397372L;
+    private static final long serialVersionUID = -318083558608430425L;
 
     protected String lastName;
     protected String firstName;
@@ -146,25 +147,20 @@ public class Person implements Serializable, IsSerializable {
         this.organization = (organization != null) ? organization.trim() : "";
     }
 
-    /**
-     * Deeply copies the values in this Person object to the given Person object.
-     *
-     * @param dup
-     *         the Person object to copy values into;
-     *         if null, a new Person object is created for copying values into
-     *
-     * @return the updated Person object
-     */
-    public Person duplicate(Person dup) {
+    @Override
+    public Object duplicate(Object dup) {
+        Person person;
         if ( dup == null )
-            dup = new Person();
-        dup.lastName = lastName;
-        dup.firstName = firstName;
-        dup.middle = middle;
-        dup.id = id;
-        dup.idType = idType;
-        dup.organization = organization;
-        return dup;
+            person = new Person();
+        else
+            person = (Person) dup;
+        person.lastName = lastName;
+        person.firstName = firstName;
+        person.middle = middle;
+        person.id = id;
+        person.idType = idType;
+        person.organization = organization;
+        return person;
     }
 
     @Override
