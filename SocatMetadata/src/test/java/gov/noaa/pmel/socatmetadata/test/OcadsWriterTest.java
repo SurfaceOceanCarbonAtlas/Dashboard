@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.Coverage;
-import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
 import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;

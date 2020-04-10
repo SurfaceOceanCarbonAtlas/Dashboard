@@ -326,7 +326,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @param platformName
-     *     the platform name to assign for this dataset
+     *         the platform name to assign for this dataset
      */
     public void setPlatformName(String platformName) {
         omeMData.setPlatformName(platformName);
@@ -344,7 +344,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @param platformType
-     *     the platform type to assign for this dataset
+     *         the platform type to assign for this dataset
      */
     public void setPlatformType(String platformType) {
         omeMData.setPlatformType(platformType);

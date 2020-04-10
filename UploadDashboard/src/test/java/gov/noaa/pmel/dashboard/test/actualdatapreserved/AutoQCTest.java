@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.junit.Test;
 
 import java.io.File;
@@ -56,12 +56,13 @@ public class AutoQCTest {
             DatasetQCStatus.Status auto = status.getAutoSuggested();
             String comment = status.getComments().get(0);
             String info = expocode + ": " + auto.toString() + " " + comment;
-            if ( ! expAutoStatus.equals(auto) ) {
+            if ( !expAutoStatus.equals(auto) ) {
                 fail(info);
             }
             if ( comment.length() >= expFullLen ) {
                 assertEquals(info, expCommentStart, comment.substring(0, expStartLen));
-                assertEquals(info, expCommentMiddle, comment.substring(expStartLen + 1, expStartLen + expMiddleLen + 1));
+                assertEquals(info, expCommentMiddle,
+                        comment.substring(expStartLen + 1, expStartLen + expMiddleLen + 1));
                 assertEquals(info, expCommentEnd, comment.substring(expStartLen + expMiddleLen + 2));
             }
             else {

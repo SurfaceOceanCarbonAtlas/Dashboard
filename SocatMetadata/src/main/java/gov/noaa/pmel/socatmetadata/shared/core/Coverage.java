@@ -1,9 +1,6 @@
-package gov.noaa.pmel.socatmetadata.shared;
+package gov.noaa.pmel.socatmetadata.shared.core;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
-import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -14,7 +11,7 @@ import java.util.TreeSet;
  */
 public class Coverage implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5188155841477831513L;
+    private static final long serialVersionUID = 5044426323221168294L;
 
     public static final String LONGITUDE_UNITS = "dec deg E";
     public static final String LATITUDE_UNITS = "dec deg N";

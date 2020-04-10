@@ -1,6 +1,6 @@
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader.VarType;
 import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;

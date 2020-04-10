@@ -1,8 +1,6 @@
-package gov.noaa.pmel.socatmetadata.shared;
+package gov.noaa.pmel.socatmetadata.shared.core;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,7 +11,7 @@ import java.util.HashSet;
  */
 public class MiscInfo implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7489028558999466560L;
+    private static final long serialVersionUID = -1909667320671892135L;
 
     protected String datasetId;
     protected String datasetName;

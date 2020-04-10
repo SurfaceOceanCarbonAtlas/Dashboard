@@ -1,7 +1,7 @@
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 
 import java.util.ArrayList;
 import java.util.TreeSet;

@@ -1,8 +1,6 @@
-package gov.noaa.pmel.socatmetadata.shared;
+package gov.noaa.pmel.socatmetadata.shared.core;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
@@ -15,7 +13,7 @@ import java.util.HashSet;
 
 public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -1420955420188832878L;
+    private static final long serialVersionUID = 8832048362470610227L;
 
     protected Submitter submitter;
     protected ArrayList<Investigator> investigators;
