@@ -3,6 +3,8 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
@@ -17,10 +19,6 @@ import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
-import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
-import gov.noaa.pmel.socatmetadata.translate.CdiacReader.VarType;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
@@ -28,12 +26,14 @@ import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
+import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
+import gov.noaa.pmel.socatmetadata.translate.CdiacReader.VarType;
 import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
@@ -187,10 +187,10 @@ public class CdiacReaderTest {
                 "occurred due to water getting into the atm condenser. The survey tech cleared out the water and " +
                         "restarted the system on 1/26 at 0519.  No data was acquired during the shutdown period."
         )), info.getAddnInfo());
-        assertEquals(info.toString(), new Datestamp("2015", "01", "15"), info.getStartDatestamp());
-        assertEquals(info.toString(), new Datestamp("2015", "01", "29"), info.getEndDatestamp());
-        assertEquals(info.toString(), new ArrayList<Datestamp>(Arrays.asList(
-                new Datestamp("2016", "01", "20")
+        assertEquals(info.toString(), new Datestamp(2015, 1, 15, 0, 0, 0), info.getStartDatestamp());
+        assertEquals(info.toString(), new Datestamp(2015, 1, 29, 0, 0, 0), info.getEndDatestamp());
+        assertEquals(info.toString(), new ArrayList<Datestamp>(Collections.singletonList(
+                new Datestamp(2016, 1, 20, 0, 0, 0)
         )), info.getHistory());
 
         Platform platform = mdata.getPlatform();
@@ -209,13 +209,10 @@ public class CdiacReaderTest {
                 coverage.getSouthernLatitude());
         assertEquals(coverage.toString(), new NumericString("38.0", Coverage.LATITUDE_UNITS),
                 coverage.getNorthernLatitude());
-        Datestamp stamp = new Datestamp("2015", "01", "15");
-        Date time = stamp.getEarliestTime();
-        assertEquals(coverage.toString(), time, coverage.getEarliestDataTime());
-        stamp = new Datestamp("2015", "01", "29");
-        time = stamp.getEarliestTime();
-        assertEquals(coverage.toString(), new Date(time.getTime() + 24L * 60L * 60L * 1000L - 1000L),
-                coverage.getLatestDataTime());
+        Datestamp stamp = new Datestamp(2015, 1, 15, 0, 0, 0);
+        assertEquals(coverage.toString(), stamp, coverage.getEarliestDataDate());
+        stamp = new Datestamp(2015, 1, 29, 0, 0, 0);
+        assertEquals(coverage.toString(), stamp, coverage.getLatestDataDate());
         assertEquals(coverage.toString(), Coverage.WGS84, coverage.getSpatialReference());
         assertEquals(coverage.toString(), 0, coverage.getGeographicNames().size());
 

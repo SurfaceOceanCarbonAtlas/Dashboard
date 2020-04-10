@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Base class for an analyzing instrument.
  */
-public class Analyzer extends Instrument implements Cloneable, Serializable {
+public class Analyzer extends Instrument implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8552012668706389753L;
+    private static final long serialVersionUID = 7541206728125008817L;
 
     protected String calibration;
 
@@ -44,9 +46,19 @@ public class Analyzer extends Instrument implements Cloneable, Serializable {
         return invalids;
     }
 
-    @Override
-    public Analyzer clone() {
-        Analyzer dup = (Analyzer) super.clone();
+    /**
+     * Deeply copies the values in this Analyzer object to the given Analyzer object.
+     *
+     * @param dup
+     *         the Analyzer object to copy values into;
+     *         if null, a new Analyzer object is created for copying values into
+     *
+     * @return the updated Analyzer object
+     */
+    public Analyzer duplicate(Analyzer dup) {
+        if ( dup == null )
+            dup = new Analyzer();
+        super.duplicate(dup);
         dup.calibration = calibration;
         return dup;
     }

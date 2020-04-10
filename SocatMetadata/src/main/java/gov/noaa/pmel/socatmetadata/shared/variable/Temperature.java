@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 
@@ -8,9 +9,9 @@ import java.io.Serializable;
  * Information about a temperature measurement.
  * The default unit is set to degrees Celsius.
  */
-public class Temperature extends DataVar implements Cloneable, Serializable {
+public class Temperature extends DataVar implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5482944605313710501L;
+    private static final long serialVersionUID = -6032699872309505299L;
 
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
@@ -30,13 +31,7 @@ public class Temperature extends DataVar implements Cloneable, Serializable {
      */
     public Temperature(Variable var) {
         super(var);
-        if ( (var != null) && (var instanceof Temperature) ) {
-            Temperature temp = (Temperature) var;
-            varUnit = temp.varUnit;
-            accuracy = temp.accuracy.clone();
-            precision = temp.precision.clone();
-        }
-        else {
+        if ( !(var instanceof Temperature) ) {
             varUnit = DEGREES_CELSIUS_UNIT;
             accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
             precision.setUnitString(DEGREES_CELSIUS_UNIT);
@@ -88,9 +83,20 @@ public class Temperature extends DataVar implements Cloneable, Serializable {
             this.precision = new NumericString(null, DEGREES_CELSIUS_UNIT);
     }
 
-    @Override
-    public Temperature clone() {
-        return (Temperature) super.clone();
+    /**
+     * Deeply copies the values in this Temperature object to the given Temperature object.
+     *
+     * @param dup
+     *         the Temperature object to copy values into;
+     *         if null, a new Temperature object is created for copying values into
+     *
+     * @return the updated Temperature object
+     */
+    public Temperature duplicate(Temperature dup) {
+        if ( dup == null )
+            dup = new Temperature();
+        super.duplicate(dup);
+        return dup;
     }
 
     @Override

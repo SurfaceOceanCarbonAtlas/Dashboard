@@ -1,9 +1,13 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import java.io.Serializable;
+
 /**
  * Types of methods for obtaining values of a variable.
  */
-public enum MethodType {
+public enum MethodType implements Serializable, IsSerializable {
     /**
      * method not yet specified
      */

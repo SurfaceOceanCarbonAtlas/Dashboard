@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
@@ -163,9 +163,9 @@ public class AquGasConcTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         AquGasConc var = new AquGasConc();
-        AquGasConc dup = var.clone();
+        AquGasConc dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -197,7 +197,7 @@ public class AquGasConcTest {
         var.setTemperatureCorrection(TEMPERATURE_CORRECTION);
         assertNotEquals(var, dup);
 
-        dup = var.clone();
+        dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());

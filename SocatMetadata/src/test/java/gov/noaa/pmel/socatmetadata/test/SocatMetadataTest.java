@@ -55,9 +55,9 @@ public class SocatMetadataTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         SocatMetadata mdata = new SocatMetadata();
-        SocatMetadata dup = mdata.clone();
+        SocatMetadata dup = mdata.duplicate(null);
         assertEquals(mdata, dup);
         assertNotSame(mdata, dup);
 
@@ -70,7 +70,7 @@ public class SocatMetadataTest {
         mdata.setMiscInfo(miscInfo);
         assertNotEquals(mdata, dup);
 
-        dup = mdata.clone();
+        dup = mdata.duplicate(null);
         assertEquals(mdata, dup);
         assertNotSame(mdata, dup);
         assertNotSame(mdata.getSubmitter(), dup.getSubmitter());

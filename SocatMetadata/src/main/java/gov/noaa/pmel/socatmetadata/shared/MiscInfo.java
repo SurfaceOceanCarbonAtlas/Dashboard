@@ -1,18 +1,18 @@
 package gov.noaa.pmel.socatmetadata.shared;
 
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 
 /**
  * Miscellaneous information about a dataset.
  */
-public class MiscInfo implements Cloneable, Serializable {
+public class MiscInfo implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7510024171885303508L;
+    private static final long serialVersionUID = 4566533439594737699L;
 
     protected String datasetId;
     protected String datasetName;
@@ -62,36 +62,33 @@ public class MiscInfo implements Cloneable, Serializable {
     }
 
     /**
+     * @param today
+     *         a Datestamp representing the current day; if null, {@link Datestamp#DEFAULT_TODAY_DATESTAMP} is used
+     *
      * @return list of field names that are currently invalid
      */
-    public HashSet<String> invalidFieldNames() {
+    public HashSet<String> invalidFieldNames(Datestamp today) {
         HashSet<String> invalid = new HashSet<String>();
         if ( datasetId.isEmpty() )
             invalid.add("datasetId");
-        Date startDate;
-        try {
-            startDate = startDatestamp.getEarliestTime();
-        } catch ( IllegalStateException ex ) {
-            startDate = null;
-        }
-        Date endDate;
-        try {
-            endDate = endDatestamp.getEarliestTime();
-        } catch ( IllegalStateException ex ) {
-            endDate = null;
-        }
-        if ( (startDate != null) && (endDate != null) ) {
-            if ( startDate.after(endDate) ) {
-                invalid.add("startDatestamp");
+
+        if ( startDatestamp.isValid(today) ) {
+            if ( endDatestamp.isValid(today) ) {
+                if ( startDatestamp.after(endDatestamp) ) {
+                    invalid.add("startDatestamp");
+                    invalid.add("endDatestamp");
+                }
+            }
+            else {
                 invalid.add("endDatestamp");
             }
         }
         else {
-            if ( null == startDate )
-                invalid.add("startDatestamp");
-            if ( null == endDate )
+            invalid.add("startDatestamp");
+            if ( !endDatestamp.isValid(today) )
                 invalid.add("endDatestamp");
         }
+
         return invalid;
     }
 
@@ -438,7 +435,7 @@ public class MiscInfo implements Cloneable, Serializable {
      * @return the starting date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getStartDatestamp() {
-        return startDatestamp.clone();
+        return startDatestamp.duplicate(null);
     }
 
     /**
@@ -447,14 +444,14 @@ public class MiscInfo implements Cloneable, Serializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setStartDatestamp(Datestamp startDatestamp) {
-        this.startDatestamp = (startDatestamp != null) ? startDatestamp.clone() : new Datestamp();
+        this.startDatestamp = (startDatestamp != null) ? startDatestamp.duplicate(null) : new Datestamp();
     }
 
     /**
      * @return the ending date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getEndDatestamp() {
-        return endDatestamp.clone();
+        return endDatestamp.duplicate(null);
     }
 
     /**
@@ -463,7 +460,7 @@ public class MiscInfo implements Cloneable, Serializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setEndDatestamp(Datestamp endDatestamp) {
-        this.endDatestamp = (endDatestamp != null) ? endDatestamp.clone() : new Datestamp();
+        this.endDatestamp = (endDatestamp != null) ? endDatestamp.duplicate(null) : new Datestamp();
     }
 
     /**
@@ -473,7 +470,7 @@ public class MiscInfo implements Cloneable, Serializable {
     public ArrayList<Datestamp> getHistory() {
         ArrayList<Datestamp> dup = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            dup.add(datestamp.clone());
+            dup.add(datestamp.duplicate(null));
         }
         return dup;
     }
@@ -504,24 +501,25 @@ public class MiscInfo implements Cloneable, Serializable {
             for (Datestamp datestamp : history) {
                 if ( datestamp == null )
                     throw new IllegalArgumentException("null datestamp given");
-                try {
-                    datestamp.getEarliestTime();
-                } catch ( Exception ex ) {
-                    throw new IllegalArgumentException("invalid datestamp given: " + ex.getMessage(), ex);
-                }
-                this.history.add(datestamp.clone());
+                if ( !datestamp.isValid(null) )
+                    throw new IllegalArgumentException("invalid datestamp given");
+                this.history.add(datestamp.duplicate(null));
             }
         }
     }
 
-    @Override
-    public MiscInfo clone() {
-        MiscInfo dup;
-        try {
-            dup = (MiscInfo) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+    /**
+     * Deeply copies the values in this MiscInfo object to the given MiscInfo object.
+     *
+     * @param dup
+     *         the MiscInfo object to copy values into;
+     *         if null, a new MiscInfo object is created for copying values into
+     *
+     * @return the updated MiscInfo object
+     */
+    public MiscInfo duplicate(MiscInfo dup) {
+        if ( dup == null )
+            dup = new MiscInfo();
         dup.datasetId = datasetId;
         dup.datasetName = datasetName;
         dup.sectionName = sectionName;
@@ -539,11 +537,11 @@ public class MiscInfo implements Cloneable, Serializable {
         dup.references = new ArrayList<String>(references);
         dup.portsOfCall = new ArrayList<String>(portsOfCall);
         dup.addnInfo = new ArrayList<String>(addnInfo);
-        dup.startDatestamp = startDatestamp.clone();
-        dup.endDatestamp = endDatestamp.clone();
+        dup.startDatestamp = startDatestamp.duplicate(null);
+        dup.endDatestamp = endDatestamp.duplicate(null);
         dup.history = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            dup.history.add(datestamp.clone());
+            dup.history.add(datestamp.duplicate(null));
         }
         return dup;
     }

@@ -69,9 +69,9 @@ public class GasSensorTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         GasSensor sensor = new GasSensor();
-        GasSensor dup = sensor.clone();
+        GasSensor dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -84,7 +84,7 @@ public class GasSensorTest {
         sensor.setCalibrationGases(CALIBRATION_GASES);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.clone();
+        dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

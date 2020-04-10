@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.person;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Basic information to uniquely describe an investigator.
  */
-public class Person implements Cloneable, Serializable {
+public class Person implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 6243965955356114525L;
+    private static final long serialVersionUID = -2110907216984397372L;
 
     protected String lastName;
     protected String firstName;
@@ -144,14 +146,18 @@ public class Person implements Cloneable, Serializable {
         this.organization = (organization != null) ? organization.trim() : "";
     }
 
-    @Override
-    public Person clone() {
-        Person dup;
-        try {
-            dup = (Person) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+    /**
+     * Deeply copies the values in this Person object to the given Person object.
+     *
+     * @param dup
+     *         the Person object to copy values into;
+     *         if null, a new Person object is created for copying values into
+     *
+     * @return the updated Person object
+     */
+    public Person duplicate(Person dup) {
+        if ( dup == null )
+            dup = new Person();
         dup.lastName = lastName;
         dup.firstName = firstName;
         dup.middle = middle;

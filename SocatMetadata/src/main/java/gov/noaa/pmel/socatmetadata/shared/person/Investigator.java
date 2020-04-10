@@ -1,5 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.person;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,9 +10,9 @@ import java.util.HashSet;
  * Full information about an investigator.
  * Super class for Submitter.
  */
-public class Investigator extends Person implements Cloneable, Serializable {
+public class Investigator extends Person implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 315951046849539804L;
+    private static final long serialVersionUID = 5621524030365810052L;
 
     protected ArrayList<String> streets;
     protected String city;
@@ -190,9 +192,19 @@ public class Investigator extends Person implements Cloneable, Serializable {
         return invalids;
     }
 
-    @Override
-    public Investigator clone() {
-        Investigator dup = (Investigator) super.clone();
+    /**
+     * Deeply copies the values in this Investigator object to the given Investigator object.
+     *
+     * @param dup
+     *         the Investigator object to copy values into;
+     *         if null, a new Investigator object is created for copying values into
+     *
+     * @return the updated Investigator object
+     */
+    public Investigator duplicate(Investigator dup) {
+        if ( dup == null )
+            dup = new Investigator();
+        super.duplicate(dup);
         dup.streets = new ArrayList<String>(streets);
         dup.city = city;
         dup.region = region;

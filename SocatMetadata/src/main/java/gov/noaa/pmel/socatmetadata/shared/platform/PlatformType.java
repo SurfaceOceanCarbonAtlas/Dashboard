@@ -1,6 +1,10 @@
 package gov.noaa.pmel.socatmetadata.shared.platform;
 
-public enum PlatformType {
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import java.io.Serializable;
+
+public enum PlatformType implements Serializable, IsSerializable {
     UNKNOWN,
     SHIP,
     MOORING,

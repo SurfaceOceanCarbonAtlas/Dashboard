@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.person;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Same as Investigator except requires contact information to be valid.
  */
-public class Submitter extends Investigator implements Cloneable, Serializable {
+public class Submitter extends Investigator implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5181726974657440228L;
+    private static final long serialVersionUID = -715419822436833443L;
 
     /**
      * Create with all fields empty
@@ -41,9 +43,21 @@ public class Submitter extends Investigator implements Cloneable, Serializable {
         return invalid;
     }
 
-    @Override
-    public Submitter clone() {
-        return (Submitter) super.clone();
+    /**
+     * Deeply copies the values in this Submitter object to the given Submitter object.
+     * A new Submitter object will be created if null is given.
+     *
+     * @param dup
+     *         the Submitter object to copy values into;
+     *         if null, a new Submitter object is created for copying values into
+     *
+     * @return the updated Submitter object
+     */
+    public Submitter duplicate(Submitter dup) {
+        if ( dup == null )
+            dup = new Submitter();
+        super.duplicate(dup);
+        return dup;
     }
 
     @Override

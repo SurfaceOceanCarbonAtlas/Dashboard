@@ -6,12 +6,13 @@ import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.shared.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -20,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -69,7 +71,9 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
 
     @Override
     public boolean isAcceptable() {
-        HashSet<String> invalidFieldNames = mdata.invalidFieldNames();
+        String[] pieces = OmeUtils.SIMPLE_DATE_FORMAT_UTC.format(new Date()).split(" ");
+        Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
+        HashSet<String> invalidFieldNames = mdata.invalidFieldNames(today);
         return invalidFieldNames.isEmpty();
     }
 
@@ -268,37 +272,68 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
 
     @Override
     public Double getDataStartTime() {
-        Date startDate = mdata.getCoverage().getEarliestDataTime();
-        if ( startDate.before(Coverage.MIN_DATA_TIME) )
+        String[] pieces = OmeUtils.SIMPLE_DATE_FORMAT_UTC.format(new Date()).split(" ");
+        Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
+
+        Datestamp startDate = mdata.getCoverage().getEarliestDataDate();
+        if ( !startDate.isValid(today) )
             return Double.NaN;
-        return startDate.getTime() / 1000.0;
+        try {
+            String startString = startDate.dateString().replace('-', ' ') +
+                    ' ' + startDate.timeString().replace(':', ' ');
+            Date startTime = OmeUtils.SIMPLE_DATE_FORMAT_UTC.parse(startString);
+            return startTime.getTime() / 1000.0;
+        } catch ( ParseException ex ) {
+            throw new RuntimeException("Unexpected error parsing Datestamp.stampString: " + ex.getMessage());
+        }
     }
 
     @Override
     public void setDataStartTime(Double dataStartTime) {
         Coverage coverage = mdata.getCoverage();
-        if ( (dataStartTime == null) || Double.isNaN(dataStartTime) || Double.isInfinite(dataStartTime) )
-            coverage.setEarliestDataTime(null);
-        else
-            coverage.setEarliestDataTime(new Date(Math.round(dataStartTime * 1000.0)));
+        if ( (dataStartTime == null) || Double.isNaN(dataStartTime) || Double.isInfinite(dataStartTime) ) {
+            coverage.setEarliestDataDate(null);
+        }
+        else {
+            String[] pieces = OmeUtils.SIMPLE_DATE_FORMAT_UTC.format(new Date(Math.round(dataStartTime * 1000.0)))
+                                                             .split(" ");
+            coverage.setEarliestDataDate(
+                    new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]));
+        }
         mdata.setCoverage(coverage);
     }
 
     @Override
     public Double getDataEndTime() {
-        Date endDate = mdata.getCoverage().getLatestDataTime();
-        if ( endDate.before(Coverage.MIN_DATA_TIME) )
+        String[] pieces = OmeUtils.SIMPLE_DATE_FORMAT_UTC.format(new Date()).split(" ");
+        Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
+
+        Datestamp endDate = mdata.getCoverage().getLatestDataDate();
+        if ( !endDate.isValid(today) )
             return Double.NaN;
-        return endDate.getTime() / 1000.0;
+        try {
+            String endString = endDate.dateString().replace('-', ' ') +
+                    ' ' + endDate.timeString().replace(':', ' ');
+            Date endTime = OmeUtils.SIMPLE_DATE_FORMAT_UTC.parse(endString);
+            return endTime.getTime() / 1000.0;
+        } catch ( ParseException ex ) {
+            throw new RuntimeException("Unexpected error parsing Datestamp.stampString: " + ex.getMessage());
+        }
     }
 
     @Override
     public void setDataEndTime(Double dataEndTime) {
         Coverage coverage = mdata.getCoverage();
-        if ( (dataEndTime == null) || Double.isNaN(dataEndTime) || Double.isInfinite(dataEndTime) )
-            coverage.setLatestDataTime(null);
-        else
-            coverage.setLatestDataTime(new Date(Math.round(dataEndTime * 1000.0)));
+        if ( (dataEndTime == null) || Double.isNaN(dataEndTime) || Double.isInfinite(dataEndTime) ) {
+            coverage.setLatestDataDate(null);
+        }
+        else {
+            String[] pieces = OmeUtils.SIMPLE_DATE_FORMAT_UTC.format(new Date(Math.round(dataEndTime * 1000.0)))
+                                                             .split("-");
+            coverage.setLatestDataDate(
+                    new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]));
+
+        }
         mdata.setCoverage(coverage);
     }
 

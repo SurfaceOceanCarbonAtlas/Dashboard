@@ -7,6 +7,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -17,6 +18,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 
 /**
  * Page for preparing to view and edit standard SOCAT metadata.
@@ -28,6 +30,10 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String TITLE_TEXT = "Edit SOCAT Metadata";
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
+
+    private static final String RETRIEVING_SOCAT_METADATA_MSG = "Retrieving the SOCAT Metadata for ";
+    private static final String RETRIEVE_METADATA_FAIL_MSG = "Failed to retrieve the SOCAT Metadata for ";
+
     private static final String SAVE_TEXT = "Save and Continue";
     private static final String DONE_TEXT = "Save and Exit";
     private static final String CANCEL_TEXT = "Exit Without Saving";
@@ -63,6 +69,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     Button cancelButton;
 
     private DashboardDataset dataset;
+    private SocatMetadata metadata;
 
     // Singleton instance of this page
     private static EditSocatMetadataPage singleton;
@@ -80,6 +87,9 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         saveButton.setText(SAVE_TEXT);
         doneButton.setText(DONE_TEXT);
         cancelButton.setText(CANCEL_TEXT);
+
+        // Create the tab panels
+        // TODO: create the tab panels
     }
 
     /**
@@ -125,7 +135,26 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         dataset = datasetList.values().iterator().next();
 
         // Update the HTML intro naming the cruise
-        introHtml.setHTML(HTML_INTRO_PROLOGUE + SafeHtmlUtils.htmlEscape(dataset.getDatasetId()) + HTML_INTRO_EPILOGUE);
+        String expo = SafeHtmlUtils.htmlEscape(dataset.getDatasetId());
+        introHtml.setHTML(HTML_INTRO_PROLOGUE + expo + HTML_INTRO_EPILOGUE);
+
+        UploadDashboard.showWaitCursor();
+        UploadDashboard.showMessage(RETRIEVING_SOCAT_METADATA_MSG + expo);
+        service.getSocatMetadata(getUsername(), dataset.getDatasetId(), new AsyncCallback<SocatMetadata>() {
+            @Override
+            public void onSuccess(SocatMetadata result) {
+                UploadDashboard.showAutoCursor();
+                metadata = result.duplicate(null);
+                showSocatMetadata();
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showAutoCursor();
+                UploadDashboard.showFailureMessage(RETRIEVE_METADATA_FAIL_MSG + expo, ex);
+                SelectSocatMetadataPage.showPage(datasetList);
+            }
+        });
     }
 
     @UiHandler("logoutButton")
@@ -133,10 +162,31 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         DashboardLogoutPage.showPage();
     }
 
+    @UiHandler("saveButton")
+    void saveButtonOnClick(ClickEvent event) {
+        // Save the current SocatMetadata on the server but continue working
+        saveSocatMetadata();
+    }
+
+    @UiHandler("doneButton")
+    void doneButtonOnClick(ClickEvent event) {
+        // Save the current SocatMetadata on the server and exit this page
+        saveSocatMetadata();
+        DatasetListPage.showPage();
+    }
+
     @UiHandler("cancelButton")
     void cancelButtonOnClick(ClickEvent event) {
-        // Return to the cruise list page which might have been updated
+        // Return to the cruise list page without save changes
         DatasetListPage.showPage();
+    }
+
+    private void showSocatMetadata() {
+        //TODO: implement
+    }
+
+    private void saveSocatMetadata() {
+        //TODO: implement
     }
 
 }

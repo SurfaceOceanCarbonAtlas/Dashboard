@@ -105,9 +105,9 @@ public class PlatformTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Platform platform = new Platform();
-        Platform dup = platform.clone();
+        Platform dup = platform.duplicate(null);
         assertEquals(platform, dup);
         assertNotSame(platform, dup);
 
@@ -118,7 +118,7 @@ public class PlatformTest {
         platform.setPlatformCountry(PLATFORM_COUNTRY);
         assertNotEquals(platform, dup);
 
-        dup = platform.clone();
+        dup = platform.duplicate(null);
         assertEquals(platform, dup);
         assertNotSame(platform, dup);
     }

@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.platform;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Basic information about the platform (ship, mooring) used by the dataset.
  */
-public class Platform implements Cloneable, Serializable {
+public class Platform implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -2013476999761954272L;
+    private static final long serialVersionUID = -860855083651939499L;
 
     protected String platformId;
     protected String platformName;
@@ -118,14 +120,19 @@ public class Platform implements Cloneable, Serializable {
         this.platformCountry = (platformCountry != null) ? platformCountry.trim() : "";
     }
 
-    @Override
-    public Platform clone() {
-        Platform dup;
-        try {
-            dup = (Platform) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+
+    /**
+     * Deeply copies the values in this Platform object to the given Platform object.
+     *
+     * @param dup
+     *         the Platform object to copy values into;
+     *         if null, a new Platform object is created for copying values into
+     *
+     * @return the updated Platform object
+     */
+    public Platform duplicate(Platform dup) {
+        if ( dup == null )
+            dup = new Platform();
         dup.platformId = platformId;
         dup.platformName = platformName;
         dup.platformType = platformType;

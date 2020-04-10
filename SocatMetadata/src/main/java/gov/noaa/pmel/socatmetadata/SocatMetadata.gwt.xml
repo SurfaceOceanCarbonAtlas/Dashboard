@@ -8,6 +8,9 @@
 
 <module rename-to='SocatMetadata'>
 
+    <!-- Inherit the core Web Toolkit stuff. -->
+    <inherits name="com.google.gwt.user.User"/>
+
     <!-- Specify the paths for translatable code -->
     <source path='shared'/>
 

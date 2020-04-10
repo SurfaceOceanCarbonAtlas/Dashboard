@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -167,9 +167,9 @@ public class NumericStringTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         NumericString numstr = new NumericString();
-        NumericString dup = numstr.clone();
+        NumericString dup = numstr.duplicate(null);
         assertEquals(numstr, dup);
         assertNotSame(numstr, dup);
 
@@ -177,7 +177,7 @@ public class NumericStringTest {
         numstr.setUnitString(UNIT_STR);
         assertNotEquals(numstr, dup);
 
-        dup = numstr.clone();
+        dup = numstr.duplicate(null);
         assertEquals(numstr, dup);
         assertNotSame(numstr, dup);
         assertTrue(dup.isNegative());

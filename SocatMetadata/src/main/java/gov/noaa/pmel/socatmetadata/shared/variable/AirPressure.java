@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 
@@ -9,9 +10,9 @@ import java.io.Serializable;
  * The default unit is hectopascals instead of empty.
  * Also provides a pressure correction field.
  */
-public class AirPressure extends DataVar implements Cloneable, Serializable {
+public class AirPressure extends DataVar implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -566334293294412502L;
+    private static final long serialVersionUID = -7149799335885804693L;
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
@@ -34,13 +35,8 @@ public class AirPressure extends DataVar implements Cloneable, Serializable {
      */
     public AirPressure(Variable var) {
         super(var);
-        accuracy.setUnitString(HECTOPASCALS_UNIT);
-        precision.setUnitString(HECTOPASCALS_UNIT);
-        if ( (var != null) && (var instanceof AirPressure) ) {
+        if ( var instanceof AirPressure ) {
             AirPressure press = (AirPressure) var;
-            varUnit = press.varUnit;
-            accuracy = press.accuracy.clone();
-            precision = press.precision.clone();
             pressureCorrection = press.pressureCorrection;
         }
         else {
@@ -111,9 +107,19 @@ public class AirPressure extends DataVar implements Cloneable, Serializable {
             this.precision = new NumericString(null, HECTOPASCALS_UNIT);
     }
 
-    @Override
-    public AirPressure clone() {
-        AirPressure dup = (AirPressure) super.clone();
+    /**
+     * Deeply copies the values in this AirPressure object to the given AirPressure object.
+     *
+     * @param dup
+     *         the AirPressure object to copy values into;
+     *         if null, a new AirPressure object is created for copying values into
+     *
+     * @return the updated AirPressure object
+     */
+    public AirPressure duplicate(AirPressure dup) {
+        if ( dup == null )
+            dup = new AirPressure();
+        super.duplicate(dup);
         dup.pressureCorrection = pressureCorrection;
         return dup;
     }

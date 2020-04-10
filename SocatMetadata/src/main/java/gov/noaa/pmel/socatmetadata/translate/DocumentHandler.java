@@ -1,16 +1,15 @@
 package gov.noaa.pmel.socatmetadata.translate;
 
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import org.jdom2.Element;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TimeZone;
@@ -164,7 +163,8 @@ public abstract class DocumentHandler {
      * @param datestring
      *         date stamp as yyyyMMdd or yyyy/MM/dd or yyyy-MM-dd; if null or empty, null is returned
      *
-     * @return datestamp representing this date, or null if the date string is not in a valid format
+     * @return datestamp representing this date (with time 00:00:00), or
+     *         null if the date string is not in a valid format
      *         (the validity of the date itself is not checked)
      */
     public static Datestamp getDatestamp(String datestring) {
@@ -200,29 +200,9 @@ public abstract class DocumentHandler {
         if ( pieces.length != 3 )
             throw new RuntimeException("Unexpected hyphenated date of: " + hypenstring);
         try {
-            return new Datestamp(pieces[0], pieces[1], pieces[2]);
+            return new Datestamp(pieces[0], pieces[1], pieces[2], "0", "0", "0");
         } catch ( IllegalArgumentException ex ) {
             return null;
-        }
-    }
-
-    /**
-     * @param date
-     *         date to use; if null, null is returned
-     *
-     * @return datestamp of the given date; the time portion of the given date is ignored
-     */
-    public static Datestamp getDatestamp(Date date) {
-        if ( null == date )
-            return null;
-        String hypenstring = DATE_FORMATTER.format(date);
-        String[] pieces = hypenstring.split("-");
-        if ( pieces.length != 3 )
-            throw new RuntimeException("Unexpected hyphenated date of: " + hypenstring);
-        try {
-            return new Datestamp(pieces[0], pieces[1], pieces[2]);
-        } catch ( IllegalArgumentException ex ) {
-            throw new RuntimeException("Unexpected failure to make a datestamp from: " + hypenstring);
         }
     }
 

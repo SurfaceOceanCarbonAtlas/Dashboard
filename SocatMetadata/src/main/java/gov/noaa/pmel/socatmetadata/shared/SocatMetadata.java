@@ -1,5 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
@@ -8,12 +10,11 @@ import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 
-public class SocatMetadata implements Cloneable, Serializable {
+public class SocatMetadata implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1944524978575517180L;
+    private static final long serialVersionUID = 7860794227284200311L;
 
     protected Submitter submitter;
     protected ArrayList<Investigator> investigators;
@@ -37,9 +38,12 @@ public class SocatMetadata implements Cloneable, Serializable {
     }
 
     /**
+     * @param today
+     *         a Datestamp representing the current day; if null, {@link Datestamp#DEFAULT_TODAY_DATESTAMP} is used
+     *
      * @return list of field names that are currently invalid
      */
-    public HashSet<String> invalidFieldNames() {
+    public HashSet<String> invalidFieldNames(Datestamp today) {
         HashSet<String> invalid = new HashSet<String>();
 
         for (String name : submitter.invalidFieldNames()) {
@@ -53,7 +57,7 @@ public class SocatMetadata implements Cloneable, Serializable {
         for (String name : platform.invalidFieldNames()) {
             invalid.add("platform." + name);
         }
-        for (String name : coverage.invalidFieldNames()) {
+        for (String name : coverage.invalidFieldNames(today)) {
             invalid.add("coverage." + name);
         }
         for (int k = 0; k < instruments.size(); k++) {
@@ -66,24 +70,21 @@ public class SocatMetadata implements Cloneable, Serializable {
                 invalid.add("variables[" + k + "]." + name);
             }
         }
-        for (String name : miscInfo.invalidFieldNames()) {
+        for (String name : miscInfo.invalidFieldNames(today)) {
             invalid.add("miscInfo." + name);
         }
 
         // check that the data times are all within the specified time range
-        // (beginning of start day; end of ending day) for the dataset
-        if ( !(invalid.contains("miscInfo.startDatestamp") || invalid.contains("coverage.earliestDataTime")) ) {
-            Date start = miscInfo.getStartDatestamp().getEarliestTime();
-            if ( start.after(coverage.getEarliestDataTime()) ) {
+        if ( !(invalid.contains("miscInfo.startDatestamp") || invalid.contains("coverage.earliestDataDate")) ) {
+            if ( miscInfo.getStartDatestamp().after(coverage.getEarliestDataDate()) ) {
                 invalid.add("miscInfo.startDatestamp");
-                invalid.add("coverage.earliestDataTime");
+                invalid.add("coverage.earliestDataDate");
             }
         }
-        if ( !(invalid.contains("miscInfo.endDatestamp") || invalid.contains("coverage.latestDataTime")) ) {
-            Date end = new Date(miscInfo.getEndDatestamp().getEarliestTime().getTime() + 24L * 60L * 60L * 1000L);
-            if ( end.before(coverage.getLatestDataTime()) ) {
+        if ( !(invalid.contains("miscInfo.endDatestamp") || invalid.contains("coverage.latestDataDate")) ) {
+            if ( miscInfo.getEndDatestamp().before(coverage.getLatestDataDate()) ) {
                 invalid.add("miscInfo.endDatestamp");
-                invalid.add("coverage.latestDataTime");
+                invalid.add("coverage.latestDataDate");
             }
         }
 
@@ -96,7 +97,7 @@ public class SocatMetadata implements Cloneable, Serializable {
      * @return the submitter of this dataset; never null but may contain invalid values
      */
     public Submitter getSubmitter() {
-        return submitter.clone();
+        return submitter.duplicate(null);
     }
 
     /**
@@ -104,7 +105,7 @@ public class SocatMetadata implements Cloneable, Serializable {
      *         assign as the submitter of this dataset; if null, a Submitter is created invalid values
      */
     public void setSubmitter(Submitter submitter) {
-        this.submitter = (submitter != null) ? submitter.clone() : new Submitter();
+        this.submitter = (submitter != null) ? submitter.duplicate(null) : new Submitter();
     }
 
     /**
@@ -113,7 +114,7 @@ public class SocatMetadata implements Cloneable, Serializable {
     public ArrayList<Investigator> getInvestigators() {
         ArrayList<Investigator> piList = new ArrayList<Investigator>(investigators.size());
         for (Investigator pi : investigators) {
-            piList.add(pi.clone());
+            piList.add(pi.duplicate(null));
         }
         return piList;
     }
@@ -146,7 +147,7 @@ public class SocatMetadata implements Cloneable, Serializable {
             for (Investigator pi : investigators) {
                 if ( null == pi )
                     throw new IllegalArgumentException("null investigator given");
-                this.investigators.add(pi.clone());
+                this.investigators.add(pi.duplicate(null));
             }
         }
     }
@@ -155,7 +156,7 @@ public class SocatMetadata implements Cloneable, Serializable {
      * @return the platform for this dataset; never null but may contain invalid values
      */
     public Platform getPlatform() {
-        return platform.clone();
+        return platform.duplicate(null);
     }
 
     /**
@@ -163,14 +164,14 @@ public class SocatMetadata implements Cloneable, Serializable {
      *         assign as the platform for this dataset; if null, a Platform with invalid values is assigned
      */
     public void setPlatform(Platform platform) {
-        this.platform = (platform != null) ? platform.clone() : new Platform();
+        this.platform = (platform != null) ? platform.duplicate(null) : new Platform();
     }
 
     /**
      * @return the coverage of this dataset; never null but may contain invalid values
      */
     public Coverage getCoverage() {
-        return coverage.clone();
+        return coverage.duplicate(null);
     }
 
     /**
@@ -178,7 +179,7 @@ public class SocatMetadata implements Cloneable, Serializable {
      *         assign as the coverage of this dataset; if null, a Coverage with invalid values is assigned
      */
     public void setCoverage(Coverage coverage) {
-        this.coverage = (coverage != null) ? coverage.clone() : new Coverage();
+        this.coverage = (coverage != null) ? coverage.duplicate(null) : new Coverage();
     }
 
     /**
@@ -187,7 +188,7 @@ public class SocatMetadata implements Cloneable, Serializable {
     public ArrayList<Instrument> getInstruments() {
         ArrayList<Instrument> instList = new ArrayList<Instrument>(instruments.size());
         for (Instrument inst : instruments) {
-            instList.add(inst.clone());
+            instList.add(inst.duplicate(null));
         }
         return instList;
     }
@@ -218,7 +219,7 @@ public class SocatMetadata implements Cloneable, Serializable {
             for (Instrument inst : instruments) {
                 if ( null == inst )
                     throw new IllegalArgumentException("null instrument given");
-                this.instruments.add(inst.clone());
+                this.instruments.add(inst.duplicate(null));
             }
         }
     }
@@ -229,7 +230,7 @@ public class SocatMetadata implements Cloneable, Serializable {
     public ArrayList<Variable> getVariables() {
         ArrayList<Variable> varList = new ArrayList<Variable>(variables.size());
         for (Variable var : variables) {
-            varList.add(var.clone());
+            varList.add(var.duplicate(null));
         }
         return varList;
     }
@@ -260,43 +261,47 @@ public class SocatMetadata implements Cloneable, Serializable {
             for (Variable var : variables) {
                 if ( null == var )
                     throw new IllegalArgumentException("null variable given");
-                this.variables.add(var.clone());
+                this.variables.add(var.duplicate(null));
             }
         }
     }
 
     public MiscInfo getMiscInfo() {
-        return miscInfo.clone();
+        return miscInfo.duplicate(null);
     }
 
     public void setMiscInfo(MiscInfo miscInfo) {
-        this.miscInfo = (miscInfo != null) ? miscInfo.clone() : new MiscInfo();
+        this.miscInfo = (miscInfo != null) ? miscInfo.duplicate(null) : new MiscInfo();
     }
 
-    @Override
-    public SocatMetadata clone() {
-        SocatMetadata dup;
-        try {
-            dup = (SocatMetadata) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
-        dup.submitter = submitter.clone();
+    /**
+     * Deeply copies the values in this SocatMetadata object to the given SocatMetadata object.
+     *
+     * @param dup
+     *         the SocatMetadata object to copy values into;
+     *         if null, a new SocatMetadata object is created for copying values into
+     *
+     * @return the updated SocatMetadata object
+     */
+    public SocatMetadata duplicate(SocatMetadata dup) {
+        if ( dup == null )
+            dup = new SocatMetadata();
+
+        dup.submitter = submitter.duplicate(null);
         dup.investigators = new ArrayList<Investigator>(investigators.size());
-        for (Investigator pi : investigators) {
-            dup.investigators.add(pi.clone());
+        for (Investigator inv : investigators) {
+            dup.investigators.add(inv.duplicate(null));
         }
-        dup.platform = platform.clone();
-        dup.coverage = coverage.clone();
+        dup.platform = platform.duplicate(null);
         dup.instruments = new ArrayList<Instrument>(instruments.size());
         for (Instrument inst : instruments) {
-            dup.instruments.add(inst.clone());
+            dup.instruments.add(inst.duplicate(null));
         }
         dup.variables = new ArrayList<Variable>(variables.size());
         for (Variable var : variables) {
-            dup.variables.add(var.clone());
+            dup.variables.add(var.duplicate(null));
         }
-        dup.miscInfo = miscInfo.clone();
+        dup.miscInfo = miscInfo.duplicate(null);
         return dup;
     }
 

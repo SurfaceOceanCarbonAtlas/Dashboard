@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Information about measurements of a gas concentration in a body of water.
  */
-public class AquGasConc extends GasConc implements Cloneable, Serializable {
+public class AquGasConc extends GasConc implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8743601559946398902L;
+    private static final long serialVersionUID = 5753890210224741680L;
 
     protected String reportTemperature;
     protected String temperatureCorrection;
@@ -29,7 +31,7 @@ public class AquGasConc extends GasConc implements Cloneable, Serializable {
      */
     public AquGasConc(Variable var) {
         super(var);
-        if ( (var != null) && (var instanceof AquGasConc) ) {
+        if ( var instanceof AquGasConc ) {
             AquGasConc conc = (AquGasConc) var;
             reportTemperature = conc.reportTemperature;
             temperatureCorrection = conc.temperatureCorrection;
@@ -80,9 +82,19 @@ public class AquGasConc extends GasConc implements Cloneable, Serializable {
         this.temperatureCorrection = (temperatureCorrection != null) ? temperatureCorrection.trim() : "";
     }
 
-    @Override
-    public AquGasConc clone() {
-        AquGasConc dup = (AquGasConc) super.clone();
+    /**
+     * Deeply copies the values in this AquGasConc object to the given AquGasConc object.
+     *
+     * @param dup
+     *         the AquGasConc object to copy values into;
+     *         if null, a new AquGasConc object is created for copying values into
+     *
+     * @return the updated AquGasConc object
+     */
+    public AquGasConc duplicate(AquGasConc dup) {
+        if ( dup == null )
+            dup = new AquGasConc();
+        super.duplicate(dup);
         dup.reportTemperature = reportTemperature;
         dup.temperatureCorrection = temperatureCorrection;
         return dup;

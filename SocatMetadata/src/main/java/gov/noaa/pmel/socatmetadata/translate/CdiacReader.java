@@ -3,6 +3,8 @@ package gov.noaa.pmel.socatmetadata.translate;
 import gov.noaa.pmel.socatmetadata.shared.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
@@ -15,8 +17,6 @@ import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
@@ -32,7 +32,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -479,17 +478,12 @@ public class CdiacReader extends DocumentHandler {
         coverage.setNorthernLatitude(
                 getNumericString(getElementText(null, NORTH_BOUND_ELEMENT_NAME), Coverage.LATITUDE_UNITS));
 
-        // CDIAC only has date stamps - use earliest and latest time of those days; should be reset from data
         Datestamp timestamp = getDatestamp(getElementText(null, TEMP_START_DATE_ELEMENT_NAME));
-        if ( timestamp != null ) {
-            coverage.setEarliestDataTime(timestamp.getEarliestTime());
-        }
+        if ( timestamp != null )
+            coverage.setEarliestDataDate(timestamp);
         timestamp = getDatestamp(getElementText(null, TEMP_END_DATE_ELEMENT_NAME));
-        if ( timestamp != null ) {
-            Date endDate = timestamp.getEarliestTime();
-            endDate = new Date(endDate.getTime() + 24L * 60L * 60L * 1000L - 1000L);
-            coverage.setLatestDataTime(endDate);
-        }
+        if ( timestamp != null )
+            coverage.setLatestDataDate(timestamp);
 
         TreeSet<String> regions = new TreeSet<String>();
         for (Element regElem : getElementList(null, GEO_REGION_ELEMENT_NAME)) {
@@ -850,6 +844,7 @@ public class CdiacReader extends DocumentHandler {
                     else
                         addnInfo.add("Precision/Resolution: " + strVal);
                     sal.setSamplingLocation(getElementText(null, SSS_LOCATION_ELEMENT_NAME));
+                    sal.setAddnInfo(addnInfo);
                     var = sal;
                     break;
                 }
@@ -990,8 +985,9 @@ public class CdiacReader extends DocumentHandler {
             if ( pieces.length > 1 ) {
                 calGasInfoList.clear();
                 calGasInfoList.add(pieces[0].trim() + ".");
-                for (int k = 1; k < pieces.length - 1; k++)
+                for (int k = 1; k < pieces.length - 1; k++) {
                     calGasInfoList.add("Std " + pieces[k].trim() + ".");
+                }
                 calGasInfoList.add("Std " + pieces[pieces.length - 1].trim());
             }
         }
@@ -1025,10 +1021,10 @@ public class CdiacReader extends DocumentHandler {
                     id = gasInfo;
                 }
             }
-            if ( ! concStr.isEmpty() ) {
+            if ( !concStr.isEmpty() ) {
                 // Assume the concentration is accurate within one of its last reported digit
                 int dotIdx = concStr.indexOf(".");
-                if ( (dotIdx >= 0) || (dotIdx + 1 < concStr.length()) ) {
+                if ( (dotIdx >= 0) && (dotIdx + 1 < concStr.length()) ) {
                     accStr = "0.";
                     for (int k = dotIdx + 2; k < concStr.length(); k++) {
                         accStr += "0";
@@ -1091,7 +1087,7 @@ public class CdiacReader extends DocumentHandler {
         for (Element elem : getElementList(null, OTHER_SENSORS_ELEMENT_NAME)) {
             k++;
             Analyzer otherSensor = new Analyzer();
-            otherSensor.setName("Other Sensor " + Integer.toString(k));
+            otherSensor.setName("Other Sensor " + k);
             otherSensor.setManufacturer(getElementText(elem, OTHER_SENSORS_MANUFACTURER_ELEMENT_NAME));
             otherSensor.setModel(getElementText(elem, OTHER_SENSORS_MODEL_ELEMENT_NAME));
             otherSensor.setCalibration(getElementText(elem, OTHER_SENSORS_CALIBRATION_ELEMENT_NAME));

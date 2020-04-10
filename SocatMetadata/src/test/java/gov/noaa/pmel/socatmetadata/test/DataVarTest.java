@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -638,9 +638,9 @@ public class DataVarTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         DataVar var = new DataVar();
-        DataVar dup = var.clone();
+        DataVar dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -668,7 +668,7 @@ public class DataVarTest {
         var.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(var, dup);
 
-        dup = var.clone();
+        dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());

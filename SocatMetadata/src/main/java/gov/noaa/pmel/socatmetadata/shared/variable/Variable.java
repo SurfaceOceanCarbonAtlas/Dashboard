@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import java.util.HashSet;
 /**
  * Basic variable information; is the base class for all variable types.
  */
-public class Variable implements Cloneable, Serializable {
+public class Variable implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5041012823142267978L;
+    private static final long serialVersionUID = 3842268615490949746L;
 
     protected String colName;
     protected String fullName;
@@ -39,7 +40,7 @@ public class Variable implements Cloneable, Serializable {
     /**
      * Create using values in the given variable.
      * This exists only for calling from constructors of subclasses;
-     * use {@link Variable#clone()}} for normal uses.
+     * use {@link Variable#duplicate(Variable)} for normal uses.
      */
     protected Variable(Variable var) {
         if ( var != null ) {
@@ -48,8 +49,8 @@ public class Variable implements Cloneable, Serializable {
             varUnit = var.varUnit;
             missVal = var.missVal;
             flagColName = var.flagColName;
-            accuracy = var.accuracy.clone();
-            precision = var.precision.clone();
+            accuracy = var.accuracy.duplicate(null);
+            precision = var.precision.duplicate(null);
             addnInfo = new ArrayList<String>(var.addnInfo);
         }
         else {
@@ -63,6 +64,7 @@ public class Variable implements Cloneable, Serializable {
             addnInfo = new ArrayList<String>();
         }
     }
+
 
     /**
      * @return set of field names that are currently invalid; never null but may be empty
@@ -159,7 +161,7 @@ public class Variable implements Cloneable, Serializable {
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getAccuracy() {
-        return accuracy.clone();
+        return accuracy.duplicate(null);
     }
 
     /**
@@ -175,7 +177,7 @@ public class Variable implements Cloneable, Serializable {
             // Empty numeric strings return false
             if ( accuracy.isNonPositive() )
                 throw new IllegalArgumentException("accuracy numeric string given is not a finite positive number");
-            this.accuracy = accuracy.clone();
+            this.accuracy = accuracy.duplicate(null);
         }
         else
             this.accuracy = new NumericString();
@@ -186,7 +188,7 @@ public class Variable implements Cloneable, Serializable {
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getPrecision() {
-        return precision.clone();
+        return precision.duplicate(null);
     }
 
     /**
@@ -202,7 +204,7 @@ public class Variable implements Cloneable, Serializable {
             // Empty numeric strings return false
             if ( precision.isNonPositive() )
                 throw new IllegalArgumentException("precision numeric string given is not a finite positive number");
-            this.precision = precision.clone();
+            this.precision = precision.duplicate(null);
         }
         else
             this.precision = new NumericString();
@@ -250,21 +252,25 @@ public class Variable implements Cloneable, Serializable {
         }
     }
 
-    @Override
-    public Variable clone() {
-        Variable dup;
-        try {
-            dup = (Variable) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+    /**
+     * Deeply copies the values in this Variable object to the given Variable object.
+     *
+     * @param dup
+     *         the Variable object to copy values into;
+     *         if null, a new Variable object is created for copying values into
+     *
+     * @return the updated Variable object
+     */
+    public Variable duplicate(Variable dup) {
+        if ( dup == null )
+            dup = new Variable();
         dup.colName = colName;
         dup.fullName = fullName;
         dup.varUnit = varUnit;
         dup.missVal = missVal;
         dup.flagColName = flagColName;
-        dup.accuracy = accuracy.clone();
-        dup.precision = precision.clone();
+        dup.accuracy = accuracy.duplicate(null);
+        dup.precision = precision.duplicate(null);
         dup.addnInfo = new ArrayList<String>(addnInfo);
         return dup;
     }

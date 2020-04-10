@@ -3,6 +3,8 @@ package gov.noaa.pmel.socatmetadata.translate;
 import gov.noaa.pmel.socatmetadata.shared.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
@@ -15,8 +17,6 @@ import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
@@ -175,7 +175,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String STANDARD_GAS_CONCENTRATION_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "concentration";
     private static final String STANDARD_GAS_UNCERTAINTY_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "uncertainty";
 
-    private Writer xmlWriter;
+    private final Writer xmlWriter;
 
     /**
      * Creates a new document containing only the root element for OCADS XML content.
@@ -213,10 +213,10 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, ACCESS_ID_ELEMENT_NAME, info.getAccessId());
         ArrayList<Datestamp> history = info.getHistory();
         if ( history.size() > 0 )
-            setElementText(null, SUBMISSION_DATE_ELEMENT_NAME, history.get(0).stampString());
+            setElementText(null, SUBMISSION_DATE_ELEMENT_NAME, history.get(0).dateString());
         for (int k = 1; k < history.size(); k++) {
             Element elem = addListElement(null, UPDATE_DATE_ELEMENT_NAME);
-            elem.setText(history.get(k).stampString());
+            elem.setText(history.get(k).dateString());
         }
 
         addInvestigatorFields(null, mdata.getSubmitter());
@@ -230,16 +230,16 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, PURPOSE_ELEMENT_NAME, info.getPurpose());
 
         Coverage coverage = mdata.getCoverage();
-        Datestamp stamp = DocumentHandler.getDatestamp(coverage.getEarliestDataTime());
+        Datestamp stamp = coverage.getEarliestDataDate();
         try {
-            setElementText(null, DATA_START_DATE_ELEMENT_NAME, stamp.stampString());
-        } catch ( IllegalStateException ex ) {
+            setElementText(null, DATA_START_DATE_ELEMENT_NAME, stamp.dateString());
+        } catch ( IllegalArgumentException ex ) {
             // Invalid Datestamp - leave unassigned
         }
-        stamp = DocumentHandler.getDatestamp(coverage.getLatestDataTime());
+        stamp = coverage.getLatestDataDate();
         try {
-            setElementText(null, DATA_END_DATE_ELEMENT_NAME, stamp.stampString());
-        } catch ( IllegalStateException ex ) {
+            setElementText(null, DATA_END_DATE_ELEMENT_NAME, stamp.dateString());
+        } catch ( IllegalArgumentException ex ) {
             // Invalid Datestamp - leave unassigned
         }
         setElementText(null, WESTERNMOST_LONGITUDE_ELEMENT_NAME, coverage.getWesternLongitude().getValueString());

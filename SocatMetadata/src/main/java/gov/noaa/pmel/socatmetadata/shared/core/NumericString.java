@@ -1,4 +1,6 @@
-package gov.noaa.pmel.socatmetadata.shared.util;
+package gov.noaa.pmel.socatmetadata.shared.core;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.io.Serializable;
 
@@ -6,9 +8,9 @@ import java.io.Serializable;
  * Represents a numeric string value with units (optional).
  * Used when the numeric value of the string needs to be validated and used.
  */
-public final class NumericString implements Cloneable, Serializable {
+public final class NumericString implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -4326342003221951882L;
+    private static final long serialVersionUID = 5568773018614693753L;
 
     private String valueString;
     private String unitString;
@@ -154,14 +156,18 @@ public final class NumericString implements Cloneable, Serializable {
         return repr.trim();
     }
 
-    @Override
-    public NumericString clone() {
-        NumericString dup;
-        try {
-            dup = (NumericString) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+    /**
+     * Deeply copies the values in this NumericString object to the given NumericString object.
+     *
+     * @param dup
+     *         the NumericString object to copy values into;
+     *         if null, a new NumericString object is created for copying values into
+     *
+     * @return the updated NumericString object
+     */
+    public NumericString duplicate(NumericString dup) {
+        if ( dup == null )
+            dup = new NumericString();
         dup.valueString = valueString;
         dup.unitString = unitString;
         dup.numericValue = numericValue;

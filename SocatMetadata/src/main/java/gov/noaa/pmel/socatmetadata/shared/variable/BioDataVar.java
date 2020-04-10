@@ -1,11 +1,13 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
-public class BioDataVar extends DataVar implements Cloneable, Serializable {
+public class BioDataVar extends DataVar implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5258934064206960496L;
+    private static final long serialVersionUID = -2015788276473614396L;
 
     String biologicalSubject;
     String speciesId;
@@ -94,9 +96,19 @@ public class BioDataVar extends DataVar implements Cloneable, Serializable {
         this.lifeStage = (lifeStage != null) ? lifeStage.trim() : "";
     }
 
-    @Override
-    public BioDataVar clone() {
-        BioDataVar dup = (BioDataVar) super.clone();
+    /**
+     * Deeply copies the values in this BioDataVar object to the given BioDataVar object.
+     *
+     * @param dup
+     *         the BioDataVar object to copy values into;
+     *         if null, a new BioDataVar object is created for copying values into
+     *
+     * @return the updated BioDataVar object
+     */
+    public BioDataVar duplicate(BioDataVar dup) {
+        if ( dup == null )
+            dup = new BioDataVar();
+        super.duplicate(dup);
         dup.biologicalSubject = biologicalSubject;
         dup.speciesId = speciesId;
         dup.lifeStage = lifeStage;

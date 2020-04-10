@@ -27,9 +27,9 @@ public class PressureSensorTest {
     ));
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         PressureSensor sensor = new PressureSensor();
-        PressureSensor dup = sensor.clone();
+        PressureSensor dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -41,7 +41,7 @@ public class PressureSensorTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.clone();
+        dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

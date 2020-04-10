@@ -69,9 +69,9 @@ public class SamplerTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Sampler sampler = new Sampler();
-        Sampler dup = sampler.clone();
+        Sampler dup = sampler.duplicate(null);
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
 
@@ -83,7 +83,7 @@ public class SamplerTest {
         sampler.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(sampler, dup);
 
-        dup = sampler.clone();
+        dup = sampler.duplicate(null);
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
         assertNotSame(sampler.getAddnInfo(), dup.getAddnInfo());

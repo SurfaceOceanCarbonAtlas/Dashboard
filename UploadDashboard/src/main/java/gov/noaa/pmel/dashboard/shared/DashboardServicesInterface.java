@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -290,6 +291,22 @@ public interface DashboardServicesInterface extends RemoteService {
     void copySocatMetadata(String username, String toId, String fromId) throws IllegalArgumentException;
 
     /**
+     * Return the SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         return the SocatMetadata for the dataset with this ID
+     *
+     * @return the SocatMetadata for the dataset
+     *
+     * @throws IllegalArgumentException
+     *         if authentication fails, or
+     *         if unable to read the SocatMetadata for the dataset.
+     */
+    SocatMetadata getSocatMetadata(String username, String datasetId) throws IllegalArgumentException;
+
+    /**
      * Submits datasets named in the given listing for QC.
      *
      * @param username
@@ -325,5 +342,6 @@ public interface DashboardServicesInterface extends RemoteService {
      *         if suspending a dataset fails
      */
     void suspendDatasets(String username, TreeSet<String> datasetIds) throws IllegalArgumentException;
+
 
 }

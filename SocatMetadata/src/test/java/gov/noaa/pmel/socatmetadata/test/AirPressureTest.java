@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import org.junit.Test;
 
@@ -114,9 +114,9 @@ public class AirPressureTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         AirPressure pressure = new AirPressure();
-        AirPressure dup = pressure.clone();
+        AirPressure dup = pressure.duplicate(null);
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -127,7 +127,7 @@ public class AirPressureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.clone();
+        dup = pressure.duplicate(null);
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());

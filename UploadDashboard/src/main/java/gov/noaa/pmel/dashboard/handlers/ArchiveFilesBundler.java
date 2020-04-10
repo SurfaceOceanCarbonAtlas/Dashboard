@@ -14,7 +14,7 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -273,7 +273,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             for (String datetime : dsetInfo.getArchiveTimestamps()) {
                 // The format of these timestamps are "yyyy-MM-dd HH:mm Z"
                 String[] pieces = datetime.split("[ :/-]");
-                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2]);
+                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], "0");
                 archiveDates.add(datestamp);
             }
             if ( archiveDates.isEmpty() ) {
@@ -283,7 +283,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                         archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ||
                         archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) )
                     // Add a datestamp of 1900-01-01 to indicate unknown submission date
-                    archiveDates.add(new Datestamp("1900", "1", "1"));
+                    archiveDates.add(new Datestamp(1900, 1, 1, 0, 0, 0));
             }
             if ( !archiveDates.isEmpty() ) {
                 // MiscInfo.getHistory returns a copy, so need to update it in the MiscInfo object

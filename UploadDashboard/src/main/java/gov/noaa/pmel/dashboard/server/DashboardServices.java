@@ -21,6 +21,8 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
+import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +40,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -1849939750979152323L;
+    private static final long serialVersionUID = -3094395353809307189L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -588,6 +590,20 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // TODO: implement
         throw new IllegalArgumentException("Not yet implemented");
+    }
+
+    @Override
+    public SocatMetadata getSocatMetadata(String pageUsername, String datasetId) throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        // TODO: actually implement - this is an incorrect stub just to return something
+        MiscInfo miscInfo = new MiscInfo();
+        miscInfo.setDatasetId(datasetId);
+        SocatMetadata metadata = new SocatMetadata();
+        metadata.setMiscInfo(miscInfo);
+        return metadata;
     }
 
     @Override

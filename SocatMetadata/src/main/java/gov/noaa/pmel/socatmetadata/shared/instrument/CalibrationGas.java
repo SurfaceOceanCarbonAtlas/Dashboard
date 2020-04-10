@@ -1,7 +1,8 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import com.google.gwt.user.client.rpc.IsSerializable;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -9,9 +10,9 @@ import java.util.HashSet;
 /**
  * Describes a standard gas mixture used for calibration of instruments.
  */
-public class CalibrationGas implements Cloneable, Serializable {
+public class CalibrationGas implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2959699486089828213L;
+    private static final long serialVersionUID = 1269010561016655437L;
 
     public static final String GAS_CONCENTRATION_UNIT = "ppm";
 
@@ -148,7 +149,7 @@ public class CalibrationGas implements Cloneable, Serializable {
      *         If not empty, guaranteed to represent a non-negative finite number.
      */
     public NumericString getConcentration() {
-        return concentration.clone();
+        return concentration.duplicate(null);
     }
 
     /**
@@ -162,7 +163,7 @@ public class CalibrationGas implements Cloneable, Serializable {
         if ( concentration != null ) {
             if ( !concentration.isNonNegative() )
                 throw new IllegalArgumentException("concentration specified is not a finite non-negative number");
-            this.concentration = concentration.clone();
+            this.concentration = concentration.duplicate(null);
         }
         else
             this.concentration = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -173,7 +174,7 @@ public class CalibrationGas implements Cloneable, Serializable {
      *         If not empty, guaranteed to represent a positive finite number.
      */
     public NumericString getAccuracy() {
-        return accuracy.clone();
+        return accuracy.duplicate(null);
     }
 
     /**
@@ -192,7 +193,7 @@ public class CalibrationGas implements Cloneable, Serializable {
             if ( !GAS_CONCENTRATION_UNIT.equals(accuracy.getUnitString()) )
                 throw new IllegalArgumentException(
                         "accuracy specified is not in units of " + GAS_CONCENTRATION_UNIT);
-            this.accuracy = accuracy.clone();
+            this.accuracy = accuracy.duplicate(null);
         }
         else
             this.accuracy = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -201,33 +202,37 @@ public class CalibrationGas implements Cloneable, Serializable {
     /**
      * @return if this calibration gas is a non-zero gas standard
      *
-     * @throws IllegalStateException
+     * @throws IllegalArgumentException
      *         if the gas concentration or the accuracy of the gas concentration is not specified (is NaN)
      */
-    public boolean isNonZero() throws IllegalStateException {
+    public boolean isNonZero() throws IllegalArgumentException {
         if ( !concentration.isValid() )
-            throw new IllegalStateException("gas concentration is not given");
+            throw new IllegalArgumentException("gas concentration is not given");
         if ( concentration.getNumericValue() == 0.0 )
             return false;
         if ( !accuracy.isValid() )
-            throw new IllegalStateException("gas concentration accuracy is not given");
+            throw new IllegalArgumentException("gas concentration accuracy is not given");
         return (concentration.getNumericValue() > accuracy.getNumericValue());
     }
 
-    @Override
-    public CalibrationGas clone() {
-        CalibrationGas dup;
-        try {
-            dup = (CalibrationGas) super.clone();
-        } catch ( CloneNotSupportedException ex ) {
-            throw new RuntimeException(ex);
-        }
+    /**
+     * Deeply copies the values in this CalibrationGas object to the given CalibrationGas object.
+     *
+     * @param dup
+     *         the CalibrationGas object to copy values into;
+     *         if null, a new CalibrationGas object is created for copying values into
+     *
+     * @return the updated CalibrationGas object
+     */
+    public CalibrationGas duplicate(CalibrationGas dup) {
+        if ( dup == null )
+            dup = new CalibrationGas();
         dup.id = id;
         dup.type = type;
         dup.supplier = supplier;
         dup.useFrequency = useFrequency;
-        dup.concentration = concentration.clone();
-        dup.accuracy = accuracy.clone();
+        dup.concentration = concentration.duplicate(null);
+        dup.accuracy = accuracy.duplicate(null);
         return dup;
     }
 

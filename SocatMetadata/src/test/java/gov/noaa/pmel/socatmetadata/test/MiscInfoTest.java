@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.MiscInfo;
-import gov.noaa.pmel.socatmetadata.shared.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -82,11 +82,11 @@ public class MiscInfoTest {
                     "condenser.  The survey tech cleared out the water and restarted the system on 1/26 at 0519.  " +
                     "No data was acquired during the shutdown period."
     ));
-    private static final Datestamp START_DATESTAMP = new Datestamp("2015", "1", "13");
-    private static final Datestamp END_DATESTAMP = new Datestamp("2015", "1", "30");
+    private static final Datestamp START_DATESTAMP = new Datestamp(2015, 1, 13, 0, 0, 0);
+    private static final Datestamp END_DATESTAMP = new Datestamp(2015, 1, 30, 0, 0, 0);
     private static final ArrayList<Datestamp> HISTORY_LIST = new ArrayList<Datestamp>(Arrays.asList(
-            new Datestamp("2016", "1", "20"),
-            new Datestamp("2017", "2", "24")
+            new Datestamp(2016, 1, 20, 0, 0, 0),
+            new Datestamp(2017, 2, 24, 0, 0, 0)
     ));
 
     @Test
@@ -593,20 +593,20 @@ public class MiscInfoTest {
     public void testInvalidFieldNames() {
         MiscInfo miscInfo = new MiscInfo();
         assertEquals(new HashSet<String>(Arrays.asList(
-                "datasetId", "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames());
+                "datasetId", "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames(null));
         miscInfo.setDatasetId(DATASET_ID);
         assertEquals(new HashSet<String>(Arrays.asList(
-                "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames());
+                "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames(null));
         miscInfo.setStartDatestamp(START_DATESTAMP);
-        assertEquals(new HashSet<String>(Arrays.asList("endDatestamp")), miscInfo.invalidFieldNames());
+        assertEquals(new HashSet<String>(Arrays.asList("endDatestamp")), miscInfo.invalidFieldNames(null));
         miscInfo.setEndDatestamp(END_DATESTAMP);
-        assertEquals(EMPTY_NAMESET, miscInfo.invalidFieldNames());
+        assertEquals(EMPTY_NAMESET, miscInfo.invalidFieldNames(null));
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         MiscInfo miscInfo = new MiscInfo();
-        MiscInfo dup = miscInfo.clone();
+        MiscInfo dup = miscInfo.duplicate(null);
         assertEquals(miscInfo, dup);
         assertNotSame(miscInfo, dup);
 
@@ -632,7 +632,7 @@ public class MiscInfoTest {
         miscInfo.setHistory(HISTORY_LIST);
         assertNotEquals(miscInfo, dup);
 
-        dup = miscInfo.clone();
+        dup = miscInfo.duplicate(null);
         assertEquals(miscInfo, dup);
         assertNotSame(miscInfo, dup);
 

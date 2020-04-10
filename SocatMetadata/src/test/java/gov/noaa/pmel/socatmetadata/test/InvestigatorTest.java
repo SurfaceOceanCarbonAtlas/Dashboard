@@ -219,9 +219,9 @@ public class InvestigatorTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Investigator investigator = new Investigator();
-        Investigator dup = investigator.clone();
+        Investigator dup = investigator.duplicate(null);
         assertEquals(investigator, dup);
         assertNotSame(investigator, dup);
 
@@ -240,7 +240,7 @@ public class InvestigatorTest {
         investigator.setEmail(EMAIL);
         assertNotEquals(investigator, dup);
 
-        dup = investigator.clone();
+        dup = investigator.duplicate(null);
         assertEquals(investigator, dup);
         assertNotSame(investigator, dup);
     }

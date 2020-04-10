@@ -1,6 +1,7 @@
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import gov.noaa.pmel.socatmetadata.shared.SocatMetadata;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -251,9 +252,24 @@ public interface DashboardServicesInterfaceAsync {
      * @param fromId
      *         copy the SocatMetadata from the dataset with this ID
      * @param callback
-     *         callback to make on success or failure
+     *         callback to make on success or failure; the onFailure method of the callback will be called if
+     *         authentication failed, if unable to get the SocatMetadata for the dataset associated with fromId, or
+     *         if unable to write the SocatMetadata for the dataset associated with toId.
      */
     void copySocatMetadata(String username, String toId, String fromId, AsyncCallback<Void> callback);
+
+    /**
+     * Client side request to return the SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         return the SocatMetadata for the dataset with this ID
+     * @param callback
+     *         callback to make on success or failure; the onFailure method of the callback will be called if
+     *         authentication fails or if unable to read the SocatMetadta for the dataset.
+     */
+    void getSocatMetadata(String username, String datasetId, AsyncCallback<SocatMetadata> callback);
 
     /**
      * Client-side interface for submitting datasets for QC.

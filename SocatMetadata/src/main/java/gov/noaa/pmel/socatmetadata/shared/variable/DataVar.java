@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.shared.variable;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 
 import java.io.Serializable;
@@ -8,9 +9,9 @@ import java.util.HashSet;
 /**
  * Information about a generic data variable in a dataset.
  */
-public class DataVar extends Variable implements Cloneable, Serializable {
+public class DataVar extends Variable implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 9118041619127432109L;
+    private static final long serialVersionUID = 5272347977578431299L;
 
     protected String observeType;
     protected MethodType measureMethod;
@@ -51,7 +52,7 @@ public class DataVar extends Variable implements Cloneable, Serializable {
      */
     public DataVar(Variable var) {
         super(var);
-        if ( (var != null) && (var instanceof DataVar) ) {
+        if ( var instanceof DataVar ) {
             DataVar other = (DataVar) var;
             observeType = other.observeType;
             measureMethod = other.measureMethod;
@@ -64,7 +65,7 @@ public class DataVar extends Variable implements Cloneable, Serializable {
             duration = other.duration;
             analysisTemperature = other.analysisTemperature;
             replication = other.replication;
-            researcher = other.researcher.clone();
+            researcher = other.researcher.duplicate(null);
             instrumentNames = new HashSet<String>(other.instrumentNames);
         }
         else {
@@ -287,7 +288,7 @@ public class DataVar extends Variable implements Cloneable, Serializable {
      *         never null but may not be a valid investigator reference
      */
     public Person getResearcher() {
-        return researcher.clone();
+        return researcher.duplicate(null);
     }
 
     /**
@@ -296,7 +297,7 @@ public class DataVar extends Variable implements Cloneable, Serializable {
      *         if null, an invalid reference (a Person with all-empty fields) is assigned
      */
     public void setResearcher(Person researcher) {
-        this.researcher = (researcher != null) ? researcher.clone() : new Person();
+        this.researcher = (researcher != null) ? researcher.duplicate(null) : new Person();
     }
 
     /**
@@ -343,9 +344,19 @@ public class DataVar extends Variable implements Cloneable, Serializable {
         }
     }
 
-    @Override
-    public DataVar clone() {
-        DataVar dup = (DataVar) super.clone();
+    /**
+     * Deeply copies the values in this DataVar object to the given DataVar object.
+     *
+     * @param dup
+     *         the DataVar object to copy values into;
+     *         if null, a new DataVar object is created for copying values into
+     *
+     * @return the updated DataVar object
+     */
+    public DataVar duplicate(DataVar dup) {
+        if ( dup == null )
+            dup = new DataVar();
+        super.duplicate(dup);
         dup.observeType = observeType;
         dup.measureMethod = measureMethod;
         dup.methodDescription = methodDescription;
@@ -357,7 +368,7 @@ public class DataVar extends Variable implements Cloneable, Serializable {
         dup.duration = duration;
         dup.analysisTemperature = analysisTemperature;
         dup.replication = replication;
-        dup.researcher = researcher.clone();
+        dup.researcher = researcher.duplicate(null);
         dup.instrumentNames = new HashSet<String>(instrumentNames);
         return dup;
     }

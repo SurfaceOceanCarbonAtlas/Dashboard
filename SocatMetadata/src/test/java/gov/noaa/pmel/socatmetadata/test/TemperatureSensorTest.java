@@ -27,9 +27,9 @@ public class TemperatureSensorTest {
     ));
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         TemperatureSensor sensor = new TemperatureSensor();
-        TemperatureSensor dup = sensor.clone();
+        TemperatureSensor dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -41,7 +41,7 @@ public class TemperatureSensorTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.clone();
+        dup = sensor.duplicate(null);
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

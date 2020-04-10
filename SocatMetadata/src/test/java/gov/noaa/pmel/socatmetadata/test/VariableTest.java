@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
@@ -213,9 +213,9 @@ public class VariableTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Variable var = new Variable();
-        Variable dup = var.clone();
+        Variable dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -229,7 +229,7 @@ public class VariableTest {
         var.setAddnInfo(ADDN_INFO);
         assertNotEquals(var, dup);
 
-        dup = var.clone();
+        dup = var.duplicate(null);
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());

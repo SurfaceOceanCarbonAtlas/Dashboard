@@ -1,14 +1,16 @@
 package gov.noaa.pmel.socatmetadata.shared.instrument;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.io.Serializable;
 import java.util.HashSet;
 
 /**
  * Describes an equilibrator for measuring the amount of a dissolved gas in water.
  */
-public class Equilibrator extends Sampler implements Cloneable, Serializable {
+public class Equilibrator extends Sampler implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2784316631869459343L;
+    private static final long serialVersionUID = -6167799176172993211L;
 
     protected String equilibratorType;
     protected String chamberVol;
@@ -155,9 +157,19 @@ public class Equilibrator extends Sampler implements Cloneable, Serializable {
         this.venting = (venting != null) ? venting.trim() : "";
     }
 
-    @Override
-    public Equilibrator clone() {
-        Equilibrator dup = (Equilibrator) super.clone();
+    /**
+     * Deeply copies the values in this Equilibrator object to the given Equilibrator object.
+     *
+     * @param dup
+     *         the Equilibrator object to copy values into;
+     *         if null, a new Equilibrator object is created for copying values into
+     *
+     * @return the updated Equilibrator object
+     */
+    public Equilibrator duplicate(Equilibrator dup) {
+        if ( dup == null )
+            dup = new Equilibrator();
+        super.duplicate(dup);
         dup.equilibratorType = equilibratorType;
         dup.chamberVol = chamberVol;
         dup.chamberWaterVol = chamberWaterVol;

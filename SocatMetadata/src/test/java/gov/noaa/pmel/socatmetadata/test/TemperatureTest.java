@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.shared.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import org.junit.Test;
 
@@ -97,9 +97,9 @@ public class TemperatureTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Temperature pressure = new Temperature();
-        Temperature dup = pressure.clone();
+        Temperature dup = pressure.duplicate(null);
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -109,7 +109,7 @@ public class TemperatureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.clone();
+        dup = pressure.duplicate(null);
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());
