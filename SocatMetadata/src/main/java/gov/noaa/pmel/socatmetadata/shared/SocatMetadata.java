@@ -293,6 +293,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
             dup.investigators.add(inv.duplicate(null));
         }
         dup.platform = platform.duplicate(null);
+        dup.coverage = coverage.duplicate(null);
         dup.instruments = new ArrayList<Instrument>(instruments.size());
         for (Instrument inst : instruments) {
             dup.instruments.add(inst.duplicate(null));
