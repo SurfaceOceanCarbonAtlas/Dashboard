@@ -2,10 +2,23 @@ package gov.noaa.pmel.socatmetadata.shared;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
+import gov.noaa.pmel.socatmetadata.shared.instrument.GasSensor;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.instrument.PressureSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.SalinitySensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
+import gov.noaa.pmel.socatmetadata.shared.instrument.TemperatureSensor;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.io.Serializable;
@@ -14,7 +27,7 @@ import java.util.HashSet;
 
 public class SocatMetadata implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7860794227284200311L;
+    private static final long serialVersionUID = 5603918291161606319L;
 
     protected Submitter submitter;
     protected ArrayList<Investigator> investigators;
@@ -61,6 +74,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
             invalid.add("coverage." + name);
         }
         for (int k = 0; k < instruments.size(); k++) {
+            HashSet<String> invalidNames;
             for (String name : instruments.get(k).invalidFieldNames()) {
                 invalid.add("instruments[" + k + "]." + name);
             }
@@ -114,7 +128,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
     public ArrayList<Investigator> getInvestigators() {
         ArrayList<Investigator> piList = new ArrayList<Investigator>(investigators.size());
         for (Investigator pi : investigators) {
-            piList.add(pi.duplicate(null));
+            if ( pi.getClass() == Submitter.class )
+                piList.add(((Submitter) pi).duplicate(null));
+            else
+                piList.add(pi.duplicate(null));
         }
         return piList;
     }
@@ -147,7 +164,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
             for (Investigator pi : investigators) {
                 if ( null == pi )
                     throw new IllegalArgumentException("null investigator given");
-                this.investigators.add(pi.duplicate(null));
+                if ( pi.getClass() == Submitter.class )
+                    this.investigators.add(((Submitter) pi).duplicate(null));
+                else
+                    this.investigators.add(pi.duplicate(null));
             }
         }
     }
@@ -188,7 +208,23 @@ public class SocatMetadata implements Serializable, IsSerializable {
     public ArrayList<Instrument> getInstruments() {
         ArrayList<Instrument> instList = new ArrayList<Instrument>(instruments.size());
         for (Instrument inst : instruments) {
-            instList.add(inst.duplicate(null));
+            // Deal with type erasure in a GWT-friendly way
+            if ( inst.getClass() == Equilibrator.class )
+                instList.add(((Equilibrator) inst).duplicate(null));
+            else if ( inst.getClass() == Sampler.class )
+                instList.add(((Sampler) inst).duplicate(null));
+            else if ( inst.getClass() == GasSensor.class )
+                instList.add(((GasSensor) inst).duplicate(null));
+            else if ( inst.getClass() == PressureSensor.class )
+                instList.add(((PressureSensor) inst).duplicate(null));
+            else if ( inst.getClass() == SalinitySensor.class )
+                instList.add(((SalinitySensor) inst).duplicate(null));
+            else if ( inst.getClass() == TemperatureSensor.class )
+                instList.add(((TemperatureSensor) inst).duplicate(null));
+            else if ( inst.getClass() == Analyzer.class )
+                instList.add(((Analyzer) inst).duplicate(null));
+            else
+                instList.add(inst.duplicate(null));
         }
         return instList;
     }
@@ -219,7 +255,23 @@ public class SocatMetadata implements Serializable, IsSerializable {
             for (Instrument inst : instruments) {
                 if ( null == inst )
                     throw new IllegalArgumentException("null instrument given");
-                this.instruments.add(inst.duplicate(null));
+                // Deal with type erasure in a GWT-friendly way
+                if ( inst.getClass() == Equilibrator.class )
+                    this.instruments.add(((Equilibrator) inst).duplicate(null));
+                else if ( inst.getClass() == Sampler.class )
+                    this.instruments.add(((Sampler) inst).duplicate(null));
+                else if ( inst.getClass() == GasSensor.class )
+                    this.instruments.add(((GasSensor) inst).duplicate(null));
+                else if ( inst.getClass() == PressureSensor.class )
+                    this.instruments.add(((PressureSensor) inst).duplicate(null));
+                else if ( inst.getClass() == SalinitySensor.class )
+                    this.instruments.add(((SalinitySensor) inst).duplicate(null));
+                else if ( inst.getClass() == TemperatureSensor.class )
+                    this.instruments.add(((TemperatureSensor) inst).duplicate(null));
+                else if ( inst.getClass() == Analyzer.class )
+                    this.instruments.add(((Analyzer) inst).duplicate(null));
+                else
+                    this.instruments.add(inst.duplicate(null));
             }
         }
     }
@@ -230,7 +282,21 @@ public class SocatMetadata implements Serializable, IsSerializable {
     public ArrayList<Variable> getVariables() {
         ArrayList<Variable> varList = new ArrayList<Variable>(variables.size());
         for (Variable var : variables) {
-            varList.add(var.duplicate(null));
+            // Deal with type erasure in a GWT-friendly way
+            if ( var.getClass() == AquGasConc.class )
+                varList.add(((AquGasConc) var).duplicate(null));
+            else if ( var.getClass() == GasConc.class )
+                varList.add(((GasConc) var).duplicate(null));
+            else if ( var.getClass() == AirPressure.class )
+                varList.add(((AirPressure) var).duplicate(null));
+            else if ( var.getClass() == BioDataVar.class )
+                varList.add(((BioDataVar) var).duplicate(null));
+            else if ( var.getClass() == Temperature.class )
+                varList.add(((Temperature) var).duplicate(null));
+            else if ( var.getClass() == DataVar.class )
+                varList.add(((DataVar) var).duplicate(null));
+            else
+                varList.add(var.duplicate(null));
         }
         return varList;
     }
@@ -261,7 +327,21 @@ public class SocatMetadata implements Serializable, IsSerializable {
             for (Variable var : variables) {
                 if ( null == var )
                     throw new IllegalArgumentException("null variable given");
-                this.variables.add(var.duplicate(null));
+                // Deal with type erasure in a GWT-friendly way
+                if ( var.getClass() == AquGasConc.class )
+                    this.variables.add(((AquGasConc) var).duplicate(null));
+                else if ( var.getClass() == GasConc.class )
+                    this.variables.add(((GasConc) var).duplicate(null));
+                else if ( var.getClass() == AirPressure.class )
+                    this.variables.add(((AirPressure) var).duplicate(null));
+                else if ( var.getClass() == BioDataVar.class )
+                    this.variables.add(((BioDataVar) var).duplicate(null));
+                else if ( var.getClass() == Temperature.class )
+                    this.variables.add(((Temperature) var).duplicate(null));
+                else if ( var.getClass() == DataVar.class )
+                    this.variables.add(((DataVar) var).duplicate(null));
+                else
+                    this.variables.add(var.duplicate(null));
             }
         }
     }
@@ -286,23 +366,13 @@ public class SocatMetadata implements Serializable, IsSerializable {
     public SocatMetadata duplicate(SocatMetadata dup) {
         if ( dup == null )
             dup = new SocatMetadata();
-
-        dup.submitter = submitter.duplicate(null);
-        dup.investigators = new ArrayList<Investigator>(investigators.size());
-        for (Investigator inv : investigators) {
-            dup.investigators.add(inv.duplicate(null));
-        }
-        dup.platform = platform.duplicate(null);
-        dup.coverage = coverage.duplicate(null);
-        dup.instruments = new ArrayList<Instrument>(instruments.size());
-        for (Instrument inst : instruments) {
-            dup.instruments.add(inst.duplicate(null));
-        }
-        dup.variables = new ArrayList<Variable>(variables.size());
-        for (Variable var : variables) {
-            dup.variables.add(var.duplicate(null));
-        }
-        dup.miscInfo = miscInfo.duplicate(null);
+        dup.setSubmitter(submitter);
+        dup.setInvestigators(investigators);
+        dup.setPlatform(platform);
+        dup.setCoverage(coverage);
+        dup.setInstruments(instruments);
+        dup.setVariables(variables);
+        dup.setMiscInfo(miscInfo);
         return dup;
     }
 
