@@ -33,11 +33,11 @@ import java.util.List;
  * with other metadata formats being converted to or produced from
  * SDIMetadata objects.
  */
-public class SdiOmeMetadata implements OmeMetadataInterface {
+public class SocatOmeMetadata implements OmeMetadataInterface {
 
     private SocatMetadata mdata;
 
-    public SdiOmeMetadata() {
+    public SocatOmeMetadata() {
         mdata = new SocatMetadata();
     }
 
@@ -48,7 +48,7 @@ public class SdiOmeMetadata implements OmeMetadataInterface {
         try {
             mdata = (SocatMetadata) xdec.readObject();
         } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems reading the SDIMetadata object from the metadata file " +
+            throw new IllegalArgumentException("Problems reading the SocatMetadata object from the metadata file " +
                     mdataFile.getName() + " for dataset " + datasetId + ": " + ex.getMessage());
         }
         String givenId = mdata.getMiscInfo().getDatasetId();

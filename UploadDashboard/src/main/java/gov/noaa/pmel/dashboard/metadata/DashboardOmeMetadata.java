@@ -24,7 +24,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 6113847974011933801L;
+    private static final long serialVersionUID = 3331599336506356277L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -39,7 +39,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         DATE_STAMPER.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private OmeMetadataInterface omeMData;
+    private final OmeMetadataInterface omeMData;
 
     /**
      * Create from the contents of the OME metadata file specified.

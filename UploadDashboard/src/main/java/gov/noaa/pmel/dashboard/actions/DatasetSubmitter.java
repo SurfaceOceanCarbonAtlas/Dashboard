@@ -294,7 +294,6 @@ public class DatasetSubmitter {
         }
 
         // If any dataset submit had errors, return the error messages
-        // TODO: do this in a return message, not an IllegalArgumentException
         if ( errorMsgs.size() > 0 ) {
             StringBuilder sb = new StringBuilder();
             for (String msg : errorMsgs) {
@@ -427,7 +426,7 @@ public class DatasetSubmitter {
             if ( rowNum <= 0 )
                 continue;
 
-            // TODO: in the general case, get the correct data QC flag variable name and value
+            // ODO: in the general case, get the correct data QC flag variable name and value
             // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
             String flagName = SocatTypes.WOCE_CO2_WATER.getVarName();
 

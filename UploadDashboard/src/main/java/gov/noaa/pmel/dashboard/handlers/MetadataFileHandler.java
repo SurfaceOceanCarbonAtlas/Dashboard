@@ -148,8 +148,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         name of the metadata document to be deleted or overwritten
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID or metaname are invalid, or if the user is not permitted to overwrite the metadata
-     *         document
+     *         if the dataset ID or metaname are invalid, or
+     *         if the user is not permitted to overwrite the metadata document
      */
     private void verifyOkayToDelete(String username, String datasetId, String metaname)
             throws IllegalArgumentException {
@@ -161,8 +161,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( IOException ex ) {
-            throw new IllegalArgumentException(
-                    "Unexpected error obtaining the dashboard configuration");
+            throw new IllegalArgumentException("Unexpected error obtaining the dashboard configuration");
         }
         String oldOwner = oldMetadata.getOwner();
         if ( !configStore.userManagesOver(username, oldOwner) )
@@ -181,8 +180,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @param uploadTimestamp
      *         client-side timestamp giving the time of the upload.
      * @param uploadFilename
-     *         upload filename to use for this metadata document; may or may not match the basename of
-     *         uploadFileItem.getName()
+     *         upload filename to use for this metadata document;
+     *         may or may not match the basename of uploadFileItem.getName()
      * @param version
      *         version for this metadata item
      * @param uploadFileItem
@@ -191,8 +190,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @return a DashboardMetadata describing the new or updated metadata document; never null
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if problems reading from the file upload stream, if problems writing to the
-     *         new metadata document, or if problems committing the new metadata document to version control
+     *         if the dataset ID is invalid,
+     *         if problems reading from the file upload stream,
+     *         if problems writing to the new metadata document, or
+     *         if problems committing the new metadata document to version control
      */
     public DashboardMetadata saveMetadataFileItem(String datasetId, String owner, String uploadTimestamp,
             String uploadFilename, String version, FileItem uploadFileItem) throws IllegalArgumentException {
@@ -228,21 +229,18 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Create the appropriate check-in message
         String message;
         if ( isUpdate ) {
-            message = "Updated metadata document " + uploadFilename +
-                    " for dataset " + datasetId + " and owner " + owner;
+            message = "Updated metadata document " + uploadFilename + " for dataset " + datasetId + " and owner " + owner;
         }
         else {
-            message = "Added metadata document " + uploadFilename +
-                    " for dataset " + datasetId + " and owner " + owner;
+            message = "Added metadata document " + uploadFilename + " for dataset " + datasetId + " and owner " + owner;
         }
 
         // Commit the new/updated metadata document to version control
         try {
             commitVersion(metadataFile, message);
         } catch ( SVNException ex ) {
-            throw new IllegalArgumentException("Problems committing " +
-                    metadataFile.getPath() + " to version control:\n    " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems committing " + metadataFile.getPath() +
+                    " to version control:\n    " + ex.getMessage());
         }
 
         // Create the DashboardMetadata to return
@@ -255,12 +253,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
         // Save the metadata properties
         if ( isUpdate ) {
-            message = "Updated properties of metadata document " + uploadFilename +
-                    " for dataset " + datasetId + " and owner " + owner;
+            message = "Updated properties of metadata document " + uploadFilename + " for dataset " + datasetId + " and owner " + owner;
         }
         else {
-            message = "Added properties of metadata document " + uploadFilename +
-                    " for dataset " + datasetId + " and owner " + owner;
+            message = "Added properties of metadata document " + uploadFilename + " for dataset " + datasetId + " and owner " + owner;
         }
         saveMetadataInfo(metadata, message, false);
 
@@ -268,24 +264,24 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Copy a metadata document to another dataset.  The document, as well as the owner, upload timestamp, and version
-     * properties, are copied under appropriate names for the new dataset.
+     * Copy a metadata document to another dataset.  The document, as well as the owner, upload timestamp,
+     * and version properties, are copied under appropriate names for the new dataset.
      *
      * @param destDatasetId
      *         ID of the dataset to be associated with the copy of the metadata file
      * @param srcMetadata
      *         metadata document to be copied
      * @param allowOverwrite
-     *         allow overwrite an existing metadata file?  If false and the metadata file exists, an
-     *         IllegalArgumentException is raised
+     *         allow overwrite an existing metadata file?
+     *         If false and the metadata file exists, an IllegalArgumentException is raised
      *
-     * @return a DashboardMetadata describing the new or updated metadata document copied from the another cruise; never
-     *         null
+     * @return a DashboardMetadata describing the new or updated metadata document
+     *         copied from the another cruise; never null
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if the metadata document to be copied does not exist, if there were
-     *         problems reading from the source metadata document, or if there were problems writing to the destination
-     *         metadata document.
+     *         if the dataset ID is invalid, if the metadata document to be copied does not exist,
+     *         if there were problems reading from the source metadata document, or
+     *         if there were problems writing to the destination metadata document.
      */
     public DashboardMetadata copyMetadataFile(String destDatasetId, DashboardMetadata srcMetadata,
             boolean allowOverwrite) throws IllegalArgumentException {
@@ -299,9 +295,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
             try {
                 // Create the metadata document from this input stream
                 // allowing overwrite if permissions permit it
-                mdata = saveMetadataInputStream(destDatasetId, owner, uploadName,
-                        srcMetadata.getUploadTimestamp(), srcMetadata.getVersion(),
-                        src, allowOverwrite);
+                mdata = saveMetadataInputStream(destDatasetId, owner, uploadName, srcMetadata.getUploadTimestamp(),
+                        srcMetadata.getVersion(), src, allowOverwrite);
             } finally {
                 src.close();
             }
@@ -325,15 +320,16 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @param urlString
      *         URL String of the document to download
      * @param allowOverwrite
-     *         allow overwrite an existing metadata file?  If false and the metadata file exists, an
-     *         IllegalArgumentException is raised and no data will have been read from src.
+     *         allow overwrite an existing metadata file?  If false and the metadata file exists,
+     *         an IllegalArgumentException is raised and no data will have been read from src.
      *
      * @return a DashboardMetadata describing the new or updated metadata document; never null.
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if the URL String is invalid, if problems reading the metadata from the
-     *         given URL if problems writing to the new metadata document, or if problems committing the new metadata
-     *         document to version control
+     *         if the dataset ID is invalid,
+     *         if the URL String is invalid,
+     *         if problems reading the metadata from the given URL if problems writing to the new metadata document, or
+     *         if problems committing the new metadata document to version control
      * @throws IOException
      *         if problems opening the given URL for reading
      */
@@ -353,8 +349,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         if ( (origName == null) || origName.trim().isEmpty() )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
                     "\n    Not a file (empty name)");
-        if ( origName.equalsIgnoreCase("index.html") ||
-                origName.equalsIgnoreCase("index.htm") )
+        if ( origName.equalsIgnoreCase("index.html") || origName.equalsIgnoreCase("index.htm") )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
                     "\n    index.html unlikely to be valid");
         String timestamp = DATETIME_FORMATTER.format(new Date());
@@ -389,14 +384,16 @@ public class MetadataFileHandler extends VersionedFileHandler {
      * @param src
      *         source to read for the contents of this metadata file
      * @param allowOverwrite
-     *         allow overwrite an existing metadata file?  If false and the metadata file exists, an
-     *         IllegalArgumentException is raised and no data will have been read from src.
+     *         allow overwrite an existing metadata file?  If false and the metadata file exists,
+     *         an IllegalArgumentException is raised and no data will have been read from src.
      *
      * @return a DashboardMetadata describing the new or updated metadata document; never null.
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID is invalid, if problems reading the given metadata file data, if problems writing to
-     *         the new metadata document, or if problems committing the new metadata document to version control
+     *         if the dataset ID is invalid,
+     *         if problems reading the given metadata file data,
+     *         if problems writing to the new metadata document, or
+     *         if problems committing the new metadata document to version control
      */
     public DashboardMetadata saveMetadataInputStream(String datasetId, String owner, String origName, String timestamp,
             String version, InputStream src, boolean allowOverwrite) throws IllegalArgumentException {
@@ -406,16 +403,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
         File parentDir = destFile.getParentFile();
         if ( !parentDir.exists() ) {
             if ( !parentDir.mkdirs() )
-                throw new IllegalArgumentException(
-                        "Problems creating the parent directory for " + destFile.getPath());
+                throw new IllegalArgumentException("Problems creating the parent directory for " + destFile.getPath());
         }
 
         // Check if this will overwrite existing metadata
         boolean isUpdate;
         if ( destFile.exists() ) {
             if ( !allowOverwrite )
-                throw new IllegalArgumentException("Destination metdata file " +
-                        destFile.getName() + "already exists");
+                throw new IllegalArgumentException("Destination metdata file " + destFile.getName() + "already exists");
             verifyOkayToDelete(owner, datasetId, origName);
             isUpdate = true;
         }
@@ -438,20 +433,17 @@ public class MetadataFileHandler extends VersionedFileHandler {
                     dest.close();
             }
         } catch ( IOException ex ) {
-            throw new IllegalArgumentException(
-                    "Problems copying the metadata document " + origName +
-                            " to " + destFile.getName() + ":\n    " + ex.getMessage());
+            throw new IllegalArgumentException("Problems copying the metadata document " + origName +
+                    " to " + destFile.getName() + ":\n    " + ex.getMessage());
         }
 
         // Create the appropriate check-in message
         String message;
         if ( isUpdate ) {
-            message = "Updated metadata document " + origName +
-                    " for dataset " + datasetId;
+            message = "Updated metadata document " + origName + " for dataset " + datasetId;
         }
         else {
-            message = "Added metadata document " + origName +
-                    " for dataset " + datasetId;
+            message = "Added metadata document " + origName + " for dataset " + datasetId;
         }
         if ( (owner != null) && !owner.trim().isEmpty() ) {
             message += " with owner " + owner;
@@ -461,9 +453,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
         try {
             commitVersion(destFile, message);
         } catch ( SVNException ex ) {
-            throw new IllegalArgumentException("Problems committing " +
-                    destFile.getName() + " to version control:\n    " +
-                    ex.getMessage());
+            throw new IllegalArgumentException("Problems committing " + destFile.getName() +
+                    " to version control:\n    " + ex.getMessage());
         }
 
         // Create the DashboardMetadata to return
@@ -476,12 +467,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
         // Create the appropriate check-in message
         if ( isUpdate ) {
-            message = "Updated properties of metadata document " + origName +
-                    " for dataset " + datasetId;
+            message = "Updated properties of metadata document " + origName + " for dataset " + datasetId;
         }
         else {
-            message = "Added properties of metadata document " + origName +
-                    " for dataset " + datasetId;
+            message = "Added properties of metadata document " + origName + " for dataset " + datasetId;
         }
         if ( (owner != null) && !owner.trim().isEmpty() ) {
             message += " with owner " + owner;
@@ -494,19 +483,20 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Generates a DashboardMetadata initialized with the contents of the information (properties) file for the
-     * metadata.  It will not be "selected".
+     * Generates a DashboardMetadata initialized with the contents of the information (properties) file
+     * for the metadata.  It will not be "selected".
      *
      * @param datasetId
      *         ID of the dataset associated with this metadata
      * @param metaname
      *         name of the metadata document
      *
-     * @return DashboardMetadata assigned from the properties file for the given metadata document.  If the properties
-     *         file does not exist, null is returned.
+     * @return DashboardMetadata assigned from the properties file for the given metadata document.
+     *         If the properties file does not exist, null is returned.
      *
      * @throws IllegalArgumentException
-     *         if dataset ID or metaname is invalid, or if there were problems reading from the properties file
+     *         if dataset ID or metaname is invalid, or
+     *         if there were problems reading from the properties file
      */
     public DashboardMetadata getMetadataInfo(String datasetId, String metaname) throws IllegalArgumentException {
         // Get the full path filename of the metadata file
@@ -554,14 +544,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         also commit the metadata file itself?
      *
      * @throws IllegalArgumentException
-     *         if there were problems saving the properties to file, or if there were problems committing the properties
-     *         file
+     *         if there were problems saving the properties to file, or
+     *         if there were problems committing the properties file
      */
     public void saveMetadataInfo(DashboardMetadata metadata, String message, boolean alsoCommitFile)
             throws IllegalArgumentException {
         // Get full path name of the metadata file
-        File metadataFile = getMetadataFile(metadata.getDatasetId(),
-                metadata.getFilename());
+        File metadataFile = getMetadataFile(metadata.getDatasetId(), metadata.getFilename());
         // Commit this metadata file if requested
         if ( alsoCommitFile && (message != null) && (!message.trim().isEmpty()) ) {
             // Submit the metadata file to version control
@@ -651,21 +640,19 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
             File newMetaFile = getMetadataFile(newId, uploadFilename);
             if ( newMetaFile.exists() )
-                throw new IllegalArgumentException("Metadata file " +
-                        uploadFilename + " already exists for " + newId);
+                throw new IllegalArgumentException("Metadata file " + uploadFilename + " already exists for " + newId);
 
             File newMetaInfoFile = new File(newMetaFile.getPath() + INFOFILE_SUFFIX);
             if ( newMetaInfoFile.exists() )
-                throw new IllegalArgumentException("Metadata info file for " +
-                        uploadFilename + " already exists for " + newId);
+                throw new IllegalArgumentException("Metadata info file for " + uploadFilename +
+                        " already exists for " + newId);
 
             // Make sure the parent directory exists for the new file
             File parent = newMetaFile.getParentFile();
             if ( !parent.exists() )
                 parent.mkdirs();
 
-            String commitMsg = "Move metadata document " + uploadFilename +
-                    " from " + oldId + " to " + newId;
+            String commitMsg = "Move metadata document " + uploadFilename + " from " + oldId + " to " + newId;
             try {
                 moveVersionedFile(oldMetaFile, newMetaFile, commitMsg);
                 moveVersionedFile(oldMetaInfoFile, newMetaInfoFile, commitMsg);
@@ -676,21 +663,18 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
         if ( omeMData != null ) {
             omeMData.changeDatasetID(newId);
-            saveOmeToFile(omeMData, "Change dataset for OME XML document from " +
-                    oldId + " to " + newId);
+            saveOmeToFile(omeMData, "Change dataset for OME XML document from " + oldId + " to " + newId);
         }
         if ( piOmeMData != null ) {
             piOmeMData.changeDatasetID(newId);
-            saveOmeToFile(omeMData, "Change dataset for PI OME XML document from " +
-                    oldId + " to " + newId);
+            saveOmeToFile(omeMData, "Change dataset for PI OME XML document from " + oldId + " to " + newId);
             // The PI_OME.pdf file will have been moved (as a normal metadata document)
             // but the dataset ID it contains needs to be updated, so regenerate it.
             try {
                 DashboardConfigStore configStore = DashboardConfigStore.get(false);
                 configStore.getOmePdfGenerator().createPiOmePdf(newId);
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException(
-                        "Unable to create the PDF from the OME XML: " + ex.getMessage());
+                throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
             }
         }
     }
@@ -706,7 +690,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         name of the metadata document
      *
      * @throws IllegalArgumentException
-     *         if the dataset ID or metaname is invalid, if the user is not permitted to delete the metadata document,
+     *         if the dataset ID or metaname is invalid,
+     *         if the user is not permitted to delete the metadata document, or
      *         if there are problems deleting the document.
      */
     public void deleteMetadata(String username, String datasetId, String metaname) throws IllegalArgumentException {
@@ -719,8 +704,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
             try {
                 deleteVersionedFile(propsFile, "Deleted metadata properties " + propsFile.getPath());
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException(
-                        "Unable to delete metadata properties file " + propsFile.getPath());
+                throw new IllegalArgumentException("Unable to delete metadata properties file " + propsFile.getPath());
             }
         }
         // Do not throw an error if the metadata file does not exist.
@@ -729,18 +713,16 @@ public class MetadataFileHandler extends VersionedFileHandler {
             try {
                 deleteVersionedFile(metadataFile, "Deleted metadata document " + metadataFile.getPath());
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException(
-                        "Unable to delete metadata file " + metadataFile.getPath());
+                throw new IllegalArgumentException("Unable to delete metadata file " + metadataFile.getPath());
             }
         }
     }
 
     /**
-     * Save the OME object to the contents of this metadata file.  The parent directory
-     * for this file is expected to exist and this method will overwrite any existing
-     * metadata file.  Note that this does NOT save the information about this metadata
-     * file to the properties file; use a separate call to
-     * {@link #saveMetadataInfo(DashboardMetadata, String, boolean)}
+     * Save the OME object to the contents of this metadata file.  The parent directory for this file
+     * is expected to exist and this method will overwrite any existing metadata file.  Note that this
+     * does NOT save the information about this metadata file to the properties file; use a separate call
+     * to {@link #saveMetadataInfo(DashboardMetadata, String, boolean)}
      *
      * @param mdata
      *         OME metadata to save
@@ -784,8 +766,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         if the contents of the metadata file are invalid for all known OME classes, or
      *         if the dataset ID (expocode) in the metadata file does not match that given
      */
-    public DashboardOmeMetadata getOmeFromFile(String datasetId, String metaname)
-            throws IllegalArgumentException {
+    public DashboardOmeMetadata getOmeFromFile(String datasetId, String metaname) throws IllegalArgumentException {
         return getOmeFromFile(getMetadataInfo(datasetId, metaname));
     }
 
@@ -803,8 +784,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
      *         if the contents of the metadata file are invalid for all known OME classes, or
      *         if the dataset ID (expocode) in the metadata file does not match that in the metadata properties
      */
-    public DashboardOmeMetadata getOmeFromFile(DashboardMetadata mdata)
-            throws IllegalArgumentException {
+    public DashboardOmeMetadata getOmeFromFile(DashboardMetadata mdata) throws IllegalArgumentException {
         File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
         DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
         return omeMData;
@@ -882,10 +862,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Moves and updates the WOCE flag messages file appropriately for a change in the
-     * unique ID for a dataset.  Does nothing (other than check the validity of the old
-     * ID) if the WOCE flag messages file under the old ID does not exist
-     * (for example, when the dataset has not yet been submitted for QC).
+     * Moves and updates the WOCE flag messages file appropriately for a change in the unique ID for a dataset.
+     * Does nothing (other than check the validity of the old ID) if the WOCE flag messages file under the old ID
+     * does not exist (for example, when the dataset has not yet been submitted for QC).
      *
      * @param oldId
      *         old unique ID (expocode) of the dataset

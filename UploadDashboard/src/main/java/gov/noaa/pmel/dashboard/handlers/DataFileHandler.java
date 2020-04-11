@@ -1333,10 +1333,7 @@ public class DataFileHandler extends VersionedFileHandler {
                 throw new IllegalArgumentException("Invalid value for wocefourrows");
             }
             dataset.setCheckerFlags(qcflags);
-            // No recorded list of PI-provided QC flags
             dataset.setUserFlags(null);
-            // TODO: maybe ? - go through data to record PI-provided data QC flags and update
-            // however, there might not be any in these early versions (especially if from v1 and v2)
             return;
         }
 
