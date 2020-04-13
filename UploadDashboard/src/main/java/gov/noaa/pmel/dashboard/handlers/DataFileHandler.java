@@ -794,12 +794,12 @@ public class DataFileHandler extends VersionedFileHandler {
         }
         else {
             String uploadFilename = addlDoc.getFilename();
-            if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) )
+            if ( DashboardServerUtils.OME_FILENAME.equals(uploadFilename) )
                 throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
-                        DashboardUtils.OME_FILENAME);
-            if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) )
+                        DashboardServerUtils.OME_FILENAME);
+            if ( DashboardServerUtils.PI_OME_FILENAME.equals(uploadFilename) )
                 throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
-                        DashboardUtils.PI_OME_FILENAME);
+                        DashboardServerUtils.PI_OME_FILENAME);
             // Work directly on the additional documents list in the cruise object
             TreeSet<String> addlDocTitles = dataset.getAddlDocs();
             String titleToDelete = null;
@@ -1007,12 +1007,12 @@ public class DataFileHandler extends VersionedFileHandler {
             // Delete the metadata and additional documents associated with this cruise
             MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
             try {
-                metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.OME_FILENAME);
+                metadataHandler.deleteMetadata(username, datasetId, DashboardServerUtils.OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
             }
             try {
-                metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.PI_OME_FILENAME);
+                metadataHandler.deleteMetadata(username, datasetId, DashboardServerUtils.PI_OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
             }

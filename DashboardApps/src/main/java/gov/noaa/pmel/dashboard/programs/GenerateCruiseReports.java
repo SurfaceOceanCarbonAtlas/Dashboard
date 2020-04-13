@@ -134,7 +134,7 @@ public class GenerateCruiseReports {
             // Exclude the (expocode)/OME.xml document at this time;
             // do include the (expocode)/PI_OME.xml
             String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !filename.equals(DashboardServerUtils.OME_FILENAME) ) {
                 addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
             }
         }
@@ -202,7 +202,7 @@ public class GenerateCruiseReports {
         String qcFlag = socatMeta.getDatasetQCFlag();
 
         // Get the rest of the metadata info from the OME XML
-        DashboardOmeMetadata omeMeta = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
+        DashboardOmeMetadata omeMeta = metadataHandler.getOmeFromFile(upperExpo, DashboardServerUtils.OME_FILENAME);
 
         // Get DOIs from data file properties
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
@@ -215,7 +215,7 @@ public class GenerateCruiseReports {
         // Use what the QC-ers see - the directory listing.
         TreeSet<String> addlDocs = new TreeSet<String>();
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo)) {
-            if ( !mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !mdata.getFilename().equals(DashboardServerUtils.OME_FILENAME) ) {
                 addlDocs.add(mdata.getFilename());
             }
         }
@@ -320,7 +320,7 @@ public class GenerateCruiseReports {
                 if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDOI) )
                     socatDOI = SOCAT_ENHANCED_DOI_TAG;
                 socatDOIList.add(socatDOI);
-                DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
+                DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(upperExpo, DashboardServerUtils.OME_FILENAME);
                 // get the original-data DOI from the data file properties (not part of CDIAC OME as such; might be part of citation)
                 omeMData.setDatasetDOI(cruise.getSourceDOI());
                 omeMetaList.add(omeMData);
@@ -335,7 +335,7 @@ public class GenerateCruiseReports {
             TreeSet<String> addlDocs = new TreeSet<String>();
             for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo)) {
                 // Ignore the OME.xml stub at this time, but include any PI_OME.xml since that is what was uploaded
-                if ( !mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
+                if ( !mdata.getFilename().equals(DashboardServerUtils.OME_FILENAME) ) {
                     addlDocs.add(mdata.getFilename());
                 }
             }

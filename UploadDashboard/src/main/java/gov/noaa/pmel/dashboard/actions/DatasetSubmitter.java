@@ -117,7 +117,7 @@ public class DatasetSubmitter {
             if ( Boolean.TRUE.equals(dataset.isEditable()) ) {
                 try {
                     // Get the OME metadata for this dataset
-                    DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardUtils.OME_FILENAME);
+                    DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardServerUtils.OME_FILENAME);
                     if ( !version.equals(omeInfo.getVersion()) ) {
                         omeInfo.setVersion(version);
                         metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " +
@@ -350,7 +350,7 @@ public class DatasetSubmitter {
             initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
             initQC.setFlagDate(now);
             initQC.setFlagValue(flagString);
-            initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+            initQC.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
             initQC.setComment(msg);
             qclist.add(initQC);
         }
@@ -377,7 +377,7 @@ public class DatasetSubmitter {
         initQC.setRealname(DashboardServerUtils.AUTOMATED_DATA_CHECKER_REALNAME);
         initQC.setFlagDate(now);
         initQC.setFlagValue(DatasetQCStatus.FLAG_COMMENT);
-        initQC.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+        initQC.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
         initQC.setComment("Automated data check found " +
                 Integer.toString(dataset.getNumErrorRows()) + " data points with errors and " +
                 Integer.toString(dataset.getNumWarnRows()) + " data points with warnings.");
@@ -426,7 +426,7 @@ public class DatasetSubmitter {
             if ( rowNum <= 0 )
                 continue;
 
-            // ODO: in the general case, get the correct data QC flag variable name and value
+            // TODO: in the general case, get the correct data QC flag variable name and value
             // For SOCAT, all the automated data checker flags are put under WOCE_CO2_water
             String flagName = SocatTypes.WOCE_CO2_WATER.getVarName();
 

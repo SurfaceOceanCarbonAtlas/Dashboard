@@ -4,8 +4,8 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class AutoQCTest {
 
         for (String expocode : TEST_EXPOCODES) {
             DashboardDataset dset = dataHandler.getDatasetFromInfoFile(expocode);
-            File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardUtils.PI_OME_FILENAME);
+            File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardServerUtils.PI_OME_FILENAME);
             FileReader cdiacReader = new FileReader(cdiacFile);
             SocatMetadata mdata = OmeUtils.createSdiMetadataFromCdiacOme(cdiacReader,
                     dset.getUserColNames(), dset.getDataColTypes());

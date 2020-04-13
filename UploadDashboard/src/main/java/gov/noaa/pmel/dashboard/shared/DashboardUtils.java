@@ -92,35 +92,6 @@ public class DashboardUtils {
     public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
 
     /**
-     * The "upload filename" for all OME metadata files.
-     */
-    public static final String OME_FILENAME = "OME.xml";
-
-    /**
-     * THe PDF version of the OME XML files.
-     */
-    public static final String OME_PDF_FILENAME = "OME.pdf";
-
-    /**
-     * The "upload filename" for all PI-provided OME metadata files that are not used for anything other than generating
-     * a supplemental document.
-     * <p>
-     * The use of this name is just a temporary measure until the CDIAC OME brought into the dashboard.
-     */
-    public static final String PI_OME_FILENAME = "PI_OME.xml";
-
-    /**
-     * The PDF version of the PI OME XML file.
-     */
-    public static final String PI_OME_PDF_FILENAME = "PI_OME.pdf";
-
-    /**
-     * Global region ID; the default region ID for QC events.
-     */
-    public static final String REGION_ID_GLOBAL = "G";
-
-
-    /**
      * For data without any specific units
      */
     public static final ArrayList<String> NO_UNITS =

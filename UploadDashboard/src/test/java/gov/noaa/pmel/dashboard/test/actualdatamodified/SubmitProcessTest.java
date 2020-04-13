@@ -119,7 +119,7 @@ public class SubmitProcessTest {
                 };
                 try {
                     metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                            DashboardUtils.OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                            DashboardServerUtils.OME_FILENAME, TIMESTAMP, version, inputStream, true);
                 } finally {
                     reader.close();
                 }
@@ -134,7 +134,7 @@ public class SubmitProcessTest {
                 };
                 try {
                     metadata = metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                            DashboardUtils.PI_OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                            DashboardServerUtils.PI_OME_FILENAME, TIMESTAMP, version, inputStream, true);
                 } finally {
                     reader.close();
                 }
@@ -191,7 +191,7 @@ public class SubmitProcessTest {
             qc.setFlagValue(flag.flagString());
             qc.setFlagDate(new Date());
             qc.setVersion(version);
-            qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+            qc.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
             qc.setComment(comment);
             qc.setDatasetId(EXPOCODE);
             dbHandler.addDatasetQCEvents(Collections.singletonList(qc));

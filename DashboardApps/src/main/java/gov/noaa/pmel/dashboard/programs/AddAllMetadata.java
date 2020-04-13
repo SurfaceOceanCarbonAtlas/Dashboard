@@ -6,9 +6,9 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -88,11 +88,11 @@ public class AddAllMetadata {
                     TreeSet<String> addlDocs = new TreeSet<String>();
                     // Add all existing metadata documents for this dataset
                     for (DashboardMetadata mdata : metaHandler.getMetadataFiles(datasetId)) {
-                        if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ||
-                                mdata.getFilename().equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
+                        if ( mdata.getFilename().equals(DashboardServerUtils.OME_FILENAME) ||
+                                mdata.getFilename().equals(DashboardServerUtils.PI_OME_PDF_FILENAME) ) {
                             // Ignore the OME.xml stub and the PI_OME.pdf file
                         }
-                        else if ( mdata.getFilename().equals(DashboardUtils.PI_OME_FILENAME) ) {
+                        else if ( mdata.getFilename().equals(DashboardServerUtils.PI_OME_FILENAME) ) {
                             // PI-provided OME.xml file - set the OME upload timestamp
                             dataset.setOmeTimestamp(mdata.getUploadTimestamp());
                         }

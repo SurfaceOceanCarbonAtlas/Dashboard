@@ -251,12 +251,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // Get the current metadata documents for the cruise
         MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-        if ( DashboardUtils.OME_FILENAME.equals(deleteFilename) ) {
+        if ( DashboardServerUtils.OME_FILENAME.equals(deleteFilename) ) {
             // Remove the OME XML stub file
             if ( !Boolean.TRUE.equals(dataset.isEditable()) )
                 throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted dataset");
         }
-        else if ( DashboardUtils.PI_OME_FILENAME.equals(deleteFilename) ) {
+        else if ( DashboardServerUtils.PI_OME_FILENAME.equals(deleteFilename) ) {
             // No more PI-provided OME metadata for this cruise
             dataset.setOmeTimestamp(null);
         }
@@ -632,7 +632,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         qc.setUsername(username);
         qc.setFlagDate(new Date());
         qc.setVersion(configStore.getQCVersion());
-        qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+        qc.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
         qc.setComment(comment);
 
         DataFileHandler dataHandler = configStore.getDataFileHandler();

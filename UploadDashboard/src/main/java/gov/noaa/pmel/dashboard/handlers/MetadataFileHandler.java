@@ -626,10 +626,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
                         oldMetaFile.getName() + " does not exist");
 
             // If this is an OME metadata file, read the contents
-            if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
+            if ( DashboardServerUtils.OME_FILENAME.equals(uploadFilename) ) {
                 omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, oldMetaFile);
             }
-            else if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
+            else if ( DashboardServerUtils.PI_OME_FILENAME.equals(uploadFilename) ) {
                 piOmeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, metaDoc, oldMetaFile);
             }
 

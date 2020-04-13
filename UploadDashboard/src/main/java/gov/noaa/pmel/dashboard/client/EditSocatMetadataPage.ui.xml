@@ -14,8 +14,70 @@
                 <g:Label addStyleNames="{style.titlereset}"/>
             </g:FlowPanel>
             <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
-            <g:TabLayoutPanel barHeight="1.5" barUnit="EM" addStyleNames="{style.metaviewtabpanel}" ui:field="metaviewTabPanel">
-            </g:TabLayoutPanel>
+            <g:ResizeLayoutPanel addStyleNames="{style.metaeditpanel}">
+                <g:TabLayoutPanel barUnit='EM' barHeight='2'>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="submitterHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}" ui:field="submitterPanel"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="pisHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}">
+                            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="pisAddButton"/>
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="pisRemoveButton"/>
+                            </g:FlowPanel>
+                            <g:StackLayoutPanel unit='EM' addStyleNames="{style.metastackpanel}" ui:field="pisPanel"/>
+                        </g:FlowPanel>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="platformHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}" ui:field="platformPanel"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="coverageHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}" ui:field="coveragePanel"/>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="varsHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}">
+                            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="varsAddButton"/>
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="varsRemoveButton"/>
+                            </g:FlowPanel>
+                            <g:StackLayoutPanel unit='EM' addStyleNames="{style.metastackpanel}" ui:field="varsPanel"/>
+                        </g:FlowPanel>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="instsHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}">
+                            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="instsAddButton"/>
+                                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="instsRemoveButton"/>
+                            </g:FlowPanel>
+                            <g:StackLayoutPanel unit='EM' addStyleNames="{style.metastackpanel}" ui:field="instsPanel"/>
+                        </g:FlowPanel>
+                    </g:tab>
+                    <g:tab>
+                        <g:customHeader>
+                            <g:HTML addStyleNames="{style.metatablabel}" ui:field="miscInfoHtml"/>
+                        </g:customHeader>
+                        <g:FlowPanel addStyleNames="{style.metatabpanel}" ui:field="miscInfoPanel"/>
+                    </g:tab>
+                </g:TabLayoutPanel>
+            </g:ResizeLayoutPanel>
             <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
                 <g:Button addStyleNames="{style.horizontalbutton}" ui:field="saveButton"/>
                 <g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton"/>

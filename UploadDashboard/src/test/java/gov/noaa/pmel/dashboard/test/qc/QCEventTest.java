@@ -4,6 +4,7 @@
 package gov.noaa.pmel.dashboard.test.qc;
 
 import gov.noaa.pmel.dashboard.qc.QCEvent;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 
@@ -114,7 +115,7 @@ public class QCEventTest {
     @Test
     public void testGetSetRegionID() {
         QCEvent myflag = new QCEvent();
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         myflag.setRegionId(MY_REGION_ID);
         assertEquals(MY_REGION_ID, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
@@ -123,7 +124,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
         assertEquals(DEFAULT_QC_ID, myflag.getId());
         myflag.setRegionId(null);
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
     }
 
     /**
@@ -135,7 +136,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
         myflag.setVersion(MY_VERSION);
         assertEquals(MY_VERSION, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());
@@ -155,7 +156,7 @@ public class QCEventTest {
         myflag.setUsername(MY_USERNAME);
         assertEquals(MY_USERNAME, myflag.getUsername());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());
@@ -176,7 +177,7 @@ public class QCEventTest {
         assertEquals(MY_REALNAME, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());
@@ -198,7 +199,7 @@ public class QCEventTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());

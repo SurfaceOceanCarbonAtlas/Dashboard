@@ -4,7 +4,6 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -344,7 +343,7 @@ public class FixPIsOrgsPlatforms {
             MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 
             for (String expocode : allExpocodes) {
-                DashboardOmeMetadata omeMData = mdataHandler.getOmeFromFile(expocode, DashboardUtils.OME_FILENAME);
+                DashboardOmeMetadata omeMData = mdataHandler.getOmeFromFile(expocode, DashboardServerUtils.OME_FILENAME);
 
                 boolean changed = false;
                 try {

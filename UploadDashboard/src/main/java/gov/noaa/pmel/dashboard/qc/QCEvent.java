@@ -1,5 +1,6 @@
 package gov.noaa.pmel.dashboard.qc;
 
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
@@ -28,7 +29,7 @@ public class QCEvent {
 
     /**
      * Creates an empty QC event where id is zero, the flag date is {@link DashboardUtils#DATE_MISSING_VALUE},
-     * the region ID is {@link DashboardUtils#REGION_ID_GLOBAL}, and all other values (strings) are
+     * the region ID is {@link DashboardServerUtils#REGION_ID_GLOBAL}, and all other values (strings) are
      * {@link DashboardUtils#STRING_MISSING_VALUE}.
      */
     public QCEvent() {
@@ -37,7 +38,7 @@ public class QCEvent {
         flagName = DashboardUtils.STRING_MISSING_VALUE;
         flagValue = DashboardUtils.STRING_MISSING_VALUE;
         datasetId = DashboardUtils.STRING_MISSING_VALUE;
-        regionId = DashboardUtils.REGION_ID_GLOBAL;
+        regionId = DashboardServerUtils.REGION_ID_GLOBAL;
         version = DashboardUtils.STRING_MISSING_VALUE;
         username = DashboardUtils.STRING_MISSING_VALUE;
         realname = DashboardUtils.STRING_MISSING_VALUE;
@@ -146,11 +147,11 @@ public class QCEvent {
 
     /**
      * @param regionId
-     *         the regionId to set; if null, {@link DashboardUtils#REGION_ID_GLOBAL} is assigned
+     *         the regionId to set; if null, {@link DashboardServerUtils#REGION_ID_GLOBAL} is assigned
      */
     public void setRegionId(String regionId) {
         if ( regionId == null )
-            this.regionId = DashboardUtils.REGION_ID_GLOBAL;
+            this.regionId = DashboardServerUtils.REGION_ID_GLOBAL;
         else
             this.regionId = regionId;
     }

@@ -52,62 +52,44 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
 
-    private static final String INTRO_HTML_PROLOGUE =
-            "Supplemental documents associated with the datasets: <ul>";
-    private static final String INTRO_HTML_EPILOGUE =
-            "</ul>";
+    private static final String INTRO_HTML_PROLOGUE = "Supplemental documents associated with the datasets: <ul>";
+    private static final String INTRO_HTML_EPILOGUE = "</ul>";
 
     private static final String UPLOAD_TEXT = "Upload";
-    private static final String UPLOAD_HOVER_HELP =
-            "upload a file that will be added as a new supplemental document, " +
-                    "or replace an existing supplemental document, for the datasets";
+    private static final String UPLOAD_HOVER_HELP = "upload a file that will be added as a new supplemental document, " +
+            "or replace an existing supplemental document, for the datasets";
 
     private static final String DISMISS_TEXT = "Done";
 
-    private static final String NO_FILE_ERROR_MSG =
-            "Please select a document to upload";
+    private static final String NO_FILE_ERROR_MSG = "Please select a document to upload";
 
-    private static final String NO_OME_OVERWRITE_ERROR_MSG =
-            "Documents with the name " + DashboardUtils.OME_FILENAME +
-                    " or " + DashboardUtils.PI_OME_FILENAME +
-                    " cannot to uploaded as supplemental documents.  " +
-                    "Please upload the file under a different name.";
+    private static final String NO_XML_UPLOAD_ERROR_MSG = "XML files cannot to uploaded as supplemental documents.  " +
+            "Please upload XML files as SOCAT metadata.";
 
     private static final String ADDL_DOCS_LIST_FAIL_MSG =
-            "Unexpected problems obtaining the updated supplemental " +
-                    "documents for the datasets";
+            "Unexpected problems obtaining the updated supplemental documents for the datasets";
 
-    private static final String OVERWRITE_WARNING_MSG_PROLOGUE =
-            "This will overwrite the supplemental documents: <ul>";
-    private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
-            "</ul> Do you wish to proceed?";
+    private static final String OVERWRITE_WARNING_MSG_PROLOGUE = "This will overwrite the supplemental documents: <ul>";
+    private static final String OVERWRITE_WARNING_MSG_EPILOGUE = "</ul> Do you wish to proceed?";
     private static final String OVERWRITE_YES_TEXT = "Yes";
     private static final String OVERWRITE_NO_TEXT = "No";
 
     private static final String DELETE_BUTTON_TEXT = "Delete";
 
-    private static final String DELETE_DOC_HTML_PROLOGUE =
-            "This will deleted the supplemental document: <ul><li>";
-    private static final String DELETE_DOC_HTML_EPILOGUE =
-            "</li></ul> Do you wish to proceed?";
+    private static final String DELETE_DOC_HTML_PROLOGUE = "This will deleted the supplemental document: <ul><li>";
+    private static final String DELETE_DOC_HTML_EPILOGUE = "</li></ul> Do you wish to proceed?";
     private static final String DELETE_YES_TEXT = "Yes";
     private static final String DELETE_NO_TEXT = "No";
 
-    private static final String DELETE_DOCS_FAIL_MSG =
-            "Problems deleting supplemental document";
+    private static final String DELETE_DOCS_FAIL_MSG = "Problems deleting supplemental document";
 
-    private static final String UNEXPLAINED_FAIL_MSG =
-            "<h3>Upload failed.</h3>" +
-                    "<p>Unexpectedly, no explanation of the failure was given</p>";
-    private static final String EXPLAINED_FAIL_MSG_START =
-            "<h3>Upload failed.</h3>" +
-                    "<p><pre>\n";
-    private static final String EXPLAINED_FAIL_MSG_END =
-            "</pre></p>";
+    private static final String UNEXPLAINED_FAIL_MSG = "<h3>Upload failed.</h3>" +
+            "<p>Unexpectedly, no explanation of the failure was given</p>";
+    private static final String EXPLAINED_FAIL_MSG_START = "<h3>Upload failed.</h3><p><pre>\n";
+    private static final String EXPLAINED_FAIL_MSG_END = "</pre></p>";
 
     // Replacement strings for empty or null values
-    private static final String EMPTY_TABLE_TEXT =
-            "No supplemental documents";
+    private static final String EMPTY_TABLE_TEXT = "No supplemental documents";
 
     // Column header strings
     private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -236,7 +218,9 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         StringBuilder sb = new StringBuilder();
         sb.append(INTRO_HTML_PROLOGUE);
         for (String expo : datasetIds) {
-            sb.append("<li>" + SafeHtmlUtils.htmlEscape(expo) + "</li>");
+            sb.append("<li>");
+            sb.append(SafeHtmlUtils.htmlEscape(expo));
+            sb.append("</li>");
         }
         sb.append(INTRO_HTML_EPILOGUE);
         introHtml.setHTML(sb.toString());
@@ -304,9 +288,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
         }
 
         // Disallow any overwrite of an OME file
-        if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
-                uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ) {
-            UploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
+        if ( uploadFilename.toUpperCase().endsWith("XML") ) {
+            UploadDashboard.showMessage(NO_XML_UPLOAD_ERROR_MSG);
             return;
         }
 
@@ -344,7 +327,6 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                     @Override
                     public void onFailure(Throwable ex) {
                         // Never called
-                        ;
                     }
                 });
             }
@@ -397,12 +379,9 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
             return;
         }
         resultMsg = resultMsg.trim();
-        if ( resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
-            // Do not show any messages on success;
-            // depend on the updated list of documents to show success
-            ;
-        }
-        else {
+        // Do not show any messages on success;
+        // depend on the updated list of documents to show success
+        if ( !resultMsg.startsWith(DashboardUtils.SUCCESS_HEADER_TAG) ) {
             // Unknown response, just display the entire message
             UploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START +
                     SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
@@ -552,7 +531,6 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
                             @Override
                             public void onFailure(Throwable caught) {
                                 // Never called
-                                ;
                             }
                         }).askQuestion(message);
             }

@@ -226,7 +226,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // Check if there is a PI-provided OME document
         try {
-            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
             FileReader xmlReader = new FileReader(mdataFile);
             sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
             platformName = sdimdata.getPlatform().getPlatformName();
@@ -236,26 +236,26 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         if ( sdimdata == null ) {
             // Use the OME stub (which should always exist)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
                 sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
-                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+                        "Unexpected failure to read " + DashboardServerUtils.OME_FILENAME + " for " + stdId);
             }
         }
         else if ( platformName.isEmpty() ) {
             // PI-provided OME document given, but does not contain the platform name; try to get it
             // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
                 SocatMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
-                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+                        "Unexpected failure to read " + DashboardServerUtils.OME_FILENAME + " for " + stdId);
             }
             if ( !platformName.isEmpty() ) {
                 // Add the platform name to the SDIMetadata object
@@ -471,17 +471,17 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // If it exists, include the (dataset)/PI_OME.xml and PI_OME.pdf files
         // (which are not listed as supplemental documents)
-        File piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+        File piOme = metadataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
         if ( piOme.exists() )
             metaDocs.add(piOme);
-        piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_PDF_FILENAME);
+        piOme = metadataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_PDF_FILENAME);
         if ( piOme.exists() )
             metaDocs.add(piOme);
 
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
             // Exclude the (dataset)/OME.xml stub document
             String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !filename.equals(DashboardServerUtils.OME_FILENAME) ) {
                 metaDocs.add(metadataHandler.getMetadataFile(stdId, filename));
             }
         }

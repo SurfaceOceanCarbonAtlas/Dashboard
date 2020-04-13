@@ -5,10 +5,10 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -115,7 +115,7 @@ public class DatasetModifierTest {
         DashboardDataset dataset = dataFileHandler.getDatasetFromInfoFile(origExpo);
         assertNotNull(dataset);
         String origOwner = dataset.getOwner();
-        DashboardMetadata metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardUtils.OME_FILENAME);
+        DashboardMetadata metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardServerUtils.OME_FILENAME);
         assertNotNull(metadata);
         try {
             metaFileHandler.getOmeFromFile(metadata);
@@ -130,9 +130,9 @@ public class DatasetModifierTest {
         dataset = dataFileHandler.getDatasetFromInfoFile(newExpo);
         assertNotNull(dataset);
         assertEquals(origOwner, dataset.getOwner());
-        metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardUtils.OME_FILENAME);
+        metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardServerUtils.OME_FILENAME);
         assertNull(metadata);
-        metadata = metaFileHandler.getMetadataInfo(newExpo, DashboardUtils.OME_FILENAME);
+        metadata = metaFileHandler.getMetadataInfo(newExpo, DashboardServerUtils.OME_FILENAME);
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {
@@ -148,9 +148,9 @@ public class DatasetModifierTest {
         dataset = dataFileHandler.getDatasetFromInfoFile(origExpo);
         assertNotNull(dataset);
         assertEquals(origOwner, dataset.getOwner());
-        metadata = metaFileHandler.getMetadataInfo(newExpo, DashboardUtils.OME_FILENAME);
+        metadata = metaFileHandler.getMetadataInfo(newExpo, DashboardServerUtils.OME_FILENAME);
         assertNull(metadata);
-        metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardUtils.OME_FILENAME);
+        metadata = metaFileHandler.getMetadataInfo(origExpo, DashboardServerUtils.OME_FILENAME);
         assertNotNull(metadata);
         assertEquals(origOwner, metadata.getOwner());
         try {

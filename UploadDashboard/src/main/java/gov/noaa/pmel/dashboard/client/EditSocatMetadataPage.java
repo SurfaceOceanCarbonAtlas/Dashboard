@@ -9,9 +9,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -38,9 +39,36 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String DONE_TEXT = "Save and Exit";
     private static final String CANCEL_TEXT = "Exit Without Saving";
 
-    private static final String HTML_INTRO_PROLOGUE = "<p>" +
-            "Dataset: <ul><li>";
-    private static final String HTML_INTRO_EPILOGUE = "</li></ul></p>";
+    private static final String HTML_INTRO_PROLOGUE = "<p>Dataset: ";
+    private static final String HTML_INTRO_EPILOGUE = "</p>";
+
+    private static final String SUBMITTER_TAB_TEXT = "Submitter";
+    private static final String INVESTIGATOR_TAB_TEXT = "Investigators";
+    private static final String PLATFORM_TAB_TEXT = "Platform";
+    private static final String COVERAGE_TAB_TEXT = "Coverage";
+    private static final String VARIABLES_TAB_TEXT = "Data fields";
+    private static final String INSTRUMENTS_TAB_TEXT = "Instruments";
+    private static final String MISC_INFO_TAB_TEXT = "Information";
+
+    private static final String SUBMITTER_TAB_HELP = "Contact information for the submitter of this dataset";
+    private static final String INVESTIGATOR_TAB_HELP = "Information about each of the principal investigator of this dataset";
+    private static final String PLATFORM_TAB_HELP = "Information about the platform (ship, mooring, etc.) used in this dataset";
+    private static final String COVERAGE_TAB_HELP = "Information about the spatial and time coverage of this dataset";
+    private static final String VARIABLES_TAB_HELP = "Information about each data field reported in this dataset";
+    private static final String INSTRUMENTS_TAB_HELP = "Information about each instrument used in this dataset";
+    private static final String MISC_INFO_TAB_HELP = "Various information about this dataset not describe elsewhere";
+
+    private static final String ADD_TEXT = "Add another";
+    private static final String REMOVE_TEXT = "Remove current";
+
+    private static final String ADD_INVESTIGATOR_HELP = "Adds a new principal investigator description to the list";
+    private static final String REMOVE_INVESTIGATOR_HELP = "Removes the currently displayed principal investigator description";
+
+    private static final String ADD_VARIABLE_HELP = "Adds a new data field description to the list";
+    private static final String REMOVE_VARIABLE_HELP = "Removes the currently displayed data field description";
+
+    private static final String ADD_INSTRUMENT_HELP = "Adds a new instrument description to the list";
+    private static final String REMOVE_INSTRUMENT_HELP = "Removes the currently displayed instrument description";
 
     interface EditSocatMetadataPageUiBinder extends UiBinder<Widget,EditSocatMetadataPage> {
     }
@@ -59,8 +87,54 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     Button logoutButton;
     @UiField
     HTML introHtml;
+
     @UiField
-    TabLayoutPanel metaviewTabPanel;
+    HTML submitterHtml;
+    @UiField
+    FlowPanel submitterPanel;
+
+    @UiField
+    HTML pisHtml;
+    @UiField
+    Button pisAddButton;
+    @UiField
+    Button pisRemoveButton;
+    @UiField
+    StackLayoutPanel pisPanel;
+
+    @UiField
+    HTML platformHtml;
+    @UiField
+    FlowPanel platformPanel;
+
+    @UiField
+    HTML coverageHtml;
+    @UiField
+    FlowPanel coveragePanel;
+
+    @UiField
+    HTML varsHtml;
+    @UiField
+    Button varsAddButton;
+    @UiField
+    Button varsRemoveButton;
+    @UiField
+    StackLayoutPanel varsPanel;
+
+    @UiField
+    HTML instsHtml;
+    @UiField
+    Button instsAddButton;
+    @UiField
+    Button instsRemoveButton;
+    @UiField
+    StackLayoutPanel instsPanel;
+
+    @UiField
+    HTML miscInfoHtml;
+    @UiField
+    FlowPanel miscInfoPanel;
+
     @UiField
     Button saveButton;
     @UiField
@@ -88,8 +162,39 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         doneButton.setText(DONE_TEXT);
         cancelButton.setText(CANCEL_TEXT);
 
-        // Create the tab panels
-        // TODO: create the tab panels
+        // Assign the HTML for the tabs
+        submitterHtml.setHTML(SUBMITTER_TAB_TEXT);
+        pisHtml.setHTML(INVESTIGATOR_TAB_TEXT);
+        platformHtml.setHTML(PLATFORM_TAB_TEXT);
+        coverageHtml.setHTML(COVERAGE_TAB_TEXT);
+        varsHtml.setHTML(VARIABLES_TAB_TEXT);
+        instsHtml.setHTML(INSTRUMENTS_TAB_TEXT);
+        miscInfoHtml.setHTML(MISC_INFO_TAB_TEXT);
+
+        // Assign the hover helps for the tabs
+        submitterHtml.setTitle(SUBMITTER_TAB_HELP);
+        pisHtml.setTitle(INVESTIGATOR_TAB_HELP);
+        platformHtml.setTitle(PLATFORM_TAB_HELP);
+        coverageHtml.setTitle(COVERAGE_TAB_HELP);
+        varsHtml.setTitle(VARIABLES_TAB_HELP);
+        instsHtml.setTitle(INSTRUMENTS_TAB_HELP);
+        miscInfoHtml.setTitle(MISC_INFO_TAB_HELP);
+
+        // Assign the labels and hover helps for add and remove buttons in the stacks panel tabs
+        pisAddButton.setHTML(ADD_TEXT);
+        pisAddButton.setTitle(ADD_INVESTIGATOR_HELP);
+        pisRemoveButton.setHTML(REMOVE_TEXT);
+        pisRemoveButton.setTitle(REMOVE_INVESTIGATOR_HELP);
+
+        varsAddButton.setHTML(ADD_TEXT);
+        varsAddButton.setTitle(ADD_VARIABLE_HELP);
+        varsRemoveButton.setHTML(REMOVE_TEXT);
+        varsRemoveButton.setTitle(REMOVE_VARIABLE_HELP);
+
+        instsAddButton.setHTML(ADD_TEXT);
+        instsAddButton.setTitle(ADD_INSTRUMENT_HELP);
+        instsRemoveButton.setHTML(REMOVE_TEXT);
+        instsRemoveButton.setTitle(REMOVE_INSTRUMENT_HELP);
     }
 
     /**
@@ -108,7 +213,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username associated with this page matches the given username.
+     * Redisplays the last version of this page if the username associated with this page matches the given
+     * username.
      */
     static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
