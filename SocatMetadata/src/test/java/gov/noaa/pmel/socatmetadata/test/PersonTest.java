@@ -49,7 +49,7 @@ public class PersonTest {
     }
 
     @Test
-    public void testGetSetMiddleInitials() {
+    public void testGetSetMiddle() {
         Person person = new Person();
         assertEquals(EMPTY_STRING, person.getMiddle());
         person.setMiddle(INITIALS);
@@ -108,6 +108,25 @@ public class PersonTest {
         assertEquals(EMPTY_STRING, person.getOrganization());
         person.setOrganization("\t");
         assertEquals(EMPTY_STRING, person.getOrganization());
+    }
+
+    @Test
+    public void testGetReferenceName() {
+        final String UNKNOWN = "Unknown";
+        Person person = new Person();
+        assertEquals(UNKNOWN, person.getReferenceName());
+        person.setLastName(LAST_NAME);
+        assertEquals(LAST_NAME, person.getReferenceName());
+        person.setFirstName(FIRST_NAME);
+        assertEquals(LAST_NAME + ", " + FIRST_NAME, person.getReferenceName());
+        person.setMiddle(INITIALS);
+        assertEquals(LAST_NAME + ", " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
+        person.setLastName(null);
+        assertEquals(UNKNOWN + ", " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
+        person.setFirstName(null);
+        assertEquals(UNKNOWN, person.getReferenceName());
+        person.setLastName(LAST_NAME);
+        assertEquals(LAST_NAME, person.getReferenceName());
     }
 
     @Test
