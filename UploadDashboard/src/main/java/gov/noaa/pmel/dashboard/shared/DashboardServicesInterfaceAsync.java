@@ -267,9 +267,25 @@ public interface DashboardServicesInterfaceAsync {
      *         return the SocatMetadata for the dataset with this ID
      * @param callback
      *         callback to make on success or failure; the onFailure method of the callback will be called if
-     *         authentication fails or if unable to read the SocatMetadta for the dataset.
+     *         authentication fails or if unable to read the SocatMetadata for the dataset.
      */
     void getSocatMetadata(String username, String datasetId, AsyncCallback<SocatMetadata> callback);
+
+    /**
+     * Client side request to save the given SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         save the given SocatMetadata for the dataset with this ID
+     * @param metadata
+     *         SocatMetadata to save
+     * @param callback
+     *         callback to make on success or failure; the onFailure method of the callback will be called
+     *         if authentication fails, if the SocatMetadata does not correspond to the indicated dataset, or
+     *         if unable to save the SocatMetadata for the dataset.
+     */
+    void saveSocatMetadata(String username, String datasetId, SocatMetadata metadata, AsyncCallback<Void> callback);
 
     /**
      * Client-side interface for submitting datasets for QC.

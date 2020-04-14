@@ -122,7 +122,7 @@ public class PersonTest {
         person.setMiddle(INITIALS);
         assertEquals(LAST_NAME + ", " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
         person.setLastName(null);
-        assertEquals(UNKNOWN + ", " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
+        assertEquals(UNKNOWN + " " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
         person.setFirstName(null);
         assertEquals(UNKNOWN, person.getReferenceName());
         person.setLastName(LAST_NAME);

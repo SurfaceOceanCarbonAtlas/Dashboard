@@ -607,6 +607,17 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
+    public void saveSocatMetadata(String pageUsername, String datasetId, SocatMetadata metadata)
+            throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        // TODO: implement
+        throw new IllegalArgumentException("Not yet implemented");
+    }
+
+    @Override
     public void submitDatasetsForQC(String pageUsername, TreeSet<String> idsSet, String archiveStatus,
             String timestamp, boolean repeatSend) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username

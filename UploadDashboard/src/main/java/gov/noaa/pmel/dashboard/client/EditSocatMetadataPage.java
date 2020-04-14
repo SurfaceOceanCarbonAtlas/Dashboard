@@ -9,9 +9,10 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
@@ -20,6 +21,12 @@ import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
+import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
+
+import java.util.ArrayList;
 
 /**
  * Page for preparing to view and edit standard SOCAT metadata.
@@ -32,8 +39,9 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String WELCOME_INTRO = "Logged in as ";
     private static final String LOGOUT_TEXT = "Logout";
 
-    private static final String RETRIEVING_SOCAT_METADATA_MSG = "Retrieving the SOCAT Metadata for ";
     private static final String RETRIEVE_METADATA_FAIL_MSG = "Failed to retrieve the SOCAT Metadata for ";
+    private static final String SAVE_METADATA_FAIL_MSG = "Failed to save the SOCAT Metadata for ";
+    private static final String SAVE_METADATA_SUCCESS_MSG = "Successfully saved the SOCAT Metadata for ";
 
     private static final String SAVE_TEXT = "Save and Continue";
     private static final String DONE_TEXT = "Save and Exit";
@@ -91,49 +99,49 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiField
     HTML submitterHtml;
     @UiField
-    FlowPanel submitterPanel;
+    SimpleLayoutPanel submitterSLPanel;
 
     @UiField
     HTML pisHtml;
     @UiField
-    Button pisAddButton;
+    Button piAddButton;
     @UiField
-    Button pisRemoveButton;
+    Button piRemoveButton;
     @UiField
-    StackLayoutPanel pisPanel;
+    StackLayoutPanel piSLPanel;
 
     @UiField
     HTML platformHtml;
     @UiField
-    FlowPanel platformPanel;
+    SimpleLayoutPanel platformSLPanel;
 
     @UiField
     HTML coverageHtml;
     @UiField
-    FlowPanel coveragePanel;
+    SimpleLayoutPanel coverageSLPanel;
 
     @UiField
     HTML varsHtml;
     @UiField
-    Button varsAddButton;
+    Button varAddButton;
     @UiField
-    Button varsRemoveButton;
+    Button varRemoveButton;
     @UiField
-    StackLayoutPanel varsPanel;
+    StackLayoutPanel varSLPanel;
 
     @UiField
     HTML instsHtml;
     @UiField
-    Button instsAddButton;
+    Button instAddButton;
     @UiField
-    Button instsRemoveButton;
+    Button instRemoveButton;
     @UiField
-    StackLayoutPanel instsPanel;
+    StackLayoutPanel instSLPanel;
 
     @UiField
     HTML miscInfoHtml;
     @UiField
-    FlowPanel miscInfoPanel;
+    SimpleLayoutPanel miscInfoSLPanel;
 
     @UiField
     Button saveButton;
@@ -144,6 +152,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
     private DashboardDataset dataset;
     private SocatMetadata metadata;
+    private InvestigatorPanel submitterPanel;
+    private final ArrayList<InvestigatorPanel> piPanels;
+    private PlatformPanel platformPanel;
+    private CoveragePanel coveragePanel;
+    private final ArrayList<VariablePanel> varPanels;
+    private final ArrayList<InstrumentPanel> instPanels;
+    private MiscInfoPanel miscInfoPanel;
 
     // Singleton instance of this page
     private static EditSocatMetadataPage singleton;
@@ -181,20 +196,25 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         miscInfoHtml.setTitle(MISC_INFO_TAB_HELP);
 
         // Assign the labels and hover helps for add and remove buttons in the stacks panel tabs
-        pisAddButton.setHTML(ADD_TEXT);
-        pisAddButton.setTitle(ADD_INVESTIGATOR_HELP);
-        pisRemoveButton.setHTML(REMOVE_TEXT);
-        pisRemoveButton.setTitle(REMOVE_INVESTIGATOR_HELP);
+        piAddButton.setHTML(ADD_TEXT);
+        piAddButton.setTitle(ADD_INVESTIGATOR_HELP);
+        piRemoveButton.setHTML(REMOVE_TEXT);
+        piRemoveButton.setTitle(REMOVE_INVESTIGATOR_HELP);
 
-        varsAddButton.setHTML(ADD_TEXT);
-        varsAddButton.setTitle(ADD_VARIABLE_HELP);
-        varsRemoveButton.setHTML(REMOVE_TEXT);
-        varsRemoveButton.setTitle(REMOVE_VARIABLE_HELP);
+        varAddButton.setHTML(ADD_TEXT);
+        varAddButton.setTitle(ADD_VARIABLE_HELP);
+        varRemoveButton.setHTML(REMOVE_TEXT);
+        varRemoveButton.setTitle(REMOVE_VARIABLE_HELP);
 
-        instsAddButton.setHTML(ADD_TEXT);
-        instsAddButton.setTitle(ADD_INSTRUMENT_HELP);
-        instsRemoveButton.setHTML(REMOVE_TEXT);
-        instsRemoveButton.setTitle(REMOVE_INSTRUMENT_HELP);
+        instAddButton.setHTML(ADD_TEXT);
+        instAddButton.setTitle(ADD_INSTRUMENT_HELP);
+        instRemoveButton.setHTML(REMOVE_TEXT);
+        instRemoveButton.setTitle(REMOVE_INSTRUMENT_HELP);
+
+        // Create the panel ArrayList
+        piPanels = new ArrayList<InvestigatorPanel>();
+        varPanels = new ArrayList<VariablePanel>();
+        instPanels = new ArrayList<InstrumentPanel>();
     }
 
     /**
@@ -245,7 +265,6 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         introHtml.setHTML(HTML_INTRO_PROLOGUE + expo + HTML_INTRO_EPILOGUE);
 
         UploadDashboard.showWaitCursor();
-        UploadDashboard.showMessage(RETRIEVING_SOCAT_METADATA_MSG + expo);
         service.getSocatMetadata(getUsername(), dataset.getDatasetId(), new AsyncCallback<SocatMetadata>() {
             @Override
             public void onSuccess(SocatMetadata result) {
@@ -262,6 +281,37 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             }
         });
     }
+
+    @UiHandler("piAddButton")
+    void addPiOnClick(ClickEvent event) {
+        // Copy the last investigator information as a first guess but remove the name
+        Investigator pi = (Investigator) (piPanels.get(piPanels.size() - 1).getUpdatedInvestigator().duplicate(null));
+        pi.setLastName(null);
+        pi.setFirstName(null);
+        pi.setMiddle(null);
+        Label header = new Label();
+        InvestigatorPanel panel = new InvestigatorPanel(pi, false, header);
+        piPanels.add(panel);
+        piSLPanel.add(panel, header, 1.0);
+    }
+
+    @UiHandler("piRemoveButton")
+    void removePiOnClick(ClickEvent event) {
+        if ( piPanels.size() < 2 ) {
+            UploadDashboard.showMessage("Cannot have less than one principal investigator");
+            return;
+        }
+        int idx = piSLPanel.getVisibleIndex();
+        if ( idx < 0 ) {
+            UploadDashboard.showMessage("No principal investigator selected");
+            return;
+        }
+        piPanels.remove(idx);
+        piSLPanel.remove(idx);
+    }
+
+    // TODO: implement add and remove for Variables
+    // TODO: implement add and remove for Instruments
 
     @UiHandler("logoutButton")
     void logoutOnClick(ClickEvent event) {
@@ -287,12 +337,90 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         DatasetListPage.showPage();
     }
 
+    /**
+     * Recreate all the panels appropriately for this SOCAT metadata
+     */
     private void showSocatMetadata() {
-        //TODO: implement
+        submitterPanel = new InvestigatorPanel(metadata.getSubmitter(), true, null);
+        submitterSLPanel.setWidget(submitterPanel);
+
+        piPanels.clear();
+        piSLPanel.clear();
+        for (Investigator pi : metadata.getInvestigators()) {
+            Label header = new Label();
+            InvestigatorPanel panel = new InvestigatorPanel(pi, false, header);
+            piPanels.add(panel);
+            piSLPanel.add(panel, header, 1.0);
+        }
+
+        platformPanel = new PlatformPanel(metadata.getPlatform());
+        platformSLPanel.setWidget(platformPanel);
+
+        coveragePanel = new CoveragePanel(metadata.getCoverage());
+        coverageSLPanel.setWidget(coveragePanel);
+
+        varPanels.clear();
+        varSLPanel.clear();
+        for (Variable var : metadata.getVariables()) {
+            Label header = new Label();
+            VariablePanel panel = new VariablePanel(var, header);
+            varPanels.add(panel);
+            varSLPanel.add(panel, header, 1.0);
+        }
+
+        instPanels.clear();
+        instSLPanel.clear();
+        for (Instrument inst : metadata.getInstruments()) {
+            Label header = new Label();
+            InstrumentPanel panel = new InstrumentPanel(inst, header);
+            instPanels.add(panel);
+            instSLPanel.add(panel, header, 1.0);
+        }
+
+        miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
+        miscInfoSLPanel.setWidget(miscInfoPanel);
     }
 
+    /**
+     * Update the metadata from all the associated panels, then send to the server to be saved
+     */
     private void saveSocatMetadata() {
-        //TODO: implement
+        metadata.setSubmitter((Submitter) submitterPanel.getUpdatedInvestigator());
+        ArrayList<Investigator> investigators = new ArrayList<Investigator>(piPanels.size());
+        for (InvestigatorPanel panel : piPanels) {
+            investigators.add(panel.getUpdatedInvestigator());
+        }
+        metadata.setInvestigators(investigators);
+        metadata.setPlatform(platformPanel.getUpdatedPlatform());
+        metadata.setCoverage(coveragePanel.getUpdatedCoverage());
+        ArrayList<Variable> variables = new ArrayList<Variable>(varPanels.size());
+        for (VariablePanel panel : varPanels) {
+            variables.add(panel.getUpdatedVariable());
+        }
+        metadata.setVariables(variables);
+        ArrayList<Instrument> instruments = new ArrayList<Instrument>(instPanels.size());
+        for (InstrumentPanel panel : instPanels) {
+            instruments.add(panel.getUpdatedInstrument());
+        }
+        metadata.setInstruments(instruments);
+        metadata.setMiscInfo(miscInfoPanel.getUpdatedMiscInfo());
+
+        UploadDashboard.showWaitCursor();
+        String expo = SafeHtmlUtils.htmlEscape(dataset.getDatasetId());
+        service.saveSocatMetadata(getUsername(), dataset.getDatasetId(), metadata, new AsyncCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                UploadDashboard.showAutoCursor();
+                UploadDashboard.showMessage(SAVE_METADATA_SUCCESS_MSG + expo);
+
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showAutoCursor();
+                UploadDashboard.showFailureMessage(SAVE_METADATA_FAIL_MSG + expo, ex);
+            }
+        });
     }
 
 }

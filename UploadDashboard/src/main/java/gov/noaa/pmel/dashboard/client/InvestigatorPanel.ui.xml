@@ -1,0 +1,26 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+    <ui:style src="FullWidth.css"/>
+
+    <g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="firstLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="firstBox"/>
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="middleLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="middleBox"/>
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="lastLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="lastBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="idLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="idBox"/>
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="idTypeLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="idTypeBox"/>
+            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="organizationLabel"/>
+            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="organizationBox"/>
+        </g:FlowPanel>
+    </g:FlowPanel>
+
+</ui:UiBinder>

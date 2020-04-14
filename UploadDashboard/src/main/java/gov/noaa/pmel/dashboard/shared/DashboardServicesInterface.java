@@ -307,6 +307,23 @@ public interface DashboardServicesInterface extends RemoteService {
     SocatMetadata getSocatMetadata(String username, String datasetId) throws IllegalArgumentException;
 
     /**
+     * Save the given SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         save the given SocatMetadata for the dataset with this ID
+     * @param metadata
+     *         SocatMetadata to save
+     *
+     * @throws IllegalArgumentException
+     *         if authentication fails,
+     *         if the SocatMetadata does not correspond to the indicated dataset, or
+     *         if unable to save the SocatMetadata for the dataset.
+     */
+    void saveSocatMetadata(String username, String datasetId, SocatMetadata metadata) throws IllegalArgumentException;
+
+    /**
      * Submits datasets named in the given listing for QC.
      *
      * @param username
@@ -342,6 +359,5 @@ public interface DashboardServicesInterface extends RemoteService {
      *         if suspending a dataset fails
      */
     void suspendDatasets(String username, TreeSet<String> datasetIds) throws IllegalArgumentException;
-
 
 }

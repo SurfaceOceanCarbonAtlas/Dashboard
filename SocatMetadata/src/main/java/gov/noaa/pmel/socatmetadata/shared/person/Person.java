@@ -150,19 +150,26 @@ public class Person implements Duplicable, Serializable, IsSerializable {
     /**
      * @return the name of the person in "(lastName), (firstName) (middle)" format;
      *         "Unknown" if lastName and firstName are empty,
-     *         "Unknown, (firstName) (middle)" if lastName is empty but firstName is not,
+     *         "Unknown (firstName) (middle)" if lastName is empty but firstName is not,
      *         "(lastName)" if firstName is empty but lastName is not, regardless of the value of middle.
      */
     public String getReferenceName() {
         String refName;
-        if ( lastName.isEmpty() )
+        if ( lastName.isEmpty() ) {
             refName = "Unknown";
-        else
+            if ( !firstName.isEmpty() ) {
+                refName += " " + firstName;
+                if ( !middle.isEmpty() )
+                    refName += " " + middle;
+            }
+        }
+        else {
             refName = lastName;
-        if ( !firstName.isEmpty() ) {
-            refName += ", " + firstName;
-            if ( !middle.isEmpty() )
-                refName += " " + middle;
+            if ( !firstName.isEmpty() ) {
+                refName += ", " + firstName;
+                if ( !middle.isEmpty() )
+                    refName += " " + middle;
+            }
         }
         return refName;
     }
