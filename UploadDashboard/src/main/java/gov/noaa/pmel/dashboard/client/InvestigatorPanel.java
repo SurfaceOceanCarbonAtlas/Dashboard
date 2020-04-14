@@ -51,18 +51,28 @@ public class InvestigatorPanel extends Composite {
      *
      * @param pi
      *         associate this panel with this Investigator; cannot be null
-     * @param asSubmitter
-     *         if false, only require the Investigator fields;
-     *         if true, require all fields expected for a Submitter
-     *         (pi should be a Submitter class object)
      * @param header
-     *         if not null, header label that should be updated when appropriate values change
+     *         header label that should be updated when appropriate values change; cannot be null.
      */
-    public InvestigatorPanel(Investigator pi, boolean asSubmitter, Label header) {
+    public InvestigatorPanel(Investigator pi, Label header) {
+        this(pi);
+
+        this.header = header;
+        header.setText(pi.getReferenceName());
+    }
+
+    /**
+     * Creates a FlowPanel associated with the given Investigator
+     * but without an associated header label.
+     *
+     * @param pi
+     *         associate this panel with this Investigator; cannot be null
+     */
+    protected InvestigatorPanel(Investigator pi) {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.pi = pi;
-        this.header = header;
+        this.header = null;
 
         firstLabel.setText("First name:");
         firstBox.setText(pi.getFirstName());
@@ -76,9 +86,6 @@ public class InvestigatorPanel extends Composite {
         idTypeBox.setText(pi.getIdType());
         organizationLabel.setText("Organization:");
         organizationBox.setText(pi.getOrganization());
-
-        if ( header != null )
-            header.setText(pi.getReferenceName());
     }
 
     @UiHandler("firstBox")

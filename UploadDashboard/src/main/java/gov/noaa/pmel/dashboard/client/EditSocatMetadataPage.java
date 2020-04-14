@@ -152,7 +152,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
     private DashboardDataset dataset;
     private SocatMetadata metadata;
-    private InvestigatorPanel submitterPanel;
+    private SubmitterPanel submitterPanel;
     private final ArrayList<InvestigatorPanel> piPanels;
     private PlatformPanel platformPanel;
     private CoveragePanel coveragePanel;
@@ -290,7 +290,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         pi.setFirstName(null);
         pi.setMiddle(null);
         Label header = new Label();
-        InvestigatorPanel panel = new InvestigatorPanel(pi, false, header);
+        InvestigatorPanel panel = new InvestigatorPanel(pi, header);
         piPanels.add(panel);
         piSLPanel.add(panel, header, 1.0);
     }
@@ -340,14 +340,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
      * Recreate all the panels appropriately for this SOCAT metadata
      */
     private void showSocatMetadata() {
-        submitterPanel = new InvestigatorPanel(metadata.getSubmitter(), true, null);
+        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
         submitterSLPanel.setWidget(submitterPanel);
 
         piPanels.clear();
         piSLPanel.clear();
         for (Investigator pi : metadata.getInvestigators()) {
             Label header = new Label();
-            InvestigatorPanel panel = new InvestigatorPanel(pi, false, header);
+            InvestigatorPanel panel = new InvestigatorPanel(pi, header);
             piPanels.add(panel);
             piSLPanel.add(panel, header, 1.0);
         }
@@ -384,7 +384,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
      * Update the metadata from all the associated panels, then send to the server to be saved
      */
     private void saveSocatMetadata(boolean exitOnSuccess) {
-        metadata.setSubmitter((Submitter) submitterPanel.getUpdatedInvestigator());
+        metadata.setSubmitter(submitterPanel.getUpdatedSumitter());
         ArrayList<Investigator> investigators = new ArrayList<Investigator>(piPanels.size());
         for (InvestigatorPanel panel : piPanels) {
             investigators.add(panel.getUpdatedInvestigator());
