@@ -28,7 +28,7 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
     private int second;
 
     /**
-     * Create with invalid values ({@link #INVALID}) for year, month, and day.
+     * Create with invalid values ({@link #INVALID}) for year, month, day, hour, minute, and second.
      */
     public Datestamp() {
         year = INVALID;
@@ -40,7 +40,7 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
     }
 
     /**
-     * Create with the given year, month, day, hour, minute, and second.
+     * Create with the given year, month, day, hour, minute, and second integer values.
      * No check is made as to whether this is a valid date.
      */
     public Datestamp(int year, int month, int day, int hour, int minute, int second) {
@@ -54,46 +54,47 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
 
     /**
      * Create with the given year, month, day, hour, minute, and second integer string values
+     * {@link #INVALID} is assigned for any values that are not integer strings.
      * No check is made as to whether this is a valid date.
-     *
-     * @throws IllegalArgumentException
-     *         if any values are null or not integer strings.
      */
-    public Datestamp(String year, String month, String day,
-            String hour, String minute, String second) throws IllegalArgumentException {
+    public Datestamp(String year, String month, String day, String hour, String minute, String second) {
+        this();
         try {
             this.year = Integer.parseInt(year);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid year '" + year + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
         try {
             this.month = Integer.parseInt(month);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid month '" + month + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
         try {
             this.day = Integer.parseInt(day);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid day '" + day + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
         try {
             this.hour = Integer.parseInt(hour);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid hour '" + hour + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
         try {
             this.minute = Integer.parseInt(minute);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid minute '" + minute + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
         try {
             this.second = Integer.parseInt(second);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Invalid second '" + second + "': " + ex.getMessage());
+        } catch ( NullPointerException | NumberFormatException ex ) {
+            // leave as INVALID
         }
     }
 
     /**
+     * Checks if this Datestmap represents a valid date and, if given, time.
+     * Any time components that are {@link #INVALID} are assumed to be zero for this check.
+     *
      * @param today
      *         a Datestamp representing the current day; if null, {@link #DEFAULT_TODAY_DATESTAMP} is used
      *
@@ -101,18 +102,22 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
      *         and not later than the given current day
      */
     public boolean isValid(Datestamp today) {
-        if ( (month < 1) || (month > 12) || (day < 1) || (day > 31) || (hour < 0) ||
-                (hour > 23) || (minute < 0) || (minute > 59) || (second < 0) || (second > 59) )
+        // If hour, minute, or second was not specified, assume zero instead of being invalid
+        int adjHour = (hour == INVALID) ? 0 : hour;
+        int adjMinute = (minute == INVALID) ? 0 : minute;
+        int adjSecond = (second == INVALID) ? 0 : second;
+        if ( (month < 1) || (month > 12) || (day < 1) || (day > 31) || (adjHour < 0) ||
+                (adjHour > 23) || (adjMinute < 0) || (adjMinute > 59) || (adjSecond < 0) || (adjSecond > 59) )
             return false;
         if ( (year < MIN_VALID_DATESTAMP.year) ||
                 ((year == MIN_VALID_DATESTAMP.year) && (month < MIN_VALID_DATESTAMP.month)) ||
                 ((year == MIN_VALID_DATESTAMP.year) && (month == MIN_VALID_DATESTAMP.month) && (day < MIN_VALID_DATESTAMP.day)) ||
                 ((year == MIN_VALID_DATESTAMP.year) && (month == MIN_VALID_DATESTAMP.month) && (day == MIN_VALID_DATESTAMP.day)
-                        && (hour < MIN_VALID_DATESTAMP.hour)) ||
+                        && (adjHour < MIN_VALID_DATESTAMP.hour)) ||
                 ((year == MIN_VALID_DATESTAMP.year) && (month == MIN_VALID_DATESTAMP.month) && (day == MIN_VALID_DATESTAMP.day)
-                        && (hour == MIN_VALID_DATESTAMP.hour) && (minute < MIN_VALID_DATESTAMP.minute)) ||
+                        && (adjHour == MIN_VALID_DATESTAMP.hour) && (adjMinute < MIN_VALID_DATESTAMP.minute)) ||
                 ((year == MIN_VALID_DATESTAMP.year) && (month == MIN_VALID_DATESTAMP.month) && (day == MIN_VALID_DATESTAMP.day)
-                        && (hour == MIN_VALID_DATESTAMP.hour) && (minute == MIN_VALID_DATESTAMP.minute) && (second < MIN_VALID_DATESTAMP.second)) )
+                        && (adjHour == MIN_VALID_DATESTAMP.hour) && (adjMinute == MIN_VALID_DATESTAMP.minute) && (adjSecond < MIN_VALID_DATESTAMP.second)) )
             return false;
         if ( today == null )
             today = DEFAULT_TODAY_DATESTAMP;
@@ -120,11 +125,11 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
                 ((year == today.year) && (month > today.month)) ||
                 ((year == today.year) && (month == today.month) && (day > today.day)) ||
                 ((year == today.year) && (month == today.month) && (day == today.day)
-                        && (hour > today.hour)) ||
+                        && (adjHour > today.hour)) ||
                 ((year == today.year) && (month == today.month) && (day == today.day)
-                        && (hour == today.hour) && (minute > today.minute)) ||
+                        && (adjHour == today.hour) && (adjMinute > today.minute)) ||
                 ((year == today.year) && (month == today.month) && (day == today.day)
-                        && (hour == today.hour) && (minute == today.minute) && (second > today.second)) )
+                        && (adjHour == today.hour) && (adjMinute == today.minute) && (adjSecond > today.second)) )
             return false;
         if ( (day > 30) && ((month == 4) || (month == 6) || (month == 9) || (month == 11)) )
             return false;
@@ -157,27 +162,39 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
     }
 
     /**
-     * @return the time string as HH:mm:ss
+     * @return the time string as:
+     *         HH (if minute is {@link #INVALID}) or
+     *         HH:mm (if second is {@link #INVALID}) or
+     *         HH:mm:ss
      *
      * @throws IllegalArgumentException
-     *         if the Datestamp is invalid
+     *         if the Datestamp is invalid or
+     *         if the hour is invalid
      */
     public String timeString() throws IllegalArgumentException {
         if ( !isValid(null) )
             throw new IllegalArgumentException("invalid date");
+        // hour, minute, or second could be INVALID
+        // but require a valid hour for a time string
+        if ( hour == INVALID )
+            throw new IllegalArgumentException("invalid hour");
         String stamp;
         if ( hour < 10 )
             stamp = "0" + hour;
         else
             stamp = "" + hour;
-        if ( minute < 10 )
-            stamp += ":0" + minute;
-        else
-            stamp += ":" + minute;
-        if ( second < 10 )
-            stamp += ":0" + second;
-        else
-            stamp += ":" + second;
+        if ( minute != INVALID ) {
+            if ( minute < 10 )
+                stamp += ":0" + minute;
+            else
+                stamp += ":" + minute;
+            if ( second != INVALID ) {
+                if ( second < 10 )
+                    stamp += ":0" + second;
+                else
+                    stamp += ":" + second;
+            }
+        }
         return stamp;
     }
 

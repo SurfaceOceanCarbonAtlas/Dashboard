@@ -19,7 +19,10 @@ public class DatestampTest {
     private static final int MINUTE = 23;
     private static final int SECOND = 53;
     private static final String DATESTRING = "2010-06-25";
-    private static final String TIMESTRING = "15:23:53";
+    private static final String FULLTIMESTRING = "15:23:53";
+    private static final String MINUTETIMESTRING = "15:23";
+    private static final String HOURTIMESTRING = "15";
+
 
     @Test
     public void testGetSetYear() {
@@ -107,7 +110,28 @@ public class DatestampTest {
         datestamp.setMinute(MINUTE);
         datestamp.setSecond(SECOND);
         assertEquals(DATESTRING, datestamp.dateString());
-        assertEquals(TIMESTRING, datestamp.timeString());
+        assertEquals(FULLTIMESTRING, datestamp.timeString());
+
+        datestamp.setSecond(Datestamp.INVALID);
+        assertEquals(DATESTRING, datestamp.dateString());
+        assertEquals(MINUTETIMESTRING, datestamp.timeString());
+        datestamp.setSecond(SECOND);
+
+        datestamp.setMinute(Datestamp.INVALID);
+        assertEquals(DATESTRING, datestamp.dateString());
+        assertEquals(HOURTIMESTRING, datestamp.timeString());
+        datestamp.setMinute(MINUTE);
+
+        datestamp.setHour(Datestamp.INVALID);
+        assertEquals(DATESTRING, datestamp.dateString());
+        try {
+            datestamp.timeString();
+            fail("timeString called on an invalid hour datestamp did not throw an exception");
+        } catch ( IllegalArgumentException ex ) {
+            // expected result
+        }
+        datestamp.setHour(HOUR);
+
         datestamp.setYear(2011);
         datestamp.setMonth(2);
         datestamp.setDay(29);
@@ -144,48 +168,59 @@ public class DatestampTest {
         assertEquals(MINUTE, datestamp.getMinute());
         assertEquals(SECOND, datestamp.getSecond());
 
-        try {
-            new Datestamp(null, Integer.toString(MONTH), Integer.toString(DAY),
-                    Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
-            fail("Datestamp constructor with null year succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            new Datestamp(Integer.toString(YEAR), null, Integer.toString(DAY),
-                    Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
-            fail("Datestamp constructor with null month succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), null,
-                    Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
-            fail("Datestamp constructor with null day succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
-                    null, Integer.toString(MINUTE), Integer.toString(SECOND));
-            fail("Datestamp constructor with null hour succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
-                    Integer.toString(HOUR), null, Integer.toString(SECOND));
-            fail("Datestamp constructor with null minute succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
-                    Integer.toString(HOUR), Integer.toString(MINUTE), null);
-            fail("Datestamp constructor with null second succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        datestamp = new Datestamp(null, Integer.toString(MONTH), Integer.toString(DAY),
+                Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
+        assertEquals(Datestamp.INVALID, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+        assertEquals(HOUR, datestamp.getHour());
+        assertEquals(MINUTE, datestamp.getMinute());
+        assertEquals(SECOND, datestamp.getSecond());
+
+        datestamp = new Datestamp(Integer.toString(YEAR), null, Integer.toString(DAY),
+                Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(Datestamp.INVALID, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+        assertEquals(HOUR, datestamp.getHour());
+        assertEquals(MINUTE, datestamp.getMinute());
+        assertEquals(SECOND, datestamp.getSecond());
+
+        datestamp = new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), null,
+                Integer.toString(HOUR), Integer.toString(MINUTE), Integer.toString(SECOND));
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(Datestamp.INVALID, datestamp.getDay());
+        assertEquals(HOUR, datestamp.getHour());
+        assertEquals(MINUTE, datestamp.getMinute());
+        assertEquals(SECOND, datestamp.getSecond());
+
+        datestamp = new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
+                null, Integer.toString(MINUTE), Integer.toString(SECOND));
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+        assertEquals(Datestamp.INVALID, datestamp.getHour());
+        assertEquals(MINUTE, datestamp.getMinute());
+        assertEquals(SECOND, datestamp.getSecond());
+
+        datestamp = new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
+                Integer.toString(HOUR), null, Integer.toString(SECOND));
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+        assertEquals(HOUR, datestamp.getHour());
+        assertEquals(Datestamp.INVALID, datestamp.getMinute());
+        assertEquals(SECOND, datestamp.getSecond());
+
+        datestamp = new Datestamp(Integer.toString(YEAR), Integer.toString(MONTH), Integer.toString(DAY),
+                Integer.toString(HOUR), Integer.toString(MINUTE), null);
+        assertEquals(YEAR, datestamp.getYear());
+        assertEquals(MONTH, datestamp.getMonth());
+        assertEquals(DAY, datestamp.getDay());
+        assertEquals(HOUR, datestamp.getHour());
+        assertEquals(MINUTE, datestamp.getMinute());
+        assertEquals(Datestamp.INVALID, datestamp.getSecond());
     }
 
     @Test
@@ -195,6 +230,48 @@ public class DatestampTest {
 
         datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND);
         assertTrue(datestamp.isValid(null));
+
+        datestamp = new Datestamp(Datestamp.INVALID, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(1899, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(2100, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+
+        datestamp = new Datestamp(YEAR, Datestamp.INVALID, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, 0, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, 13, DAY, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+
+        datestamp = new Datestamp(YEAR, MONTH, Datestamp.INVALID, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, 0, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, 32, HOUR, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY, Datestamp.INVALID, MINUTE, SECOND);
+        assertTrue(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, -2, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, 32, MINUTE, SECOND);
+        assertFalse(datestamp.isValid(null));
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, Datestamp.INVALID, SECOND);
+        assertTrue(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, -2, SECOND);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, 60, SECOND);
+        assertFalse(datestamp.isValid(null));
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, Datestamp.INVALID);
+        assertTrue(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, -2);
+        assertFalse(datestamp.isValid(null));
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, 60);
+        assertFalse(datestamp.isValid(null));
 
         datestamp = new Datestamp(2011, 2, 29, HOUR, MINUTE, SECOND);
         assertFalse(datestamp.isValid(null));

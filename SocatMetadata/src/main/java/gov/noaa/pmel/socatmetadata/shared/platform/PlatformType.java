@@ -31,7 +31,7 @@ public enum PlatformType implements Serializable, IsSerializable {
         PlatformType type;
         try {
             type = PlatformType.valueOf(strVal);
-        } catch ( Exception ex ) {
+        } catch ( IllegalArgumentException ex ) {
             // If not known, "BUOY" matches MOORING
             if ( "BUOY".equals(strVal) )
                 type = MOORING;
