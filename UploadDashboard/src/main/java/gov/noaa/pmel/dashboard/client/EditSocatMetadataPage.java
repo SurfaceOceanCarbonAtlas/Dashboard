@@ -321,14 +321,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiHandler("saveButton")
     void saveButtonOnClick(ClickEvent event) {
         // Save the current SocatMetadata on the server but continue working
-        saveSocatMetadata();
+        saveSocatMetadata(false);
     }
 
     @UiHandler("doneButton")
     void doneButtonOnClick(ClickEvent event) {
-        // Save the current SocatMetadata on the server and exit this page
-        saveSocatMetadata();
-        DatasetListPage.showPage();
+        // Save the current SocatMetadata on the server and exit this page if successful
+        saveSocatMetadata(true);
     }
 
     @UiHandler("cancelButton")
@@ -384,7 +383,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     /**
      * Update the metadata from all the associated panels, then send to the server to be saved
      */
-    private void saveSocatMetadata() {
+    private void saveSocatMetadata(boolean exitOnSuccess) {
         metadata.setSubmitter((Submitter) submitterPanel.getUpdatedInvestigator());
         ArrayList<Investigator> investigators = new ArrayList<Investigator>(piPanels.size());
         for (InvestigatorPanel panel : piPanels) {
@@ -412,7 +411,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             public void onSuccess(Void result) {
                 UploadDashboard.showAutoCursor();
                 UploadDashboard.showMessage(SAVE_METADATA_SUCCESS_MSG + expo);
-
+                if ( exitOnSuccess )
+                    DatasetListPage.showPage();
             }
 
             @Override
