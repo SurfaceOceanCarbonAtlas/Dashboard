@@ -1,10 +1,14 @@
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 
 public class InstrumentPanel extends Composite {
@@ -13,6 +17,11 @@ public class InstrumentPanel extends Composite {
     }
 
     private static InstrumentPanelUiBinder uiBinder = GWT.create(InstrumentPanelUiBinder.class);
+
+    @UiField
+    Label nameLabel;
+    @UiField
+    TextBox nameBox;
 
     private Instrument inst;
     private Label header;
@@ -29,7 +38,23 @@ public class InstrumentPanel extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.inst = inst;
-        header.setText(inst.getName());
+        this.header = header;
+
+        nameLabel.setText("Name:");
+        String name = inst.getName();
+        nameBox.setText(name);
+        if ( name.isEmpty() )
+            name = "Unknown";
+        header.setText(name);
+    }
+
+    @UiHandler("nameBox")
+    void nameBoxOnValueChange(ValueChangeEvent<String> event) {
+        String name = nameBox.getText();
+        inst.setName(name);
+        if ( name.isEmpty() )
+            name = "Unknown";
+        header.setText(name);
     }
 
     /**

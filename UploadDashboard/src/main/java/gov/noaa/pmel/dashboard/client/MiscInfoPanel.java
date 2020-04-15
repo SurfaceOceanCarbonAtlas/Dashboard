@@ -1,9 +1,14 @@
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 
 public class MiscInfoPanel extends Composite {
@@ -12,6 +17,11 @@ public class MiscInfoPanel extends Composite {
     }
 
     private static MiscInfoPanelUiBinder uiBinder = GWT.create(MiscInfoPanelUiBinder.class);
+
+    @UiField
+    Label nameLabel;
+    @UiField
+    TextBox nameBox;
 
     private MiscInfo info;
 
@@ -25,6 +35,14 @@ public class MiscInfoPanel extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.info = info;
+
+        nameLabel.setText("Expocode:");
+        nameBox.setText(info.getDatasetId());
+    }
+
+    @UiHandler("nameBox")
+    void nameBoxOnValueChange(ValueChangeEvent<String> event) {
+        info.setDatasetId(nameBox.getText());
     }
 
     /**

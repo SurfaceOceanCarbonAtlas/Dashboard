@@ -1,0 +1,13 @@
+@CHARSET "UTF-8";
+
+.namebox {
+    display: inline;
+}
+
+.namelabel {
+    display: inline;
+}
+
+.namepanel {
+    display: block;
+}

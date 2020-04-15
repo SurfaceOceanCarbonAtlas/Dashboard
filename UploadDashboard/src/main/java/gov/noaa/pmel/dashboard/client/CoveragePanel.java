@@ -128,69 +128,69 @@ public class CoveragePanel extends Composite {
 
     @UiHandler("spacialBox")
     void spacialBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setSpatialReference(spacialBox.getValue());
+        coverage.setSpatialReference(spacialBox.getText());
     }
 
     @UiHandler("southLatValueBox")
     void southLatValueBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getSouthernLatitude();
-        val.setValueString(southLatValueBox.getValue());
+        val.setValueString(southLatValueBox.getText());
         coverage.setSouthernLatitude(val);
     }
 
     @UiHandler("southLatUnitBox")
     void southLatUnitBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getSouthernLatitude();
-        val.setUnitString(southLatUnitBox.getValue());
+        val.setUnitString(southLatUnitBox.getText());
         coverage.setSouthernLatitude(val);
     }
 
     @UiHandler("northLatValueBox")
     void northLatValueBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getNorthernLatitude();
-        val.setValueString(northLatValueBox.getValue());
+        val.setValueString(northLatValueBox.getText());
         coverage.setNorthernLatitude(val);
     }
 
     @UiHandler("northLatUnitBox")
     void northLatUnitBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getNorthernLatitude();
-        val.setUnitString(northLatUnitBox.getValue());
+        val.setUnitString(northLatUnitBox.getText());
         coverage.setNorthernLatitude(val);
     }
 
     @UiHandler("westLonValueBox")
     void westLonValueBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getWesternLongitude();
-        val.setValueString(westLonValueBox.getValue());
+        val.setValueString(westLonValueBox.getText());
         coverage.setWesternLongitude(val);
     }
 
     @UiHandler("westLonUnitBox")
     void westLonUnitBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getWesternLongitude();
-        val.setUnitString(westLonUnitBox.getValue());
+        val.setUnitString(westLonUnitBox.getText());
         coverage.setWesternLongitude(val);
     }
 
     @UiHandler("eastLonValueBox")
     void eastLonValueBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getEasternLongitude();
-        val.setValueString(eastLonValueBox.getValue());
+        val.setValueString(eastLonValueBox.getText());
         coverage.setEasternLongitude(val);
     }
 
     @UiHandler("eastLonUnitBox")
     void eastLonUnitBoxOnValueChange(ValueChangeEvent<String> event) {
         NumericString val = coverage.getEasternLongitude();
-        val.setUnitString(eastLonUnitBox.getValue());
+        val.setUnitString(eastLonUnitBox.getText());
         coverage.setEasternLongitude(val);
     }
 
     @UiHandler("earlyDateBox")
     void earlyDateBoxOnValueChange(ValueChangeEvent<String> event) {
         Datestamp stamp;
-        String[] pieces = earlyDateBox.getValue().split("[ /:-]");
+        String[] pieces = earlyDateBox.getText().split("[ /:-]");
         switch ( pieces.length ) {
             case 1:
                 stamp = new Datestamp(pieces[0], null, null, null, null, null);
@@ -217,7 +217,7 @@ public class CoveragePanel extends Composite {
     @UiHandler("lateDateBox")
     void lateDateBoxOnValueChange(ValueChangeEvent<String> event) {
         Datestamp stamp;
-        String[] pieces = lateDateBox.getValue().split("[ /:-]");
+        String[] pieces = lateDateBox.getText().split("[ /:-]");
         switch ( pieces.length ) {
             case 1:
                 stamp = new Datestamp(pieces[0], null, null, null, null, null);

@@ -92,38 +92,38 @@ public class InvestigatorPanel extends Composite {
 
     @UiHandler("firstBox")
     void firstBoxOnChange(ChangeEvent event) {
-        pi.setFirstName(firstBox.getValue());
+        pi.setFirstName(firstBox.getText());
         if ( header != null )
             header.setText(pi.getReferenceName());
     }
 
     @UiHandler("middleBox")
     void middleBoxOnChange(ChangeEvent event) {
-        pi.setMiddle(middleBox.getValue());
+        pi.setMiddle(middleBox.getText());
         if ( header != null )
             header.setText(pi.getReferenceName());
     }
 
     @UiHandler("lastBox")
     void lastBoxOnChange(ChangeEvent event) {
-        pi.setLastName(lastBox.getValue());
+        pi.setLastName(lastBox.getText());
         if ( header != null )
             header.setText(pi.getReferenceName());
     }
 
     @UiHandler("idBox")
     void idBoxOnChange(ChangeEvent event) {
-        pi.setId(idBox.getValue());
+        pi.setId(idBox.getText());
     }
 
     @UiHandler("idTypeBox")
     void idTypeBoxOnChange(ChangeEvent event) {
-        pi.setIdType(idTypeBox.getValue());
+        pi.setIdType(idTypeBox.getText());
     }
 
     @UiHandler("organizationBox")
     void organizationBoxOnChange(ChangeEvent event) {
-        pi.setOrganization(organizationBox.getValue());
+        pi.setOrganization(organizationBox.getText());
     }
 
     /**

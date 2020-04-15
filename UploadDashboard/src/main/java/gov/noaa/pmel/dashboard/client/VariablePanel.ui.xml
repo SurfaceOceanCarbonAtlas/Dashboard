@@ -2,10 +2,13 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:style src="FullWidth.css"/>
+    <ui:style src="Variable.css"/>
 
     <g:FlowPanel>
-
+        <g:FlowPanel addStyleNames="{style.namepanel}">
+            <g:Label addStyleNames="{style.namelabel}" ui:field="nameLabel"/>
+            <g:TextBox addStyleNames="{style.namebox}" ui:field="nameBox"/>
+        </g:FlowPanel>
     </g:FlowPanel>
 
 </ui:UiBinder>
