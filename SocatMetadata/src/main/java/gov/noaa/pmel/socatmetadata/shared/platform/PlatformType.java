@@ -8,7 +8,8 @@ public enum PlatformType implements Serializable, IsSerializable {
     UNKNOWN,
     SHIP,
     MOORING,
-    DRIFTING_BUOY;
+    DRIFTING_BUOY,
+    AUTONOMOUS_SURFACE_VEHICLE;
 
     /**
      * The argument is trimmed, all characters converted to uppercase, and all space characters replaced with
@@ -52,6 +53,8 @@ public enum PlatformType implements Serializable, IsSerializable {
                 return "Mooring";
             case DRIFTING_BUOY:
                 return "Drifting Buoy";
+            case AUTONOMOUS_SURFACE_VEHICLE:
+                return "Autonomous Surface Vehicle";
             default:
                 throw new RuntimeException("Unexpected PlatformType of " + super.toString());
 

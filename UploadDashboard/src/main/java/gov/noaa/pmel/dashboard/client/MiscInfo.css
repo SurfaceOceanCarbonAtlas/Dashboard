@@ -1,5 +1,29 @@
 @CHARSET "UTF-8";
 
+.doibox {
+    display: inline;
+}
+
+.doilabel {
+    display: inline;
+}
+
+.doipanel {
+    display: block;
+}
+
+.idbox {
+    display: inline;
+}
+
+.idlabel {
+    display: inline;
+}
+
+.idpanel {
+    display: block;
+}
+
 .namebox {
     display: inline;
 }
@@ -9,5 +33,17 @@
 }
 
 .namepanel {
+    display: block;
+}
+
+.sectionbox {
+    display: inline;
+}
+
+.sectionlabel {
+    display: inline;
+}
+
+.sectionepanel {
     display: block;
 }

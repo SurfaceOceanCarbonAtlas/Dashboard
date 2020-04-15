@@ -1,5 +1,29 @@
 @CHARSET "UTF-8";
 
+.countrybox {
+    display: inline;
+}
+
+.countrylabel {
+    display: inline;
+}
+
+.countrypanel {
+    display: block;
+}
+
+.idbox {
+    display: inline;
+}
+
+.idlabel {
+    display: inline;
+}
+
+.idpanel {
+    display: block;
+}
+
 .namebox {
     display: inline;
 }
@@ -9,5 +33,29 @@
 }
 
 .namepanel {
+    display: block;
+}
+
+.ownerbox {
+    display: inline;
+}
+
+.ownerlabel {
+    display: inline;
+}
+
+.ownerpanel {
+    display: block;
+}
+
+.typebox {
+    display: inline;
+}
+
+.typelabel {
+    display: inline;
+}
+
+.typepanel {
     display: block;
 }

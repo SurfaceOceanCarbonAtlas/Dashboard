@@ -6,6 +6,7 @@ import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.File;
@@ -166,7 +167,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         // Set the platform type - could be missing
         String platformType = omeMData.getPlatformType();
         if ( (platformType == null) || platformType.trim().isEmpty() )
-            platformType = DashboardServerUtils.guessPlatformType(this.datasetId, platformName);
+            platformType = DashboardUtils.guessPlatformType(this.datasetId, platformName);
         scMData.setPlatformType(platformType);
 
         scMData.setWestmostLongitude(omeMData.getWesternLongitude());

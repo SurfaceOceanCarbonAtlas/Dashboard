@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -263,6 +264,19 @@ public class DashboardUtils {
     public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day",
             321.0, "sec of day", "sample second of day",
             false, NO_UNITS);
+
+    /**
+     * NODC codes (all upper-case) for Moorings and Fixed Buoys
+     */
+    public static final HashSet<String> FIXED_PLATFORM_NODC_CODES =
+            new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F", "187F", "18FX", "247F", "24FS",
+                    "267F", "26FS", "297F", "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F", "48MB",
+                    "497F", "49FS", "747F", "74FS", "767F", "77FS", "907F", "91FS", "GH7F"));
+    /**
+     * NODC codes (all upper-case) for Drifting Buoys
+     */
+    public static final HashSet<String> DRIFTING_BUOY_NODC_CODES =
+            new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ", "61DB", "74DZ", "91DB", "99DB"));
 
     /**
      * Encodes an ArrayList of Strings suitable for decoding using {@link #decodeStringArrayList(String)}.
@@ -875,5 +889,37 @@ public class DashboardUtils {
             return msg1.detailedComment.compareTo(msg2.detailedComment);
         }
     };
+
+    /**
+     * Guesses the platform type from the platform name or the expocode. If the platform name indicates it is a
+     * mooring, drifting buoy, or autonomous surface vehicle, or NODC code from the expocode is that of a mooring
+     * or drifting buoy, that type is returned; otherwise it is assumed to be a ship.
+     *
+     * @param expocode
+     *         expocode of the dataset; cannot be null
+     * @param platformName
+     *         platform name for the dataset; cannot be null
+     *
+     * @return one of "Ship", "Mooring", "Drifting Buoy", or "Autonomous Surface Vehicle"
+     */
+    public static String guessPlatformType(String expocode, String platformName) {
+        if ( platformName.toUpperCase().contains("MOORING") )
+            return "Mooring";
+        if ( platformName.toUpperCase().contains("DRIFTING BUOY") )
+            return "Drifting Buoy";
+        if ( platformName.toUpperCase().contains("BUOY") )
+            return "Mooring";
+        if ( platformName.toUpperCase().contains("SAILDRONE") )
+            return "Autonomous Surface Vehicle";
+        if ( platformName.toUpperCase().contains("WAVEGLIDER") )
+            return "Autonomous Surface Vehicle";
+
+        String nodc = expocode.substring(0, 4).toUpperCase();
+        if ( FIXED_PLATFORM_NODC_CODES.contains(nodc) )
+            return "Mooring";
+        if ( DRIFTING_BUOY_NODC_CODES.contains(nodc) )
+            return "Drifting Buoy";
+        return "Ship";
+    }
 
 }

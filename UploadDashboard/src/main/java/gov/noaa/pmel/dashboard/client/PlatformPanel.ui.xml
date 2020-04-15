@@ -5,9 +5,25 @@
     <ui:style src="Platform.css"/>
 
     <g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.idpanel}">
+            <g:Label addStyleNames="{style.idlabel}" ui:field="idLabel"/>
+            <g:TextBox addStyleNames="{style.idbox}" ui:field="idBox"/>
+        </g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.namepanel}">
             <g:Label addStyleNames="{style.namelabel}" ui:field="nameLabel"/>
             <g:TextBox addStyleNames="{style.namebox}" ui:field="nameBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.typepanel}">
+            <g:Label addStyleNames="{style.typelabel}" ui:field="typeLabel"/>
+            <g:ValuePicker addStyleNames="{style.typebox}" ui:field="typeBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.ownerpanel}">
+            <g:Label addStyleNames="{style.ownerlabel}" ui:field="ownerLabel"/>
+            <g:TextBox addStyleNames="{style.ownerbox}" ui:field="ownerBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.countrypanel}">
+            <g:Label addStyleNames="{style.countrylabel}" ui:field="countryLabel"/>
+            <g:TextBox addStyleNames="{style.countrybox}" ui:field="countryBox"/>
         </g:FlowPanel>
     </g:FlowPanel>
 

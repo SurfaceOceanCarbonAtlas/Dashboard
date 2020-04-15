@@ -142,4 +142,18 @@ public class DashboardUtilsTest {
         assertFalse(DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0));
     }
 
+    /**
+     * Test method for {@link DashboardUtils#guessPlatformType(String, String)}.
+     */
+    @Test
+    public void testGuessPlatformType() {
+        assertEquals("Ship", DashboardUtils.guessPlatformType("ABCD", ""));
+        assertEquals("Mooring", DashboardUtils.guessPlatformType("ABCD", "Mooring"));
+        assertEquals("Mooring", DashboardUtils.guessPlatformType("ABCD", "Buoy"));
+        assertEquals("Drifting Buoy", DashboardUtils.guessPlatformType("ABCD", "Drifting Buoy"));
+        assertEquals("Mooring", DashboardUtils.guessPlatformType("3164", ""));
+        assertEquals("Mooring", DashboardUtils.guessPlatformType("91FS", ""));
+        assertEquals("Drifting Buoy", DashboardUtils.guessPlatformType("91DB", ""));
+    }
+
 }

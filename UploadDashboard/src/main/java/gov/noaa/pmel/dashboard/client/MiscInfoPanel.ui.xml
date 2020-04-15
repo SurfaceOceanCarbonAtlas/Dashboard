@@ -6,8 +6,16 @@
 
     <g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.namepanel}">
+            <g:Label addStyleNames="{style.idlabel}" ui:field="idLabel"/>
+            <g:TextBox addStyleNames="{style.idbox}" ui:field="idBox"/>
             <g:Label addStyleNames="{style.namelabel}" ui:field="nameLabel"/>
             <g:TextBox addStyleNames="{style.namebox}" ui:field="nameBox"/>
+            <g:Label addStyleNames="{style.sectionlabel}" ui:field="sectionLabel"/>
+            <g:TextBox addStyleNames="{style.sectionbox}" ui:field="sectionBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.doipanel}">
+            <g:Label addStyleNames="{style.doilabel}" ui:field="doiLabel"/>
+            <g:TextBox addStyleNames="{style.doibox}" ui:field="doiBox"/>
         </g:FlowPanel>
     </g:FlowPanel>
 

@@ -19,20 +19,6 @@ import static org.junit.Assert.assertTrue;
 public class DashboardServerUtilsTest {
 
     /**
-     * Test method for {@link DashboardServerUtils#guessPlatformType(String, String)}.
-     */
-    @Test
-    public void testGuessPlatformType() {
-        assertEquals("Ship", DashboardServerUtils.guessPlatformType("ABCD", ""));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("ABCD", "Mooring"));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("ABCD", "Buoy"));
-        assertEquals("Drifting Buoy", DashboardServerUtils.guessPlatformType("ABCD", "Drifting Buoy"));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("3164", ""));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("91FS", ""));
-        assertEquals("Drifting Buoy", DashboardServerUtils.guessPlatformType("91DB", ""));
-    }
-
-    /**
      * Test method for {@link DashboardServerUtils#getKeyForName(String)}.
      */
     @Test

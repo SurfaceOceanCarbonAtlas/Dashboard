@@ -518,7 +518,7 @@ public class DataUploadService extends HttpServlet {
             }
             // If the platform type is not given, make an educated guess
             if ( platformType == null ) {
-                platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
+                platformType = DashboardUtils.guessPlatformType(datasetId, platformName);
             }
 
             // Clear any dataset QC comments as they were for previous data,

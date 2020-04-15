@@ -12,7 +12,6 @@ import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -374,47 +373,6 @@ public class DashboardServerUtils {
      * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)}
      */
     public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
-
-    /**
-     * NODC codes (all upper-case) for Moorings and Fixed Buoys
-     */
-    private static final HashSet<String> FIXED_PLATFORM_NODC_CODES =
-            new HashSet<String>(Arrays.asList("067F", "08FS", "09FS", "147F", "187F", "18FX", "247F", "24FS",
-                    "267F", "26FS", "297F", "3119", "3164", "317F", "32FS", "33GO", "33TT", "357F", "48MB",
-                    "497F", "49FS", "747F", "74FS", "767F", "77FS", "907F", "91FS", "GH7F"));
-
-    /**
-     * NODC codes (all upper-case) for Drifting Buoys
-     */
-    private static final HashSet<String> DRIFTING_BUOY_NODC_CODES =
-            new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ", "61DB", "74DZ", "91DB", "99DB"));
-
-    /**
-     * Guesses the platform type from the platform name or the expocode. If the platform name or NODC code from the
-     * expocode is that of a mooring or drifting buoy, that type is returned; otherwise it is assumed to be a ship.
-     *
-     * @param expocode
-     *         expocode of the dataset; cannot be null
-     * @param platformName
-     *         platform name for the dataset; cannot be null
-     *
-     * @return one of "Mooring", "Drifting Buoy", or "Ship"
-     */
-    public static String guessPlatformType(String expocode, String platformName) {
-        if ( platformName.toUpperCase().contains("MOORING") )
-            return "Mooring";
-        if ( platformName.toUpperCase().contains("DRIFTING BUOY") )
-            return "Drifting Buoy";
-        if ( platformName.toUpperCase().contains("BUOY") )
-            return "Mooring";
-
-        String nodc = expocode.substring(0, 4).toUpperCase();
-        if ( DashboardServerUtils.FIXED_PLATFORM_NODC_CODES.contains(nodc) )
-            return "Mooring";
-        if ( DashboardServerUtils.DRIFTING_BUOY_NODC_CODES.contains(nodc) )
-            return "Drifting Buoy";
-        return "Ship";
-    }
 
     /**
      * Pattern for {@link #getDatasetIDFromName(String)}
