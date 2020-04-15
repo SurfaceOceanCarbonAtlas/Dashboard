@@ -1,0 +1,101 @@
+@CHARSET "UTF-8";
+
+.datepanel {
+    display: block;
+}
+
+.earlydatebox {
+    display: inline;
+}
+
+.earlydatelabel {
+    display: inline;
+}
+
+.eastlonunitbox {
+    display: inline;
+}
+
+.eastlonvaluebox {
+    display: inline;
+}
+
+.eastlonlabel {
+    display: inline;
+}
+
+.latedatebox {
+    display: inline;
+}
+
+.latedatelabel {
+    display: inline;
+}
+
+.latpanel {
+    display: block;
+}
+
+.lonpanel {
+    display: block;
+}
+
+.northlatunitbox {
+    display: inline;
+}
+
+.northlatvaluebox {
+    display: inline;
+}
+
+.northlatlabel {
+    display: inline;
+}
+
+.regionspanel {
+    display: block;
+}
+
+.regionslabel {
+    display: inline;
+}
+
+.regionsbox {
+    display: inline;
+}
+
+.southlatunitbox {
+    display: inline;
+}
+
+.southlatvaluebox {
+    display: inline;
+}
+
+.southlatlabel {
+    display: inline;
+}
+
+.spatialbox {
+    display: inline;
+}
+
+.spatiallabel {
+    display: inline;
+}
+
+.spatialpanel {
+    display: block;
+}
+
+.westlonunitbox {
+    display: inline;
+}
+
+.westlonvaluebox {
+    display: inline;
+}
+
+.westlonlabel {
+    display: inline;
+}

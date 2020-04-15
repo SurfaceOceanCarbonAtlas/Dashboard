@@ -1,0 +1,61 @@
+@CHARSET "UTF-8";
+
+.namepanel {
+    display: block;
+}
+
+.firstnamelabel {
+    display: inline;
+}
+
+.firstnamebox {
+    display: inline;
+}
+
+.middlenamelabel {
+    display: inline;
+}
+
+.middlenamebox {
+    display: inline;
+}
+
+.lastnamelabel {
+    display: inline;
+}
+
+.lastnamebox {
+    display: inline;
+}
+
+.idpanel {
+    display: block;
+}
+
+.idlabel {
+    display: inline;
+}
+
+.idbox {
+    display: inline;
+}
+
+.idtypelabel {
+    display: inline;
+}
+
+.idtypebox {
+    display: inline;
+}
+
+.orgpanel {
+    display: block;
+}
+
+.orglabel {
+    display: inline;
+}
+
+.orgbox {
+    display: inline;
+}

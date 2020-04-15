@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+
+.metaeditpanel {
+    display: block;
+    width: 85em;
+    height: 35em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.metatablabel {
+    font-size: small;
+}
+
+.metastackpanel {
+    display: block;
+    width: 100%;
+    margin: 0em;
+}
+
+.metatabpanel {
+    display: block;
+    width: 100%;
+    margin: 0em;
+}

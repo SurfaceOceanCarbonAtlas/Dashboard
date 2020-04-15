@@ -2,24 +2,26 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:style src="FullWidth.css"/>
+    <ui:style src="Investigator.css"/>
 
     <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.labeledlistpanel}">
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="firstLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="firstBox"/>
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="middleLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="middleBox"/>
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="lastLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="lastBox"/>
+        <g:FlowPanel addStyleNames="{style.namepanel}">
+            <g:Label addStyleNames="{style.firstnamelabel}" ui:field="firstLabel"/>
+            <g:TextBox addStyleNames="{style.firstnamebox}" ui:field="firstBox"/>
+            <g:Label addStyleNames="{style.middlenamebox}" ui:field="middleLabel"/>
+            <g:TextBox addStyleNames="{style.middlenamebox}" ui:field="middleBox"/>
+            <g:Label addStyleNames="{style.lastnamebox}" ui:field="lastLabel"/>
+            <g:TextBox addStyleNames="{style.lastnamebox}" ui:field="lastBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.labeledlistpanel}">
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="idLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="idBox"/>
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="idTypeLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="idTypeBox"/>
-            <g:Label addStyleNames="{style.labeledlistlabel}" ui:field="organizationLabel"/>
-            <g:TextBox addStyleNames="{style.labeledlistbox}" ui:field="organizationBox"/>
+        <g:FlowPanel addStyleNames="{style.idpanel}">
+            <g:Label addStyleNames="{style.idlabel}" ui:field="idLabel"/>
+            <g:TextBox addStyleNames="{style.idbox}" ui:field="idBox"/>
+            <g:Label addStyleNames="{style.idtypelabel}" ui:field="idTypeLabel"/>
+            <g:TextBox addStyleNames="{style.idtypebox}" ui:field="idTypeBox"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.orgpanel}">
+            <g:Label addStyleNames="{style.orglabel}" ui:field="organizationLabel"/>
+            <g:TextBox addStyleNames="{style.orgbox}" ui:field="organizationBox"/>
         </g:FlowPanel>
     </g:FlowPanel>
 

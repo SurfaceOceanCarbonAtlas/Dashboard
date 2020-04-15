@@ -23,7 +23,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
-import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.ArrayList;
@@ -282,10 +281,58 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         });
     }
 
+    /**
+     * Recreate all the panels appropriately for this SOCAT metadata
+     */
+    private void showSocatMetadata() {
+        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
+        submitterSLPanel.setWidget(submitterPanel);
+
+        piPanels.clear();
+        piSLPanel.clear();
+        for (Investigator pi : metadata.getInvestigators()) {
+            Label header = new Label();
+            InvestigatorPanel panel = new InvestigatorPanel(pi, header);
+            piPanels.add(panel);
+            piSLPanel.add(panel, header, 1.0);
+        }
+        piSLPanel.showWidget(0);
+
+        platformPanel = new PlatformPanel(metadata.getPlatform());
+        platformSLPanel.setWidget(platformPanel);
+
+        coveragePanel = new CoveragePanel(metadata.getCoverage());
+        coverageSLPanel.setWidget(coveragePanel);
+
+        varPanels.clear();
+        varSLPanel.clear();
+        for (Variable var : metadata.getVariables()) {
+            Label header = new Label();
+            VariablePanel panel = new VariablePanel(var, header);
+            varPanels.add(panel);
+            varSLPanel.add(panel, header, 1.0);
+        }
+        varSLPanel.showWidget(0);
+
+        instPanels.clear();
+        instSLPanel.clear();
+        for (Instrument inst : metadata.getInstruments()) {
+            Label header = new Label();
+            InstrumentPanel panel = new InstrumentPanel(inst, header);
+            instPanels.add(panel);
+            instSLPanel.add(panel, header, 1.0);
+        }
+        instSLPanel.showWidget(0);
+
+        miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
+        miscInfoSLPanel.setWidget(miscInfoPanel);
+    }
+
     @UiHandler("piAddButton")
     void addPiOnClick(ClickEvent event) {
-        // Copy the last investigator information as a first guess but remove the name
-        Investigator pi = (Investigator) (piPanels.get(piPanels.size() - 1).getUpdatedInvestigator().duplicate(null));
+        // Copy the last investigator information as a first guess, but remove the name
+        int numPanels = piPanels.size();
+        Investigator pi = (Investigator) (piPanels.get(numPanels - 1).getUpdatedInvestigator().duplicate(null));
         pi.setLastName(null);
         pi.setFirstName(null);
         pi.setMiddle(null);
@@ -293,6 +340,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         InvestigatorPanel panel = new InvestigatorPanel(pi, header);
         piPanels.add(panel);
         piSLPanel.add(panel, header, 1.0);
+        piSLPanel.showWidget(numPanels);
     }
 
     @UiHandler("piRemoveButton")
@@ -308,6 +356,10 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         }
         piPanels.remove(idx);
         piSLPanel.remove(idx);
+        // show what was the next panel if it exists; otherwise the last panel
+        if ( idx == piPanels.size() )
+            idx--;
+        piSLPanel.showWidget(idx);
     }
 
     // TODO: implement add and remove for Variables
@@ -336,51 +388,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         DatasetListPage.showPage();
     }
 
-    /**
-     * Recreate all the panels appropriately for this SOCAT metadata
-     */
-    private void showSocatMetadata() {
-        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
-        submitterSLPanel.setWidget(submitterPanel);
-
-        piPanels.clear();
-        piSLPanel.clear();
-        for (Investigator pi : metadata.getInvestigators()) {
-            Label header = new Label();
-            InvestigatorPanel panel = new InvestigatorPanel(pi, header);
-            piPanels.add(panel);
-            piSLPanel.add(panel, header, 1.0);
-        }
-
-        platformPanel = new PlatformPanel(metadata.getPlatform());
-        platformSLPanel.setWidget(platformPanel);
-
-        coveragePanel = new CoveragePanel(metadata.getCoverage());
-        coverageSLPanel.setWidget(coveragePanel);
-
-        varPanels.clear();
-        varSLPanel.clear();
-        for (Variable var : metadata.getVariables()) {
-            Label header = new Label();
-            VariablePanel panel = new VariablePanel(var, header);
-            varPanels.add(panel);
-            varSLPanel.add(panel, header, 1.0);
-        }
-
-        instPanels.clear();
-        instSLPanel.clear();
-        for (Instrument inst : metadata.getInstruments()) {
-            Label header = new Label();
-            InstrumentPanel panel = new InstrumentPanel(inst, header);
-            instPanels.add(panel);
-            instSLPanel.add(panel, header, 1.0);
-        }
-
-        miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
-        miscInfoSLPanel.setWidget(miscInfoPanel);
-    }
-
-    /**
+     /**
      * Update the metadata from all the associated panels, then send to the server to be saved
      */
     private void saveSocatMetadata(boolean exitOnSuccess) {

@@ -88,6 +88,8 @@ public class InvestigatorPanel extends Composite {
         organizationBox.setText(pi.getOrganization());
     }
 
+    // TODO: complete this panel
+
     @UiHandler("firstBox")
     void firstBoxOnChange(ChangeEvent event) {
         pi.setFirstName(firstBox.getValue());
