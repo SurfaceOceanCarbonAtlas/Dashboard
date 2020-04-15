@@ -8,8 +8,8 @@
         <g:FlowPanel addStyleNames="{style.namepanel}">
             <g:Label addStyleNames="{style.firstnamelabel}" ui:field="firstLabel"/>
             <g:TextBox addStyleNames="{style.firstnamebox}" ui:field="firstBox"/>
-            <g:Label addStyleNames="{style.middlenamebox}" ui:field="middleLabel"/>
-            <g:TextBox addStyleNames="{style.middlenamebox}" ui:field="middleBox"/>
+            <g:Label addStyleNames="{style.middleinitbox}" ui:field="middleLabel"/>
+            <g:TextBox addStyleNames="{style.middleinitbox}" ui:field="middleBox"/>
             <g:Label addStyleNames="{style.lastnamebox}" ui:field="lastLabel"/>
             <g:TextBox addStyleNames="{style.lastnamebox}" ui:field="lastBox"/>
         </g:FlowPanel>

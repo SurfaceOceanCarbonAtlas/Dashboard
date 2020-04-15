@@ -1,38 +1,10 @@
 @CHARSET "UTF-8";
 
-.namepanel {
-    display: block;
-}
-
-.firstnamelabel {
-    display: inline;
-}
-
 .firstnamebox {
     display: inline;
 }
 
-.middlenamelabel {
-    display: inline;
-}
-
-.middlenamebox {
-    display: inline;
-}
-
-.lastnamelabel {
-    display: inline;
-}
-
-.lastnamebox {
-    display: inline;
-}
-
-.idpanel {
-    display: block;
-}
-
-.idlabel {
+.firstnamelabel {
     display: inline;
 }
 
@@ -40,22 +12,50 @@
     display: inline;
 }
 
-.idtypelabel {
+.idlabel {
     display: inline;
+}
+
+.idpanel {
+    display: block;
 }
 
 .idtypebox {
     display: inline;
 }
 
-.orgpanel {
+.idtypelabel {
+    display: inline;
+}
+
+.lastnamebox {
+    display: inline;
+}
+
+.lastnamelabel {
+    display: inline;
+}
+
+.middleinitbox {
+    display: inline;
+}
+
+.middleinitlabel {
+    display: inline;
+}
+
+.namepanel {
     display: block;
+}
+
+.orgbox {
+    display: inline;
 }
 
 .orglabel {
     display: inline;
 }
 
-.orgbox {
-    display: inline;
+.orgpanel {
+    display: block;
 }

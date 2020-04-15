@@ -17,8 +17,8 @@ public class SubmitterPanel extends InvestigatorPanel {
         this.submitter = submitter;
     }
 
-    // The fields in submitter is directly modified by the InvestigatorPanel superclass
-    // so there is little more to add here.
+    // Since there are no additional fields in Submitter,
+    // there is not much to add here.
 
     /**
      * @return the updated Submitter; never null

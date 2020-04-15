@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
-import com.google.gwt.user.client.ui.StackLayoutPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -107,7 +107,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiField
     Button piRemoveButton;
     @UiField
-    StackLayoutPanel piSLPanel;
+    TabLayoutPanel pisTLPanel;
 
     @UiField
     HTML platformHtml;
@@ -126,7 +126,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiField
     Button varRemoveButton;
     @UiField
-    StackLayoutPanel varSLPanel;
+    TabLayoutPanel varsTLPanel;
 
     @UiField
     HTML instsHtml;
@@ -135,7 +135,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiField
     Button instRemoveButton;
     @UiField
-    StackLayoutPanel instSLPanel;
+    TabLayoutPanel instsTLPanel;
 
     @UiField
     HTML miscInfoHtml;
@@ -293,14 +293,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             investigators.add(new Investigator());
 
         piPanels.clear();
-        piSLPanel.clear();
+        pisTLPanel.clear();
         for (Investigator pi : investigators) {
             Label header = new Label();
             InvestigatorPanel panel = new InvestigatorPanel(pi, header);
             piPanels.add(panel);
-            piSLPanel.add(panel, header, 1.0);
+            pisTLPanel.add(panel, header);
         }
-        piSLPanel.showWidget(0);
+        pisTLPanel.selectTab(0);
 
         platformPanel = new PlatformPanel(metadata.getPlatform());
         platformSLPanel.setWidget(platformPanel);
@@ -314,14 +314,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             variables.add(new Variable());
 
         varPanels.clear();
-        varSLPanel.clear();
+        varsTLPanel.clear();
         for (Variable var : variables) {
             Label header = new Label();
             VariablePanel panel = new VariablePanel(var, header);
             varPanels.add(panel);
-            varSLPanel.add(panel, header, 1.0);
+            varsTLPanel.add(panel, header);
         }
-        varSLPanel.showWidget(0);
+        varsTLPanel.selectTab(0);
 
         // Make sure there is at least one instrument specified, even if it is completely blank
         ArrayList<Instrument> instruments = metadata.getInstruments();
@@ -329,14 +329,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             instruments.add(new Instrument());
 
         instPanels.clear();
-        instSLPanel.clear();
+        instsTLPanel.clear();
         for (Instrument inst : instruments) {
             Label header = new Label();
             InstrumentPanel panel = new InstrumentPanel(inst, header);
             instPanels.add(panel);
-            instSLPanel.add(panel, header, 1.0);
+            instsTLPanel.add(panel, header);
         }
-        instSLPanel.showWidget(0);
+        instsTLPanel.selectTab(0);
 
         miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
         miscInfoSLPanel.setWidget(miscInfoPanel);
@@ -344,17 +344,18 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
     @UiHandler("piAddButton")
     void addPiOnClick(ClickEvent event) {
-        // Copy the last investigator information as a first guess, but remove the name
+        // Copy the last investigator information as a first guess, but remove the name and ID
         int numPanels = piPanels.size();
         Investigator pi = (Investigator) (piPanels.get(numPanels - 1).getUpdatedInvestigator().duplicate(null));
         pi.setLastName(null);
         pi.setFirstName(null);
         pi.setMiddle(null);
+        pi.setId(null);
         Label header = new Label();
         InvestigatorPanel panel = new InvestigatorPanel(pi, header);
         piPanels.add(panel);
-        piSLPanel.add(panel, header, 1.0);
-        piSLPanel.showWidget(numPanels);
+        pisTLPanel.add(panel, header);
+        pisTLPanel.selectTab(numPanels);
     }
 
     @UiHandler("piRemoveButton")
@@ -363,17 +364,17 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             UploadDashboard.showMessage("Cannot have less than one principal investigator description");
             return;
         }
-        int idx = piSLPanel.getVisibleIndex();
+        int idx = pisTLPanel.getSelectedIndex();
         if ( idx < 0 ) {
             UploadDashboard.showMessage("No principal investigator description selected");
             return;
         }
         piPanels.remove(idx);
-        piSLPanel.remove(idx);
+        pisTLPanel.remove(idx);
         // show what was the next panel if it exists; otherwise the last panel
         if ( idx == piPanels.size() )
             idx--;
-        piSLPanel.showWidget(idx);
+        pisTLPanel.selectTab(idx);
     }
 
     @UiHandler("varAddButton")
@@ -385,8 +386,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         Label header = new Label();
         VariablePanel panel = new VariablePanel(var, header);
         varPanels.add(panel);
-        varSLPanel.add(panel, header, 1.0);
-        varSLPanel.showWidget(numPanels);
+        varsTLPanel.add(panel, header);
+        varsTLPanel.selectTab(numPanels);
     }
 
     @UiHandler("varRemoveButton")
@@ -395,17 +396,17 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             UploadDashboard.showMessage("Cannot have less than one data field description");
             return;
         }
-        int idx = varSLPanel.getVisibleIndex();
+        int idx = varsTLPanel.getSelectedIndex();
         if ( idx < 0 ) {
             UploadDashboard.showMessage("No data field description selected");
             return;
         }
         varPanels.remove(idx);
-        varSLPanel.remove(idx);
+        varsTLPanel.remove(idx);
         // show what was the next panel if it exists; otherwise the last panel
         if ( idx == varPanels.size() )
             idx--;
-        varSLPanel.showWidget(idx);
+        varsTLPanel.selectTab(idx);
     }
 
     @UiHandler("instAddButton")
@@ -417,8 +418,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         Label header = new Label();
         InstrumentPanel panel = new InstrumentPanel(inst, header);
         instPanels.add(panel);
-        instSLPanel.add(panel, header, 1.0);
-        instSLPanel.showWidget(numPanels);
+        instsTLPanel.add(panel, header);
+        instsTLPanel.selectTab(numPanels);
     }
 
     @UiHandler("instRemoveButton")
@@ -427,17 +428,17 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             UploadDashboard.showMessage("Cannot have less than one instrument description");
             return;
         }
-        int idx = instSLPanel.getVisibleIndex();
+        int idx = instsTLPanel.getSelectedIndex();
         if ( idx < 0 ) {
             UploadDashboard.showMessage("No instrument description selected");
             return;
         }
         instPanels.remove(idx);
-        instSLPanel.remove(idx);
+        instsTLPanel.remove(idx);
         // show what was the next panel if it exists; otherwise the last panel
         if ( idx == instPanels.size() )
             idx--;
-        instSLPanel.showWidget(idx);
+        instsTLPanel.selectTab(idx);
     }
 
     @UiHandler("logoutButton")

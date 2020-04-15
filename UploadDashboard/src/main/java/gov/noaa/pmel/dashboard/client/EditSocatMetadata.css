@@ -1,25 +1,47 @@
 @CHARSET "UTF-8";
 
+.investigatorspanel {
+    display: block;
+    height: 30em;
+    width: 100%;
+}
+
+.instrumentspanel {
+    display: block;
+    height: 30em;
+    width: 100%;
+}
+
 .metaeditpanel {
     display: block;
     width: 85em;
     height: 35em;
-    margin-top: 1em;
-    margin-bottom: 1em;
 }
 
 .metatablabel {
-    font-size: small;
-}
-
-.metastackpanel {
-    display: block;
-    width: 100%;
-    margin: 0em;
+    font-size: medium;
 }
 
 .metatabpanel {
     display: block;
     width: 100%;
-    margin: 0em;
+}
+
+.modifypanel {
+    display: block;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.modifybutton {
+    display: inline;
+    font-size: medium;
+    width: 12em;
+    margin-left: 3em;
+}
+
+.variablespanel {
+    display: block;
+    height: 30em;
+    width: 100%;
 }
