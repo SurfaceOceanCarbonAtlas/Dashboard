@@ -5,9 +5,11 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 
@@ -19,9 +21,57 @@ public class MiscInfoPanel extends Composite {
     private static MiscInfoPanelUiBinder uiBinder = GWT.create(MiscInfoPanelUiBinder.class);
 
     @UiField
+    Label idLabel;
+    @UiField
+    TextBox idBox;
+    @UiField
     Label nameLabel;
     @UiField
     TextBox nameBox;
+    @UiField
+    Label sectionLabel;
+    @UiField
+    TextBox sectionBox;
+    @UiField
+    Label doiLabel;
+    @UiField
+    TextBox doiBox;
+    @UiField
+    Label accessLabel;
+    @UiField
+    TextBox accessBox;
+    @UiField
+    Label citationLabel;
+    @UiField
+    TextBox citationBox;
+    @UiField
+    Label websiteLabel;
+    @UiField
+    TextBox websiteBox;
+    @UiField
+    Label downloadLabel;
+    @UiField
+    TextBox downloadBox;
+    @UiField
+    Label fundAgencyLabel;
+    @UiField
+    TextBox fundAgencyBox;
+    @UiField
+    Label fundTitleLabel;
+    @UiField
+    TextBox fundTitleBox;
+    @UiField
+    Label fundIdLabel;
+    @UiField
+    TextBox fundIdBox;
+    @UiField
+    Label projectLabel;
+    @UiField
+    TextBox projectBox;
+    @UiField
+    CaptionPanel synopsisPanel;
+    @UiField
+    TextArea synopsisBox;
 
     private MiscInfo info;
 

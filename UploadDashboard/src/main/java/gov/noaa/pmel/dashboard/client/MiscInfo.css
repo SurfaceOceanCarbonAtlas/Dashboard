@@ -1,5 +1,32 @@
 @CHARSET "UTF-8";
 
+.accessbox {
+    display: block;
+}
+
+.accesslabel {
+    display: inline;
+}
+
+.addninfobox {
+}
+
+.addninfopanel {
+    display: block;
+}
+
+.citationbox {
+    display: inline;
+}
+
+.citationlabel {
+    display: inline;
+}
+
+.citationpanel {
+    display: block;
+}
+
 .doibox {
     display: inline;
 }
@@ -12,16 +39,59 @@
     display: block;
 }
 
+.downloadbox {
+    display: inline;
+}
+
+.downloadlabel {
+    display: inline;
+}
+
+.downloadpanel {
+    display: block;
+}
+
+.fundagencygbox {
+    display: inline;
+}
+
+.fundagencylabel {
+    display: inline;
+}
+
+.fundidbox {
+    display: inline;
+}
+
+.fundidlabel {
+    display: inline;
+}
+
+.fundingpanel {
+    display: block;
+}
+
+.fundtitlegbox {
+    display: inline;
+}
+
+.fundtitlelabel {
+    display: inline;
+}
+
+.historybox {
+}
+
+.historypanel {
+    display: block;
+}
+
 .idbox {
     display: inline;
 }
 
 .idlabel {
     display: inline;
-}
-
-.idpanel {
-    display: block;
 }
 
 .namebox {
@@ -36,6 +106,39 @@
     display: block;
 }
 
+.portsbox {
+}
+
+.portspanel {
+    display: block;
+}
+
+.projectbox {
+    display: inline;
+}
+
+.projectlabel {
+    display: inline;
+}
+
+.projectpanel {
+    display: block;
+}
+
+.purposebox {
+}
+
+.purposepanel {
+    display: block;
+}
+
+.refsbox {
+}
+
+.refspanel {
+    display: block;
+}
+
 .sectionbox {
     display: inline;
 }
@@ -44,6 +147,22 @@
     display: inline;
 }
 
-.sectionepanel {
+.synopsisbox {
+    display: inline;
+}
+
+.synopsispanel {
+    display: block;
+}
+
+.websitebox {
+    display: inline;
+}
+
+.websitelabel {
+    display: inline;
+}
+
+.websitepanel {
     display: block;
 }
