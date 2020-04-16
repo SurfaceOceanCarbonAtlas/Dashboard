@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class MiscInfo implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -1909667320671892135L;
+    private static final long serialVersionUID = -4025979225204814723L;
 
     protected String datasetId;
     protected String datasetName;
@@ -30,8 +30,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
     protected ArrayList<String> references;
     protected ArrayList<String> portsOfCall;
     protected ArrayList<String> addnInfo;
-    protected Datestamp startDatestamp;
-    protected Datestamp endDatestamp;
     protected ArrayList<Datestamp> history;
 
     /**
@@ -55,38 +53,16 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         references = new ArrayList<String>();
         portsOfCall = new ArrayList<String>();
         addnInfo = new ArrayList<String>();
-        startDatestamp = new Datestamp();
-        endDatestamp = new Datestamp();
         history = new ArrayList<Datestamp>();
     }
 
     /**
-     * @param today
-     *         a Datestamp representing the current day; if null, {@link Datestamp#DEFAULT_TODAY_DATESTAMP} is used
-     *
      * @return list of field names that are currently invalid
      */
-    public HashSet<String> invalidFieldNames(Datestamp today) {
+    public HashSet<String> invalidFieldNames() {
         HashSet<String> invalid = new HashSet<String>();
         if ( datasetId.isEmpty() )
             invalid.add("datasetId");
-
-        if ( startDatestamp.isValid(today) ) {
-            if ( endDatestamp.isValid(today) ) {
-                if ( startDatestamp.after(endDatestamp) ) {
-                    invalid.add("startDatestamp");
-                    invalid.add("endDatestamp");
-                }
-            }
-            else {
-                invalid.add("endDatestamp");
-            }
-        }
-        else {
-            invalid.add("startDatestamp");
-            if ( !endDatestamp.isValid(today) )
-                invalid.add("endDatestamp");
-        }
 
         return invalid;
     }
@@ -431,38 +407,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
     }
 
     /**
-     * @return the starting date for this dataset; never null but may be an invalid Datestamp
-     */
-    public Datestamp getStartDatestamp() {
-        return (Datestamp) (startDatestamp.duplicate(null));
-    }
-
-    /**
-     * @param startDatestamp
-     *         assign as the starting date for this dataset;
-     *         if null, an invalid Datestamp will be assigned.
-     */
-    public void setStartDatestamp(Datestamp startDatestamp) {
-        this.startDatestamp = (startDatestamp != null) ? (Datestamp) (startDatestamp.duplicate(null)) : new Datestamp();
-    }
-
-    /**
-     * @return the ending date for this dataset; never null but may be an invalid Datestamp
-     */
-    public Datestamp getEndDatestamp() {
-        return (Datestamp) (endDatestamp.duplicate(null));
-    }
-
-    /**
-     * @param endDatestamp
-     *         assign as the ending date for this dataset;
-     *         if null, an invalid Datestamp will be assigned.
-     */
-    public void setEndDatestamp(Datestamp endDatestamp) {
-        this.endDatestamp = (endDatestamp != null) ? (Datestamp) (endDatestamp.duplicate(null)) : new Datestamp();
-    }
-
-    /**
      * @return the submission date history list for this dataset; never null but maybe be empty.
      *         Any dates present are guaranteed to be valid.
      */
@@ -531,8 +475,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         info.references = new ArrayList<String>(references);
         info.portsOfCall = new ArrayList<String>(portsOfCall);
         info.addnInfo = new ArrayList<String>(addnInfo);
-        info.startDatestamp = (Datestamp) (startDatestamp.duplicate(null));
-        info.endDatestamp = (Datestamp) (endDatestamp.duplicate(null));
         info.history = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
             info.history.add((Datestamp) (datestamp.duplicate(null)));
@@ -549,47 +491,43 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         if ( !(obj instanceof MiscInfo) )
             return false;
 
-        MiscInfo miscInfo = (MiscInfo) obj;
+        MiscInfo other = (MiscInfo) obj;
 
-        if ( !datasetId.equals(miscInfo.datasetId) )
+        if ( !datasetId.equals(other.datasetId) )
             return false;
-        if ( !datasetName.equals(miscInfo.datasetName) )
+        if ( !datasetName.equals(other.datasetName) )
             return false;
-        if ( !sectionName.equals(miscInfo.sectionName) )
+        if ( !sectionName.equals(other.sectionName) )
             return false;
-        if ( !fundingAgency.equals(miscInfo.fundingAgency) )
+        if ( !fundingAgency.equals(other.fundingAgency) )
             return false;
-        if ( !fundingTitle.equals(miscInfo.fundingTitle) )
+        if ( !fundingTitle.equals(other.fundingTitle) )
             return false;
-        if ( !fundingId.equals(miscInfo.fundingId) )
+        if ( !fundingId.equals(other.fundingId) )
             return false;
-        if ( !researchProject.equals(miscInfo.researchProject) )
+        if ( !researchProject.equals(other.researchProject) )
             return false;
-        if ( !datasetDoi.equals(miscInfo.datasetDoi) )
+        if ( !datasetDoi.equals(other.datasetDoi) )
             return false;
-        if ( !accessId.equals(miscInfo.accessId) )
+        if ( !accessId.equals(other.accessId) )
             return false;
-        if ( !website.equals(miscInfo.website) )
+        if ( !website.equals(other.website) )
             return false;
-        if ( !downloadUrl.equals(miscInfo.downloadUrl) )
+        if ( !downloadUrl.equals(other.downloadUrl) )
             return false;
-        if ( !citation.equals(miscInfo.citation) )
+        if ( !citation.equals(other.citation) )
             return false;
-        if ( !synopsis.equals(miscInfo.synopsis) )
+        if ( !synopsis.equals(other.synopsis) )
             return false;
-        if ( !purpose.equals(miscInfo.purpose) )
+        if ( !purpose.equals(other.purpose) )
             return false;
-        if ( !references.equals(miscInfo.references) )
+        if ( !references.equals(other.references) )
             return false;
-        if ( !portsOfCall.equals(miscInfo.portsOfCall) )
+        if ( !portsOfCall.equals(other.portsOfCall) )
             return false;
-        if ( !addnInfo.equals(miscInfo.addnInfo) )
+        if ( !addnInfo.equals(other.addnInfo) )
             return false;
-        if ( !startDatestamp.equals(miscInfo.startDatestamp) )
-            return false;
-        if ( !endDatestamp.equals(miscInfo.endDatestamp) )
-            return false;
-        if ( !history.equals(miscInfo.history) )
+        if ( !history.equals(other.history) )
             return false;
         return true;
     }
@@ -614,8 +552,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         result = result * prime + references.hashCode();
         result = result * prime + portsOfCall.hashCode();
         result = result * prime + addnInfo.hashCode();
-        result = result * prime + startDatestamp.hashCode();
-        result = result * prime + endDatestamp.hashCode();
         result = result * prime + history.hashCode();
         return result;
     }
@@ -640,11 +576,8 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
                 ", references=" + references +
                 ", portsOfCall=" + portsOfCall +
                 ", addnInfo=" + addnInfo +
-                ", startDatestamp=" + startDatestamp +
-                ", endDatestamp=" + endDatestamp +
                 ", history=" + history +
                 '}';
     }
 
 }
-

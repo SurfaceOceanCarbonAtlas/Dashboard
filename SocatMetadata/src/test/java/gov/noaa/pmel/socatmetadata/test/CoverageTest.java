@@ -25,6 +25,7 @@ public class CoverageTest {
 
     private static final NumericString EMPTY_LONGITUDE = new NumericString(null, Coverage.LONGITUDE_UNITS);
     private static final NumericString EMPTY_LATITUDE = new NumericString(null, Coverage.LATITUDE_UNITS);
+    private static final Datestamp EMPTY_DATESTAMP = new Datestamp();
     private static final TreeSet<String> EMPTY_NAMESET = new TreeSet<String>();
 
     private static final NumericString WESTERN_LONGITUDE = new NumericString("146.23", Coverage.LONGITUDE_UNITS);
@@ -37,8 +38,11 @@ public class CoverageTest {
             "Tropical Pacific"
     ));
 
+    private static final Datestamp START_DATESTAMP = new Datestamp(2015, 1, 5, -1, -1, -1);
     private static final Datestamp EARLIEST_DATA_DATE = new Datestamp(2015, 1, 5, 13, 25, 53);
     private static final Datestamp LATEST_DATA_DATE = new Datestamp(2015, 2, 14, 19, 4, 23);
+    private static final Datestamp END_DATESTAMP = new Datestamp(2015, 2, 14, -1, -1, -1);
+
     private static final Datestamp TODAY;
     private static final Datestamp TOO_LONG_AGO;
     private static final Datestamp IN_THE_FUTURE;
@@ -245,6 +249,53 @@ public class CoverageTest {
     }
 
     @Test
+    public void testGetSetStartDatestamp() {
+        Coverage coverage = new Coverage();
+        assertEquals(EMPTY_DATESTAMP, coverage.getStartDatestamp());
+
+        coverage.setStartDatestamp(START_DATESTAMP);
+        Datestamp stamp = coverage.getStartDatestamp();
+        assertEquals(START_DATESTAMP, stamp);
+        assertNotSame(START_DATESTAMP, stamp);
+        assertNotSame(stamp, coverage.getStartDatestamp());
+        assertEquals(EMPTY_DATESTAMP, coverage.getLatestDataDate());
+        assertEquals(EMPTY_DATESTAMP, coverage.getEarliestDataDate());
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
+
+        coverage.setStartDatestamp(null);
+        assertEquals(EMPTY_DATESTAMP, coverage.getStartDatestamp());
+        coverage.setStartDatestamp(EMPTY_DATESTAMP);
+        assertEquals(EMPTY_DATESTAMP, coverage.getStartDatestamp());
+    }
+
+    @Test
+    public void testGetSetEndDatestamp() {
+        Coverage coverage = new Coverage();
+        assertEquals(EMPTY_DATESTAMP, coverage.getEndDatestamp());
+
+        coverage.setEndDatestamp(END_DATESTAMP);
+        Datestamp stamp = coverage.getEndDatestamp();
+        assertEquals(END_DATESTAMP, stamp);
+        assertNotSame(END_DATESTAMP, stamp);
+        assertNotSame(stamp, coverage.getEndDatestamp());
+        assertEquals(EMPTY_DATESTAMP, coverage.getStartDatestamp());
+        assertEquals(EMPTY_DATESTAMP, coverage.getLatestDataDate());
+        assertEquals(EMPTY_DATESTAMP, coverage.getEarliestDataDate());
+        assertEquals(EMPTY_LATITUDE, coverage.getNorthernLatitude());
+        assertEquals(EMPTY_LATITUDE, coverage.getSouthernLatitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getEasternLongitude());
+        assertEquals(EMPTY_LONGITUDE, coverage.getWesternLongitude());
+
+        coverage.setEndDatestamp(null);
+        assertEquals(EMPTY_DATESTAMP, coverage.getEndDatestamp());
+        coverage.setEndDatestamp(EMPTY_DATESTAMP);
+        assertEquals(EMPTY_DATESTAMP, coverage.getEndDatestamp());
+    }
+
+    @Test
     public void testGetSetSpatialReference() {
         Coverage coverage = new Coverage();
         assertEquals(Coverage.WGS84, coverage.getSpatialReference());
@@ -305,40 +356,29 @@ public class CoverageTest {
     }
 
     @Test
-    public void testCoverage() {
-        Coverage coverage = new Coverage(null, null, null, null, null, null);
-        assertEquals(new Coverage(), coverage);
-        coverage = new Coverage(WESTERN_LONGITUDE.getValueString(), EASTERN_LONGITUDE.getValueString(),
-                SOUTHERN_LATITUDE.getValueString(), NORTHERN_LATITUDE.getValueString(),
-                EARLIEST_DATA_DATE, LATEST_DATA_DATE);
-        assertEquals(WESTERN_LONGITUDE, coverage.getWesternLongitude());
-        assertEquals(EASTERN_LONGITUDE, coverage.getEasternLongitude());
-        assertEquals(SOUTHERN_LATITUDE, coverage.getSouthernLatitude());
-        assertEquals(NORTHERN_LATITUDE, coverage.getNorthernLatitude());
-        assertEquals(EARLIEST_DATA_DATE, coverage.getEarliestDataDate());
-        assertEquals(LATEST_DATA_DATE, coverage.getLatestDataDate());
-        assertEquals(Coverage.WGS84, coverage.getSpatialReference());
-        assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
-    }
-
-    @Test
     public void testInvalidFieldNames() {
         Coverage coverage = new Coverage();
         assertEquals(new HashSet<String>(Arrays.asList("westernLongitude", "easternLongitude", "southernLatitude",
-                "northernLatitude", "earliestDataDate", "latestDataDate")), coverage.invalidFieldNames(TODAY));
+                "northernLatitude", "earliestDataDate", "latestDataDate", "startDatestamp", "endDatestamp")),
+                coverage.invalidFieldNames(TODAY));
 
         coverage.setWesternLongitude(WESTERN_LONGITUDE);
         coverage.setEasternLongitude(EASTERN_LONGITUDE);
-        assertEquals(new HashSet<String>(Arrays.asList("southernLatitude", "northernLatitude",
-                "earliestDataDate", "latestDataDate")), coverage.invalidFieldNames(TODAY));
+        assertEquals(new HashSet<String>(Arrays.asList("southernLatitude", "northernLatitude", "earliestDataDate",
+                "latestDataDate", "startDatestamp", "endDatestamp")), coverage.invalidFieldNames(TODAY));
 
         coverage.setSouthernLatitude(SOUTHERN_LATITUDE);
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
-        assertEquals(new HashSet<String>(Arrays.asList(
-                "earliestDataDate", "latestDataDate")), coverage.invalidFieldNames(TODAY));
+        assertEquals(new HashSet<String>(Arrays.asList("earliestDataDate", "latestDataDate",
+                "startDatestamp", "endDatestamp")), coverage.invalidFieldNames(TODAY));
 
         coverage.setEarliestDataDate(EARLIEST_DATA_DATE);
         coverage.setLatestDataDate(LATEST_DATA_DATE);
+        assertEquals(new HashSet<String>(Arrays.asList("startDatestamp", "endDatestamp")),
+                coverage.invalidFieldNames(TODAY));
+
+        coverage.setStartDatestamp(START_DATESTAMP);
+        coverage.setEndDatestamp(END_DATESTAMP);
         assertEquals(new HashSet<String>(), coverage.invalidFieldNames(TODAY));
 
         coverage.setWesternLongitude(EASTERN_LONGITUDE);
@@ -357,6 +397,17 @@ public class CoverageTest {
         coverage.setLatestDataDate(EARLIEST_DATA_DATE);
         assertEquals(new HashSet<String>(Arrays.asList(
                 "earliestDataDate", "latestDataDate")), coverage.invalidFieldNames(TODAY));
+        coverage.setEarliestDataDate(EARLIEST_DATA_DATE);
+        coverage.setLatestDataDate(LATEST_DATA_DATE);
+        assertEquals(new HashSet<String>(), coverage.invalidFieldNames(TODAY));
+
+        coverage.setStartDatestamp(LATEST_DATA_DATE);
+        coverage.setEndDatestamp(EARLIEST_DATA_DATE);
+        assertEquals(new HashSet<String>(Arrays.asList("startDatestamp", "endDatestamp")),
+                coverage.invalidFieldNames(TODAY));
+        coverage.setStartDatestamp(EARLIEST_DATA_DATE);
+        coverage.setEndDatestamp(LATEST_DATA_DATE);
+        assertEquals(new HashSet<String>(), coverage.invalidFieldNames(TODAY));
     }
 
     @Test
@@ -372,6 +423,8 @@ public class CoverageTest {
         coverage.setNorthernLatitude(NORTHERN_LATITUDE);
         coverage.setEarliestDataDate(EARLIEST_DATA_DATE);
         coverage.setLatestDataDate(LATEST_DATA_DATE);
+        coverage.setStartDatestamp(START_DATESTAMP);
+        coverage.setEndDatestamp(END_DATESTAMP);
         coverage.setSpatialReference(SPATIAL_REFERENCE);
         coverage.setGeographicNames(GEOGRAPHIC_NAMES);
         assertNotEquals(coverage, dup);
@@ -384,6 +437,8 @@ public class CoverageTest {
         assertNotSame(coverage.getSouthernLatitude(), dup.getSouthernLatitude());
         assertNotSame(coverage.getNorthernLatitude(), dup.getNorthernLatitude());
         assertNotSame(coverage.getEarliestDataDate(), dup.getEarliestDataDate());
+        assertNotSame(coverage.getStartDatestamp(), dup.getStartDatestamp());
+        assertNotSame(coverage.getEndDatestamp(), dup.getEndDatestamp());
         assertNotSame(coverage.getLatestDataDate(), dup.getLatestDataDate());
         assertNotSame(coverage.getGeographicNames(), dup.getGeographicNames());
     }
@@ -437,6 +492,20 @@ public class CoverageTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setLatestDataDate(LATEST_DATA_DATE);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setStartDatestamp(START_DATESTAMP);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setStartDatestamp(START_DATESTAMP);
+        assertEquals(first.hashCode(), second.hashCode());
+        assertTrue(first.equals(second));
+
+        first.setEndDatestamp(END_DATESTAMP);
+        assertNotEquals(first.hashCode(), second.hashCode());
+        assertFalse(first.equals(second));
+        second.setEndDatestamp(END_DATESTAMP);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

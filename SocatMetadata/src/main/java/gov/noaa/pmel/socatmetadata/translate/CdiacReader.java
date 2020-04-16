@@ -368,16 +368,6 @@ public class CdiacReader extends DocumentHandler {
         }
         info.setHistory(history);
 
-        // If the "cruise" start and end dates are not specified, use the temporal coverage dates
-        Datestamp datestamp = getDatestamp(getElementText(null, START_DATE_ELEMENT_NAME));
-        if ( datestamp == null )
-            datestamp = getDatestamp(getElementText(null, TEMP_START_DATE_ELEMENT_NAME));
-        info.setStartDatestamp(datestamp);
-        datestamp = getDatestamp(getElementText(null, END_DATE_ELEMENT_NAME));
-        if ( datestamp == null )
-            datestamp = getDatestamp(getElementText(null, TEMP_END_DATE_ELEMENT_NAME));
-        info.setEndDatestamp(datestamp);
-
         ArrayList<String> portsOfCall = new ArrayList<String>();
         for (Element portElem : getElementList(null, PORT_OF_CALL_ELEMENT_NAME)) {
             String port = portElem.getTextTrim();
@@ -478,12 +468,25 @@ public class CdiacReader extends DocumentHandler {
         coverage.setNorthernLatitude(
                 getNumericString(getElementText(null, NORTH_BOUND_ELEMENT_NAME), Coverage.LATITUDE_UNITS));
 
+        // If the "cruise" start and end dates are not specified, use the temporal coverage dates
+
         Datestamp timestamp = getDatestamp(getElementText(null, TEMP_START_DATE_ELEMENT_NAME));
         if ( timestamp != null )
             coverage.setEarliestDataDate(timestamp);
+
+        Datestamp datestamp = getDatestamp(getElementText(null, START_DATE_ELEMENT_NAME));
+        if ( datestamp == null )
+            datestamp = timestamp;
+        coverage.setStartDatestamp(datestamp);
+
         timestamp = getDatestamp(getElementText(null, TEMP_END_DATE_ELEMENT_NAME));
         if ( timestamp != null )
             coverage.setLatestDataDate(timestamp);
+
+        datestamp = getDatestamp(getElementText(null, END_DATE_ELEMENT_NAME));
+        if ( datestamp == null )
+            datestamp = timestamp;
+        coverage.setEndDatestamp(datestamp);
 
         TreeSet<String> regions = new TreeSet<String>();
         for (Element regElem : getElementList(null, GEO_REGION_ELEMENT_NAME)) {

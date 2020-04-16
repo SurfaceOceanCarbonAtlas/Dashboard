@@ -187,8 +187,6 @@ public class CdiacReaderTest {
                 "occurred due to water getting into the atm condenser. The survey tech cleared out the water and " +
                         "restarted the system on 1/26 at 0519.  No data was acquired during the shutdown period."
         )), info.getAddnInfo());
-        assertEquals(info.toString(), new Datestamp(2015, 1, 15, 0, 0, 0), info.getStartDatestamp());
-        assertEquals(info.toString(), new Datestamp(2015, 1, 29, 0, 0, 0), info.getEndDatestamp());
         assertEquals(info.toString(), new ArrayList<Datestamp>(Collections.singletonList(
                 new Datestamp(2016, 1, 20, 0, 0, 0)
         )), info.getHistory());
@@ -213,6 +211,10 @@ public class CdiacReaderTest {
         assertEquals(coverage.toString(), stamp, coverage.getEarliestDataDate());
         stamp = new Datestamp(2015, 1, 29, 0, 0, 0);
         assertEquals(coverage.toString(), stamp, coverage.getLatestDataDate());
+        stamp = new Datestamp(2015, 1, 15, 0, 0, 0);
+        assertEquals(coverage.toString(), stamp, coverage.getStartDatestamp());
+        stamp = new Datestamp(2015, 1, 29, 0, 0, 0);
+        assertEquals(coverage.toString(), stamp, coverage.getEndDatestamp());
         assertEquals(coverage.toString(), Coverage.WGS84, coverage.getSpatialReference());
         assertEquals(coverage.toString(), 0, coverage.getGeographicNames().size());
 

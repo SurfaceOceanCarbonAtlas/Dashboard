@@ -70,22 +70,8 @@ public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
                 invalid.add("variables[" + k + "]." + name);
             }
         }
-        for (String name : miscInfo.invalidFieldNames(today)) {
+        for (String name : miscInfo.invalidFieldNames()) {
             invalid.add("miscInfo." + name);
-        }
-
-        // check that the data times are all within the specified time range
-        if ( !(invalid.contains("miscInfo.startDatestamp") || invalid.contains("coverage.earliestDataDate")) ) {
-            if ( miscInfo.getStartDatestamp().after(coverage.getEarliestDataDate()) ) {
-                invalid.add("miscInfo.startDatestamp");
-                invalid.add("coverage.earliestDataDate");
-            }
-        }
-        if ( !(invalid.contains("miscInfo.endDatestamp") || invalid.contains("coverage.latestDataDate")) ) {
-            if ( miscInfo.getEndDatestamp().before(coverage.getLatestDataDate()) ) {
-                invalid.add("miscInfo.endDatestamp");
-                invalid.add("coverage.latestDataDate");
-            }
         }
 
         // TODO: verify researcher and instrument names in variables match some entry in investigators and instruments

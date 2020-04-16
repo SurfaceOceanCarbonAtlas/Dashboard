@@ -11,7 +11,7 @@ import java.util.TreeSet;
  */
 public class Coverage implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5044426323221168294L;
+    private static final long serialVersionUID = 2368707540950489499L;
 
     public static final String LONGITUDE_UNITS = "dec deg E";
     public static final String LATITUDE_UNITS = "dec deg N";
@@ -23,6 +23,8 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
     protected NumericString northernLatitude;
     protected Datestamp earliestDataDate;
     protected Datestamp latestDataDate;
+    protected Datestamp startDatestamp;
+    protected Datestamp endDatestamp;
     protected String spatialReference;
     protected TreeSet<String> geographicNames;
 
@@ -37,39 +39,10 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
         northernLatitude = new NumericString(null, LATITUDE_UNITS);
         earliestDataDate = new Datestamp();
         latestDataDate = new Datestamp();
+        startDatestamp = new Datestamp();
+        endDatestamp = new Datestamp();
         spatialReference = WGS84;
         geographicNames = new TreeSet<String>();
-    }
-
-    /**
-     * Create with the given values, the spatial reference set to WGS 84, and no geographic names.
-     *
-     * @param westernLongitude
-     *         westernmost longitude in decimal degrees east; if null or blank, an empty numeric string is assigned
-     * @param easternLongitude
-     *         easternmost longitude in decimal degrees east; if null or blank, an empty numeric string is assigned
-     * @param southernLatitude
-     *         southernmost latitude in decimal degrees north; if null or blank, an empty numeric string is assigned
-     * @param northernLatitude
-     *         northernmost latitude in decimal degrees north; if null or blank, an empty numeric string is assigned
-     * @param earliestDataDate
-     *         date of the earliest (oldest) data measurement; if null or blank, an invalid time is assigned
-     * @param latestDataDate
-     *         date of the latest (newest) data measurement; if null or blank, an invalid time is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any of the values, if not null or blank, for the longitudes, latitudes, or times are invalid
-     *         (longitudes outside the range [-360, 360] are considered in invalid)
-     */
-    public Coverage(String westernLongitude, String easternLongitude, String southernLatitude, String northernLatitude,
-            Datestamp earliestDataDate, Datestamp latestDataDate) throws IllegalArgumentException {
-        this();
-        setWesternLongitude(new NumericString(westernLongitude, LONGITUDE_UNITS));
-        setEasternLongitude(new NumericString(easternLongitude, LONGITUDE_UNITS));
-        setSouthernLatitude(new NumericString(southernLatitude, LATITUDE_UNITS));
-        setNorthernLatitude(new NumericString(northernLatitude, LATITUDE_UNITS));
-        setEarliestDataDate(earliestDataDate);
-        setLatestDataDate(latestDataDate);
     }
 
     /**
@@ -113,6 +86,35 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
             if ( !latestDataDate.isValid(today) )
                 invalid.add("latestDataDate");
         }
+
+        if ( startDatestamp.isValid(today) ) {
+            if ( endDatestamp.isValid(today) ) {
+                if ( startDatestamp.after(endDatestamp) ) {
+                    invalid.add("startDatestamp");
+                    invalid.add("endDatestamp");
+                }
+            }
+            else {
+                invalid.add("endDatestamp");
+            }
+        }
+        else {
+            invalid.add("startDatestamp");
+            if ( !endDatestamp.isValid(today) )
+                invalid.add("endDatestamp");
+        }
+
+        // If cruise start date is after first data date, assume the problem is with the cruise start date
+        if ( startDatestamp.isValid(today) && earliestDataDate.isValid(today) &&
+                earliestDataDate.before(startDatestamp) ) {
+            invalid.add("startDatestamp");
+        }
+        // If cruise start date is after first data date, assume the problem is with the cruise start date
+        if ( endDatestamp.isValid(today) && latestDataDate.isValid(today) &&
+                latestDataDate.after(endDatestamp) ) {
+            invalid.add("endDatestamp");
+        }
+
 
         return invalid;
     }
@@ -272,6 +274,38 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
     }
 
     /**
+     * @return the starting date for this dataset; never null but may be an invalid Datestamp
+     */
+    public Datestamp getStartDatestamp() {
+        return (Datestamp) (startDatestamp.duplicate(null));
+    }
+
+    /**
+     * @param startDatestamp
+     *         assign as the starting date for this dataset;
+     *         if null, an invalid Datestamp will be assigned.
+     */
+    public void setStartDatestamp(Datestamp startDatestamp) {
+        this.startDatestamp = (startDatestamp != null) ? (Datestamp) (startDatestamp.duplicate(null)) : new Datestamp();
+    }
+
+    /**
+     * @return the ending date for this dataset; never null but may be an invalid Datestamp
+     */
+    public Datestamp getEndDatestamp() {
+        return (Datestamp) (endDatestamp.duplicate(null));
+    }
+
+    /**
+     * @param endDatestamp
+     *         assign as the ending date for this dataset;
+     *         if null, an invalid Datestamp will be assigned.
+     */
+    public void setEndDatestamp(Datestamp endDatestamp) {
+        this.endDatestamp = (endDatestamp != null) ? (Datestamp) (endDatestamp.duplicate(null)) : new Datestamp();
+    }
+
+    /**
      * @return the spatial reference; never null but may be empty
      */
     public String getSpatialReference() {
@@ -343,6 +377,8 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
         coverage.northernLatitude = (NumericString) (northernLatitude.duplicate(null));
         coverage.earliestDataDate = (Datestamp) (earliestDataDate.duplicate(null));
         coverage.latestDataDate = (Datestamp) (latestDataDate.duplicate(null));
+        coverage.startDatestamp = (Datestamp) (startDatestamp.duplicate(null));
+        coverage.endDatestamp = (Datestamp) (endDatestamp.duplicate(null));
         coverage.spatialReference = spatialReference;
         coverage.geographicNames = new TreeSet<String>(geographicNames);
         return coverage;
@@ -371,6 +407,10 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
             return false;
         if ( !latestDataDate.equals(other.latestDataDate) )
             return false;
+        if ( !startDatestamp.equals(other.startDatestamp) )
+            return false;
+        if ( !endDatestamp.equals(other.endDatestamp) )
+            return false;
         if ( !spatialReference.equals(other.spatialReference) )
             return false;
         if ( !geographicNames.equals(other.geographicNames) )
@@ -387,6 +427,8 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
         result = result * prime + northernLatitude.hashCode();
         result = result * prime + earliestDataDate.hashCode();
         result = result * prime + latestDataDate.hashCode();
+        result = result * prime + startDatestamp.hashCode();
+        result = result * prime + endDatestamp.hashCode();
         result = result * prime + spatialReference.hashCode();
         result = result * prime + geographicNames.hashCode();
         return result;
@@ -401,6 +443,8 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 ", northernLatitude=" + northernLatitude +
                 ", earliestDataDate=" + earliestDataDate +
                 ", latestDataDate=" + latestDataDate +
+                ", startDatestamp=" + startDatestamp +
+                ", endDatestamp=" + endDatestamp +
                 ", spatialReference='" + spatialReference + "'" +
                 ", geographicNames=" + geographicNames +
                 '}';

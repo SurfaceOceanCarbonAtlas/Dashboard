@@ -290,11 +290,16 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
 
     /**
      * Compares the date specified in this Datestamp to the date specified in the given Datestamp.
+     * Time comparisons are only made until the an invalid hour, minute, or second in either
+     * this Datestamp or the given Datestamp; for example, minutes are compared if hours are
+     * valid in both and minutes are valid in both.  Datestamps that have dates and whatever part
+     * of time is compared that are identical are considered equal and, thus, will return false.
      *
      * @param other
      *         Datestamp to compare to
      *
-     * @return true if this Datestamp specifies a date before to the given Datestamp; otherwise false
+     * @return true if this Datestamp specifies a date before to the given Datestamp;
+     *         otherwise false
      *
      * @throws IllegalArgumentException
      *         if either this Datestamp or the given Datestamp to is invalid
@@ -304,41 +309,62 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
             throw new IllegalArgumentException("before method being called on an invalid date");
         if ( !other.isValid(null) )
             throw new IllegalArgumentException("before method being called with an invalid date");
+
         if ( year < other.year )
             return true;
         if ( year > other.year )
             return false;
+
         if ( month < other.month )
             return true;
         if ( month > other.month )
             return false;
+
         if ( day < other.day )
             return true;
         if ( day > other.day )
+            return false;
+
+        // If an hour is invalid, do not compare time.  Dates are identical, so false.
+        if ( (hour == INVALID) || (other.hour == INVALID) )
             return false;
         if ( hour < other.hour )
             return true;
         if ( hour > other.hour )
             return false;
+
+        // If a minute is invalid, do not compare minutes and seconds.  Dates and hours are identical, so false.
+        if ( (minute == INVALID) || (other.minute == INVALID) )
+            return false;
         if ( minute < other.minute )
             return true;
         if ( minute > other.minute )
+            return false;
+
+        // If a second is invalid, do not compare seconds.  Dates, hours, and minutes are identical, so false.
+        if ( (second == INVALID) || (other.second == INVALID) )
             return false;
         if ( second < other.second )
             return true;
         if ( second > other.second )
             return false;
-        // Equal and thus not before
+
+        // Equal dates and times so not before
         return false;
     }
 
     /**
      * Compares the date specified in this Datestamp to the date specified in the given Datestamp.
+     * Time comparisons are only made until the an invalid hour, minute, or second in either
+     * this Datestamp or the given Datestamp; for example, minutes are compared if hours are
+     * valid in both and minutes are valid in both.  Datestamps that have dates and whatever part
+     * of time is compared that are identical are considered equal and, thus, will return false.
      *
      * @param other
      *         Datestamp to compare to
      *
-     * @return true if this Datestamp specifies a date after to the given Datestamp; otherwise false
+     * @return true if this Datestamp specifies a date after to the given Datestamp;
+     *         otherwise false
      *
      * @throws IllegalArgumentException
      *         if either this Datestamp or the given Datestamp to is invalid
@@ -348,31 +374,47 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
             throw new IllegalArgumentException("after method being called on an invalid date");
         if ( !other.isValid(null) )
             throw new IllegalArgumentException("after method being called with an invalid date");
+
         if ( year > other.year )
             return true;
         if ( year < other.year )
             return false;
+
         if ( month > other.month )
             return true;
         if ( month < other.month )
             return false;
+
         if ( day > other.day )
             return true;
         if ( day < other.day )
+            return false;
+
+        // If an hour is invalid, do not compare time.  Dates are identical, so false.
+        if ( (hour == INVALID) || (other.hour == INVALID) )
             return false;
         if ( hour > other.hour )
             return true;
         if ( hour < other.hour )
             return false;
+
+        // If a minute is invalid, do not compare minutes and seconds.  Dates and hours are identical, so false.
+        if ( (minute == INVALID) || (other.minute == INVALID) )
+            return false;
         if ( minute > other.minute )
             return true;
         if ( minute < other.minute )
+            return false;
+
+        // If a second is invalid, do not compare seconds.  Dates, hours, and minutes are identical, so false.
+        if ( (second == INVALID) || (other.second == INVALID) )
             return false;
         if ( second > other.second )
             return true;
         if ( second < other.second )
             return false;
-        // Equal and thus not before
+
+        // Equal dates and times so not after
         return false;
     }
 

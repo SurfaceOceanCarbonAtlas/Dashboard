@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +21,6 @@ public class MiscInfoTest {
     private static final String EMPTY_STR = "";
     private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
     private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
-    private static final Datestamp EMPTY_DATESTAMP = new Datestamp();
     private static final ArrayList<Datestamp> EMPTY_STAMPLIST = new ArrayList<Datestamp>();
 
     private static final String DATASET_ID = "33RO20150114";
@@ -82,12 +82,11 @@ public class MiscInfoTest {
                     "condenser.  The survey tech cleared out the water and restarted the system on 1/26 at 0519.  " +
                     "No data was acquired during the shutdown period."
     ));
-    private static final Datestamp START_DATESTAMP = new Datestamp(2015, 1, 13, 0, 0, 0);
-    private static final Datestamp END_DATESTAMP = new Datestamp(2015, 1, 30, 0, 0, 0);
     private static final ArrayList<Datestamp> HISTORY_LIST = new ArrayList<Datestamp>(Arrays.asList(
             new Datestamp(2016, 1, 20, 0, 0, 0),
             new Datestamp(2017, 2, 24, 0, 0, 0)
     ));
+
 
     @Test
     public void testGetSetDatasetId() {
@@ -476,71 +475,6 @@ public class MiscInfoTest {
     }
 
     @Test
-    public void testGetSetStartDatestamp() {
-        MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        miscInfo.setStartDatestamp(START_DATESTAMP);
-        Datestamp stamp = miscInfo.getStartDatestamp();
-        assertEquals(START_DATESTAMP, stamp);
-        assertNotSame(START_DATESTAMP, stamp);
-        assertNotSame(stamp, miscInfo.getStartDatestamp());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
-        assertEquals(EMPTY_STR, miscInfo.getPurpose());
-        assertEquals(EMPTY_STR, miscInfo.getSynopsis());
-        assertEquals(EMPTY_STR, miscInfo.getCitation());
-        assertEquals(EMPTY_STR, miscInfo.getDownloadUrl());
-        assertEquals(EMPTY_STR, miscInfo.getWebsite());
-        assertEquals(EMPTY_STR, miscInfo.getAccessId());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetDoi());
-        assertEquals(EMPTY_STR, miscInfo.getResearchProject());
-        assertEquals(EMPTY_STR, miscInfo.getFundingId());
-        assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
-        assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
-        assertEquals(EMPTY_STR, miscInfo.getSectionName());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetName());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetId());
-        miscInfo.setStartDatestamp(null);
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        miscInfo.setStartDatestamp(EMPTY_DATESTAMP);
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-    }
-
-    @Test
-    public void testGetSetEndDatestamp() {
-        MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-        miscInfo.setEndDatestamp(END_DATESTAMP);
-        Datestamp stamp = miscInfo.getEndDatestamp();
-        assertEquals(END_DATESTAMP, stamp);
-        assertNotSame(END_DATESTAMP, stamp);
-        assertNotSame(stamp, miscInfo.getEndDatestamp());
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
-        assertEquals(EMPTY_STR, miscInfo.getPurpose());
-        assertEquals(EMPTY_STR, miscInfo.getSynopsis());
-        assertEquals(EMPTY_STR, miscInfo.getCitation());
-        assertEquals(EMPTY_STR, miscInfo.getDownloadUrl());
-        assertEquals(EMPTY_STR, miscInfo.getWebsite());
-        assertEquals(EMPTY_STR, miscInfo.getAccessId());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetDoi());
-        assertEquals(EMPTY_STR, miscInfo.getResearchProject());
-        assertEquals(EMPTY_STR, miscInfo.getFundingId());
-        assertEquals(EMPTY_STR, miscInfo.getFundingTitle());
-        assertEquals(EMPTY_STR, miscInfo.getFundingAgency());
-        assertEquals(EMPTY_STR, miscInfo.getSectionName());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetName());
-        assertEquals(EMPTY_STR, miscInfo.getDatasetId());
-        miscInfo.setEndDatestamp(null);
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-        miscInfo.setEndDatestamp(EMPTY_DATESTAMP);
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-    }
-
-    @Test
     public void testGetSetHistory() {
         MiscInfo miscInfo = new MiscInfo();
         assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
@@ -552,8 +486,6 @@ public class MiscInfoTest {
             assertNotSame(HISTORY_LIST.get(k), history.get(k));
         }
         assertNotSame(history, miscInfo.getHistory());
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getEndDatestamp());
-        assertEquals(EMPTY_DATESTAMP, miscInfo.getStartDatestamp());
         assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
         assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
         assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
@@ -576,7 +508,7 @@ public class MiscInfoTest {
         miscInfo.setHistory(EMPTY_STAMPLIST);
         assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
         try {
-            miscInfo.setHistory(Arrays.asList(HISTORY_LIST.get(0), EMPTY_DATESTAMP));
+            miscInfo.setHistory(Arrays.asList(HISTORY_LIST.get(0), new Datestamp()));
             fail("calling setHistory with an invalid datestamp succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -592,15 +524,9 @@ public class MiscInfoTest {
     @Test
     public void testInvalidFieldNames() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(new HashSet<String>(Arrays.asList(
-                "datasetId", "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames(null));
+        assertEquals(new HashSet<String>(Collections.singletonList("datasetId")), miscInfo.invalidFieldNames());
         miscInfo.setDatasetId(DATASET_ID);
-        assertEquals(new HashSet<String>(Arrays.asList(
-                "startDatestamp", "endDatestamp")), miscInfo.invalidFieldNames(null));
-        miscInfo.setStartDatestamp(START_DATESTAMP);
-        assertEquals(new HashSet<String>(Arrays.asList("endDatestamp")), miscInfo.invalidFieldNames(null));
-        miscInfo.setEndDatestamp(END_DATESTAMP);
-        assertEquals(EMPTY_NAMESET, miscInfo.invalidFieldNames(null));
+        assertEquals(EMPTY_NAMESET, miscInfo.invalidFieldNames());
     }
 
     @Test
@@ -627,8 +553,6 @@ public class MiscInfoTest {
         miscInfo.setReferences(REFERENCES);
         miscInfo.setPortsOfCall(PORTS_OF_CALL);
         miscInfo.setAddnInfo(ADDN_INFO_LIST);
-        miscInfo.setStartDatestamp(START_DATESTAMP);
-        miscInfo.setEndDatestamp(END_DATESTAMP);
         miscInfo.setHistory(HISTORY_LIST);
         assertNotEquals(miscInfo, dup);
 
@@ -639,8 +563,6 @@ public class MiscInfoTest {
         assertNotSame(miscInfo.getReferences(), dup.getReferences());
         assertNotSame(miscInfo.getPortsOfCall(), dup.getPortsOfCall());
         assertNotSame(miscInfo.getAddnInfo(), dup.getAddnInfo());
-        assertNotSame(miscInfo.getStartDatestamp(), dup.getStartDatestamp());
-        assertNotSame(miscInfo.getEndDatestamp(), dup.getEndDatestamp());
 
         ArrayList<Datestamp> history = miscInfo.getHistory();
         ArrayList<Datestamp> dupHistory = dup.getHistory();
@@ -776,20 +698,6 @@ public class MiscInfoTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setAddnInfo(ADDN_INFO_LIST);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setStartDatestamp(START_DATESTAMP);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setStartDatestamp(START_DATESTAMP);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setEndDatestamp(END_DATESTAMP);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setEndDatestamp(END_DATESTAMP);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
