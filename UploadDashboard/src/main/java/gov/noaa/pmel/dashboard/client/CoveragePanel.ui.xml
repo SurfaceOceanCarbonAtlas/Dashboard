@@ -5,36 +5,41 @@
     <ui:style src="Coverage.css"/>
 
     <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.spatialpanel}">
-            <g:Label addStyleNames="{style.spatiallabel}" ui:field="spacialLabel"/>
-            <g:TextBox addStyleNames="{style.spatialbox}" ui:field="spacialBox"/>
+        <g:FlowPanel addStyleNames="{style.valuespanel}">
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="spacialLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="spacialBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.latpanel}">
-            <g:Label addStyleNames="{style.southlatlabel}" ui:field="southLatLabel"/>
-            <g:TextBox addStyleNames="{style.southlatvaluebox}" ui:field="southLatValueBox"/>
-            <g:TextBox addStyleNames="{style.southlatunitbox}" ui:field="southLatUnitBox"/>
-            <g:Label addStyleNames="{style.northlatlabel}" ui:field="northLatLabel"/>
-            <g:TextBox addStyleNames="{style.northlatvaluebox}" ui:field="northLatValueBox"/>
-            <g:TextBox addStyleNames="{style.northlatunitbox}" ui:field="northLatUnitBox"/>
+        <g:FlowPanel addStyleNames="{style.valuespanel}">
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="southLatLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="southLatValueBox"/>
+            <g:Label addStyleNames="{style.unitlabel}" ui:field="southLatUnitLabel"/>
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="northLatLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="northLatValueBox"/>
+            <g:Label addStyleNames="{style.unitlabel}" ui:field="northLatUnitLabel"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.lonpanel}">
-            <g:Label addStyleNames="{style.westlonlabel}" ui:field="westLonLabel"/>
-            <g:TextBox addStyleNames="{style.westlonvaluebox}" ui:field="westLonValueBox"/>
-            <g:TextBox addStyleNames="{style.westlonunitbox}" ui:field="westLonUnitBox"/>
-            <g:Label addStyleNames="{style.eastlonlabel}" ui:field="eastLonLabel"/>
-            <g:TextBox addStyleNames="{style.eastlonvaluebox}" ui:field="eastLonValueBox"/>
-            <g:TextBox addStyleNames="{style.eastlonunitbox}" ui:field="eastLonUnitBox"/>
+        <g:FlowPanel addStyleNames="{style.valuespanel}">
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="westLonLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="westLonValueBox"/>
+            <g:Label addStyleNames="{style.unitlabel}" ui:field="westLonUnitLabel"/>
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="eastLonLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="eastLonValueBox"/>
+            <g:Label addStyleNames="{style.unitlabel}" ui:field="eastLonUnitLabel"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.datepanel}">
-            <g:Label addStyleNames="{style.earlydatelabel}" ui:field="earlyDateLabel"/>
-            <g:TextBox addStyleNames="{style.earlydatebox}" ui:field="earlyDateBox"/>
-            <g:Label addStyleNames="{style.latedatelabel}" ui:field="lateDateLabel"/>
-            <g:TextBox addStyleNames="{style.latedatebox}" ui:field="lateDateBox"/>
+        <g:FlowPanel addStyleNames="{style.valuespanel}">
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="startDateLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="startDateBox"/>
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="endDateLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="endDateBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.regionspanel}">
-            <g:Label addStyleNames="{style.regionslabel}" ui:field="regionsLabel"/>
+        <g:FlowPanel addStyleNames="{style.valuespanel}">
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="earlyDateLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="earlyDateBox"/>
+            <g:Label addStyleNames="{style.valuelabel}" ui:field="lateDateLabel"/>
+            <g:TextBox addStyleNames="{style.valuebox}" ui:field="lateDateBox"/>
+        </g:FlowPanel>
+        <g:CaptionPanel addStyleNames="{style.valuespanel}" ui:field="regionsPanel">
             <g:TextArea addStyleNames="{style.regionsbox}" ui:field="regionsBox"/>
-        </g:FlowPanel>
+        </g:CaptionPanel>
     </g:FlowPanel>
 
 </ui:UiBinder>

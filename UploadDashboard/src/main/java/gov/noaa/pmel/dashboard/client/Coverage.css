@@ -1,101 +1,42 @@
 @CHARSET "UTF-8";
 
-.datepanel {
-    display: block;
-}
-
-.earlydatebox {
-    display: inline;
-}
-
-.earlydatelabel {
-    display: inline;
-}
-
-.eastlonunitbox {
-    display: inline;
-}
-
-.eastlonvaluebox {
-    display: inline;
-}
-
-.eastlonlabel {
-    display: inline;
-}
-
-.latedatebox {
-    display: inline;
-}
-
-.latedatelabel {
-    display: inline;
-}
-
-.latpanel {
-    display: block;
-}
-
-.lonpanel {
-    display: block;
-}
-
-.northlatunitbox {
-    display: inline;
-}
-
-.northlatvaluebox {
-    display: inline;
-}
-
-.northlatlabel {
-    display: inline;
-}
-
-.regionspanel {
-    display: block;
-}
-
-.regionslabel {
-    display: inline;
-}
-
 .regionsbox {
-    display: inline;
+    height: 10em;
+    width: 100%;
 }
 
-.southlatunitbox {
-    display: inline;
+.regionsbox-invalid {
+    color: red;
+    font-weight: bold;
+    font-style: italic;
 }
 
-.southlatvaluebox {
+.unitlabel {
     display: inline;
+    margin-left: 0em;
+    margin-right: 0.5em;
 }
 
-.southlatlabel {
+.valuebox {
     display: inline;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 
-.spatialbox {
-    display: inline;
+.valuebox-invalid {
+    color: red;
+    font-weight: bold;
+    font-style: italic;
 }
 
-.spatiallabel {
+.valuelabel {
     display: inline;
+    margin-left: 1em;
+    margin-right: 0em;
 }
 
-.spatialpanel {
+.valuespanel {
     display: block;
-}
-
-.westlonunitbox {
-    display: inline;
-}
-
-.westlonvaluebox {
-    display: inline;
-}
-
-.westlonlabel {
-    display: inline;
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
 }

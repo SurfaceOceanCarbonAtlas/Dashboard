@@ -2,6 +2,8 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,12 +22,14 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Page for preparing to view and edit standard SOCAT metadata.
@@ -284,6 +288,11 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
      * Recreate all the panels appropriately for the given SOCAT metadata
      */
     private void showSocatMetadata(SocatMetadata metadata) {
+        DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy MM dd HH mm ss");
+        TimeZone timeZone = TimeZone.createTimeZone(0);
+        String[] pieces = dateTimeFormat.format(new Date(), timeZone).split(" ");
+        Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
+
         submitterPanel = new SubmitterPanel(metadata.getSubmitter());
         submitterSLPanel.setWidget(submitterPanel);
 
@@ -305,7 +314,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         platformPanel = new PlatformPanel(metadata.getPlatform());
         platformSLPanel.setWidget(platformPanel);
 
-        coveragePanel = new CoveragePanel(metadata.getCoverage());
+        coveragePanel = new CoveragePanel(metadata.getCoverage(), today);
         coverageSLPanel.setWidget(coveragePanel);
 
         // Make sure there is at least one variable specified, even if it is completely blank
