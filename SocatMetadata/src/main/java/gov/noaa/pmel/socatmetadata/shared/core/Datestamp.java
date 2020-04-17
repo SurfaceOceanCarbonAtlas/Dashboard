@@ -10,10 +10,12 @@ import java.io.Serializable;
  */
 public final class Datestamp implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2505776058379883322L;
+    private static final long serialVersionUID = -3033185888931897459L;
 
-    public static final Datestamp MIN_VALID_DATESTAMP = new Datestamp(1900, 1, 1, 0, 0, 0);
-    public static final Datestamp DEFAULT_TODAY_DATESTAMP = new Datestamp(2099, 12, 31, 23, 59, 59);
+    private static final int FIRST_VALID_YEAR = 1900;
+    private static final int LAST_VALID_YEAR = 2099;
+    public static final Datestamp MIN_VALID_DATESTAMP = new Datestamp(FIRST_VALID_YEAR, 1, 1, 0, 0, 0);
+    public static final Datestamp DEFAULT_TODAY_DATESTAMP = new Datestamp(LAST_VALID_YEAR, 12, 31, 23, 59, 59);
 
     /**
      * Integer assigned for invalid year, month, day, hour, minute, or second
@@ -195,6 +197,63 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
                     stamp += ":" + second;
             }
         }
+        return stamp;
+    }
+
+    /**
+     * @return a date/time stamp of the form yyyy-MM-dd HH:mm:ss up to the point where an invalid entry is encountered.
+     *         So Datetime(2000,2,30,12,24,36) will return "2000-02" since the day is invalid for the year and month,
+     *         and Datetime(2000,2,28,12,24,-1) will return "2000-02-28 12:24".  If the year is invalid (before
+     *         the year of {@link #MIN_VALID_DATESTAMP} or after the year of {@link #DEFAULT_TODAY_DATESTAMP}),
+     *         an empty string is returned.
+     */
+    public String fullOrPartialString() {
+        String stamp = "";
+        if ( (year < FIRST_VALID_YEAR) || (year > LAST_VALID_YEAR) )
+            return stamp;
+        stamp += year;
+
+        if ( (month < 1) || (month > 12) )
+            return stamp;
+        if ( month < 10 )
+            stamp += "-0" + month;
+        else
+            stamp += "-" + month;
+
+        if ( day < 1 )
+            return stamp;
+        if ( (day > 30) && ((month == 4) || (month == 6) || (month == 9) || (month == 11)) )
+            return stamp;
+        if ( (day > 29) && (month == 2) )
+            return stamp;
+        if ( (day > 28) && (month == 2) && (((year % 4) != 0) || (((year % 100) == 0) && ((year % 400) != 0))) )
+            return stamp;
+        if ( day < 10 )
+            stamp += "-0" + day;
+        else
+            stamp += "-" + day;
+
+        if ( (hour < 0) || (hour > 23) )
+            return stamp;
+        if ( hour < 10 )
+            stamp += " 0" + hour;
+        else
+            stamp += " " + hour;
+
+        if ( (minute < 0) || (minute > 59) )
+            return stamp;
+        if ( minute < 10 )
+            stamp += ":0" + minute;
+        else
+            stamp += ":" + minute;
+
+        if ( (second < 0) || (second > 59) )
+            return stamp;
+        if ( second < 10 )
+            stamp += ":0" + second;
+        else
+            stamp += ":" + second;
+
         return stamp;
     }
 

@@ -19,6 +19,8 @@ public class DatestampTest {
     private static final int MINUTE = 23;
     private static final int SECOND = 53;
     private static final String DATESTRING = "2010-06-25";
+    private static final String MONTHSTRING = "2010-06";
+    private static final String YEARSTRING = "2010";
     private static final String FULLTIMESTRING = "15:23:53";
     private static final String MINUTETIMESTRING = "15:23";
     private static final String HOURTIMESTRING = "15";
@@ -147,6 +149,24 @@ public class DatestampTest {
         } catch ( IllegalArgumentException ex ) {
             // expected result
         }
+    }
+
+    @Test
+    public void testFullOrPartialString() {
+        Datestamp datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertEquals(DATESTRING + " " + FULLTIMESTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, 60);
+        assertEquals(DATESTRING + " " + MINUTETIMESTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, 60, SECOND);
+        assertEquals(DATESTRING + " " + HOURTIMESTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(YEAR, MONTH, DAY, -5, MINUTE, SECOND);
+        assertEquals(DATESTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(YEAR, MONTH, -3, HOUR, MINUTE, SECOND);
+        assertEquals(MONTHSTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(YEAR, -1, DAY, HOUR, MINUTE, SECOND);
+        assertEquals(YEARSTRING, datestamp.fullOrPartialString());
+        datestamp = new Datestamp(1899, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertEquals("", datestamp.fullOrPartialString());
     }
 
     @Test
