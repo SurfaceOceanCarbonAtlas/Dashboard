@@ -1,42 +1,70 @@
 @CHARSET "UTF-8";
 
+.earlydatebox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
+}
+
+.eastlonbox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
+}
+
+.enddatebox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
+}
+
+.latedatebox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
+}
+
+.northlatbox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
+}
+
 .regionsbox {
     height: 10em;
-    width: 100%;
+    width: 55em;
 }
 
-.regionsbox-invalid {
-    color: red;
-    font-weight: bold;
-    font-style: italic;
-}
-
-.unitlabel {
+.regionspanel {
     display: inline;
-    margin-left: 0em;
-    margin-right: 0.5em;
+    margin: 0.25em;
 }
 
-.valuebox {
-    display: inline;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+.southlatbox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
 }
 
-.valuebox-invalid {
-    color: red;
-    font-weight: bold;
-    font-style: italic;
+.spacialbox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
 }
 
-.valuelabel {
-    display: inline;
-    margin-left: 1em;
-    margin-right: 0em;
+.startdatebox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
 }
 
-.valuespanel {
+.textpanel {
     display: block;
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
+    width: 55em;
+}
+
+.westlonbox {
+    display: inline-block;
+    width: 30em;
+    margin: 0.25em;
 }

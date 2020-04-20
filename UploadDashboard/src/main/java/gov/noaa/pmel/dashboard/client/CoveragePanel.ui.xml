@@ -1,43 +1,31 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:my='urn:import:gov.noaa.pmel.dashboard.client'>
 
     <ui:style src="Coverage.css"/>
 
     <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.valuespanel}">
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="spacialLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="spacialBox"/>
+        <g:FlowPanel addStyleNames="{style.textpanel}">
+            <my:LabeledTextBox addStyleNames="{style.spacialbox}" ui:field="spacialValueBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.valuespanel}">
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="southLatLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="southLatValueBox"/>
-            <g:Label addStyleNames="{style.unitlabel}" ui:field="southLatUnitLabel"/>
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="northLatLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="northLatValueBox"/>
-            <g:Label addStyleNames="{style.unitlabel}" ui:field="northLatUnitLabel"/>
+        <g:FlowPanel addStyleNames="{style.textpanel}">
+            <my:LabeledTextBox addStyleNames="{style.southlatbox}" ui:field="southLatValueBox"/>
+            <my:LabeledTextBox addStyleNames="{style.northlatbox}" ui:field="northLatValueBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.valuespanel}">
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="westLonLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="westLonValueBox"/>
-            <g:Label addStyleNames="{style.unitlabel}" ui:field="westLonUnitLabel"/>
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="eastLonLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="eastLonValueBox"/>
-            <g:Label addStyleNames="{style.unitlabel}" ui:field="eastLonUnitLabel"/>
+        <g:FlowPanel addStyleNames="{style.textpanel}">
+            <my:LabeledTextBox addStyleNames="{style.westlonbox}" ui:field="westLonValueBox"/>
+            <my:LabeledTextBox addStyleNames="{style.eastlonbox}" ui:field="eastLonValueBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.valuespanel}">
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="startDateLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="startDateBox"/>
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="endDateLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="endDateBox"/>
+        <g:FlowPanel addStyleNames="{style.textpanel}">
+            <my:LabeledTextBox addStyleNames="{style.startdatebox}" ui:field="startDateBox"/>
+            <my:LabeledTextBox addStyleNames="{style.enddatebox}" ui:field="endDateBox"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.valuespanel}">
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="earlyDateLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="earlyDateBox"/>
-            <g:Label addStyleNames="{style.valuelabel}" ui:field="lateDateLabel"/>
-            <g:TextBox addStyleNames="{style.valuebox}" ui:field="lateDateBox"/>
+        <g:FlowPanel addStyleNames="{style.textpanel}">
+            <my:LabeledTextBox addStyleNames="{style.earlydatebox}" ui:field="earlyDateBox"/>
+            <my:LabeledTextBox addStyleNames="{style.latedatebox}" ui:field="lateDateBox"/>
         </g:FlowPanel>
-        <g:CaptionPanel addStyleNames="{style.valuespanel}" ui:field="regionsPanel">
+        <g:CaptionPanel addStyleNames="{style.regionspanel}" ui:field="regionsPanel">
             <g:TextArea addStyleNames="{style.regionsbox}" ui:field="regionsBox"/>
         </g:CaptionPanel>
     </g:FlowPanel>
