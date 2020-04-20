@@ -9,7 +9,11 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
@@ -24,32 +28,89 @@ public class CoveragePanel extends Composite {
 
     private static final CoveragePanelUiBinder uiBinder = GWT.create(CoveragePanelUiBinder.class);
 
-    @UiField(provided = true)
-    final LabeledTextBox spacialValueBox;
-    @UiField(provided = true)
-    final LabeledTextBox southLatValueBox;
-    @UiField(provided = true)
-    final LabeledTextBox northLatValueBox;
-    @UiField(provided = true)
-    final LabeledTextBox westLonValueBox;
-    @UiField(provided = true)
-    final LabeledTextBox eastLonValueBox;
-    @UiField(provided = true)
-    final LabeledTextBox startDateBox;
-    @UiField(provided = true)
-    final LabeledTextBox endDateBox;
-    @UiField(provided = true)
-    final LabeledTextBox earlyDateBox;
-    @UiField(provided = true)
-    final LabeledTextBox lateDateBox;
+    @UiField
+    Grid coverageGrid;
+    @UiField
+    HTML spacialHtml;
+    @UiField
+    TextBox spacialValue;
+    @UiField
+    HTML southLatHtml;
+    @UiField
+    TextBox southLatValue;
+    @UiField
+    Label southLatUnit;
+    @UiField
+    HTML northLatHtml;
+    @UiField
+    TextBox northLatValue;
+    @UiField
+    Label northLatUnit;
+    @UiField
+    HTML westLonHtml;
+    @UiField
+    TextBox westLonValue;
+    @UiField
+    Label westLonUnit;
+    @UiField
+    HTML eastLonHtml;
+    @UiField
+    TextBox eastLonValue;
+    @UiField
+    Label eastLonUnit;
+    @UiField
+    HTML startDateHtml;
+    @UiField
+    TextBox startDateValue;
+    @UiField
+    Label startDateUnit;
+    @UiField
+    HTML endDateHtml;
+    @UiField
+    TextBox endDateValue;
+    @UiField
+    Label endDateUnit;
+    @UiField
+    HTML earlyDateHtml;
+    @UiField
+    TextBox earlyDateValue;
+    @UiField
+    Label earlyDateUnit;
+    @UiField
+    HTML lateDateHtml;
+    @UiField
+    TextBox lateDateValue;
+    @UiField
+    Label lateDateUnit;
     @UiField
     CaptionPanel regionsPanel;
     @UiField
     TextArea regionsBox;
 
-    private static final String REGIONS_PANEL_CAPTION = " Geographic names ";
+    private static final String SPATIAL_REFERENCE_HTML = "Spatial reference:";
+    private static final String SOUTHERN_LATITUDE_HTML = "Southern-most latitude:";
+    private static final String NORTHERN_LATITUDE_HTML = "Northern-most latitude:";
+    private static final String WESTERN_LONGITUDE_HTML = "Western-most longitude:";
+    private static final String EASTERN_LONGITUDE_HTML = "Eastern-most longitude:";
+    private static final String START_DATE_HTML = "Expedition starting date:";
+    private static final String END_DATE_HTML = "Expedition ending date:";
+    private static final String EARLY_DATE_HTML = "Earliest data date:";
+    private static final String LATE_DATE_HTML = "Latest data date:";
+    private static final String REGIONS_HTML = "Geographic names";
+
+    private static final String DATE_UNIT_TEXT = "(yyyy-MM-dd)";
+
+    private static final String INVALID_LATITUDE_MSG = "Invalid latitude";
+    private static final String INVALID_LONGITUDE_MSG = "Invalid longitude";
+    private static final String INVALID_DATESTAMP_MSG = "Invalid date";
+
+    private static final String INVALID_HTML_PREFIX = "<span style='color:red; font-weight:bold; font-style:oblique'>";
+    private static final String INVALID_HTML_SUFFIX = "</span>";
+
     private final Coverage coverage;
     private final Datestamp today;
+    private final Datestamp origEarlyDate;
+    private final Datestamp origLateDate;
 
     /**
      * Creates a FlowPanel associated with the given Coverage.
@@ -58,122 +119,167 @@ public class CoveragePanel extends Composite {
      *         associate this panel with this Coverage; cannot be null
      */
     public CoveragePanel(Coverage coverage, Datestamp today) {
-        spacialValueBox = new LabeledTextBox("Spatial reference:", "15em", 15, "");
-        southLatValueBox = new LabeledTextBox("Southern-most latitude:", "15em", 15,
-                coverage.getSouthernLatitude().getUnitString());
-        northLatValueBox = new LabeledTextBox("Northern-most latitude:", "15em", 15,
-                coverage.getNorthernLatitude().getUnitString());
-        westLonValueBox = new LabeledTextBox("Western-most longitude:", "15em", 15,
-                coverage.getWesternLongitude().getUnitString());
-        eastLonValueBox = new LabeledTextBox("Eastern-most longitude:", "15em", 15,
-                coverage.getEasternLongitude().getUnitString());
-        startDateBox = new LabeledTextBox("Starting date:", "15em", 15, "");
-        endDateBox = new LabeledTextBox("Ending date:", "15em", 15, "");
-        earlyDateBox = new LabeledTextBox("Earliest data date/time:", "15em", 15, "");
-        lateDateBox = new LabeledTextBox("Latest data date/time:", "15em", 15, "");
         initWidget(uiBinder.createAndBindUi(this));
 
         this.coverage = coverage;
         this.today = today;
 
-        spacialValueBox.setText(coverage.getSpatialReference());
-        southLatValueBox.setText(coverage.getSouthernLatitude().getValueString());
-        northLatValueBox.setText(coverage.getNorthernLatitude().getValueString());
-        westLonValueBox.setText(coverage.getWesternLongitude().getValueString());
-        eastLonValueBox.setText(coverage.getEasternLongitude().getValueString());
-        startDateBox.setText(coverage.getStartDatestamp().fullOrPartialString());
-        endDateBox.setText(coverage.getEndDatestamp().fullOrPartialString());
-        earlyDateBox.setText(coverage.getEarliestDataDate().fullOrPartialString());
-        lateDateBox.setText(coverage.getLatestDataDate().fullOrPartialString());
+        southLatUnit.setText(coverage.getSouthernLatitude().getUnitString());
+        northLatUnit.setText(coverage.getNorthernLatitude().getUnitString());
+        westLonUnit.setText(coverage.getWesternLongitude().getUnitString());
+        eastLonUnit.setText(coverage.getEasternLongitude().getUnitString());
+        startDateUnit.setText(DATE_UNIT_TEXT);
+        endDateUnit.setText(DATE_UNIT_TEXT);
+        earlyDateUnit.setText(DATE_UNIT_TEXT);
+        lateDateUnit.setText(DATE_UNIT_TEXT);
 
-        regionsPanel.setCaptionText(REGIONS_PANEL_CAPTION);
-        String regions = "";
-        for (String name : coverage.getGeographicNames()) {
-            regions += name + "\n";
-        }
-        regionsBox.setText(regions);
+        origEarlyDate = coverage.getEarliestDataDate();
+        origLateDate = coverage.getLatestDataDate();
+
+        // The following will assign the values in the text fields
+        getUpdatedCoverage();
+        // The following will assign the HTML to the labels before the text fields
+        markInvalids(null);
     }
 
-    @UiHandler("spacialValueBox")
+    @UiHandler("spacialValue")
     void spacialBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setSpatialReference(spacialValueBox.getText());
-        markInvalids();
+        coverage.setSpatialReference(spacialValue.getText());
+        markInvalids(null);
     }
 
-    @UiHandler("southLatValueBox")
-    void southLatValueBoxOnValueChange(ValueChangeEvent<String> event) {
-        NumericString val = coverage.getSouthernLatitude();
-        val.setValueString(southLatValueBox.getText());
+    @UiHandler("southLatValue")
+    void southLatValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
         try {
+            NumericString val = coverage.getSouthernLatitude();
+            val.setValueString(southLatValue.getText());
             coverage.setSouthernLatitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage("Invalid latitude: ", ex);
-            southLatValueBox.setValue(coverage.getSouthernLatitude().getValueString(), false);
+            UploadDashboard.showFailureMessage(INVALID_LATITUDE_MSG, ex);
+            // southLatValue.setValue(coverage.getSouthernLatitude().getValueString(), false);
+            addnInvalid = "southernLatitude";
         }
-        markInvalids();
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("northLatValueBox")
-    void northLatValueBoxOnValueChange(ValueChangeEvent<String> event) {
-        NumericString val = coverage.getNorthernLatitude();
-        val.setValueString(northLatValueBox.getText());
+    @UiHandler("northLatValue")
+    void northLatValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
         try {
+            NumericString val = coverage.getNorthernLatitude();
+            val.setValueString(northLatValue.getText());
             coverage.setNorthernLatitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage("Invalid latitude: ", ex);
-            northLatValueBox.setValue(coverage.getNorthernLatitude().getValueString(), false);
+            UploadDashboard.showFailureMessage(INVALID_LATITUDE_MSG, ex);
+            // northLatValue.setValue(coverage.getNorthernLatitude().getValueString(), false);
+            addnInvalid = "northernLatitude";
         }
-        markInvalids();
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("westLonValueBox")
-    void westLonValueBoxOnValueChange(ValueChangeEvent<String> event) {
-        NumericString val = coverage.getWesternLongitude();
-        val.setValueString(westLonValueBox.getText());
+    @UiHandler("westLonValue")
+    void westLonValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
         try {
+            NumericString val = coverage.getWesternLongitude();
+            val.setValueString(westLonValue.getText());
             coverage.setWesternLongitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage("Invalid longitude: ", ex);
-            westLonValueBox.setValue(coverage.getWesternLongitude().getValueString(), false);
+            UploadDashboard.showFailureMessage(INVALID_LONGITUDE_MSG, ex);
+            // westLonValue.setValue(coverage.getWesternLongitude().getValueString(), false);
+            addnInvalid = "westernLongitude";
         }
-        markInvalids();
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("eastLonValueBox")
-    void eastLonValueBoxOnValueChange(ValueChangeEvent<String> event) {
-        NumericString val = coverage.getEasternLongitude();
-        val.setValueString(eastLonValueBox.getText());
+    @UiHandler("eastLonValue")
+    void eastLonValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
         try {
+            NumericString val = coverage.getEasternLongitude();
+            val.setValueString(eastLonValue.getText());
             coverage.setEasternLongitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage("Invalid longitude: ", ex);
-            eastLonValueBox.setValue(coverage.getEasternLongitude().getValueString(), false);
+            UploadDashboard.showFailureMessage(INVALID_LONGITUDE_MSG, ex);
+            // eastLonValue.setValue(coverage.getEasternLongitude().getValueString(), false);
+            addnInvalid = "easternLongitude";
         }
-        markInvalids();
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("startDateBox")
-    void startDateBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setStartDatestamp(parseDatestampString(startDateBox.getText()));
-        markInvalids();
+    @UiHandler("startDateValue")
+    void startDateValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
+        try {
+            Datestamp newStamp = parseDatestampString(startDateValue.getText());
+            if ( !newStamp.isValid(today) )
+                throw new IllegalArgumentException("improper date/time format or not an actual date/time");
+            if ( origEarlyDate.isValid(today) && newStamp.after(origEarlyDate) )
+                throw new IllegalArgumentException("start date cannot be later than the earliest data date");
+            coverage.setStartDatestamp(newStamp);
+        } catch ( IllegalArgumentException ex ) {
+            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            // startDateValue.setValue(coverage.getStartDatestamp().fullOrPartialString(), false);
+            addnInvalid = "startDatestamp";
+        }
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("endDateBox")
-    void endDateBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setEndDatestamp(parseDatestampString(endDateBox.getText()));
-        markInvalids();
+    @UiHandler("endDateValue")
+    void endDateValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
+        try {
+            Datestamp newStamp = parseDatestampString(endDateValue.getText());
+            if ( !newStamp.isValid(today) )
+                throw new IllegalArgumentException("improper date/time format or not an actual date/time");
+            if ( origLateDate.isValid(today) && newStamp.before(origLateDate) )
+                throw new IllegalArgumentException("end date cannot be earlier than the latest data date");
+            coverage.setEndDatestamp(newStamp);
+        } catch ( IllegalArgumentException ex ) {
+            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            // endDateValue.setValue(coverage.getEndDatestamp().fullOrPartialString(), false);
+            addnInvalid = "endDatestamp";
+        }
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("earlyDateBox")
-    void earlyDateBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setEarliestDataDate(parseDatestampString(earlyDateBox.getText()));
-        markInvalids();
+    @UiHandler("earlyDateValue")
+    void earlyDateValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
+        try {
+            Datestamp newStamp = parseDatestampString(earlyDateValue.getText());
+            if ( !newStamp.isValid(today) )
+                throw new IllegalArgumentException("improper date/time format or not an actual date/time");
+            if ( origEarlyDate.isValid(today) && (newStamp.before(origEarlyDate) || newStamp.after(origEarlyDate)) )
+                throw new IllegalArgumentException("date and whatever time given must match " +
+                        origEarlyDate.fullOrPartialString());
+            coverage.setEarliestDataDate(newStamp);
+        } catch ( IllegalArgumentException ex ) {
+            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            // earlyDateValue.setValue(coverage.getEarliestDataDate().fullOrPartialString(), false);
+            addnInvalid = "earliestDataDate";
+        }
+        markInvalids(addnInvalid);
     }
 
-    @UiHandler("lateDateBox")
-    void lateDateBoxOnValueChange(ValueChangeEvent<String> event) {
-        coverage.setLatestDataDate(parseDatestampString(lateDateBox.getText()));
-        markInvalids();
+    @UiHandler("lateDateValue")
+    void lateDateValueOnValueChange(ValueChangeEvent<String> event) {
+        String addnInvalid = null;
+        try {
+            Datestamp newStamp = parseDatestampString(lateDateValue.getText());
+            if ( !newStamp.isValid(today) )
+                throw new IllegalArgumentException("improper date/time format or not an actual date/time");
+            if ( origLateDate.isValid(today) && (newStamp.before(origLateDate) || newStamp.after(origLateDate)) )
+                throw new IllegalArgumentException("date and whatever time given must match " +
+                        origLateDate.fullOrPartialString());
+            coverage.setLatestDataDate(newStamp);
+        } catch ( IllegalArgumentException ex ) {
+            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            // lateDateValue.setValue(coverage.getLatestDataDate().fullOrPartialString(), false);
+            addnInvalid = "latestDataDate";
+        }
+        markInvalids(addnInvalid);
     }
 
     @UiHandler("regionsBox")
@@ -186,7 +292,7 @@ public class CoveragePanel extends Composite {
                 regions.add(reg);
         }
         coverage.setGeographicNames(regions);
-        markInvalids();
+        markInvalids(null);
     }
 
     /**
@@ -227,65 +333,97 @@ public class CoveragePanel extends Composite {
 
     /**
      * Indicate which fields contain invalid values and which contain acceptable values.
+     *
+     * @param addnField
+     *         if not null or blank, always mark this field as invalid
      */
-    private void markInvalids() {
+    private void markInvalids(String addnField) {
         HashSet<String> invalids = coverage.invalidFieldNames(today);
+        if ( (addnField != null) && !addnField.trim().isEmpty() )
+            invalids.add(addnField.trim());
         if ( invalids.contains("spatialReference") )
-            spacialValueBox.markInvalid();
+            spacialHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + SPATIAL_REFERENCE_HTML + INVALID_HTML_SUFFIX));
         else
-            spacialValueBox.markValid();
+            spacialHtml.setHTML(SafeHtmlUtils.fromSafeConstant(SPATIAL_REFERENCE_HTML));
+
 
         if ( invalids.contains("southernLatitude") )
-            southLatValueBox.markInvalid();
+            southLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + SOUTHERN_LATITUDE_HTML + INVALID_HTML_SUFFIX));
         else
-            southLatValueBox.markValid();
+            southLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(SOUTHERN_LATITUDE_HTML));
 
         if ( invalids.contains("northernLatitude") )
-            northLatValueBox.markInvalid();
+            northLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + NORTHERN_LATITUDE_HTML + INVALID_HTML_SUFFIX));
         else
-            northLatValueBox.markValid();
+            northLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(NORTHERN_LATITUDE_HTML));
 
         if ( invalids.contains("westernLongitude") )
-            westLonValueBox.markInvalid();
+            westLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + WESTERN_LONGITUDE_HTML + INVALID_HTML_SUFFIX));
         else
-            westLonValueBox.markValid();
+            westLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(WESTERN_LONGITUDE_HTML));
 
         if ( invalids.contains("easternLongitude") )
-            eastLonValueBox.markInvalid();
+            eastLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + EASTERN_LONGITUDE_HTML + INVALID_HTML_SUFFIX));
         else
-            eastLonValueBox.markValid();
+            eastLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(EASTERN_LONGITUDE_HTML));
 
         if ( invalids.contains("startDatestamp") )
-            startDateBox.markInvalid();
+            startDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + START_DATE_HTML + INVALID_HTML_SUFFIX));
         else
-            startDateBox.markValid();
+            startDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(START_DATE_HTML));
 
         if ( invalids.contains("endDatestamp") )
-            endDateBox.markInvalid();
+            endDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + END_DATE_HTML + INVALID_HTML_SUFFIX));
         else
-            endDateBox.markValid();
+            endDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(END_DATE_HTML));
 
         if ( invalids.contains("earliestDataDate") )
-            earlyDateBox.markInvalid();
+            earlyDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + EARLY_DATE_HTML + INVALID_HTML_SUFFIX));
         else
-            earlyDateBox.markValid();
+            earlyDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(EARLY_DATE_HTML));
 
         if ( invalids.contains("latestDataDate") )
-            lateDateBox.markInvalid();
+            lateDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
+                    INVALID_HTML_PREFIX + LATE_DATE_HTML + INVALID_HTML_SUFFIX));
         else
-            lateDateBox.markValid();
+            lateDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(LATE_DATE_HTML));
 
         if ( invalids.contains("geographicNames") )
             regionsPanel.setCaptionHTML(SafeHtmlUtils.fromSafeConstant(
-                    "<b><em><color:red>" + REGIONS_PANEL_CAPTION + "</color></em></b>"));
+                    INVALID_HTML_PREFIX + REGIONS_HTML + INVALID_HTML_SUFFIX));
         else
-            regionsPanel.setCaptionText(REGIONS_PANEL_CAPTION);
+            regionsPanel.setCaptionHTML(SafeHtmlUtils.fromSafeConstant(REGIONS_HTML));
     }
 
     /**
      * @return the update Coverage object; never null
      */
     public Coverage getUpdatedCoverage() {
+        // Because erroneous input can leave mismatches,
+        // first update the displayed content in case this is from a save-and-continue
+        spacialValue.setText(coverage.getSpatialReference());
+        southLatValue.setText(coverage.getSouthernLatitude().getValueString());
+        northLatValue.setText(coverage.getNorthernLatitude().getValueString());
+        westLonValue.setText(coverage.getWesternLongitude().getValueString());
+        eastLonValue.setText(coverage.getEasternLongitude().getValueString());
+        startDateValue.setText(coverage.getStartDatestamp().fullOrPartialString());
+        endDateValue.setText(coverage.getEndDatestamp().fullOrPartialString());
+        earlyDateValue.setText(coverage.getEarliestDataDate().fullOrPartialString());
+        lateDateValue.setText(coverage.getLatestDataDate().fullOrPartialString());
+        String regions = "";
+        for (String name : coverage.getGeographicNames()) {
+            regions += name + "\n";
+        }
+        regionsBox.setText(regions);
+
         return coverage;
     }
 
