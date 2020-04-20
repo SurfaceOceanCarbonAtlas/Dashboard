@@ -9,7 +9,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextArea;
@@ -28,8 +27,6 @@ public class CoveragePanel extends Composite {
 
     private static final CoveragePanelUiBinder uiBinder = GWT.create(CoveragePanelUiBinder.class);
 
-    @UiField
-    Grid coverageGrid;
     @UiField
     HTML spacialHtml;
     @UiField
@@ -341,6 +338,7 @@ public class CoveragePanel extends Composite {
         HashSet<String> invalids = coverage.invalidFieldNames(today);
         if ( (addnField != null) && !addnField.trim().isEmpty() )
             invalids.add(addnField.trim());
+
         if ( invalids.contains("spatialReference") )
             spacialHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
                     INVALID_HTML_PREFIX + SPATIAL_REFERENCE_HTML + INVALID_HTML_SUFFIX));

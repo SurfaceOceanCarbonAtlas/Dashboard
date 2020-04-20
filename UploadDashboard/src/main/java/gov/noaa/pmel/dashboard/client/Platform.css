@@ -1,61 +1,18 @@
 @CHARSET "UTF-8";
 
-.countrybox {
-    display: inline;
+.grid {
+    display: grid;
+    column-gap: 0.25em;
+    row-gap: 1em;
+    margin: 0.25em;
 }
 
-.countrylabel {
-    display: inline;
+.gridlabel {
+    text-align: right;
+    font-size: medium;
+    width: 12em;
 }
 
-.countrypanel {
-    display: block;
-}
-
-.idbox {
-    display: inline;
-}
-
-.idlabel {
-    display: inline;
-}
-
-.idpanel {
-    display: block;
-}
-
-.namebox {
-    display: inline;
-}
-
-.namelabel {
-    display: inline;
-}
-
-.namepanel {
-    display: block;
-}
-
-.ownerbox {
-    display: inline;
-}
-
-.ownerlabel {
-    display: inline;
-}
-
-.ownerpanel {
-    display: block;
-}
-
-.typebox {
-    display: inline;
-}
-
-.typelabel {
-    display: inline;
-}
-
-.typepanel {
-    display: block;
+.gridtext {
+    width: 36em;
 }

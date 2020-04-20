@@ -45,7 +45,7 @@ public class Platform implements Duplicable, Serializable, IsSerializable {
     }
 
     /**
-     * @return the unique ID for this platform; never null but may be empty
+     * @return the ID (e.g., NODC code) for this platform; never null but may be empty
      */
     public String getPlatformId() {
         return platformId;
@@ -53,7 +53,7 @@ public class Platform implements Duplicable, Serializable, IsSerializable {
 
     /**
      * @param platformId
-     *         assign as the unique ID for this platform; if null, an empty string is assigned
+     *         assign as the ID (e.g., NODC code) for this platform; if null, an empty string is assigned
      */
     public void setPlatformId(String platformId) {
         this.platformId = (platformId != null) ? platformId.trim() : "";
