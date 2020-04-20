@@ -288,3 +288,5 @@ public class CoveragePanel extends Composite {
     public Coverage getUpdatedCoverage() {
         return coverage;
     }
+
+}
