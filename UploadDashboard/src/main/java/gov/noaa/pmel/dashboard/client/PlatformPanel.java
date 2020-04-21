@@ -56,25 +56,14 @@ public class PlatformPanel extends Composite {
         // Create a list of platform types and add the corresponding nice-looking type names to typeList
         platformTypeList = new ArrayList<PlatformType>();
         for (PlatformType type : PlatformType.values()) {
-            if ( type != PlatformType.UNKNOWN ) {
-                platformTypeList.add(type);
-                typeList.addItem(type.toString());
-            }
-        }
-
-        // Make sure there is an appropriate platform type assigned
-        if ( platform.getPlatformType() == PlatformType.UNKNOWN ) {
-            // Guess the type from the name and NODC code of the expocode; returns SHIP if cannot determine
-            PlatformType type = PlatformType.parse(DashboardUtils.guessPlatformType(
-                    platform.getPlatformId() + "ZZZZ", platform.getPlatformName()));
-            // Should not return UNKNOWN, but just in case...
-            if ( type == PlatformType.UNKNOWN )
-                type = PlatformType.SHIP;
-            platform.setPlatformType(type);
+            platformTypeList.add(type);
+            typeList.addItem(type.toString());
         }
 
         // The following will assign the values in the text fields
         getUpdatedPlatform();
+        // If the platform type is unknown, see if it can guess the type
+        possiblyUpdatePlatformType();
         // The following will assign the HTML to the labels before the text fields
         markInvalids();
     }
@@ -82,12 +71,16 @@ public class PlatformPanel extends Composite {
     @UiHandler("idValue")
     void idValueOnValueChange(ValueChangeEvent<String> event) {
         platform.setPlatformId(idValue.getText());
+        // If the platform type is unknown, see if it can guess the type
+        possiblyUpdatePlatformType();
         markInvalids();
     }
 
     @UiHandler("nameValue")
     void nameValueOnValueChange(ValueChangeEvent<String> event) {
         platform.setPlatformName(nameValue.getText());
+        // If the platform type is unknown, see if it can guess the type
+        possiblyUpdatePlatformType();
         markInvalids();
     }
 
@@ -109,6 +102,21 @@ public class PlatformPanel extends Composite {
     void countryValueOnValueChange(ValueChangeEvent<String> event) {
         platform.setPlatformCountry(countryValue.getText());
         markInvalids();
+    }
+
+    /**
+     * If the platform type is unknown, but there is a NODC code (and maybe also a platform name), guess the type
+     */
+    private void possiblyUpdatePlatformType() {
+        String platformId = platform.getPlatformId();
+        if ( (platform.getPlatformType() == PlatformType.UNKNOWN) && (platformId.length() >= 4) ) {
+            String platformName = platform.getPlatformName();
+            PlatformType type = PlatformType.parse(DashboardUtils.guessPlatformType(platformId, platformName));
+            platform.setPlatformType(type);
+            int idx = platformTypeList.indexOf(type);
+            if ( idx >= 0 )
+                typeList.setSelectedIndex(idx);
+        }
     }
 
     /**
