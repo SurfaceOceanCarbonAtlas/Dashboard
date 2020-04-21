@@ -6,6 +6,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -13,6 +14,9 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
 
 public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
+
+    private static final String INVALID_HTML_PREFIX = "<span style='color:red; font-weight:bold; font-style:oblique'>";
+    private static final String INVALID_HTML_SUFFIX = "</span>";
 
     public static final DashboardResources resources =
             GWT.create(DashboardResources.class);
@@ -115,6 +119,18 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         // Make sure singleton is assign to this instance since
         // this constructor is probably called from GWT.
         singleton = this;
+    }
+
+    /**
+     * Generates the highlighted version of a label indicating associated content is invalid.
+     *
+     * @param labelHtml
+     *         HTML of the Label with valid associated content
+     *
+     * @return HTML of the label with invalid associated content
+     */
+    public static SafeHtml invalidLabelHtml(SafeHtml labelHtml) {
+        return SafeHtmlUtils.fromTrustedString(INVALID_HTML_PREFIX + labelHtml.asString() + INVALID_HTML_SUFFIX);
     }
 
     /**

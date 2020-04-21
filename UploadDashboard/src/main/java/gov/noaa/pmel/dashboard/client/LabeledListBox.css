@@ -1,0 +1,29 @@
+@CHARSET "UTF-8";
+
+.prefix {
+    display: inline-block;
+    text-align: right;
+    font-size: medium;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0;
+    margin-right: 0.25em;
+}
+
+.value {
+    display: inline;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+}
+
+.suffix {
+    display: inline-block;
+    text-align: left;
+    font-size: medium;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0.25em;
+    margin-right: 0;
+}

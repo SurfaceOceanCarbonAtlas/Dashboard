@@ -1,40 +1,28 @@
 @CHARSET "UTF-8";
 
-.grid {
-    display: grid;
-    column-gap: 0.25em;
-    row-gap: 1em;
-    margin: 0.25em;
+.scrollpanel {
+    width: min-content;
 }
 
-.gridlabel {
-    text-align: right;
-    font-size: medium;
-    width: 12em;
+.rowpanel {
+    display: block;
+    width: max-content;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: 0;
+    margin-right: 0;
 }
 
-.gridtext {
-    width: 12em;
-}
-
-.gridunit {
-    text-align: left;
-    font-size: medium;
-    width: 8em;
-}
-
-.dateunit {
-    text-align: left;
-    font-size: small;
-    width: 8em;
-}
-
-.regionspanel {
+.cellpanel {
     display: inline;
-    margin: 0.25em;
+    width: min-content;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 
-.regionsbox {
-    height: 10em;
-    width: 60em;
+.areapanel {
+    display: block;
+    margin: 0.5em;
 }

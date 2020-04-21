@@ -1,66 +1,45 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:my='urn:import:gov.noaa.pmel.dashboard.client'>
 
     <ui:style src="MiscInfo.css"/>
 
-    <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.namepanel}">
-            <g:Label addStyleNames="{style.idlabel}" ui:field="idLabel"/>
-            <g:TextBox addStyleNames="{style.idbox}" ui:field="idBox"/>
-            <g:Label addStyleNames="{style.namelabel}" ui:field="nameLabel"/>
-            <g:TextBox addStyleNames="{style.namebox}" ui:field="nameBox"/>
-            <g:Label addStyleNames="{style.sectionlabel}" ui:field="sectionLabel"/>
-            <g:TextBox addStyleNames="{style.sectionbox}" ui:field="sectionBox"/>
+    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="sectionValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="doiValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="accessValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="citationValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="websiteValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="downloadValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fundAgencyValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fundIdValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fundTitleValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="projectValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="synopsisValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="purposeValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="refsValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="portsValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="historyValue"/>
         </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.doipanel}">
-            <g:Label addStyleNames="{style.doilabel}" ui:field="doiLabel"/>
-            <g:TextBox addStyleNames="{style.doibox}" ui:field="doiBox"/>
-            <g:Label addStyleNames="{style.accesslabel}" ui:field="accessLabel"/>
-            <g:TextBox addStyleNames="{style.accessbox}" ui:field="accessBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.citationpanel}">
-            <g:Label addStyleNames="{style.citationlabel}" ui:field="citationLabel"/>
-            <g:TextBox addStyleNames="{style.citationbox}" ui:field="citationBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.websitepanel}">
-            <g:Label addStyleNames="{style.websitelabel}" ui:field="websiteLabel"/>
-            <g:TextBox addStyleNames="{style.websitebox}" ui:field="websiteBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.downloadpanel}">
-            <g:Label addStyleNames="{style.downloadlabel}" ui:field="downloadLabel"/>
-            <g:TextBox addStyleNames="{style.downloadbox}" ui:field="downloadBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.fundingpanel}">
-            <g:Label addStyleNames="{style.fundagencylabel}" ui:field="fundAgencyLabel"/>
-            <g:TextBox addStyleNames="{style.fundagencygbox}" ui:field="fundAgencyBox"/>
-            <g:Label addStyleNames="{style.fundtitlelabel}" ui:field="fundTitleLabel"/>
-            <g:TextBox addStyleNames="{style.fundtitlegbox}" ui:field="fundTitleBox"/>
-            <g:Label addStyleNames="{style.fundidlabel}" ui:field="fundIdLabel"/>
-            <g:TextBox addStyleNames="{style.fundidbox}" ui:field="fundIdBox"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.projectpanel}">
-            <g:Label addStyleNames="{style.projectlabel}" ui:field="projectLabel"/>
-            <g:TextBox addStyleNames="{style.projectbox}" ui:field="projectBox"/>
-        </g:FlowPanel>
-        <g:CaptionPanel addStyleNames="{style.synopsispanel}" ui:field="synopsisPanel">
-            <g:TextArea addStyleNames="{style.synopsisbox}" ui:field="synopsisBox"/>
-        </g:CaptionPanel>
-        <g:CaptionPanel addStyleNames="{style.purposepanel}" ui:field="purposePanel">
-            <g:TextArea addStyleNames="{style.purposebox}" ui:field="purposeBox"/>
-        </g:CaptionPanel>
-        <g:CaptionPanel addStyleNames="{style.refspanel}" ui:field="refsPanel">
-            <g:TextArea addStyleNames="{style.refsbox}" ui:field="refsBox"/>
-        </g:CaptionPanel>
-        <g:CaptionPanel addStyleNames="{style.portspanel}" ui:field="portsPanel">
-            <g:TextArea addStyleNames="{style.portsbox}" ui:field="portsBox"/>
-        </g:CaptionPanel>
-        <g:CaptionPanel addStyleNames="{style.addninfopanel}" ui:field="addnInfoPanel">
-            <g:TextArea addStyleNames="{style.addninfobox}" ui:field="addnInfoBox"/>
-        </g:CaptionPanel>
-        <g:CaptionPanel addStyleNames="{style.historypanel}" ui:field="historyPanel">
-            <g:TextArea addStyleNames="{style.historybox}" ui:field="historyBox"/>
-        </g:CaptionPanel>
-    </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

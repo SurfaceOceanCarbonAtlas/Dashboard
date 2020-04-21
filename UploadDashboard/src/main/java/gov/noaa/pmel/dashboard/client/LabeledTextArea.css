@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.captionpanel {
+    height: min-content;
+    width: min-content;
+}
+

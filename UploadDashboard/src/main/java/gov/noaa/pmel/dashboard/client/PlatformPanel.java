@@ -3,15 +3,11 @@ package gov.noaa.pmel.dashboard.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
@@ -24,40 +20,21 @@ public class PlatformPanel extends Composite {
     interface PlatformPanelUiBinder extends UiBinder<FlowPanel,PlatformPanel> {
     }
 
-    private static PlatformPanelUiBinder uiBinder = GWT.create(PlatformPanelUiBinder.class);
+    private static final PlatformPanelUiBinder uiBinder = GWT.create(PlatformPanelUiBinder.class);
 
-    @UiField
-    HTML idHtml;
-    @UiField
-    TextBox idValue;
-    @UiField
-    HTML nameHtml;
-    @UiField
-    TextBox nameValue;
-    @UiField
-    HTML typeHtml;
-    @UiField
-    ListBox typeList;
-    @UiField
-    HTML ownerHtml;
-    @UiField
-    TextBox ownerValue;
-    @UiField
-    HTML countryHtml;
-    @UiField
-    TextBox countryValue;
+    @UiField(provided = true)
+    final LabeledTextBox idValue;
+    @UiField(provided = true)
+    final LabeledTextBox nameValue;
+    @UiField(provided = true)
+    final LabeledListBox typeList;
+    @UiField(provided = true)
+    final LabeledTextBox ownerValue;
+    @UiField(provided = true)
+    final LabeledTextBox countryValue;
 
-    private static final String PLATFORM_ID_HTML = "NODC code or other ID:";
-    private static final String PLATFORM_NAME_HTML = "Name of plaform:";
-    private static final String PLATFORM_TYPE_HTML = "Type of platform:";
-    private static final String OWNER_HTML = "Owner of platform:";
-    private static final String COUNTRY_HTML = "Country of registration:";
-
-    private static final String INVALID_HTML_PREFIX = "<span style='color:red; font-weight:bold; font-style:oblique'>";
-    private static final String INVALID_HTML_SUFFIX = "</span>";
-
-    private Platform platform;
-    private ArrayList<PlatformType> platformTypeList;
+    private final Platform platform;
+    private final ArrayList<PlatformType> platformTypeList;
 
     /**
      * Creates a FlowPanel associated with the given Platform.
@@ -66,6 +43,12 @@ public class PlatformPanel extends Composite {
      *         associate this panel with this Platform; cannot be null
      */
     public PlatformPanel(Platform platform) {
+        idValue = new LabeledTextBox("NODC code or other ID:", "12em", "15em", null, null);
+        nameValue = new LabeledTextBox("Name of plaform:", "12em", "15em", null, null);
+        typeList = new LabeledListBox("Type of platform:", "12em", null, null, null);
+        ownerValue = new LabeledTextBox("Owner of platform:", "12em", "15em", null, null);
+        countryValue = new LabeledTextBox("Country of registration:", "12em", "15em", null, null);
+
         initWidget(uiBinder.createAndBindUi(this));
 
         this.platform = platform;
@@ -135,41 +118,36 @@ public class PlatformPanel extends Composite {
         HashSet<String> invalids = platform.invalidFieldNames();
 
         if ( invalids.contains("platformId") )
-            idHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + PLATFORM_ID_HTML + INVALID_HTML_SUFFIX));
+            idValue.markInvalid();
         else
-            idHtml.setHTML(SafeHtmlUtils.fromSafeConstant(PLATFORM_ID_HTML));
+            idValue.markValid();
 
         if ( invalids.contains("platformName") )
-            nameHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + PLATFORM_NAME_HTML + INVALID_HTML_SUFFIX));
+            nameValue.markInvalid();
         else
-            nameHtml.setHTML(SafeHtmlUtils.fromSafeConstant(PLATFORM_NAME_HTML));
+            nameValue.markValid();
 
         if ( invalids.contains("platformType") )
-            typeHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + PLATFORM_TYPE_HTML + INVALID_HTML_SUFFIX));
+            typeList.markInvalid();
         else
-            typeHtml.setHTML(SafeHtmlUtils.fromSafeConstant(PLATFORM_TYPE_HTML));
+            typeList.markValid();
 
         if ( invalids.contains("owner") )
-            ownerHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + OWNER_HTML + INVALID_HTML_SUFFIX));
+            ownerValue.markInvalid();
         else
-            ownerHtml.setHTML(SafeHtmlUtils.fromSafeConstant(OWNER_HTML));
+            ownerValue.markValid();
 
         if ( invalids.contains("country") )
-            countryHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + COUNTRY_HTML + INVALID_HTML_SUFFIX));
+            countryValue.markInvalid();
         else
-            countryHtml.setHTML(SafeHtmlUtils.fromSafeConstant(COUNTRY_HTML));
+            countryValue.markValid();
     }
 
     /**
      * @return the updated Platform; never null
      */
     public Platform getUpdatedPlatform() {
-        // Because erroneous input can leave mismatches,
+        // In case erroneous input leaves mismatches,
         // first update the displayed content in case this is from a save-and-continue
         idValue.setText(platform.getPlatformId());
         nameValue.setText(platform.getPlatformName());

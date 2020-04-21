@@ -1,18 +1,6 @@
 @CHARSET "UTF-8";
 
-.grid {
-    display: grid;
-    column-gap: 0.25em;
-    row-gap: 1em;
-    margin: 0.25em;
-}
-
-.gridlabel {
-    text-align: right;
-    font-size: medium;
-    width: 12em;
-}
-
-.gridtext {
-    width: 36em;
+.areapanel {
+    display: block;
+    margin: 0.5em;
 }

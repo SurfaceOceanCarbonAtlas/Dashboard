@@ -1,115 +1,33 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:my='urn:import:gov.noaa.pmel.dashboard.client'>
 
     <ui:style src="Coverage.css"/>
 
-    <g:FlowPanel>
-        <g:Grid addStyleNames="{style.grid}">
-            <g:row>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="spacialHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="spacialValue"/>
-                </g:customCell>
-                <g:cell>
-                    <span>&nbsp;</span>
-                </g:cell>
-                <g:cell>
-                    <span>&nbsp;</span>
-                </g:cell>
-                <g:cell>
-                    <span>&nbsp;</span>
-                </g:cell>
-                <g:cell>
-                    <span>&nbsp;</span>
-                </g:cell>
-            </g:row>
-            <g:row>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="southLatHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="southLatValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.gridunit}" ui:field="southLatUnit"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="northLatHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="northLatValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.gridunit}" ui:field="northLatUnit"/>
-                </g:customCell>
-            </g:row>
-            <g:row>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="westLonHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="westLonValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.gridunit}" ui:field="westLonUnit"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="eastLonHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="eastLonValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.gridunit}" ui:field="eastLonUnit"/>
-                </g:customCell>
-            </g:row>
-            <g:row>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="startDateHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="startDateValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.dateunit}" ui:field="startDateUnit"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="endDateHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="endDateValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.dateunit}" ui:field="endDateUnit"/>
-                </g:customCell>
-            </g:row>
-            <g:row>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="earlyDateHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="earlyDateValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.dateunit}" ui:field="earlyDateUnit"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:HTML addStyleNames="{style.gridlabel}" ui:field="lateDateHtml"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:TextBox addStyleNames="{style.gridtext}" ui:field="lateDateValue"/>
-                </g:customCell>
-                <g:customCell>
-                    <g:Label addStyleNames="{style.dateunit}" ui:field="lateDateUnit"/>
-                </g:customCell>
-            </g:row>
-        </g:Grid>
-        <g:CaptionPanel addStyleNames="{style.regionspanel}" ui:field="regionsPanel">
-            <g:TextArea addStyleNames="{style.regionsbox}" ui:field="regionsBox"/>
-        </g:CaptionPanel>
-    </g:FlowPanel>
+    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="spacialValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="southLatValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="northLatValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="westLonValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="eastLonValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="startDateValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="endDateValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="earlyDateValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lateDateValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="regionsValue"/>
+        </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

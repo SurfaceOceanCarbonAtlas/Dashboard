@@ -2,17 +2,11 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
@@ -22,87 +16,33 @@ import java.util.TreeSet;
 
 public class CoveragePanel extends Composite {
 
-    interface CoveragePanelUiBinder extends UiBinder<FlowPanel,CoveragePanel> {
+    private static final String DATE_UNIT_TEXT = "(yyyy-MM-dd)";
+
+    interface CoveragePanelUiBinder extends UiBinder<ScrollPanel,CoveragePanel> {
     }
 
     private static final CoveragePanelUiBinder uiBinder = GWT.create(CoveragePanelUiBinder.class);
 
-    @UiField
-    HTML spacialHtml;
-    @UiField
-    TextBox spacialValue;
-    @UiField
-    HTML southLatHtml;
-    @UiField
-    TextBox southLatValue;
-    @UiField
-    Label southLatUnit;
-    @UiField
-    HTML northLatHtml;
-    @UiField
-    TextBox northLatValue;
-    @UiField
-    Label northLatUnit;
-    @UiField
-    HTML westLonHtml;
-    @UiField
-    TextBox westLonValue;
-    @UiField
-    Label westLonUnit;
-    @UiField
-    HTML eastLonHtml;
-    @UiField
-    TextBox eastLonValue;
-    @UiField
-    Label eastLonUnit;
-    @UiField
-    HTML startDateHtml;
-    @UiField
-    TextBox startDateValue;
-    @UiField
-    Label startDateUnit;
-    @UiField
-    HTML endDateHtml;
-    @UiField
-    TextBox endDateValue;
-    @UiField
-    Label endDateUnit;
-    @UiField
-    HTML earlyDateHtml;
-    @UiField
-    TextBox earlyDateValue;
-    @UiField
-    Label earlyDateUnit;
-    @UiField
-    HTML lateDateHtml;
-    @UiField
-    TextBox lateDateValue;
-    @UiField
-    Label lateDateUnit;
-    @UiField
-    CaptionPanel regionsPanel;
-    @UiField
-    TextArea regionsBox;
-
-    private static final String SPATIAL_REFERENCE_HTML = "Spatial reference:";
-    private static final String SOUTHERN_LATITUDE_HTML = "Southern-most latitude:";
-    private static final String NORTHERN_LATITUDE_HTML = "Northern-most latitude:";
-    private static final String WESTERN_LONGITUDE_HTML = "Western-most longitude:";
-    private static final String EASTERN_LONGITUDE_HTML = "Eastern-most longitude:";
-    private static final String START_DATE_HTML = "Expedition starting date:";
-    private static final String END_DATE_HTML = "Expedition ending date:";
-    private static final String EARLY_DATE_HTML = "Earliest data date:";
-    private static final String LATE_DATE_HTML = "Latest data date:";
-    private static final String REGIONS_HTML = "Geographic names";
-
-    private static final String DATE_UNIT_TEXT = "(yyyy-MM-dd)";
-
-    private static final String INVALID_LATITUDE_MSG = "Invalid latitude";
-    private static final String INVALID_LONGITUDE_MSG = "Invalid longitude";
-    private static final String INVALID_DATESTAMP_MSG = "Invalid date";
-
-    private static final String INVALID_HTML_PREFIX = "<span style='color:red; font-weight:bold; font-style:oblique'>";
-    private static final String INVALID_HTML_SUFFIX = "</span>";
+    @UiField(provided = true)
+    final LabeledTextBox spacialValue;
+    @UiField(provided = true)
+    final LabeledTextBox southLatValue;
+    @UiField(provided = true)
+    final LabeledTextBox northLatValue;
+    @UiField(provided = true)
+    final LabeledTextBox westLonValue;
+    @UiField(provided = true)
+    final LabeledTextBox eastLonValue;
+    @UiField(provided = true)
+    final LabeledTextBox startDateValue;
+    @UiField(provided = true)
+    final LabeledTextBox endDateValue;
+    @UiField(provided = true)
+    final LabeledTextBox earlyDateValue;
+    @UiField(provided = true)
+    final LabeledTextBox lateDateValue;
+    @UiField(provided = true)
+    final LabeledTextArea regionsValue;
 
     private final Coverage coverage;
     private final Datestamp today;
@@ -116,19 +56,30 @@ public class CoveragePanel extends Composite {
      *         associate this panel with this Coverage; cannot be null
      */
     public CoveragePanel(Coverage coverage, Datestamp today) {
+        spacialValue = new LabeledTextBox("Spatial reference:", "12em", "15em", null, null);
+        //
+        southLatValue = new LabeledTextBox("Southern-most latitude:", "12em", "15em",
+                coverage.getSouthernLatitude().getUnitString(), "8em");
+        northLatValue = new LabeledTextBox("Northern-most latitude:", "12em", "15em",
+                coverage.getNorthernLatitude().getUnitString(), "8em");
+        //
+        westLonValue = new LabeledTextBox("Western-most longitude:", "12em", "15em",
+                coverage.getWesternLongitude().getUnitString(), "8em");
+        eastLonValue = new LabeledTextBox("Eastern-most longitude:", "12em", "15em",
+                coverage.getEasternLongitude().getUnitString(), "8em");
+        //
+        startDateValue = new LabeledTextBox("Expedition starting date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        endDateValue = new LabeledTextBox("Expedition ending date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        //
+        earlyDateValue = new LabeledTextBox("Earliest data date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        lateDateValue = new LabeledTextBox("Latest data date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        //
+        regionsValue = new LabeledTextArea("Geographic names", "10em", "74em");
+
         initWidget(uiBinder.createAndBindUi(this));
 
         this.coverage = coverage;
         this.today = today;
-
-        southLatUnit.setText(coverage.getSouthernLatitude().getUnitString());
-        northLatUnit.setText(coverage.getNorthernLatitude().getUnitString());
-        westLonUnit.setText(coverage.getWesternLongitude().getUnitString());
-        eastLonUnit.setText(coverage.getEasternLongitude().getUnitString());
-        startDateUnit.setText(DATE_UNIT_TEXT);
-        endDateUnit.setText(DATE_UNIT_TEXT);
-        earlyDateUnit.setText(DATE_UNIT_TEXT);
-        lateDateUnit.setText(DATE_UNIT_TEXT);
 
         origEarlyDate = coverage.getEarliestDataDate();
         origLateDate = coverage.getLatestDataDate();
@@ -153,7 +104,7 @@ public class CoveragePanel extends Composite {
             val.setValueString(southLatValue.getText());
             coverage.setSouthernLatitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_LATITUDE_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid southern-most latitude", ex);
             // southLatValue.setValue(coverage.getSouthernLatitude().getValueString(), false);
             addnInvalid = "southernLatitude";
         }
@@ -168,7 +119,7 @@ public class CoveragePanel extends Composite {
             val.setValueString(northLatValue.getText());
             coverage.setNorthernLatitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_LATITUDE_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid northern-most latitude", ex);
             // northLatValue.setValue(coverage.getNorthernLatitude().getValueString(), false);
             addnInvalid = "northernLatitude";
         }
@@ -183,7 +134,7 @@ public class CoveragePanel extends Composite {
             val.setValueString(westLonValue.getText());
             coverage.setWesternLongitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_LONGITUDE_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid western-most longitude", ex);
             // westLonValue.setValue(coverage.getWesternLongitude().getValueString(), false);
             addnInvalid = "westernLongitude";
         }
@@ -198,7 +149,7 @@ public class CoveragePanel extends Composite {
             val.setValueString(eastLonValue.getText());
             coverage.setEasternLongitude(val);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_LONGITUDE_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid eastern-most longitude", ex);
             // eastLonValue.setValue(coverage.getEasternLongitude().getValueString(), false);
             addnInvalid = "easternLongitude";
         }
@@ -216,7 +167,7 @@ public class CoveragePanel extends Composite {
                 throw new IllegalArgumentException("start date cannot be later than the earliest data date");
             coverage.setStartDatestamp(newStamp);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid expedition start date", ex);
             // startDateValue.setValue(coverage.getStartDatestamp().fullOrPartialString(), false);
             addnInvalid = "startDatestamp";
         }
@@ -234,7 +185,7 @@ public class CoveragePanel extends Composite {
                 throw new IllegalArgumentException("end date cannot be earlier than the latest data date");
             coverage.setEndDatestamp(newStamp);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid expedition end date", ex);
             // endDateValue.setValue(coverage.getEndDatestamp().fullOrPartialString(), false);
             addnInvalid = "endDatestamp";
         }
@@ -253,7 +204,7 @@ public class CoveragePanel extends Composite {
                         origEarlyDate.fullOrPartialString());
             coverage.setEarliestDataDate(newStamp);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid earliest data date", ex);
             // earlyDateValue.setValue(coverage.getEarliestDataDate().fullOrPartialString(), false);
             addnInvalid = "earliestDataDate";
         }
@@ -272,16 +223,16 @@ public class CoveragePanel extends Composite {
                         origLateDate.fullOrPartialString());
             coverage.setLatestDataDate(newStamp);
         } catch ( IllegalArgumentException ex ) {
-            UploadDashboard.showFailureMessage(INVALID_DATESTAMP_MSG, ex);
+            UploadDashboard.showFailureMessage("Invalid latest data date", ex);
             // lateDateValue.setValue(coverage.getLatestDataDate().fullOrPartialString(), false);
             addnInvalid = "latestDataDate";
         }
         markInvalids(addnInvalid);
     }
 
-    @UiHandler("regionsBox")
-    void regionsBoxOnValueChanged(ValueChangeEvent<String> event) {
-        String[] pieces = regionsBox.getText().split("\n");
+    @UiHandler("regionsValue")
+    void regionsValueOnValueChanged(ValueChangeEvent<String> event) {
+        String[] pieces = regionsValue.getText().split("\n");
         TreeSet<String> regions = new TreeSet<String>();
         for (String str : pieces) {
             String reg = str.trim();
@@ -340,65 +291,54 @@ public class CoveragePanel extends Composite {
             invalids.add(addnField.trim());
 
         if ( invalids.contains("spatialReference") )
-            spacialHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + SPATIAL_REFERENCE_HTML + INVALID_HTML_SUFFIX));
+            spacialValue.markInvalid();
         else
-            spacialHtml.setHTML(SafeHtmlUtils.fromSafeConstant(SPATIAL_REFERENCE_HTML));
-
+            spacialValue.markValid();
 
         if ( invalids.contains("southernLatitude") )
-            southLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + SOUTHERN_LATITUDE_HTML + INVALID_HTML_SUFFIX));
+            southLatValue.markInvalid();
         else
-            southLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(SOUTHERN_LATITUDE_HTML));
+            southLatValue.markValid();
 
         if ( invalids.contains("northernLatitude") )
-            northLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + NORTHERN_LATITUDE_HTML + INVALID_HTML_SUFFIX));
+            northLatValue.markInvalid();
         else
-            northLatHtml.setHTML(SafeHtmlUtils.fromSafeConstant(NORTHERN_LATITUDE_HTML));
+            northLatValue.markValid();
 
         if ( invalids.contains("westernLongitude") )
-            westLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + WESTERN_LONGITUDE_HTML + INVALID_HTML_SUFFIX));
+            westLonValue.markInvalid();
         else
-            westLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(WESTERN_LONGITUDE_HTML));
+            westLonValue.markValid();
 
         if ( invalids.contains("easternLongitude") )
-            eastLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + EASTERN_LONGITUDE_HTML + INVALID_HTML_SUFFIX));
+            eastLonValue.markInvalid();
         else
-            eastLonHtml.setHTML(SafeHtmlUtils.fromSafeConstant(EASTERN_LONGITUDE_HTML));
+            eastLonValue.markValid();
 
         if ( invalids.contains("startDatestamp") )
-            startDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + START_DATE_HTML + INVALID_HTML_SUFFIX));
+            startDateValue.markInvalid();
         else
-            startDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(START_DATE_HTML));
+            startDateValue.markValid();
 
         if ( invalids.contains("endDatestamp") )
-            endDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + END_DATE_HTML + INVALID_HTML_SUFFIX));
+            endDateValue.markInvalid();
         else
-            endDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(END_DATE_HTML));
+            endDateValue.markValid();
 
         if ( invalids.contains("earliestDataDate") )
-            earlyDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + EARLY_DATE_HTML + INVALID_HTML_SUFFIX));
+            earlyDateValue.markInvalid();
         else
-            earlyDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(EARLY_DATE_HTML));
+            earlyDateValue.markValid();
 
         if ( invalids.contains("latestDataDate") )
-            lateDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + LATE_DATE_HTML + INVALID_HTML_SUFFIX));
+            lateDateValue.markInvalid();
         else
-            lateDateHtml.setHTML(SafeHtmlUtils.fromSafeConstant(LATE_DATE_HTML));
+            lateDateValue.markValid();
 
         if ( invalids.contains("geographicNames") )
-            regionsPanel.setCaptionHTML(SafeHtmlUtils.fromSafeConstant(
-                    INVALID_HTML_PREFIX + REGIONS_HTML + INVALID_HTML_SUFFIX));
+            regionsValue.markInvalid();
         else
-            regionsPanel.setCaptionHTML(SafeHtmlUtils.fromSafeConstant(REGIONS_HTML));
+            regionsValue.markValid();
     }
 
     /**
@@ -420,7 +360,7 @@ public class CoveragePanel extends Composite {
         for (String name : coverage.getGeographicNames()) {
             regions += name + "\n";
         }
-        regionsBox.setText(regions);
+        regionsValue.setText(regions);
 
         return coverage;
     }

@@ -1,168 +1,28 @@
 @CHARSET "UTF-8";
 
-.accessbox {
+.scrollpanel {
+    width: min-content;
+}
+
+.rowpanel {
     display: block;
+    width: max-content;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: 0;
+    margin-right: 0;
 }
 
-.accesslabel {
+.cellpanel {
     display: inline;
+    width: min-content;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 
-.addninfobox {
-}
-
-.addninfopanel {
+.areapanel {
     display: block;
-}
-
-.citationbox {
-    display: inline;
-}
-
-.citationlabel {
-    display: inline;
-}
-
-.citationpanel {
-    display: block;
-}
-
-.doibox {
-    display: inline;
-}
-
-.doilabel {
-    display: inline;
-}
-
-.doipanel {
-    display: block;
-}
-
-.downloadbox {
-    display: inline;
-}
-
-.downloadlabel {
-    display: inline;
-}
-
-.downloadpanel {
-    display: block;
-}
-
-.fundagencygbox {
-    display: inline;
-}
-
-.fundagencylabel {
-    display: inline;
-}
-
-.fundidbox {
-    display: inline;
-}
-
-.fundidlabel {
-    display: inline;
-}
-
-.fundingpanel {
-    display: block;
-}
-
-.fundtitlegbox {
-    display: inline;
-}
-
-.fundtitlelabel {
-    display: inline;
-}
-
-.historybox {
-}
-
-.historypanel {
-    display: block;
-}
-
-.idbox {
-    display: inline;
-}
-
-.idlabel {
-    display: inline;
-}
-
-.namebox {
-    display: inline;
-}
-
-.namelabel {
-    display: inline;
-}
-
-.namepanel {
-    display: block;
-}
-
-.portsbox {
-}
-
-.portspanel {
-    display: block;
-}
-
-.projectbox {
-    display: inline;
-}
-
-.projectlabel {
-    display: inline;
-}
-
-.projectpanel {
-    display: block;
-}
-
-.purposebox {
-}
-
-.purposepanel {
-    display: block;
-}
-
-.refsbox {
-}
-
-.refspanel {
-    display: block;
-}
-
-.sectionbox {
-    display: inline;
-}
-
-.sectionlabel {
-    display: inline;
-}
-
-.synopsisbox {
-    display: inline;
-}
-
-.synopsispanel {
-    display: block;
-}
-
-.websitebox {
-    display: inline;
-}
-
-.websitelabel {
-    display: inline;
-}
-
-.websitepanel {
-    display: block;
+    margin: 0.5em;
 }
