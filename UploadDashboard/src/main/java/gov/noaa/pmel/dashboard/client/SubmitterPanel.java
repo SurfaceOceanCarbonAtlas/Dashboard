@@ -17,8 +17,8 @@ public class SubmitterPanel extends InvestigatorPanel {
         this.submitter = submitter;
     }
 
-    // Since there are no additional fields in Submitter,
-    // there is not much to add here.
+    // Since there are no additional fields in Submitter, and InvestigatorPanel works with exactly
+    // the Investigator object passed to it, there is not much to add here.
 
     /**
      * @return the updated Submitter; never null

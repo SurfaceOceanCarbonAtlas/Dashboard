@@ -23,6 +23,7 @@ import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -599,10 +600,15 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
             throw new IllegalArgumentException("Invalid user request");
 
         // TODO: actually implement - this is an incorrect stub just to return something
+        SocatMetadata metadata = new SocatMetadata();
         MiscInfo miscInfo = new MiscInfo();
         miscInfo.setDatasetId(datasetId);
-        SocatMetadata metadata = new SocatMetadata();
         metadata.setMiscInfo(miscInfo);
+        if ( datasetId.length() >= 4 ) {
+            Platform platform = new Platform();
+            platform.setPlatformId(datasetId.substring(0, 4));
+            metadata.setPlatform(platform);
+        }
         return metadata;
     }
 

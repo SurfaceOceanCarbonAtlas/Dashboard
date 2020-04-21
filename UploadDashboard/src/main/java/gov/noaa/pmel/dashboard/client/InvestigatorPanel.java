@@ -1,15 +1,16 @@
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
+
+import java.util.HashSet;
 
 public class InvestigatorPanel extends Composite {
 
@@ -18,119 +19,149 @@ public class InvestigatorPanel extends Composite {
 
     private static InvestigatorPanelUiBinder uiBinder = GWT.create(InvestigatorPanelUiBinder.class);
 
-    @UiField
-    Label firstLabel;
-    @UiField
-    TextBox firstBox;
-    @UiField
-    Label middleLabel;
-    @UiField
-    TextBox middleBox;
-    @UiField
-    Label lastLabel;
-    @UiField
-    TextBox lastBox;
-    @UiField
-    Label idLabel;
-    @UiField
-    TextBox idBox;
-    @UiField
-    Label idTypeLabel;
-    @UiField
-    TextBox idTypeBox;
-    @UiField
-    Label organizationLabel;
-    @UiField
-    TextBox organizationBox;
+    @UiField(provided = true)
+    final LabeledTextBox firstValue;
+    @UiField(provided = true)
+    final LabeledTextBox middleValue;
+    @UiField(provided = true)
+    final LabeledTextBox lastValue;
+    @UiField(provided = true)
+    final LabeledTextBox idValue;
+    @UiField(provided = true)
+    final LabeledTextBox idTypeValue;
+    @UiField(provided = true)
+    final LabeledTextBox orgValue;
 
-    private Investigator pi;
+    private Investigator investigator;
     private Label header;
 
     /**
      * Creates a FlowPanel associated with the given Investigator.
      *
-     * @param pi
+     * @param investigator
      *         associate this panel with this Investigator; cannot be null
      * @param header
      *         header label that should be updated when appropriate values change; cannot be null.
      */
-    public InvestigatorPanel(Investigator pi, Label header) {
-        this(pi);
+    public InvestigatorPanel(Investigator investigator, Label header) {
+        this(investigator);
 
         this.header = header;
-        header.setText(pi.getReferenceName());
+        header.setText(investigator.getReferenceName());
     }
 
     /**
      * Creates a FlowPanel associated with the given Investigator
      * but without an associated header label.
      *
-     * @param pi
+     * @param investigator
      *         associate this panel with this Investigator; cannot be null
      */
-    protected InvestigatorPanel(Investigator pi) {
+    protected InvestigatorPanel(Investigator investigator) {
+        firstValue = new LabeledTextBox("First name:", "10em", "12em", null, null);
+        middleValue = new LabeledTextBox("Middle initial(s):", "10em", "8em", null, null);
+        lastValue = new LabeledTextBox("Last name:", "10em", "12em", null, null);
+        idValue = new LabeledTextBox("ID:", "10em", "26em", null, null);
+        idTypeValue = new LabeledTextBox("ID type:", "6em", "26em", null, null);
+        orgValue = new LabeledTextBox("Organization:", "10em", "62.25em", null, null);
         initWidget(uiBinder.createAndBindUi(this));
 
-        this.pi = pi;
+        this.investigator = investigator;
         this.header = null;
 
-        firstLabel.setText("First name:");
-        firstBox.setText(pi.getFirstName());
-        middleLabel.setText("Middle initial(s):");
-        middleBox.setText(pi.getMiddle());
-        lastLabel.setText("Last name:");
-        lastBox.setText(pi.getLastName());
-        idLabel.setText("ID:");
-        idBox.setText(pi.getId());
-        idTypeLabel.setText("ID type:");
-        idTypeBox.setText(pi.getIdType());
-        organizationLabel.setText("Organization:");
-        organizationBox.setText(pi.getOrganization());
+        // The following will assign the values in the text fields
+        getUpdatedInvestigator();
+        // The following will assign the HTML to the labels before the text fields
+        markInvalids();
     }
 
-    // TODO: complete this panel
-
-    @UiHandler("firstBox")
-    void firstBoxOnChange(ChangeEvent event) {
-        pi.setFirstName(firstBox.getText());
+    @UiHandler("firstValue")
+    void firstValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setFirstName(firstValue.getText());
         if ( header != null )
-            header.setText(pi.getReferenceName());
+            header.setText(investigator.getReferenceName());
     }
 
-    @UiHandler("middleBox")
-    void middleBoxOnChange(ChangeEvent event) {
-        pi.setMiddle(middleBox.getText());
+    @UiHandler("middleValue")
+    void middleValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setMiddle(middleValue.getText());
         if ( header != null )
-            header.setText(pi.getReferenceName());
+            header.setText(investigator.getReferenceName());
     }
 
-    @UiHandler("lastBox")
-    void lastBoxOnChange(ChangeEvent event) {
-        pi.setLastName(lastBox.getText());
+    @UiHandler("lastValue")
+    void lastValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setLastName(lastValue.getText());
         if ( header != null )
-            header.setText(pi.getReferenceName());
+            header.setText(investigator.getReferenceName());
     }
 
-    @UiHandler("idBox")
-    void idBoxOnChange(ChangeEvent event) {
-        pi.setId(idBox.getText());
+    @UiHandler("idValue")
+    void idValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setId(idValue.getText());
     }
 
-    @UiHandler("idTypeBox")
-    void idTypeBoxOnChange(ChangeEvent event) {
-        pi.setIdType(idTypeBox.getText());
+    @UiHandler("idTypeValue")
+    void idTypeValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setIdType(idTypeValue.getText());
     }
 
-    @UiHandler("organizationBox")
-    void organizationBoxOnChange(ChangeEvent event) {
-        pi.setOrganization(organizationBox.getText());
+    @UiHandler("orgValue")
+    void organizationValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setOrganization(orgValue.getText());
+    }
+
+    /**
+     * Indicate which fields contain invalid values and which contain acceptable values.
+     */
+    private void markInvalids() {
+        HashSet<String> invalids = investigator.invalidFieldNames();
+
+        if ( invalids.contains("firstName") )
+            firstValue.markInvalid();
+        else
+            firstValue.markValid();
+
+        if ( invalids.contains("middle") )
+            middleValue.markInvalid();
+        else
+            middleValue.markValid();
+
+        if ( invalids.contains("lastName") )
+            lastValue.markInvalid();
+        else
+            lastValue.markValid();
+
+        if ( invalids.contains("id") )
+            idValue.markInvalid();
+        else
+            idValue.markValid();
+
+        if ( invalids.contains("idType") )
+            idTypeValue.markInvalid();
+        else
+            idTypeValue.markValid();
+
+        if ( invalids.contains("organization") )
+            orgValue.markInvalid();
+        else
+            orgValue.markValid();
     }
 
     /**
      * @return the updated Investigator; never null
      */
     public Investigator getUpdatedInvestigator() {
-        return pi;
+        // In case erroneous input leaves mismatches,
+        // first update the displayed content in case this is from a save-and-continue
+        firstValue.setText(investigator.getFirstName());
+        middleValue.setText(investigator.getMiddle());
+        lastValue.setText(investigator.getLastName());
+        idValue.setText(investigator.getId());
+        idTypeValue.setText(investigator.getIdType());
+        orgValue.setText(investigator.getOrganization());
+
+        return investigator;
     }
 
 }

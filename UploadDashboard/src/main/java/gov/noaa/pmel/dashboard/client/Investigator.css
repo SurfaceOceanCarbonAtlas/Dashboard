@@ -1,61 +1,19 @@
 @CHARSET "UTF-8";
 
-.firstnamebox {
-    display: inline;
-}
-
-.firstnamelabel {
-    display: inline;
-}
-
-.idbox {
-    display: inline;
-}
-
-.idlabel {
-    display: inline;
-}
-
-.idpanel {
+.rowpanel {
     display: block;
+    width: max-content;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: 0;
+    margin-right: 0;
 }
 
-.idtypebox {
+.cellpanel {
     display: inline;
-}
-
-.idtypelabel {
-    display: inline;
-}
-
-.lastnamebox {
-    display: inline;
-}
-
-.lastnamelabel {
-    display: inline;
-}
-
-.middleinitbox {
-    display: inline;
-}
-
-.middleinitlabel {
-    display: inline;
-}
-
-.namepanel {
-    display: block;
-}
-
-.orgbox {
-    display: inline;
-}
-
-.orglabel {
-    display: inline;
-}
-
-.orgpanel {
-    display: block;
+    width: min-content;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
