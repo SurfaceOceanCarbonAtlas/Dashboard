@@ -10,6 +10,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class InvestigatorPanel extends Composite {
@@ -17,22 +18,39 @@ public class InvestigatorPanel extends Composite {
     interface InvestigatorPanelUiBinder extends UiBinder<FlowPanel,InvestigatorPanel> {
     }
 
-    private static InvestigatorPanelUiBinder uiBinder = GWT.create(InvestigatorPanelUiBinder.class);
+    private static final InvestigatorPanelUiBinder uiBinder = GWT.create(InvestigatorPanelUiBinder.class);
 
     @UiField(provided = true)
-    final LabeledTextBox firstValue;
+    final LabeledTextBox firstNameValue;
     @UiField(provided = true)
-    final LabeledTextBox middleValue;
+    final LabeledTextBox middleInitValue;
     @UiField(provided = true)
-    final LabeledTextBox lastValue;
+    final LabeledTextBox lastNameValue;
     @UiField(provided = true)
     final LabeledTextBox idValue;
     @UiField(provided = true)
     final LabeledTextBox idTypeValue;
     @UiField(provided = true)
     final LabeledTextBox orgValue;
+    @UiField(provided = true)
+    final LabeledTextBox firstStreetValue;
+    @UiField(provided = true)
+    final LabeledTextBox secondStreetValue;
+    @UiField(provided = true)
+    final LabeledTextBox cityValue;
+    @UiField(provided = true)
+    final LabeledTextBox regionValue;
+    @UiField(provided = true)
+    final LabeledTextBox zipValue;
+    @UiField(provided = true)
+    final LabeledTextBox countryValue;
+    @UiField(provided = true)
+    final LabeledTextBox emailValue;
+    @UiField(provided = true)
+    final LabeledTextBox phoneValue;
 
-    private Investigator investigator;
+
+    private final Investigator investigator;
     private Label header;
 
     /**
@@ -58,12 +76,28 @@ public class InvestigatorPanel extends Composite {
      *         associate this panel with this Investigator; cannot be null
      */
     protected InvestigatorPanel(Investigator investigator) {
-        firstValue = new LabeledTextBox("First name:", "10em", "12em", null, null);
-        middleValue = new LabeledTextBox("Middle initial(s):", "10em", "8em", null, null);
-        lastValue = new LabeledTextBox("Last name:", "10em", "12em", null, null);
-        idValue = new LabeledTextBox("ID:", "10em", "26em", null, null);
-        idTypeValue = new LabeledTextBox("ID type:", "6em", "26em", null, null);
+        firstNameValue = new LabeledTextBox("First name:", "10em", "12em", null, null);
+        middleInitValue = new LabeledTextBox("Middle initial(s):", "10em", "8em", null, null);
+        lastNameValue = new LabeledTextBox("Last name:", "10em", "12em", null, null);
+        //
+        idTypeValue = new LabeledTextBox("ID type:", "10em", "26em", null, null);
+        idValue = new LabeledTextBox("ID:", "6em", "26em", null, null);
+        //
         orgValue = new LabeledTextBox("Organization:", "10em", "62.25em", null, null);
+        //
+        firstStreetValue = new LabeledTextBox("Street/Box:", "10em", "62.25em", null, null);
+        //
+        secondStreetValue = new LabeledTextBox("Street:", "10em", "62.25em", null, null);
+        //
+        cityValue = new LabeledTextBox("City:", "10em", "26em", null, null);
+        regionValue = new LabeledTextBox("Region:", "6em", "26em", null, null);
+        //
+        zipValue = new LabeledTextBox("Postal code:", "10em", "26em", null, null);
+        countryValue = new LabeledTextBox("Country:", "6em", "26em", null, null);
+        //
+        emailValue = new LabeledTextBox("E-mail:", "6em", "26em", null, null);
+        phoneValue = new LabeledTextBox("Phone:", "10em", "26em", null, null);
+
         initWidget(uiBinder.createAndBindUi(this));
 
         this.investigator = investigator;
@@ -75,40 +109,108 @@ public class InvestigatorPanel extends Composite {
         markInvalids();
     }
 
-    @UiHandler("firstValue")
-    void firstValueOnValueChange(ValueChangeEvent<String> event) {
-        investigator.setFirstName(firstValue.getText());
+    @UiHandler("firstNameValue")
+    void firstNameValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setFirstName(firstNameValue.getText());
         if ( header != null )
             header.setText(investigator.getReferenceName());
+        markInvalids();
     }
 
-    @UiHandler("middleValue")
-    void middleValueOnValueChange(ValueChangeEvent<String> event) {
-        investigator.setMiddle(middleValue.getText());
+    @UiHandler("middleInitValue")
+    void middleInitValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setMiddle(middleInitValue.getText());
         if ( header != null )
             header.setText(investigator.getReferenceName());
+        markInvalids();
     }
 
-    @UiHandler("lastValue")
-    void lastValueOnValueChange(ValueChangeEvent<String> event) {
-        investigator.setLastName(lastValue.getText());
+    @UiHandler("lastNameValue")
+    void lastNameValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setLastName(lastNameValue.getText());
         if ( header != null )
             header.setText(investigator.getReferenceName());
-    }
-
-    @UiHandler("idValue")
-    void idValueOnValueChange(ValueChangeEvent<String> event) {
-        investigator.setId(idValue.getText());
+        markInvalids();
     }
 
     @UiHandler("idTypeValue")
     void idTypeValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setIdType(idTypeValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("idValue")
+    void idValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setId(idValue.getText());
+        markInvalids();
     }
 
     @UiHandler("orgValue")
-    void organizationValueOnValueChange(ValueChangeEvent<String> event) {
+    void orgValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setOrganization(orgValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("firstStreetValue")
+    void firstStreetValueOnValueChange(ValueChangeEvent<String> event) {
+        assignInvestigatorStreets();
+        markInvalids();
+    }
+
+    @UiHandler("secondStreetValue")
+    void secondStreetValueOnValueChange(ValueChangeEvent<String> event) {
+        assignInvestigatorStreets();
+        markInvalids();
+    }
+
+    @UiHandler("cityValue")
+    void cityValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setCity(cityValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("regionValue")
+    void regionValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setRegion(regionValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("zipValue")
+    void zipValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setZipCode(zipValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("countryValue")
+    void countryValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setCountry(countryValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("emailValue")
+    void emailValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setEmail(emailValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("phoneValue")
+    void phoneValueOnValueChange(ValueChangeEvent<String> event) {
+        investigator.setPhone(phoneValue.getText());
+        markInvalids();
+    }
+
+    /**
+     * Assigns the investigator.streets from the values in firstStreetValue and secondStreetValue
+     */
+    private void assignInvestigatorStreets() {
+        String first = firstStreetValue.getText().trim();
+        String second = secondStreetValue.getText();
+        ArrayList<String> streets = new ArrayList<String>(2);
+        if ( !first.isEmpty() )
+            streets.add(first);
+        if ( !second.isEmpty() )
+            streets.add(second);
+        investigator.setStreets(streets);
     }
 
     /**
@@ -118,34 +220,71 @@ public class InvestigatorPanel extends Composite {
         HashSet<String> invalids = investigator.invalidFieldNames();
 
         if ( invalids.contains("firstName") )
-            firstValue.markInvalid();
+            firstNameValue.markInvalid();
         else
-            firstValue.markValid();
+            firstNameValue.markValid();
 
         if ( invalids.contains("middle") )
-            middleValue.markInvalid();
+            middleInitValue.markInvalid();
         else
-            middleValue.markValid();
+            middleInitValue.markValid();
 
         if ( invalids.contains("lastName") )
-            lastValue.markInvalid();
+            lastNameValue.markInvalid();
         else
-            lastValue.markValid();
-
-        if ( invalids.contains("id") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
+            lastNameValue.markValid();
 
         if ( invalids.contains("idType") )
             idTypeValue.markInvalid();
         else
             idTypeValue.markValid();
 
+        if ( invalids.contains("id") )
+            idValue.markInvalid();
+        else
+            idValue.markValid();
+
         if ( invalids.contains("organization") )
             orgValue.markInvalid();
         else
             orgValue.markValid();
+
+        // Only mark the first street invalid (ie, not given);
+        // the second street is optional and so it always valid (the default)
+        if ( invalids.contains("streets") )
+            firstStreetValue.markInvalid();
+        else
+            firstStreetValue.markValid();
+
+        if ( invalids.contains("city") )
+            cityValue.markInvalid();
+        else
+            cityValue.markValid();
+
+        if ( invalids.contains("region") )
+            regionValue.markInvalid();
+        else
+            regionValue.markValid();
+
+        if ( invalids.contains("zipCode") )
+            zipValue.markInvalid();
+        else
+            zipValue.markValid();
+
+        if ( invalids.contains("country") )
+            countryValue.markInvalid();
+        else
+            countryValue.markValid();
+
+        if ( invalids.contains("email") )
+            emailValue.markInvalid();
+        else
+            emailValue.markValid();
+
+        if ( invalids.contains("phone") )
+            phoneValue.markInvalid();
+        else
+            phoneValue.markValid();
     }
 
     /**
@@ -154,12 +293,41 @@ public class InvestigatorPanel extends Composite {
     public Investigator getUpdatedInvestigator() {
         // In case erroneous input leaves mismatches,
         // first update the displayed content in case this is from a save-and-continue
-        firstValue.setText(investigator.getFirstName());
-        middleValue.setText(investigator.getMiddle());
-        lastValue.setText(investigator.getLastName());
+        firstNameValue.setText(investigator.getFirstName());
+        middleInitValue.setText(investigator.getMiddle());
+        lastNameValue.setText(investigator.getLastName());
         idValue.setText(investigator.getId());
         idTypeValue.setText(investigator.getIdType());
         orgValue.setText(investigator.getOrganization());
+        ArrayList<String> streets = investigator.getStreets();
+        switch ( streets.size() ) {
+            case 0:
+                firstStreetValue.setText("");
+                secondStreetValue.setText("");
+                break;
+            case 1:
+                firstStreetValue.setText(streets.get(0));
+                secondStreetValue.setText("");
+                break;
+            case 2:
+                firstStreetValue.setText(streets.get(0));
+                secondStreetValue.setText(streets.get(1));
+                break;
+            default:
+                // Hack for now but probably good enough
+                firstStreetValue.setText(streets.get(0));
+                String rest = streets.get(1);
+                for (int k = 2; k < streets.size(); k++) {
+                    rest += "; " + streets.get(k);
+                }
+                secondStreetValue.setText(rest);
+        }
+        cityValue.setText(investigator.getCity());
+        regionValue.setText(investigator.getRegion());
+        zipValue.setText(investigator.getZipCode());
+        countryValue.setText(investigator.getCountry());
+        emailValue.setText(investigator.getEmail());
+        phoneValue.setText(investigator.getPhone());
 
         return investigator;
     }

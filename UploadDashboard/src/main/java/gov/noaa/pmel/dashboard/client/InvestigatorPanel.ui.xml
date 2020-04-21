@@ -7,16 +7,34 @@
 
     <g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="firstValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="middleValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lastValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="firstNameValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="middleInitValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lastNameValue"/>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idTypeValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="orgValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="firstStreetValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="secondStreetValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="cityValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="regionValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="zipValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="countryValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="phoneValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="emailValue"/>
         </g:FlowPanel>
     </g:FlowPanel>
 
