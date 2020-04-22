@@ -76,27 +76,27 @@ public class InvestigatorPanel extends Composite {
      *         associate this panel with this Investigator; cannot be null
      */
     protected InvestigatorPanel(Investigator investigator) {
-        firstNameValue = new LabeledTextBox("First name:", "10em", "12em", null, null);
-        middleInitValue = new LabeledTextBox("Middle initial(s):", "10em", "8em", null, null);
-        lastNameValue = new LabeledTextBox("Last name:", "10em", "12em", null, null);
+        firstNameValue = new LabeledTextBox("First name:", "8em", "10em", null, null);
+        middleInitValue = new LabeledTextBox("Middle initial(s):", "8em", "6em", null, null);
+        lastNameValue = new LabeledTextBox("Last name:", "8em", "10em", null, null);
         //
-        idTypeValue = new LabeledTextBox("ID type:", "10em", "26em", null, null);
-        idValue = new LabeledTextBox("ID:", "6em", "26em", null, null);
+        idTypeValue = new LabeledTextBox("ID type:", "8em", "21.5em", null, null);
+        idValue = new LabeledTextBox("ID:", "4.5em", "21.5em", null, null);
         //
-        orgValue = new LabeledTextBox("Organization:", "10em", "62.25em", null, null);
+        orgValue = new LabeledTextBox("Organization:", "8em", "51.25em", null, null);
         //
-        firstStreetValue = new LabeledTextBox("Street/Box:", "10em", "62.25em", null, null);
+        firstStreetValue = new LabeledTextBox("Street/Box:", "8em", "51.25em", null, null);
         //
-        secondStreetValue = new LabeledTextBox("Street:", "10em", "62.25em", null, null);
+        secondStreetValue = new LabeledTextBox("Street:", "8em", "51.25em", null, null);
         //
-        cityValue = new LabeledTextBox("City:", "10em", "26em", null, null);
-        regionValue = new LabeledTextBox("Region:", "6em", "26em", null, null);
+        cityValue = new LabeledTextBox("City:", "8em", "21.5em", null, null);
+        regionValue = new LabeledTextBox("Region:", "4.5em", "21.5em", null, null);
         //
-        zipValue = new LabeledTextBox("Postal code:", "10em", "26em", null, null);
-        countryValue = new LabeledTextBox("Country:", "6em", "26em", null, null);
+        zipValue = new LabeledTextBox("Postal code:", "8em", "21.5em", null, null);
+        countryValue = new LabeledTextBox("Country:", "4.5em", "21.5em", null, null);
         //
-        emailValue = new LabeledTextBox("E-mail:", "6em", "26em", null, null);
-        phoneValue = new LabeledTextBox("Phone:", "10em", "26em", null, null);
+        emailValue = new LabeledTextBox("E-mail:", "8em", "21.5em", null, null);
+        phoneValue = new LabeledTextBox("Phone:", "4.5em", "21.5em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
 
