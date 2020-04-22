@@ -25,15 +25,15 @@
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="pisHtml"/>
+                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="investigatorsHtml"/>
                         </g:customHeader>
                         <g:FlowPanel addStyleNames="{mstyle.metatabpanel}">
                             <g:FlowPanel addStyleNames="{mstyle.modifypanel}">
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="piAddButton"/>
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="piRemoveButton"/>
+                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="investigatorAddButton"/>
+                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="investigatorRemoveButton"/>
                             </g:FlowPanel>
                             <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{mstyle.investigatorspanel}"
-                                              ui:field="pisTLPanel"/>
+                                              ui:field="investigatorsTLPanel"/>
                         </g:FlowPanel>
                     </g:tab>
                     <g:tab>

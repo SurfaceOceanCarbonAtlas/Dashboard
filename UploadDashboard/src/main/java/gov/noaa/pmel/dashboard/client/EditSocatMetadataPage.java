@@ -105,13 +105,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     SimpleLayoutPanel submitterSLPanel;
 
     @UiField
-    HTML pisHtml;
+    HTML investigatorsHtml;
     @UiField
-    Button piAddButton;
+    Button investigatorAddButton;
     @UiField
-    Button piRemoveButton;
+    Button investigatorRemoveButton;
     @UiField
-    TabLayoutPanel pisTLPanel;
+    TabLayoutPanel investigatorsTLPanel;
 
     @UiField
     HTML platformHtml;
@@ -181,7 +181,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
         // Assign the HTML for the tabs
         submitterHtml.setHTML(SUBMITTER_TAB_TEXT);
-        pisHtml.setHTML(INVESTIGATOR_TAB_TEXT);
+        investigatorsHtml.setHTML(INVESTIGATOR_TAB_TEXT);
         platformHtml.setHTML(PLATFORM_TAB_TEXT);
         coverageHtml.setHTML(COVERAGE_TAB_TEXT);
         varsHtml.setHTML(VARIABLES_TAB_TEXT);
@@ -190,7 +190,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
         // Assign the hover helps for the tabs
         submitterHtml.setTitle(SUBMITTER_TAB_HELP);
-        pisHtml.setTitle(INVESTIGATOR_TAB_HELP);
+        investigatorsHtml.setTitle(INVESTIGATOR_TAB_HELP);
         platformHtml.setTitle(PLATFORM_TAB_HELP);
         coverageHtml.setTitle(COVERAGE_TAB_HELP);
         varsHtml.setTitle(VARIABLES_TAB_HELP);
@@ -198,10 +198,10 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         miscInfoHtml.setTitle(MISC_INFO_TAB_HELP);
 
         // Assign the labels and hover helps for add and remove buttons in the stacks panel tabs
-        piAddButton.setHTML(ADD_TEXT);
-        piAddButton.setTitle(ADD_INVESTIGATOR_HELP);
-        piRemoveButton.setHTML(REMOVE_TEXT);
-        piRemoveButton.setTitle(REMOVE_INVESTIGATOR_HELP);
+        investigatorAddButton.setHTML(ADD_TEXT);
+        investigatorAddButton.setTitle(ADD_INVESTIGATOR_HELP);
+        investigatorRemoveButton.setHTML(REMOVE_TEXT);
+        investigatorRemoveButton.setTitle(REMOVE_INVESTIGATOR_HELP);
 
         varAddButton.setHTML(ADD_TEXT);
         varAddButton.setTitle(ADD_VARIABLE_HELP);
@@ -302,14 +302,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             investigators.add(new Investigator());
 
         piPanels.clear();
-        pisTLPanel.clear();
+        investigatorsTLPanel.clear();
         for (Investigator pi : investigators) {
             Label header = new Label();
             InvestigatorPanel panel = new InvestigatorPanel(pi, header);
             piPanels.add(panel);
-            pisTLPanel.add(panel, header);
+            investigatorsTLPanel.add(panel, header);
         }
-        pisTLPanel.selectTab(0);
+        investigatorsTLPanel.selectTab(0);
 
         platformPanel = new PlatformPanel(metadata.getPlatform());
         platformSLPanel.setWidget(platformPanel);
@@ -351,7 +351,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         miscInfoSLPanel.setWidget(miscInfoPanel);
     }
 
-    @UiHandler("piAddButton")
+    @UiHandler("investigatorAddButton")
     void addPiOnClick(ClickEvent event) {
         // Copy the last investigator information as a first guess, but remove the name and ID
         int numPanels = piPanels.size();
@@ -363,27 +363,27 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         Label header = new Label();
         InvestigatorPanel panel = new InvestigatorPanel(pi, header);
         piPanels.add(panel);
-        pisTLPanel.add(panel, header);
-        pisTLPanel.selectTab(numPanels);
+        investigatorsTLPanel.add(panel, header);
+        investigatorsTLPanel.selectTab(numPanels);
     }
 
-    @UiHandler("piRemoveButton")
+    @UiHandler("investigatorRemoveButton")
     void removePiOnClick(ClickEvent event) {
         if ( piPanels.size() < 2 ) {
             UploadDashboard.showMessage("Cannot have less than one principal investigator description");
             return;
         }
-        int idx = pisTLPanel.getSelectedIndex();
+        int idx = investigatorsTLPanel.getSelectedIndex();
         if ( idx < 0 ) {
             UploadDashboard.showMessage("No principal investigator description selected");
             return;
         }
         piPanels.remove(idx);
-        pisTLPanel.remove(idx);
+        investigatorsTLPanel.remove(idx);
         // show what was the next panel if it exists; otherwise the last panel
         if ( idx == piPanels.size() )
             idx--;
-        pisTLPanel.selectTab(idx);
+        investigatorsTLPanel.selectTab(idx);
     }
 
     @UiHandler("varAddButton")

@@ -1,0 +1,19 @@
+@CHARSET "UTF-8";
+
+.sidescroll {
+    width: 4.5em;
+}
+
+.modbutton {
+    font-size: small;
+    margin: 0.25em;
+}
+
+.valslist {
+    font-size: small;
+    margin: 0.25em;
+}
+
+.mainscroll {
+    width: min-content;
+}
