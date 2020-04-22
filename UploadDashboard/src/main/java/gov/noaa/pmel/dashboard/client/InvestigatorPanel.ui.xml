@@ -33,8 +33,8 @@
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="countryValue"/>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="phoneValue"/>
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="emailValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="phoneValue"/>
         </g:FlowPanel>
     </g:FlowPanel>
 
