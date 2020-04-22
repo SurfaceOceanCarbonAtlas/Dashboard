@@ -56,25 +56,25 @@ public class CoveragePanel extends Composite {
      *         associate this panel with this Coverage; cannot be null
      */
     public CoveragePanel(Coverage coverage, Datestamp today) {
-        spacialValue = new LabeledTextBox("Spatial reference:", "12em", "15em", null, null);
+        spacialValue = new LabeledTextBox("Spatial reference:", "12em", "12em", null, null);
         //
-        southLatValue = new LabeledTextBox("Southern-most latitude:", "12em", "15em",
+        southLatValue = new LabeledTextBox("Southern-most latitude:", "12em", "12em",
                 coverage.getSouthernLatitude().getUnitString(), "8em");
-        northLatValue = new LabeledTextBox("Northern-most latitude:", "12em", "15em",
+        northLatValue = new LabeledTextBox("Northern-most latitude:", "12em", "12em",
                 coverage.getNorthernLatitude().getUnitString(), "8em");
         //
-        westLonValue = new LabeledTextBox("Western-most longitude:", "12em", "15em",
+        westLonValue = new LabeledTextBox("Western-most longitude:", "12em", "12em",
                 coverage.getWesternLongitude().getUnitString(), "8em");
-        eastLonValue = new LabeledTextBox("Eastern-most longitude:", "12em", "15em",
+        eastLonValue = new LabeledTextBox("Eastern-most longitude:", "12em", "12em",
                 coverage.getEasternLongitude().getUnitString(), "8em");
         //
-        startDateValue = new LabeledTextBox("Expedition starting date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
-        endDateValue = new LabeledTextBox("Expedition ending date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        startDateValue = new LabeledTextBox("Expedition starting date:", "12em", "12em", DATE_UNIT_TEXT, "8em");
+        endDateValue = new LabeledTextBox("Expedition ending date:", "12em", "12em", DATE_UNIT_TEXT, "8em");
         //
-        earlyDateValue = new LabeledTextBox("Earliest data date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
-        lateDateValue = new LabeledTextBox("Latest data date:", "12em", "15em", DATE_UNIT_TEXT, "8em");
+        earlyDateValue = new LabeledTextBox("Earliest data date:", "12em", "12em", DATE_UNIT_TEXT, "8em");
+        lateDateValue = new LabeledTextBox("Latest data date:", "12em", "12em", DATE_UNIT_TEXT, "8em");
         //
-        regionsValue = new LabeledTextArea("Geographic names", "10em", "74em");
+        regionsValue = new LabeledTextArea("Geographic names", "10em", "60em");
 
         initWidget(uiBinder.createAndBindUi(this));
 

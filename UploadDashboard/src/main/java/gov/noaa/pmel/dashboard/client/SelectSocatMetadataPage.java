@@ -49,7 +49,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
             "Dataset: <ul><li>";
     private static final String HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
-    private static final String EXISTING_RADIO_TEXT_PROLOGUE = " Use existing SOCAT metdata (";
+    private static final String EXISTING_RADIO_TEXT_PROLOGUE = " Use existing SOCAT metadata (";
     private static final String EXISTING_RADIO_TEXT_EPILOGUE = ")";
     private static final String EXISTING_IS_STUB_TEXT = "minimal metadata derived from data";
     private static final String EXISTING_LAST_MODIFIED = "last modified ";
