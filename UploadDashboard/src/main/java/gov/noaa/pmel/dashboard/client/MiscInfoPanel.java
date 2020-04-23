@@ -82,7 +82,7 @@ public class MiscInfoPanel extends Composite {
         fundAgencyValue = new LabeledTextBox("Funding agency:", "12em", "55.25em", null, null);
         //
         fundIdValue = new LabeledTextBox("Funding ID:", "12em", "10em", null, null);
-        fundTitleValue = new LabeledTextBox("Funding title:", "8em", "32.5em", null, null);
+        fundTitleValue = new LabeledTextBox("Funding title:", "6em", "35em", null, null);
         //
         projectValue = new LabeledTextBox("Research project:", "12em", "55.25em", null, null);
         //

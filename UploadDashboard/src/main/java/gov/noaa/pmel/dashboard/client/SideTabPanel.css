@@ -1,22 +1,30 @@
 @CHARSET "UTF-8";
 
-.sidescroll {
-    width: 4.5em;
+.sidepanel {
+    width: 7.5em;
+    padding: 0.25em;
+    margin: 0;
 }
 
 .modbutton {
+    display: block;
     font-size: small;
-    margin: 0.25em;
+    width: 7.5em;
+    margin: 0.5em;
 }
 
 .valslist {
+    display: block;
     font-size: small;
-    margin: 0.25em;
+    height: 24em;
+    width: 7.5em;
+    border-width: 0;
+    margin: 0.5em;
 }
 
 .stashpanel {
-    width: 5em;
-    height: 0.25em;
+    width: 7.5em;
+    height: 1em;
 }
 
 .mainscroll {

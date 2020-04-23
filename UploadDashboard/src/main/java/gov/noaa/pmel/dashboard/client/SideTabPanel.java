@@ -147,6 +147,7 @@ public class SideTabPanel extends ResizeComposite {
         }
         else if ( index < selectedIndex )
             selectedIndex--;
+        valsList.setSelectedIndex(selectedIndex);
     }
 
     /**

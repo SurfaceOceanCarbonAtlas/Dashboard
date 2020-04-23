@@ -69,10 +69,10 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String INSTRUMENTS_TAB_HELP = "Information about each instrument used in this dataset";
     private static final String MISC_INFO_TAB_HELP = "Various information about this dataset not describe elsewhere";
 
-    private static final String ADD_TEXT = "Add another";
+    private static final String ADD_TEXT = "Append another";
     private static final String REMOVE_TEXT = "Remove current";
 
-    private static final String ADD_INVESTIGATOR_HELP = "Adds a new principal investigator description to the list";
+    private static final String ADD_INVESTIGATOR_HELP = "Adds a new principal investigator description to the end of the list";
     private static final String REMOVE_INVESTIGATOR_HELP = "Removes the currently displayed principal investigator description";
 
     private static final String ADD_VARIABLE_HELP = "Adds a new data field description to the list";
