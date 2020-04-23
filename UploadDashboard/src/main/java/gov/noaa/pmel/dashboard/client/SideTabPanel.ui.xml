@@ -7,10 +7,12 @@
     <g:DockLayoutPanel unit="EM">
         <g:west size="5">
             <g:ScrollPanel addStyleNames="{style.sidescroll}">
-                <g:Button addStyleNames="{style.modbutton}" ui:field="addButton"/>
-                <g:Button addStyleNames="{style.modbutton}" ui:field="removeButton"/>
-                <g:ListBox addStyleNames="{style.valslist}" visibleItemCount="10" ui:field="valsList"/>
-                <g:FlowPanel addStyleNames="{style.hidden}" ui:field="hiddenPanel"/>
+                <g:FlowPanel>
+                    <g:Button addStyleNames="{style.modbutton}" ui:field="addButton"/>
+                    <g:Button addStyleNames="{style.modbutton}" ui:field="removeButton"/>
+                    <g:ListBox addStyleNames="{style.valslist}" visibleItemCount="10" ui:field="valsList"/>
+                    <g:FlowPanel addStyleNames="{style.stashpanel}" ui:field="stashPanel"/>
+                </g:FlowPanel>
             </g:ScrollPanel>
         </g:west>
         <g:center>

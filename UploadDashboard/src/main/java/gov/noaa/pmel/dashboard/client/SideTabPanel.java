@@ -32,7 +32,7 @@ public class SideTabPanel extends ResizeComposite {
     @UiField
     ListBox valsList;
     @UiField
-    FlowPanel hiddenPanel;
+    FlowPanel stashPanel;
     @UiField
     ScrollPanel mainPanel;
 
@@ -86,7 +86,7 @@ public class SideTabPanel extends ResizeComposite {
         headersList.clear();
         panelsList.clear();
         valsList.clear();
-        hiddenPanel.clear();
+        stashPanel.clear();
         mainPanel.clear();
         selectedIndex = -1;
     }
@@ -105,7 +105,7 @@ public class SideTabPanel extends ResizeComposite {
         mainPanel.setWidget(panel);
         // Add the header TextBox as an invisible element just to make sure it is in the event chain
         header.setVisible(false);
-        hiddenPanel.add(header);
+        stashPanel.add(header);
         headersList.add(header);
         valsList.addItem(header.getText());
         valsList.setSelectedIndex(selectedIndex);
@@ -133,7 +133,7 @@ public class SideTabPanel extends ResizeComposite {
         HandlerRegistration reg = registrationsList.remove(index);
         reg.removeHandler();
         TextBox header = headersList.remove(index);
-        hiddenPanel.remove(header);
+        stashPanel.remove(header);
         panelsList.remove(index);
         valsList.removeItem(index);
         if ( selectedIndex == index ) {

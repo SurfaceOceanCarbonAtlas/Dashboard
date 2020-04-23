@@ -14,10 +14,9 @@
     margin: 0.25em;
 }
 
-.hidden {
-    visibility: hidden;
+.stashpanel {
     width: 5em;
-    height: 1em;
+    height: 0.25em;
 }
 
 .mainscroll {

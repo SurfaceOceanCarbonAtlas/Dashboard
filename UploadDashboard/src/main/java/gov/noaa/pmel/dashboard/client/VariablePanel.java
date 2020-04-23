@@ -54,7 +54,7 @@ public class VariablePanel extends Composite {
         var.setColName(name);
         if ( name.isEmpty() )
             name = "Unknown";
-        header.setText(name);
+        header.setValue(name, true);
     }
 
     /**

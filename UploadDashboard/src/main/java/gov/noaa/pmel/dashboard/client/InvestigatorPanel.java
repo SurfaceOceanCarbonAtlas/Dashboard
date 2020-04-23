@@ -113,7 +113,7 @@ public class InvestigatorPanel extends Composite {
     void firstNameValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setFirstName(firstNameValue.getText());
         if ( header != null )
-            header.setText(investigator.getReferenceName());
+            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
@@ -121,7 +121,7 @@ public class InvestigatorPanel extends Composite {
     void middleInitValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setMiddle(middleInitValue.getText());
         if ( header != null )
-            header.setText(investigator.getReferenceName());
+            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
@@ -129,7 +129,7 @@ public class InvestigatorPanel extends Composite {
     void lastNameValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setLastName(lastNameValue.getText());
         if ( header != null )
-            header.setText(investigator.getReferenceName());
+            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
@@ -328,6 +328,9 @@ public class InvestigatorPanel extends Composite {
         countryValue.setText(investigator.getCountry());
         emailValue.setText(investigator.getEmail());
         phoneValue.setText(investigator.getPhone());
+
+        if ( header != null )
+            header.setValue(investigator.getReferenceName(), true);
 
         return investigator;
     }

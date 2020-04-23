@@ -158,7 +158,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         singleton = this;
 
         Button addPiButton = investigatorsSTPanel.getAddButton();
-        Button removePiButton = instrumentsSTPanel.getRemoveButton();
+        Button removePiButton = investigatorsSTPanel.getRemoveButton();
         Button addVarButton = variablesSTPanel.getAddButton();
         Button removeVarButton = variablesSTPanel.getRemoveButton();
         Button addInstButton = instrumentsSTPanel.getAddButton();

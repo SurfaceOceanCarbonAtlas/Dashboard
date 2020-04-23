@@ -54,7 +54,7 @@ public class InstrumentPanel extends Composite {
         inst.setName(name);
         if ( name.isEmpty() )
             name = "Unknown";
-        header.setText(name);
+        header.setValue(name, true);
     }
 
     /**
