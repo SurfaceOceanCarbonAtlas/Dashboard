@@ -24,7 +24,7 @@ public class InstrumentPanel extends Composite {
     TextBox nameBox;
 
     private Instrument inst;
-    private Label header;
+    private TextBox header;
 
     /**
      * Creates a FlowPanel associated with the given Instrument.
@@ -32,9 +32,9 @@ public class InstrumentPanel extends Composite {
      * @param inst
      *         associate this panel with this Instrument; cannot be null
      * @param header
-     *         header label that should be updated when appropriate values change; cannot be null
+     *         header that should be updated when appropriate values change; cannot be null
      */
-    public InstrumentPanel(Instrument inst, Label header) {
+    public InstrumentPanel(Instrument inst, TextBox header) {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.inst = inst;

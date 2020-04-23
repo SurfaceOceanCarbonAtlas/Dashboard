@@ -24,7 +24,7 @@ public class VariablePanel extends Composite {
     TextBox nameBox;
 
     private Variable var;
-    private Label header;
+    private TextBox header;
 
     /**
      * Creates a FlowPanel associated with the given Variable.
@@ -32,9 +32,9 @@ public class VariablePanel extends Composite {
      * @param var
      *         associate this panel with this Variable; cannot be null
      * @param header
-     *         header label that should be updated when appropriate values change; cannot be null
+     *         header that should be updated when appropriate values change; cannot be null
      */
-    public VariablePanel(Variable var, Label header) {
+    public VariablePanel(Variable var, TextBox header) {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.var = var;

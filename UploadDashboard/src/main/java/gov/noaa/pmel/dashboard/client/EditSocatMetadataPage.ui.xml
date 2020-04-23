@@ -1,7 +1,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
->
+             xmlns:my='urn:import:gov.noaa.pmel.dashboard.client'>
 
     <ui:style src="FullWidth.css"/>
     <ui:style field="mstyle" src="EditSocatMetadata.css"/>
@@ -27,14 +27,7 @@
                         <g:customHeader>
                             <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="investigatorsHtml"/>
                         </g:customHeader>
-                        <g:FlowPanel addStyleNames="{mstyle.metatabpanel}">
-                            <g:FlowPanel addStyleNames="{mstyle.modifypanel}">
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="investigatorAddButton"/>
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="investigatorRemoveButton"/>
-                            </g:FlowPanel>
-                            <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{mstyle.investigatorspanel}"
-                                              ui:field="investigatorsTLPanel"/>
-                        </g:FlowPanel>
+                        <my:SideTabPanel addStyleNames="{mstyle.metatabpanel}" ui:field="investigatorsSTPanel"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
@@ -50,29 +43,15 @@
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="varsHtml"/>
+                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="variablesHtml"/>
                         </g:customHeader>
-                        <g:FlowPanel addStyleNames="{mstyle.metatabpanel}">
-                            <g:FlowPanel addStyleNames="{mstyle.modifypanel}">
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="varAddButton"/>
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="varRemoveButton"/>
-                            </g:FlowPanel>
-                            <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{mstyle.variablespanel}"
-                                              ui:field="varsTLPanel"/>
-                        </g:FlowPanel>
+                        <my:SideTabPanel addStyleNames="{mstyle.metatabpanel}" ui:field="variablesSTPanel"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>
-                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="instsHtml"/>
+                            <g:HTML addStyleNames="{mstyle.metatablabel}" ui:field="instrumentsHtml"/>
                         </g:customHeader>
-                        <g:FlowPanel addStyleNames="{mstyle.metatabpanel}">
-                            <g:FlowPanel addStyleNames="{mstyle.modifypanel}">
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="instAddButton"/>
-                                <g:Button addStyleNames="{mstyle.modifybutton}" ui:field="instRemoveButton"/>
-                            </g:FlowPanel>
-                            <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{mstyle.instrumentspanel}"
-                                              ui:field="instsTLPanel"/>
-                        </g:FlowPanel>
+                        <my:SideTabPanel addStyleNames="{mstyle.metatabpanel}" ui:field="instrumentsSTPanel"/>
                     </g:tab>
                     <g:tab>
                         <g:customHeader>

@@ -7,7 +7,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextBox;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class InvestigatorPanel extends Composite {
 
 
     private final Investigator investigator;
-    private Label header;
+    private TextBox header;
 
     /**
      * Creates a FlowPanel associated with the given Investigator.
@@ -59,9 +59,9 @@ public class InvestigatorPanel extends Composite {
      * @param investigator
      *         associate this panel with this Investigator; cannot be null
      * @param header
-     *         header label that should be updated when appropriate values change; cannot be null.
+     *         headerabel that should be updated when appropriate values change; cannot be null.
      */
-    public InvestigatorPanel(Investigator investigator, Label header) {
+    public InvestigatorPanel(Investigator investigator, TextBox header) {
         this(investigator);
 
         this.header = header;

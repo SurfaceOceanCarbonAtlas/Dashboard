@@ -65,38 +65,38 @@ public class MiscInfoPanel extends Composite {
      *         associate this panel with this MiscInfo; cannot be null
      */
     public MiscInfoPanel(MiscInfo info) {
-        idValue = new LabeledTextBox("Expocode:", "12em", "20em", null, null);
+        idValue = new LabeledTextBox("Expocode:", "12em", "10em", null, null);
         //
         nameValue = new LabeledTextBox("Dataset name:", "12em", "20em", null, null);
-        sectionValue = new LabeledTextBox("Section or leg name:", "12em", "20em", null, null);
+        sectionValue = new LabeledTextBox("Section or leg name:", "10em", "20em", null, null);
         //
         doiValue = new LabeledTextBox("Dataset DOI:", "12em", "20em", null, null);
-        accessValue = new LabeledTextBox("Accession ID:", "12em", "20em", null, null);
+        accessValue = new LabeledTextBox("Accession ID:", "10em", "20em", null, null);
         //
-        citationValue = new LabeledTextBox("Citation for this dataset:", "12em", "57.5em", null, null);
+        citationValue = new LabeledTextBox("Citation for this dataset:", "12em", "55.25em", null, null);
         //
-        websiteValue = new LabeledTextBox("Website for this dataset:", "12em", "57.5em", null, null);
+        websiteValue = new LabeledTextBox("Website for this dataset:", "12em", "55.25em", null, null);
         //
-        downloadValue = new LabeledTextBox("Dataset download URL:", "12em", "57.5em", null, null);
+        downloadValue = new LabeledTextBox("Dataset download URL:", "12em", "55.25em", null, null);
         //
-        fundAgencyValue = new LabeledTextBox("Funding agency:", "12em", "57.5em", null, null);
+        fundAgencyValue = new LabeledTextBox("Funding agency:", "12em", "55.25em", null, null);
         //
-        fundIdValue = new LabeledTextBox("Funding ID:", "12em", "20em", null, null);
-        fundTitleValue = new LabeledTextBox("Funding title:", "12em", "20em", null, null);
+        fundIdValue = new LabeledTextBox("Funding ID:", "12em", "10em", null, null);
+        fundTitleValue = new LabeledTextBox("Funding title:", "8em", "32.5em", null, null);
         //
-        projectValue = new LabeledTextBox("Research project:", "12em", "57.5em", null, null);
+        projectValue = new LabeledTextBox("Research project:", "12em", "55.25em", null, null);
         //
-        synopsisValue = new LabeledTextArea("Synopsis of project", "5em", "57.5em");
+        synopsisValue = new LabeledTextArea("Synopsis of project", "5em", "55.25em");
         //
-        purposeValue = new LabeledTextArea("Purpose of project", "10em", "57.5em");
+        purposeValue = new LabeledTextArea("Purpose of project", "10em", "55.25em");
         //
-        refsValue = new LabeledTextArea("References", "10em", "57.5em");
+        refsValue = new LabeledTextArea("References", "10em", "55.25em");
         //
-        portsValue = new LabeledTextArea("Ports of call", "5em", "57.5em");
+        portsValue = new LabeledTextArea("Ports of call", "5em", "55.25em");
         //
-        addnInfoValue = new LabeledTextArea("Additional information", "10em", "57.5em");
+        addnInfoValue = new LabeledTextArea("Additional information", "10em", "55.25em");
         //
-        historyValue = new LabeledTextArea("Archival history", "5em", "57.5em");
+        historyValue = new LabeledTextArea("Archival history", "5em", "55.25em");
 
         initWidget(uiBinder.createAndBindUi(this));
 

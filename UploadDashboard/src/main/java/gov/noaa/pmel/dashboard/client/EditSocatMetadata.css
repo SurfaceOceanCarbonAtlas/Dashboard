@@ -1,21 +1,9 @@
 @CHARSET "UTF-8";
 
-.investigatorspanel {
-    display: block;
-    height: 30em;
-    width: 100%;
-}
-
-.instrumentspanel {
-    display: block;
-    height: 30em;
-    width: 100%;
-}
-
 .metaeditpanel {
     display: block;
     width: 85em;
-    height: 35em;
+    height: 30em;
 }
 
 .metatablabel {
@@ -24,24 +12,5 @@
 
 .metatabpanel {
     display: block;
-    width: 100%;
-}
-
-.modifypanel {
-    display: block;
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-}
-
-.modifybutton {
-    display: inline;
-    font-size: medium;
-    width: 12em;
-    margin-left: 3em;
-}
-
-.variablespanel {
-    display: block;
-    height: 30em;
     width: 100%;
 }
