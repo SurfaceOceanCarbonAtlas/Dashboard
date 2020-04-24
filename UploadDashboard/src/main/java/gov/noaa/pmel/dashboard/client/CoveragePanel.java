@@ -54,6 +54,8 @@ public class CoveragePanel extends Composite {
      *
      * @param coverage
      *         associate this panel with this Coverage; cannot be null
+     * @param today
+     *         latest date for Datestamp validation
      */
     public CoveragePanel(Coverage coverage, Datestamp today) {
         spacialValue = new LabeledTextBox("Spatial reference:", "12em", "12em", null, null);
@@ -84,10 +86,8 @@ public class CoveragePanel extends Composite {
         origEarlyDate = coverage.getEarliestDataDate();
         origLateDate = coverage.getLatestDataDate();
 
-        // The following will assign the values in the text fields
+        // The following will assign the values in the labels and text fields
         getUpdatedCoverage();
-        // The following will assign the HTML to the labels before the text fields
-        markInvalids(null);
     }
 
     @UiHandler("spacialValue")
@@ -287,6 +287,7 @@ public class CoveragePanel extends Composite {
      */
     private void markInvalids(String addnField) {
         HashSet<String> invalids = coverage.invalidFieldNames(today);
+
         if ( (addnField != null) && !addnField.trim().isEmpty() )
             invalids.add(addnField.trim());
 
@@ -361,6 +362,8 @@ public class CoveragePanel extends Composite {
             regions += name + "\n";
         }
         regionsValue.setText(regions);
+
+        markInvalids(null);
 
         return coverage;
     }

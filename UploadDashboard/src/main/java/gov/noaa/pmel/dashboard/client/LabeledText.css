@@ -1,5 +1,10 @@
 @CHARSET "UTF-8";
 
+.captionpanel {
+    height: min-content;
+    width: min-content;
+}
+
 .prefix {
     display: inline-block;
     text-align: right;
@@ -7,14 +12,6 @@
     margin-top: 2px;
     margin-bottom: 2px;
     margin-left: 0;
-    margin-right: 0.25em;
-}
-
-.value {
-    display: inline;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0.25em;
     margin-right: 0.25em;
 }
 
@@ -26,4 +23,12 @@
     margin-bottom: 2px;
     margin-left: 0.25em;
     margin-right: 0;
+}
+
+.value {
+    display: inline;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
 }

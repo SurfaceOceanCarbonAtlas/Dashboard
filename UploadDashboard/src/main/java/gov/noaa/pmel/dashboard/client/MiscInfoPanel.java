@@ -102,10 +102,8 @@ public class MiscInfoPanel extends Composite {
 
         this.info = info;
 
-        // The following will assign the values in the text fields
+        // The following will assign the values in the labels and text fields
         getUpdatedMiscInfo();
-        // The following will assign the HTML to the labels before the text fields
-        markInvalids();
     }
 
     @UiHandler("idValue")
@@ -258,6 +256,9 @@ public class MiscInfoPanel extends Composite {
             value += stamp.fullOrPartialString() + "\n";
         }
         historyValue.setText(value.trim());
+
+        markInvalids();
+
         return info;
     }
 

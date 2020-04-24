@@ -3,7 +3,7 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
              xmlns:my='urn:import:gov.noaa.pmel.dashboard.client'>
 
-    <ui:style src="Coverage.css"/>
+    <ui:style src="EditSocatMetadata.css"/>
 
     <g:ScrollPanel addStyleNames="{style.scrollpanel}">
         <g:FlowPanel>

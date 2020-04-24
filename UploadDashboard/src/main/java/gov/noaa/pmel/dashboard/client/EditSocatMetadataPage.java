@@ -2,7 +2,6 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -12,10 +11,9 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DeckLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.SimpleLayoutPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
@@ -65,21 +63,9 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String INVESTIGATOR_TAB_HELP = "Information about each of the principal investigator of this dataset";
     private static final String PLATFORM_TAB_HELP = "Information about the platform (ship, mooring, etc.) used in this dataset";
     private static final String COVERAGE_TAB_HELP = "Information about the spatial and time coverage of this dataset";
-    private static final String VARIABLES_TAB_HELP = "Information about each data field reported in this dataset";
+    private static final String VARIABLES_TAB_HELP = "Information about each data field (variable) reported in this dataset";
     private static final String INSTRUMENTS_TAB_HELP = "Information about each instrument used in this dataset";
     private static final String MISC_INFO_TAB_HELP = "Various information about this dataset not describe elsewhere";
-
-    private static final String ADD_TEXT = "Append another";
-    private static final String REMOVE_TEXT = "Remove current";
-
-    private static final String ADD_INVESTIGATOR_HELP = "Adds a new principal investigator description to the end of the list";
-    private static final String REMOVE_INVESTIGATOR_HELP = "Removes the currently displayed principal investigator description";
-
-    private static final String ADD_VARIABLE_HELP = "Adds a new data field description to the list";
-    private static final String REMOVE_VARIABLE_HELP = "Removes the currently displayed data field description";
-
-    private static final String ADD_INSTRUMENT_HELP = "Adds a new instrument description to the list";
-    private static final String REMOVE_INSTRUMENT_HELP = "Removes the currently displayed instrument description";
 
     interface EditSocatMetadataPageUiBinder extends UiBinder<Widget,EditSocatMetadataPage> {
     }
@@ -100,39 +86,22 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     HTML introHtml;
 
     @UiField
-    HTML submitterHtml;
+    Button submitterButton;
     @UiField
-    SimpleLayoutPanel submitterSLPanel;
+    Button investigatorsButton;
+    @UiField
+    Button platformButton;
+    @UiField
+    Button coverageButton;
+    @UiField
+    Button variablesButton;
+    @UiField
+    Button instrumentsButton;
+    @UiField
+    Button miscInfoButton;
 
     @UiField
-    HTML investigatorsHtml;
-    @UiField
-    SideTabPanel investigatorsSTPanel;
-
-    @UiField
-    HTML platformHtml;
-    @UiField
-    SimpleLayoutPanel platformSLPanel;
-
-    @UiField
-    HTML coverageHtml;
-    @UiField
-    SimpleLayoutPanel coverageSLPanel;
-
-    @UiField
-    HTML variablesHtml;
-    @UiField
-    SideTabPanel variablesSTPanel;
-
-    @UiField
-    HTML instrumentsHtml;
-    @UiField
-    SideTabPanel instrumentsSTPanel;
-
-    @UiField
-    HTML miscInfoHtml;
-    @UiField
-    SimpleLayoutPanel miscInfoSLPanel;
+    DeckLayoutPanel mainPanel;
 
     @UiField
     Button saveButton;
@@ -143,11 +112,11 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
     private DashboardDataset dataset;
     private SubmitterPanel submitterPanel;
-    private final ArrayList<InvestigatorPanel> piPanels;
+    private InvestigatorsTabPanel investigatorsPanel;
     private PlatformPanel platformPanel;
     private CoveragePanel coveragePanel;
-    private final ArrayList<VariablePanel> varPanels;
-    private final ArrayList<InstrumentPanel> instPanels;
+    private VariablesTabPanel variablesPanel;
+    private InstrumentsTabPanel instrumentsPanel;
     private MiscInfoPanel miscInfoPanel;
 
     // Singleton instance of this page
@@ -156,13 +125,6 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     EditSocatMetadataPage() {
         initWidget(uiBinder.createAndBindUi(this));
         singleton = this;
-
-        Button addPiButton = investigatorsSTPanel.getAddButton();
-        Button removePiButton = investigatorsSTPanel.getRemoveButton();
-        Button addVarButton = variablesSTPanel.getAddButton();
-        Button removeVarButton = variablesSTPanel.getRemoveButton();
-        Button addInstButton = instrumentsSTPanel.getAddButton();
-        Button removeInstButton = instrumentsSTPanel.getRemoveButton();
 
         setUsername(null);
         dataset = null;
@@ -175,162 +137,30 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         cancelButton.setText(CANCEL_TEXT);
 
         // Assign the text for the tabs
-        submitterHtml.setText(SUBMITTER_TAB_TEXT);
-        investigatorsHtml.setText(INVESTIGATOR_TAB_TEXT);
-        platformHtml.setText(PLATFORM_TAB_TEXT);
-        coverageHtml.setText(COVERAGE_TAB_TEXT);
-        variablesHtml.setText(VARIABLES_TAB_TEXT);
-        instrumentsHtml.setText(INSTRUMENTS_TAB_TEXT);
-        miscInfoHtml.setText(MISC_INFO_TAB_TEXT);
+        submitterButton.setText(SUBMITTER_TAB_TEXT);
+        investigatorsButton.setText(INVESTIGATOR_TAB_TEXT);
+        platformButton.setText(PLATFORM_TAB_TEXT);
+        coverageButton.setText(COVERAGE_TAB_TEXT);
+        variablesButton.setText(VARIABLES_TAB_TEXT);
+        instrumentsButton.setText(INSTRUMENTS_TAB_TEXT);
+        miscInfoButton.setText(MISC_INFO_TAB_TEXT);
 
         // Assign the hover helps for the tabs
-        submitterHtml.setTitle(SUBMITTER_TAB_HELP);
-        investigatorsHtml.setTitle(INVESTIGATOR_TAB_HELP);
-        platformHtml.setTitle(PLATFORM_TAB_HELP);
-        coverageHtml.setTitle(COVERAGE_TAB_HELP);
-        variablesHtml.setTitle(VARIABLES_TAB_HELP);
-        instrumentsHtml.setTitle(INSTRUMENTS_TAB_HELP);
-        miscInfoHtml.setTitle(MISC_INFO_TAB_HELP);
+        submitterButton.setTitle(SUBMITTER_TAB_HELP);
+        investigatorsButton.setTitle(INVESTIGATOR_TAB_HELP);
+        platformButton.setTitle(PLATFORM_TAB_HELP);
+        coverageButton.setTitle(COVERAGE_TAB_HELP);
+        variablesButton.setTitle(VARIABLES_TAB_HELP);
+        instrumentsButton.setTitle(INSTRUMENTS_TAB_HELP);
+        miscInfoButton.setTitle(MISC_INFO_TAB_HELP);
 
-        // Assign the labels and hover helps for add and remove buttons in the stacks panel tabs
-        addPiButton.setText(ADD_TEXT);
-        addPiButton.setTitle(ADD_INVESTIGATOR_HELP);
-        removePiButton.setText(REMOVE_TEXT);
-        removePiButton.setTitle(REMOVE_INVESTIGATOR_HELP);
-
-        addVarButton.setText(ADD_TEXT);
-        addVarButton.setTitle(ADD_VARIABLE_HELP);
-        removeVarButton.setText(REMOVE_TEXT);
-        removeVarButton.setTitle(REMOVE_VARIABLE_HELP);
-
-        addInstButton.setText(ADD_TEXT);
-        addInstButton.setTitle(ADD_INSTRUMENT_HELP);
-        removeInstButton.setText(REMOVE_TEXT);
-        removeInstButton.setTitle(REMOVE_INSTRUMENT_HELP);
-
-        // Create the panel ArrayList
-        piPanels = new ArrayList<InvestigatorPanel>();
-        varPanels = new ArrayList<VariablePanel>();
-        instPanels = new ArrayList<InstrumentPanel>();
-
-        // Add the button handlers
-        addPiButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                // Copy the last investigator information as a first guess, but remove the name and ID
-                int numPanels = piPanels.size();
-                Investigator pi;
-                if ( numPanels > 0 ) {
-                    pi = (Investigator) (piPanels.get(numPanels - 1).getUpdatedInvestigator().duplicate(null));
-                    pi.setLastName(null);
-                    pi.setFirstName(null);
-                    pi.setMiddle(null);
-                    pi.setId(null);
-                }
-                else {
-                    // This should never happen
-                    pi = new Investigator();
-                }
-                TextBox header = new TextBox();
-                InvestigatorPanel panel = new InvestigatorPanel(pi, header);
-                piPanels.add(panel);
-                investigatorsSTPanel.addPanel(panel, header);
-            }
-        });
-
-        removePiButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if ( piPanels.size() < 2 ) {
-                    UploadDashboard.showMessage("Cannot have less than one principal investigator description");
-                    return;
-                }
-                int idx = investigatorsSTPanel.getSelectedIndex();
-                if ( idx < 0 ) {
-                    UploadDashboard.showMessage("No principal investigator description selected");
-                    return;
-                }
-                piPanels.remove(idx);
-                investigatorsSTPanel.removePanel(idx);
-            }
-        });
-
-        addVarButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                // Copy the last variable information as a first guess, but remove the name
-                int numPanels = varPanels.size();
-                Variable var;
-                if ( numPanels > 0 ) {
-                    var = (Variable) (varPanels.get(numPanels - 1).getUpdatedVariable().duplicate(null));
-                    var.setColName(null);
-                }
-                else {
-                    // This should never happen
-                    var = new Variable();
-                }
-                TextBox header = new TextBox();
-                VariablePanel panel = new VariablePanel(var, header);
-                varPanels.add(panel);
-                variablesSTPanel.addPanel(panel, header);
-            }
-        });
-
-        removeVarButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if ( varPanels.size() < 2 ) {
-                    UploadDashboard.showMessage("Cannot have less than one data field description");
-                    return;
-                }
-                int idx = variablesSTPanel.getSelectedIndex();
-                if ( idx < 0 ) {
-                    UploadDashboard.showMessage("No data field description selected");
-                    return;
-                }
-                varPanels.remove(idx);
-                variablesSTPanel.removePanel(idx);
-            }
-        });
-
-        addInstButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                // Copy the last instrument information as a first guess, but remove the name
-                int numPanels = instPanels.size();
-                Instrument inst;
-                if ( numPanels > 0 ) {
-                    inst = (Instrument) (instPanels.get(numPanels - 1).getUpdatedInstrument().duplicate(null));
-                    inst.setName(null);
-                }
-                else {
-                    // This should never happen
-                    inst = new Instrument();
-                }
-                TextBox header = new TextBox();
-                InstrumentPanel panel = new InstrumentPanel(inst, header);
-                instPanels.add(panel);
-                investigatorsSTPanel.addPanel(panel, header);
-            }
-        });
-
-        removeInstButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                if ( instPanels.size() < 2 ) {
-                    UploadDashboard.showMessage("Cannot have less than one instrument description");
-                    return;
-                }
-                int idx = investigatorsSTPanel.getSelectedIndex();
-                if ( idx < 0 ) {
-                    UploadDashboard.showMessage("No instrument description selected");
-                    return;
-                }
-                instPanels.remove(idx);
-                investigatorsSTPanel.removePanel(idx);
-            }
-        });
-
+        submitterPanel = null;
+        investigatorsPanel = null;
+        platformPanel = null;
+        coveragePanel = null;
+        variablesPanel = null;
+        instrumentsPanel = null;
+        miscInfoPanel = null;
     }
 
     /**
@@ -407,62 +237,80 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         String[] pieces = dateTimeFormat.format(new Date(), timeZone).split(" ");
         Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
 
-        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
-        submitterSLPanel.setWidget(submitterPanel);
 
         // Make sure there is at least one PI specified, even if it is completely blank
         ArrayList<Investigator> investigators = metadata.getInvestigators();
         if ( investigators.isEmpty() )
             investigators.add(new Investigator());
 
-        piPanels.clear();
-        investigatorsSTPanel.clear();
-        for (Investigator pi : investigators) {
-            TextBox header = new TextBox();
-            InvestigatorPanel panel = new InvestigatorPanel(pi, header);
-            piPanels.add(panel);
-            investigatorsSTPanel.addPanel(panel, header);
-        }
-        investigatorsSTPanel.showSelectedIndex(0);
-
-        platformPanel = new PlatformPanel(metadata.getPlatform());
-        platformSLPanel.setWidget(platformPanel);
-
-        coveragePanel = new CoveragePanel(metadata.getCoverage(), today);
-        coverageSLPanel.setWidget(coveragePanel);
-
         // Make sure there is at least one variable specified, even if it is completely blank
         ArrayList<Variable> variables = metadata.getVariables();
         if ( variables.isEmpty() )
             variables.add(new Variable());
-
-        varPanels.clear();
-        variablesSTPanel.clear();
-        for (Variable var : variables) {
-            TextBox header = new TextBox();
-            VariablePanel panel = new VariablePanel(var, header);
-            varPanels.add(panel);
-            variablesSTPanel.addPanel(panel, header);
-        }
-        variablesSTPanel.showSelectedIndex(0);
 
         // Make sure there is at least one instrument specified, even if it is completely blank
         ArrayList<Instrument> instruments = metadata.getInstruments();
         if ( instruments.isEmpty() )
             instruments.add(new Instrument());
 
-        instPanels.clear();
-        instrumentsSTPanel.clear();
-        for (Instrument inst : instruments) {
-            TextBox header = new TextBox();
-            InstrumentPanel panel = new InstrumentPanel(inst, header);
-            instPanels.add(panel);
-            instrumentsSTPanel.addPanel(panel, header);
-        }
-        instrumentsSTPanel.showSelectedIndex(0);
-
+        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
+        investigatorsPanel = new InvestigatorsTabPanel(investigators);
+        platformPanel = new PlatformPanel(metadata.getPlatform());
+        coveragePanel = new CoveragePanel(metadata.getCoverage(), today);
+        variablesPanel = new VariablesTabPanel(variables);
+        instrumentsPanel = new InstrumentsTabPanel(instruments);
         miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
-        miscInfoSLPanel.setWidget(miscInfoPanel);
+
+        mainPanel.clear();
+        mainPanel.add(submitterPanel);
+        mainPanel.add(investigatorsPanel);
+        mainPanel.add(platformPanel);
+        mainPanel.add(coveragePanel);
+        mainPanel.add(variablesPanel);
+        mainPanel.add(instrumentsPanel);
+        mainPanel.add(miscInfoPanel);
+
+        investigatorsPanel.showPanel(0);
+        variablesPanel.showPanel(0);
+        instrumentsPanel.showPanel(0);
+
+        // Highlight the submitterButton and show the submitterPanel
+        submitterButton.click();
+    }
+
+    @UiHandler("submitterButton")
+    void submitterButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(0);
+    }
+
+    @UiHandler("investigatorsButton")
+    void setInvestigatorsButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(1);
+    }
+
+    @UiHandler("platformButton")
+    void platformButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(2);
+    }
+
+    @UiHandler("coverageButton")
+    void coverageButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(3);
+    }
+
+    @UiHandler("variablesButton")
+    void variablesButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(4);
+    }
+
+    @UiHandler("instrumentsButton")
+    void instrumentsButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(5);
+    }
+
+    @UiHandler("miscInfoButton")
+    void miscInfoButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(6);
     }
 
     @UiHandler("logoutButton")
@@ -494,23 +342,11 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private void saveSocatMetadata(boolean exitOnSuccess) {
         SocatMetadata metadata = new SocatMetadata();
         metadata.setSubmitter(submitterPanel.getUpdatedSumitter());
-        ArrayList<Investigator> investigators = new ArrayList<Investigator>(piPanels.size());
-        for (InvestigatorPanel panel : piPanels) {
-            investigators.add(panel.getUpdatedInvestigator());
-        }
-        metadata.setInvestigators(investigators);
+        metadata.setInvestigators(investigatorsPanel.getUpdatedInvestigators());
         metadata.setPlatform(platformPanel.getUpdatedPlatform());
         metadata.setCoverage(coveragePanel.getUpdatedCoverage());
-        ArrayList<Variable> variables = new ArrayList<Variable>(varPanels.size());
-        for (VariablePanel panel : varPanels) {
-            variables.add(panel.getUpdatedVariable());
-        }
-        metadata.setVariables(variables);
-        ArrayList<Instrument> instruments = new ArrayList<Instrument>(instPanels.size());
-        for (InstrumentPanel panel : instPanels) {
-            instruments.add(panel.getUpdatedInstrument());
-        }
-        metadata.setInstruments(instruments);
+        metadata.setVariables(variablesPanel.getUpdatedVariables());
+        metadata.setInstruments(instrumentsPanel.getUpdatedInstruments());
         metadata.setMiscInfo(miscInfoPanel.getUpdatedMiscInfo());
 
         UploadDashboard.showWaitCursor();

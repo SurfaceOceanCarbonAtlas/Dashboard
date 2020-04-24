@@ -2,12 +2,14 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
 import java.util.ArrayList;
@@ -51,7 +53,7 @@ public class InvestigatorPanel extends Composite {
 
 
     private final Investigator investigator;
-    private TextBox header;
+    private HTML header;
 
     /**
      * Creates a FlowPanel associated with the given Investigator.
@@ -59,23 +61,9 @@ public class InvestigatorPanel extends Composite {
      * @param investigator
      *         associate this panel with this Investigator; cannot be null
      * @param header
-     *         headerabel that should be updated when appropriate values change; cannot be null.
+     *         header that should be updated when appropriate values change; can be null
      */
-    public InvestigatorPanel(Investigator investigator, TextBox header) {
-        this(investigator);
-
-        this.header = header;
-        header.setText(investigator.getReferenceName());
-    }
-
-    /**
-     * Creates a FlowPanel associated with the given Investigator
-     * but without an associated header label.
-     *
-     * @param investigator
-     *         associate this panel with this Investigator; cannot be null
-     */
-    protected InvestigatorPanel(Investigator investigator) {
+    public InvestigatorPanel(Investigator investigator, HTML header) {
         firstNameValue = new LabeledTextBox("First name:", "8em", "10em", null, null);
         middleInitValue = new LabeledTextBox("Middle initial(s):", "8em", "6em", null, null);
         lastNameValue = new LabeledTextBox("Last name:", "8em", "10em", null, null);
@@ -101,35 +89,27 @@ public class InvestigatorPanel extends Composite {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.investigator = investigator;
-        this.header = null;
+        this.header = header;
 
-        // The following will assign the values in the text fields
+        // The following will assign the values in the labels and text fields
         getUpdatedInvestigator();
-        // The following will assign the HTML to the labels before the text fields
-        markInvalids();
     }
 
     @UiHandler("firstNameValue")
     void firstNameValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setFirstName(firstNameValue.getText());
-        if ( header != null )
-            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
     @UiHandler("middleInitValue")
     void middleInitValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setMiddle(middleInitValue.getText());
-        if ( header != null )
-            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
     @UiHandler("lastNameValue")
     void lastNameValueOnValueChange(ValueChangeEvent<String> event) {
         investigator.setLastName(lastNameValue.getText());
-        if ( header != null )
-            header.setValue(investigator.getReferenceName(), true);
         markInvalids();
     }
 
@@ -218,6 +198,15 @@ public class InvestigatorPanel extends Composite {
      */
     private void markInvalids() {
         HashSet<String> invalids = investigator.invalidFieldNames();
+
+        if ( header != null ) {
+            String oldVal = header.getHTML();
+            SafeHtml val = SafeHtmlUtils.fromString(investigator.getReferenceName());
+            if ( !invalids.isEmpty() )
+                val = UploadDashboard.invalidLabelHtml(val);
+            if ( !val.asString().equals(oldVal) )
+                header.setHTML(val);
+        }
 
         if ( invalids.contains("firstName") )
             firstNameValue.markInvalid();
@@ -329,8 +318,7 @@ public class InvestigatorPanel extends Composite {
         emailValue.setText(investigator.getEmail());
         phoneValue.setText(investigator.getPhone());
 
-        if ( header != null )
-            header.setValue(investigator.getReferenceName(), true);
+        markInvalids();
 
         return investigator;
     }

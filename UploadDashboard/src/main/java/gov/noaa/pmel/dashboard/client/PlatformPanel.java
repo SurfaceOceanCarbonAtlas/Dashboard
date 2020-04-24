@@ -60,12 +60,8 @@ public class PlatformPanel extends Composite {
             typeList.addItem(type.toString());
         }
 
-        // The following will assign the values in the text fields
+        // The following will assign the values in the labels and text fields
         getUpdatedPlatform();
-        // If the platform type is unknown, see if it can guess the type
-        possiblyUpdatePlatformType();
-        // The following will assign the HTML to the labels before the text fields
-        markInvalids();
     }
 
     @UiHandler("idValue")
@@ -164,6 +160,11 @@ public class PlatformPanel extends Composite {
             typeList.setSelectedIndex(idx);
         ownerValue.setText(platform.getPlatformOwner());
         countryValue.setText(platform.getPlatformCountry());
+
+        // If the platform type is unknown, see if it can guess the type
+        possiblyUpdatePlatformType();
+
+        markInvalids();
 
         return platform;
     }

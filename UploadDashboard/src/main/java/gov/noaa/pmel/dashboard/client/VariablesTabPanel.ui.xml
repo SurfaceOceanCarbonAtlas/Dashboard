@@ -1,0 +1,14 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+    <ui:style src="EditSocatMetadata.css"/>
+
+    <g:FlowPanel>
+        <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{style.tabpanel}" ui:field="mainPanel"/>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <g:Button addStyleNames="{style.modbutton}" ui:field="addButton"/>
+            <g:Button addStyleNames="{style.modbutton}" ui:field="removeButton"/>
+        </g:FlowPanel>
+    </g:FlowPanel>
+
+</ui:UiBinder>

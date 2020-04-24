@@ -13,7 +13,7 @@ public class SubmitterPanel extends InvestigatorPanel {
      *         associate this panel with this Investigator; cannot be null
      */
     public SubmitterPanel(Submitter submitter) {
-        super(submitter);
+        super(submitter, null);
         this.submitter = submitter;
     }
 

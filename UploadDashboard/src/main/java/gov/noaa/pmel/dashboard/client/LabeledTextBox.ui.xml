@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
              xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:style src="LabeledTextBox.css"/>
+    <ui:style src="LabeledText.css"/>
 
     <g:FlowPanel>
         <g:HTML addStyleNames="{style.prefix}" ui:field="prefixHtml"/>
