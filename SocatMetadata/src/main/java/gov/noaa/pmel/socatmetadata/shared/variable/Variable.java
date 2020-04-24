@@ -13,7 +13,7 @@ import java.util.HashSet;
  */
 public class Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5472958616941321533L;
+    private static final long serialVersionUID = 7212627524921707714L;
 
     protected String colName;
     protected String fullName;
@@ -251,6 +251,19 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
                 this.addnInfo.add(info);
             }
         }
+    }
+
+    /**
+     * @return the column name of the variable if given (not empty);
+     *         otherwise the full name of the variable if given (not empty);
+     *         otherwise "unknown"
+     */
+    public String getReferenceName() {
+        if ( !colName.isEmpty() )
+            return colName;
+        if ( !fullName.isEmpty() )
+            return fullName;
+        return "unknown";
     }
 
     @Override

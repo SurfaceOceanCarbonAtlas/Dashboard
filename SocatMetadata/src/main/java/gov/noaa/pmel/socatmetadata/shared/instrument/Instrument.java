@@ -12,7 +12,7 @@ import java.util.HashSet;
  */
 public class Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6339512187742983054L;
+    private static final long serialVersionUID = 5761809466391631159L;
 
     protected String name;
     protected String id;
@@ -146,6 +146,19 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
                 this.addnInfo.add(info);
             }
         }
+    }
+
+    /**
+     * @return the name of the instrument if given (not empty);
+     *         otherwise the ID of the instrument if given (not empty);
+     *         otherwise "unknown"
+     */
+    public String getReferenceName() {
+        if ( !name.isEmpty() )
+            return name;
+        if ( !id.isEmpty() )
+            return id;
+        return "unknown";
     }
 
     @Override
