@@ -3,13 +3,15 @@
 
     <ui:style src="EditSocatMetadata.css"/>
 
-    <g:FlowPanel>
-        <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
-        <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{style.tabpanel}" ui:field="mainPanel"/>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <g:Button addStyleNames="{style.modbutton}" ui:field="addButton"/>
-            <g:Button addStyleNames="{style.modbutton}" ui:field="removeButton"/>
+    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+        <g:FlowPanel>
+            <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
+            <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{style.variablepanel}" ui:field="mainPanel"/>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <g:Button addStyleNames="{style.modbutton}" ui:field="addButton"/>
+                <g:Button addStyleNames="{style.modbutton}" ui:field="removeButton"/>
+            </g:FlowPanel>
         </g:FlowPanel>
-    </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

@@ -7,16 +7,16 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.ArrayList;
 
 public class VariablesTabPanel extends Composite {
-    interface VariablesTabPanelUiBinder extends UiBinder<FlowPanel,VariablesTabPanel> {
+    interface VariablesTabPanelUiBinder extends UiBinder<ScrollPanel,VariablesTabPanel> {
     }
 
     private static VariablesTabPanelUiBinder uiBinder = GWT.create(VariablesTabPanelUiBinder.class);

@@ -275,7 +275,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         instrumentsPanel.showPanel(0);
 
         // Highlight the submitterButton and show the submitterPanel
-        submitterButton.click();
+        submitterButton.setFocus(true);
+        mainPanel.showWidget(0);
     }
 
     @UiHandler("submitterButton")
