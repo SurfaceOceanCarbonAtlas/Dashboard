@@ -6,7 +6,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
@@ -18,11 +19,13 @@ public class CoveragePanel extends Composite {
 
     private static final String DATE_UNIT_TEXT = "(yyyy-MM-dd)";
 
-    interface CoveragePanelUiBinder extends UiBinder<ScrollPanel,CoveragePanel> {
+    interface CoveragePanelUiBinder extends UiBinder<FlowPanel,CoveragePanel> {
     }
 
     private static final CoveragePanelUiBinder uiBinder = GWT.create(CoveragePanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField(provided = true)
     final LabeledTextBox spacialValue;
     @UiField(provided = true)
@@ -79,6 +82,8 @@ public class CoveragePanel extends Composite {
         regionsValue = new LabeledTextArea("Geographic names", "10em", "60em");
 
         initWidget(uiBinder.createAndBindUi(this));
+
+        headerLabel.setText(EditSocatMetadataPage.COVERAGE_TAB_TEXT);
 
         this.coverage = coverage;
         this.today = today;

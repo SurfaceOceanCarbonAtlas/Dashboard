@@ -7,11 +7,7 @@
 
     <g:FlowPanel>
         <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="idValue"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="nameValue"/>
-        <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="typeList"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="ownerValue"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="countryValue"/>
+        <my:InvestigatorPanel ui:field="subPanel"/>
     </g:FlowPanel>
 
 </ui:UiBinder>

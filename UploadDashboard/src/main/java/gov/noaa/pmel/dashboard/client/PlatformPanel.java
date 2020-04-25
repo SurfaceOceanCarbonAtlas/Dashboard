@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
@@ -22,6 +23,8 @@ public class PlatformPanel extends Composite {
 
     private static final PlatformPanelUiBinder uiBinder = GWT.create(PlatformPanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField(provided = true)
     final LabeledTextBox idValue;
     @UiField(provided = true)
@@ -50,6 +53,8 @@ public class PlatformPanel extends Composite {
         countryValue = new LabeledTextBox("Country of registration:", "12em", "15em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
+
+        headerLabel.setText(EditSocatMetadataPage.PLATFORM_TAB_TEXT);
 
         this.platform = platform;
 

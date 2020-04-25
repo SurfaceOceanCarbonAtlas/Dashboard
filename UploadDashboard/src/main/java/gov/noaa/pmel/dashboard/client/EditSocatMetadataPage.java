@@ -51,13 +51,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private static final String HTML_INTRO_PROLOGUE = "<p>Dataset: ";
     private static final String HTML_INTRO_EPILOGUE = "</p>";
 
-    private static final String SUBMITTER_TAB_TEXT = "Submitter";
-    private static final String INVESTIGATOR_TAB_TEXT = "Investigators";
-    private static final String PLATFORM_TAB_TEXT = "Platform";
-    private static final String COVERAGE_TAB_TEXT = "Coverage";
-    private static final String VARIABLES_TAB_TEXT = "Data fields";
-    private static final String INSTRUMENTS_TAB_TEXT = "Instruments";
-    private static final String MISC_INFO_TAB_TEXT = "Information";
+    public static final String SUBMITTER_TAB_TEXT = "Submitter";
+    public static final String INVESTIGATOR_TAB_TEXT = "Investigators";
+    public static final String PLATFORM_TAB_TEXT = "Platform";
+    public static final String COVERAGE_TAB_TEXT = "Coverage";
+    public static final String VARIABLES_TAB_TEXT = "Data fields";
+    public static final String INSTRUMENTS_TAB_TEXT = "Instruments";
+    public static final String MISC_INFO_TAB_TEXT = "Information";
 
     private static final String SUBMITTER_TAB_HELP = "Contact information for the submitter of this dataset";
     private static final String INVESTIGATOR_TAB_HELP = "Information about each of the principal investigator of this dataset";

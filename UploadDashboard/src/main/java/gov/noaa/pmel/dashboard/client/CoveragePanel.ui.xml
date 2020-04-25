@@ -5,29 +5,28 @@
 
     <ui:style src="EditSocatMetadata.css"/>
 
-    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
-        <g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="spacialValue"/>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="southLatValue"/>
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="northLatValue"/>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="westLonValue"/>
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="eastLonValue"/>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="startDateValue"/>
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="endDateValue"/>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="earlyDateValue"/>
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lateDateValue"/>
-            </g:FlowPanel>
-            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="regionsValue"/>
+    <g:FlowPanel addStyleNames="{style.scrollpanel}">
+        <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="spacialValue"/>
         </g:FlowPanel>
-    </g:ScrollPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="southLatValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="northLatValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="westLonValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="eastLonValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="startDateValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="endDateValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="earlyDateValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lateDateValue"/>
+        </g:FlowPanel>
+        <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="regionsValue"/>
+    </g:FlowPanel>
 
 </ui:UiBinder>

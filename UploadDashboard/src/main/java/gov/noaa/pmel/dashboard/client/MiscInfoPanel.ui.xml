@@ -7,6 +7,7 @@
 
     <g:ScrollPanel addStyleNames="{style.scrollpanel}">
         <g:FlowPanel>
+            <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
             <g:FlowPanel addStyleNames="{style.rowpanel}">
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
             </g:FlowPanel>

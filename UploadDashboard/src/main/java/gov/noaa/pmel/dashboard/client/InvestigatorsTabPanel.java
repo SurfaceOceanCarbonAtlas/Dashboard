@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
@@ -20,6 +21,8 @@ public class InvestigatorsTabPanel extends Composite {
 
     private static InvestigatorsTabPanelUiBinder uiBinder = GWT.create(InvestigatorsTabPanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField
     TabLayoutPanel mainPanel;
     @UiField
@@ -44,6 +47,7 @@ public class InvestigatorsTabPanel extends Composite {
     public InvestigatorsTabPanel(ArrayList<Investigator> investigators) {
         initWidget(uiBinder.createAndBindUi(this));
 
+        headerLabel.setText(EditSocatMetadataPage.INVESTIGATOR_TAB_TEXT);
         investigatorPanels = new ArrayList<InvestigatorPanel>(investigators.size());
         for (Investigator pi : investigators) {
             HTML header = new HTML();

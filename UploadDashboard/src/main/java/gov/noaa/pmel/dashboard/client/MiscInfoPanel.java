@@ -6,6 +6,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
@@ -19,6 +20,8 @@ public class MiscInfoPanel extends Composite {
 
     private static final MiscInfoPanelUiBinder uiBinder = GWT.create(MiscInfoPanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField(provided = true)
     final LabeledTextBox idValue;
     @UiField(provided = true)
@@ -99,6 +102,8 @@ public class MiscInfoPanel extends Composite {
         historyValue = new LabeledTextArea("Archival history", "5em", "55.25em");
 
         initWidget(uiBinder.createAndBindUi(this));
+
+        headerLabel.setText(EditSocatMetadataPage.MISC_INFO_TAB_TEXT);
 
         this.info = info;
 

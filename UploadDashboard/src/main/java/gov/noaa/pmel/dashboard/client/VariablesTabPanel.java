@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
@@ -20,6 +21,8 @@ public class VariablesTabPanel extends Composite {
 
     private static VariablesTabPanelUiBinder uiBinder = GWT.create(VariablesTabPanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField
     TabLayoutPanel mainPanel;
     @UiField
@@ -44,6 +47,7 @@ public class VariablesTabPanel extends Composite {
     public VariablesTabPanel(ArrayList<Variable> variables) {
         initWidget(uiBinder.createAndBindUi(this));
 
+        headerLabel.setText(EditSocatMetadataPage.VARIABLES_TAB_TEXT);
         variablePanels = new ArrayList<VariablePanel>(variables.size());
         for (Variable vari : variables) {
             HTML header = new HTML();

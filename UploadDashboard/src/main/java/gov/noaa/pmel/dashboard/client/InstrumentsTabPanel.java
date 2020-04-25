@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 
@@ -20,6 +21,8 @@ public class InstrumentsTabPanel extends Composite {
 
     private static InstrumentsTabPanelUiBinder uiBinder = GWT.create(InstrumentsTabPanelUiBinder.class);
 
+    @UiField
+    Label headerLabel;
     @UiField
     TabLayoutPanel mainPanel;
     @UiField
@@ -44,6 +47,7 @@ public class InstrumentsTabPanel extends Composite {
     public InstrumentsTabPanel(ArrayList<Instrument> instruments) {
         initWidget(uiBinder.createAndBindUi(this));
 
+        headerLabel.setText(EditSocatMetadataPage.INSTRUMENTS_TAB_TEXT);
         instrumentPanels = new ArrayList<InstrumentPanel>(instruments.size());
         for (Instrument instr : instruments) {
             HTML header = new HTML();
