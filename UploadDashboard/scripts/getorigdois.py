@@ -312,16 +312,15 @@ if __name__ == '__main__':
             linkedobjs = getXmlContent(url)
 
             givenexpos = getExpocodes(linkedobjs)
-            givenexposstr = str(givenexpos)
-            # make sure the given expocodes are found in the XML
-            numgiven = len(givenexpos)
             for value in pieces[3].strip().strip('"').split(','):
                 value = getExpocodeFromValue(value)
                 if value:
-                    givenexpos.add(value)
-            if (numgiven < 1) or (len(givenexpos) != numgiven):
+                    if value not in givenexpos:
+                        givenexpos.add(value)
+                        print('Warning: expoocode not given in the XML: ' + value)
+            if not givenexpos:
                 print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    provided expocodes not found in XML expocodes: ' + givenexposstr, file=sys.stderr)
+                print('    no expocodes found', file=sys.stderr)
                 problems = True
                 continue
 
@@ -337,6 +336,7 @@ if __name__ == '__main__':
                 problems = True
                 continue
             else:
+                # allow missing DOIs since there will be a landing page
                 doi = ''
 
             urlSet = getLandingLinks(linkedobjs)
