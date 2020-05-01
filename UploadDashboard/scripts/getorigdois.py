@@ -17,8 +17,6 @@ import xml.sax.handler
 
 # skip any "expocodes" that do not match (start with) usual expocode pattern
 EXPO_REGEX = re.compile(r'[A-Z0-9]{4,5}?[0-9]{8}')
-# skip any "DOIs" that do not match (start with) usual DOI pattern
-DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Za-z0-9/_\.]+')
 
 
 def resemblesExpocode(myvalue):
@@ -26,6 +24,10 @@ def resemblesExpocode(myvalue):
         Returns: whether the given value resembles an expocode
     """
     return EXPO_REGEX.match(myvalue)
+
+
+# skip any "DOIs" that do not match (start with) usual DOI pattern
+DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Za-z0-9/_.]+')
 
 
 def getDOIFromValue(myvalue):
@@ -68,15 +70,15 @@ class LinkedObjectsContentHandler(xml.sax.handler.ContentHandler):
     """
 
     def __init__(self):
-        super(LinkedObjectsContentHandler, self).__init__()
+        # calling the superclass constructor fails in production
+        # super(LinkedObjectsContentHandler, self).__init__()
         self.__rootobj = MyObject('', None, None)
         self.__rootobj.parent = self.__rootobj
         self.__currobj = self.__rootobj
         self.__parent = self.__rootobj
 
     def startElement(self, name, attrs):
-        self.__fullname = self.__parent.fullname + '/' + name
-        currobj = MyObject(self.__fullname, attrs, self.__currobj)
+        currobj = MyObject(self.__parent.fullname + '/' + name, attrs, self.__currobj)
         currobj.parent = self.__parent
         self.__currobj.nextobj = currobj
         self.__currobj = currobj
@@ -150,7 +152,8 @@ def getLandingLinks(mylinkedobjs):
             myvalue = obj.value
             if myvalue.startswith('http'):
                 links.add(myvalue)
-        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor':
+        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
+                'gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor':
             myvalue = obj.attrs.getValueByQName('xlink:title')
             if not myvalue:
                 myvalue = obj.attrs.getValue('xlink:title')
@@ -176,7 +179,8 @@ def getDois(mylinkedobjs):
             myvalue = getDOIFromValue(obj.value)
             if myvalue is not None:
                 dois.add(myvalue)
-        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor':
+        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
+                'gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gmx:Anchor':
             myvalue = obj.attrs.getValueByQName('xlink:title')
             if not myvalue:
                 myvalue = obj.attrs.getValue('xlink:title')
@@ -200,15 +204,19 @@ def getExpocodes(mylinkedobjs):
             myvalue = obj.value.strip()
             if resemblesExpocode(myvalue):
                 expocodes.add(myvalue)
-        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords':
+        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
+                'gmd:descriptiveKeywords/gmd:MD_Keywords':
             # clear tmpset whenever a new gmd:MD_Keywords is found
             tmpset = set()
-        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString':
+        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
+                'gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString':
             # possibly an expocode, add to tmpset for now
             myvalue = obj.value.strip()
             if resemblesExpocode(myvalue):
                 tmpset.add(myvalue)
-        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString':
+        elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
+                'gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/' + \
+                'gmd:title/gco:CharacterString':
             myvalue = obj.value.strip()
             if myvalue == 'EXPOCODE':
                 # this set of "keywords" were expocodes; add all the expocodes in tmpset to expocodes
@@ -218,6 +226,25 @@ def getExpocodes(mylinkedobjs):
     return expocodes
 
 
+# Extracts the accession number from these URLs
+ACCESSION_URL = re.compile(r'https://accession.nodc.noaa.gov/([0-9]+)$')
+DATAISOID_URL = re.compile(r'https://data\.nodc\.noaa\.gov/cgi-bin/iso\?id=gov\.noaa\.nodc:([0-9]+)$')
+TESTDATA_URL = re.compile(r'https://test\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.xml$')
+
+
+def getAlternateURL(myurl):
+    # check if the URL matches one of the known patterns with an accession number
+    match = ACCESSION_URL.match(myurl)
+    if not match:
+        match = DATAISOID_URL.match(myurl)
+    if not match:
+        match = TESTDATA_URL.match(myurl)
+    if match:
+        # provide the standard XML URL using the accession number
+        return 'https://www.nodc.noaa.gov/ocads/data/' + match.group(1) + '.xml'
+    return None
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('', file=sys.stderr)
@@ -225,8 +252,8 @@ if __name__ == '__main__':
         print('', file=sys.stderr)
         print('    Reads expocodes (fourth column), URLs (fifth column), and DOIs (sixth column) ', file=sys.stderr)
         print('    from the TSV file, reads the XML from each URL to extract more expocodes and ', file=sys.stderr)
-        print('    possibly a DOI, then writes out triplets of expocode, URL, and DOI to standard ', file=sys.stderr)
-        print('    output. ', file=sys.stderr)
+        print('    possibly a DOI, then writes out triplets of expocode, landing page URL, and ', file=sys.stderr)
+        print('    DOI to standard output. ', file=sys.stderr)
         print('', file=sys.stderr)
         print('    If the value in the URL column for a row is not present or does not start with ', file=sys.stderr)
         print('    "http", the row is skipped.  If the URL is for an XML file, or an XML file can be ', file=sys.stderr)
@@ -235,7 +262,6 @@ if __name__ == '__main__':
         print('', file=sys.stderr)
         print('    If the value in the DOI column for a row is not present or does not resemble ', file=sys.stderr)
         print('    a DOI, then the XML file from the URL for the row is examined for a DOI. ', file=sys.stderr)
-        print('    If no DOI can be found, the row is skipped. ', file=sys.stderr)
         print('', file=sys.stderr)
         print('    If the value in the expocode column for a row is a double-quoted (optional), ', file=sys.stderr)
         print('    comma-separated list of values instead of a single value, then each value in ', file=sys.stderr)
@@ -245,8 +271,9 @@ if __name__ == '__main__':
         print('    associated with the URL and DOI for that row. ', file=sys.stderr)
         print('', file=sys.stderr)
         sys.exit(1)
-    problems = False
     tsvfile = open(sys.argv[1])
+
+    problems = False
     try:
         for dataline in tsvfile:
             pieces = dataline.split('\t')
@@ -268,29 +295,49 @@ if __name__ == '__main__':
                 problems = True
                 continue
 
-            if url.endswith(('.xml', '.XML')):
-                linkedobjs = getXmlContent(url)
-            else:
-                linkedobjs = getXmlContent(url + ";view=xml;responseType=text/xml")
+            alturl = getAlternateURL(url)
+            if alturl:
+                url = alturl
+            linkedobjs = getXmlContent(url)
 
             givenexpos = getExpocodes(linkedobjs)
+            # make sure the given expocodes are found in the XML
+            numgiven = len(givenexpos)
             for value in pieces[3].strip().strip('"').split(','):
-                givenexpos.add(value.strip())
+                value = value.strip()
+                if resemblesExpocode(value):
+                    givenexpos.add(value)
+            if (numgiven < 1) or (len(givenexpos) != numgiven):
+                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('    provided expocodes not found in XML', file=sys.stderr)
+                problems = True
+                continue
 
-            if doi is None:
-                doiSet = getDois(linkedobjs)
-                if len(doiSet) == 1:
-                    doi = doiSet.pop()
-                elif len(doiSet) > 1:
-                    print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                    print('    multiple DOIs found: ' + str(doiSet), file=sys.stderr)
-                    problems = True
-                    continue
-                else:
-                    print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                    print('    no DOI found', file=sys.stderr)
-                    problems = True
-                    continue
+            doiSet = getDois(linkedobjs)
+            # make sure the given DOI matches that in the XML
+            if doi:
+                doiSet.add(doi)
+            if len(doiSet) == 1:
+                doi = doiSet.pop()
+            elif len(doiSet) > 1:
+                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('    multiple DOIs found: ' + str(doiSet), file=sys.stderr)
+                problems = True
+                continue
+            else:
+                doi = ''
+
+            urlSet = getLandingLinks(linkedobjs)
+            if len(urlSet) == 1:
+                url = urlSet.pop()
+            elif len(urlSet) > 1:
+                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('    multiple landing pages found: ' + str(urlSet), file=sys.stderr)
+                problems = True
+                continue
+            else:
+                # just use the URL used here as the landing page URL
+                pass
 
             for expo in givenexpos:
                 print(expo + '\t' + url + '\t' + doi)
