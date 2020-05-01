@@ -10,7 +10,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
         self.assertFalse(getorigdois.resemblesExpocode('multiple'))
 
     def test_getDOIFromValue(self):
-        mydoi = '10.25921/0pmp-1r57'
+        mydoi = '10.25921/0PMP-1R57'
         doi = getorigdois.getDOIFromValue(mydoi)
         self.assertEqual(mydoi, doi)
         doi = getorigdois.getDOIFromValue('https://doi.org/' + mydoi)
@@ -139,7 +139,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
         expocodes = getorigdois.getExpocodes(linkedobjs)
         self.assertEqual(set(('35MV20190109',)), expocodes)
         dois = getorigdois.getDois(linkedobjs)
-        self.assertEqual(set(('10.25921/0pmp-1r57',)), dois)
+        self.assertEqual(set(('10.25921/0PMP-1R57',)), dois)
         urls = getorigdois.getLandingLinks(linkedobjs)
         self.assertEqual(set(('https://accession.nodc.noaa.gov/0208441',)), urls)
 
@@ -152,7 +152,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
                               '316420090902', '316420100908', '316420110706', '316420120822',
                               '316420131105', '316420140925', '316420160107', '316420161115')), expocodes)
         dois = getorigdois.getDois(linkedobjs)
-        self.assertEqual(set(('10.3334/cdiac/otg.tsm_nh_70w_43n',)), dois)
+        self.assertEqual(set(('10.3334/CDIAC/OTG.TSM_NH_70W_43N',)), dois)
         urls = getorigdois.getLandingLinks(linkedobjs)
         self.assertEqual(set(('https://accession.nodc.noaa.gov/0115402',)), urls)
 
@@ -164,7 +164,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
         expocodes = getorigdois.getExpocodes(linkedobjs)
         self.assertEqual(set(('325020131025',)), expocodes)
         dois = getorigdois.getDois(linkedobjs)
-        self.assertEqual(set(('10.3334/cdiac/otg.goship_p21_325020131025',)), dois)
+        self.assertEqual(set(('10.3334/CDIAC/OTG.GOSHIP_P21_325020131025',)), dois)
         urls = getorigdois.getLandingLinks(linkedobjs)
         self.assertEqual(set(('https://accession.nodc.noaa.gov/0163186',)), urls)
 
@@ -180,7 +180,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
                               'PANC20160911', 'PANC20160928', 'PANC20161014', 'PANC20161031',
                               'PANC20161117', 'PANC20161203',)), expocodes)
         dois = getorigdois.getDois(linkedobjs)
-        self.assertEqual(set(('10.7289/v5kd1w5w',)), dois)
+        self.assertEqual(set(('10.7289/V5KD1W5W',)), dois)
         urls = getorigdois.getLandingLinks(linkedobjs)
         self.assertEqual(set(('https://accession.nodc.noaa.gov/0169950',)), urls)
 

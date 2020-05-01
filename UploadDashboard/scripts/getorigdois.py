@@ -27,7 +27,7 @@ def resemblesExpocode(myvalue):
 
 
 # skip any "DOIs" that do not match (start with) usual DOI pattern
-DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Za-z0-9/_.]+')
+DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Z0-9/_.]+')
 
 
 def getDOIFromValue(myvalue):
@@ -39,6 +39,7 @@ def getDOIFromValue(myvalue):
         mydoi = myvalue[16:]
     else:
         mydoi = myvalue
+    mydoi = mydoi.upper()
     if not DOI_REGEX.match(mydoi):
         mydoi = None
     return mydoi
@@ -190,7 +191,7 @@ def getDois(mylinkedobjs):
             if myvalue == 'DOI':
                 myvalue = getDOIFromValue(obj.value)
                 if myvalue is not None:
-                    dois.add(myvalue)
+                    dois.add(myvalue.upper())
         obj = obj.nextobj
     return dois
 
@@ -204,7 +205,7 @@ def getExpocodes(mylinkedobjs):
     obj = mylinkedobjs
     while obj:
         if obj.fullname == '/metadata/expocode':
-            myvalue = obj.value.strip()
+            myvalue = obj.value.strip().upper()
             if resemblesExpocode(myvalue):
                 expocodes.add(myvalue)
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
@@ -214,7 +215,7 @@ def getExpocodes(mylinkedobjs):
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
                 'gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString':
             # possibly an expocode, add to tmpset for now
-            myvalue = obj.value.strip()
+            myvalue = obj.value.strip().upper()
             if resemblesExpocode(myvalue):
                 tmpset.add(myvalue)
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
@@ -307,7 +308,7 @@ if __name__ == '__main__':
             # make sure the given expocodes are found in the XML
             numgiven = len(givenexpos)
             for value in pieces[3].strip().strip('"').split(','):
-                value = value.strip()
+                value = value.strip().upper()
                 if resemblesExpocode(value):
                     givenexpos.add(value)
             if (numgiven < 1) or (len(givenexpos) != numgiven):
@@ -319,7 +320,7 @@ if __name__ == '__main__':
             doiSet = getDois(linkedobjs)
             # make sure the given DOI matches that in the XML
             if doi:
-                doiSet.add(doi)
+                doiSet.add(doi.upper())
             if len(doiSet) == 1:
                 doi = doiSet.pop()
             elif len(doiSet) > 1:
