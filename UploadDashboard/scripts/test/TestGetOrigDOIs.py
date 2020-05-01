@@ -125,16 +125,25 @@ class GetOrigDOIsTestCase(unittest.TestCase):
     def test_getXmlContentExpocodesDois(self):
         linkedobjs = getorigdois.getXmlContent("https://www.nodc.noaa.gov/ocads/data/0208441.xml")
         self.assertIsNotNone(linkedobjs)
-        thisobj = linkedobjs;
-        while thisobj:
-            print(str(thisobj))
-            thisobj = thisobj.nextobj
         expocodes = getorigdois.getExpocodes(linkedobjs)
-        self.assertEqual(set(("35MV20190109",)), expocodes)
+        self.assertEqual({"35MV20190109"}, expocodes)
         dois = getorigdois.getDois(linkedobjs)
-        self.assertEqual(set(("10.25921/0pmp-1r57",)), dois)
+        self.assertEqual({"10.25921/0pmp-1r57"}, dois)
         urls = getorigdois.getLandingLinks(linkedobjs)
-        self.assertEqual(set(("https://accession.nodc.noaa.gov/0208441",)), urls)
+        self.assertEqual({"https://accession.nodc.noaa.gov/0208441"}, urls)
+
+        linkedobjs = getorigdois.getXmlContent(
+            "https://data.nodc.noaa.gov/cgi-bin/iso?id=gov.noaa.nodc:0115402;view=xml;responseType=text/xml")
+        self.assertIsNotNone(linkedobjs)
+        expocodes = getorigdois.getExpocodes(linkedobjs)
+        self.assertEqual({"316420060713", "316420070829", "316420081014", "316420081209",
+                          "316420090902", "316420100908", "316420110706", "316420120822",
+                          "316420131105", "316420140925", "316420160107", "316420161115"}, expocodes)
+        dois = getorigdois.getDois(linkedobjs)
+        self.assertEqual({"10.3334/cdiac/otg.tsm_nh_70w_43n"}, dois)
+        urls = getorigdois.getLandingLinks(linkedobjs)
+        self.assertEqual({"https://accession.nodc.noaa.gov/0115402"}, urls)
+
 
 if __name__ == '__main__':
     unittest.main()
