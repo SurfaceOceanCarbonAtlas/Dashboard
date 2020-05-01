@@ -100,7 +100,10 @@ class LinkedObjectsContentHandler(xml.sax.handler.ContentHandler):
         # clean up all the values
         thisobj = self.__rootobj.nextobj
         while thisobj:
-            thisobj.value = str(thisobj.value).strip()
+            if sys.version_info[0] > 2:
+                thisobj.value = str(thisobj.value).strip()
+            else:
+                thisobj.value = unicode(thisobj.value).strip()
             thisobj = thisobj.nextobj
         return self.__rootobj.nextobj
 
