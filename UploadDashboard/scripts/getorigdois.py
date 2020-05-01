@@ -16,14 +16,22 @@ import xml.sax
 import xml.sax.handler
 
 # skip any "expocodes" that do not match (start with) usual expocode pattern
-EXPO_REGEX = re.compile(r'[A-Z0-9]{4,5}?[0-9]{8}')
+EXPO_REGEX = re.compile(r'([A-Z0-9]{4,5}?[0-9]{8})')
 
 
-def resemblesExpocode(myvalue):
+def getExpocodeFromValue(myvalue):
     """
-        Returns: whether the given value resembles an expocode
+        Returns: the expocode in the value if the value resembles an expocode,
+                 or None if the value does not resemble an expocode
     """
-    return EXPO_REGEX.match(myvalue)
+    match = EXPO_REGEX.match(myvalue.strip().upper())
+    if match:
+        expocode = match.group(1)
+        if len(expocode) != len(myvalue):
+            print("Warning: extra characters at the end of expocode: " + myvalue, file=sys.stderr)
+    else:
+        expocode = None
+    return expocode
 
 
 # skip any "DOIs" that do not match (start with) usual DOI pattern
@@ -35,11 +43,9 @@ def getDOIFromValue(myvalue):
         Returns: the "bare" DOI value if the value resembles a DOI,
                  or None if the value does not resemble a DOI
     """
-    if myvalue.startswith('https://doi.org/'):
-        mydoi = myvalue[16:]
-    else:
-        mydoi = myvalue
-    mydoi = mydoi.upper()
+    mydoi = myvalue.strip().upper()
+    if mydoi.startswith('HTTPS://DOI.ORG/'):
+        mydoi = mydoi[16:]
     if not DOI_REGEX.match(mydoi):
         mydoi = None
     return mydoi
@@ -190,8 +196,8 @@ def getDois(mylinkedobjs):
                 myvalue = obj.attrs.getValue('xlink:title')
             if myvalue == 'DOI':
                 myvalue = getDOIFromValue(obj.value)
-                if myvalue is not None:
-                    dois.add(myvalue.upper())
+                if myvalue:
+                    dois.add(myvalue)
         obj = obj.nextobj
     return dois
 
@@ -205,8 +211,8 @@ def getExpocodes(mylinkedobjs):
     obj = mylinkedobjs
     while obj:
         if obj.fullname == '/metadata/expocode':
-            myvalue = obj.value.strip().upper()
-            if resemblesExpocode(myvalue):
+            myvalue = getExpocodeFromValue(obj.value)
+            if myvalue:
                 expocodes.add(myvalue)
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
                 'gmd:descriptiveKeywords/gmd:MD_Keywords':
@@ -215,8 +221,8 @@ def getExpocodes(mylinkedobjs):
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
                 'gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString':
             # possibly an expocode, add to tmpset for now
-            myvalue = obj.value.strip().upper()
-            if resemblesExpocode(myvalue):
+            myvalue = getExpocodeFromValue(obj.value)
+            if myvalue:
                 tmpset.add(myvalue)
         elif obj.fullname == '/gmi:MI_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/' + \
                 'gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/' + \
@@ -288,7 +294,7 @@ if __name__ == '__main__':
                 problems = True
                 continue
             if len(pieces) > 5:
-                doi = getDOIFromValue(pieces[5].strip())
+                doi = getDOIFromValue(pieces[5])
             else:
                 doi = None
 
@@ -305,22 +311,23 @@ if __name__ == '__main__':
             linkedobjs = getXmlContent(url)
 
             givenexpos = getExpocodes(linkedobjs)
+            givenexposstr = str(givenexpos)
             # make sure the given expocodes are found in the XML
             numgiven = len(givenexpos)
             for value in pieces[3].strip().strip('"').split(','):
-                value = value.strip().upper()
-                if resemblesExpocode(value):
+                value = getExpocodeFromValue(value)
+                if value:
                     givenexpos.add(value)
             if (numgiven < 1) or (len(givenexpos) != numgiven):
                 print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    provided expocodes not found in XML', file=sys.stderr)
+                print('    provided expocodes not found in XML expocodes: ' + givenexposstr, file=sys.stderr)
                 problems = True
                 continue
 
             doiSet = getDois(linkedobjs)
             # make sure the given DOI matches that in the XML
             if doi:
-                doiSet.add(doi.upper())
+                doiSet.add(doi)
             if len(doiSet) == 1:
                 doi = doiSet.pop()
             elif len(doiSet) > 1:

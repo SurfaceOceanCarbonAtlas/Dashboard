@@ -4,10 +4,11 @@ import getorigdois
 
 
 class GetOrigDOIsTestCase(unittest.TestCase):
-    def test_resemblesExpocode(self):
-        self.assertTrue(getorigdois.resemblesExpocode('ABCD20041215'))
-        self.assertTrue(getorigdois.resemblesExpocode('ABCDE20041215'))
-        self.assertFalse(getorigdois.resemblesExpocode('multiple'))
+    def test_getExpocodeFromValue(self):
+        self.assertEqual('ABCD20041215', getorigdois.getExpocodeFromValue('ABCD20041215'))
+        self.assertEqual('ABCDE20041215', getorigdois.getExpocodeFromValue('ABCDE20041215'))
+        self.assertEqual(None, getorigdois.getExpocodeFromValue('multiple'))
+        self.assertEqual('ABCD20041215', getorigdois.getExpocodeFromValue('ABCD20041215.'))
 
     def test_getDOIFromValue(self):
         mydoi = '10.25921/0PMP-1R57'
