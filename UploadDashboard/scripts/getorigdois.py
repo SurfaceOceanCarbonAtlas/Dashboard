@@ -16,7 +16,7 @@ import xml.sax
 import xml.sax.handler
 
 # skip any "expocodes" that do not match (start with) usual expocode pattern
-EXPO_REGEX = re.compile(r'([A-Z0-9]{4,5}?[0-9]{8})')
+EXPO_REGEX = re.compile(r'([A-Z0-9]{4,5}?[0-9]{8}(-[1-9])?)')
 
 
 def getExpocodeFromValue(myvalue):
@@ -24,7 +24,8 @@ def getExpocodeFromValue(myvalue):
         Returns: the expocode in the value if the value resembles an expocode,
                  or None if the value does not resemble an expocode
     """
-    match = EXPO_REGEX.match(myvalue.strip().upper())
+    myvalue = myvalue.strip().upper()
+    match = EXPO_REGEX.match(myvalue)
     if match:
         expocode = match.group(1)
         if len(expocode) != len(myvalue):

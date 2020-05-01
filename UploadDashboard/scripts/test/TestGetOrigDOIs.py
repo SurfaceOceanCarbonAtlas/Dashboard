@@ -8,7 +8,11 @@ class GetOrigDOIsTestCase(unittest.TestCase):
         self.assertEqual('ABCD20041215', getorigdois.getExpocodeFromValue('ABCD20041215'))
         self.assertEqual('ABCDE20041215', getorigdois.getExpocodeFromValue('ABCDE20041215'))
         self.assertEqual(None, getorigdois.getExpocodeFromValue('multiple'))
-        self.assertEqual('ABCD20041215', getorigdois.getExpocodeFromValue('ABCD20041215.'))
+        # the following will product a warning about extra characters at the end of the expoocode
+        self.assertEqual('ABCD20041215', getorigdois.getExpocodeFromValue('ABCD20041215-'))
+        self.assertEqual('ABCD20041215-1', getorigdois.getExpocodeFromValue('ABCD20041215-1 '))
+        # the following will product a warning about extra characters at the end of the expoocode
+        self.assertEqual('ABCD20041215-1', getorigdois.getExpocodeFromValue('ABCD20041215-12'))
 
     def test_getDOIFromValue(self):
         mydoi = '10.25921/0PMP-1R57'
