@@ -33,7 +33,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
     def test_MyObject(self):
         firstname = 'name/first'
         firstattrs = {'pos': 1}
-        firstobj = getorigdois.MyObject(firstname, firstattrs, None)
+        firstobj = getorigdois.LinkedObject(firstname, firstattrs, None)
         self.assertNotEqual(None, firstobj)
         self.assertEqual(firstname, firstobj.fullname)
         self.assertEqual(firstattrs, firstobj.attrs)
@@ -42,7 +42,7 @@ class GetOrigDOIsTestCase(unittest.TestCase):
         self.assertEqual(None, firstobj.nextobj)
         secname = 'name/second'
         secattrs = {'pos': 2}
-        secobj = getorigdois.MyObject(secname, secattrs, firstobj)
+        secobj = getorigdois.LinkedObject(secname, secattrs, firstobj)
         self.assertNotEqual(None, secobj)
         self.assertEqual(secname, secobj.fullname)
         self.assertEqual(secattrs, secobj.attrs)

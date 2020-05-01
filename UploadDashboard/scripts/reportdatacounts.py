@@ -1,23 +1,25 @@
-#! /usr/bin/python2
+#! /usr/bin/python
 from __future__ import print_function
 
 import sys
 
-def adddatacounts(tsvfile, yearqccount):
-    '''
-    Reads the TSV data given in tsvfile and increments the counts in yearqccount,
-    a dictionary giving the number of observations for each year and QC flag.  
-    Assumes the header to the data in tsvfile starts with the line:
-        Expocode<tab>version<tab>SOCAT_DOI<tab>QC_Flag<tab>yr<tab>
 
-    Arguments:
-        tsvfile:      File containing the TSV data (SOCAT global synthesis data file)
-        yearqccount:  dictionary whose keys are the four-digit year followed by 
-                      the QC flag (e.g., '2010B') and whose values are the number 
-                      of observations for that year and QC flag.
-    Return:
-        the number of data lines processed
-    '''
+def adddatacounts(tsvfile, yearqccount):
+    # type: (iter, dict) -> int
+    """
+        Reads the TSV data given in tsvfile and increments the counts in yearqccount,
+        a dictionary giving the number of observations for each year and QC flag.
+        Assumes the header to the data in tsvfile starts with the line:
+            Expocode<tab>version<tab>SOCAT_DOI<tab>QC_Flag<tab>yr<tab>
+
+        :param tsvfile: File containing the TSV data (SOCAT global synthesis data file)
+
+        :param yearqccount:  dictionary whose keys are the four-digit year followed by
+                              the QC flag (e.g., '2010B') and whose values are the number
+                              of observations for that year and QC flag.
+
+        :return: the number of data lines processed
+    """
     datafound = False
     linecount = 0
     columncount = 0
@@ -47,7 +49,7 @@ if __name__ == '__main__':
         print('', file=sys.stderr)
         sys.exit(1)
 
-    yearqccount = { }
+    yearqccount = {}
     for tsvfilename in sys.argv[1:]:
         try:
             tsvfile = open(tsvfilename, 'r')
@@ -68,4 +70,3 @@ if __name__ == '__main__':
         print('%s\t%s\t%d' % (year, qc, count))
 
     sys.exit(0)
-

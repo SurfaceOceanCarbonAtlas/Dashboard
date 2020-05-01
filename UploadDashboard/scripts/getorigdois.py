@@ -20,8 +20,17 @@ EXPO_REGEX = re.compile(r'([A-Z0-9]{4,5}?[0-9]{8}(-[1-9])?)')
 
 
 def getExpocodeFromValue(myvalue):
+    # type: (str) -> (str, None)
     """
-        Returns: the expocode in the value if the value resembles an expocode,
+        Determines if the given value resembles an expocode, although the date in the expocode
+        is not checked for validity.  Prior to examination, the value is converted to uppercase,
+        and whitespace is removed from each end.  If the resulting value starts with what resembles
+        be an expocode but has additional trailing characters, a warning is printed to sys.stderr
+        but the expocode found (without the additional trainling characters) is returned.
+
+        :param myvalue: value to check
+
+        :return: the expocode in the value if the value resembles an expocode,
                  or None if the value does not resemble an expocode
     """
     myvalue = myvalue.strip().upper()
@@ -40,8 +49,15 @@ DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Z0-9/_.]+')
 
 
 def getDOIFromValue(myvalue):
+    # type: (str) -> (str, None)
     """
-        Returns: the "bare" DOI value if the value resembles a DOI,
+        Determines if the given value represents a DOI. Prior to examination, the value is converted
+        to uppercase, and whitespace is removed from each end.  If the DOI is in the form of a hyperlink
+        to https://doi.org/, this prefix is removed to give the "bare" DOI value.
+
+        :param myvalue: value to check
+
+        :return: the "bare" DOI value if the value resembles a DOI,
                  or None if the value does not resemble a DOI
     """
     mydoi = myvalue.strip().upper()
@@ -52,8 +68,27 @@ def getDOIFromValue(myvalue):
     return mydoi
 
 
-class MyObject(object):
+class LinkedObject(object):
+    """
+        A simple object for use in doubly-linked lists the following attributes
+          - fullname: the "full path" name of the element
+          - attrs: attributes associated with the element
+          - value: value associated with that element
+          - prevobj: prior object in the linked list
+          - nextobj: next object in the linked list
+
+    """
+
     def __init__(self, fullname, attrs, prevobj):
+        # type: (str, object, LinkedObject) -> None
+        """
+            Create with the given values for fullname, attrs, and prevobj.  The value attribute is
+            assigned as an empty string.  The nextobj and parent attributes are assigned as None.
+
+            :param fullname: value for the fullname attribute
+            :param attrs: value for the attrs attribute
+            :param prevobj: value for the prevobj attribute, either None or another LinedObject
+        """
         self.fullname = fullname
         self.attrs = attrs
         self.value = ''
@@ -61,7 +96,12 @@ class MyObject(object):
         self.nextobj = None
         self.parent = None
 
+    # @override
     def __str__(self):
+        """
+            :return: string giving the fullname, string representation of the attribute object,
+                     and value of this object
+        """
         return '{ fullname: "' + self.fullname + '", attrs: "' + \
                str(self.attrs) + '", value: "' + self.value + '" }'
 
@@ -70,41 +110,64 @@ class LinkedObjectsContentHandler(xml.sax.handler.ContentHandler):
     """
         Extracts information from parsed XML content into a doubly-linked list of objects that
         can be retrieved from this instance.  Each object in this linked list has attributes:
-            fullname: the "full path" name of the element
-            attrs: attributes associated with the element
-            value: value associated with that element
-            prevobj: prior object in the linked list
-            nextobj: next object in the linked list
+          - fullname: the "full path" name of the element
+          - attrs: attributes associated with the element
+          - value: value associated with that element
+          - prevobj: prior object in the linked list
+          - nextobj: next object in the linked list
     """
 
     def __init__(self):
         # calling the superclass constructor fails in production
         # super(LinkedObjectsContentHandler, self).__init__()
-        self.__rootobj = MyObject('', None, None)
+        self.__rootobj = LinkedObject('', None, None)
         self.__rootobj.parent = self.__rootobj
         self.__currobj = self.__rootobj
         self.__parent = self.__rootobj
 
+    # @override
     def startElement(self, name, attrs):
-        currobj = MyObject(self.__parent.fullname + '/' + name, attrs, self.__currobj)
+        # type: (str, object) -> None
+        currobj = LinkedObject(self.__parent.fullname + '/' + name, attrs, self.__currobj)
         currobj.parent = self.__parent
         self.__currobj.nextobj = currobj
         self.__currobj = currobj
         self.__parent = currobj
 
+    # @override
     def startElementNS(self, name, qname, attrs):
+        # type: (str, str, object) -> None
         self.startElement(qname, attrs)
 
+    # @override
     def endElement(self, name):
+        # type: (str) -> None
         self.__parent = self.__parent.parent
 
+    # @override
     def endElementNS(self, name, qname):
+        # type: (str, str) -> None
         self.endElement(qname)
 
+    # @override
     def characters(self, data):
+        # type: (bytearray) -> None
         self.__currobj.value += data
 
     def getLinkedObjects(self):
+        # type: () -> (LinkedObject, None)
+        """
+        Provides the doubly-linked list of objects generated from the XML.
+        Each object in this linked list has attributes:
+          - fullname: the "full path" name of the element
+          - attrs: attributes associated with the element
+          - value: value (as a unicode string) associated with that element
+          - prevobj: prior object in the linked list
+          - nextobj: next object in the linked list
+
+        :return: the head element in the linked list of objects,
+                 which could be None if no XML has been read
+        """
         # clean up all the values
         thisobj = self.__rootobj.nextobj
         while thisobj:
@@ -117,19 +180,20 @@ class LinkedObjectsContentHandler(xml.sax.handler.ContentHandler):
 
 
 def getXmlContent(myurl):
+    # type: (str) -> (LinkedObject,None)
     """
-        Reads the XML file at the given URL and generates a doubly-linked list
-        of objects containing the contents of the XML.  Each object in this
-        linked list has attributes:
-            fullname: the "full path" name of the element
-            attrs: attributes associated with the element
-            value: value associated with that element
-            prevobj: prior object in the linked list
-            nextobj: next object in the linked list
+        Reads the XML file at the given URL and generates a doubly-linked list of objects
+        containing the contents of the XML.  Each object in this linked list has attributes:
+          - fullname: the "full path" name of the element
+          - attrs: attributes associated with the element
+          - value: value associated with that element
+          - prevobj: prior object in the linked list
+          - nextobj: next object in the linked list
 
-        Returns: the doubly-linked list of objects containing the contents of the XML,
-                  or None if the there were problems accessing the URL or interpreting
-                  its contents
+        :param myurl: URL of site to obtain the XML
+
+        :return: the head element of the linked list of objects,
+                  or None if the there were problems with getting or interpreting the XML
     """
     handler = LinkedObjectsContentHandler()
     parser = xml.sax.make_parser()
@@ -139,21 +203,16 @@ def getXmlContent(myurl):
             req = urllib.request.urlopen(myurl)
         else:
             req = urllib2.urlopen(myurl)
-    except Exception as ex:
-        print('Problems accessing URL ' + myurl + " : " + repr(ex), file=sys.stderr)
-        return None
-    try:
         parser.parse(req)
-    except Exception as ex:
-        # Probably not an XML document
-        print('Problems reading XML from ' + myurl + " : " + repr(ex), file=sys.stderr)
+    except Exception:
         return None
     return handler.getLinkedObjects()
 
 
 def getLandingLinks(mylinkedobjs):
+    # type: (LinkedObject) -> set
     """
-        Returns: set of landing page links found in the linked-list of objects;
+        :return: set of landing page links found in the given linked-list of objects;
                  may be empty or have multiple entries, but should be a singleton set
     """
     links = set()
@@ -179,8 +238,9 @@ def getLandingLinks(mylinkedobjs):
 
 
 def getDois(mylinkedobjs):
+    # type: (LinkedObject) -> set
     """
-        Returns: set of DOIs found in the linked-list of objects; may be empty or
+        :return: set of DOIs found in the linked-list of objects; may be empty or
                  have multiple entries, but should be a singleton set
     """
     dois = set()
@@ -204,8 +264,9 @@ def getDois(mylinkedobjs):
 
 
 def getExpocodes(mylinkedobjs):
+    # type: (LinkedObject) -> set
     """
-        Returns: set of expocodes found in the linked-list of objects; may be empty
+        :return: set of expocodes found in the linked-list of objects; may be empty
     """
     expocodes = set()
     tmpset = set()
@@ -244,6 +305,16 @@ TESTDATA_URL = re.compile(r'https://test\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.x
 
 
 def getAlternateURL(myurl):
+    # type: (str) -> (str, None)
+    """
+        Check the given URL for an alternative URL to use.  The alternative URL may fix errors
+        when trying to access and interpret the XML using the given URL.  The XML at the alternative
+        URL may also be simpler.
+
+        :param myurl: URL to check
+
+        :return: alternate URL to use, or None if no alternate found
+    """
     # check if the URL matches one of the known patterns with an accession number
     match = ACCESSION_URL.match(myurl)
     if not match:
@@ -290,8 +361,8 @@ if __name__ == '__main__':
             pieces = dataline.split('\t')
 
             if len(pieces) < 5:
-                print('Ignoring entry: "' + dataline + '"', file=sys.stderr)
-                print('    insufficient number of values')
+                print('Warning: ignoring entry: "' + dataline + '"', file=sys.stderr)
+                print('    insufficient number of values', file=sys.stderr)
                 problems = True
                 continue
             if len(pieces) > 5:
@@ -301,7 +372,7 @@ if __name__ == '__main__':
 
             url = pieces[4].strip()
             if not url.startswith('http'):
-                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    no URL found', file=sys.stderr)
                 problems = True
                 continue
@@ -310,6 +381,11 @@ if __name__ == '__main__':
             if alturl:
                 url = alturl
             linkedobjs = getXmlContent(url)
+            if not linkedobjs:
+                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('    problems accessing or interpreting the XML from the site', file=sys.stderr)
+                problems = True
+                continue
 
             givenexpos = getExpocodes(linkedobjs)
             for value in pieces[3].strip().strip('"').split(','):
@@ -317,9 +393,9 @@ if __name__ == '__main__':
                 if value:
                     if value not in givenexpos:
                         givenexpos.add(value)
-                        print('Warning: expoocode not given in the XML: ' + value)
+                        print('Warning: expoocode not given in the XML: ' + value, file=sys.stderr)
             if not givenexpos:
-                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    no expocodes found', file=sys.stderr)
                 problems = True
                 continue
@@ -328,28 +404,28 @@ if __name__ == '__main__':
             # make sure the given DOI matches that in the XML
             if doi:
                 doiSet.add(doi)
-            if len(doiSet) == 1:
+            if len(doiSet) == 0:
+                # allow missing DOIs since there will be a landing page
+                doi = ''
+            elif len(doiSet) == 1:
                 doi = doiSet.pop()
-            elif len(doiSet) > 1:
+            else:
                 print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    multiple DOIs found: ' + str(doiSet), file=sys.stderr)
                 problems = True
                 continue
-            else:
-                # allow missing DOIs since there will be a landing page
-                doi = ''
 
             urlSet = getLandingLinks(linkedobjs)
-            if len(urlSet) == 1:
+            if len(urlSet) == 0:
+                # just use the URL used here as the landing page URL
+                pass
+            elif len(urlSet) == 1:
                 url = urlSet.pop()
-            elif len(urlSet) > 1:
+            else:
                 print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    multiple landing pages found: ' + str(urlSet), file=sys.stderr)
                 problems = True
                 continue
-            else:
-                # just use the URL used here as the landing page URL
-                pass
 
             for expo in givenexpos:
                 print(expo + '\t' + url + '\t' + doi)
