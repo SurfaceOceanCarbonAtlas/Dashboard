@@ -39,6 +39,7 @@ def getExpocodeFromValue(myvalue):
         expocode = match.group(1)
         if len(expocode) != len(myvalue):
             print("Warning: extra characters at the end of expocode: " + myvalue, file=sys.stderr)
+            sys.stderr.flush()
     else:
         expocode = None
     return expocode
@@ -363,6 +364,8 @@ if __name__ == '__main__':
             if len(pieces) < 5:
                 print('Warning: ignoring entry: "' + dataline + '"', file=sys.stderr)
                 print('    insufficient number of values', file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
             if len(pieces) > 5:
@@ -370,33 +373,55 @@ if __name__ == '__main__':
             else:
                 doi = None
 
-            url = pieces[4].strip()
-            if not url.startswith('http'):
+            origurl = pieces[4].strip()
+            if not origurl.startswith('http'):
                 print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    no URL found', file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
 
-            alturl = getAlternateURL(url)
-            if alturl:
-                url = alturl
+            linkedobjs = None
+            # check if there is a alternate URL which might work is the original fails (and might be simpler XML)
+            alturl = getAlternateURL(origurl)
+            # make sure the given URL is going to return XML
+            if not origurl.endswith(('.xml', '.XML', '/xml')):
+                origurl += ';view=xml;responseType=text/xml'
+            # first try the given URL
+            url = origurl
             linkedobjs = getXmlContent(url)
+            # if there is an alternate URL and the original failed, try the alternate
+            if alturl and not linkedobjs :
+                url = alturl
+                linkedobjs = getXmlContent(url)
             if not linkedobjs:
                 print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    problems accessing or interpreting the XML from the site', file=sys.stderr)
+                print('    problems accessing or interpreting the XML from the site: ' + origurl, file=sys.stderr)
+                if alturl:
+                    print('    or the site: ' + alturl, file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
 
             givenexpos = getExpocodes(linkedobjs)
+            warned = False
             for value in pieces[3].strip().strip('"').split(','):
                 value = getExpocodeFromValue(value)
                 if value:
                     if value not in givenexpos:
                         givenexpos.add(value)
                         print('Warning: expoocode not given in the XML: ' + value, file=sys.stderr)
+                        warned = True
+            if warned:
+                print('', file=sys.stderr)
+                sys.stderr.flush()
             if not givenexpos:
                 print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    no expocodes found', file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
 
@@ -410,8 +435,10 @@ if __name__ == '__main__':
             elif len(doiSet) == 1:
                 doi = doiSet.pop()
             else:
-                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    multiple DOIs found: ' + str(doiSet), file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
 
@@ -422,8 +449,10 @@ if __name__ == '__main__':
             elif len(urlSet) == 1:
                 url = urlSet.pop()
             else:
-                print('Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
                 print('    multiple landing pages found: ' + str(urlSet), file=sys.stderr)
+                print('', file=sys.stderr)
+                sys.stderr.flush()
                 problems = True
                 continue
 
