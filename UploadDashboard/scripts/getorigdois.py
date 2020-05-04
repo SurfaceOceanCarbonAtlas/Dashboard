@@ -38,8 +38,7 @@ def getExpocodeFromValue(myvalue):
     if match:
         expocode = match.group(1)
         if len(expocode) != len(myvalue):
-            print("Warning: extra characters at the end of expocode: " + myvalue, file=sys.stderr)
-            sys.stderr.flush()
+            print('    Warning: extra characters at the end of expocode "' + myvalue + '"', file=sys.stderr)
     else:
         expocode = None
     return expocode
@@ -365,8 +364,7 @@ if __name__ == '__main__':
             sys.stderr.flush()
 
             if len(pieces) < 5:
-                print('    Warning: ignoring entry: "' + dataline + '"', file=sys.stderr)
-                print('        insufficient number of values', file=sys.stderr)
+                print('    Warning: ignoring entry; insufficient number of values', file=sys.stderr)
                 continue
             if len(pieces) > 5:
                 doi = getDOIFromValue(pieces[5])
@@ -375,8 +373,7 @@ if __name__ == '__main__':
 
             origurl = pieces[4].strip()
             if not origurl.startswith('http'):
-                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('        no URL found', file=sys.stderr)
+                print('    Warning: ignoring entry; no URL found', file=sys.stderr)
                 continue
 
             linkedobjs = None
@@ -394,8 +391,8 @@ if __name__ == '__main__':
                 url = alturl
                 linkedobjs = getXmlContent(url)
             if not linkedobjs:
-                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('        problems accessing or interpreting the XML from the site: ' + origurl, file=sys.stderr)
+                print('    Warning: ignoring entry; problems accessing or interpreting the XML ', file=sys.stderr)
+                print('        from the site: ' + origurl, file=sys.stderr)
                 if alturl:
                     print('        or the site: ' + alturl, file=sys.stderr)
                 continue
@@ -403,20 +400,18 @@ if __name__ == '__main__':
             givenexpos = getExpocodes(linkedobjs)
             for value in pieces[3].strip().strip('"').split(','):
                 value = getExpocodeFromValue(value)
-                if value:
-                    if value not in givenexpos:
-                        givenexpos.add(value)
-                        print('Warning: expocode not given in the XML: ' + value, file=sys.stderr)
+                if value and (value not in givenexpos):
+                    givenexpos.add(value)
+                    print('    Warning: expocode "' + value + '" not given in the XML', file=sys.stderr)
             if not givenexpos:
-                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('        no expocodes found', file=sys.stderr)
+                print('    Warning: ignoring entry; no expocodes found', file=sys.stderr)
                 continue
 
             doiSet = getDois(linkedobjs)
             # make sure any given DOI is present
             if doi and (doi not in doiSet):
                 doiSet.add(doi)
-                print('    Warning: DOI not given in the XML: ' + doi, file=sys.stderr)
+                print('    Warning: DOI "' + doi + '" not given in the XML', file=sys.stderr)
             # allow missing DOIs since there will be a landing page
             # allow multiple DOIs - maybe okay?
 
@@ -427,12 +422,14 @@ if __name__ == '__main__':
             elif len(urlSet) == 1:
                 url = urlSet.pop()
             else:
-                print('    Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('        multiple landing pages found: ' + str(urlSet), file=sys.stderr)
+                print('    Warning: Ignoring entry; multiple landing pages found: ', file=sys.stderr)
+                for url in urlSet:
+                    print('        ' + url, file=sys.stderr)
                 continue
 
             for expo in givenexpos:
                 for doi in doiSet:
                     print(expo + '\t' + url + '\t' + doi)
+
     finally:
         tsvfile.close()
