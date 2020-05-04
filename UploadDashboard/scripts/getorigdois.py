@@ -356,17 +356,17 @@ if __name__ == '__main__':
         sys.exit(1)
     tsvfile = open(sys.argv[1])
 
-    problems = False
     try:
         for dataline in tsvfile:
             pieces = dataline.split('\t')
 
+            print('', file=sys.stderr)
+            print('Examining: "' + dataline + '"', file=sys.stderr)
+            sys.stderr.flush()
+
             if len(pieces) < 5:
-                print('Warning: ignoring entry: "' + dataline + '"', file=sys.stderr)
-                print('    insufficient number of values', file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
+                print('    Warning: ignoring entry: "' + dataline + '"', file=sys.stderr)
+                print('        insufficient number of values', file=sys.stderr)
                 continue
             if len(pieces) > 5:
                 doi = getDOIFromValue(pieces[5])
@@ -375,11 +375,8 @@ if __name__ == '__main__':
 
             origurl = pieces[4].strip()
             if not origurl.startswith('http'):
-                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    no URL found', file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
+                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('        no URL found', file=sys.stderr)
                 continue
 
             linkedobjs = None
@@ -388,59 +385,40 @@ if __name__ == '__main__':
             # make sure the given URL is going to return XML
             if not origurl.endswith(('.xml', '.XML', '/xml')):
                 origurl += ';view=xml;responseType=text/xml'
+
             # first try the given URL
             url = origurl
             linkedobjs = getXmlContent(url)
             # if there is an alternate URL and the original failed, try the alternate
-            if alturl and not linkedobjs :
+            if alturl and not linkedobjs:
                 url = alturl
                 linkedobjs = getXmlContent(url)
             if not linkedobjs:
-                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    problems accessing or interpreting the XML from the site: ' + origurl, file=sys.stderr)
+                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('        problems accessing or interpreting the XML from the site: ' + origurl, file=sys.stderr)
                 if alturl:
-                    print('    or the site: ' + alturl, file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
+                    print('        or the site: ' + alturl, file=sys.stderr)
                 continue
 
             givenexpos = getExpocodes(linkedobjs)
-            warned = False
             for value in pieces[3].strip().strip('"').split(','):
                 value = getExpocodeFromValue(value)
                 if value:
                     if value not in givenexpos:
                         givenexpos.add(value)
-                        print('Warning: expoocode not given in the XML: ' + value, file=sys.stderr)
-                        warned = True
-            if warned:
-                print('', file=sys.stderr)
-                sys.stderr.flush()
+                        print('Warning: expocode not given in the XML: ' + value, file=sys.stderr)
             if not givenexpos:
-                print('Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    no expocodes found', file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
+                print('    Warning: ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('        no expocodes found', file=sys.stderr)
                 continue
 
             doiSet = getDois(linkedobjs)
-            # make sure the given DOI matches that in the XML
-            if doi:
+            # make sure any given DOI is present
+            if doi and (doi not in doiSet):
                 doiSet.add(doi)
-            if len(doiSet) == 0:
-                # allow missing DOIs since there will be a landing page
-                doi = ''
-            elif len(doiSet) == 1:
-                doi = doiSet.pop()
-            else:
-                print('Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    multiple DOIs found: ' + str(doiSet), file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
-                continue
+                print('    Warning: DOI not given in the XML: ' + doi, file=sys.stderr)
+            # allow missing DOIs since there will be a landing page
+            # allow multiple DOIs - maybe okay?
 
             urlSet = getLandingLinks(linkedobjs)
             if len(urlSet) == 0:
@@ -449,17 +427,12 @@ if __name__ == '__main__':
             elif len(urlSet) == 1:
                 url = urlSet.pop()
             else:
-                print('Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
-                print('    multiple landing pages found: ' + str(urlSet), file=sys.stderr)
-                print('', file=sys.stderr)
-                sys.stderr.flush()
-                problems = True
+                print('    Warning: Ignoring entry: "' + dataline.strip() + '"', file=sys.stderr)
+                print('        multiple landing pages found: ' + str(urlSet), file=sys.stderr)
                 continue
 
             for expo in givenexpos:
-                print(expo + '\t' + url + '\t' + doi)
+                for doi in doiSet:
+                    print(expo + '\t' + url + '\t' + doi)
     finally:
         tsvfile.close()
-
-    if problems:
-        sys.exit(1)
