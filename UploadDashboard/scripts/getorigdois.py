@@ -360,7 +360,7 @@ if __name__ == '__main__':
             pieces = dataline.split('\t')
 
             print('', file=sys.stderr)
-            print('Examining: "' + dataline + '"', file=sys.stderr)
+            print('Examining: "' + dataline.strip('\r\n') + '"', file=sys.stderr)
             sys.stderr.flush()
 
             if len(pieces) < 5:
