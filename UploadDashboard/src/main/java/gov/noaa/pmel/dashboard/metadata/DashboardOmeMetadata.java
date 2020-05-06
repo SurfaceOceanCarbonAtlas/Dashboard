@@ -413,13 +413,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the http reference for the source dataset; never null but may be empty
+     * @return the landing page(s) for the PI-provided dataset; never null but may be empty
      */
     public String getDatasetLink() {
-        String dataSetLink = omeMData.getDatasetLink();
-        if ( dataSetLink == null )
-            dataSetLink = "";
-        return dataSetLink;
+        String datasetLink = omeMData.getDatasetLink();
+        if ( datasetLink == null )
+            datasetLink = "";
+        return datasetLink;
     }
 
     /**

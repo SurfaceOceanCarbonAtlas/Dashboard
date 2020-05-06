@@ -13,7 +13,7 @@ import java.util.TreeSet;
  */
 public class DashboardDataset implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 8032325269484692750L;
+    private static final long serialVersionUID = 1136055198038962864L;
 
     protected boolean selected;
     protected String version;
@@ -28,7 +28,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
     protected String uploadFilename;
     protected String uploadTimestamp;
     protected String sourceDOI;
+    protected String sourceURL;
     protected String enhancedDOI;
+    protected String enhancedURL;
     protected int numDataRows;
     protected int numErrorRows;
     protected int numWarnRows;
@@ -57,7 +59,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
         uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
         uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
         sourceDOI = DashboardUtils.STRING_MISSING_VALUE;
+        sourceURL = DashboardUtils.STRING_MISSING_VALUE;
         enhancedDOI = DashboardUtils.STRING_MISSING_VALUE;
+        enhancedURL = DashboardUtils.STRING_MISSING_VALUE;
         numDataRows = 0;
         numErrorRows = 0;
         numWarnRows = 0;
@@ -340,6 +344,26 @@ public class DashboardDataset implements Serializable, IsSerializable {
     }
 
     /**
+     * @return the landing page URL of the source dataset document;
+     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getSourceURL() {
+        return sourceURL;
+    }
+
+    /**
+     * @param sourceURL
+     *         the landing page URL (after trimming) of the source dataset document to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setSourceURL(String sourceURL) {
+        if ( sourceURL == null )
+            this.sourceURL = DashboardUtils.STRING_MISSING_VALUE;
+        else
+            this.sourceURL = sourceURL.trim();
+    }
+
+    /**
      * @return the DOI of the enhanced data document;
      *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */
@@ -357,6 +381,26 @@ public class DashboardDataset implements Serializable, IsSerializable {
             this.enhancedDOI = DashboardUtils.STRING_MISSING_VALUE;
         else
             this.enhancedDOI = enhancedDOI.trim();
+    }
+
+    /**
+     * @return the landing page URL of the enhanced data document;
+     *         never null but may be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+     */
+    public String getEnhancedURL() {
+        return enhancedURL;
+    }
+
+    /**
+     * @param enhancedURL
+     *         the landing page URL (after trimming) of the enhanced data document to set;
+     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+     */
+    public void setEnhancedURL(String enhancedURL) {
+        if ( enhancedURL == null )
+            this.enhancedURL = DashboardUtils.STRING_MISSING_VALUE;
+        else
+            this.enhancedURL = enhancedURL.trim();
     }
 
     /**
@@ -499,7 +543,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
         result = result * prime + uploadFilename.hashCode();
         result = result * prime + uploadTimestamp.hashCode();
         result = result * prime + sourceDOI.hashCode();
+        result = result * prime + sourceURL.hashCode();
         result = result * prime + enhancedDOI.hashCode();
+        result = result * prime + enhancedURL.hashCode();
         result = result * prime + Integer.hashCode(numDataRows);
         result = result * prime + Integer.hashCode(numErrorRows);
         result = result * prime + Integer.hashCode(numWarnRows);
@@ -547,7 +593,11 @@ public class DashboardDataset implements Serializable, IsSerializable {
             return false;
         if ( !sourceDOI.equals(other.sourceDOI) )
             return false;
+        if ( !sourceURL.equals(other.sourceURL) )
+            return false;
         if ( !enhancedDOI.equals(other.enhancedDOI) )
+            return false;
+        if ( !enhancedURL.equals(other.enhancedURL) )
             return false;
         if ( numDataRows != other.numDataRows )
             return false;
@@ -582,7 +632,9 @@ public class DashboardDataset implements Serializable, IsSerializable {
                 ";\n    uploadFilename=" + uploadFilename +
                 ";\n    uploadTimestamp=" + uploadTimestamp +
                 ";\n    sourceDOI=" + sourceDOI +
+                ";\n    sourceURL=" + sourceURL +
                 ";\n    enhancedDOI=" + enhancedDOI +
+                ";\n    enhancedURL=" + enhancedURL +
                 ";\n    numDataRows=" + Integer.toString(numDataRows) +
                 ";\n    numErrorRows=" + Integer.toString(numErrorRows) +
                 ";\n    numWarnRows=" + Integer.toString(numWarnRows) +

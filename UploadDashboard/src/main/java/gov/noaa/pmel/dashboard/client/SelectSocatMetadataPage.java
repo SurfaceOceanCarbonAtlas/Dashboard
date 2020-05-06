@@ -45,8 +45,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
     private static final String EDIT_TEXT = "View/Edit";
     private static final String CANCEL_TEXT = "Cancel";
 
-    private static final String HTML_INTRO_PROLOGUE = "<p>" +
-            "Dataset: <ul><li>";
+    private static final String HTML_INTRO_PROLOGUE = "<p>Dataset: <ul><li>";
     private static final String HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
     private static final String EXISTING_RADIO_TEXT_PROLOGUE = " Use existing SOCAT metadata (";
@@ -63,32 +62,27 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
 
     private static final String UPLOAD_RADIO_TEXT = " Generate from uploaded metadata XML file: ";
 
-    private static final String NO_FILE_ERROR_MSG =
-            "Please select a metadata XML file to upload";
+    private static final String NO_FILE_ERROR_MSG = "Please select a metadata XML file to upload";
 
-    private static final String OVERWRITE_WARNING_MSG =
-            "The SOCAT metadata for this dataset will be overwritten.  Do you wish to proceed?";
+    private static final String OVERWRITE_WARNING_MSG = "<h3>The SOCAT metadata for this dataset will be overwritten./h3>" +
+            "<p>Do you wish to proceed?</p>";
     private static final String OVERWRITE_YES_TEXT = "Yes";
     private static final String OVERWRITE_NO_TEXT = "No";
 
     private static final String COPY_FAILURE_MSG = "Copy of metadata failed: ";
 
-    private static final String UNEXPLAINED_FAIL_MSG =
-            "<h3>Upload failed.</h3>" +
-                    "<p>Unexpectedly, no explanation of the failure was given</p>";
-    private static final String EXPLAINED_FAIL_MSG_START =
-            "<h3>Upload failed.</h3>" +
-                    "<p><pre>\n";
-    private static final String EXPLAINED_FAIL_MSG_END =
-            "</pre></p>";
+    private static final String UNEXPLAINED_FAIL_MSG = "<h3>Upload failed.</h3>" +
+            "<p>Unexpectedly, no explanation of the failure was given</p>";
+    private static final String EXPLAINED_FAIL_MSG_START = "<h3>Upload failed.</h3><p><pre>\n";
+    private static final String EXPLAINED_FAIL_MSG_END = "</pre></p>";
 
     interface SelectSocatMetadataPageUiBinder extends UiBinder<Widget,SelectSocatMetadataPage> {
     }
 
-    private static SelectSocatMetadataPageUiBinder uiBinder =
+    private static final SelectSocatMetadataPageUiBinder uiBinder =
             GWT.create(SelectSocatMetadataPageUiBinder.class);
 
-    private static DashboardServicesInterfaceAsync service =
+    private static final DashboardServicesInterfaceAsync service =
             GWT.create(DashboardServicesInterface.class);
 
     @UiField
@@ -176,11 +170,11 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
     }
 
     /**
-     * Redisplays the last version of this page if the username associated with this page matches the given username.
+     * Re-displays the last version of this page if the username associated with this page matches the given username.
      */
     static void redisplayPage(String username) {
-        if ( (username == null) || username.isEmpty() ||
-                (singleton == null) || !singleton.getUsername().equals(username) ) {
+        if ( (username == null) || username.isEmpty() || (singleton == null) ||
+                !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();
         }
         else {
@@ -316,22 +310,21 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
             // If an overwrite will occur, ask for confirmation
             if ( !cruise.getOmeTimestamp().isEmpty() ) {
                 if ( askOverwritePopup == null ) {
-                    askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT,
-                            OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            // Submit only if yes
-                            if ( result == Boolean.TRUE ) {
-                                copyMetadataFromSelectedIdAndShow();
-                            }
-                        }
+                    askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, OVERWRITE_NO_TEXT,
+                            new AsyncCallback<Boolean>() {
+                                @Override
+                                public void onSuccess(Boolean result) {
+                                    // Submit only if yes
+                                    if ( result == Boolean.TRUE ) {
+                                        copyMetadataFromSelectedIdAndShow();
+                                    }
+                                }
 
-                        @Override
-                        public void onFailure(Throwable ex) {
-                            // Never called
-                            ;
-                        }
-                    });
+                                @Override
+                                public void onFailure(Throwable ex) {
+                                    // Never called
+                                }
+                            });
                 }
                 askOverwritePopup.askQuestion(OVERWRITE_WARNING_MSG);
                 return;
@@ -349,23 +342,22 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
             // If an overwrite will occur, ask for confirmation
             if ( !cruise.getOmeTimestamp().isEmpty() ) {
                 if ( askOverwritePopup == null ) {
-                    askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT,
-                            OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            // Submit only if yes
-                            if ( result == Boolean.TRUE ) {
-                                assignTokens();
-                                uploadForm.submit();
-                            }
-                        }
+                    askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, OVERWRITE_NO_TEXT,
+                            new AsyncCallback<Boolean>() {
+                                @Override
+                                public void onSuccess(Boolean result) {
+                                    // Submit only if yes
+                                    if ( result == Boolean.TRUE ) {
+                                        assignTokens();
+                                        uploadForm.submit();
+                                    }
+                                }
 
-                        @Override
-                        public void onFailure(Throwable ex) {
-                            // Never called
-                            ;
-                        }
-                    });
+                                @Override
+                                public void onFailure(Throwable ex) {
+                                    // Never called
+                                }
+                            });
                 }
                 askOverwritePopup.askQuestion(OVERWRITE_WARNING_MSG);
                 return;

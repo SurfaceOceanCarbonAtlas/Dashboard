@@ -53,7 +53,9 @@ public class DataFileHandler extends VersionedFileHandler {
     private static final String UPLOAD_FILENAME_ID = "uploadfilename";
     private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
     private static final String SOURCE_DOI_ID = "sourcedoi";
+    private static final String SOURCE_URL_ID = "sourceurl";
     private static final String ENHANCED_DOI_ID = "enhanceddoi";
+    private static final String ENHANCED_URL_ID = "enhancedurl";
     private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
     private static final String OME_TIMESTAMP_ID = "ometimestamp";
     private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
@@ -601,6 +603,9 @@ public class DataFileHandler extends VersionedFileHandler {
         // DOIs
         datasetProps.setProperty(SOURCE_DOI_ID, dataset.getSourceDOI());
         datasetProps.setProperty(ENHANCED_DOI_ID, dataset.getEnhancedDOI());
+        // URLs
+        datasetProps.setProperty(SOURCE_URL_ID, dataset.getSourceURL());
+        datasetProps.setProperty(ENHANCED_URL_ID, dataset.getEnhancedURL());
         // Data-check status string
         datasetProps.setProperty(DATA_CHECK_STATUS_ID, dataset.getDataCheckStatus());
         // OME metadata timestamp
@@ -1106,6 +1111,18 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value != null ) {
             // Missing in earlier SOCAT versions
             dataset.setEnhancedDOI(value);
+        }
+
+        // URLS
+        value = cruiseProps.getProperty(SOURCE_URL_ID);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setSourceURL(value);
+        }
+        value = cruiseProps.getProperty(ENHANCED_URL_ID);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setEnhancedURL(value);
         }
 
         // Data check status

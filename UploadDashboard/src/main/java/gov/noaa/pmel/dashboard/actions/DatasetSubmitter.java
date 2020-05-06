@@ -124,7 +124,7 @@ public class DatasetSubmitter {
                                 version + " with submission of " + datasetId, false);
                     }
                     DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(omeInfo);
-                    // get the DOIs from data file properties; CDIAC OME does save the DOI as such (may be part of citation)
+                    // get the DOIs from data file properties; CDIAC OME does not save the DOI as such (may be part of citation)
                     omeMData.setDatasetDOI(dataset.getSourceDOI());
                     DsgMetadata dsgMData = omeMData.createDsgMetadata(fileMetadataTypes);
 
