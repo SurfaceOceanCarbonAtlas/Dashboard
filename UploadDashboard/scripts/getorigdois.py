@@ -45,7 +45,7 @@ def getExpocodeFromValue(myvalue):
 
 
 # skip any "DOIs" that do not match (start with) usual DOI pattern
-DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Z0-9/_.]+')
+DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Z0-9/_.-]+')
 
 
 def getDOIFromValue(myvalue):

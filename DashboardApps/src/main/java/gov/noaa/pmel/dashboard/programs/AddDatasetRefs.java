@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class AddDatasetRefs {
 
-    private static final Pattern DOI_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+/[A-Z0-9/_.]+");
+    private static final Pattern DOI_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+/[A-Z0-9/_.-]+");
 
     private final DataFileHandler dataHandler;
 
