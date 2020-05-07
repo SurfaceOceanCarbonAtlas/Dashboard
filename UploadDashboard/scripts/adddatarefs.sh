@@ -25,4 +25,4 @@ if [ ! -d "${DASHBOARD_WEBINF}/lib" ]; then
 fi
 
 export CLASSPATH="${DASHBOARDAPPS_JAR}:${DASHBOARD_WEBINF}/classes:${DASHBOARD_WEBINF}/lib/*"
-java -Dcatalina.base="${CATALINA_BASE}" gov.noaa.pmel.dashboard.programs.AddDOIs "$@"
+java -Dcatalina.base="${CATALINA_BASE}" gov.noaa.pmel.dashboard.programs.AddDatasetRefs "$@"
