@@ -6,10 +6,9 @@ import re
 import sys
 
 if sys.version_info[0] > 2:
-    import urllib
-    import urllib.request
+    from urllib.request import urlopen
 else:
-    import urllib2
+    from urllib2 import urlopen
 
 import xml
 import xml.sax
@@ -199,10 +198,7 @@ def getXmlContent(myurl):
     parser = xml.sax.make_parser()
     parser.setContentHandler(handler)
     try:
-        if sys.version_info[0] > 2:
-            req = urllib.request.urlopen(myurl)
-        else:
-            req = urllib2.urlopen(myurl)
+        req = urlopen(myurl)
         parser.parse(req)
     except Exception:
         return None
@@ -299,9 +295,9 @@ def getExpocodes(mylinkedobjs):
 
 
 # Extracts the accession number from these URLs
-ACCESSION_URL = re.compile(r'https://accession.nodc.noaa.gov/([0-9]+)$')
-DATAISOID_URL = re.compile(r'https://data\.nodc\.noaa\.gov/cgi-bin/iso\?id=gov\.noaa\.nodc:([0-9]+)$')
-TESTDATA_URL = re.compile(r'https://test\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.xml$')
+ACCESSION_URL = re.compile(r'https://accession\.nodc\.noaa\.gov/([0-9]+)$', re.IGNORECASE)
+DATAISOID_URL = re.compile(r'https://data\.nodc\.noaa\.gov/cgi-bin/iso\?id=gov\.noaa\.nodc:([0-9]+)$', re.IGNORECASE)
+TESTDATA_URL = re.compile(r'https://test\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.xml$', re.IGNORECASE)
 
 
 def getAlternateURL(myurl):
