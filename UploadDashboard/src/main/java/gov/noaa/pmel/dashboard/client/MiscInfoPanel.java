@@ -23,8 +23,6 @@ public class MiscInfoPanel extends Composite {
     @UiField
     Label headerLabel;
     @UiField(provided = true)
-    final LabeledTextBox idValue;
-    @UiField(provided = true)
     final LabeledTextBox nameValue;
     @UiField(provided = true)
     final LabeledTextBox sectionValue;
@@ -68,38 +66,36 @@ public class MiscInfoPanel extends Composite {
      *         associate this panel with this MiscInfo; cannot be null
      */
     public MiscInfoPanel(MiscInfo info) {
-        idValue = new LabeledTextBox("Expocode:", "12em", "10em", null, null);
-        //
-        nameValue = new LabeledTextBox("Dataset name:", "12em", "20em", null, null);
+        nameValue = new LabeledTextBox("Dataset name:", "11em", "20em", null, null);
         sectionValue = new LabeledTextBox("Section or leg name:", "10em", "20em", null, null);
         //
-        doiValue = new LabeledTextBox("Dataset DOI:", "12em", "20em", null, null);
+        doiValue = new LabeledTextBox("Dataset DOI:", "11em", "20em", null, null);
         accessValue = new LabeledTextBox("Accession ID:", "10em", "20em", null, null);
         //
-        citationValue = new LabeledTextBox("Citation for this dataset:", "12em", "55.25em", null, null);
+        citationValue = new LabeledTextBox("Citation for this dataset:", "11em", "55.25em", null, null);
         //
-        websiteValue = new LabeledTextBox("Website for this dataset:", "12em", "55.25em", null, null);
+        websiteValue = new LabeledTextBox("Website for this dataset:", "11em", "55.25em", null, null);
         //
-        downloadValue = new LabeledTextBox("Dataset download URL:", "12em", "55.25em", null, null);
+        downloadValue = new LabeledTextBox("Dataset download URL:", "11em", "55.25em", null, null);
         //
-        fundAgencyValue = new LabeledTextBox("Funding agency:", "12em", "55.25em", null, null);
+        fundAgencyValue = new LabeledTextBox("Funding agency:", "11em", "55.25em", null, null);
         //
-        fundIdValue = new LabeledTextBox("Funding ID:", "12em", "10em", null, null);
-        fundTitleValue = new LabeledTextBox("Funding title:", "6em", "35em", null, null);
+        fundIdValue = new LabeledTextBox("Funding ID:", "11em", "12em", null, null);
+        fundTitleValue = new LabeledTextBox("Funding title:", "6em", "33em", null, null);
         //
-        projectValue = new LabeledTextBox("Research project:", "12em", "55.25em", null, null);
+        projectValue = new LabeledTextBox("Research project:", "11em", "55.25em", null, null);
         //
-        synopsisValue = new LabeledTextArea("Synopsis of project", "5em", "55.25em");
+        synopsisValue = new LabeledTextArea("Synopsis of project", "5em", "54.5em");
         //
-        purposeValue = new LabeledTextArea("Purpose of project", "10em", "55.25em");
+        purposeValue = new LabeledTextArea("Purpose of project", "10em", "54.5em");
         //
-        refsValue = new LabeledTextArea("References", "10em", "55.25em");
+        refsValue = new LabeledTextArea("References", "10em", "54.5em");
         //
-        portsValue = new LabeledTextArea("Ports of call", "5em", "55.25em");
+        portsValue = new LabeledTextArea("Ports of call", "5em", "54.5em");
         //
-        addnInfoValue = new LabeledTextArea("Additional information", "10em", "55.25em");
+        addnInfoValue = new LabeledTextArea("Additional information", "10em", "54.5em");
         //
-        historyValue = new LabeledTextArea("Archival history", "5em", "55.25em");
+        historyValue = new LabeledTextArea("Archival history", "5em", "54.5em");
 
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -109,12 +105,6 @@ public class MiscInfoPanel extends Composite {
 
         // The following will assign the values in the labels and text fields
         getUpdatedMiscInfo();
-    }
-
-    @UiHandler("idValue")
-    void idValueOnValueChange(ValueChangeEvent<String> event) {
-        info.setDatasetId(idValue.getText());
-        markInvalids();
     }
 
     @UiHandler("nameValue")
@@ -128,11 +118,6 @@ public class MiscInfoPanel extends Composite {
      */
     private void markInvalids() {
         HashSet<String> invalids = info.invalidFieldNames();
-
-        if ( invalids.contains("datasetId") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
 
         if ( invalids.contains("datasetName") )
             nameValue.markInvalid();
@@ -227,7 +212,6 @@ public class MiscInfoPanel extends Composite {
     public MiscInfo getUpdatedMiscInfo() {
         // In case erroneous input leaves mismatches,
         // first update the displayed content in case this is from a save-and-continue
-        idValue.setText(info.getDatasetId());
         nameValue.setText(info.getDatasetName());
         sectionValue.setText(info.getSectionName());
         doiValue.setText(info.getDatasetDoi());

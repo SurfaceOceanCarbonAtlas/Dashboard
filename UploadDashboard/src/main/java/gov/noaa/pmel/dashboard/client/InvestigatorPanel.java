@@ -64,27 +64,27 @@ public class InvestigatorPanel extends Composite {
      *         header that should be updated when appropriate values change; can be null
      */
     public InvestigatorPanel(Investigator investigator, HTML header) {
-        firstNameValue = new LabeledTextBox("First name:", "8em", "10em", null, null);
-        middleInitValue = new LabeledTextBox("Middle initial(s):", "8em", "6em", null, null);
-        lastNameValue = new LabeledTextBox("Last name:", "8em", "10em", null, null);
+        firstNameValue = new LabeledTextBox("First name:", "7em", "12em", null, null);
+        middleInitValue = new LabeledTextBox("Middle initial(s):", "7.5em", "5em", null, null);
+        lastNameValue = new LabeledTextBox("Last name:", "6em", "13.75em", null, null);
         //
-        idTypeValue = new LabeledTextBox("ID type:", "8em", "21.5em", null, null);
-        idValue = new LabeledTextBox("ID:", "4.5em", "21.5em", null, null);
+        idTypeValue = new LabeledTextBox("ID type:", "7em", "22em", null, null);
+        idValue = new LabeledTextBox("ID:", "5em", "22em", null, null);
         //
-        orgValue = new LabeledTextBox("Organization:", "8em", "51.25em", null, null);
+        orgValue = new LabeledTextBox("Organization:", "7em", "53em", null, null);
         //
-        firstStreetValue = new LabeledTextBox("Street/Box:", "8em", "51.25em", null, null);
+        firstStreetValue = new LabeledTextBox("Street/Box:", "7em", "53em", null, null);
         //
-        secondStreetValue = new LabeledTextBox("Street:", "8em", "51.25em", null, null);
+        secondStreetValue = new LabeledTextBox("Street:", "7em", "53em", null, null);
         //
-        cityValue = new LabeledTextBox("City:", "8em", "21.5em", null, null);
-        regionValue = new LabeledTextBox("Region:", "4.5em", "21.5em", null, null);
+        cityValue = new LabeledTextBox("City:", "7em", "22em", null, null);
+        regionValue = new LabeledTextBox("Region:", "5em", "22em", null, null);
         //
-        zipValue = new LabeledTextBox("Postal code:", "8em", "21.5em", null, null);
-        countryValue = new LabeledTextBox("Country:", "4.5em", "21.5em", null, null);
+        zipValue = new LabeledTextBox("Postal code:", "7em", "22em", null, null);
+        countryValue = new LabeledTextBox("Country:", "5em", "22em", null, null);
         //
-        emailValue = new LabeledTextBox("E-mail:", "8em", "21.5em", null, null);
-        phoneValue = new LabeledTextBox("Phone:", "4.5em", "21.5em", null, null);
+        emailValue = new LabeledTextBox("E-mail:", "7em", "22em", null, null);
+        phoneValue = new LabeledTextBox("Phone:", "5em", "22em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
 

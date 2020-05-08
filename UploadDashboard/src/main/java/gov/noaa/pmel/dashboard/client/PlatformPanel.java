@@ -46,11 +46,11 @@ public class PlatformPanel extends Composite {
      *         associate this panel with this Platform; cannot be null
      */
     public PlatformPanel(Platform platform) {
-        idValue = new LabeledTextBox("NODC code or other ID:", "12em", "15em", null, null);
-        nameValue = new LabeledTextBox("Name of plaform:", "12em", "15em", null, null);
-        typeList = new LabeledListBox("Type of platform:", "12em", null, null, null);
-        ownerValue = new LabeledTextBox("Owner of platform:", "12em", "15em", null, null);
-        countryValue = new LabeledTextBox("Country of registration:", "12em", "15em", null, null);
+        idValue = new LabeledTextBox("Platform ID:", "11em", "20em", null, null);
+        nameValue = new LabeledTextBox("Name of platform:", "11em", "20em", null, null);
+        typeList = new LabeledListBox("Type of platform:", "11em", "20.75em", null, null);
+        ownerValue = new LabeledTextBox("Owner of platform:", "11em", "20em", null, null);
+        countryValue = new LabeledTextBox("Country of registration:", "11em", "20em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
 

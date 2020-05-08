@@ -9,9 +9,6 @@
         <g:FlowPanel>
             <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
             <g:FlowPanel addStyleNames="{style.rowpanel}">
-                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="{style.rowpanel}">
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="sectionValue"/>
             </g:FlowPanel>
