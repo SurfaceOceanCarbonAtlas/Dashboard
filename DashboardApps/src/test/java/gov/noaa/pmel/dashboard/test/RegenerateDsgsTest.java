@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;

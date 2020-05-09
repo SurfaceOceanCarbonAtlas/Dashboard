@@ -50,65 +50,84 @@ public class AddDatasetRefs {
      * @param enhancedUrl
      *         enhanced-data landing page URL to use;
      *         if null or blank, no changes are mode to the enhanced-data landing URL
+     * @param replaceOld
+     *         replace existing information?
      *
      * @return message about what was done.
      *         If all DOIs and URLs are null or blank, null is returned.
-     *
-     * @throws IllegalArgumentException
-     *         if the expocode is invalid,
-     *         if the information file for this dataset does not exist, or
-     *         if there are problems reading or updating the information file for this dataset.
      */
     public String updateReferencesForDataset(String expocode, String origDoi, String origUrl,
-            String enhancedDoi, String enhancedUrl) throws IllegalArgumentException {
-        String upperExpo = DashboardServerUtils.checkDatasetID(expocode);
+            String enhancedDoi, String enhancedUrl, boolean replaceOld) {
+        String upperExpo;
+        try {
+            upperExpo = DashboardServerUtils.checkDatasetID(expocode);
+        } catch ( IllegalArgumentException ex ) {
+            return "invalid expocode " + expocode + ": " + ex.getMessage();
+        }
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
         if ( cruise == null )
-            throw new IllegalArgumentException("info file for " + upperExpo + "does not exist");
+            return "dataset " + upperExpo + "does not exist";
 
         String msg = null;
+        boolean proceed = (replaceOld || (cruise.getSourceDOI().isEmpty() && cruise.getSourceURL().isEmpty()));
+        if ( !proceed ) {
+            msg = "existing original-data references for " + upperExpo + " was not changed";
+        }
+        else {
+            if ( origDoi != null ) {
+                String doi = origDoi.trim();
+                if ( !doi.isEmpty() ) {
+                    cruise.setSourceDOI(doi);
+                    cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
+                    msg = "updated the original-data DOI for " + upperExpo + " to " + doi + " and marking as archived";
+                }
+            }
+            if ( origUrl != null ) {
+                String url = origUrl.trim();
+                if ( !url.isEmpty() ) {
+                    cruise.setSourceURL(url);
+                    if ( msg != null )
+                        msg += "\n";
+                    else
+                        msg = "";
+                    msg += "updated the original-data URL for " + upperExpo + " to " + url + " and marking as archived";
+                }
+            }
+        }
 
-        if ( enhancedDoi != null ) {
-            String doi = enhancedDoi.trim();
-            if ( !doi.isEmpty() ) {
-                cruise.setEnhancedDOI(doi);
-                msg = "updated the SOCAT-enhanced DOI for " + upperExpo + " to " + doi;
+        proceed = (replaceOld || (cruise.getEnhancedDOI().isEmpty() && cruise.getEnhancedURL().isEmpty()));
+        if ( !proceed ) {
+            if ( msg != null )
+                msg += "\n";
+            else
+                msg = "";
+            msg += "existing SOCAT-enhanced references for " + upperExpo + " was not changed";
+        }
+        else {
+            if ( enhancedDoi != null ) {
+                String doi = enhancedDoi.trim();
+                if ( !doi.isEmpty() ) {
+                    cruise.setEnhancedDOI(doi);
+                    if ( msg != null )
+                        msg += "\n";
+                    else
+                        msg = "";
+                    msg += "updated the SOCAT-enhanced DOI for " + upperExpo + " to " + doi;
+                }
+            }
+            if ( enhancedUrl != null ) {
+                String url = enhancedUrl.trim();
+                if ( !url.isEmpty() ) {
+                    cruise.setEnhancedURL(url);
+                    if ( msg != null )
+                        msg += "\n";
+                    else
+                        msg = "";
+                    msg += "updated the SOCAT-enhanced URL for " + upperExpo + " to " + url;
+                }
             }
         }
-        if ( enhancedUrl != null ) {
-            String url = enhancedUrl.trim();
-            if ( !url.isEmpty() ) {
-                cruise.setEnhancedURL(url);
-                if ( msg != null )
-                    msg += "\n";
-                else
-                    msg = "";
-                msg += "updated the SOCAT-enhanced URL for " + upperExpo + " to " + url;
-            }
-        }
-        if ( origDoi != null ) {
-            String doi = origDoi.trim();
-            if ( !doi.isEmpty() ) {
-                cruise.setSourceDOI(doi);
-                cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
-                if ( msg != null )
-                    msg += "\n";
-                else
-                    msg = "";
-                msg += "updated the original-data DOI for " + upperExpo + " to " + doi + " and marking as archived";
-            }
-        }
-        if ( origUrl != null ) {
-            String url = origUrl.trim();
-            if ( !url.isEmpty() ) {
-                cruise.setSourceURL(url);
-                if ( msg != null )
-                    msg += "\n";
-                else
-                    msg = "";
-                msg += "updated the original-data URL for " + upperExpo + " to " + url + " and marking as archived";
-            }
-        }
+
         dataHandler.saveDatasetInfoToFile(cruise, null);
         return msg;
     }
@@ -189,38 +208,32 @@ public class AddDatasetRefs {
      *         Orig_Refs_File - file of expocodes with DOIs of the original data documents
      */
     public static void main(String[] args) {
-        if ( args.length != 2 ) {
+        if ( args.length != 3 ) {
             System.err.println();
-            System.err.println("Arguments:  SOCAT_Refs.tsv  Orig_Refs.tsv");
+            System.err.println("Arguments:  Orig_Refs.tsv  SOCAT_Refs.tsv  ReplaceOld");
             System.err.println();
-            System.err.println("Updates the DOIs for the SOCAT-enhanced and original data documents.  Each ");
+            System.err.println("Updates the DOIs for the original and SOCAT-enhanced data documents.  Each ");
             System.err.println("line in the files should be an expocode, a tab character, the landing page URL ");
             System.err.println("for the dataset to assign, a tab character, and the DOI for the dataset to ");
             System.err.println("assign.  Blank lines or lines starting with a '#' are ignored.  Any blank URL ");
-            System.err.println("or DOI values are ignored.  The default dashboard configuration (specified by ");
-            System.err.println("the UPLOAD_DASHBOARD_SERVER_NAME environment variable) is used for this process. ");
+            System.err.println("or DOI values are ignored.  If ReplaceOld is True or T (case insensitive), ");
+            System.err.println("then any existing information is replaced; otherwise, information is assigned ");
+            System.err.println("only where no information is already present.");
+            System.err.println();
+            System.err.println("The default dashboard configuration (specified by the UPLOAD_DASHBOARD_SERVER_NAME ");
+            System.err.println("environment variable) is used for this process. ");
             System.err.println();
             System.exit(1);
         }
 
-        String socatDOIsFilename = args[0];
-        String origDOIsFilename = args[1];
+        String origDOIsFilename = args[0];
+        String socatDOIsFilename = args[1];
+        boolean replaceOld = ("True".equalsIgnoreCase(args[2]) || "T".equalsIgnoreCase(args[2]));
 
-        TreeMap<String,String> origDOIMap = new TreeMap<String,String>();
-        TreeMap<String,String> origURLMap = new TreeMap<String,String>();
-        TreeMap<String,String> socatDOIMap = new TreeMap<String,String>();
-        TreeMap<String,String> socatURLMap = new TreeMap<String,String>();
-
-        // Create the maps of expocode to the SOCAT URL and SOCAT DOI
-        try {
-            readRefsFromFile(socatDOIsFilename, socatURLMap, socatDOIMap);
-        } catch ( Exception ex ) {
-            System.err.println("Error reading " + socatDOIsFilename + ": " + ex.getMessage());
-            ex.printStackTrace();
-            System.exit(1);
-        }
 
         // Create the maps of expocode to the original-data URL and original-data DOI
+        TreeMap<String,String> origDOIMap = new TreeMap<String,String>();
+        TreeMap<String,String> origURLMap = new TreeMap<String,String>();
         try {
             readRefsFromFile(origDOIsFilename, origURLMap, origDOIMap);
         } catch ( Exception ex ) {
@@ -229,11 +242,22 @@ public class AddDatasetRefs {
             System.exit(1);
         }
 
+        // Create the maps of expocode to the SOCAT URL and SOCAT DOI
+        TreeMap<String,String> socatDOIMap = new TreeMap<String,String>();
+        TreeMap<String,String> socatURLMap = new TreeMap<String,String>();
+        try {
+            readRefsFromFile(socatDOIsFilename, socatURLMap, socatDOIMap);
+        } catch ( Exception ex ) {
+            System.err.println("Error reading " + socatDOIsFilename + ": " + ex.getMessage());
+            ex.printStackTrace();
+            System.exit(1);
+        }
+
         TreeSet<String> exposSet = new TreeSet<String>();
-        exposSet.addAll(socatURLMap.keySet());
-        exposSet.addAll(socatDOIMap.keySet());
         exposSet.addAll(origURLMap.keySet());
         exposSet.addAll(origDOIMap.keySet());
+        exposSet.addAll(socatURLMap.keySet());
+        exposSet.addAll(socatDOIMap.keySet());
         if ( exposSet.size() == 0 ) {
             System.err.println("No valid expocode DOI data in " + socatDOIsFilename + " or " + origDOIsFilename);
             System.exit(1);
@@ -249,26 +273,19 @@ public class AddDatasetRefs {
             System.exit(1);
         }
 
-        boolean success = true;
         try {
             AddDatasetRefs updater = new AddDatasetRefs(configStore.getDataFileHandler());
             for (String expocode : exposSet) {
-                try {
-                    String msg = updater.updateReferencesForDataset(expocode, origDOIMap.get(expocode),
-                            origURLMap.get(expocode), socatDOIMap.get(expocode), socatURLMap.get(expocode));
-                    if ( msg != null )
-                        System.out.println(msg);
-                } catch ( Exception ex ) {
-                    System.err.println("Problems updating the DOIs for " + expocode + ": " + ex.getMessage());
-                    success = false;
-                }
+                String msg = updater.updateReferencesForDataset(expocode, origDOIMap.get(expocode),
+                        origURLMap.get(expocode), socatDOIMap.get(expocode), socatURLMap.get(expocode),
+                        replaceOld);
+                if ( msg != null )
+                    System.out.println(msg);
             }
         } finally {
             DashboardConfigStore.shutdown();
         }
 
-        if ( !success )
-            System.exit(1);
         System.exit(0);
     }
 
