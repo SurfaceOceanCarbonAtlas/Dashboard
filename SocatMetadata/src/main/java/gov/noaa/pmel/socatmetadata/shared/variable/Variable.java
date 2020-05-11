@@ -13,7 +13,7 @@ import java.util.HashSet;
  */
 public class Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5030711239099089834L;
+    private static final long serialVersionUID = -7769218158731992012L;
 
     protected String colName;
     protected String fullName;
@@ -40,10 +40,10 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
 
     /**
      * Create using values in the given variable.
-     * This exists only for calling from constructors of subclasses;
+     * This exists primarily for calling from constructors of subclasses;
      * use {@link Variable#duplicate(Object)} for normal uses.
      */
-    protected Variable(Variable var) {
+    public Variable(Variable var) {
         if ( var != null ) {
             colName = var.colName;
             fullName = var.fullName;
