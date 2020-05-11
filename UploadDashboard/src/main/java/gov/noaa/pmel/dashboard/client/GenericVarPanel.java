@@ -1,6 +1,8 @@
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -10,24 +12,34 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
+import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 
-public class VariablePanel extends Composite {
+public class GenericVarPanel extends Composite {
 
-    interface VariablePanelUiBinder extends UiBinder<FlowPanel,VariablePanel> {
+    interface GenericVarPanelUiBinder extends UiBinder<FlowPanel,GenericVarPanel> {
     }
 
-    private static VariablePanelUiBinder uiBinder = GWT.create(VariablePanelUiBinder.class);
+    private static GenericVarPanelUiBinder uiBinder = GWT.create(GenericVarPanelUiBinder.class);
 
     @UiField(provided = true)
-    final LabeledTextBox colNameValue;
+    LabeledTextBox colNameValue;
     @UiField(provided = true)
-    final LabeledTextBox fullNameValue;
+    LabeledTextBox fullNameValue;
+    @UiField(provided = true)
+    LabeledListBox varTypeList;
 
-    private Variable var;
-    private HTML header;
+    protected Variable var;
+    protected HTML header;
 
     /**
      * Creates a FlowPanel associated with the given Variable.
@@ -37,13 +49,18 @@ public class VariablePanel extends Composite {
      * @param header
      *         header that should be updated when appropriate values change; cannot be null
      */
-    public VariablePanel(Variable var, HTML header) {
-        colNameValue = new LabeledTextBox("ID:", "12em", "20em", null, null);
-        fullNameValue = new LabeledTextBox("Name:", "12em", "20em", null, null);
+    public GenericVarPanel(Variable var, HTML header) {
+        colNameValue = new LabeledTextBox("Column name:", "12em", "20em", null, null);
+        fullNameValue = new LabeledTextBox("Full name:", "12em", "20em", null, null);
+        varTypeList = new LabeledListBox("Type:", "12em", "20em", null, null);
+
         initWidget(uiBinder.createAndBindUi(this));
 
         this.var = var;
         this.header = header;
+
+        // Assign the variable types list
+        VariablesTabPanel.(varTypeList, var);
 
         // The following will assign the values in the labels and text fields
         getUpdatedVariable();
@@ -93,6 +110,11 @@ public class VariablePanel extends Composite {
         // first update the displayed content in case this is from a save-and-continue
         colNameValue.setText(var.getColName());
         fullNameValue.setText(var.getFullName());
+
+        int k = varTypeSimpleClassNames.indexOf(var.getClass().getSimpleName());
+        if ( k < 0 )
+            throw new IllegalArgumentException("Unexpected variable type of " + getClass().getSimpleName());
+        varTypeList.setSelectedIndex(k);
 
         markInvalids();
 
