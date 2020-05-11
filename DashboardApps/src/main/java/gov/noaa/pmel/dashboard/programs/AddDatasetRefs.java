@@ -66,7 +66,7 @@ public class AddDatasetRefs {
         }
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
         if ( cruise == null )
-            return "dataset " + upperExpo + "does not exist";
+            return "dataset " + upperExpo + " does not exist";
 
         String msg = null;
         boolean proceed = (replaceOld || (cruise.getSourceDOI().isEmpty() && cruise.getSourceURL().isEmpty()));
