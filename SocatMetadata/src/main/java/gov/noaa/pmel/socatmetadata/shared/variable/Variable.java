@@ -13,7 +13,7 @@ import java.util.HashSet;
  */
 public class Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7212627524921707714L;
+    private static final long serialVersionUID = -5030711239099089834L;
 
     protected String colName;
     protected String fullName;
@@ -331,7 +331,7 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
 
     @Override
     public String toString() {
-        return "Variable{" +
+        return getSimpleName() + "{" +
                 "colName='" + colName + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", varUnit='" + varUnit + '\'' +
@@ -341,6 +341,15 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
                 ", precision=" + precision +
                 ", addnInfo=" + addnInfo +
                 '}';
+    }
+
+    /**
+     * @return the simple name for this type of variable; used to identifying the variable type in
+     *         client code, and used in {@link #toString()}.  Essentially this.getClass().getSimpleName()
+     *         but explicit defined for GWT client compatibility.
+     */
+    public String getSimpleName() {
+        return "Variable";
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class AquGasConc extends GasConc implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 7263970059747709607L;
+    private static final long serialVersionUID = 1495485400427148697L;
 
     protected String reportTemperature;
     protected String temperatureCorrection;
@@ -128,11 +128,16 @@ public class AquGasConc extends GasConc implements Duplicable, Serializable, IsS
 
     @Override
     public String toString() {
-        String repr = "Aqu" + super.toString();
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
         return repr.substring(0, repr.length() - 1) +
                 ", reportTemperature='" + reportTemperature + '\'' +
                 ", temperatureCorrection='" + temperatureCorrection + '\'' +
                 '}';
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "AquGasConc";
     }
 
 }

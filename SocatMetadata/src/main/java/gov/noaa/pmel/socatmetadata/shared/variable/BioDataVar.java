@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class BioDataVar extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 9043720457493998136L;
+    private static final long serialVersionUID = -5768266523048459705L;
 
     String biologicalSubject;
     String speciesId;
@@ -144,12 +144,17 @@ public class BioDataVar extends DataVar implements Duplicable, Serializable, IsS
 
     @Override
     public String toString() {
-        String repr = "Bio" + super.toString();
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
         return repr.substring(0, repr.length() - 1) +
                 ", biologicalSubject='" + biologicalSubject + '\'' +
                 ", speciesId='" + speciesId + '\'' +
                 ", lifeStage='" + lifeStage + '\'' +
                 '}';
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "BioDataVar";
     }
 
 }

@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 public class AirPressure extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5104578066431658285L;
+    private static final long serialVersionUID = 1059334938352414705L;
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
@@ -149,9 +149,14 @@ public class AirPressure extends DataVar implements Duplicable, Serializable, Is
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("DataVar", "AirPressure");
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
         return repr.substring(0, repr.length() - 1) +
                 ", pressureCorrection='" + pressureCorrection + "'}";
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "AirPressure";
     }
 
 }

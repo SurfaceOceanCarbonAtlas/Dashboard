@@ -12,7 +12,7 @@ import java.util.HashSet;
  */
 public class DataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6320986210965720061L;
+    private static final long serialVersionUID = 1394503872541486646L;
 
     protected String observeType;
     protected MethodType measureMethod;
@@ -434,7 +434,7 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Variable", "DataVar");
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
         return repr.substring(0, repr.length() - 1) +
                 ", observeType='" + observeType + '\'' +
                 ", measureMethod=" + measureMethod +
@@ -451,4 +451,10 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
                 ", instrumentNames=" + instrumentNames +
                 '}';
     }
+
+    @Override
+    public String getSimpleName() {
+        return "DataVar";
+    }
+
 }

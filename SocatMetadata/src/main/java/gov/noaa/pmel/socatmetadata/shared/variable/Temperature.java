@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class Temperature extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -1245868639486173639L;
+    private static final long serialVersionUID = 1635226933184077100L;
 
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
@@ -113,7 +113,12 @@ public class Temperature extends DataVar implements Duplicable, Serializable, Is
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("DataVar", "Temperature");
+        return super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "Temperature";
     }
 
 }

@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class GasConc extends DataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 6153853587820137758L;
+    private static final long serialVersionUID = 6191787400163620896L;
 
     protected String dryingMethod;
     protected String waterVaporCorrection;
@@ -117,11 +117,16 @@ public class GasConc extends DataVar implements Duplicable, Serializable, IsSeri
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("DataVar", "GasConc");
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
         return repr.substring(0, repr.length() - 1) +
                 ", dryingMethod='" + dryingMethod + '\'' +
                 ", waterVaporCorrection='" + waterVaporCorrection + '\'' +
                 '}';
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "GasConc";
     }
 
 }
