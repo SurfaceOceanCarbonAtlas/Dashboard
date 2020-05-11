@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 
@@ -62,10 +63,12 @@ public class MiscInfoPanel extends Composite {
     /**
      * Creates a FlowPanel associated with the given MiscInfo.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param info
      *         associate this panel with this MiscInfo; cannot be null
      */
-    public MiscInfoPanel(MiscInfo info) {
+    public MiscInfoPanel(DashboardDataset dataset, MiscInfo info) {
         nameValue = new LabeledTextBox("Dataset name:", "11em", "20em", null, null);
         sectionValue = new LabeledTextBox("Section or leg name:", "10em", "20em", null, null);
         //
@@ -99,7 +102,7 @@ public class MiscInfoPanel extends Composite {
 
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.MISC_INFO_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.MISC_INFO_TAB_TEXT + " for " + dataset.getDatasetId());
 
         this.info = info;
 

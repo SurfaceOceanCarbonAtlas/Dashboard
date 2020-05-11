@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.ArrayList;
@@ -41,13 +42,15 @@ public class VariablesTabPanel extends Composite {
      * <p>
      * A call to {@link #showPanel(int)} will need to be made to show a panel.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param variables
      *         the initial list of variables to show
      */
-    public VariablesTabPanel(ArrayList<Variable> variables) {
+    public VariablesTabPanel(DashboardDataset dataset, ArrayList<Variable> variables) {
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.VARIABLES_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.VARIABLES_TAB_TEXT + " for " + dataset.getDatasetId());
         variablePanels = new ArrayList<VariablePanel>(variables.size());
         for (Variable vari : variables) {
             HTML header = new HTML();

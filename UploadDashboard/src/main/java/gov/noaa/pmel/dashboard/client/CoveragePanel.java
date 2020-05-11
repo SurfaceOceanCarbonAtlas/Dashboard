@@ -8,6 +8,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
@@ -55,12 +56,14 @@ public class CoveragePanel extends Composite {
     /**
      * Creates a FlowPanel associated with the given Coverage.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param coverage
      *         associate this panel with this Coverage; cannot be null
      * @param today
      *         latest date for Datestamp validation
      */
-    public CoveragePanel(Coverage coverage, Datestamp today) {
+    public CoveragePanel(DashboardDataset dataset, Coverage coverage, Datestamp today) {
         spacialValue = new LabeledTextBox("Spatial reference:", "11em", "12em", null, null);
         //
         southLatValue = new LabeledTextBox("Southern-most latitude:", "11em", "12em",
@@ -83,7 +86,7 @@ public class CoveragePanel extends Composite {
 
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.COVERAGE_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.COVERAGE_TAB_TEXT + " for " + dataset.getDatasetId());
 
         this.coverage = coverage;
         this.today = today;

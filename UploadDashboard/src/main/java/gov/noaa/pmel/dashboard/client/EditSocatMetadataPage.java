@@ -136,7 +136,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         doneButton.setText(DONE_TEXT);
         cancelButton.setText(CANCEL_TEXT);
 
-        // Assign the text for the tabs
+        // Assign the generic text for the category buttons
         submitterButton.setText(SUBMITTER_TAB_TEXT);
         investigatorsButton.setText(INVESTIGATOR_TAB_TEXT);
         platformButton.setText(PLATFORM_TAB_TEXT);
@@ -145,7 +145,7 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         instrumentsButton.setText(INSTRUMENTS_TAB_TEXT);
         miscInfoButton.setText(MISC_INFO_TAB_TEXT);
 
-        // Assign the hover helps for the tabs
+        // Assign the hover helps for the category buttons
         submitterButton.setTitle(SUBMITTER_TAB_HELP);
         investigatorsButton.setTitle(INVESTIGATOR_TAB_HELP);
         platformButton.setTitle(PLATFORM_TAB_HELP);
@@ -253,13 +253,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         if ( instruments.isEmpty() )
             instruments.add(new Instrument());
 
-        submitterPanel = new SubmitterPanel(metadata.getSubmitter());
-        investigatorsPanel = new InvestigatorsTabPanel(investigators);
-        platformPanel = new PlatformPanel(metadata.getPlatform());
-        coveragePanel = new CoveragePanel(metadata.getCoverage(), today);
-        variablesPanel = new VariablesTabPanel(variables);
-        instrumentsPanel = new InstrumentsTabPanel(instruments);
-        miscInfoPanel = new MiscInfoPanel(metadata.getMiscInfo());
+        submitterPanel = new SubmitterPanel(dataset, metadata.getSubmitter());
+        investigatorsPanel = new InvestigatorsTabPanel(dataset, investigators);
+        platformPanel = new PlatformPanel(dataset, metadata.getPlatform());
+        coveragePanel = new CoveragePanel(dataset, metadata.getCoverage(), today);
+        variablesPanel = new VariablesTabPanel(dataset, variables);
+        instrumentsPanel = new InstrumentsTabPanel(dataset, instruments);
+        miscInfoPanel = new MiscInfoPanel(dataset, metadata.getMiscInfo());
 
         mainPanel.clear();
         mainPanel.add(submitterPanel);

@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 
 import java.util.ArrayList;
@@ -41,13 +42,15 @@ public class InstrumentsTabPanel extends Composite {
      * <p>
      * A call to {@link #showPanel(int)} will need to be made to show a panel.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param instruments
      *         the initial list of instruments to show
      */
-    public InstrumentsTabPanel(ArrayList<Instrument> instruments) {
+    public InstrumentsTabPanel(DashboardDataset dataset, ArrayList<Instrument> instruments) {
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.INSTRUMENTS_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.INSTRUMENTS_TAB_TEXT + " for " + dataset.getDatasetId());
         instrumentPanels = new ArrayList<InstrumentPanel>(instruments.size());
         for (Instrument instr : instruments) {
             HTML header = new HTML();

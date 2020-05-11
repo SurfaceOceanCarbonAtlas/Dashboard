@@ -9,6 +9,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
@@ -42,10 +43,12 @@ public class PlatformPanel extends Composite {
     /**
      * Creates a FlowPanel associated with the given Platform.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param platform
      *         associate this panel with this Platform; cannot be null
      */
-    public PlatformPanel(Platform platform) {
+    public PlatformPanel(DashboardDataset dataset, Platform platform) {
         idValue = new LabeledTextBox("Platform ID:", "11em", "20em", null, null);
         nameValue = new LabeledTextBox("Name of platform:", "11em", "20em", null, null);
         typeList = new LabeledListBox("Type of platform:", "11em", "20.75em", null, null);
@@ -54,7 +57,7 @@ public class PlatformPanel extends Composite {
 
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.PLATFORM_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.PLATFORM_TAB_TEXT + " for " + dataset.getDatasetId());
 
         this.platform = platform;
 

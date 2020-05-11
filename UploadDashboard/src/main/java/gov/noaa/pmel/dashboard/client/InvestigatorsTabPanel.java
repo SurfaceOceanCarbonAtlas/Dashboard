@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
 import java.util.ArrayList;
@@ -41,13 +42,15 @@ public class InvestigatorsTabPanel extends Composite {
      * <p>
      * A call to {@link #showPanel(int)} will need to be made to show a panel.
      *
+     * @param dataset
+     *         the dataset associated with this metadata
      * @param investigators
      *         the initial list of investigators to show
      */
-    public InvestigatorsTabPanel(ArrayList<Investigator> investigators) {
+    public InvestigatorsTabPanel(DashboardDataset dataset, ArrayList<Investigator> investigators) {
         initWidget(uiBinder.createAndBindUi(this));
 
-        headerLabel.setText(EditSocatMetadataPage.INVESTIGATOR_TAB_TEXT);
+        headerLabel.setText(EditSocatMetadataPage.INVESTIGATOR_TAB_TEXT + " for " + dataset.getDatasetId());
         investigatorPanels = new ArrayList<InvestigatorPanel>(investigators.size());
         for (Investigator pi : investigators) {
             HTML header = new HTML();
