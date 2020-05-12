@@ -25,7 +25,7 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
     }
 
     /**
-     * Create with as many fields as possible assigned from the given variable.
+     * Create using as many of the values in the given variable subclass as possible.
      */
     public BioDataVar(Variable var) {
         super(var);

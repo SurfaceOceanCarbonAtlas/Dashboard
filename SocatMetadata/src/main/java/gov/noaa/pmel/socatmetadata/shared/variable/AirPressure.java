@@ -31,8 +31,7 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
     }
 
     /**
-     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
-     * If a AirPressure is given, all AirPressure fields are copied.
+     * Create using as many of the values in the given variable subclass as possible.
      */
     public AirPressure(Variable var) {
         super(var);

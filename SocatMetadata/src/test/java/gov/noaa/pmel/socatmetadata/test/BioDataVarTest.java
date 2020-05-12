@@ -167,7 +167,6 @@ public class BioDataVarTest {
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setMissVal(MISSING_VALUE);
-        var.setFlagColName(FLAG_COL_NAME);
 
         BioDataVar biovar = new BioDataVar(var);
         assertEquals(EMPTY_HASHSET, biovar.getInstrumentNames());
@@ -176,12 +175,13 @@ public class BioDataVarTest {
         assertEquals(EMPTY_STRING, biovar.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, biovar.getMeasureMethod());
         assertEquals(EMPTY_STRING, biovar.getObserveType());
-        assertEquals(FLAG_COL_NAME, biovar.getFlagColName());
+        assertEquals(EMPTY_STRING, biovar.getFlagColName());
         assertEquals(MISSING_VALUE, biovar.getMissVal());
         assertEquals(FULL_NAME, biovar.getFullName());
         assertEquals(COL_NAME, biovar.getColName());
 
         InstDataVar datavar = new InstDataVar(var);
+        datavar.setFlagColName(FLAG_COL_NAME);
         datavar.setObserveType(OBSERVE_TYPE);
         datavar.setMeasureMethod(MEASURE_METHOD);
         datavar.setMethodDescription(METHOD_DESCRIPTION);

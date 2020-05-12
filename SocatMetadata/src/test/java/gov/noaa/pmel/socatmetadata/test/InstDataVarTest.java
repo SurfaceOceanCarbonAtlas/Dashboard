@@ -2,9 +2,9 @@ package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
-import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -575,8 +575,8 @@ public class InstDataVarTest {
     }
 
     @Test
-    public void testDataVarVariable() {
-        Variable var = new Variable();
+    public void testInstDataVarVariable() {
+        GenDataVar var = new GenDataVar();
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);

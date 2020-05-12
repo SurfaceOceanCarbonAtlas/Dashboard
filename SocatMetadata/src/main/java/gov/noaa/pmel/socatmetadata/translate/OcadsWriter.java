@@ -19,8 +19,9 @@ import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.jdom2.Document;
@@ -282,8 +283,10 @@ public class OcadsWriter extends DocumentHandler {
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
+            if ( var instanceof GenDataVar )
+                addGenDataVarAddnFields(ancestor, (GenDataVar) var);
             if ( var instanceof InstDataVar )
-                usedInstrumentNames.addAll(addDataVariableAddnFields(ancestor, (InstDataVar) var, instruments));
+                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstDataVar) var, instruments));
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -394,24 +397,13 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_COLUMN_NAME_ELEMENT_NAME, var.getColName());
         setElementText(ancestor, VARIABLE_FULL_NAME_ELEMENT_NAME, var.getFullName());
         setElementText(ancestor, VARIABLE_UNIT_ELEMENT_NAME, var.getVarUnit());
-        setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
-        String strVal = var.getFlagColName();
-        if ( !strVal.isEmpty() )
-            setElementText(ancestor, VARIABLE_FLAG_ELEMENT_NAME, "Given in column: " + strVal);
 
         StringBuilder strBldr = new StringBuilder();
-        strVal = var.getMissVal();
+        String strVal = var.getMissVal();
         if ( !strVal.isEmpty() ) {
             if ( strBldr.length() > 0 )
                 strBldr.append("\n");
             strBldr.append("Missing Value: ");
-            strBldr.append(strVal);
-        }
-        strVal = var.getPrecision().asOneString();
-        if ( !strVal.isEmpty() ) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append("Resolution/Precision: ");
             strBldr.append(strVal);
         }
         for (String addn : var.getAddnInfo()) {
@@ -420,6 +412,34 @@ public class OcadsWriter extends DocumentHandler {
             strBldr.append(addn);
         }
         setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+    }
+
+    /**
+     * Add the OCADS XML for the additional fields found in GenDataVar
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this data variable
+     */
+    private void addGenDataVarAddnFields(Element ancestor, GenDataVar var) {
+        setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
+        String strVal = var.getFlagColName();
+        if ( !strVal.isEmpty() )
+            setElementText(ancestor, VARIABLE_FLAG_ELEMENT_NAME, "Given in column: " + strVal);
+
+        strVal = var.getPrecision().asOneString();
+        if ( !strVal.isEmpty() ) {
+            StringBuilder strBldr = new StringBuilder();
+            strBldr.append("Resolution/Precision: ");
+            strBldr.append(strVal);
+            String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+            if ( !addnInfo.isEmpty() ) {
+                strBldr.append("\n");
+                strBldr.append(addnInfo);
+            }
+            setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+        }
     }
 
     /**
@@ -434,7 +454,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addDataVariableAddnFields(Element ancestor, InstDataVar var,
+    private HashSet<String> addInstDataVarAddnFields(Element ancestor, InstDataVar var,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
 

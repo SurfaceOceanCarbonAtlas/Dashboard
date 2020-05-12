@@ -26,8 +26,7 @@ public class GasConc extends InstDataVar implements Duplicable, Serializable, Is
     }
 
     /**
-     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
-     * If a GasConc is given, all GasConc fields are copied.
+     * Create using as many of the values in the given variable subclass as possible.
      */
     public GasConc(Variable var) {
         super(var);

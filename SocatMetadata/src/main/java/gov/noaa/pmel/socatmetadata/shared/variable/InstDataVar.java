@@ -10,9 +10,9 @@ import java.util.HashSet;
 /**
  * Information about a generic data variable in a dataset.
  */
-public class InstDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
+public class InstDataVar extends GenDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1394503872541486646L;
+    private static final long serialVersionUID = 8968660545730752307L;
 
     protected String observeType;
     protected MethodType measureMethod;
@@ -49,7 +49,7 @@ public class InstDataVar extends Variable implements Duplicable, Serializable, I
     }
 
     /**
-     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
+     * Create using as many of the values in the given variable subclass as possible.
      */
     public InstDataVar(Variable var) {
         super(var);

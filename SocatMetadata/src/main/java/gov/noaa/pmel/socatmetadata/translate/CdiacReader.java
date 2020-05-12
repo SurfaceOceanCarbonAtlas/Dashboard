@@ -19,8 +19,9 @@ import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -873,12 +874,14 @@ public class CdiacReader extends DocumentHandler {
         // Mention any WOCE flags
         if ( woceCO2WaterVarNames != null ) {
             for (int idx : co2WaterVarIndices) {
-                varList.get(idx).setFlagColName(woceCO2WaterVarNames);
+                GenDataVar genDataVar = (GenDataVar) (varList.get(idx));
+                genDataVar.setFlagColName(woceCO2WaterVarNames);
             }
         }
         if ( woceCO2AtmVarNames != null ) {
             for (int idx : co2AtmVarIndices) {
-                varList.get(idx).setFlagColName(woceCO2AtmVarNames);
+                GenDataVar genDataVar = (GenDataVar) (varList.get(idx));
+                genDataVar.setFlagColName(woceCO2AtmVarNames);
             }
         }
 

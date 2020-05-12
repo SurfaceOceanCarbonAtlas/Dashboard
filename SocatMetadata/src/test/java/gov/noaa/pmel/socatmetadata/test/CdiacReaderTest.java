@@ -21,8 +21,9 @@ import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -414,23 +415,28 @@ public class CdiacReaderTest {
                     "at equilibrator temperature (ppm)", var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
             strList = var.getAddnInfo();
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
-            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
+                    instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    instDataVar.getMethodReference());
             assertEquals(instDataVar.toString(), "Bow", instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
@@ -461,24 +467,30 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Mole fraction of CO2 measured in dry outside air (ppm)", var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
             strList = var.getAddnInfo();
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
-            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
+                    instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
-            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.",
+                    instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
@@ -505,24 +517,30 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
             strList = var.getAddnInfo();
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
-            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
+                    instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
-            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.",
+                    instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
@@ -548,10 +566,13 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.05", "hPa"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.015", "hPa"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.05", "hPa"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.015", "hPa"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
@@ -559,7 +580,8 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
-            assertEquals(instDataVar.toString(), "Attached to CO2 analyzer exit to lab.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "Attached to CO2 analyzer exit to lab.",
+                    instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
@@ -580,10 +602,13 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), AirPressure.HECTOPASCALS_UNIT, var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.2", "hPa"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.08", "hPa"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.2", "hPa"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.08", "hPa"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
@@ -613,10 +638,13 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Water temperature in equilibrator (degrees Celsius)", var.getFullName());
             assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.025", "°C"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.025", "°C"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "°C"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
@@ -643,10 +671,13 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Sea surface temperature (degrees Celsius)", var.getFullName());
             assertEquals(var.toString(), Temperature.DEGREES_CELSIUS_UNIT, var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.001", "°C"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.01", "°C"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.001", "°C"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
@@ -674,10 +705,13 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.005 ", "permil"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.0002", "permil"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.005 ", "permil"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.0002", "permil"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
@@ -706,23 +740,28 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "WOCE_QC_FLAG", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), var.getPrecision());
             strList = var.getAddnInfo();
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
-            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
+                    instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    instDataVar.getMethodReference());
             assertEquals(instDataVar.toString(), "Bow", instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
@@ -754,24 +793,30 @@ public class CdiacReaderTest {
                     "at SST and 100% humidity (microatmospheres)", var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("0.2", "ppm"), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "ppm"), var.getPrecision());
             strList = var.getAddnInfo();
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
+
+            assertTrue(var instanceof GenDataVar);
+            GenDataVar genDataVar = (GenDataVar) var;
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genDataVar.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genDataVar.getPrecision());
+            assertEquals(var.toString(), "", genDataVar.getFlagColName());
 
             assertTrue(var instanceof InstDataVar);
             InstDataVar instDataVar = (InstDataVar) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
-            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
+                    instDataVar.getMethodDescription());
             assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
-            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.",
+                    instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.",
+                    instDataVar.getSamplingLocation());
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
@@ -798,12 +843,9 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof InstDataVar);
+            assertFalse(var instanceof GenDataVar);
         }
 
         {
@@ -813,12 +855,9 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof InstDataVar);
+            assertFalse(var instanceof GenDataVar);
         }
 
         {
@@ -828,12 +867,9 @@ public class CdiacReaderTest {
                     var.getFullName());
             assertEquals(var.toString(), "", var.getVarUnit());
             assertEquals(var.toString(), "", var.getMissVal());
-            assertEquals(var.toString(), "", var.getFlagColName());
-            assertEquals(var.toString(), new NumericString("", ""), var.getAccuracy());
-            assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof InstDataVar);
+            assertFalse(var instanceof GenDataVar);
         }
 
     }

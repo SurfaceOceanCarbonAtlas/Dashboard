@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
@@ -89,7 +90,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetFlagColName() {
-        Variable var = new Variable();
+        GenDataVar var = new GenDataVar();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
@@ -105,7 +106,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetAccuracy() {
-        Variable var = new Variable();
+        GenDataVar var = new GenDataVar();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
         NumericString numstr = var.getAccuracy();
@@ -137,7 +138,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetPrecision() {
-        Variable var = new Variable();
+        GenDataVar var = new GenDataVar();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
         NumericString numstr = var.getPrecision();
@@ -177,9 +178,6 @@ public class VariableTest {
         assertEquals(ADDN_INFO, addnInfo);
         assertNotSame(ADDN_INFO, addnInfo);
         assertNotSame(addnInfo, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
@@ -223,17 +221,12 @@ public class VariableTest {
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
         var.setMissVal(MISSING_VALUE);
-        var.setFlagColName(FLAG_COL_NAME);
-        var.setAccuracy(ACCURACY);
-        var.setPrecision(PRECISION);
         var.setAddnInfo(ADDN_INFO);
         assertNotEquals(var, dup);
 
         dup = (Variable) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
-        assertNotSame(var.getAccuracy(), dup.getAccuracy());
-        assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
     }
 
@@ -272,27 +265,6 @@ public class VariableTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setMissVal(MISSING_VALUE);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setFlagColName(FLAG_COL_NAME);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setFlagColName(FLAG_COL_NAME);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setAccuracy(ACCURACY);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setAccuracy(ACCURACY);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setPrecision(PRECISION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setPrecision(PRECISION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
