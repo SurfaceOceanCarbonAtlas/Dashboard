@@ -10,7 +10,7 @@ import java.util.HashSet;
 /**
  * Information about a generic data variable in a dataset.
  */
-public class DataVar extends Variable implements Duplicable, Serializable, IsSerializable {
+public class InstDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = 1394503872541486646L;
 
@@ -31,7 +31,7 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
     /**
      * Create with all fields empty.
      */
-    public DataVar() {
+    public InstDataVar() {
         super();
         observeType = "";
         measureMethod = MethodType.UNSPECIFIED;
@@ -49,12 +49,12 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
     }
 
     /**
-     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
      */
-    public DataVar(Variable var) {
+    public InstDataVar(Variable var) {
         super(var);
-        if ( var instanceof DataVar ) {
-            DataVar other = (DataVar) var;
+        if ( var instanceof InstDataVar ) {
+            InstDataVar other = (InstDataVar) var;
             observeType = other.observeType;
             measureMethod = other.measureMethod;
             methodDescription = other.methodDescription;
@@ -347,11 +347,11 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
 
     @Override
     public Object duplicate(Object dup) {
-        DataVar var;
+        InstDataVar var;
         if ( dup == null )
-            var = new DataVar();
+            var = new InstDataVar();
         else
-            var = (DataVar) dup;
+            var = (InstDataVar) dup;
         super.duplicate(var);
         var.observeType = observeType;
         var.measureMethod = measureMethod;
@@ -375,38 +375,38 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
             return true;
         if ( null == obj )
             return false;
-        if ( !(obj instanceof DataVar) )
+        if ( !(obj instanceof InstDataVar) )
             return false;
         if ( !super.equals(obj) )
             return false;
 
-        DataVar dataVar = (DataVar) obj;
+        InstDataVar instDataVar = (InstDataVar) obj;
 
-        if ( !observeType.equals(dataVar.observeType) )
+        if ( !observeType.equals(instDataVar.observeType) )
             return false;
-        if ( measureMethod != dataVar.measureMethod )
+        if ( measureMethod != instDataVar.measureMethod )
             return false;
-        if ( !methodDescription.equals(dataVar.methodDescription) )
+        if ( !methodDescription.equals(instDataVar.methodDescription) )
             return false;
-        if ( !methodReference.equals(dataVar.methodReference) )
+        if ( !methodReference.equals(instDataVar.methodReference) )
             return false;
-        if ( !manipulationDescription.equals(dataVar.manipulationDescription) )
+        if ( !manipulationDescription.equals(instDataVar.manipulationDescription) )
             return false;
-        if ( !samplingLocation.equals(dataVar.samplingLocation) )
+        if ( !samplingLocation.equals(instDataVar.samplingLocation) )
             return false;
-        if ( !samplingElevation.equals(dataVar.samplingElevation) )
+        if ( !samplingElevation.equals(instDataVar.samplingElevation) )
             return false;
-        if ( !storageMethod.equals(dataVar.storageMethod) )
+        if ( !storageMethod.equals(instDataVar.storageMethod) )
             return false;
-        if ( !duration.equals(dataVar.duration) )
+        if ( !duration.equals(instDataVar.duration) )
             return false;
-        if ( !analysisTemperature.equals(dataVar.analysisTemperature) )
+        if ( !analysisTemperature.equals(instDataVar.analysisTemperature) )
             return false;
-        if ( !replication.equals(dataVar.replication) )
+        if ( !replication.equals(instDataVar.replication) )
             return false;
-        if ( !researcher.equals(dataVar.researcher) )
+        if ( !researcher.equals(instDataVar.researcher) )
             return false;
-        if ( !instrumentNames.equals(dataVar.instrumentNames) )
+        if ( !instrumentNames.equals(instDataVar.instrumentNames) )
             return false;
 
         return true;
@@ -454,7 +454,7 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
 
     @Override
     public String getSimpleName() {
-        return "DataVar";
+        return "InstDataVar";
     }
 
 }

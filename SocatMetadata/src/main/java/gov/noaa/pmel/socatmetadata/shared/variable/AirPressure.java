@@ -11,7 +11,7 @@ import java.io.Serializable;
  * The default unit is hectopascals instead of empty.
  * Also provides a pressure correction field.
  */
-public class AirPressure extends DataVar implements Duplicable, Serializable, IsSerializable {
+public class AirPressure extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = 1059334938352414705L;
 
@@ -31,7 +31,7 @@ public class AirPressure extends DataVar implements Duplicable, Serializable, Is
     }
 
     /**
-     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
      * If a AirPressure is given, all AirPressure fields are copied.
      */
     public AirPressure(Variable var) {

@@ -19,7 +19,7 @@ import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -282,8 +282,8 @@ public class OcadsWriter extends DocumentHandler {
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
-            if ( var instanceof DataVar )
-                usedInstrumentNames.addAll(addDataVariableAddnFields(ancestor, (DataVar) var, instruments));
+            if ( var instanceof InstDataVar )
+                usedInstrumentNames.addAll(addDataVariableAddnFields(ancestor, (InstDataVar) var, instruments));
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -423,7 +423,7 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     /**
-     * Add the OCADS XML for the additional fields found in DataVar
+     * Add the OCADS XML for the additional fields found in InstDataVar
      *
      * @param ancestor
      *         add under this element
@@ -434,7 +434,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addDataVariableAddnFields(Element ancestor, DataVar var,
+    private HashSet<String> addDataVariableAddnFields(Element ancestor, InstDataVar var,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
 
@@ -655,7 +655,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addSamplerElements(Element ancestor, DataVar var, Sampler inst,
+    private HashSet<String> addSamplerElements(Element ancestor, InstDataVar var, Sampler inst,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
@@ -747,7 +747,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addAnalyzerElements(Element ancestor, DataVar var, Analyzer inst) {
+    private HashSet<String> addAnalyzerElements(Element ancestor, InstDataVar var, Analyzer inst) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
 

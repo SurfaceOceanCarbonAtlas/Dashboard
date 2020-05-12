@@ -2,13 +2,13 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 
 import java.io.Serializable;
 
 /**
  * Basic information about an instrument that is a salinity sensor.  Specific details about values measured
- * by the sensor are part of {@link DataVar}.
+ * by the sensor are part of {@link InstDataVar}.
  */
 public class SalinitySensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 

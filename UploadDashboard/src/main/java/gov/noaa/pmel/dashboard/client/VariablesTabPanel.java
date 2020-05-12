@@ -18,7 +18,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -43,7 +43,7 @@ public class VariablesTabPanel extends Composite {
             new GasConc().getSimpleName(),
             new BioDataVar().getSimpleName(),
             new Temperature().getSimpleName(),
-            new DataVar().getSimpleName(),
+            new InstDataVar().getSimpleName(),
             new Variable().getSimpleName()
     ));
 
@@ -127,8 +127,8 @@ public class VariablesTabPanel extends Composite {
             case "Temperature":
                 panel = new TemperatureVarPanel((Temperature) vari, header, this);
                 break;
-            case "DataVar":
-                panel = new DataVarPanel((DataVar) vari, header, this);
+            case "InstDataVar":
+                panel = new DataVarPanel((InstDataVar) vari, header, this);
                 break;
             case "Variable":
                 panel = new GenericVarPanel(vari, header, this);
@@ -206,8 +206,8 @@ public class VariablesTabPanel extends Composite {
             case "Temperature":
                 vari = new Temperature(oldVar);
                 break;
-            case "DataVar":
-                vari = new DataVar(oldVar);
+            case "InstDataVar":
+                vari = new InstDataVar(oldVar);
                 break;
             case "Variable":
                 vari = new Variable(oldVar);

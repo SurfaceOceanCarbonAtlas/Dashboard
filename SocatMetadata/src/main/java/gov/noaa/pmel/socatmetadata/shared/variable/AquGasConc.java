@@ -26,7 +26,7 @@ public class AquGasConc extends GasConc implements Duplicable, Serializable, IsS
     }
 
     /**
-     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
      * If a GasConc is given, all GasConc fields are copied. If an AquGasConc is given, all AquGasConc fields are
      * copied.
      */

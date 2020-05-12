@@ -19,7 +19,7 @@ import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
@@ -822,7 +822,7 @@ public class CdiacReader extends DocumentHandler {
                     break;
                 }
                 case SALINITY: {
-                    DataVar sal = new DataVar(var);
+                    InstDataVar sal = new InstDataVar(var);
                     ArrayList<String> addnInfo = new ArrayList<String>();
                     sal.setMeasureMethod(MethodType.MEASURED_INSITU);
                     sal.setInstrumentNames(Collections.singletonList("Salinity Sensor"));

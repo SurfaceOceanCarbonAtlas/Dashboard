@@ -21,7 +21,7 @@ import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
@@ -421,28 +421,28 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 2, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
-            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 2, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator"));
+            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof GasConc);
-            GasConc gasConc = (GasConc) dataVar;
+            assertTrue(instDataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) instDataVar;
             assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                             "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                     gasConc.getDryingMethod());
@@ -468,27 +468,27 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof GasConc);
-            GasConc gasConc = (GasConc) dataVar;
+            assertTrue(instDataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) instDataVar;
             assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                             "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                     gasConc.getDryingMethod());
@@ -512,27 +512,27 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof GasConc);
-            GasConc gasConc = (GasConc) dataVar;
+            assertTrue(instDataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) instDataVar;
             assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                             "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                     gasConc.getDryingMethod());
@@ -553,23 +553,23 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("0.015", "hPa"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Attached to CO2 analyzer exit to lab.", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Equilibrator Pressure Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Attached to CO2 analyzer exit to lab.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator Pressure Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof AirPressure);
-            AirPressure pressure = (AirPressure) dataVar;
+            assertTrue(instDataVar instanceof AirPressure);
+            AirPressure pressure = (AirPressure) instDataVar;
             assertEquals(pressure.toString(), "", pressure.getPressureCorrection());
         }
 
@@ -585,25 +585,25 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("0.08", "hPa"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(),
                     "On bulkhead exterior on the port side of the radio room aft of the bridge " +
-                            "at ~14 m above the sea surface.", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Atmospheric Pressure Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "at ~14 m above the sea surface.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Atmospheric Pressure Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof AirPressure);
-            AirPressure pressure = (AirPressure) dataVar;
+            assertTrue(instDataVar instanceof AirPressure);
+            AirPressure pressure = (AirPressure) instDataVar;
             assertEquals(pressure.toString(), "Normalized: yes", pressure.getPressureCorrection());
         }
 
@@ -618,23 +618,23 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("0.01", "°C"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.",
-                    dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Equilibrator Temperature Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.",
+                    instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator Temperature Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof Temperature);
+            assertTrue(instDataVar instanceof Temperature);
         }
 
         {
@@ -648,23 +648,23 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("0.001", "°C"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow thruster room, before sea water pump, ~5 m below water line.",
-                    dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Water Temperature Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow thruster room, before sea water pump, ~5 m below water line.",
+                    instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Water Temperature Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof Temperature);
+            assertTrue(instDataVar instanceof Temperature);
         }
 
         {
@@ -679,24 +679,24 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("0.0002", "permil"), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(), "", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Attached to underway system at sea water input.",
-                    dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Salinity Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(), "", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Attached to underway system at sea water input.",
+                    instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Salinity Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertFalse(dataVar instanceof Temperature);
-            assertFalse(dataVar instanceof AirPressure);
+            assertFalse(instDataVar instanceof Temperature);
+            assertFalse(instDataVar instanceof AirPressure);
         }
 
         {
@@ -713,28 +713,28 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.get(0));
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.MEASURED_INSITU, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "Sampling Depth: 5 meters", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 2, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("Equilibrator"));
-            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 2, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator"));
+            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof GasConc);
-            GasConc gasConc = (GasConc) dataVar;
+            assertTrue(instDataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) instDataVar;
             assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                             "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                     gasConc.getDryingMethod());
@@ -761,27 +761,27 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), 1, strList.size());
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.get(0));
 
-            assertTrue(var instanceof DataVar);
-            DataVar dataVar = (DataVar) var;
-            assertEquals(dataVar.toString(), "Surface Underway", dataVar.getObserveType());
-            assertEquals(dataVar.toString(), MethodType.COMPUTED, dataVar.getMeasureMethod());
-            assertEquals(dataVar.toString(), "Infrared absorption of dry sample gas.", dataVar.getMethodDescription());
-            assertEquals(dataVar.toString(),
+            assertTrue(var instanceof InstDataVar);
+            InstDataVar instDataVar = (InstDataVar) var;
+            assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
+            assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
+            assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.", instDataVar.getMethodDescription());
+            assertEquals(instDataVar.toString(),
                     "Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, \n" +
                             "T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), \n" +
                             "Recommendations for autonomous underway pCO2 measuring systems \n" +
-                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", dataVar.getMethodReference());
-            assertEquals(dataVar.toString(), "Bow tower ~10 m above the sea surface.", dataVar.getSamplingLocation());
-            assertEquals(dataVar.toString(), "", dataVar.getSamplingElevation());
-            assertEquals(dataVar.toString(), "", dataVar.getStorageMethod());
-            assertEquals(dataVar.toString(), "", dataVar.getReplication());
-            HashSet<String> strSet = dataVar.getInstrumentNames();
-            assertEquals(dataVar.toString(), 1, strSet.size());
-            assertTrue(dataVar.toString(), strSet.contains("CO2 Sensor"));
-            assertEquals(dataVar.toString(), new Person(), dataVar.getResearcher());
+                            "and data reduction routines, Deep-Sea Res II, 56, 512-522.", instDataVar.getMethodReference());
+            assertEquals(instDataVar.toString(), "Bow tower ~10 m above the sea surface.", instDataVar.getSamplingLocation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
+            assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
+            assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
+            HashSet<String> strSet = instDataVar.getInstrumentNames();
+            assertEquals(instDataVar.toString(), 1, strSet.size());
+            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
-            assertTrue(dataVar instanceof GasConc);
-            GasConc gasConc = (GasConc) dataVar;
+            assertTrue(instDataVar instanceof GasConc);
+            GasConc gasConc = (GasConc) instDataVar;
             assertEquals(gasConc.toString(), "Gas stream passes through a thermoelectric condenser (~5 °C) and then " +
                             "through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).",
                     gasConc.getDryingMethod());
@@ -803,7 +803,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof DataVar);
+            assertFalse(var instanceof InstDataVar);
         }
 
         {
@@ -818,7 +818,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof DataVar);
+            assertFalse(var instanceof InstDataVar);
         }
 
         {
@@ -833,7 +833,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), new NumericString("", ""), var.getPrecision());
             assertEquals(var.toString(), 0, var.getAddnInfo().size());
 
-            assertFalse(var instanceof DataVar);
+            assertFalse(var instanceof InstDataVar);
         }
 
     }

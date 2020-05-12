@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Information about a temperature measurement.
  * The default unit is set to degrees Celsius.
  */
-public class Temperature extends DataVar implements Duplicable, Serializable, IsSerializable {
+public class Temperature extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = 1635226933184077100L;
 
@@ -27,7 +27,7 @@ public class Temperature extends DataVar implements Duplicable, Serializable, Is
     }
 
     /**
-     * Create using values in the given variable. If a DataVar is given, all DataVar fields are copied.
+     * Create using values in the given variable. If a InstDataVar is given, all InstDataVar fields are copied.
      * If a Temperature is given, all Temperature fields are copied.
      */
     public Temperature(Variable var) {

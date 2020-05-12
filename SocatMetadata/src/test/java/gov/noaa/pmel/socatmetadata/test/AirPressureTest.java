@@ -71,7 +71,7 @@ public class AirPressureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((InstDataVar) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setAccuracy with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -105,7 +105,7 @@ public class AirPressureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((InstDataVar) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setPrecision with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result

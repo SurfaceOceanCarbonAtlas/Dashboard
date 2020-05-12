@@ -3,7 +3,7 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
@@ -181,7 +181,7 @@ public class BioDataVarTest {
         assertEquals(FULL_NAME, biovar.getFullName());
         assertEquals(COL_NAME, biovar.getColName());
 
-        DataVar datavar = new DataVar(var);
+        InstDataVar datavar = new InstDataVar(var);
         datavar.setObserveType(OBSERVE_TYPE);
         datavar.setMeasureMethod(MEASURE_METHOD);
         datavar.setMethodDescription(METHOD_DESCRIPTION);

@@ -6,7 +6,7 @@ import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import java.io.Serializable;
 import java.util.HashSet;
 
-public class BioDataVar extends DataVar implements Duplicable, Serializable, IsSerializable {
+public class BioDataVar extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = -5768266523048459705L;
 

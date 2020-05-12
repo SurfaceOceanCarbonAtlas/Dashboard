@@ -55,7 +55,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
+            ((InstDataVar) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setAccuracy with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -88,7 +88,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
+            ((InstDataVar) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setPrecision with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result

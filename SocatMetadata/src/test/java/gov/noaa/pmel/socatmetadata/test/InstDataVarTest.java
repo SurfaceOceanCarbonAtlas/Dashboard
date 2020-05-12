@@ -2,7 +2,7 @@ package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
-import gov.noaa.pmel.socatmetadata.shared.variable.DataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class DataVarTest {
+public class InstDataVarTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
@@ -54,7 +54,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetColName() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getColName());
         var.setColName(COL_NAME);
         assertEquals(COL_NAME, var.getColName());
@@ -66,7 +66,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetFullName() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getFullName());
         var.setFullName(FULL_NAME);
         assertEquals(FULL_NAME, var.getFullName());
@@ -79,7 +79,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetVarUnit() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getVarUnit());
         var.setVarUnit(VAR_UNIT);
         assertEquals(VAR_UNIT, var.getVarUnit());
@@ -93,7 +93,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetMissVal() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getMissVal());
         var.setMissVal(MISSING_VALUE);
         assertEquals(MISSING_VALUE, var.getMissVal());
@@ -108,7 +108,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetFlagColName() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
@@ -124,7 +124,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetAccuracy() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
         NumericString numstr = var.getAccuracy();
@@ -156,7 +156,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetPrecision() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
         NumericString numstr = var.getPrecision();
@@ -189,7 +189,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetAddnInfo() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
         var.setAddnInfo(ADDN_INFO);
         ArrayList<String> addnInfo = var.getAddnInfo();
@@ -223,7 +223,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetObserveType() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getObserveType());
         var.setObserveType(OBSERVE_TYPE);
         assertEquals(OBSERVE_TYPE, var.getObserveType());
@@ -243,7 +243,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetMeasureMethod() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         var.setMeasureMethod(MEASURE_METHOD);
         assertEquals(MEASURE_METHOD, var.getMeasureMethod());
@@ -262,7 +262,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetMethodDescription() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         var.setMethodDescription(METHOD_DESCRIPTION);
         assertEquals(METHOD_DESCRIPTION, var.getMethodDescription());
@@ -284,7 +284,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetMethodReference() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getMethodReference());
         var.setMethodReference(METHOD_REFERENCE);
         assertEquals(METHOD_REFERENCE, var.getMethodReference());
@@ -307,7 +307,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetManipulationDescription() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getManipulationDescription());
         var.setManipulationDescription(MANIPULATION_DESCRIPTION);
         assertEquals(MANIPULATION_DESCRIPTION, var.getManipulationDescription());
@@ -331,7 +331,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetSamplingLocation() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         var.setSamplingLocation(SAMPLING_LOCATION);
         assertEquals(SAMPLING_LOCATION, var.getSamplingLocation());
@@ -356,7 +356,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetSamplingElevation() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         var.setSamplingElevation(SAMPLING_ELEVATION);
         assertEquals(SAMPLING_ELEVATION, var.getSamplingElevation());
@@ -382,7 +382,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetStorageMethod() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         var.setStorageMethod(STORAGE_METHOD);
         assertEquals(STORAGE_METHOD, var.getStorageMethod());
@@ -409,7 +409,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetDuration() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getDuration());
         var.setDuration(DURATION);
         assertEquals(DURATION, var.getDuration());
@@ -437,7 +437,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetMeasureTemperature() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         assertEquals(MEASURE_TEMPERATURE, var.getAnalysisTemperature());
@@ -467,7 +467,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetReplication() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_STRING, var.getReplication());
         var.setReplication(REPLICATION_INFO);
         assertEquals(REPLICATION_INFO, var.getReplication());
@@ -497,7 +497,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetResearcher() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_PERSON, var.getResearcher());
         var.setResearcher(RESEARCHER);
         Person researcher = var.getResearcher();
@@ -529,7 +529,7 @@ public class DataVarTest {
 
     @Test
     public void testGetSetInstrumentNames() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         var.setInstrumentNames(INSTRUMENT_NAMES);
         HashSet<String> names = var.getInstrumentNames();
@@ -586,36 +586,36 @@ public class DataVarTest {
         var.setPrecision(PRECISION);
         var.setAddnInfo(ADDN_INFO);
 
-        DataVar dataVar = new DataVar(var);
-        assertEquals(EMPTY_HASHSET, dataVar.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, dataVar.getResearcher());
-        assertEquals(EMPTY_STRING, dataVar.getReplication());
-        assertEquals(EMPTY_STRING, dataVar.getAnalysisTemperature());
-        assertEquals(EMPTY_STRING, dataVar.getDuration());
-        assertEquals(EMPTY_STRING, dataVar.getStorageMethod());
-        assertEquals(EMPTY_STRING, dataVar.getSamplingElevation());
-        assertEquals(EMPTY_STRING, dataVar.getSamplingLocation());
-        assertEquals(EMPTY_STRING, dataVar.getManipulationDescription());
-        assertEquals(EMPTY_STRING, dataVar.getMethodReference());
-        assertEquals(EMPTY_STRING, dataVar.getMethodDescription());
-        assertEquals(MethodType.UNSPECIFIED, dataVar.getMeasureMethod());
-        assertEquals(EMPTY_STRING, dataVar.getObserveType());
-        assertEquals(ADDN_INFO, dataVar.getAddnInfo());
-        assertEquals(PRECISION, dataVar.getPrecision());
-        assertEquals(ACCURACY, dataVar.getAccuracy());
-        assertEquals(FLAG_COL_NAME, dataVar.getFlagColName());
-        assertEquals(MISSING_VALUE, dataVar.getMissVal());
-        assertEquals(VAR_UNIT, dataVar.getVarUnit());
-        assertEquals(FULL_NAME, dataVar.getFullName());
-        assertEquals(COL_NAME, dataVar.getColName());
+        InstDataVar instDataVar = new InstDataVar(var);
+        assertEquals(EMPTY_HASHSET, instDataVar.getInstrumentNames());
+        assertEquals(EMPTY_PERSON, instDataVar.getResearcher());
+        assertEquals(EMPTY_STRING, instDataVar.getReplication());
+        assertEquals(EMPTY_STRING, instDataVar.getAnalysisTemperature());
+        assertEquals(EMPTY_STRING, instDataVar.getDuration());
+        assertEquals(EMPTY_STRING, instDataVar.getStorageMethod());
+        assertEquals(EMPTY_STRING, instDataVar.getSamplingElevation());
+        assertEquals(EMPTY_STRING, instDataVar.getSamplingLocation());
+        assertEquals(EMPTY_STRING, instDataVar.getManipulationDescription());
+        assertEquals(EMPTY_STRING, instDataVar.getMethodReference());
+        assertEquals(EMPTY_STRING, instDataVar.getMethodDescription());
+        assertEquals(MethodType.UNSPECIFIED, instDataVar.getMeasureMethod());
+        assertEquals(EMPTY_STRING, instDataVar.getObserveType());
+        assertEquals(ADDN_INFO, instDataVar.getAddnInfo());
+        assertEquals(PRECISION, instDataVar.getPrecision());
+        assertEquals(ACCURACY, instDataVar.getAccuracy());
+        assertEquals(FLAG_COL_NAME, instDataVar.getFlagColName());
+        assertEquals(MISSING_VALUE, instDataVar.getMissVal());
+        assertEquals(VAR_UNIT, instDataVar.getVarUnit());
+        assertEquals(FULL_NAME, instDataVar.getFullName());
+        assertEquals(COL_NAME, instDataVar.getColName());
 
-        dataVar = new DataVar(null);
-        assertEquals(new DataVar(), dataVar);
+        instDataVar = new InstDataVar(null);
+        assertEquals(new InstDataVar(), instDataVar);
     }
 
     @Test
     public void testInvalidFieldNames() {
-        DataVar var = new DataVar();
+        InstDataVar var = new InstDataVar();
         assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName",
                 "observeType", "accuracy", "measureMethod")), var.invalidFieldNames());
         var.setColName(COL_NAME);
@@ -639,8 +639,8 @@ public class DataVarTest {
 
     @Test
     public void testDuplicate() {
-        DataVar var = new DataVar();
-        DataVar dup = (DataVar) (var.duplicate(null));
+        InstDataVar var = new InstDataVar();
+        InstDataVar dup = (InstDataVar) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -668,7 +668,7 @@ public class DataVarTest {
         var.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(var, dup);
 
-        dup = (DataVar) (var.duplicate(null));
+        dup = (InstDataVar) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());
@@ -680,11 +680,11 @@ public class DataVarTest {
 
     @Test
     public void testHashCodeEquals() {
-        DataVar first = new DataVar();
+        InstDataVar first = new InstDataVar();
         assertFalse(first.equals(null));
         assertFalse(first.equals(FULL_NAME));
 
-        DataVar second = new DataVar();
+        InstDataVar second = new InstDataVar();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
