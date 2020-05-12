@@ -18,8 +18,9 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
@@ -35,7 +36,8 @@ public class VariablesTabPanel extends Composite {
             "Biological",
             "Temperature",
             "Other measured",
-            "Other generic"
+            "Other generic",
+            "Flag"
     ));
     private static final ArrayList<String> varTypeSimpleNames = new ArrayList<String>(Arrays.asList(
             new AirPressure().getSimpleName(),
@@ -44,6 +46,7 @@ public class VariablesTabPanel extends Composite {
             new BioDataVar().getSimpleName(),
             new Temperature().getSimpleName(),
             new InstDataVar().getSimpleName(),
+            new GenDataVar().getSimpleName(),
             new Variable().getSimpleName()
     ));
 
@@ -83,8 +86,9 @@ public class VariablesTabPanel extends Composite {
         headerLabel.setText(EditSocatMetadataPage.VARIABLES_TAB_TEXT + " (variables) for " + dataset.getDatasetId());
         variablePanels = new ArrayList<VariablePanel>(variables.size());
         // Add a panel for each variable
-        for (int k = 0; k < variables.size(); k++)
+        for (int k = 0; k < variables.size(); k++) {
             replacePanel(k, variables.get(k));
+        }
         addButton.setText("Append another");
         addButton.setTitle("Adds a new variable description to the end of the list");
         removeButton.setText("Remove current");
@@ -128,10 +132,13 @@ public class VariablesTabPanel extends Composite {
                 panel = new TemperatureVarPanel((Temperature) vari, header, this);
                 break;
             case "InstDataVar":
-                panel = new DataVarPanel((InstDataVar) vari, header, this);
+                panel = new InstDataVarPanel((InstDataVar) vari, header, this);
+                break;
+            case "GenDataVar":
+                panel = new GenDataVarPanel((GenDataVar) vari, header, this);
                 break;
             case "Variable":
-                panel = new GenericVarPanel(vari, header, this);
+                panel = new FlagVarPanel(vari, header, this);
                 break;
             default:
                 UploadDashboard.showMessage("Unexpect variable type of " + SafeHtmlUtils.htmlEscape(simpleName));
@@ -146,7 +153,7 @@ public class VariablesTabPanel extends Composite {
             mainPanel.remove(index);
             mainPanel.insert(panel, header, index);
         }
-
+        showPanel(index);
     }
 
     /**
@@ -156,8 +163,9 @@ public class VariablesTabPanel extends Composite {
      * appropriate panel for a newly selected variable type.
      */
     public void assignVariableTypeList(LabeledListBox typeList, Variable vari, VariablePanel panel) {
-        for (String name : varTypeListNames)
+        for (String name : varTypeListNames) {
             typeList.addItem(name);
+        }
         int k = varTypeSimpleNames.indexOf(vari.getSimpleName());
         if ( k < 0 ) {
             UploadDashboard.showMessage("Unexpected variable type of " +
@@ -175,8 +183,10 @@ public class VariablesTabPanel extends Composite {
     /**
      * Change the variable and associated panel to the selected type.
      *
-     * @param varIdx index of the variable and associate panel to change
-     * @param typeIdx index (in the varType lists) of the variable type to change to
+     * @param varIdx
+     *         index of the variable and associate panel to change
+     * @param typeIdx
+     *         index (in the varType lists) of the variable type to change to
      */
     private void changeVariableType(int varIdx, int typeIdx) {
         if ( varIdx < 0 ) {
@@ -208,6 +218,9 @@ public class VariablesTabPanel extends Composite {
                 break;
             case "InstDataVar":
                 vari = new InstDataVar(oldVar);
+                break;
+            case "GenDataVar":
+                vari = new GenDataVar(oldVar);
                 break;
             case "Variable":
                 vari = new Variable(oldVar);

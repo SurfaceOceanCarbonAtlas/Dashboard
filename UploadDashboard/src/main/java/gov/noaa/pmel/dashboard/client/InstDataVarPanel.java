@@ -13,31 +13,19 @@ import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.HashSet;
 
-public class GenericVarPanel extends VariablePanel {
+public class InstDataVarPanel extends VariablePanel {
 
-    interface GenericVarPanelUiBinder extends UiBinder<FlowPanel,GenericVarPanel> {
+    interface DataVarPanelUiBinder extends UiBinder<FlowPanel,InstDataVarPanel> {
     }
 
-    private static final GenericVarPanelUiBinder uiBinder = GWT.create(GenericVarPanelUiBinder.class);
+    private static final DataVarPanelUiBinder uiBinder = GWT.create(DataVarPanelUiBinder.class);
 
     @UiField(provided = true)
-    final LabeledTextBox columnNameValue;
+    final LabeledTextBox colNameValue;
     @UiField(provided = true)
     final LabeledTextBox fullNameValue;
     @UiField(provided = true)
     final LabeledListBox varTypeList;
-    @UiField(provided = true)
-    final LabeledTextBox unitValue;
-    @UiField(provided = true)
-    final LabeledTextBox accuracyValue;
-    @UiField(provided = true)
-    final LabeledTextBox precisionValue;
-    @UiField(provided = true)
-    final LabeledTextBox missingValue;
-    @UiField(provided = true)
-    final LabeledTextBox flagNameValue;
-    @UiField(provided = true)
-    final LabeledTextArea addnInfoValue;
 
     private final Variable vari;
     private final HTML header;
@@ -50,20 +38,10 @@ public class GenericVarPanel extends VariablePanel {
      * @param header
      *         header that should be updated when appropriate values change; cannot be null
      */
-    public GenericVarPanel(Variable vari, HTML header, VariablesTabPanel parentPanel) {
-        columnNameValue = new LabeledTextBox("Column name:", "11em", "20em", null, null);
-        fullNameValue = new LabeledTextBox("Full name:", "10em", "20em", null, null);
-        //
-        varTypeList = new LabeledListBox("Type:", "11em", "20.75em", null, null);
-        unitValue = new LabeledTextBox("Units:", "10em", "20em", null, null);
-        //
-        accuracyValue = new LabeledTextBox("Accuracy:", "11em", "20em", null, null);
-        precisionValue = new LabeledTextBox("Precision:", "10em", "20em", null, null);
-        //
-        missingValue = new LabeledTextBox("Missing value:", "11em", "20em", null, null);
-        flagNameValue = new LabeledTextBox("QC column:", "10em", "20em", null, null);
-        //
-        addnInfoValue = new LabeledTextArea("Additional information", "10em", "54.5em");
+    public InstDataVarPanel(Variable vari, HTML header, VariablesTabPanel parentPanel) {
+        colNameValue = new LabeledTextBox("Column name:", "12em", "20em", null, null);
+        fullNameValue = new LabeledTextBox("Full name:", "12em", "20em", null, null);
+        varTypeList = new LabeledListBox("Type:", "12em", "20em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -77,9 +55,9 @@ public class GenericVarPanel extends VariablePanel {
         getUpdatedVariable();
     }
 
-    @UiHandler("columnNameValue")
-    void columnNameValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setColName(columnNameValue.getText());
+    @UiHandler("colNameValue")
+    void colNameValueOnValueChange(ValueChangeEvent<String> event) {
+        vari.setColName(colNameValue.getText());
         markInvalids();
     }
 
@@ -102,10 +80,10 @@ public class GenericVarPanel extends VariablePanel {
         if ( !val.asString().equals(oldVal) )
             header.setHTML(val);
 
-        if ( invalids.contains("columnName") )
-            columnNameValue.markInvalid();
+        if ( invalids.contains("colName") )
+            colNameValue.markInvalid();
         else
-            columnNameValue.markValid();
+            colNameValue.markValid();
 
         if ( invalids.contains("fullName") )
             fullNameValue.markInvalid();
@@ -118,7 +96,7 @@ public class GenericVarPanel extends VariablePanel {
         // In case erroneous input leaves mismatches,
         // first update the displayed content in case this is from a save-and-continue.
         // But do not mess with the variable type as this is handled by the parent tab panel
-        columnNameValue.setText(vari.getColName());
+        colNameValue.setText(vari.getColName());
         fullNameValue.setText(vari.getFullName());
 
         markInvalids();

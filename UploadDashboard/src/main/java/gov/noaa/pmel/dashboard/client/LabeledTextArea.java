@@ -87,6 +87,13 @@ public class LabeledTextArea extends Composite implements HasText, HasValue<Stri
     }
 
     /**
+     * Make the text area read-only
+     */
+    public void markReadOnly() {
+        valueBox.setEnabled(false);
+    }
+
+    /**
      * Highlights the prefix text to indicate the TextArea value is invalid.
      */
     public void markInvalid() {

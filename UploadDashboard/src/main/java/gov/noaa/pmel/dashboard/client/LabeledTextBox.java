@@ -104,6 +104,20 @@ public class LabeledTextBox extends Composite implements HasText, HasValue<Strin
     }
 
     /**
+     * @param suffix
+     *         displays the new value for the suffix label.  If null, the label is hidden.
+     */
+    public void setSuffix(String suffix) {
+        if ( suffix != null ) {
+            suffixLabel.setText(suffix);
+            suffixLabel.setVisible(true);
+        }
+        else {
+            suffixLabel.setVisible(false);
+        }
+    }
+
+    /**
      * Highlights the prefix text to indicate the TextBox value is invalid.
      */
     public void markInvalid() {

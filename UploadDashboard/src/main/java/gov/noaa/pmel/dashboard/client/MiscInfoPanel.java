@@ -12,6 +12,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 public class MiscInfoPanel extends Composite {
@@ -99,6 +100,7 @@ public class MiscInfoPanel extends Composite {
         addnInfoValue = new LabeledTextArea("Additional information", "10em", "54.5em");
         //
         historyValue = new LabeledTextArea("Archival history", "5em", "54.5em");
+        historyValue.markReadOnly();
 
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -115,6 +117,98 @@ public class MiscInfoPanel extends Composite {
         info.setDatasetName(nameValue.getText());
         markInvalids();
     }
+
+    @UiHandler("sectionValue")
+    void sectionValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setSectionName(sectionValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("doiValue")
+    void doiValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setDatasetDoi(doiValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("accessValue")
+    void accessValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setAccessId(accessValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("citationValue")
+    void citationValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setCitation(citationValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("websiteValue")
+    void websiteValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setWebsite(websiteValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("downloadValue")
+    void downloadValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setDownloadUrl(downloadValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("fundAgencyValue")
+    void fundAgencyValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setFundingAgency(fundAgencyValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("fundIdValue")
+    void fundIdValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setFundingId(fundIdValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("fundTitleValue")
+    void fundTitleValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setFundingTitle(fundTitleValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("projectValue")
+    void projectValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setResearchProject(projectValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("synopsisValue")
+    void synopsisValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setSynopsis(synopsisValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("purposeValue")
+    void purposeValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setPurpose(purposeValue.getText());
+        markInvalids();
+    }
+
+    @UiHandler("refsValue")
+    void refsValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setReferences(Arrays.asList(refsValue.getText().trim().split("\\v+")));
+        markInvalids();
+    }
+
+    @UiHandler("portsValue")
+    void portsValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setPortsOfCall(Arrays.asList(portsValue.getText().trim().split("\\v+")));
+        markInvalids();
+    }
+
+    @UiHandler("addnInfoValue")
+    void addnInfoValueOnValueChange(ValueChangeEvent<String> event) {
+        info.setAddnInfo(Arrays.asList(addnInfoValue.getText().trim().split("\\v+")));
+        markInvalids();
+    }
+
+    // No handler for historyValue as it is read-only
 
     /**
      * Indicate which fields contain invalid values and which contain acceptable values.
@@ -202,10 +296,8 @@ public class MiscInfoPanel extends Composite {
         else
             addnInfoValue.markValid();
 
-        if ( invalids.contains("history") )
-            historyValue.markInvalid();
-        else
-            historyValue.markValid();
+        // read-only, always valid
+        historyValue.markValid();
     }
 
 
