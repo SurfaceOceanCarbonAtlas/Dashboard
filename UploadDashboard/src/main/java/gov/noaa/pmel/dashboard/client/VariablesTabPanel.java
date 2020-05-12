@@ -113,25 +113,25 @@ public class VariablesTabPanel extends Composite {
         HTML header = new HTML();
         switch ( simpleName ) {
             case "AirPressure":
-                panel = new AirPressureVarPanel((AirPressure) vari, header);
+                panel = new AirPressureVarPanel((AirPressure) vari, header, this);
                 break;
             case "AquGasConc":
-                panel = new AquGasConcVarPanel((AquGasConc) vari, header);
+                panel = new AquGasConcVarPanel((AquGasConc) vari, header, this);
                 break;
             case "GasConc":
-                panel = new GasConcVarPanel((GasConc) vari, header);
+                panel = new GasConcVarPanel((GasConc) vari, header, this);
                 break;
             case "BioDataVar":
-                panel = new BioDataVarPanel((BioDataVar) vari, header);
+                panel = new BioDataVarPanel((BioDataVar) vari, header, this);
                 break;
             case "Temperature":
-                panel = new TemperatureVarPanel((Temperature) vari, header);
+                panel = new TemperatureVarPanel((Temperature) vari, header, this);
                 break;
             case "DataVar":
-                panel = new DataVarPanel((DataVar) vari, header);
+                panel = new DataVarPanel((DataVar) vari, header, this);
                 break;
             case "Variable":
-                panel = new VariablePanel(vari, header);
+                panel = new GenericVarPanel(vari, header, this);
                 break;
             default:
                 UploadDashboard.showMessage("Unexpect variable type of " + SafeHtmlUtils.htmlEscape(simpleName));
@@ -150,24 +150,24 @@ public class VariablesTabPanel extends Composite {
     }
 
     /**
-     * Assigns the values to the variable type list and selects the appropriate value
-     * for the type of variable represented by this VariablePanel subclass.  Also adds
-     * the callback to the type list to change to the appropriate panel for this variable.
+     * Initialized the type list for a VariablePanel instance.  Assumes the type list has not yet been
+     * initialized.  Appropriate values are assigned to the variable type list and selects the appropriate
+     * value for the type of variable given.  Also adds the callback to the type list to change to the
+     * appropriate panel for a newly selected variable type.
      */
-    private void assignVariableTypeList(LabeledListBox myTypeList, Variable vari, VariablePanel panel) {
-        for (String name : varTypeListNames) {
-            myTypeList.addItem(name);
-        }
+    public void assignVariableTypeList(LabeledListBox typeList, Variable vari, VariablePanel panel) {
+        for (String name : varTypeListNames)
+            typeList.addItem(name);
         int k = varTypeSimpleNames.indexOf(vari.getSimpleName());
         if ( k < 0 ) {
             UploadDashboard.showMessage("Unexpected variable type of " +
                     SafeHtmlUtils.htmlEscape(vari.getSimpleName()));
         }
-        myTypeList.setSelectedIndex(k);
-        myTypeList.addChangeHandler(new ChangeHandler() {
+        typeList.setSelectedIndex(k);
+        typeList.addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
-                changeVariableType(variablePanels.indexOf(panel), myTypeList.getSelectedIndex());
+                changeVariableType(variablePanels.indexOf(panel), typeList.getSelectedIndex());
             }
         });
     }
