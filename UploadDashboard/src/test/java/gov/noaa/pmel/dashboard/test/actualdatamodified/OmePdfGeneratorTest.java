@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.actualdatamodified;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
@@ -31,7 +28,7 @@ public class OmePdfGeneratorTest {
 
     @Test
     public void testCreatePiOmePdf() throws IOException {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         MetadataFileHandler metaHandler = confStore.getMetadataFileHandler();

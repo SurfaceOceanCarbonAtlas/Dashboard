@@ -21,7 +21,7 @@ public class ArchiveFilesBundlerTest {
     @Test
     public void testSendOrigFileBundles() throws IOException {
         final List<String> expoList = Arrays.asList("PAT520151021", "26NA20160612", "11SS20150807");
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore configStore = null;
         try {

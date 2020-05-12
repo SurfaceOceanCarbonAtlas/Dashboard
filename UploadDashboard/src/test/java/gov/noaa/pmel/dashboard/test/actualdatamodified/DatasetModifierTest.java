@@ -36,7 +36,7 @@ public class DatasetModifierTest {
         final String metaName = "PI_OME.xml";
         final String newOwner = "are.olsen";
 
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
@@ -95,7 +95,7 @@ public class DatasetModifierTest {
         final String newExpo = "000020150630";
         final String adminUser = "karl.smith";
 
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;

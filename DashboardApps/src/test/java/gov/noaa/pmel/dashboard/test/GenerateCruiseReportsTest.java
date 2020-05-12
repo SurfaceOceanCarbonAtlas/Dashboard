@@ -27,7 +27,7 @@ public class GenerateCruiseReportsTest {
     @Test
     public void testCreateEnhancedFilesBundle() throws IOException {
         final List<String> expoList = Arrays.asList("PAT520151021", "26NA20160612", "11SS20150807");
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore configStore = null;
         try {
@@ -55,7 +55,7 @@ public class GenerateCruiseReportsTest {
     public void testGenerateSingleCruiseReport() throws IOException {
         final String expocode = "PAT520150211";
         final File reportFile = new File("/var/tmp/junit/PAT520150211.tsv");
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore configStore = null;
         try {
@@ -136,7 +136,7 @@ public class GenerateCruiseReportsTest {
         final TreeSet<String> expocodeList = new TreeSet<String>(Collections.singleton("PAT520150211"));
         final File reportFile = new File("/var/tmp/junit/PAT520150211_multi.tsv");
 
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore configStore = null;
         try {

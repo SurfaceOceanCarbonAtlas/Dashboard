@@ -26,7 +26,7 @@ public class AutoQCTest {
      */
     @Test
     public void testSuggestDatasetQCFlag() throws Exception {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         DataFileHandler dataHandler = confStore.getDataFileHandler();

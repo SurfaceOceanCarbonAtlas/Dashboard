@@ -41,7 +41,7 @@ public class SubmitProcessTest {
      */
     @Test
     public void testSubmitProcess() {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
@@ -254,7 +254,7 @@ public class SubmitProcessTest {
 
     static {
         if ( !DATA_COLUMN_TYPES.get(2).setSelectedUnit("dd-mm-yyyy") )
-            throw new RuntimeException("Failed to assign the DATE unit ofr DATA_COLUMN_TYPES");
+            throw new RuntimeException("Failed to assign the DATE unit for DATA_COLUMN_TYPES");
     }
 
     private static final String[] TSV_DATA_STRINGS = new String[] {
