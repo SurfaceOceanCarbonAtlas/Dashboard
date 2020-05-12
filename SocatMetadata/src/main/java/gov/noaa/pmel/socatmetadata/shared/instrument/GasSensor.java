@@ -15,7 +15,7 @@ import java.util.HashSet;
  */
 public class GasSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8312332943645091996L;
+    private static final long serialVersionUID = 5685437566259606506L;
 
     protected ArrayList<CalibrationGas> calibrationGases;
 
@@ -126,10 +126,15 @@ public class GasSensor extends Analyzer implements Duplicable, Serializable, IsS
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Analyzer", "GasSensor");
-        return repr.substring(0, repr.length() - 1) +
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+        return repr.substring(0, repr.length() - 2) +
                 ", calibrationGases=" + calibrationGases +
-                '}';
+                " }";
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "GasSensor";
     }
 
 }

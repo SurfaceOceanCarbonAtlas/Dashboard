@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Submitter extends Investigator implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8737358748883630303L;
+    private static final long serialVersionUID = 9119658494313912857L;
 
     /**
      * Create with all fields empty
@@ -73,7 +73,11 @@ public class Submitter extends Investigator implements Duplicable, Serializable,
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Investigator", "Submitter");
+        return super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
     }
 
+    @Override
+    public String getSimpleName() {
+        return "Submitter";
+    }
 }

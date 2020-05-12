@@ -13,7 +13,7 @@ import java.util.HashSet;
  */
 public class Investigator extends Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5866240306060467276L;
+    private static final long serialVersionUID = -5900221519133196965L;
 
     protected ArrayList<String> streets;
     protected String city;
@@ -258,16 +258,21 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Person", "Investigator");
-        return repr.substring(0, repr.length() - 1) +
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+        return repr.substring(0, repr.length() - 2) +
                 ", streets=" + streets +
-                ", city='" + city + '\'' +
-                ", region='" + region + '\'' +
-                ", zipCode='" + zipCode + '\'' +
-                ", country='" + country + '\'' +
-                ", phone='" + phone + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+                ", city='" + city + "'" +
+                ", region='" + region + "'" +
+                ", zipCode='" + zipCode + "'" +
+                ", country='" + country + "'" +
+                ", phone='" + phone + "'" +
+                ", email='" + email + "'" +
+                " }";
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "Investigator";
     }
 
 }

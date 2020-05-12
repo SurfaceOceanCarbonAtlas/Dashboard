@@ -145,11 +145,11 @@ public class BioDataVar extends DataVar implements Duplicable, Serializable, IsS
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
-        return repr.substring(0, repr.length() - 1) +
-                ", biologicalSubject='" + biologicalSubject + '\'' +
-                ", speciesId='" + speciesId + '\'' +
-                ", lifeStage='" + lifeStage + '\'' +
-                '}';
+        return repr.substring(0, repr.length() - 2) +
+                ", biologicalSubject='" + biologicalSubject + "'" +
+                ", speciesId='" + speciesId + "'" +
+                ", lifeStage='" + lifeStage + "'" +
+                " }";
     }
 
     @Override

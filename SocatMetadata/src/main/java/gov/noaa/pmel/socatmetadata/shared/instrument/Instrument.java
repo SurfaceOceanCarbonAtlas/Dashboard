@@ -12,7 +12,7 @@ import java.util.HashSet;
  */
 public class Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5761809466391631159L;
+    private static final long serialVersionUID = 5194493772199222454L;
 
     protected String name;
     protected String id;
@@ -214,13 +214,23 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
 
     @Override
     public String toString() {
-        return "Instrument{" +
-                "name='" + name + '\'' +
-                ", id='" + id + '\'' +
-                ", manufacturer='" + manufacturer + '\'' +
-                ", model='" + model + '\'' +
+        return getSimpleName() +
+                "{ name='" + name + "'" +
+                ", id='" + id + "'" +
+                ", manufacturer='" + manufacturer + "'" +
+                ", model='" + model + "'" +
                 ", addnInfo=" + addnInfo +
-                '}';
+                " }";
+    }
+
+    /**
+     * @return the simple name for this type of instrument; used to identifying the instrument type in
+     *         client code, and used in {@link #toString()}.  Essentially this.getClass().getSimpleName()
+     *         but explicit defined for GWT client compatibility.
+     */
+
+    public String getSimpleName() {
+        return "Instrument";
     }
 
 }

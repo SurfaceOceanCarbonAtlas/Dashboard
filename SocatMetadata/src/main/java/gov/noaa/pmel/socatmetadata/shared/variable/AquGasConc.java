@@ -129,10 +129,10 @@ public class AquGasConc extends GasConc implements Duplicable, Serializable, IsS
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
-        return repr.substring(0, repr.length() - 1) +
-                ", reportTemperature='" + reportTemperature + '\'' +
-                ", temperatureCorrection='" + temperatureCorrection + '\'' +
-                '}';
+        return repr.substring(0, repr.length() - 2) +
+                ", reportTemperature='" + reportTemperature + "'" +
+                ", temperatureCorrection='" + temperatureCorrection + "'" +
+                " }";
     }
 
     @Override

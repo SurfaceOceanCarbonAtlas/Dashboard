@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class PressureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5025452549008862907L;
+    private static final long serialVersionUID = -3136690229558714813L;
 
     @Override
     public Object duplicate(Object dup) {
@@ -43,7 +43,11 @@ public class PressureSensor extends Analyzer implements Duplicable, Serializable
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Analyzer", "PressureSensor");
+        return super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
     }
 
+    @Override
+    public String getSimpleName() {
+        return "PressureSensor";
+    }
 }

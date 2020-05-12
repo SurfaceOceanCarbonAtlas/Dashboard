@@ -150,8 +150,9 @@ public class AirPressure extends DataVar implements Duplicable, Serializable, Is
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
-        return repr.substring(0, repr.length() - 1) +
-                ", pressureCorrection='" + pressureCorrection + "'}";
+        return repr.substring(0, repr.length() - 2) +
+                ", pressureCorrection='" + pressureCorrection + "'" +
+                " }";
     }
 
     @Override

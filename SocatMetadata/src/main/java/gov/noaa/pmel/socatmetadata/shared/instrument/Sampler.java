@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Sampler extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6667356833643169854L;
+    private static final long serialVersionUID = -3803030210273160174L;
 
     HashSet<String> instrumentNames;
 
@@ -118,11 +118,16 @@ public class Sampler extends Instrument implements Duplicable, Serializable, IsS
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Instrument", "Sampler");
-        repr = repr.substring(0, repr.length() - 1) +
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+        repr = repr.substring(0, repr.length() - 2) +
                 ", instrumentNames=" + instrumentNames +
-                '}';
+                " }";
         return repr;
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "Sampler";
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5780160315195326915L;
+    private static final long serialVersionUID = 8527772910950075088L;
 
     protected String lastName;
     protected String firstName;
@@ -231,14 +231,18 @@ public class Person implements Duplicable, Serializable, IsSerializable {
 
     @Override
     public String toString() {
-        return "Person{" +
-                "lastName='" + lastName + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middle='" + middle + '\'' +
-                ", id='" + id + '\'' +
-                ", idType='" + idType + '\'' +
-                ", organization='" + organization + '\'' +
-                '}';
+        return getSimpleName() +
+                "{ lastName='" + lastName + "'" +
+                ", firstName='" + firstName + "'" +
+                ", middle='" + middle + "'" +
+                ", id='" + id + "'" +
+                ", idType='" + idType + "'" +
+                ", organization='" + organization + "'" +
+                " }";
+    }
+
+    public String getSimpleName() {
+        return "Person";
     }
 
 }

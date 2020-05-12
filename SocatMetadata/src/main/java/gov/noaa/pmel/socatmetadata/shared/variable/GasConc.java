@@ -118,10 +118,10 @@ public class GasConc extends DataVar implements Duplicable, Serializable, IsSeri
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
-        return repr.substring(0, repr.length() - 1) +
-                ", dryingMethod='" + dryingMethod + '\'' +
-                ", waterVaporCorrection='" + waterVaporCorrection + '\'' +
-                '}';
+        return repr.substring(0, repr.length() - 2) +
+                ", dryingMethod='" + dryingMethod + "'" +
+                ", waterVaporCorrection='" + waterVaporCorrection + "'" +
+                " }";
     }
 
     @Override

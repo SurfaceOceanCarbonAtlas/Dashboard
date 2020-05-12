@@ -435,21 +435,21 @@ public class DataVar extends Variable implements Duplicable, Serializable, IsSer
     @Override
     public String toString() {
         String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
-        return repr.substring(0, repr.length() - 1) +
-                ", observeType='" + observeType + '\'' +
+        return repr.substring(0, repr.length() - 2) +
+                ", observeType='" + observeType + "'" +
                 ", measureMethod=" + measureMethod +
-                ", methodDescription='" + methodDescription + '\'' +
-                ", methodReference='" + methodReference + '\'' +
-                ", manipulationDescription='" + manipulationDescription + '\'' +
-                ", samplingLocation='" + samplingLocation + '\'' +
-                ", samplingElevation='" + samplingElevation + '\'' +
-                ", storageMethod='" + storageMethod + '\'' +
-                ", duration='" + duration + '\'' +
-                ", analysisTemperature='" + analysisTemperature + '\'' +
-                ", replication='" + replication + '\'' +
+                ", methodDescription='" + methodDescription + "'" +
+                ", methodReference='" + methodReference + "'" +
+                ", manipulationDescription='" + manipulationDescription + "'" +
+                ", samplingLocation='" + samplingLocation + "'" +
+                ", samplingElevation='" + samplingElevation + "'" +
+                ", storageMethod='" + storageMethod + "'" +
+                ", duration='" + duration + "'" +
+                ", analysisTemperature='" + analysisTemperature + "'" +
+                ", replication='" + replication + "'" +
                 ", researcher=" + researcher +
                 ", instrumentNames=" + instrumentNames +
-                '}';
+                " }";
     }
 
     @Override

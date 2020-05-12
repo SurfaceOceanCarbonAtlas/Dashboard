@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class TemperatureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3711132123163488056L;
+    private static final long serialVersionUID = 9000521138173709256L;
 
     @Override
     public Object duplicate(Object dup) {
@@ -43,7 +43,12 @@ public class TemperatureSensor extends Analyzer implements Duplicable, Serializa
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Analyzer", "TemperatureSensor");
+        return super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "TemperatureSensor";
     }
 
 }

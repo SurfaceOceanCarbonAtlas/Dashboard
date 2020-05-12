@@ -331,16 +331,16 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
 
     @Override
     public String toString() {
-        return getSimpleName() + "{" +
-                "colName='" + colName + '\'' +
-                ", fullName='" + fullName + '\'' +
-                ", varUnit='" + varUnit + '\'' +
-                ", missVal='" + missVal + '\'' +
-                ", flagColName='" + flagColName + '\'' +
+        return getSimpleName() +
+                "{ colName='" + colName + "'" +
+                ", fullName='" + fullName + "'" +
+                ", varUnit='" + varUnit + "'" +
+                ", missVal='" + missVal + "'" +
+                ", flagColName='" + flagColName + "'" +
                 ", accuracy=" + accuracy +
                 ", precision=" + precision +
                 ", addnInfo=" + addnInfo +
-                '}';
+                " }";
     }
 
     /**

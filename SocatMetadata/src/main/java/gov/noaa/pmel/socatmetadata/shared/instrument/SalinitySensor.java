@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 public class SalinitySensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 4809012848068234769L;
+    private static final long serialVersionUID = 1596978904478727528L;
 
     @Override
     public Object duplicate(Object dup) {
@@ -43,7 +43,12 @@ public class SalinitySensor extends Analyzer implements Duplicable, Serializable
 
     @Override
     public String toString() {
-        return super.toString().replaceFirst("Analyzer", "SalinitySensor");
+        return super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "SalinitySensor";
     }
 
 }

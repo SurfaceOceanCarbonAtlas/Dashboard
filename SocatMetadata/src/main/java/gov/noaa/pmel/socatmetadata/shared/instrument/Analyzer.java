@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Analyzer extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3186287287463623663L;
+    private static final long serialVersionUID = 8013254332439277166L;
 
     protected String calibration;
 
@@ -88,10 +88,14 @@ public class Analyzer extends Instrument implements Duplicable, Serializable, Is
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Instrument", "Analyzer");
-        return repr.substring(0, repr.length() - 1) +
-                ", calibration='" + calibration + '\'' +
-                '}';
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+        return repr.substring(0, repr.length() - 2) +
+                ", calibration='" + calibration + "'" +
+                " }";
     }
 
+    @Override
+    public String getSimpleName() {
+        return "Analyzer";
+    }
 }

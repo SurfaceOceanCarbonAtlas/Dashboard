@@ -273,14 +273,14 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
 
     @Override
     public String toString() {
-        return "CalibrationGas{" +
-                "id='" + id + '\'' +
-                ", type='" + type + '\'' +
-                ", supplier='" + supplier + '\'' +
-                ", useFrequency='" + useFrequency + '\'' +
+        return "CalibrationGas" +
+                "{ id='" + id + "'" +
+                ", type='" + type + "'" +
+                ", supplier='" + supplier + "'" +
+                ", useFrequency='" + useFrequency + "'" +
                 ", concentration=" + concentration +
                 ", accuracy=" + accuracy +
-                '}';
+                " }";
     }
 
 }

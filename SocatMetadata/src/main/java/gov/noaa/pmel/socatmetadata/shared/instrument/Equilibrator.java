@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Equilibrator extends Sampler implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 6908117739724188551L;
+    private static final long serialVersionUID = 431081811325812144L;
 
     protected String equilibratorType;
     protected String chamberVol;
@@ -223,16 +223,21 @@ public class Equilibrator extends Sampler implements Duplicable, Serializable, I
 
     @Override
     public String toString() {
-        String repr = super.toString().replaceFirst("Sampler", "Equilibrator");
-        return repr.substring(0, repr.length() - 1) +
-                ", equilibratorType='" + equilibratorType + '\'' +
-                ", chamberVol='" + chamberVol + '\'' +
-                ", chamberWaterVol='" + chamberWaterVol + '\'' +
-                ", chamberGasVol='" + chamberGasVol + '\'' +
-                ", waterFlowRate='" + waterFlowRate + '\'' +
-                ", gasFlowRate='" + gasFlowRate + '\'' +
-                ", venting='" + venting + '\'' +
-                '}';
+        String repr = super.toString().replaceFirst(super.getSimpleName(), getSimpleName());
+        return repr.substring(0, repr.length() - 2) +
+                ", equilibratorType='" + equilibratorType + "'" +
+                ", chamberVol='" + chamberVol + "'" +
+                ", chamberWaterVol='" + chamberWaterVol + "'" +
+                ", chamberGasVol='" + chamberGasVol + "'" +
+                ", waterFlowRate='" + waterFlowRate + "'" +
+                ", gasFlowRate='" + gasFlowRate + "'" +
+                ", venting='" + venting + "'" +
+                " }";
+    }
+
+    @Override
+    public String getSimpleName() {
+        return "Equilibrator";
     }
 
 }
