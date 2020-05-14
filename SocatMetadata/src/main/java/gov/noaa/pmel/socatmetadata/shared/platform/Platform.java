@@ -11,13 +11,13 @@ import java.util.HashSet;
  */
 public class Platform implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3633399373959840559L;
+    private static final long serialVersionUID = 3082911527411665628L;
 
-    protected String platformId;
-    protected String platformName;
-    protected PlatformType platformType;
-    protected String platformOwner;
-    protected String platformCountry;
+    private String platformId;
+    private String platformName;
+    private PlatformType platformType;
+    private String platformOwner;
+    private String platformCountry;
 
     /**
      * Create with all values empty
@@ -137,6 +137,17 @@ public class Platform implements Duplicable, Serializable, IsSerializable {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = platformId.hashCode();
+        result = result * prime + platformName.hashCode();
+        result = result * prime + platformType.hashCode();
+        result = result * prime + platformOwner.hashCode();
+        result = result * prime + platformCountry.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -159,17 +170,6 @@ public class Platform implements Duplicable, Serializable, IsSerializable {
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = platformId.hashCode();
-        result = result * prime + platformName.hashCode();
-        result = result * prime + platformType.hashCode();
-        result = result * prime + platformOwner.hashCode();
-        result = result * prime + platformCountry.hashCode();
-        return result;
     }
 
     @Override

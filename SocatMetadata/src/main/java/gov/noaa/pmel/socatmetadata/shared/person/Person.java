@@ -11,14 +11,14 @@ import java.util.HashSet;
  */
 public class Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 8527772910950075088L;
+    private static final long serialVersionUID = -6584211193508187602L;
 
-    protected String lastName;
-    protected String firstName;
-    protected String middle;
-    protected String id;
-    protected String idType;
-    protected String organization;
+    private String lastName;
+    private String firstName;
+    private String middle;
+    private String id;
+    private String idType;
+    private String organization;
 
     /**
      * Create with all empty fields.
@@ -30,6 +30,18 @@ public class Person implements Duplicable, Serializable, IsSerializable {
         id = "";
         idType = "";
         organization = "";
+    }
+
+    /**
+     * Create with a copy of the information from the given Person
+     */
+    public Person(Person other) {
+        lastName = other.lastName;
+        firstName = other.firstName;
+        middle = other.middle;
+        id = other.id;
+        idType = other.idType;
+        organization = other.organization;
     }
 
     /**
@@ -191,6 +203,18 @@ public class Person implements Duplicable, Serializable, IsSerializable {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = lastName.hashCode();
+        result = result * prime + firstName.hashCode();
+        result = result * prime + middle.hashCode();
+        result = result * prime + id.hashCode();
+        result = result * prime + idType.hashCode();
+        result = result * prime + organization.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -215,18 +239,6 @@ public class Person implements Duplicable, Serializable, IsSerializable {
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = lastName.hashCode();
-        result = result * prime + firstName.hashCode();
-        result = result * prime + middle.hashCode();
-        result = result * prime + id.hashCode();
-        result = result * prime + idType.hashCode();
-        result = result * prime + organization.hashCode();
-        return result;
     }
 
     @Override

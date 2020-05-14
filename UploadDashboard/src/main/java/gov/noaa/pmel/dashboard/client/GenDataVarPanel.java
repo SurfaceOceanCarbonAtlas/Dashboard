@@ -9,11 +9,11 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 public class GenDataVarPanel extends VariablePanel {
@@ -145,7 +145,7 @@ public class GenDataVarPanel extends VariablePanel {
 
     @UiHandler("addnInfoValue")
     void addnInfoValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setAddnInfo(Arrays.asList(addnInfoValue.getText().trim().split("\\v+")));
+        vari.setAddnInfo(new MultiString(addnInfoValue.getText()));
         markInvalids();
     }
 
@@ -213,11 +213,7 @@ public class GenDataVarPanel extends VariablePanel {
         precisionValue.setText(vari.getPrecision().getValueString());
         missingValue.setText(vari.getMissVal());
         flagNameValue.setText(vari.getFlagColName());
-        String value = "";
-        for (String addInfo : vari.getAddnInfo()) {
-            value += addInfo + "\n";
-        }
-        addnInfoValue.setText(value.trim());
+        addnInfoValue.setText(vari.getAddnInfo().asOneString());
 
         markInvalids();
         return vari;

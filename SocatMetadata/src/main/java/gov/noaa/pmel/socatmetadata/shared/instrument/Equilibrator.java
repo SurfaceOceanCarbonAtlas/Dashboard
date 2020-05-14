@@ -11,15 +11,15 @@ import java.util.HashSet;
  */
 public class Equilibrator extends Sampler implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 431081811325812144L;
+    private static final long serialVersionUID = 887297891729486226L;
 
-    protected String equilibratorType;
-    protected String chamberVol;
-    protected String chamberWaterVol;
-    protected String chamberGasVol;
-    protected String waterFlowRate;
-    protected String gasFlowRate;
-    protected String venting;
+    private String equilibratorType;
+    private String chamberVol;
+    private String chamberWaterVol;
+    private String chamberGasVol;
+    private String waterFlowRate;
+    private String gasFlowRate;
+    private String venting;
 
     /**
      * Create with all fields empty.

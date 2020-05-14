@@ -8,9 +8,9 @@ import java.io.Serializable;
  * Represents a numeric string value with units (optional).
  * Used when the numeric value of the string needs to be validated and used.
  */
-public final class NumericString implements Duplicable, Serializable, IsSerializable {
+public final class NumericString implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5784369588906401122L;
+    private static final long serialVersionUID = -6244297690685449688L;
 
     private String valueString;
     private String unitString;
@@ -24,6 +24,19 @@ public final class NumericString implements Duplicable, Serializable, IsSerializ
         valueString = "";
         unitString = "";
         numericValue = Double.NaN;
+    }
+
+    /**
+     * Create with a copy of the information in given NumericString.
+     * If null is given, creates as {@link NumericString#NumericString()}
+     */
+    public NumericString(NumericString other) {
+        this();
+        if ( other != null ) {
+            valueString = other.valueString;
+            unitString = other.unitString;
+            numericValue = other.numericValue;
+        }
     }
 
     /**
@@ -98,9 +111,9 @@ public final class NumericString implements Duplicable, Serializable, IsSerializ
 
     /**
      * Does nothing; the numeric value is always assigned from parsing the string value.
-     * This only exist to satisfy JavaBean requirements.
+     * This only exists to satisfy JavaBean requirements for XML encoding/decoding.
      */
-    private void setNumericValue(double numericValue) {
+    public void setNumericValue(double numericValue) {
     }
 
     /**
@@ -157,16 +170,11 @@ public final class NumericString implements Duplicable, Serializable, IsSerializ
     }
 
     @Override
-    public Object duplicate(Object dup) {
-        NumericString numstr;
-        if ( dup == null )
-            numstr = new NumericString();
-        else
-            numstr = (NumericString) dup;
-        numstr.valueString = valueString;
-        numstr.unitString = unitString;
-        numstr.numericValue = numericValue;
-        return numstr;
+    public int hashCode() {
+        final int prime = 37;
+        int result = valueString.hashCode();
+        result = result * prime + unitString.hashCode();
+        return result;
     }
 
     @Override
@@ -176,22 +184,14 @@ public final class NumericString implements Duplicable, Serializable, IsSerializ
         if ( !(obj instanceof NumericString) )
             return false;
 
-        NumericString that = (NumericString) obj;
+        NumericString other = (NumericString) obj;
 
-        if ( !valueString.equals(that.valueString) )
+        if ( !valueString.equals(other.valueString) )
             return false;
-        if ( !unitString.equals(that.unitString) )
+        if ( !unitString.equals(other.unitString) )
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = valueString.hashCode();
-        result = result * prime + unitString.hashCode();
-        return result;
     }
 
     @Override

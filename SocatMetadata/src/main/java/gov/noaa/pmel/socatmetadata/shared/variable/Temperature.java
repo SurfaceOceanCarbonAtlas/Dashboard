@@ -21,9 +21,9 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
      */
     public Temperature() {
         super();
-        varUnit = DEGREES_CELSIUS_UNIT;
-        accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
-        precision.setUnitString(DEGREES_CELSIUS_UNIT);
+        super.setVarUnit(DEGREES_CELSIUS_UNIT);
+        setAccuracyUnit(DEGREES_CELSIUS_UNIT);
+        setPrecisionUnit(DEGREES_CELSIUS_UNIT);
     }
 
     /**
@@ -31,11 +31,9 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
      */
     public Temperature(Variable var) {
         super(var);
-        if ( !(var instanceof Temperature) ) {
-            varUnit = DEGREES_CELSIUS_UNIT;
-            accuracy.setUnitString(DEGREES_CELSIUS_UNIT);
-            precision.setUnitString(DEGREES_CELSIUS_UNIT);
-        }
+        super.setVarUnit(DEGREES_CELSIUS_UNIT);
+        setAccuracyUnit(DEGREES_CELSIUS_UNIT);
+        setPrecisionUnit(DEGREES_CELSIUS_UNIT);
     }
 
     /**
@@ -44,9 +42,10 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
      */
     @Override
     public void setVarUnit(String varUnit) {
-        this.varUnit = (varUnit != null) ? varUnit.trim() : DEGREES_CELSIUS_UNIT;
-        if ( this.varUnit.isEmpty() )
-            this.varUnit = DEGREES_CELSIUS_UNIT;
+        if ( (varUnit == null) || varUnit.trim().isEmpty() )
+            super.setVarUnit(DEGREES_CELSIUS_UNIT);
+        else
+            super.setVarUnit(varUnit);
     }
 
     /**
@@ -62,8 +61,10 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
         if ( accuracy != null ) {
             super.setAccuracy(accuracy);
         }
-        else
-            this.accuracy = new NumericString(null, DEGREES_CELSIUS_UNIT);
+        else {
+            super.setAccuracy(null);
+            setAccuracyUnit(DEGREES_CELSIUS_UNIT);
+        }
     }
 
     /**
@@ -79,8 +80,10 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
         if ( precision != null ) {
             super.setPrecision(precision);
         }
-        else
-            this.precision = new NumericString(null, DEGREES_CELSIUS_UNIT);
+        else {
+            super.setPrecision(null);
+            setPrecisionUnit(DEGREES_CELSIUS_UNIT);
+        }
     }
 
     @Override
@@ -95,6 +98,11 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -103,11 +111,6 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
         if ( !(obj instanceof Temperature) )
             return false;
         return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override

@@ -11,9 +11,9 @@ import java.util.HashSet;
  */
 public class Analyzer extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 8013254332439277166L;
+    private static final long serialVersionUID = -1355870685018481799L;
 
-    protected String calibration;
+    private String calibration;
 
     public Analyzer() {
         super();
@@ -38,9 +38,9 @@ public class Analyzer extends Instrument implements Duplicable, Serializable, Is
     @Override
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalids = super.invalidFieldNames();
-        if ( manufacturer.isEmpty() )
+        if ( getManufacturer().isEmpty() )
             invalids.add("manufacturer");
-        if ( model.isEmpty() )
+        if ( getModel().isEmpty() )
             invalids.add("model");
         if ( calibration.isEmpty() )
             invalids.add("calibration");
@@ -60,6 +60,14 @@ public class Analyzer extends Instrument implements Duplicable, Serializable, Is
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + calibration.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -76,14 +84,6 @@ public class Analyzer extends Instrument implements Duplicable, Serializable, Is
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + calibration.hashCode();
-        return result;
     }
 
     @Override

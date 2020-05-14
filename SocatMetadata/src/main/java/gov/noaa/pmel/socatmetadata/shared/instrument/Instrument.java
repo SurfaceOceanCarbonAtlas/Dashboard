@@ -2,9 +2,9 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -12,13 +12,13 @@ import java.util.HashSet;
  */
 public class Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5194493772199222454L;
+    private static final long serialVersionUID = -5484453751264048509L;
 
-    protected String name;
-    protected String id;
-    protected String manufacturer;
-    protected String model;
-    protected ArrayList<String> addnInfo;
+    private String name;
+    private String id;
+    private String manufacturer;
+    private String model;
+    private MultiString addnInfo;
 
     /**
      * Create with all fields empty
@@ -28,7 +28,7 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
         id = "";
         manufacturer = "";
         model = "";
-        addnInfo = new ArrayList<String>();
+        addnInfo = new MultiString();
     }
 
     /**
@@ -105,47 +105,19 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
     }
 
     /**
-     * @return the list of additional information about this instrument; never null but may be empty.
-     *         Any information strings given are guaranteed to have some content (not null, not blank).
+     * @return the additional information about this instrument; never null but may be empty.
      */
-    public ArrayList<String> getAddnInfo() {
-        return new ArrayList<String>(addnInfo);
-    }
-
-    /**
-     * Calls {@link #setAddnInfo(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param addnInfo
-     *         assign as the list of additional information about this instrument;
-     *         if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any of the information strings are null or empty
-     */
-    public void setAddnInfo(ArrayList<String> addnInfo) throws IllegalArgumentException {
-        setAddnInfo((Iterable<String>) addnInfo);
+    public MultiString getAddnInfo() {
+        return new MultiString(addnInfo);
     }
 
     /**
      * @param addnInfo
      *         assign as the list of additional information about this instrument;
      *         if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any of the information strings are null or empty
      */
-    public void setAddnInfo(Iterable<String> addnInfo) throws IllegalArgumentException {
-        this.addnInfo.clear();
-        if ( addnInfo != null ) {
-            for (String info : addnInfo) {
-                if ( info == null )
-                    throw new IllegalArgumentException("null information string given");
-                info = info.trim();
-                if ( info.isEmpty() )
-                    throw new IllegalArgumentException("blank information string given");
-                this.addnInfo.add(info);
-            }
-        }
+    public void setAddnInfo(MultiString addnInfo) throws IllegalArgumentException {
+        this.addnInfo = new MultiString(addnInfo);
     }
 
     /**
@@ -172,8 +144,19 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
         inst.id = id;
         inst.manufacturer = manufacturer;
         inst.model = model;
-        inst.addnInfo = new ArrayList<String>(addnInfo);
+        inst.addnInfo = new MultiString(addnInfo);
         return inst;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = name.hashCode();
+        result = result * prime + id.hashCode();
+        result = result * prime + manufacturer.hashCode();
+        result = result * prime + model.hashCode();
+        result = result * prime + addnInfo.hashCode();
+        return result;
     }
 
     @Override
@@ -199,17 +182,6 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = name.hashCode();
-        result = result * prime + id.hashCode();
-        result = result * prime + manufacturer.hashCode();
-        result = result * prime + model.hashCode();
-        result = result * prime + addnInfo.hashCode();
-        return result;
     }
 
     @Override

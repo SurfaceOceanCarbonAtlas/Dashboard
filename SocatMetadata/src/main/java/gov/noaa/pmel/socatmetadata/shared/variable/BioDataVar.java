@@ -8,11 +8,11 @@ import java.util.HashSet;
 
 public class BioDataVar extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5768266523048459705L;
+    private static final long serialVersionUID = 3964590419040442153L;
 
-    String biologicalSubject;
-    String speciesId;
-    String lifeStage;
+    private String biologicalSubject;
+    private String speciesId;
+    private String lifeStage;
 
     /**
      * Create with all fields empty
@@ -112,6 +112,16 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + biologicalSubject.hashCode();
+        result = result * prime + speciesId.hashCode();
+        result = result * prime + lifeStage.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -130,16 +140,6 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + biologicalSubject.hashCode();
-        result = result * prime + speciesId.hashCode();
-        result = result * prime + lifeStage.hashCode();
-        return result;
     }
 
     @Override

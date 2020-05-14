@@ -11,22 +11,22 @@ import java.util.TreeSet;
  */
 public class Coverage implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2368707540950489499L;
+    private static final long serialVersionUID = 4301952297875355625L;
 
     public static final String LONGITUDE_UNITS = "dec deg E";
     public static final String LATITUDE_UNITS = "dec deg N";
     public static final String WGS84 = "WGS 84";
 
-    protected NumericString westernLongitude;
-    protected NumericString easternLongitude;
-    protected NumericString southernLatitude;
-    protected NumericString northernLatitude;
-    protected Datestamp earliestDataDate;
-    protected Datestamp latestDataDate;
-    protected Datestamp startDatestamp;
-    protected Datestamp endDatestamp;
-    protected String spatialReference;
-    protected TreeSet<String> geographicNames;
+    private NumericString westernLongitude;
+    private NumericString easternLongitude;
+    private NumericString southernLatitude;
+    private NumericString northernLatitude;
+    private Datestamp earliestDataDate;
+    private Datestamp latestDataDate;
+    private Datestamp startDatestamp;
+    private Datestamp endDatestamp;
+    private String spatialReference;
+    private TreeSet<String> geographicNames;
 
     /**
      * Create with empty longitudes, empty latitudes, invalid times,
@@ -124,7 +124,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}.
      */
     public NumericString getWesternLongitude() {
-        return (NumericString) (westernLongitude.duplicate(null));
+        return new NumericString(westernLongitude);
     }
 
     /**
@@ -142,7 +142,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 throw new IllegalArgumentException("westernmost longitude is not in [-360.0,360.0]");
             if ( !LONGITUDE_UNITS.equals(westernLongitude.getUnitString()) )
                 throw new IllegalArgumentException("westernmost longitude units are not " + LONGITUDE_UNITS);
-            this.westernLongitude = (NumericString) (westernLongitude.duplicate(null));
+            this.westernLongitude = new NumericString(westernLongitude);
         }
         else
             this.westernLongitude = new NumericString(null, LONGITUDE_UNITS);
@@ -153,7 +153,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         to be a numeric value in the range [-360.0,360.0] and the units will be {@link #LONGITUDE_UNITS}
      */
     public NumericString getEasternLongitude() {
-        return (NumericString) (easternLongitude.duplicate(null));
+        return new NumericString(easternLongitude);
     }
 
     /**
@@ -171,7 +171,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 throw new IllegalArgumentException("easternmost longitude is not in [-360.0,360.0]");
             if ( !LONGITUDE_UNITS.equals(easternLongitude.getUnitString()) )
                 throw new IllegalArgumentException("easternmost longitude units are not " + LONGITUDE_UNITS);
-            this.easternLongitude = (NumericString) (easternLongitude.duplicate(null));
+            this.easternLongitude = new NumericString(easternLongitude);
         }
         else
             this.easternLongitude = new NumericString(null, LONGITUDE_UNITS);
@@ -182,7 +182,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
     public NumericString getSouthernLatitude() {
-        return (NumericString) (southernLatitude.duplicate(null));
+        return new NumericString(southernLatitude);
     }
 
     /**
@@ -200,7 +200,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 throw new IllegalArgumentException("southernmost latitude is not in [-90.0,90.0]");
             if ( !LATITUDE_UNITS.equals(southernLatitude.getUnitString()) )
                 throw new IllegalArgumentException("southernLatitude longitude units are not " + LATITUDE_UNITS);
-            this.southernLatitude = (NumericString) (southernLatitude.duplicate(null));
+            this.southernLatitude = new NumericString(southernLatitude);
         }
         else
             this.southernLatitude = new NumericString(null, LATITUDE_UNITS);
@@ -211,7 +211,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         to be a numeric value in the range [-90.0,90.0] and the units will be {@link #LATITUDE_UNITS}
      */
     public NumericString getNorthernLatitude() {
-        return (NumericString) (northernLatitude.duplicate(null));
+        return new NumericString(northernLatitude);
     }
 
     /**
@@ -229,7 +229,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 throw new IllegalArgumentException("northernmost latitude is not in [-90.0,90.0]");
             if ( !LATITUDE_UNITS.equals(northernLatitude.getUnitString()) )
                 throw new IllegalArgumentException("northernLatitude longitude units are not " + LATITUDE_UNITS);
-            this.northernLatitude = (NumericString) (northernLatitude.duplicate(null));
+            this.northernLatitude = new NumericString(northernLatitude);
         }
         else
             this.northernLatitude = new NumericString(null, LATITUDE_UNITS);
@@ -239,7 +239,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      * @return the earliest (oldest) data time value; never null but may be an invalid date
      */
     public Datestamp getEarliestDataDate() {
-        return (Datestamp) (earliestDataDate.duplicate(null));
+        return new Datestamp(earliestDataDate);
     }
 
     /**
@@ -248,17 +248,14 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         if null, an invalid Datestamp is assigned
      */
     public void setEarliestDataDate(Datestamp earliestDataDate) {
-        if ( earliestDataDate != null )
-            this.earliestDataDate = (Datestamp) (earliestDataDate.duplicate(null));
-        else
-            this.earliestDataDate = new Datestamp();
+        this.earliestDataDate = new Datestamp(earliestDataDate);
     }
 
     /**
      * @return the latest (newest) data time value; never null but may be an invalid date
      */
     public Datestamp getLatestDataDate() {
-        return (Datestamp) (latestDataDate.duplicate(null));
+        return new Datestamp(latestDataDate);
     }
 
     /**
@@ -267,17 +264,14 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         if null, a invalid Datestamp is assigned
      */
     public void setLatestDataDate(Datestamp latestDataDate) {
-        if ( latestDataDate != null )
-            this.latestDataDate = (Datestamp) (latestDataDate.duplicate(null));
-        else
-            this.latestDataDate = new Datestamp();
+        this.latestDataDate = new Datestamp(latestDataDate);
     }
 
     /**
      * @return the starting date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getStartDatestamp() {
-        return (Datestamp) (startDatestamp.duplicate(null));
+        return new Datestamp(startDatestamp);
     }
 
     /**
@@ -286,14 +280,14 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setStartDatestamp(Datestamp startDatestamp) {
-        this.startDatestamp = (startDatestamp != null) ? (Datestamp) (startDatestamp.duplicate(null)) : new Datestamp();
+        this.startDatestamp = new Datestamp(startDatestamp);
     }
 
     /**
      * @return the ending date for this dataset; never null but may be an invalid Datestamp
      */
     public Datestamp getEndDatestamp() {
-        return (Datestamp) (endDatestamp.duplicate(null));
+        return new Datestamp(endDatestamp);
     }
 
     /**
@@ -302,7 +296,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      *         if null, an invalid Datestamp will be assigned.
      */
     public void setEndDatestamp(Datestamp endDatestamp) {
-        this.endDatestamp = (endDatestamp != null) ? (Datestamp) (endDatestamp.duplicate(null)) : new Datestamp();
+        this.endDatestamp = new Datestamp(endDatestamp);
     }
 
     /**
@@ -371,17 +365,33 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
             coverage = new Coverage();
         else
             coverage = (Coverage) dup;
-        coverage.westernLongitude = (NumericString) (westernLongitude.duplicate(null));
-        coverage.easternLongitude = (NumericString) (easternLongitude.duplicate(null));
-        coverage.southernLatitude = (NumericString) (southernLatitude.duplicate(null));
-        coverage.northernLatitude = (NumericString) (northernLatitude.duplicate(null));
-        coverage.earliestDataDate = (Datestamp) (earliestDataDate.duplicate(null));
-        coverage.latestDataDate = (Datestamp) (latestDataDate.duplicate(null));
-        coverage.startDatestamp = (Datestamp) (startDatestamp.duplicate(null));
-        coverage.endDatestamp = (Datestamp) (endDatestamp.duplicate(null));
+        coverage.westernLongitude = new NumericString(westernLongitude);
+        coverage.easternLongitude = new NumericString(easternLongitude);
+        coverage.southernLatitude = new NumericString(southernLatitude);
+        coverage.northernLatitude = new NumericString(northernLatitude);
+        coverage.earliestDataDate = new Datestamp(earliestDataDate);
+        coverage.latestDataDate = new Datestamp(latestDataDate);
+        coverage.startDatestamp = new Datestamp(startDatestamp);
+        coverage.endDatestamp = new Datestamp(endDatestamp);
         coverage.spatialReference = spatialReference;
         coverage.geographicNames = new TreeSet<String>(geographicNames);
         return coverage;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = westernLongitude.hashCode();
+        result = result * prime + easternLongitude.hashCode();
+        result = result * prime + southernLatitude.hashCode();
+        result = result * prime + northernLatitude.hashCode();
+        result = result * prime + earliestDataDate.hashCode();
+        result = result * prime + latestDataDate.hashCode();
+        result = result * prime + startDatestamp.hashCode();
+        result = result * prime + endDatestamp.hashCode();
+        result = result * prime + spatialReference.hashCode();
+        result = result * prime + geographicNames.hashCode();
+        return result;
     }
 
     @Override
@@ -419,25 +429,9 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = westernLongitude.hashCode();
-        result = result * prime + easternLongitude.hashCode();
-        result = result * prime + southernLatitude.hashCode();
-        result = result * prime + northernLatitude.hashCode();
-        result = result * prime + earliestDataDate.hashCode();
-        result = result * prime + latestDataDate.hashCode();
-        result = result * prime + startDatestamp.hashCode();
-        result = result * prime + endDatestamp.hashCode();
-        result = result * prime + spatialReference.hashCode();
-        result = result * prime + geographicNames.hashCode();
-        return result;
-    }
-
-    @Override
     public String toString() {
-        return "Coverage{" +
-                "westernLongitude=" + westernLongitude +
+        return "Coverage" +
+                "{ westernLongitude=" + westernLongitude +
                 ", easternLongitude=" + easternLongitude +
                 ", southernLatitude=" + southernLatitude +
                 ", northernLatitude=" + northernLatitude +
@@ -447,7 +441,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
                 ", endDatestamp=" + endDatestamp +
                 ", spatialReference='" + spatialReference + "'" +
                 ", geographicNames=" + geographicNames +
-                '}';
+                " }";
     }
 
 }

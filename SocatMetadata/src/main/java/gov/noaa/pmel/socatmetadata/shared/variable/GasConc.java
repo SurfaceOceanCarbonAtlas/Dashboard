@@ -11,10 +11,10 @@ import java.io.Serializable;
  */
 public class GasConc extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 6191787400163620896L;
+    private static final long serialVersionUID = -5300357921096259559L;
 
-    protected String dryingMethod;
-    protected String waterVaporCorrection;
+    private String dryingMethod;
+    private String waterVaporCorrection;
 
     /**
      * Create with all field empty.
@@ -85,6 +85,15 @@ public class GasConc extends InstDataVar implements Duplicable, Serializable, Is
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + dryingMethod.hashCode();
+        result = result * prime + waterVaporCorrection.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -103,15 +112,6 @@ public class GasConc extends InstDataVar implements Duplicable, Serializable, Is
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + dryingMethod.hashCode();
-        result = result * prime + waterVaporCorrection.hashCode();
-        return result;
     }
 
     @Override

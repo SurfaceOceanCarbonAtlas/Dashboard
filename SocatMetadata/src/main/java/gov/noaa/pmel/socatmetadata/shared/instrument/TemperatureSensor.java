@@ -26,6 +26,11 @@ public class TemperatureSensor extends Analyzer implements Duplicable, Serializa
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -34,11 +39,6 @@ public class TemperatureSensor extends Analyzer implements Duplicable, Serializa
         if ( !(obj instanceof TemperatureSensor) )
             return false;
         return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override

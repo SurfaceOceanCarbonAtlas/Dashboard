@@ -11,11 +11,11 @@ import java.io.Serializable;
  */
 public class GenDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3105506219374546272L;
+    private static final long serialVersionUID = -3148748945744862187L;
 
-    protected NumericString accuracy;
-    protected NumericString precision;
-    protected String flagColName;
+    private NumericString accuracy;
+    private NumericString precision;
+    private String flagColName;
 
     /**
      * Create with all fields empty.
@@ -34,8 +34,8 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
         super(var);
         if ( var instanceof GenDataVar ) {
             GenDataVar other = (GenDataVar) var;
-            accuracy = (NumericString) (other.accuracy.duplicate(null));
-            precision = (NumericString) (other.precision.duplicate(null));
+            accuracy = new NumericString(other.accuracy);
+            precision = new NumericString(other.precision);
             flagColName = other.flagColName;
         }
         else {
@@ -50,7 +50,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getAccuracy() {
-        return (NumericString) (accuracy.duplicate(null));
+        return new NumericString(accuracy);
     }
 
     /**
@@ -66,7 +66,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
             // Empty numeric strings return false
             if ( accuracy.isNonPositive() )
                 throw new IllegalArgumentException("accuracy numeric string given is not a finite positive number");
-            this.accuracy = (NumericString) (accuracy.duplicate(null));
+            this.accuracy = new NumericString(accuracy);
         }
         else
             this.accuracy = new NumericString();
@@ -77,7 +77,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
      *         If not an empty numeric string, guaranteed to represent a finite positive number.
      */
     public NumericString getPrecision() {
-        return (NumericString) (precision.duplicate(null));
+        return new NumericString(precision);
     }
 
     /**
@@ -93,7 +93,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
             // Empty numeric strings return false
             if ( precision.isNonPositive() )
                 throw new IllegalArgumentException("precision numeric string given is not a finite positive number");
-            this.precision = (NumericString) (precision.duplicate(null));
+            this.precision = new NumericString(precision);
         }
         else
             this.precision = new NumericString();
@@ -114,6 +114,28 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
         this.flagColName = (flagColName != null) ? flagColName.trim() : "";
     }
 
+    /**
+     * Assigns the unit in the accuracy NumericString in this object.
+     * No check is made of the validity of the NumericString.
+     *
+     * @param unit
+     *         unit string to assign
+     */
+    protected void setAccuracyUnit(String unit) {
+        accuracy.setUnitString(unit);
+    }
+
+    /**
+     * Assigns the unit in the precision NumericString in this object.
+     * No check is made of the validity of the NumericString.
+     *
+     * @param unit
+     *         unit string to assign
+     */
+    protected void setPrecisionUnit(String unit) {
+        precision.setUnitString(unit);
+    }
+
     @Override
     public Object duplicate(Object dup) {
         GenDataVar var;
@@ -122,10 +144,20 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
         else
             var = (GenDataVar) dup;
         super.duplicate(var);
-        var.accuracy = (NumericString) (accuracy.duplicate(null));
-        var.precision = (NumericString) (precision.duplicate(null));
+        var.accuracy = new NumericString(accuracy);
+        var.precision = new NumericString(precision);
         var.flagColName = flagColName;
         return var;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + accuracy.hashCode();
+        result = result * prime + precision.hashCode();
+        result = result * prime + flagColName.hashCode();
+        return result;
     }
 
     @Override
@@ -149,16 +181,6 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + accuracy.hashCode();
-        result = result * prime + precision.hashCode();
-        result = result * prime + flagColName.hashCode();
-        return result;
     }
 
     @Override

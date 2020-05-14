@@ -10,9 +10,9 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class InvestigatorPanel extends Composite {
@@ -185,11 +185,11 @@ public class InvestigatorPanel extends Composite {
     private void assignInvestigatorStreets() {
         String first = firstStreetValue.getText().trim();
         String second = secondStreetValue.getText();
-        ArrayList<String> streets = new ArrayList<String>(2);
+        MultiString streets = new MultiString();
         if ( !first.isEmpty() )
-            streets.add(first);
+            streets.append(first);
         if ( !second.isEmpty() )
-            streets.add(second);
+            streets.append(second);
         investigator.setStreets(streets);
     }
 
@@ -288,28 +288,24 @@ public class InvestigatorPanel extends Composite {
         idValue.setText(investigator.getId());
         idTypeValue.setText(investigator.getIdType());
         orgValue.setText(investigator.getOrganization());
-        ArrayList<String> streets = investigator.getStreets();
-        switch ( streets.size() ) {
-            case 0:
-                firstStreetValue.setText("");
-                secondStreetValue.setText("");
-                break;
-            case 1:
-                firstStreetValue.setText(streets.get(0));
-                secondStreetValue.setText("");
-                break;
-            case 2:
-                firstStreetValue.setText(streets.get(0));
-                secondStreetValue.setText(streets.get(1));
-                break;
-            default:
-                // Hack for now but probably good enough
-                firstStreetValue.setText(streets.get(0));
-                String rest = streets.get(1);
-                for (int k = 2; k < streets.size(); k++) {
-                    rest += "; " + streets.get(k);
+        MultiString streets = investigator.getStreets();
+        if ( !streets.isEmpty() ) {
+            firstStreetValue.setText(streets.pop());
+            if ( !streets.isEmpty() ) {
+                String value = streets.pop();
+                while ( !streets.isEmpty() ) {
+                    value += "; ";
+                    value += streets.pop();
                 }
-                secondStreetValue.setText(rest);
+                secondStreetValue.setText(value);
+            }
+            else {
+                secondStreetValue.setText("");
+            }
+        }
+        else {
+            firstStreetValue.setText("");
+            secondStreetValue.setText("");
         }
         cityValue.setText(investigator.getCity());
         regionValue.setText(investigator.getRegion());

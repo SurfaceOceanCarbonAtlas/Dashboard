@@ -11,26 +11,26 @@ import java.util.HashSet;
  */
 public class MiscInfo implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -4025979225204814723L;
+    private static final long serialVersionUID = 4539293840905120652L;
 
-    protected String datasetId;
-    protected String datasetName;
-    protected String sectionName;
-    protected String fundingAgency;
-    protected String fundingTitle;
-    protected String fundingId;
-    protected String researchProject;
-    protected String datasetDoi;
-    protected String accessId;
-    protected String website;
-    protected String downloadUrl;
-    protected String citation;
-    protected String synopsis;
-    protected String purpose;
-    protected ArrayList<String> references;
-    protected ArrayList<String> portsOfCall;
-    protected ArrayList<String> addnInfo;
-    protected ArrayList<Datestamp> history;
+    private String datasetId;
+    private String datasetName;
+    private String sectionName;
+    private String fundingAgency;
+    private String fundingTitle;
+    private String fundingId;
+    private String researchProject;
+    private String datasetDoi;
+    private String accessId;
+    private String website;
+    private String downloadUrl;
+    private String citation;
+    private String synopsis;
+    private String purpose;
+    private MultiString references;
+    private MultiString portsOfCall;
+    private MultiString addnInfo;
+    private ArrayList<Datestamp> history;
 
     /**
      * Create with empty or invalid values for all fields.
@@ -50,9 +50,9 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         citation = "";
         synopsis = "";
         purpose = "";
-        references = new ArrayList<String>();
-        portsOfCall = new ArrayList<String>();
-        addnInfo = new ArrayList<String>();
+        references = new MultiString();
+        portsOfCall = new MultiString();
+        addnInfo = new MultiString();
         history = new ArrayList<Datestamp>();
     }
 
@@ -278,132 +278,50 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
     }
 
     /**
-     * @return the list of references used by this dataset; never null but may be empty.
-     *         Any reference given is guaranteed to be a valid (non-blank) string.
+     * @return the references list used by this dataset; never null but may be empty.
      */
-    public ArrayList<String> getReferences() {
-        return new ArrayList<String>(references);
-    }
-
-    /**
-     * Calls {@link #setReferences(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param references
-     *         assign as the list of references used by this dataset; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any reference given is null or blank
-     */
-    public void setReferences(ArrayList<String> references) throws IllegalArgumentException {
-        setReferences((Iterable<String>) references);
+    public MultiString getReferences() {
+        return new MultiString(references);
     }
 
     /**
      * @param references
-     *         assign as the list of references used by this dataset; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any reference given is null or blank
+     *         assign as the references list used by this dataset; if null, an empty list is assigned
      */
-    public void setReferences(Iterable<String> references) throws IllegalArgumentException {
-        this.references.clear();
-        if ( references != null ) {
-            for (String ref : references) {
-                if ( ref == null )
-                    throw new IllegalArgumentException("null reference given");
-                ref = ref.trim();
-                if ( ref.isEmpty() )
-                    throw new IllegalArgumentException("blank reference given");
-                this.references.add(ref);
-            }
-        }
+    public void setReferences(MultiString references) {
+        this.references = new MultiString(references);
     }
 
     /**
      * @return the port-of-call list for this dataset; never null but may be empty.
-     *         Any strings given are guaranteed to have some content (not null, not blank).
      */
-    public ArrayList<String> getPortsOfCall() {
-        return new ArrayList<String>(portsOfCall);
-    }
-
-    /**
-     * Calls {@link #setPortsOfCall(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param portsOfCall
-     *         assign as the port-of-call list for this dataset; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any of the port-of-call strings are null or empty
-     */
-    public void setPortsOfCall(ArrayList<String> portsOfCall) throws IllegalArgumentException {
-        setPortsOfCall((Iterable<String>) portsOfCall);
+    public MultiString getPortsOfCall() {
+        return new MultiString(portsOfCall);
     }
 
     /**
      * @param portsOfCall
      *         assign as the port-of-call list for this dataset; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any of the port-of-call strings are null or empty
      */
-    public void setPortsOfCall(Iterable<String> portsOfCall) throws IllegalArgumentException {
-        this.portsOfCall.clear();
-        if ( portsOfCall != null ) {
-            for (String port : portsOfCall) {
-                if ( port == null )
-                    throw new IllegalArgumentException("null port-of-call string given");
-                port = port.trim();
-                if ( port.isEmpty() )
-                    throw new IllegalArgumentException("blank port-of-call string given");
-                this.portsOfCall.add(port);
-            }
-        }
+    public void setPortsOfCall(MultiString portsOfCall) {
+        this.portsOfCall = new MultiString(portsOfCall);
     }
 
 
     /**
      * @return the list of addition information strings for this dataset; never null but may be empty.
-     *         Any strings given are guaranteed to have some content (not null, not blank).
      */
-    public ArrayList<String> getAddnInfo() {
-        return new ArrayList<String>(addnInfo);
-    }
-
-    /**
-     * Calls {@link #setAddnInfo(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param addnInfo
-     *         assign as the list of additional information strings for this dataset;
-     *         if null, an empty list is assigned.
-     *
-     * @throws IllegalArgumentException
-     *         if any of the additional information strings are null or empty
-     */
-    public void setAddnInfo(ArrayList<String> addnInfo) throws IllegalArgumentException {
-        setAddnInfo((Iterable<String>) addnInfo);
+    public MultiString getAddnInfo() {
+        return new MultiString(addnInfo);
     }
 
     /**
      * @param addnInfo
      *         assign as the list of additional information strings for this dataset;
      *         if null, an empty list is assigned.
-     *
-     * @throws IllegalArgumentException
-     *         if any of the additional information strings are null or empty
      */
-    public void setAddnInfo(Iterable<String> addnInfo) throws IllegalArgumentException {
-        this.addnInfo.clear();
-        if ( addnInfo != null ) {
-            for (String info : addnInfo) {
-                if ( info == null )
-                    throw new IllegalArgumentException("null additional information string given");
-                info = info.trim();
-                if ( info.isEmpty() )
-                    throw new IllegalArgumentException("blank additional information string given");
-                this.addnInfo.add(info);
-            }
-        }
+    public void setAddnInfo(MultiString addnInfo) {
+        this.addnInfo = new MultiString(addnInfo);
     }
 
     /**
@@ -413,14 +331,12 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
     public ArrayList<Datestamp> getHistory() {
         ArrayList<Datestamp> dup = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            dup.add((Datestamp) (datestamp.duplicate(null)));
+            dup.add(new Datestamp(datestamp));
         }
         return dup;
     }
 
     /**
-     * Calls {@link #setHistory(Iterable)}; added to satisfy JavaBean requirements.
-     *
      * @param history
      *         assign as the submission date history list for this dataset; if null, an empty list is assigned.
      *
@@ -428,17 +344,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
      *         if any of the dates given are invalid
      */
     public void setHistory(ArrayList<Datestamp> history) throws IllegalArgumentException {
-        setHistory((Iterable<Datestamp>) history);
-    }
-
-    /**
-     * @param history
-     *         assign as the submission date history list for this dataset; if null, an empty list is assigned.
-     *
-     * @throws IllegalArgumentException
-     *         if any of the dates given are invalid
-     */
-    public void setHistory(Iterable<Datestamp> history) throws IllegalArgumentException {
         this.history.clear();
         if ( history != null ) {
             for (Datestamp datestamp : history) {
@@ -446,7 +351,7 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
                     throw new IllegalArgumentException("null datestamp given");
                 if ( !datestamp.isValid(null) )
                     throw new IllegalArgumentException("invalid datestamp given");
-                this.history.add((Datestamp) (datestamp.duplicate(null)));
+                this.history.add(new Datestamp(datestamp));
             }
         }
     }
@@ -472,14 +377,38 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         info.citation = citation;
         info.synopsis = synopsis;
         info.purpose = purpose;
-        info.references = new ArrayList<String>(references);
-        info.portsOfCall = new ArrayList<String>(portsOfCall);
-        info.addnInfo = new ArrayList<String>(addnInfo);
+        info.references = new MultiString(references);
+        info.portsOfCall = new MultiString(portsOfCall);
+        info.addnInfo = new MultiString(addnInfo);
         info.history = new ArrayList<Datestamp>(history.size());
         for (Datestamp datestamp : history) {
-            info.history.add((Datestamp) (datestamp.duplicate(null)));
+            info.history.add(new Datestamp(datestamp));
         }
         return info;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = datasetId.hashCode();
+        result = result * prime + datasetName.hashCode();
+        result = result * prime + sectionName.hashCode();
+        result = result * prime + fundingAgency.hashCode();
+        result = result * prime + fundingTitle.hashCode();
+        result = result * prime + fundingId.hashCode();
+        result = result * prime + researchProject.hashCode();
+        result = result * prime + datasetDoi.hashCode();
+        result = result * prime + accessId.hashCode();
+        result = result * prime + website.hashCode();
+        result = result * prime + downloadUrl.hashCode();
+        result = result * prime + citation.hashCode();
+        result = result * prime + synopsis.hashCode();
+        result = result * prime + purpose.hashCode();
+        result = result * prime + references.hashCode();
+        result = result * prime + portsOfCall.hashCode();
+        result = result * prime + addnInfo.hashCode();
+        result = result * prime + history.hashCode();
+        return result;
     }
 
     @Override
@@ -530,30 +459,6 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
         if ( !history.equals(other.history) )
             return false;
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = datasetId.hashCode();
-        result = result * prime + datasetName.hashCode();
-        result = result * prime + sectionName.hashCode();
-        result = result * prime + fundingAgency.hashCode();
-        result = result * prime + fundingTitle.hashCode();
-        result = result * prime + fundingId.hashCode();
-        result = result * prime + researchProject.hashCode();
-        result = result * prime + datasetDoi.hashCode();
-        result = result * prime + accessId.hashCode();
-        result = result * prime + website.hashCode();
-        result = result * prime + downloadUrl.hashCode();
-        result = result * prime + citation.hashCode();
-        result = result * prime + synopsis.hashCode();
-        result = result * prime + purpose.hashCode();
-        result = result * prime + references.hashCode();
-        result = result * prime + portsOfCall.hashCode();
-        result = result * prime + addnInfo.hashCode();
-        result = result * prime + history.hashCode();
-        return result;
     }
 
     @Override

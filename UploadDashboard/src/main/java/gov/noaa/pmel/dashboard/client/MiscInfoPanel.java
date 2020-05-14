@@ -9,10 +9,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 public class MiscInfoPanel extends Composite {
@@ -56,8 +55,6 @@ public class MiscInfoPanel extends Composite {
     final LabeledTextArea portsValue;
     @UiField(provided = true)
     final LabeledTextArea addnInfoValue;
-    @UiField(provided = true)
-    final LabeledTextArea historyValue;
 
     private final MiscInfo info;
 
@@ -98,9 +95,6 @@ public class MiscInfoPanel extends Composite {
         portsValue = new LabeledTextArea("Ports of call", "5em", "54.5em");
         //
         addnInfoValue = new LabeledTextArea("Additional information", "10em", "54.5em");
-        //
-        historyValue = new LabeledTextArea("Archival history", "5em", "54.5em");
-        historyValue.markReadOnly();
 
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -192,23 +186,21 @@ public class MiscInfoPanel extends Composite {
 
     @UiHandler("refsValue")
     void refsValueOnValueChange(ValueChangeEvent<String> event) {
-        info.setReferences(Arrays.asList(refsValue.getText().trim().split("\\v+")));
+        info.setReferences(new MultiString(refsValue.getText()));
         markInvalids();
     }
 
     @UiHandler("portsValue")
     void portsValueOnValueChange(ValueChangeEvent<String> event) {
-        info.setPortsOfCall(Arrays.asList(portsValue.getText().trim().split("\\v+")));
+        info.setPortsOfCall(new MultiString(portsValue.getText()));
         markInvalids();
     }
 
     @UiHandler("addnInfoValue")
     void addnInfoValueOnValueChange(ValueChangeEvent<String> event) {
-        info.setAddnInfo(Arrays.asList(addnInfoValue.getText().trim().split("\\v+")));
+        info.setAddnInfo(new MultiString(addnInfoValue.getText()));
         markInvalids();
     }
-
-    // No handler for historyValue as it is read-only
 
     /**
      * Indicate which fields contain invalid values and which contain acceptable values.
@@ -295,9 +287,6 @@ public class MiscInfoPanel extends Composite {
             addnInfoValue.markInvalid();
         else
             addnInfoValue.markValid();
-
-        // read-only, always valid
-        historyValue.markValid();
     }
 
 
@@ -320,26 +309,9 @@ public class MiscInfoPanel extends Composite {
         projectValue.setText(info.getResearchProject());
         synopsisValue.setText(info.getSynopsis());
         purposeValue.setText(info.getPurpose());
-        String value = "";
-        for (String ref : info.getReferences()) {
-            value += ref + "\n";
-        }
-        refsValue.setText(value.trim());
-        value = "";
-        for (String port : info.getPortsOfCall()) {
-            value += port + "\n";
-        }
-        portsValue.setText(value.trim());
-        value = "";
-        for (String addInfo : info.getAddnInfo()) {
-            value += addInfo + "\n";
-        }
-        addnInfoValue.setText(value.trim());
-        value = "";
-        for (Datestamp stamp : info.getHistory()) {
-            value += stamp.fullOrPartialString() + "\n";
-        }
-        historyValue.setText(value.trim());
+        refsValue.setText(info.getReferences().asOneString());
+        portsValue.setText(info.getPortsOfCall().asOneString());
+        addnInfoValue.setText(info.getAddnInfo().asOneString());
 
         markInvalids();
 

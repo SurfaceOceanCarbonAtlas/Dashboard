@@ -21,10 +21,7 @@ public class Submitter extends Investigator implements Duplicable, Serializable,
     }
 
     /**
-     * Create with Person fields assigned from the given person and all other fields empty
-     *
-     * @param person
-     *         assign lastName, firstName, id, idType, and organization fields from here; cannot be null
+     * Create with as many fields assigned from the given person as possible.
      */
     public Submitter(Person person) {
         super(person);
@@ -37,9 +34,9 @@ public class Submitter extends Investigator implements Duplicable, Serializable,
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalid = super.invalidFieldNames();
         // At this time only check streets for address - address from CDIAC not parsed
-        if ( streets.isEmpty() )
+        if ( getStreets().isEmpty() )
             invalid.add("streets");
-        if ( email.isEmpty() )
+        if ( getEmail().isEmpty() )
             invalid.add("email");
         return invalid;
     }
@@ -56,6 +53,11 @@ public class Submitter extends Investigator implements Duplicable, Serializable,
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -64,11 +66,6 @@ public class Submitter extends Investigator implements Duplicable, Serializable,
         if ( !(obj instanceof Submitter) )
             return false;
         return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override

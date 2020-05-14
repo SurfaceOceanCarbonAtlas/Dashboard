@@ -13,15 +13,15 @@ import java.util.HashSet;
 
 public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 8832048362470610227L;
+    private static final long serialVersionUID = -7072506917048565345L;
 
-    protected Submitter submitter;
-    protected ArrayList<Investigator> investigators;
-    protected Platform platform;
-    protected Coverage coverage;
-    protected ArrayList<Instrument> instruments;
-    protected ArrayList<Variable> variables;
-    protected MiscInfo miscInfo;
+    private Submitter submitter;
+    private ArrayList<Investigator> investigators;
+    private Platform platform;
+    private Coverage coverage;
+    private ArrayList<Instrument> instruments;
+    private ArrayList<Variable> variables;
+    private MiscInfo miscInfo;
 
     /**
      * Create with empty or invalid values for all fields.
@@ -252,10 +252,17 @@ public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
         }
     }
 
+    /**
+     * @return the miscellaneous information about a dataset; never null but may be empty
+     */
     public MiscInfo getMiscInfo() {
         return (MiscInfo) (miscInfo.duplicate(null));
     }
 
+    /**
+     * @param miscInfo
+     *         assign as the miscellaneous information about a dataset; if null, an empty MiscInfo is assigned
+     */
     public void setMiscInfo(MiscInfo miscInfo) {
         this.miscInfo = (miscInfo != null) ? (MiscInfo) (miscInfo.duplicate(null)) : new MiscInfo();
     }
@@ -275,6 +282,19 @@ public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
         metadata.setVariables(variables);
         metadata.setMiscInfo(miscInfo);
         return metadata;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = submitter.hashCode();
+        result = result * prime + investigators.hashCode();
+        result = result * prime + platform.hashCode();
+        result = result * prime + coverage.hashCode();
+        result = result * prime + instruments.hashCode();
+        result = result * prime + variables.hashCode();
+        result = result * prime + miscInfo.hashCode();
+        return result;
     }
 
     @Override
@@ -301,19 +321,6 @@ public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
         if ( !variables.equals(other.variables) )
             return false;
         return miscInfo.equals(other.miscInfo);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = submitter.hashCode();
-        result = result * prime + investigators.hashCode();
-        result = result * prime + platform.hashCode();
-        result = result * prime + coverage.hashCode();
-        result = result * prime + instruments.hashCode();
-        result = result * prime + variables.hashCode();
-        result = result * prime + miscInfo.hashCode();
-        return result;
     }
 
     @Override

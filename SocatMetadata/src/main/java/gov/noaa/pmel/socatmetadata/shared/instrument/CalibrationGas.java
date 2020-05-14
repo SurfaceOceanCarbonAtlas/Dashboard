@@ -13,16 +13,16 @@ import java.util.HashSet;
  */
 public class CalibrationGas implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -7465872060159352093L;
+    private static final long serialVersionUID = 1290593730353243972L;
 
     public static final String GAS_CONCENTRATION_UNIT = "ppm";
 
-    protected String id;
-    protected String type;
-    protected String supplier;
-    protected String useFrequency;
-    protected NumericString concentration;
-    protected NumericString accuracy;
+    private String id;
+    private String type;
+    private String supplier;
+    private String useFrequency;
+    private NumericString concentration;
+    private NumericString accuracy;
 
     /**
      * Assign with all fields empty or NaN
@@ -150,7 +150,7 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
      *         If not empty, guaranteed to represent a non-negative finite number.
      */
     public NumericString getConcentration() {
-        return (NumericString) (concentration.duplicate(null));
+        return new NumericString(concentration);
     }
 
     /**
@@ -164,7 +164,7 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
         if ( concentration != null ) {
             if ( !concentration.isNonNegative() )
                 throw new IllegalArgumentException("concentration specified is not a finite non-negative number");
-            this.concentration = (NumericString) (concentration.duplicate(null));
+            this.concentration = new NumericString(concentration);
         }
         else
             this.concentration = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -175,7 +175,7 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
      *         If not empty, guaranteed to represent a positive finite number.
      */
     public NumericString getAccuracy() {
-        return (NumericString) (accuracy.duplicate(null));
+        return new NumericString(accuracy);
     }
 
     /**
@@ -194,7 +194,7 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
             if ( !GAS_CONCENTRATION_UNIT.equals(accuracy.getUnitString()) )
                 throw new IllegalArgumentException(
                         "accuracy specified is not in units of " + GAS_CONCENTRATION_UNIT);
-            this.accuracy = (NumericString) (accuracy.duplicate(null));
+            this.accuracy = new NumericString(accuracy);
         }
         else
             this.accuracy = new NumericString(null, GAS_CONCENTRATION_UNIT);
@@ -227,9 +227,21 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
         gas.type = type;
         gas.supplier = supplier;
         gas.useFrequency = useFrequency;
-        gas.concentration = (NumericString) (concentration.duplicate(null));
-        gas.accuracy = (NumericString) (accuracy.duplicate(null));
+        gas.concentration = new NumericString(concentration);
+        gas.accuracy = new NumericString(accuracy);
         return gas;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = id.hashCode();
+        result = result * prime + type.hashCode();
+        result = result * prime + supplier.hashCode();
+        result = result * prime + useFrequency.hashCode();
+        result = result * prime + concentration.hashCode();
+        result = result * prime + accuracy.hashCode();
+        return result;
     }
 
     @Override
@@ -257,18 +269,6 @@ public class CalibrationGas implements Duplicable, Serializable, IsSerializable 
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = id.hashCode();
-        result = result * prime + type.hashCode();
-        result = result * prime + supplier.hashCode();
-        result = result * prime + useFrequency.hashCode();
-        result = result * prime + concentration.hashCode();
-        result = result * prime + accuracy.hashCode();
-        return result;
     }
 
     @Override

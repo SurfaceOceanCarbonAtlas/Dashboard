@@ -13,20 +13,20 @@ import java.io.Serializable;
  */
 public class AirPressure extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1059334938352414705L;
+    private static final long serialVersionUID = -7446507959702017867L;
 
     public static final String HECTOPASCALS_UNIT = "hPa";
 
-    protected String pressureCorrection;
+    private String pressureCorrection;
 
     /**
      * Create with all fields empty except for units which are {@link #HECTOPASCALS_UNIT}
      */
     public AirPressure() {
         super();
-        varUnit = HECTOPASCALS_UNIT;
-        accuracy.setUnitString(HECTOPASCALS_UNIT);
-        precision.setUnitString(HECTOPASCALS_UNIT);
+        super.setVarUnit(HECTOPASCALS_UNIT);
+        setAccuracyUnit(HECTOPASCALS_UNIT);
+        setPrecisionUnit(HECTOPASCALS_UNIT);
         pressureCorrection = "";
     }
 
@@ -40,9 +40,9 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
             pressureCorrection = press.pressureCorrection;
         }
         else {
-            varUnit = HECTOPASCALS_UNIT;
-            accuracy.setUnitString(HECTOPASCALS_UNIT);
-            precision.setUnitString(HECTOPASCALS_UNIT);
+            super.setVarUnit(HECTOPASCALS_UNIT);
+            setAccuracyUnit(HECTOPASCALS_UNIT);
+            setPrecisionUnit(HECTOPASCALS_UNIT);
             pressureCorrection = "";
         }
     }
@@ -68,9 +68,10 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
      */
     @Override
     public void setVarUnit(String varUnit) {
-        this.varUnit = (varUnit != null) ? varUnit.trim() : HECTOPASCALS_UNIT;
-        if ( this.varUnit.isEmpty() )
-            this.varUnit = HECTOPASCALS_UNIT;
+        if ( (varUnit == null) || (varUnit.trim().isEmpty()) )
+            super.setVarUnit(HECTOPASCALS_UNIT);
+        else
+            super.setVarUnit(varUnit);
     }
 
     /**
@@ -86,8 +87,10 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
         if ( accuracy != null ) {
             super.setAccuracy(accuracy);
         }
-        else
-            this.accuracy = new NumericString(null, HECTOPASCALS_UNIT);
+        else {
+            super.setAccuracy(null);
+            setAccuracyUnit(HECTOPASCALS_UNIT);
+        }
     }
 
     /**
@@ -103,8 +106,10 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
         if ( precision != null ) {
             super.setPrecision(precision);
         }
-        else
-            this.precision = new NumericString(null, HECTOPASCALS_UNIT);
+        else {
+            super.setPrecision(null);
+            setPrecisionUnit(HECTOPASCALS_UNIT);
+        }
     }
 
     @Override
@@ -117,6 +122,14 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
         super.duplicate(press);
         press.pressureCorrection = pressureCorrection;
         return press;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + pressureCorrection.hashCode();
+        return result;
     }
 
     @Override
@@ -136,14 +149,6 @@ public class AirPressure extends InstDataVar implements Duplicable, Serializable
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + pressureCorrection.hashCode();
-        return result;
     }
 
     @Override

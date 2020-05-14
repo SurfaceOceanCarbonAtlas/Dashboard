@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
@@ -8,7 +9,6 @@ import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -22,7 +22,7 @@ public class BioDataVarTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
-    private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
     private static final Person EMPTY_PERSON = new Person();
 
@@ -59,7 +59,7 @@ public class BioDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -91,7 +91,7 @@ public class BioDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -124,7 +124,7 @@ public class BioDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());

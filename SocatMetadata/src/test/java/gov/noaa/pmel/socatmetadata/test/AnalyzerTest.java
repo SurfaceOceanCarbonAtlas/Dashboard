@@ -1,12 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,11 +20,12 @@ public class AnalyzerTest {
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
     private static final String CALIBRATION = "Factory calibration";
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Pressure reading from the Setra-270 on the exit of the sensor was added to the differential pressure " +
-                    "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
-            "Some other comment just to have a second one."
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Pressure reading from the Setra-270 on the exit of the sensor was added to the " +
+                    "differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                    "to yield the equlibrator pressure.\n" +
+                    "Some other comment just to have a second one."
+    );
 
     @Test
     public void testGetSetCalibration() {

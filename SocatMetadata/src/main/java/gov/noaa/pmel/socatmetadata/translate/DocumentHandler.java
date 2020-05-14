@@ -84,7 +84,7 @@ public abstract class DocumentHandler {
             expocode = expocode.substring(0, 12);
             len = expocode.length();
         }
-        // Only exception to NODCYYYYMMDD is QUIMAYYYYMMDD; but QUIM which is not one of the codes
+        // Only exception to NODCYYYYMMDD is QUIMAYYYYMMDD; but QUIM is not one of the codes, so not an issue
         if ( (len == 12) && EXPOCODE_PATTERN.matcher(expocode).matches() ) {
             String nodc = expocode.substring(0, 4);
             if ( FIXED_PLATFORM_NODC_CODES.contains(nodc) )

@@ -143,31 +143,31 @@ public class OcadsWriterTest {
                 docHandler.getElementText(null, "citation"));
 
         assertEquals("DOE (1994). Handbook of methods for the analysis of the various\n" +
-                        "parameters of the carbon dioxide system in sea water; version\n" +
-                        "2. DOE.\n" +
+                        "        parameters of the carbon dioxide system in sea water; version\n" +
+                        "        2. DOE.\n" +
                         "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and\n" +
-                        "P. P. Murphy (1998) A new automated underway system for making\n" +
-                        "high precision pCO2 measurements onboard research ships.\n" +
-                        "Analytica Chim. Acta 377: 185-191.\n" +
+                        "        P. P. Murphy (1998) A new automated underway system for making\n" +
+                        "        high precision pCO2 measurements onboard research ships.\n" +
+                        "        Analytica Chim. Acta 377: 185-191.\n" +
                         "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca\n" +
-                        "(1997). Measurement of underway fCO2 in the Eastern\n" +
-                        "Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER,\n" +
-                        "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.\n" +
+                        "        (1997). Measurement of underway fCO2 in the Eastern\n" +
+                        "        Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER,\n" +
+                        "        NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.\n" +
                         "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H.\n" +
-                        "Luger, T. Johannessen, A. Olsen, R. A. Feely, and C. E.\n" +
-                        "Cosca (2009), Recommendations for autonomous underway pCO2\n" +
-                        "measuring systems and data-reduction routines.  Deep Sea\n" +
-                        "Research II, 56: 512-522.\n" +
-                        "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in\n" +
-                        "surface water using continuous and discrete sampling methods.\n" +
-                        "Mar. Chem. 44(2-4): 189-205.\n" +
+                        "        Luger, T. Johannessen, A. Olsen, R. A. Feely, and C. E.\n" +
+                        "        Cosca (2009), Recommendations for autonomous underway pCO2\n" +
+                        "        measuring systems and data-reduction routines.  Deep Sea\n" +
+                        "        Research II, 56: 512-522.\n" +
+                        "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in \n" +
+                        "        surface water using continuous and discrete sampling methods.\n" +
+                        "        Mar. Chem. 44(2-4): 189-205.\n" +
                         "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in\n" +
-                        "water and seawater. Deep-Sea Research 17: 721-735.\n" +
+                        "        water and seawater. Deep-Sea Research 17: 721-735.\n" +
                         "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the\n" +
-                        "solubility of a non-ideal gas.  Mar. Chem. 2: 203-215.\n" +
+                        "        solubility of a non-ideal gas.  Mar. Chem. 2: 203-215.\n" +
                         "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects\n" +
-                        "of temperature and salinity on the partial pressure of CO2 in\n" +
-                        "seawater. Nature 300: 511-513.",
+                        "        of temperature and salinity on the partial pressure of CO2 in\n" +
+                        "        seawater. Nature 300: 511-513.",
                 docHandler.getElementText(null, "reference"));
 
         assertEquals("Other Sensor 1: Manufacturer: Setra; Model: 239; Calibration: Factory calibration; " +
@@ -185,7 +185,7 @@ public class OcadsWriterTest {
                         "were interpolated using this offset to determine the SST at the time of the equilibrator " +
                         "measurement.  (2.) A total of 6011 measurements were taken with 5661 flagged as good, 342 " +
                         "flagged as questionable, and 8 flagged as bad.  All measurements flagged as 4 (bad) have " +
-                        "been removed from the final data file.  (3.) There was a 17-1/2 hour dropout of EqT readings at\n" +
+                        "been removed from the final data file.  (3.) There was a 17-1/2 hour dropout of EqT readings at \n" +
                         "the start of the cruise.  New values were determined using a relation between equilibrator " +
                         "temperature and SST.  The equation used was EqT = 0.9734*SST + 0.7735, n = 124, " +
                         "r^2 = 0.9630.  All of these values have been flagged 3.  (4.) On 1/22 at 1730, an emergency " +

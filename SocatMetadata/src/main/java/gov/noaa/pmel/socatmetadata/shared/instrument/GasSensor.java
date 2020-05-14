@@ -15,9 +15,9 @@ import java.util.HashSet;
  */
 public class GasSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5685437566259606506L;
+    private static final long serialVersionUID = -8883755394488095375L;
 
-    protected ArrayList<CalibrationGas> calibrationGases;
+    private ArrayList<CalibrationGas> calibrationGases;
 
     public GasSensor() {
         super();
@@ -99,6 +99,14 @@ public class GasSensor extends Analyzer implements Duplicable, Serializable, IsS
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + calibrationGases.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -114,14 +122,6 @@ public class GasSensor extends Analyzer implements Duplicable, Serializable, IsS
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + calibrationGases.hashCode();
-        return result;
     }
 
     @Override

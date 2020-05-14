@@ -3,6 +3,7 @@ package gov.noaa.pmel.socatmetadata.translate;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
@@ -270,13 +271,7 @@ public class OcadsWriter extends DocumentHandler {
 
         setElementText(null, CITATION_ELEMENT_NAME, info.getCitation());
 
-        StringBuilder strBldr = new StringBuilder();
-        for (String ref : info.getReferences()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append(ref);
-        }
-        setElementText(null, REFERENCE_ELEMENT_NAME, strBldr.toString());
+        setElementText(null, REFERENCE_ELEMENT_NAME, info.getReferences().asOneString());
 
         ArrayList<Instrument> instruments = mdata.getInstruments();
         HashSet<String> usedInstrumentNames = new HashSet<String>();
@@ -296,30 +291,22 @@ public class OcadsWriter extends DocumentHandler {
         }
 
         // Additional information
-        strBldr = new StringBuilder();
+        MultiString addnInfo = new MultiString();
         // Describe any instruments not included elsewhere
         for (Instrument inst : instruments) {
             if ( !usedInstrumentNames.contains(inst.getName()) ) {
-                if ( strBldr.length() > 0 )
-                    strBldr.append("\n");
-                strBldr.append(getInstrumentDescription(inst));
+                addnInfo.append(getInstrumentDescription(inst));
             }
         }
         // Include the ports-of-call
         for (String port : info.getPortsOfCall()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append("Port of Call: ");
-            strBldr.append(port);
-
+            addnInfo.append("Port of Call: " + port);
         }
         // And any additional information in the SocatMetadata
         for (String addn : info.getAddnInfo()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append(addn);
+            addnInfo.append(addn);
         }
-        setElementText(null, ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+        setElementText(null, ADDN_INFO_ELEMENT_NAME, addnInfo.asOneString());
 
         setElementText(null, WEBSITE_ELEMENT_NAME, info.getWebsite());
         setElementText(null, DOWNLOAD_URL_ELEMENT_NAME, info.getDownloadUrl());
@@ -349,40 +336,35 @@ public class OcadsWriter extends DocumentHandler {
         }
         String strVal = pi.getFirstName() + " " + pi.getMiddle();
         strVal = strVal.trim() + " " + pi.getLastName();
-        setElementText(ancestor, issubmitter ? SUBMITTER_NAME_ELEMENT_NAME : INVESTIGATOR_NAME_ELEMENT_NAME,
-                strVal);
-        setElementText(ancestor, issubmitter ? SUBMITTER_ORG_ELEMENT_NAME : INVESTIGATOR_ORG_ELEMENT_NAME,
-                pi.getOrganization());
-        ArrayList<String> strList = pi.getStreets();
-        if ( strList.size() > 0 )
-            setElementText(ancestor,
-                    issubmitter ? SUBMITTER_FIRST_STREET_ELEMENT_NAME : INVESTIGATOR_FIRST_STREET_ELEMENT_NAME,
-                    strList.get(0));
-        if ( strList.size() > 1 ) {
-            strVal = strList.get(1);
-            for (int k = 2; k < strList.size(); k++) {
-                strVal += "\n" + strList.get(k);
-            }
-            setElementText(ancestor,
-                    issubmitter ? SUBMITTER_SECOND_STREET_ELEMENT_NAME : INVESTIGATOR_SECOND_STREET_ELEMENT_NAME,
-                    strVal);
+        setElementText(ancestor, issubmitter ? SUBMITTER_NAME_ELEMENT_NAME :
+                INVESTIGATOR_NAME_ELEMENT_NAME, strVal);
+        setElementText(ancestor, issubmitter ? SUBMITTER_ORG_ELEMENT_NAME :
+                INVESTIGATOR_ORG_ELEMENT_NAME, pi.getOrganization());
+        MultiString streets = pi.getStreets();
+        if ( !streets.isEmpty() ) {
+            strVal = streets.pop();
+            setElementText(ancestor, issubmitter ? SUBMITTER_FIRST_STREET_ELEMENT_NAME :
+                    INVESTIGATOR_FIRST_STREET_ELEMENT_NAME, strVal);
         }
-        setElementText(ancestor, issubmitter ? SUBMITTER_CITY_ELEMENT_NAME : INVESTIGATOR_CITY_ELEMENT_NAME,
-                pi.getCity());
-        setElementText(ancestor, issubmitter ? SUBMITTER_REGION_ELEMENT_NAME : INVESTIGATOR_REGION_ELEMENT_NAME,
-                pi.getRegion());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ZIP_ELEMENT_NAME : INVESTIGATOR_ZIP_ELEMENT_NAME,
-                pi.getZipCode());
-        setElementText(ancestor, issubmitter ? SUBMITTER_COUNTRY_ELEMENT_NAME : INVESTIGATOR_COUNTRY_ELEMENT_NAME,
-                pi.getCountry());
-        setElementText(ancestor, issubmitter ? SUBMITTER_EMAIL_ELEMENT_NAME : INVESTIGATOR_EMAIL_ELEMENT_NAME,
-                pi.getEmail());
-        setElementText(ancestor, issubmitter ? SUBMITTER_PHONE_ELEMENT_NAME : INVESTIGATOR_PHONE_ELEMENT_NAME,
-                pi.getPhone());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ID_ELEMENT_NAME : INVESTIGATOR_ID_ELEMENT_NAME,
-                pi.getId());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ID_TYPE_ELEMENT_NAME : INVESTIGATOR_ID_TYPE_ELEMENT_NAME,
-                pi.getIdType());
+        if ( !streets.isEmpty() )
+            setElementText(ancestor, issubmitter ? SUBMITTER_SECOND_STREET_ELEMENT_NAME :
+                    INVESTIGATOR_SECOND_STREET_ELEMENT_NAME, streets.asOneString());
+        setElementText(ancestor, issubmitter ? SUBMITTER_CITY_ELEMENT_NAME :
+                INVESTIGATOR_CITY_ELEMENT_NAME, pi.getCity());
+        setElementText(ancestor, issubmitter ? SUBMITTER_REGION_ELEMENT_NAME :
+                INVESTIGATOR_REGION_ELEMENT_NAME, pi.getRegion());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ZIP_ELEMENT_NAME :
+                INVESTIGATOR_ZIP_ELEMENT_NAME, pi.getZipCode());
+        setElementText(ancestor, issubmitter ? SUBMITTER_COUNTRY_ELEMENT_NAME :
+                INVESTIGATOR_COUNTRY_ELEMENT_NAME, pi.getCountry());
+        setElementText(ancestor, issubmitter ? SUBMITTER_EMAIL_ELEMENT_NAME :
+                INVESTIGATOR_EMAIL_ELEMENT_NAME, pi.getEmail());
+        setElementText(ancestor, issubmitter ? SUBMITTER_PHONE_ELEMENT_NAME :
+                INVESTIGATOR_PHONE_ELEMENT_NAME, pi.getPhone());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_ELEMENT_NAME :
+                INVESTIGATOR_ID_ELEMENT_NAME, pi.getId());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_TYPE_ELEMENT_NAME :
+                INVESTIGATOR_ID_TYPE_ELEMENT_NAME, pi.getIdType());
     }
 
     /**

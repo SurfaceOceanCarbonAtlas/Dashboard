@@ -11,10 +11,10 @@ import java.util.HashSet;
  */
 public class AquGasConc extends GasConc implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1495485400427148697L;
+    private static final long serialVersionUID = -6347862202375795785L;
 
-    protected String reportTemperature;
-    protected String temperatureCorrection;
+    private String reportTemperature;
+    private String temperatureCorrection;
 
     /**
      * Create with all fields empty
@@ -95,6 +95,15 @@ public class AquGasConc extends GasConc implements Duplicable, Serializable, IsS
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + reportTemperature.hashCode();
+        result = result * prime + temperatureCorrection.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -113,15 +122,6 @@ public class AquGasConc extends GasConc implements Duplicable, Serializable, IsS
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + reportTemperature.hashCode();
-        result = result * prime + temperatureCorrection.hashCode();
-        return result;
     }
 
     @Override

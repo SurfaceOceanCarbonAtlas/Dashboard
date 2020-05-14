@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import static org.junit.Assert.fail;
 public class MiscInfoTest {
 
     private static final String EMPTY_STR = "";
-    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
     private static final ArrayList<Datestamp> EMPTY_STAMPLIST = new ArrayList<Datestamp>();
 
@@ -44,44 +45,46 @@ public class MiscInfoTest {
     private static final String PURPOSE = "The major objectives of the project were to characterize and map the key " +
             "indicators of ocean acidification (OA) in the Pacific Ocean, and to continue a time series documenting " +
             "the distribution of surface and atmospheric fCO2, salinity, temperature, and other parameters.";
-    private static final ArrayList<String> REFERENCES = new ArrayList<String>(Arrays.asList(
-            "DOE (1994). Handbook of methods for the analysis of the various parameters of the carbon dioxide system " +
-                    "in sea water; version 2. DOE.",
-            "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and P. P. Murphy (1998)  A new " +
-                    "automated underway system for making high precision pCO2 measurements onboard research ships. " +
-                    "Analytica Chim. Acta 377: 185-191.",
-            "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca (1997). Measurement of underway " +
-                    "fCO2 in the Eastern Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER, " +
-                    "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.",
-            "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H. Luger, T. Johannessen, A. Olsen, " +
-                    "R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring " +
-                    "systems and data-reduction routines.  Deep Sea Research II, 56: 512-522.",
-            "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in surface water using continuous " +
-                    "and discrete sampling methods.  Mar. Chem. 44(2-4): 189-205.",
-            "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in water and seawater. " +
-                    "Deep-Sea Research 17: 721-735.",
-            "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the solubility of a non-ideal gas.  " +
-                    "Mar. Chem. 2: 203-215.",
-            "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects of temperature and salinity " +
-                    "on the partial pressure of CO2 in seawater. Nature 300: 511-513."
-    ));
-    private static final ArrayList<String> PORTS_OF_CALL = new ArrayList<String>(Arrays.asList(
-            "Honolulu, HI",
-            "San Francisco, CA"
-    ));
-    private static final ArrayList<String> ADDN_INFO_LIST = new ArrayList<String>(Arrays.asList(
-            "It was determined that there was a 2.68 minute offset between the SST data record from the SBE-21 " +
-                    "in the bow and the Hart 1521 temperature sensor in the equilibrator.  The SST data were " +
-                    "interpolated using this offset to determine the SST at the time of the equilibrator measurement.",
-            "A total of 6011 measurements were taken with 5661 flagged as good, 342 flagged as questionable, and 8 " +
-                    "flagged as bad.  All measurements flagged as 4 (bad) have been removed from the final data file.",
-            "There was a 17-1/2 hour dropout of EqT readings at the start of the cruise.  New values were determined " +
-                    "using a relation between equilibrator temperature and SST.  The equation used was " +
-                    "EqT = 0.9734*SST + 0.7735, n = 124, r^2 = 0.9630.  All of these values have been flagged 3.",
-            "On 1/22 at 1730, an emergency shutdown of the system occurred due to water getting into the atm " +
-                    "condenser.  The survey tech cleared out the water and restarted the system on 1/26 at 0519.  " +
-                    "No data was acquired during the shutdown period."
-    ));
+    private static final MultiString REFERENCES = new MultiString(
+            "DOE (1994). Handbook of methods for the analysis of the various parameters " +
+                    "of the carbon dioxide system in sea water; version 2. DOE.\n" +
+                    "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and P. P. Murphy (1998)  " +
+                    "A new automated underway system for making high precision pCO2 measurements onboard research " +
+                    "ships. Analytica Chim. Acta 377: 185-191.\n" +
+                    "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca (1997). Measurement of " +
+                    "underway fCO2 in the Eastern Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER, " +
+                    "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.\n" +
+                    "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H. Luger, T. Johannessen, " +
+                    "A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway " +
+                    "pCO2 measuring systems and data-reduction routines.  Deep Sea Research II, 56: 512-522.\n" +
+                    "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in surface water using " +
+                    "continuous and discrete sampling methods.  Mar. Chem. 44(2-4): 189-205.\n" +
+                    "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in water and seawater. " +
+                    "Deep-Sea Research 17: 721-735.\n" +
+                    "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the solubility of a non-ideal " +
+                    "gas.  Mar. Chem. 2: 203-215.\n" +
+                    "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects of temperature and " +
+                    "salinity on the partial pressure of CO2 in seawater. Nature 300: 511-513."
+    );
+    private static final MultiString PORTS_OF_CALL = new MultiString(
+            "Honolulu, HI\n" +
+                    "San Francisco, CA"
+    );
+    private static final MultiString ADDN_INFO_LIST = new MultiString(
+            "It was determined that there was a 2.68 minute offset between the SST data record from " +
+                    "the SBE-21 in the bow and the Hart 1521 temperature sensor in the equilibrator.  The SST " +
+                    "data were interpolated using this offset to determine the SST at the time of the equilibrator " +
+                    "measurement.\n" +
+                    "A total of 6011 measurements were taken with 5661 flagged as good, 342 flagged as questionable, " +
+                    "and 8 flagged as bad.  All measurements flagged as 4 (bad) have been removed from the final data " +
+                    "file.\n" +
+                    "There was a 17-1/2 hour dropout of EqT readings at the start of the cruise.  New values were " +
+                    "determined using a relation between equilibrator temperature and SST.  The equation used was " +
+                    "EqT = 0.9734*SST + 0.7735, n = 124, r^2 = 0.9630.  All of these values have been flagged 3.\n" +
+                    "On 1/22 at 1730, an emergency shutdown of the system occurred due to water getting into the " +
+                    "atm condenser.  The survey tech cleared out the water and restarted the system on 1/26 at " +
+                    "0519.  No data was acquired during the shutdown period."
+    );
     private static final ArrayList<Datestamp> HISTORY_LIST = new ArrayList<Datestamp>(Arrays.asList(
             new Datestamp(2016, 1, 20, 0, 0, 0),
             new Datestamp(2017, 2, 24, 0, 0, 0)
@@ -351,9 +354,9 @@ public class MiscInfoTest {
     @Test
     public void testGetSetReferences() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
         miscInfo.setReferences(REFERENCES);
-        ArrayList<String> nameList = miscInfo.getReferences();
+        MultiString nameList = miscInfo.getReferences();
         assertEquals(REFERENCES, nameList);
         assertNotSame(REFERENCES, nameList);
         assertNotSame(nameList, miscInfo.getReferences());
@@ -372,33 +375,21 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setReferences(null);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
-        miscInfo.setReferences(EMPTY_NAMESET);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
-        try {
-            miscInfo.setReferences(Arrays.asList("Some information", "\n", "More information"));
-            fail("calling setReferences with a list containing an blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            miscInfo.setReferences(Arrays.asList("Some information", null, "More information"));
-            fail("calling setReferences with a list containing a null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
+        miscInfo.setReferences(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
     }
 
     @Test
     public void testGetSetPortsOfCall() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getPortsOfCall());
         miscInfo.setPortsOfCall(PORTS_OF_CALL);
-        ArrayList<String> nameList = miscInfo.getPortsOfCall();
+        MultiString nameList = miscInfo.getPortsOfCall();
         assertEquals(PORTS_OF_CALL, nameList);
         assertNotSame(PORTS_OF_CALL, nameList);
         assertNotSame(nameList, miscInfo.getPortsOfCall());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -414,34 +405,22 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setPortsOfCall(null);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        miscInfo.setPortsOfCall(EMPTY_NAMESET);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        try {
-            miscInfo.setPortsOfCall(Arrays.asList("Some information", "\n", "More information"));
-            fail("calling setPortsOfCall with a list containing an blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            miscInfo.setPortsOfCall(Arrays.asList("Some information", null, "More information"));
-            fail("calling setPortsOfCall with a list containing a null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getPortsOfCall());
+        miscInfo.setPortsOfCall(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getPortsOfCall());
     }
 
     @Test
     public void testGetSetAddnInfo() {
         MiscInfo miscInfo = new MiscInfo();
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getAddnInfo());
         miscInfo.setAddnInfo(ADDN_INFO_LIST);
-        ArrayList<String> nameList = miscInfo.getAddnInfo();
+        MultiString nameList = miscInfo.getAddnInfo();
         assertEquals(ADDN_INFO_LIST, nameList);
         assertNotSame(ADDN_INFO_LIST, nameList);
         assertNotSame(nameList, miscInfo.getAddnInfo());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getPortsOfCall());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -457,21 +436,9 @@ public class MiscInfoTest {
         assertEquals(EMPTY_STR, miscInfo.getDatasetName());
         assertEquals(EMPTY_STR, miscInfo.getDatasetId());
         miscInfo.setAddnInfo(null);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        miscInfo.setAddnInfo(EMPTY_NAMESET);
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        try {
-            miscInfo.setAddnInfo(Arrays.asList("Some information", "\n", "More information"));
-            fail("calling setAddnInfo with a list containing an blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            miscInfo.setAddnInfo(Arrays.asList("Some information", null, "More information"));
-            fail("calling setAddnInfo with a list containing a null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getAddnInfo());
+        miscInfo.setAddnInfo(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getAddnInfo());
     }
 
     @Test
@@ -486,9 +453,9 @@ public class MiscInfoTest {
             assertNotSame(HISTORY_LIST.get(k), history.get(k));
         }
         assertNotSame(history, miscInfo.getHistory());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getAddnInfo());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getPortsOfCall());
-        assertEquals(EMPTY_NAMELIST, miscInfo.getReferences());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getPortsOfCall());
+        assertEquals(EMPTY_MULTISTRING, miscInfo.getReferences());
         assertEquals(EMPTY_STR, miscInfo.getPurpose());
         assertEquals(EMPTY_STR, miscInfo.getSynopsis());
         assertEquals(EMPTY_STR, miscInfo.getCitation());
@@ -508,13 +475,13 @@ public class MiscInfoTest {
         miscInfo.setHistory(EMPTY_STAMPLIST);
         assertEquals(EMPTY_STAMPLIST, miscInfo.getHistory());
         try {
-            miscInfo.setHistory(Arrays.asList(HISTORY_LIST.get(0), new Datestamp()));
+            miscInfo.setHistory(new ArrayList<Datestamp>(Arrays.asList(HISTORY_LIST.get(0), new Datestamp())));
             fail("calling setHistory with an invalid datestamp succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         try {
-            miscInfo.setHistory(Arrays.asList(HISTORY_LIST.get(0), null));
+            miscInfo.setHistory(new ArrayList<Datestamp>(Arrays.asList(HISTORY_LIST.get(0), null)));
             fail("calling setHistory with an null datestamp succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result

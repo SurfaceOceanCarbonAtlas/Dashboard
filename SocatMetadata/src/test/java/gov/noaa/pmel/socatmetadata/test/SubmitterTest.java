@@ -1,10 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -22,10 +22,10 @@ public class SubmitterTest {
     private static final String ID = "PI-23423";
     private static final String ID_TYPE = "PIRecords";
     private static final String ORGANIZATION = "NOAA/PMEL";
-    private static final ArrayList<String> STREETS = new ArrayList<String>(Arrays.asList(
-            "Room 259, Bldg 4",
-            "123 Main St"
-    ));
+    private static final MultiString STREETS = new MultiString(
+            "Room 259, Bldg 4\n" +
+                    "123 Main St"
+    );
     private static final String CITY = "Seattle";
     private static final String REGION = "WA";
     private static final String ZIP_CODE = "98101";

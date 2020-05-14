@@ -1,10 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -13,12 +13,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class InvestigatorTest {
 
     private static final String EMPTY_STRING = "";
-    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
 
     private static final String LAST_NAME = "Smith";
@@ -27,10 +26,10 @@ public class InvestigatorTest {
     private static final String ID = "PI-23423";
     private static final String ID_TYPE = "PIRecords";
     private static final String ORGANIZATION = "NOAA/PMEL";
-    private static final ArrayList<String> STREETS = new ArrayList<String>(Arrays.asList(
-            "Room 259, Bldg 4",
-            "123 Main St"
-    ));
+    private static final MultiString STREETS = new MultiString(
+            "Room 259, Bldg 4\n" +
+                    "123 Main St"
+    );
     private static final String CITY = "Seattle";
     private static final String REGION = "WA";
     private static final String ZIP_CODE = "98101";
@@ -41,9 +40,9 @@ public class InvestigatorTest {
     @Test
     public void testGetSetStreets() {
         Investigator investigator = new Investigator();
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         investigator.setStreets(STREETS);
-        ArrayList<String> nameList = investigator.getStreets();
+        MultiString nameList = investigator.getStreets();
         assertEquals(STREETS, nameList);
         assertNotSame(STREETS, nameList);
         assertNotSame(nameList, investigator.getStreets());
@@ -54,21 +53,9 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getFirstName());
         assertEquals(EMPTY_STRING, investigator.getLastName());
         investigator.setStreets(null);
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
-        investigator.setStreets(EMPTY_NAMESET);
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
-        try {
-            investigator.setStreets(Arrays.asList(STREETS.get(0), null, STREETS.get(1)));
-            fail("calling setStreets with a list containing null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            investigator.setStreets(Arrays.asList(STREETS.get(0), "\n", STREETS.get(1)));
-            fail("calling setStreets with a list containing a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
+        investigator.setStreets(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
     }
 
     @Test
@@ -77,7 +64,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getCity());
         investigator.setCity(CITY);
         assertEquals(CITY, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -97,7 +84,7 @@ public class InvestigatorTest {
         investigator.setRegion(REGION);
         assertEquals(REGION, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -118,7 +105,7 @@ public class InvestigatorTest {
         assertEquals(ZIP_CODE, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -140,7 +127,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -163,7 +150,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());
@@ -187,7 +174,7 @@ public class InvestigatorTest {
         assertEquals(EMPTY_STRING, investigator.getZipCode());
         assertEquals(EMPTY_STRING, investigator.getRegion());
         assertEquals(EMPTY_STRING, investigator.getCity());
-        assertEquals(EMPTY_NAMELIST, investigator.getStreets());
+        assertEquals(EMPTY_MULTISTRING, investigator.getStreets());
         assertEquals(EMPTY_STRING, investigator.getOrganization());
         assertEquals(EMPTY_STRING, investigator.getIdType());
         assertEquals(EMPTY_STRING, investigator.getId());

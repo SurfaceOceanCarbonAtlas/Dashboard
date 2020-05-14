@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
@@ -21,6 +22,7 @@ import static org.junit.Assert.fail;
 public class InstDataVarTest {
 
     private static final String EMPTY_STRING = "";
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
     private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
@@ -33,10 +35,10 @@ public class InstDataVarTest {
     private static final String FLAG_COL_NAME = "WOCE SST";
     private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
     private static final NumericString PRECISION = new NumericString("0.001", "deg C");
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some sort of information",
-            "Another bit of information"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some sort of information\n" +
+                    "Another bit of information"
+    );
 
     private static final String OBSERVE_TYPE = "Surface Underway";
     private static final MethodType MEASURE_METHOD = MethodType.MEASURED_INSITU;
@@ -190,9 +192,9 @@ public class InstDataVarTest {
     @Test
     public void testGetSetAddnInfo() {
         InstDataVar var = new InstDataVar();
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         var.setAddnInfo(ADDN_INFO);
-        ArrayList<String> addnInfo = var.getAddnInfo();
+        MultiString addnInfo = var.getAddnInfo();
         assertEquals(ADDN_INFO, addnInfo);
         assertNotSame(ADDN_INFO, addnInfo);
         assertNotSame(addnInfo, var.getAddnInfo());
@@ -204,21 +206,9 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAddnInfo(null);
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        var.setAddnInfo(EMPTY_HASHSET);
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        try {
-            var.setAddnInfo(Arrays.asList("something", null, "else"));
-            fail("calling setAddnInfo with a null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAddnInfo(Arrays.asList("something", "\n", "else"));
-            fail("calling setAddnInfo with a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
+        var.setAddnInfo(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
     }
 
     @Test
@@ -227,7 +217,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getObserveType());
         var.setObserveType(OBSERVE_TYPE);
         assertEquals(OBSERVE_TYPE, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -248,7 +238,7 @@ public class InstDataVarTest {
         var.setMeasureMethod(MEASURE_METHOD);
         assertEquals(MEASURE_METHOD, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -268,7 +258,7 @@ public class InstDataVarTest {
         assertEquals(METHOD_DESCRIPTION, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -291,7 +281,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -315,7 +305,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -340,7 +330,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -366,7 +356,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -393,7 +383,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -421,7 +411,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -451,7 +441,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -481,7 +471,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -515,7 +505,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -548,7 +538,7 @@ public class InstDataVarTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());

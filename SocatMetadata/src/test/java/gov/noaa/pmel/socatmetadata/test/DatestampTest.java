@@ -6,7 +6,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -241,6 +240,16 @@ public class DatestampTest {
         assertEquals(HOUR, datestamp.getHour());
         assertEquals(MINUTE, datestamp.getMinute());
         assertEquals(Datestamp.INVALID, datestamp.getSecond());
+
+        datestamp = new Datestamp();
+        Datestamp clone = new Datestamp(datestamp);
+        assertEquals(datestamp, clone);
+
+        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND);
+        assertNotEquals(datestamp, clone);
+
+        clone = new Datestamp(datestamp);
+        assertEquals(datestamp, clone);
     }
 
     @Test
@@ -295,21 +304,6 @@ public class DatestampTest {
 
         datestamp = new Datestamp(2011, 2, 29, HOUR, MINUTE, SECOND);
         assertFalse(datestamp.isValid(null));
-    }
-
-    @Test
-    public void testDuplicate() {
-        Datestamp datestamp = new Datestamp();
-        Datestamp clone = (Datestamp) (datestamp.duplicate(null));
-        assertEquals(datestamp, clone);
-        assertNotSame(datestamp, clone);
-
-        datestamp = new Datestamp(YEAR, MONTH, DAY, HOUR, MINUTE, SECOND);
-        assertNotEquals(datestamp, clone);
-
-        clone = (Datestamp) (datestamp.duplicate(null));
-        assertEquals(datestamp, clone);
-        assertNotSame(datestamp, clone);
     }
 
     @Test

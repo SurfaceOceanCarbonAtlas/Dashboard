@@ -2,9 +2,9 @@ package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -12,13 +12,13 @@ import java.util.HashSet;
  */
 public class Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 5735318506117787997L;
+    private static final long serialVersionUID = -3757114256842814669L;
 
-    protected String colName;
-    protected String fullName;
-    protected String varUnit;
-    protected String missVal;
-    protected ArrayList<String> addnInfo;
+    private String colName;
+    private String fullName;
+    private String varUnit;
+    private String missVal;
+    private MultiString addnInfo;
 
     /**
      * Create with all fields empty.
@@ -28,7 +28,7 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
         fullName = "";
         varUnit = "";
         missVal = "";
-        addnInfo = new ArrayList<String>();
+        addnInfo = new MultiString();
     }
 
     /**
@@ -40,14 +40,14 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
             fullName = var.fullName;
             varUnit = var.varUnit;
             missVal = var.missVal;
-            addnInfo = new ArrayList<String>(var.addnInfo);
+            addnInfo = new MultiString(var.addnInfo);
         }
         else {
             colName = "";
             fullName = "";
             varUnit = "";
             missVal = "";
-            addnInfo = new ArrayList<String>();
+            addnInfo = new MultiString();
         }
     }
 
@@ -129,44 +129,17 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
 
     /**
      * @return the list of additional information strings; never null but may be empty.
-     *         Any strings given are guaranteed to be strings with content (not blank).
      */
-    public ArrayList<String> getAddnInfo() {
-        return new ArrayList<String>(addnInfo);
-    }
-
-    /**
-     * Calls {@link #setAddnInfo(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param addnInfo
-     *         assign as the list of additional information strings; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any information string given is null or blank
-     */
-    public void setAddnInfo(ArrayList<String> addnInfo) throws IllegalArgumentException {
-        setAddnInfo((Iterable<String>) addnInfo);
+    public MultiString getAddnInfo() {
+        return new MultiString(addnInfo);
     }
 
     /**
      * @param addnInfo
      *         assign as the list of additional information strings; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any information string given is null or blank
      */
-    public void setAddnInfo(Iterable<String> addnInfo) throws IllegalArgumentException {
-        this.addnInfo.clear();
-        if ( addnInfo != null ) {
-            for (String info : addnInfo) {
-                if ( info == null )
-                    throw new IllegalArgumentException("null information string given");
-                info = info.trim();
-                if ( info.isEmpty() )
-                    throw new IllegalArgumentException("blank information string given");
-                this.addnInfo.add(info);
-            }
-        }
+    public void setAddnInfo(MultiString addnInfo) {
+        this.addnInfo = new MultiString(addnInfo);
     }
 
     /**
@@ -193,8 +166,19 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
         var.fullName = fullName;
         var.varUnit = varUnit;
         var.missVal = missVal;
-        var.addnInfo = new ArrayList<String>(addnInfo);
+        var.addnInfo = new MultiString(addnInfo);
         return var;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = colName.hashCode();
+        result = result * prime + fullName.hashCode();
+        result = result * prime + varUnit.hashCode();
+        result = result * prime + missVal.hashCode();
+        result = result * prime + addnInfo.hashCode();
+        return result;
     }
 
     @Override
@@ -220,17 +204,6 @@ public class Variable implements Duplicable, Serializable, IsSerializable {
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = colName.hashCode();
-        result = result * prime + fullName.hashCode();
-        result = result * prime + varUnit.hashCode();
-        result = result * prime + missVal.hashCode();
-        result = result * prime + addnInfo.hashCode();
-        return result;
     }
 
     @Override

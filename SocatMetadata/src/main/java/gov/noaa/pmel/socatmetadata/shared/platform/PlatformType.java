@@ -57,7 +57,6 @@ public enum PlatformType implements Serializable, IsSerializable {
                 return "Autonomous Surface Vehicle";
             default:
                 throw new RuntimeException("Unexpected PlatformType of " + super.toString());
-
         }
     }
 

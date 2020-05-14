@@ -2,9 +2,9 @@ package gov.noaa.pmel.socatmetadata.shared.person;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -13,22 +13,22 @@ import java.util.HashSet;
  */
 public class Investigator extends Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5900221519133196965L;
+    private static final long serialVersionUID = 8464640869413581049L;
 
-    protected ArrayList<String> streets;
-    protected String city;
-    protected String region;
-    protected String zipCode;
-    protected String country;
-    protected String phone;
-    protected String email;
+    private MultiString streets;
+    private String city;
+    private String region;
+    private String zipCode;
+    private String country;
+    private String phone;
+    private String email;
 
     /**
      * Create with all fields empty.
      */
     public Investigator() {
         super();
-        streets = new ArrayList<String>(2);
+        streets = new MultiString();
         city = "";
         region = "";
         zipCode = "";
@@ -38,61 +38,44 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
     }
 
     /**
-     * Create with Person fields assigned from the given person and all other fields empty
-     *
-     * @param person
-     *         assign lastName, firstName, id, idType, and organization fields from here; cannot be null
+     * Create with as many fields assigned from the given Person as possible.
      */
     public Investigator(Person person) {
-        super(person.lastName, person.firstName, person.middle, person.id, person.idType, person.organization);
-        streets = new ArrayList<String>(2);
-        city = "";
-        region = "";
-        zipCode = "";
-        country = "";
-        phone = "";
-        email = "";
+        super(person);
+        if ( person instanceof Investigator ) {
+            Investigator pi = (Investigator) person;
+            streets = new MultiString(pi.streets);
+            city = pi.city;
+            region = pi.region;
+            zipCode = pi.zipCode;
+            country = pi.country;
+            phone = pi.phone;
+            email = pi.email;
+        }
+        else {
+            streets = new MultiString();
+            city = "";
+            region = "";
+            zipCode = "";
+            country = "";
+            phone = "";
+            email = "";
+        }
     }
 
     /**
      * @return the street / delivery point portion of the address; never null but may be empty
      */
-    public ArrayList<String> getStreets() {
-        return new ArrayList<String>(streets);
-    }
-
-    /**
-     * Calls {@link #setStreets(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param streets
-     *         assign as the street / delivery point portion of the address; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the given list contains a null or blank string
-     */
-    public void setStreets(ArrayList<String> streets) throws IllegalArgumentException {
-        setStreets((Iterable<String>) streets);
+    public MultiString getStreets() {
+        return new MultiString(streets);
     }
 
     /**
      * @param streets
      *         assign as the street / delivery point portion of the address; if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the given list contains a null or blank string
      */
-    public void setStreets(Iterable<String> streets) throws IllegalArgumentException {
-        this.streets.clear();
-        if ( streets != null ) {
-            for (String loc : streets) {
-                if ( loc == null )
-                    throw new IllegalArgumentException("null street String given");
-                loc = loc.trim();
-                if ( loc.isEmpty() )
-                    throw new IllegalArgumentException("blank street String given");
-                this.streets.add(loc);
-            }
-        }
+    public void setStreets(MultiString streets) {
+        this.streets = new MultiString(streets);
     }
 
     /**
@@ -188,7 +171,7 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
     @Override
     public HashSet<String> invalidFieldNames() {
         HashSet<String> invalids = super.invalidFieldNames();
-        if ( organization.isEmpty() )
+        if ( getOrganization().isEmpty() )
             invalids.add("organization");
         return invalids;
     }
@@ -201,7 +184,7 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
         else
             inv = (Investigator) dup;
         super.duplicate(inv);
-        inv.streets = new ArrayList<String>(streets);
+        inv.streets = new MultiString(streets);
         inv.city = city;
         inv.region = region;
         inv.zipCode = zipCode;
@@ -209,6 +192,20 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
         inv.phone = phone;
         inv.email = email;
         return inv;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + streets.hashCode();
+        result = result * prime + city.hashCode();
+        result = result * prime + region.hashCode();
+        result = result * prime + zipCode.hashCode();
+        result = result * prime + country.hashCode();
+        result = result * prime + phone.hashCode();
+        result = result * prime + email.hashCode();
+        return result;
     }
 
     @Override
@@ -240,20 +237,6 @@ public class Investigator extends Person implements Duplicable, Serializable, Is
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + streets.hashCode();
-        result = result * prime + city.hashCode();
-        result = result * prime + region.hashCode();
-        result = result * prime + zipCode.hashCode();
-        result = result * prime + country.hashCode();
-        result = result * prime + phone.hashCode();
-        result = result * prime + email.hashCode();
-        return result;
     }
 
     @Override

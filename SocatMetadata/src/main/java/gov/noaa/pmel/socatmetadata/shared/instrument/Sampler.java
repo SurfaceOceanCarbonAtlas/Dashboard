@@ -11,9 +11,9 @@ import java.util.HashSet;
  */
 public class Sampler extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3803030210273160174L;
+    private static final long serialVersionUID = -8878532090544959160L;
 
-    HashSet<String> instrumentNames;
+    private HashSet<String> instrumentNames;
 
     /**
      * Create with all fields empty.
@@ -90,6 +90,14 @@ public class Sampler extends Instrument implements Duplicable, Serializable, IsS
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + instrumentNames.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -106,14 +114,6 @@ public class Sampler extends Instrument implements Duplicable, Serializable, IsS
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + instrumentNames.hashCode();
-        return result;
     }
 
     @Override

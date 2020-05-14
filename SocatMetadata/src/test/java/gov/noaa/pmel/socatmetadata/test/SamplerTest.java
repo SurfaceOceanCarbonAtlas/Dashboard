@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
@@ -19,6 +20,7 @@ import static org.junit.Assert.fail;
 public class SamplerTest {
 
     private static final String EMPTY_STRING = "";
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
     private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
 
@@ -26,10 +28,10 @@ public class SamplerTest {
     private static final String ID = "325";
     private static final String MANUFACTURER = "NOAA";
     private static final String MODEL = "7";
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some comment",
-            "Another comment"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some comment\n" +
+                    "Another comment"
+    );
     private static final HashSet<String> INSTRUMENT_NAMES = new HashSet<String>(Arrays.asList(
             "Equilibrator Pressure Sensor",
             "Equilibrator Temperature Sensor"
@@ -44,7 +46,7 @@ public class SamplerTest {
         assertEquals(INSTRUMENT_NAMES, instNames);
         assertNotSame(INSTRUMENT_NAMES, instNames);
         assertNotSame(instNames, sampler.getInstrumentNames());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());

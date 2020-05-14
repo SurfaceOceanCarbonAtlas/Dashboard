@@ -8,9 +8,9 @@ import java.io.Serializable;
  * Represents a simple UTC date and time as year, month, day, hour, minute, second
  * with minimal support.
  */
-public final class Datestamp implements Duplicable, Serializable, IsSerializable {
+public final class Datestamp implements Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3033185888931897459L;
+    private static final long serialVersionUID = -2000617868657143552L;
 
     private static final int FIRST_VALID_YEAR = 1900;
     private static final int LAST_VALID_YEAR = 2099;
@@ -39,6 +39,22 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
         hour = INVALID;
         minute = INVALID;
         second = INVALID;
+    }
+
+    /**
+     * Create with a copy of the contents in the given Datestamp.  If null is given, creates
+     * as with {@link Datestamp#Datestamp()} .
+     */
+    public Datestamp(Datestamp other) {
+        this();
+        if ( other != null ) {
+            year = other.year;
+            month = other.month;
+            day = other.day;
+            hour = other.hour;
+            minute = other.minute;
+            second = other.second;
+        }
     }
 
     /**
@@ -478,19 +494,15 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
     }
 
     @Override
-    public Object duplicate(Object dup) {
-        Datestamp stamp;
-        if ( dup == null )
-            stamp = new Datestamp();
-        else
-            stamp = (Datestamp) dup;
-        stamp.year = year;
-        stamp.month = month;
-        stamp.day = day;
-        stamp.hour = hour;
-        stamp.minute = minute;
-        stamp.second = second;
-        return stamp;
+    public int hashCode() {
+        final int prime = 37;
+        int result = Integer.hashCode(year);
+        result = result * prime + Integer.hashCode(month);
+        result = result * prime + Integer.hashCode(day);
+        result = result * prime + Integer.hashCode(hour);
+        result = result * prime + Integer.hashCode(minute);
+        result = result * prime + Integer.hashCode(second);
+        return result;
     }
 
     @Override
@@ -517,18 +529,6 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
         if ( second != datestamp.second )
             return false;
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = Integer.hashCode(year);
-        result = result * prime + Integer.hashCode(month);
-        result = result * prime + Integer.hashCode(day);
-        result = result * prime + Integer.hashCode(hour);
-        result = result * prime + Integer.hashCode(minute);
-        result = result * prime + Integer.hashCode(second);
-        return result;
     }
 
     @Override

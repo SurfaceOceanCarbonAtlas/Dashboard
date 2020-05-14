@@ -1,11 +1,11 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -20,7 +20,7 @@ public class VariableTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
-    private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
 
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
@@ -29,10 +29,10 @@ public class VariableTest {
     private static final String FLAG_COL_NAME = "WOCE SST";
     private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
     private static final NumericString PRECISION = new NumericString("0.001", "deg C");
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some sort of information",
-            "Another bit of information"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some sort of information\n" +
+                    "Another bit of information"
+    );
 
     @Test
     public void testGetSetColName() {
@@ -172,9 +172,9 @@ public class VariableTest {
     @Test
     public void testGetSetAddnInfo() {
         Variable var = new Variable();
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         var.setAddnInfo(ADDN_INFO);
-        ArrayList<String> addnInfo = var.getAddnInfo();
+        MultiString addnInfo = var.getAddnInfo();
         assertEquals(ADDN_INFO, addnInfo);
         assertNotSame(ADDN_INFO, addnInfo);
         assertNotSame(addnInfo, var.getAddnInfo());
@@ -183,21 +183,9 @@ public class VariableTest {
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAddnInfo(null);
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        var.setAddnInfo(new HashSet<String>());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        try {
-            var.setAddnInfo(Arrays.asList("something", null, "else"));
-            fail("calling setAddnInfo with a null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAddnInfo(Arrays.asList("something", "\n", "else"));
-            fail("calling setAddnInfo with a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
+        var.setAddnInfo(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
     }
 
     @Test

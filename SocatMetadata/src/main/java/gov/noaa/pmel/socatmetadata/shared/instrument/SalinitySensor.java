@@ -26,6 +26,11 @@ public class SalinitySensor extends Analyzer implements Duplicable, Serializable
     }
 
     @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -34,11 +39,6 @@ public class SalinitySensor extends Analyzer implements Duplicable, Serializable
         if ( !(obj instanceof SalinitySensor) )
             return false;
         return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     @Override

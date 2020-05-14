@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
@@ -20,7 +21,7 @@ public class GasConcTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
-    private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
     private static final Person EMPTY_PERSON = new Person();
 
@@ -31,10 +32,10 @@ public class GasConcTest {
     private static final String FLAG_COL_NAME = "WOCE xCO2_atm";
     private static final NumericString ACCURACY = new NumericString("0.01", "umol/mol");
     private static final NumericString PRECISION = new NumericString("0.001", "umol/mol");
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some sort of information",
-            "Another bit of information"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some sort of information\n" +
+                    "Another bit of information"
+    );
 
     private static final String OBSERVE_TYPE = "Surface Underway";
     private static final MethodType MEASURE_METHOD = MethodType.MEASURED_INSITU;
@@ -71,7 +72,7 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -103,7 +104,7 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());

@@ -12,21 +12,21 @@ import java.util.HashSet;
  */
 public class InstDataVar extends GenDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 8968660545730752307L;
+    private static final long serialVersionUID = 3116290747977544563L;
 
-    protected String observeType;
-    protected MethodType measureMethod;
-    protected String methodDescription;
-    protected String methodReference;
-    protected String manipulationDescription;
-    protected String samplingLocation;
-    protected String samplingElevation;
-    protected String storageMethod;
-    protected String duration;
-    protected String analysisTemperature;
-    protected String replication;
-    protected Person researcher;
-    protected HashSet<String> instrumentNames;
+    private String observeType;
+    private MethodType measureMethod;
+    private String methodDescription;
+    private String methodReference;
+    private String manipulationDescription;
+    private String samplingLocation;
+    private String samplingElevation;
+    private String storageMethod;
+    private String duration;
+    private String analysisTemperature;
+    private String replication;
+    private Person researcher;
+    private HashSet<String> instrumentNames;
 
     /**
      * Create with all fields empty.
@@ -91,7 +91,7 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
         HashSet<String> invalid = super.invalidFieldNames();
         if ( observeType.isEmpty() )
             invalid.add("observeType");
-        if ( !accuracy.isValid() )
+        if ( !getAccuracy().isValid() )
             invalid.add("accuracy");
         switch ( measureMethod ) {
             case UNSPECIFIED:
@@ -370,6 +370,26 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = super.hashCode();
+        result = result * prime + observeType.hashCode();
+        result = result * prime + measureMethod.hashCode();
+        result = result * prime + methodDescription.hashCode();
+        result = result * prime + methodReference.hashCode();
+        result = result * prime + manipulationDescription.hashCode();
+        result = result * prime + samplingLocation.hashCode();
+        result = result * prime + samplingElevation.hashCode();
+        result = result * prime + storageMethod.hashCode();
+        result = result * prime + duration.hashCode();
+        result = result * prime + analysisTemperature.hashCode();
+        result = result * prime + replication.hashCode();
+        result = result * prime + researcher.hashCode();
+        result = result * prime + instrumentNames.hashCode();
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
@@ -410,26 +430,6 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
             return false;
 
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = super.hashCode();
-        result = result * prime + observeType.hashCode();
-        result = result * prime + measureMethod.hashCode();
-        result = result * prime + methodDescription.hashCode();
-        result = result * prime + methodReference.hashCode();
-        result = result * prime + manipulationDescription.hashCode();
-        result = result * prime + samplingLocation.hashCode();
-        result = result * prime + samplingElevation.hashCode();
-        result = result * prime + storageMethod.hashCode();
-        result = result * prime + duration.hashCode();
-        result = result * prime + analysisTemperature.hashCode();
-        result = result * prime + replication.hashCode();
-        result = result * prime + researcher.hashCode();
-        result = result * prime + instrumentNames.hashCode();
-        return result;
     }
 
     @Override

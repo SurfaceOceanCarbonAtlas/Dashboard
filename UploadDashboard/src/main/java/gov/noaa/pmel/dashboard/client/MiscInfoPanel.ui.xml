@@ -38,7 +38,6 @@
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="refsValue"/>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="portsValue"/>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
-            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="historyValue"/>
         </g:FlowPanel>
     </g:ScrollPanel>
 
