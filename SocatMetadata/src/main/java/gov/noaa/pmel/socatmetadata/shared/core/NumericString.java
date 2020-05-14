@@ -196,10 +196,7 @@ public final class NumericString implements Duplicable, Serializable, IsSerializ
 
     @Override
     public String toString() {
-        return "NumericString{" +
-                "valueString='" + valueString + '\'' +
-                ", unitString='" + unitString + '\'' +
-                '}';
+        return "NumericString{ valueString='" + valueString + "', unitString='" + unitString + "' }";
     }
 
 }

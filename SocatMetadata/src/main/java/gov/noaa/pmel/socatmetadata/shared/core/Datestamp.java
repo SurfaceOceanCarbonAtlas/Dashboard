@@ -533,14 +533,14 @@ public final class Datestamp implements Duplicable, Serializable, IsSerializable
 
     @Override
     public String toString() {
-        return "Datestamp{" +
-                "year=" + year +
+        return "Datestamp" +
+                "{ year=" + year +
                 ", month=" + month +
                 ", day=" + day +
                 ", hour=" + hour +
                 ", minute=" + minute +
                 ", second=" + second +
-                '}';
+                " }";
     }
 
 }

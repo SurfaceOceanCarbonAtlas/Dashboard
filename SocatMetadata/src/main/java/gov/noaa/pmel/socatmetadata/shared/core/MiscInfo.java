@@ -558,26 +558,26 @@ public class MiscInfo implements Duplicable, Serializable, IsSerializable {
 
     @Override
     public String toString() {
-        return "Dataset{" +
-                "datasetId='" + datasetId + '\'' +
-                ", datasetName='" + datasetName + '\'' +
-                ", sectionName='" + sectionName + '\'' +
-                ", fundingAgency='" + fundingAgency + '\'' +
-                ", fundingTitle='" + fundingTitle + '\'' +
-                ", fundingId='" + fundingId + '\'' +
-                ", researchProject='" + researchProject + '\'' +
-                ", datasetDoi='" + datasetDoi + '\'' +
-                ", accessId='" + accessId + '\'' +
-                ", website='" + website + '\'' +
-                ", downloadUrl='" + downloadUrl + '\'' +
-                ", citation='" + citation + '\'' +
-                ", synopsis='" + synopsis + '\'' +
-                ", purpose='" + purpose + '\'' +
-                ", references=" + references +
-                ", portsOfCall=" + portsOfCall +
-                ", addnInfo=" + addnInfo +
-                ", history=" + history +
-                '}';
+        return "MiscInfo{" +
+                " datasetId='" + datasetId + "'," +
+                " datasetName='" + datasetName + "'," +
+                " sectionName='" + sectionName + "'," +
+                " fundingAgency='" + fundingAgency + "'," +
+                " fundingTitle='" + fundingTitle + "'," +
+                " fundingId='" + fundingId + "'," +
+                " researchProject='" + researchProject + "'," +
+                " datasetDoi='" + datasetDoi + "'," +
+                " accessId='" + accessId + "'," +
+                " website='" + website + "'," +
+                " downloadUrl='" + downloadUrl + "'," +
+                " citation='" + citation + "'," +
+                " synopsis='" + synopsis + "'," +
+                " purpose='" + purpose + "'," +
+                " references=" + references + "," +
+                " portsOfCall=" + portsOfCall + "," +
+                " addnInfo=" + addnInfo + "," +
+                " history=" + history +
+                " }";
     }
 
 }
