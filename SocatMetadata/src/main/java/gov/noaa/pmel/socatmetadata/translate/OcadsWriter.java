@@ -21,8 +21,8 @@ import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.jdom2.Document;
@@ -278,10 +278,10 @@ public class OcadsWriter extends DocumentHandler {
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
-            if ( var instanceof GenDataVar )
-                addGenDataVarAddnFields(ancestor, (GenDataVar) var);
-            if ( var instanceof InstDataVar )
-                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstDataVar) var, instruments));
+            if ( var instanceof GenData )
+                addGenDataVarAddnFields(ancestor, (GenData) var);
+            if ( var instanceof InstData )
+                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstData) var, instruments));
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -397,14 +397,14 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     /**
-     * Add the OCADS XML for the additional fields found in GenDataVar
+     * Add the OCADS XML for the additional fields found in GenData
      *
      * @param ancestor
      *         add under this element
      * @param var
      *         use the information given in this data variable
      */
-    private void addGenDataVarAddnFields(Element ancestor, GenDataVar var) {
+    private void addGenDataVarAddnFields(Element ancestor, GenData var) {
         setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
         String strVal = var.getFlagColName();
         if ( !strVal.isEmpty() )
@@ -425,7 +425,7 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     /**
-     * Add the OCADS XML for the additional fields found in InstDataVar
+     * Add the OCADS XML for the additional fields found in InstData
      *
      * @param ancestor
      *         add under this element
@@ -436,7 +436,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addInstDataVarAddnFields(Element ancestor, InstDataVar var,
+    private HashSet<String> addInstDataVarAddnFields(Element ancestor, InstData var,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
 
@@ -657,7 +657,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addSamplerElements(Element ancestor, InstDataVar var, Sampler inst,
+    private HashSet<String> addSamplerElements(Element ancestor, InstData var, Sampler inst,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
@@ -749,7 +749,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addAnalyzerElements(Element ancestor, InstDataVar var, Analyzer inst) {
+    private HashSet<String> addAnalyzerElements(Element ancestor, InstData var, Analyzer inst) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
 

@@ -6,9 +6,9 @@ import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import java.io.Serializable;
 import java.util.HashSet;
 
-public class BioDataVar extends InstDataVar implements Duplicable, Serializable, IsSerializable {
+public class BioData extends InstData implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 3964590419040442153L;
+    private static final long serialVersionUID = -2278403095729938763L;
 
     private String biologicalSubject;
     private String speciesId;
@@ -17,7 +17,7 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
     /**
      * Create with all fields empty
      */
-    public BioDataVar() {
+    public BioData() {
         super();
         biologicalSubject = "";
         speciesId = "";
@@ -27,10 +27,10 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
     /**
      * Create using as many of the values in the given variable subclass as possible.
      */
-    public BioDataVar(Variable var) {
+    public BioData(Variable var) {
         super(var);
-        if ( var instanceof BioDataVar ) {
-            BioDataVar biovar = (BioDataVar) var;
+        if ( var instanceof BioData ) {
+            BioData biovar = (BioData) var;
             biologicalSubject = biovar.biologicalSubject;
             speciesId = biovar.speciesId;
             lifeStage = biovar.lifeStage;
@@ -99,11 +99,11 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
 
     @Override
     public Object duplicate(Object dup) {
-        BioDataVar var;
+        BioData var;
         if ( dup == null )
-            var = new BioDataVar();
+            var = new BioData();
         else
-            var = (BioDataVar) dup;
+            var = (BioData) dup;
         super.duplicate(var);
         var.biologicalSubject = biologicalSubject;
         var.speciesId = speciesId;
@@ -125,12 +125,12 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
     public boolean equals(Object obj) {
         if ( this == obj )
             return true;
-        if ( !(obj instanceof BioDataVar) )
+        if ( !(obj instanceof BioData) )
             return false;
         if ( !super.equals(obj) )
             return false;
 
-        BioDataVar other = (BioDataVar) obj;
+        BioData other = (BioData) obj;
 
         if ( !biologicalSubject.equals(other.biologicalSubject) )
             return false;
@@ -154,7 +154,7 @@ public class BioDataVar extends InstDataVar implements Duplicable, Serializable,
 
     @Override
     public String getSimpleName() {
-        return "BioDataVar";
+        return "BioData";
     }
 
 }

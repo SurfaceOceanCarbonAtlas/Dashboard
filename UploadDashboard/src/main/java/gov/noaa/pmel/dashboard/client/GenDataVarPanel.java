@@ -8,7 +8,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
 
 import java.util.HashSet;
 
@@ -35,7 +35,7 @@ public class GenDataVarPanel extends FlagVarPanel {
      * @param header
      *         header that should be updated when appropriate values change; cannot be null
      */
-    public GenDataVarPanel(GenDataVar gendata, HTML header, VariablesTabPanel parentPanel) {
+    public GenDataVarPanel(GenData gendata, HTML header, VariablesTabPanel parentPanel) {
         super(gendata, header, parentPanel);
         // Create the provided widgets added by this panel
         accuracyValue = new LabeledTextBox("Accuracy:", "11em", "20em", null, null);
@@ -52,7 +52,7 @@ public class GenDataVarPanel extends FlagVarPanel {
 
     @Override
     protected void finishInitialization() {
-        GenDataVar gendata = (GenDataVar) vari;
+        GenData gendata = (GenData) vari;
 
         // Assign the values in the text fields added in this panel
         accuracyValue.setText((gendata.getAccuracy().getValueString()));
@@ -66,7 +66,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         unitValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                // For GenDataVar, change in the varible units also changes the accuracy and precision units
+                // For GenData, change in the varible units also changes the accuracy and precision units
                 String unit = unitValue.getText();
                 accuracyValue.setSuffix(unit);
                 precisionValue.setSuffix(unit);
@@ -76,7 +76,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         accuracyValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                GenDataVar gendata = (GenDataVar) vari;
+                GenData gendata = (GenData) vari;
                 try {
                     gendata.setAccuracy(new NumericString(accuracyValue.getText(), unitValue.getText()));
                 } catch ( IllegalArgumentException ex ) {
@@ -88,7 +88,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         precisionValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                GenDataVar gendata = (GenDataVar) vari;
+                GenData gendata = (GenData) vari;
                 try {
                     gendata.setPrecision(new NumericString(precisionValue.getText(), unitValue.getText()));
                 } catch ( IllegalArgumentException ex ) {
@@ -100,7 +100,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         flagNameValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                GenDataVar gendata = (GenDataVar) vari;
+                GenData gendata = (GenData) vari;
                 gendata.setFlagColName(flagNameValue.getText());
                 markInvalids(null);
             }
@@ -113,7 +113,7 @@ public class GenDataVarPanel extends FlagVarPanel {
     @Override
     protected void markInvalids(HashSet<String> invalids) {
         if ( invalids == null )
-            invalids = ((GenDataVar) vari).invalidFieldNames();
+            invalids = ((GenData) vari).invalidFieldNames();
 
         // Appropriately mark the labels of fields added in this panel
         if ( invalids.contains("accuracy") )

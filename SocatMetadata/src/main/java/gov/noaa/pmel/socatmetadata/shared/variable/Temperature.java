@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Information about a temperature measurement.
  * The default unit is set to degrees Celsius.
  */
-public class Temperature extends InstDataVar implements Duplicable, Serializable, IsSerializable {
+public class Temperature extends InstData implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = 7362053649610620025L;
 

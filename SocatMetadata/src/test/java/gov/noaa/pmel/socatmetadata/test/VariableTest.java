@@ -2,7 +2,7 @@ package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
@@ -90,7 +90,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetFlagColName() {
-        GenDataVar var = new GenDataVar();
+        GenData var = new GenData();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
@@ -106,7 +106,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetAccuracy() {
-        GenDataVar var = new GenDataVar();
+        GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
         assertEquals(new NumericString(ACCURACY.getValueString(), ""), var.getAccuracy());
@@ -142,7 +142,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetPrecision() {
-        GenDataVar var = new GenDataVar();
+        GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
         assertEquals(new NumericString(PRECISION.getValueString(), ""), var.getPrecision());

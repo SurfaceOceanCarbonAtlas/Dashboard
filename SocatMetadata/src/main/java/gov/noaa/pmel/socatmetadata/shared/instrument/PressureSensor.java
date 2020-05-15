@@ -2,13 +2,13 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 
 import java.io.Serializable;
 
 /**
  * Basic information about an instrument that is a pressure sensor.  Specific details about values measured
- * by the sensor are part of {@link InstDataVar}.
+ * by the sensor are part of {@link InstData}.
  */
 public class PressureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 

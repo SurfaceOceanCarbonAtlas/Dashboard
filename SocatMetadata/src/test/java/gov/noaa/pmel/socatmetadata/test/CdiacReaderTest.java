@@ -23,8 +23,8 @@ import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
@@ -432,14 +432,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.pop());
             assertTrue(var.toString(), strList.isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("1", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "WOCE_QC_FLAG", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("1", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
@@ -485,14 +485,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.pop());
             assertTrue(var.toString(), strList.isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
@@ -536,14 +536,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.pop());
             assertTrue(var.toString(), strList.isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
@@ -583,14 +583,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.05", "hPa"), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.015", "hPa"), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.05", "hPa"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.015", "hPa"), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
@@ -619,14 +619,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.2", "hPa"), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.08", "hPa"), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.2", "hPa"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.08", "hPa"), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
@@ -655,14 +655,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.025", "deg C"), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", "deg C"), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.025", "deg C"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "deg C"), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
@@ -688,14 +688,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.01", "deg C"), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.001", "deg C"), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.01", "deg C"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.001", "deg C"), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
@@ -722,14 +722,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.005 ", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.0002", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.005 ", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.0002", ""), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getMethodDescription());
@@ -760,14 +760,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Frequency: Every 150 seconds", strList.pop());
             assertTrue(var.toString(), strList.isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("1", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "WOCE_QC_FLAG", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("1", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), "WOCE_QC_FLAG", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.MEASURED_INSITU, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
@@ -814,14 +814,14 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "Measurement: Yes, 5 readings in a group every 3.25 hours.", strList.pop());
             assertTrue(var.toString(), strList.isEmpty());
 
-            assertTrue(var instanceof GenDataVar);
-            GenDataVar genDataVar = (GenDataVar) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genDataVar.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genDataVar.getPrecision());
-            assertEquals(var.toString(), "", genDataVar.getFlagColName());
+            assertTrue(var instanceof GenData);
+            GenData genData = (GenData) var;
+            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), "", genData.getFlagColName());
 
-            assertTrue(var instanceof InstDataVar);
-            InstDataVar instDataVar = (InstDataVar) var;
+            assertTrue(var instanceof InstData);
+            InstData instDataVar = (InstData) var;
             assertEquals(instDataVar.toString(), "Surface Underway", instDataVar.getObserveType());
             assertEquals(instDataVar.toString(), MethodType.COMPUTED, instDataVar.getMeasureMethod());
             assertEquals(instDataVar.toString(), "Infrared absorption of dry sample gas.",
@@ -862,7 +862,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertFalse(var instanceof GenDataVar);
+            assertFalse(var instanceof GenData);
         }
 
         {
@@ -874,7 +874,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertFalse(var instanceof GenDataVar);
+            assertFalse(var instanceof GenData);
         }
 
         {
@@ -886,7 +886,7 @@ public class CdiacReaderTest {
             assertEquals(var.toString(), "", var.getMissVal());
             assertTrue(var.toString(), var.getAddnInfo().isEmpty());
 
-            assertFalse(var instanceof GenDataVar);
+            assertFalse(var instanceof GenData);
         }
 
     }

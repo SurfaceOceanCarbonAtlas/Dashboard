@@ -3,8 +3,8 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class InstDataVarTest {
+public class InstDataTest {
 
     private static final String EMPTY_STRING = "";
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
@@ -56,7 +56,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetColName() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getColName());
         var.setColName(COL_NAME);
         assertEquals(COL_NAME, var.getColName());
@@ -68,7 +68,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetFullName() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getFullName());
         var.setFullName(FULL_NAME);
         assertEquals(FULL_NAME, var.getFullName());
@@ -81,7 +81,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetVarUnit() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getVarUnit());
         var.setVarUnit(VAR_UNIT);
         assertEquals(VAR_UNIT, var.getVarUnit());
@@ -95,7 +95,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetMissVal() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getMissVal());
         var.setMissVal(MISSING_VALUE);
         assertEquals(MISSING_VALUE, var.getMissVal());
@@ -110,7 +110,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetFlagColName() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
@@ -126,7 +126,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetAccuracy() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
         assertEquals(new NumericString(ACCURACY.getValueString(), ""), var.getAccuracy());
@@ -162,7 +162,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetPrecision() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
         assertEquals(new NumericString(PRECISION.getValueString(), ""), var.getPrecision());
@@ -199,7 +199,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetAddnInfo() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         var.setAddnInfo(ADDN_INFO);
         MultiString addnInfo = var.getAddnInfo();
@@ -221,7 +221,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetObserveType() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getObserveType());
         var.setObserveType(OBSERVE_TYPE);
         assertEquals(OBSERVE_TYPE, var.getObserveType());
@@ -241,7 +241,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetMeasureMethod() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         var.setMeasureMethod(MEASURE_METHOD);
         assertEquals(MEASURE_METHOD, var.getMeasureMethod());
@@ -260,7 +260,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetMethodDescription() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         var.setMethodDescription(METHOD_DESCRIPTION);
         assertEquals(METHOD_DESCRIPTION, var.getMethodDescription());
@@ -282,7 +282,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetMethodReference() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getMethodReference());
         var.setMethodReference(METHOD_REFERENCE);
         assertEquals(METHOD_REFERENCE, var.getMethodReference());
@@ -305,7 +305,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetManipulationDescription() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getManipulationDescription());
         var.setManipulationDescription(MANIPULATION_DESCRIPTION);
         assertEquals(MANIPULATION_DESCRIPTION, var.getManipulationDescription());
@@ -329,7 +329,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetSamplingLocation() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getSamplingLocation());
         var.setSamplingLocation(SAMPLING_LOCATION);
         assertEquals(SAMPLING_LOCATION, var.getSamplingLocation());
@@ -354,7 +354,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetSamplingElevation() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
         var.setSamplingElevation(SAMPLING_ELEVATION);
         assertEquals(SAMPLING_ELEVATION, var.getSamplingElevation());
@@ -380,7 +380,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetStorageMethod() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         var.setStorageMethod(STORAGE_METHOD);
         assertEquals(STORAGE_METHOD, var.getStorageMethod());
@@ -407,7 +407,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetDuration() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getDuration());
         var.setDuration(DURATION);
         assertEquals(DURATION, var.getDuration());
@@ -435,7 +435,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetMeasureTemperature() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         assertEquals(MEASURE_TEMPERATURE, var.getAnalysisTemperature());
@@ -465,7 +465,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetReplication() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_STRING, var.getReplication());
         var.setReplication(REPLICATION_INFO);
         assertEquals(REPLICATION_INFO, var.getReplication());
@@ -495,7 +495,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetResearcher() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_PERSON, var.getResearcher());
         var.setResearcher(RESEARCHER);
         Person researcher = var.getResearcher();
@@ -527,7 +527,7 @@ public class InstDataVarTest {
 
     @Test
     public void testGetSetInstrumentNames() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
         var.setInstrumentNames(INSTRUMENT_NAMES);
         HashSet<String> names = var.getInstrumentNames();
@@ -574,7 +574,7 @@ public class InstDataVarTest {
 
     @Test
     public void testInstDataVarVariable() {
-        GenDataVar var = new GenDataVar();
+        GenData var = new GenData();
         var.setColName(COL_NAME);
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
@@ -584,7 +584,7 @@ public class InstDataVarTest {
         var.setPrecision(PRECISION);
         var.setAddnInfo(ADDN_INFO);
 
-        InstDataVar instDataVar = new InstDataVar(var);
+        InstData instDataVar = new InstData(var);
         assertEquals(EMPTY_HASHSET, instDataVar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, instDataVar.getResearcher());
         assertEquals(EMPTY_STRING, instDataVar.getReplication());
@@ -607,13 +607,13 @@ public class InstDataVarTest {
         assertEquals(FULL_NAME, instDataVar.getFullName());
         assertEquals(COL_NAME, instDataVar.getColName());
 
-        instDataVar = new InstDataVar(null);
-        assertEquals(new InstDataVar(), instDataVar);
+        instDataVar = new InstData(null);
+        assertEquals(new InstData(), instDataVar);
     }
 
     @Test
     public void testInvalidFieldNames() {
-        InstDataVar var = new InstDataVar();
+        InstData var = new InstData();
         assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName",
                 "observeType", "accuracy", "measureMethod")), var.invalidFieldNames());
         var.setColName(COL_NAME);
@@ -637,8 +637,8 @@ public class InstDataVarTest {
 
     @Test
     public void testDuplicate() {
-        InstDataVar var = new InstDataVar();
-        InstDataVar dup = (InstDataVar) (var.duplicate(null));
+        InstData var = new InstData();
+        InstData dup = (InstData) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -666,7 +666,7 @@ public class InstDataVarTest {
         var.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(var, dup);
 
-        dup = (InstDataVar) (var.duplicate(null));
+        dup = (InstData) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());
@@ -678,11 +678,11 @@ public class InstDataVarTest {
 
     @Test
     public void testHashCodeEquals() {
-        InstDataVar first = new InstDataVar();
+        InstData first = new InstData();
         assertFalse(first.equals(null));
         assertFalse(first.equals(FULL_NAME));
 
-        InstDataVar second = new InstDataVar();
+        InstData second = new InstData();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

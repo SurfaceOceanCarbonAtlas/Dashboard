@@ -10,9 +10,9 @@ import java.util.HashSet;
 /**
  * Information about a generic data variable in a dataset.
  */
-public class InstDataVar extends GenDataVar implements Duplicable, Serializable, IsSerializable {
+public class InstData extends GenData implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 3116290747977544563L;
+    private static final long serialVersionUID = 1051703471507308823L;
 
     private String observeType;
     private MethodType measureMethod;
@@ -31,7 +31,7 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
     /**
      * Create with all fields empty.
      */
-    public InstDataVar() {
+    public InstData() {
         super();
         observeType = "";
         measureMethod = MethodType.UNSPECIFIED;
@@ -51,10 +51,10 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
     /**
      * Create using as many of the values in the given variable subclass as possible.
      */
-    public InstDataVar(Variable var) {
+    public InstData(Variable var) {
         super(var);
-        if ( var instanceof InstDataVar ) {
-            InstDataVar other = (InstDataVar) var;
+        if ( var instanceof InstData ) {
+            InstData other = (InstData) var;
             observeType = other.observeType;
             measureMethod = other.measureMethod;
             methodDescription = other.methodDescription;
@@ -347,11 +347,11 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
 
     @Override
     public Object duplicate(Object dup) {
-        InstDataVar var;
+        InstData var;
         if ( dup == null )
-            var = new InstDataVar();
+            var = new InstData();
         else
-            var = (InstDataVar) dup;
+            var = (InstData) dup;
         super.duplicate(var);
         var.observeType = observeType;
         var.measureMethod = measureMethod;
@@ -395,12 +395,12 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
             return true;
         if ( null == obj )
             return false;
-        if ( !(obj instanceof InstDataVar) )
+        if ( !(obj instanceof InstData) )
             return false;
         if ( !super.equals(obj) )
             return false;
 
-        InstDataVar instDataVar = (InstDataVar) obj;
+        InstData instDataVar = (InstData) obj;
 
         if ( !observeType.equals(instDataVar.observeType) )
             return false;
@@ -454,7 +454,7 @@ public class InstDataVar extends GenDataVar implements Duplicable, Serializable,
 
     @Override
     public String getSimpleName() {
-        return "InstDataVar";
+        return "InstData";
     }
 
 }

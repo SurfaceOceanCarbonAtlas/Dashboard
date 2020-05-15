@@ -4,7 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 
 import java.util.HashSet;
 
@@ -16,14 +16,14 @@ public class InstDataVarPanel extends GenDataVarPanel {
     private static final InstDataVarPanelUiBinder uiBinder = GWT.create(InstDataVarPanelUiBinder.class);
 
     /**
-     * Creates a FlowPanel associated with the given InstDataVar metadata.
+     * Creates a FlowPanel associated with the given InstData metadata.
      *
      * @param instvar
-     *         associate this panel with this InstDataVar; cannot be null
+     *         associate this panel with this InstData; cannot be null
      * @param header
      *         header that should be updated when appropriate values change; cannot be null
      */
-    public InstDataVarPanel(InstDataVar instvar, HTML header, VariablesTabPanel parentPanel) {
+    public InstDataVarPanel(InstData instvar, HTML header, VariablesTabPanel parentPanel) {
         super(instvar, header, parentPanel);
         // TODO: Create the provided widgets added by this panel
     }
@@ -36,7 +36,7 @@ public class InstDataVarPanel extends GenDataVarPanel {
 
     @Override
     protected void finishInitialization() {
-        InstDataVar instvar = (InstDataVar) vari;
+        InstData instvar = (InstData) vari;
         // TODO: Assign the values in the text fields added in this panel
 
         // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
@@ -48,7 +48,7 @@ public class InstDataVarPanel extends GenDataVarPanel {
     @Override
     protected void markInvalids(HashSet<String> invalids) {
         if ( invalids == null )
-            invalids = ((InstDataVar) vari).invalidFieldNames();
+            invalids = ((InstData) vari).invalidFieldNames();
 
         // TODO: Appropriately mark the labels of fields added in this panel
 

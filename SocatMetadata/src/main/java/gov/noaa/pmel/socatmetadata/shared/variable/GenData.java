@@ -9,9 +9,9 @@ import java.io.Serializable;
 /**
  * Generic numeric variable information
  */
-public class GenDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
+public class GenData extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 2237379867223250671L;
+    private static final long serialVersionUID = -6054834461580557290L;
 
     private NumericString accuracy;
     private NumericString precision;
@@ -20,7 +20,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
     /**
      * Create with all fields empty.
      */
-    public GenDataVar() {
+    public GenData() {
         super();
         accuracy = new NumericString();
         precision = new NumericString();
@@ -30,10 +30,10 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
     /**
      * Create using as many of the values in the given variable subclass as possible.
      */
-    public GenDataVar(Variable var) {
+    public GenData(Variable var) {
         super(var);
-        if ( var instanceof GenDataVar ) {
-            GenDataVar other = (GenDataVar) var;
+        if ( var instanceof GenData ) {
+            GenData other = (GenData) var;
             accuracy = new NumericString(other.accuracy);
             precision = new NumericString(other.precision);
             flagColName = other.flagColName;
@@ -130,11 +130,11 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
 
     @Override
     public Object duplicate(Object dup) {
-        GenDataVar var;
+        GenData var;
         if ( dup == null )
-            var = new GenDataVar();
+            var = new GenData();
         else
-            var = (GenDataVar) dup;
+            var = (GenData) dup;
         super.duplicate(var);
         var.accuracy = new NumericString(accuracy);
         var.precision = new NumericString(precision);
@@ -158,12 +158,12 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
             return true;
         if ( null == obj )
             return false;
-        if ( !(obj instanceof GenDataVar) )
+        if ( !(obj instanceof GenData) )
             return false;
         if ( !super.equals(obj) )
             return false;
 
-        GenDataVar other = (GenDataVar) obj;
+        GenData other = (GenData) obj;
 
         if ( !accuracy.equals(other.accuracy) )
             return false;
@@ -187,7 +187,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
 
     @Override
     public String getSimpleName() {
-        return "GenDataVar";
+        return "GenData";
     }
 
 }

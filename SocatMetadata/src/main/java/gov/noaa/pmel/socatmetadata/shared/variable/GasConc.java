@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Information about measurements of a gas concentration.  Instances of this class are assumed
  * to be atmospheric gas concentration as aqueous gas concentrations should be the subclass AquGasConc.
  */
-public class GasConc extends InstDataVar implements Duplicable, Serializable, IsSerializable {
+public class GasConc extends InstData implements Duplicable, Serializable, IsSerializable {
 
     private static final long serialVersionUID = -5300357921096259559L;
 

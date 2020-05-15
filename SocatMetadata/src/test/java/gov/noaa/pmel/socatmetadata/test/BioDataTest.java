@@ -3,8 +3,8 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
-import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.BioData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 
-public class BioDataVarTest {
+public class BioDataTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
@@ -44,7 +44,7 @@ public class BioDataVarTest {
 
     @Test
     public void testGetSetBiologicalSubject() {
-        BioDataVar var = new BioDataVar();
+        BioData var = new BioData();
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
         assertEquals(BIOLOGICAL_SUBJECT, var.getBiologicalSubject());
@@ -75,7 +75,7 @@ public class BioDataVarTest {
 
     @Test
     public void testGetSetSpeciesId() {
-        BioDataVar var = new BioDataVar();
+        BioData var = new BioData();
         assertEquals(EMPTY_STRING, var.getSpeciesId());
         var.setSpeciesId(SPECIES_ID);
         assertEquals(SPECIES_ID, var.getSpeciesId());
@@ -107,7 +107,7 @@ public class BioDataVarTest {
 
     @Test
     public void testGetSetLifeStage() {
-        BioDataVar var = new BioDataVar();
+        BioData var = new BioData();
         assertEquals(EMPTY_STRING, var.getLifeStage());
         var.setLifeStage(LIFE_STAGE);
         assertEquals(LIFE_STAGE, var.getLifeStage());
@@ -140,7 +140,7 @@ public class BioDataVarTest {
 
     @Test
     public void testInvalidFieldNames() {
-        BioDataVar var = new BioDataVar();
+        BioData var = new BioData();
         assertEquals(new HashSet<String>(Arrays.asList("colName", "fullName",
                 "observeType", "measureMethod", "speciesId")), var.invalidFieldNames());
         var.setColName(COL_NAME);
@@ -168,7 +168,7 @@ public class BioDataVarTest {
         var.setFullName(FULL_NAME);
         var.setMissVal(MISSING_VALUE);
 
-        BioDataVar biovar = new BioDataVar(var);
+        BioData biovar = new BioData(var);
         assertEquals(EMPTY_HASHSET, biovar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, biovar.getResearcher());
         assertEquals(EMPTY_STRING, biovar.getMethodReference());
@@ -180,7 +180,7 @@ public class BioDataVarTest {
         assertEquals(FULL_NAME, biovar.getFullName());
         assertEquals(COL_NAME, biovar.getColName());
 
-        InstDataVar datavar = new InstDataVar(var);
+        InstData datavar = new InstData(var);
         datavar.setFlagColName(FLAG_COL_NAME);
         datavar.setObserveType(OBSERVE_TYPE);
         datavar.setMeasureMethod(MEASURE_METHOD);
@@ -189,7 +189,7 @@ public class BioDataVarTest {
         datavar.setResearcher(RESEARCHER);
         datavar.setInstrumentNames(ANALYZER_NAMES);
 
-        biovar = new BioDataVar(datavar);
+        biovar = new BioData(datavar);
         assertEquals(ANALYZER_NAMES, biovar.getInstrumentNames());
         assertEquals(RESEARCHER, biovar.getResearcher());
         assertEquals(METHOD_REFERENCE, biovar.getMethodReference());
@@ -201,15 +201,15 @@ public class BioDataVarTest {
         assertEquals(FULL_NAME, biovar.getFullName());
         assertEquals(COL_NAME, biovar.getColName());
 
-        biovar = new BioDataVar(null);
-        assertEquals(new BioDataVar(), biovar);
+        biovar = new BioData(null);
+        assertEquals(new BioData(), biovar);
     }
 
 
     @Test
     public void testDuplicate() {
-        BioDataVar var = new BioDataVar();
-        BioDataVar dup = (BioDataVar) (var.duplicate(null));
+        BioData var = new BioData();
+        BioData dup = (BioData) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -230,18 +230,18 @@ public class BioDataVarTest {
         var.setLifeStage(LIFE_STAGE);
         assertNotEquals(var, dup);
 
-        dup = (BioDataVar) (var.duplicate(null));
+        dup = (BioData) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
     }
 
     @Test
     public void testhashCodeEquals() {
-        BioDataVar first = new BioDataVar();
+        BioData first = new BioData();
         assertFalse(first.equals(null));
         assertFalse(first.equals(FULL_NAME));
 
-        BioDataVar second = new BioDataVar();
+        BioData second = new BioData();
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

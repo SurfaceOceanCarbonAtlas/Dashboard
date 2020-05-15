@@ -17,10 +17,10 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.BioDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.BioData;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
-import gov.noaa.pmel.socatmetadata.shared.variable.GenDataVar;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
@@ -43,10 +43,10 @@ public class VariablesTabPanel extends Composite {
             new AirPressure().getSimpleName(),
             new AquGasConc().getSimpleName(),
             new GasConc().getSimpleName(),
-            new BioDataVar().getSimpleName(),
+            new BioData().getSimpleName(),
             new Temperature().getSimpleName(),
-            new InstDataVar().getSimpleName(),
-            new GenDataVar().getSimpleName(),
+            new InstData().getSimpleName(),
+            new GenData().getSimpleName(),
             new Variable().getSimpleName()
     ));
 
@@ -125,17 +125,17 @@ public class VariablesTabPanel extends Composite {
             case "GasConc":
                 panel = new GasConcVarPanel((GasConc) vari, header, this);
                 break;
-            case "BioDataVar":
-                panel = new BioDataVarPanel((BioDataVar) vari, header, this);
+            case "BioData":
+                panel = new BioDataVarPanel((BioData) vari, header, this);
                 break;
             case "Temperature":
                 panel = new TemperatureVarPanel((Temperature) vari, header, this);
                 break;
-            case "InstDataVar":
-                panel = new InstDataVarPanel((InstDataVar) vari, header, this);
+            case "InstData":
+                panel = new InstDataVarPanel((InstData) vari, header, this);
                 break;
-            case "GenDataVar":
-                panel = new GenDataVarPanel((GenDataVar) vari, header, this);
+            case "GenData":
+                panel = new GenDataVarPanel((GenData) vari, header, this);
                 break;
             case "Variable":
                 panel = new FlagVarPanel(vari, header, this);
@@ -211,17 +211,17 @@ public class VariablesTabPanel extends Composite {
             case "GasConc":
                 vari = new GasConc(oldVar);
                 break;
-            case "BioDataVar":
-                vari = new BioDataVar(oldVar);
+            case "BioData":
+                vari = new BioData(oldVar);
                 break;
             case "Temperature":
                 vari = new Temperature(oldVar);
                 break;
-            case "InstDataVar":
-                vari = new InstDataVar(oldVar);
+            case "InstData":
+                vari = new InstData(oldVar);
                 break;
-            case "GenDataVar":
-                vari = new GenDataVar(oldVar);
+            case "GenData":
+                vari = new GenData(oldVar);
                 break;
             case "Variable":
                 vari = new Variable(oldVar);

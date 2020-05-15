@@ -2,7 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
-import gov.noaa.pmel.socatmetadata.shared.variable.InstDataVar;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 /**
  * Basic information about an instrument that is a gas sensor.  Specific details about values
- * measured by the sensor are part of {@link InstDataVar} since a sensor can be used to measure
+ * measured by the sensor are part of {@link InstData} since a sensor can be used to measure
  * more than one variable (e.g., atmospheric and aqueous CO2) with differing details (e.g., accuracy).
  */
 public class GasSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
