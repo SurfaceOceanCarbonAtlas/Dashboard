@@ -7,12 +7,22 @@
 
     <g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="colNameValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fullNameValue"/>
         </g:FlowPanel>
         <g:FlowPanel addStyleNames="{style.rowpanel}">
             <my:LabeledListBox addStyleNames="{style.cellpanel}" ui:field="varTypeList"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="unitValue"/>
         </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="accuracyValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="precisionValue"/>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="missingValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="flagNameValue"/>
+        </g:FlowPanel>
+        <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
     </g:FlowPanel>
 
 </ui:UiBinder>

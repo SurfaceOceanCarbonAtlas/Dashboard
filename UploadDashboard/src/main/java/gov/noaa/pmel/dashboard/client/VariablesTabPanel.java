@@ -144,6 +144,7 @@ public class VariablesTabPanel extends Composite {
                 UploadDashboard.showMessage("Unexpect variable type of " + SafeHtmlUtils.htmlEscape(simpleName));
                 return;
         }
+        panel.initialize();
         if ( index == variablePanels.size() ) {
             variablePanels.add(panel);
             mainPanel.add(panel, header);

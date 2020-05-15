@@ -2,8 +2,6 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -22,23 +20,21 @@ public class FlagVarPanel extends VariablePanel {
     private static final FlagVarPanelUiBinder uiBinder = GWT.create(FlagVarPanelUiBinder.class);
 
     @UiField(provided = true)
-    final LabeledTextBox columnNameValue;
+    protected final LabeledTextBox columnNameValue;
     @UiField(provided = true)
-    final LabeledTextBox fullNameValue;
+    protected final LabeledTextBox fullNameValue;
     @UiField(provided = true)
-    final LabeledListBox varTypeList;
+    protected final LabeledListBox varTypeList;
     @UiField(provided = true)
-    final LabeledTextBox unitValue;
+    protected final LabeledTextBox unitValue;
     @UiField(provided = true)
-    final LabeledTextBox missingValue;
+    protected final LabeledTextBox missingValue;
     @UiField(provided = true)
-    final LabeledTextArea addnInfoValue;
-
-    private final Variable vari;
-    private final HTML header;
+    protected final LabeledTextArea addnInfoValue;
 
     /**
-     * Creates a FlowPanel associated with the given Variable.
+     * Creates but does not initialize a FlowPanel associated with the given Variable.
+     * The {@link #initialize()} method must be called prior to using this FlowPanel.
      *
      * @param vari
      *         associate this panel with this Variable; cannot be null
@@ -46,6 +42,8 @@ public class FlagVarPanel extends VariablePanel {
      *         header that should be updated when appropriate values change; cannot be null
      */
     public FlagVarPanel(Variable vari, HTML header, VariablesTabPanel parentPanel) {
+        super(vari, header, parentPanel);
+        // Create the provided widgets added by this panel
         columnNameValue = new LabeledTextBox("Column name:", "11em", "20em", null, null);
         fullNameValue = new LabeledTextBox("Full name:", "10em", "20em", null, null);
         //
@@ -55,62 +53,68 @@ public class FlagVarPanel extends VariablePanel {
         missingValue = new LabeledTextBox("Missing value:", "11em", "20em", null, null);
         //
         addnInfoValue = new LabeledTextArea("Additional information", "10em", "54.5em");
+    }
 
+    @Override
+    public void initialize() {
         initWidget(uiBinder.createAndBindUi(this));
+        finishInitialization();
+    }
 
-        this.vari = vari;
-        this.header = header;
+    @Override
+    protected void finishInitialization() {
+        // Assign the values in the text fields added in this panel
+        columnNameValue.setText(vari.getColName());
+        fullNameValue.setText(vari.getFullName());
+        unitValue.setText(vari.getVarUnit());
+        missingValue.setText(vari.getMissVal());
+        addnInfoValue.setText(vari.getAddnInfo().asOneString());
 
-        // Assign the variable types list - labels and callback
+        // Assign the variable types list and callback
         parentPanel.assignVariableTypeList(varTypeList, vari, this);
 
-        // The following will assign the values in the labels and text fields
-        getUpdatedVariable();
+        // Finish initialization, including marking invalid fields
+        super.finishInitialization();
     }
+
+    // Handlers for widgets added by this panel
 
     @UiHandler("columnNameValue")
     void columnNameValueOnValueChange(ValueChangeEvent<String> event) {
         vari.setColName(columnNameValue.getText());
-        markInvalids();
+        markInvalids(null);
     }
 
     @UiHandler("fullNameValue")
     void fullNameValueOnValueChange(ValueChangeEvent<String> event) {
         vari.setFullName(fullNameValue.getText());
-        markInvalids();
+        markInvalids(null);
     }
 
     @UiHandler("unitValue")
     void unitValueOnValueChange(ValueChangeEvent<String> event) {
         vari.setVarUnit(unitValue.getText());
-        markInvalids();
+        markInvalids(null);
     }
 
     @UiHandler("missingValue")
     void missingValueOnValueChange(ValueChangeEvent<String> event) {
         vari.setMissVal(missingValue.getText());
-        markInvalids();
+        markInvalids(null);
     }
 
     @UiHandler("addnInfoValue")
     void addnInfoValueOnValueChange(ValueChangeEvent<String> event) {
         vari.setAddnInfo(new MultiString(addnInfoValue.getText()));
-        markInvalids();
+        markInvalids(null);
     }
 
-    /**
-     * Indicate which fields contain invalid values and which contain acceptable values.
-     */
-    private void markInvalids() {
-        HashSet<String> invalids = vari.invalidFieldNames();
+    @Override
+    protected void markInvalids(HashSet<String> invalids) {
+        if ( invalids == null )
+            invalids = vari.invalidFieldNames();
 
-        String oldVal = header.getHTML();
-        SafeHtml val = SafeHtmlUtils.fromString(vari.getReferenceName());
-        if ( !invalids.isEmpty() )
-            val = UploadDashboard.invalidLabelHtml(val);
-        if ( !val.asString().equals(oldVal) )
-            header.setHTML(val);
-
+        // Appropriately mark the labels of fields added in this panel
         if ( invalids.contains("colName") )
             columnNameValue.markInvalid();
         else
@@ -135,19 +139,9 @@ public class FlagVarPanel extends VariablePanel {
             addnInfoValue.markInvalid();
         else
             addnInfoValue.markValid();
-    }
 
-    @Override
-    public Variable getUpdatedVariable() {
-        columnNameValue.setText(vari.getColName());
-        fullNameValue.setText(vari.getFullName());
-        // varType handled by the parent panel
-        unitValue.setText(vari.getVarUnit());
-        missingValue.setText(vari.getMissVal());
-        addnInfoValue.setText(vari.getAddnInfo().asOneString());
-
-        markInvalids();
-        return vari;
+        // Finish marking labels and the tab for this panel
+        super.markInvalids(invalids);
     }
 
 }

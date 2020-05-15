@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class GenDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3148748945744862187L;
+    private static final long serialVersionUID = -3583581974560708342L;
 
     private NumericString accuracy;
     private NumericString precision;
@@ -121,7 +121,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
      * @param unit
      *         unit string to assign
      */
-    protected void setAccuracyUnit(String unit) {
+    public void setAccuracyUnit(String unit) {
         accuracy.setUnitString(unit);
     }
 
@@ -132,7 +132,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
      * @param unit
      *         unit string to assign
      */
-    protected void setPrecisionUnit(String unit) {
+    public void setPrecisionUnit(String unit) {
         precision.setUnitString(unit);
     }
 
