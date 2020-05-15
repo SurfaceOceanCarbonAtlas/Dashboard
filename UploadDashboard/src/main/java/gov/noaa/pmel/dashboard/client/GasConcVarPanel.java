@@ -40,11 +40,11 @@ public class GasConcVarPanel extends GenDataVarPanel {
         GasConc conc = (GasConc) vari;
         // TODO: Assign the values in the text fields added in this panel
 
+        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
     }
-
-    // TODO: Handlers for widgets added by this panel
 
     @Override
     protected void markInvalids(HashSet<String> invalids) {

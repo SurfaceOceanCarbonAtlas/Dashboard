@@ -2,9 +2,9 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
@@ -73,40 +73,46 @@ public class FlagVarPanel extends VariablePanel {
         // Assign the variable types list and callback
         parentPanel.assignVariableTypeList(varTypeList, vari, this);
 
+        // Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+
+        columnNameValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                vari.setColName(columnNameValue.getText());
+                markInvalids(null);
+            }
+        });
+        fullNameValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                vari.setFullName(fullNameValue.getText());
+                markInvalids(null);
+            }
+        });
+        unitValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                vari.setVarUnit(unitValue.getText());
+                markInvalids(null);
+            }
+        });
+        missingValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                vari.setMissVal(missingValue.getText());
+                markInvalids(null);
+            }
+        });
+        addnInfoValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                vari.setAddnInfo(new MultiString(addnInfoValue.getText()));
+                markInvalids(null);
+            }
+        });
+
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
-    }
-
-    // Handlers for widgets added by this panel
-
-    @UiHandler("columnNameValue")
-    void columnNameValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setColName(columnNameValue.getText());
-        markInvalids(null);
-    }
-
-    @UiHandler("fullNameValue")
-    void fullNameValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setFullName(fullNameValue.getText());
-        markInvalids(null);
-    }
-
-    @UiHandler("unitValue")
-    void unitValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setVarUnit(unitValue.getText());
-        markInvalids(null);
-    }
-
-    @UiHandler("missingValue")
-    void missingValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setMissVal(missingValue.getText());
-        markInvalids(null);
-    }
-
-    @UiHandler("addnInfoValue")
-    void addnInfoValueOnValueChange(ValueChangeEvent<String> event) {
-        vari.setAddnInfo(new MultiString(addnInfoValue.getText()));
-        markInvalids(null);
     }
 
     @Override

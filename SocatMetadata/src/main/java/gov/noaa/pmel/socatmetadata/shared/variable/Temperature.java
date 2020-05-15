@@ -2,7 +2,6 @@ package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
-import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.io.Serializable;
 
@@ -12,33 +11,31 @@ import java.io.Serializable;
  */
 public class Temperature extends InstDataVar implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1635226933184077100L;
+    private static final long serialVersionUID = 7362053649610620025L;
 
     public static final String DEGREES_CELSIUS_UNIT = "deg C";
 
     /**
-     * Create with all fields empty, except for units which are set to degrees Celsius.
+     * Create with all fields empty, except for units which are set to {@link #DEGREES_CELSIUS_UNIT}
      */
     public Temperature() {
         super();
         super.setVarUnit(DEGREES_CELSIUS_UNIT);
-        setAccuracyUnit(DEGREES_CELSIUS_UNIT);
-        setPrecisionUnit(DEGREES_CELSIUS_UNIT);
     }
 
     /**
-     * Create using as many of the values in the given variable subclass as possible.
+     * Create using as many of the values in the given variable subclass as possible,
+     * except for units which are set to {@link #DEGREES_CELSIUS_UNIT}
      */
     public Temperature(Variable var) {
         super(var);
         super.setVarUnit(DEGREES_CELSIUS_UNIT);
-        setAccuracyUnit(DEGREES_CELSIUS_UNIT);
-        setPrecisionUnit(DEGREES_CELSIUS_UNIT);
     }
 
     /**
      * @param varUnit
-     *         assign as the unit for values of this variable; if null or blank, degrees Celsius is assigned
+     *         assign as the unit for values of this variable as well as accuracy and precision;
+     *         if null or blank, degrees Celsius is assigned
      */
     @Override
     public void setVarUnit(String varUnit) {
@@ -46,44 +43,6 @@ public class Temperature extends InstDataVar implements Duplicable, Serializable
             super.setVarUnit(DEGREES_CELSIUS_UNIT);
         else
             super.setVarUnit(varUnit);
-    }
-
-    /**
-     * @param accuracy
-     *         assign as the accuracy (uncertainty) in values of this variable;
-     *         if null, an NumericString with an empty numeric value but units of degrees Celsius is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if a numeric string is given but is not a finite positive number
-     */
-    @Override
-    public void setAccuracy(NumericString accuracy) throws IllegalArgumentException {
-        if ( accuracy != null ) {
-            super.setAccuracy(accuracy);
-        }
-        else {
-            super.setAccuracy(null);
-            setAccuracyUnit(DEGREES_CELSIUS_UNIT);
-        }
-    }
-
-    /**
-     * @param precision
-     *         assign as the precision (resolution) in values of this variable;
-     *         if null, an NumericString with an empty numeric value but units of degrees Celsius is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if a numeric string is given but is not a finite positive number
-     */
-    @Override
-    public void setPrecision(NumericString precision) throws IllegalArgumentException {
-        if ( precision != null ) {
-            super.setPrecision(precision);
-        }
-        else {
-            super.setPrecision(null);
-            setPrecisionUnit(DEGREES_CELSIUS_UNIT);
-        }
     }
 
     @Override

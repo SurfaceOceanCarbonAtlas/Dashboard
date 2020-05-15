@@ -2,9 +2,9 @@ package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
@@ -53,57 +53,61 @@ public class GenDataVarPanel extends FlagVarPanel {
     @Override
     protected void finishInitialization() {
         GenDataVar gendata = (GenDataVar) vari;
+
         // Assign the values in the text fields added in this panel
         accuracyValue.setText((gendata.getAccuracy().getValueString()));
+        // use the units for the variable and ignore the unit in the accuracy
+        accuracyValue.setSuffix(gendata.getVarUnit());
         precisionValue.setText(gendata.getPrecision().getValueString());
+        precisionValue.setSuffix(gendata.getVarUnit());
         flagNameValue.setText(gendata.getFlagColName());
+
+        // Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        unitValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                // For GenDataVar, change in the varible units also changes the accuracy and precision units
+                String unit = unitValue.getText();
+                accuracyValue.setSuffix(unit);
+                precisionValue.setSuffix(unit);
+                markInvalids(null);
+            }
+        });
+        accuracyValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                GenDataVar gendata = (GenDataVar) vari;
+                try {
+                    gendata.setAccuracy(new NumericString(accuracyValue.getText(), unitValue.getText()));
+                } catch ( IllegalArgumentException ex ) {
+                    gendata.setAccuracy(null);
+                }
+                markInvalids(null);
+            }
+        });
+        precisionValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                GenDataVar gendata = (GenDataVar) vari;
+                try {
+                    gendata.setPrecision(new NumericString(precisionValue.getText(), unitValue.getText()));
+                } catch ( IllegalArgumentException ex ) {
+                    gendata.setPrecision(null);
+                }
+                markInvalids(null);
+            }
+        });
+        flagNameValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                GenDataVar gendata = (GenDataVar) vari;
+                gendata.setFlagColName(flagNameValue.getText());
+                markInvalids(null);
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
-    }
-
-    // Handlers for widgets added by this panel
-
-    @UiHandler("unitValue")
-    void unitValueAccuracyPrecisionOnValueChange(ValueChangeEvent<String> event) {
-        GenDataVar gendata = (GenDataVar) vari;
-        String unit = unitValue.getText();
-        accuracyValue.setSuffix(unit);
-        gendata.setAccuracyUnit(unit);
-        precisionValue.setSuffix(unit);
-        gendata.setPrecisionUnit(unit);
-        markInvalids(null);
-    }
-
-    @UiHandler("accuracyValue")
-    void accuracyValueOnValueChange(ValueChangeEvent<String> event) {
-        GenDataVar gendata = (GenDataVar) vari;
-        try {
-            gendata.setAccuracy(new NumericString(accuracyValue.getText(), unitValue.getText()));
-        } catch ( IllegalArgumentException ex ) {
-            gendata.setAccuracy(null);
-            gendata.setAccuracyUnit(unitValue.getText());
-        }
-        markInvalids(null);
-    }
-
-    @UiHandler("precisionValue")
-    void precisionValueOnValueChange(ValueChangeEvent<String> event) {
-        GenDataVar gendata = (GenDataVar) vari;
-        try {
-            gendata.setPrecision(new NumericString(precisionValue.getText(), unitValue.getText()));
-        } catch ( IllegalArgumentException ex ) {
-            gendata.setPrecision(null);
-            gendata.setPrecisionUnit(unitValue.getText());
-        }
-        markInvalids(null);
-    }
-
-    @UiHandler("flagNameValue")
-    void flagNameValueOnValueChange(ValueChangeEvent<String> event) {
-        GenDataVar gendata = (GenDataVar) vari;
-        gendata.setFlagColName(flagNameValue.getText());
-        markInvalids(null);
     }
 
     @Override

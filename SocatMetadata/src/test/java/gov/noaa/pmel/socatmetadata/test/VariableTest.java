@@ -24,11 +24,11 @@ public class VariableTest {
 
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
-    private static final String VAR_UNIT = "degrees Celsius";
+    private static final String VAR_UNIT = "deg C";
     private static final String MISSING_VALUE = "-999";
     private static final String FLAG_COL_NAME = "WOCE SST";
-    private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
-    private static final NumericString PRECISION = new NumericString("0.001", "deg C");
+    private static final NumericString ACCURACY = new NumericString("0.01", VAR_UNIT);
+    private static final NumericString PRECISION = new NumericString("0.001", VAR_UNIT);
     private static final MultiString ADDN_INFO = new MultiString(
             "Some sort of information\n" +
                     "Another bit of information"
@@ -109,19 +109,23 @@ public class VariableTest {
         GenDataVar var = new GenDataVar();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
+        assertEquals(new NumericString(ACCURACY.getValueString(), ""), var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        var.setVarUnit(VAR_UNIT);
+        assertEquals(ACCURACY, var.getAccuracy());
+        var.setAccuracy(ACCURACY);
         NumericString numstr = var.getAccuracy();
         assertEquals(ACCURACY, numstr);
         assertNotSame(ACCURACY, numstr);
         assertNotSame(numstr, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAccuracy(null);
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         var.setAccuracy(EMPTY_NUMSTR);
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         try {
             var.setAccuracy(new NumericString("0.0", VAR_UNIT));
             fail("calling setAccuracy with a zero string succeeded");
@@ -141,20 +145,24 @@ public class VariableTest {
         GenDataVar var = new GenDataVar();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
+        assertEquals(new NumericString(PRECISION.getValueString(), ""), var.getPrecision());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        var.setVarUnit(VAR_UNIT);
+        assertEquals(PRECISION, var.getPrecision());
+        var.setPrecision(PRECISION);
         NumericString numstr = var.getPrecision();
         assertEquals(PRECISION, numstr);
         assertNotSame(PRECISION, numstr);
         assertNotSame(numstr, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setPrecision(null);
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(new NumericString("", VAR_UNIT), var.getPrecision());
         var.setPrecision(EMPTY_NUMSTR);
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(new NumericString("", VAR_UNIT), var.getPrecision());
         try {
             var.setPrecision(new NumericString("0.0", VAR_UNIT));
             fail("calling setPrecision with a zero string succeeded");

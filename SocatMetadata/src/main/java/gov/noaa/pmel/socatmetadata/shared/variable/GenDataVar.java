@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public class GenDataVar extends Variable implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3583581974560708342L;
+    private static final long serialVersionUID = 2237379867223250671L;
 
     private NumericString accuracy;
     private NumericString precision;
@@ -56,7 +56,8 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
     /**
      * @param accuracy
      *         assign as the accuracy (uncertainty) in values of this variable;
-     *         if null, an empty NumericString is assigned
+     *         if null, an empty NumericString is assigned.
+     *         The unit is ignored and is force to match the variable unit value.
      *
      * @throws IllegalArgumentException
      *         if a numeric string is given but is not a finite positive number
@@ -70,6 +71,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
         }
         else
             this.accuracy = new NumericString();
+        this.accuracy.setUnitString(getVarUnit());
     }
 
     /**
@@ -84,6 +86,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
      * @param precision
      *         assign as the precision (resolution) in values of this variable;
      *         if null, an empty NumericString is assigned
+     *         The unit is ignored and is force to match the variable unit value.
      *
      * @throws IllegalArgumentException
      *         if a numeric string is given but is not a finite positive number
@@ -97,6 +100,7 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
         }
         else
             this.precision = new NumericString();
+        this.precision.setUnitString(getVarUnit());
     }
 
     /**
@@ -115,25 +119,13 @@ public class GenDataVar extends Variable implements Duplicable, Serializable, Is
     }
 
     /**
-     * Assigns the unit in the accuracy NumericString in this object.
-     * No check is made of the validity of the NumericString.
-     *
-     * @param unit
-     *         unit string to assign
+     * Assigns the unit for values of this variable as well as the accuracy and precision values.
      */
-    public void setAccuracyUnit(String unit) {
-        accuracy.setUnitString(unit);
-    }
-
-    /**
-     * Assigns the unit in the precision NumericString in this object.
-     * No check is made of the validity of the NumericString.
-     *
-     * @param unit
-     *         unit string to assign
-     */
-    public void setPrecisionUnit(String unit) {
-        precision.setUnitString(unit);
+    @Override
+    public void setVarUnit(String unit) {
+        super.setVarUnit(unit);
+        accuracy.setUnitString(getVarUnit());
+        precision.setUnitString(getVarUnit());
     }
 
     @Override

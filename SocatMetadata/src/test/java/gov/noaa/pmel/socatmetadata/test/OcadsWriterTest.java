@@ -258,8 +258,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+            assertEquals("1", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01\n" +
                             "Frequency: Every 150 seconds",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -304,8 +304,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, dryMethod));
             assertEquals("LI-COR", docHandler.getElementText(var, gasDetectorManufacturer));
             assertEquals("LI-6262", docHandler.getElementText(var, gasDetectorModel));
-            assertEquals("0.01 microatmosphere", docHandler.getElementText(var, gasDetectorResolution));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("0.01", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("1", docHandler.getElementText(var, gasDetectorUncertainty));
             assertEquals("The analyzer is calibrated every 3.25 hours with standards from ESRL in Boulder, CO " +
                             "that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
                     docHandler.getElementText(var, standardizationDescription));
@@ -347,11 +347,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -413,11 +413,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -590,9 +590,9 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("deg C", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.025 deg C", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
-                    "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
+                    "Resolution/Precision: 0.01 deg C", docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
             assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
@@ -643,9 +643,9 @@ public class OcadsWriterTest {
             assertEquals("Sea surface temperature (degrees Celsius)", docHandler.getElementText(var, fullname));
             assertEquals("deg C", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.01 deg C", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
-                    "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
+                    "Resolution/Precision: 0.001 deg C", docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
             assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
@@ -697,9 +697,9 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.005 permil", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.005", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
-                            "Resolution/Precision: 0.0002 permil",
+                            "Resolution/Precision: 0.0002",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
@@ -752,8 +752,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+            assertEquals("1", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01\n" +
                             "Frequency: Every 150 seconds",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -798,8 +798,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, dryMethod));
             assertEquals("LI-COR", docHandler.getElementText(var, gasDetectorManufacturer));
             assertEquals("LI-6262", docHandler.getElementText(var, gasDetectorModel));
-            assertEquals("0.01 microatmosphere", docHandler.getElementText(var, gasDetectorResolution));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("0.01", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("1", docHandler.getElementText(var, gasDetectorUncertainty));
             assertEquals("The analyzer is calibrated every 3.25 hours with standards from ESRL in Boulder, CO " +
                             "that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
                     docHandler.getElementText(var, standardizationDescription));
@@ -842,11 +842,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
