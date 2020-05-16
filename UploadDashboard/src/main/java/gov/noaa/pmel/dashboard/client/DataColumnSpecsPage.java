@@ -278,7 +278,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
      * @param expocodes
      *         show the specifications for this cruise
      */
-    static void showPage(String username, ArrayList<String> expocodes) {
+    public static void showPage(String username, ArrayList<String> expocodes) {
         if ( singleton == null )
             singleton = new DataColumnSpecsPage();
 
@@ -316,7 +316,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

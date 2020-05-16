@@ -380,7 +380,7 @@ public class DatasetListPage extends CompositeWithUsername {
      * Display the dataset list page in the RootLayoutPanel with the latest information from the server. Adds this page
      * to the page history.
      */
-    static void showPage() {
+    public static void showPage() {
         UploadDashboard.showWaitCursor();
         // Request the latest cruise list
         service.getDatasetList(new AsyncCallback<DashboardDatasetList>() {
@@ -405,7 +405,7 @@ public class DatasetListPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) )
             DatasetListPage.showPage();
@@ -420,7 +420,7 @@ public class DatasetListPage extends CompositeWithUsername {
      * @param datasetId
      *         select the dataset with this ID
      */
-    static void addSelectedDataset(String datasetId) {
+    public static void addSelectedDataset(String datasetId) {
         if ( singleton == null )
             singleton = new DatasetListPage();
         singleton.datasetIdsSet.add(datasetId);
@@ -429,7 +429,7 @@ public class DatasetListPage extends CompositeWithUsername {
     /**
      * Resorts the cruise list table first by upload timestamp in descending order, then by dataset in ascending order.
      */
-    static void resortTable() {
+    public static void resortTable() {
         if ( singleton == null )
             singleton = new DatasetListPage();
         ColumnSortList sortList = singleton.datasetsGrid.getColumnSortList();

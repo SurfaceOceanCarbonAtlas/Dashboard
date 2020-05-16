@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardDatasetList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
@@ -161,7 +162,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
      * @param cruises
      *         ask about editing the metadata for the first dataset in this set
      */
-    static void showPage(DashboardDatasetList cruises) {
+    public static void showPage(DashboardDatasetList cruises) {
         if ( singleton == null )
             singleton = new SelectSocatMetadataPage();
         singleton.updateDataset(cruises);
@@ -172,7 +173,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
     /**
      * Re-displays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() || (singleton == null) ||
                 !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

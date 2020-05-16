@@ -1,0 +1,43 @@
+@CHARSET "UTF-8";
+
+.boxprefix {
+    display: inline-block;
+    text-align: right;
+    font-size: medium;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 0;
+    margin-right: 0.5em;
+}
+
+.boxvalue {
+    display: inline;
+    font-size: medium;
+    margin: 0;
+}
+
+.suffix {
+    display: inline-block;
+    text-align: left;
+    font-size: medium;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 0.5em;
+    margin-right: 0;
+}
+
+.areaprefix {
+    float: left;
+    text-align: right;
+    font-size: medium;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-left: 0;
+    margin-right: 0.5em;
+}
+
+.areavalue {
+    float: none;
+    font-size: medium;
+    margin: 0;
+}

@@ -233,7 +233,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
     /**
      * Display this page in the RootLayoutPanel showing the given cruises.  Adds this page to the page history.
      */
-    static void showPage(DashboardDatasetList cruises) {
+    public static void showPage(DashboardDatasetList cruises) {
         if ( singleton == null )
             singleton = new SubmitForQCPage();
         UploadDashboard.updateCurrentPage(singleton);
@@ -244,7 +244,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

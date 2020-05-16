@@ -176,7 +176,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
      * @param cruiseList
      *         cruises to use
      */
-    static void showPage(DashboardDatasetList cruiseList) {
+    public static void showPage(DashboardDatasetList cruiseList) {
         if ( singleton == null )
             singleton = new AddlDocsManagerPage();
         UploadDashboard.updateCurrentPage(singleton);
@@ -187,7 +187,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

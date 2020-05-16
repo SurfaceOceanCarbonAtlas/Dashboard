@@ -12,6 +12,7 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 
 public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 
