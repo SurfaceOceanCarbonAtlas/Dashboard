@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.client.metadata;
+package gov.noaa.pmel.dashboard.client.metadata.instpanels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 

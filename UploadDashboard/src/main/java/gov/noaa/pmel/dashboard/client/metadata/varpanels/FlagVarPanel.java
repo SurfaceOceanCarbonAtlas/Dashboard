@@ -10,7 +10,6 @@ import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
-import gov.noaa.pmel.dashboard.client.metadata.VariablesTabPanel;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
@@ -57,7 +56,7 @@ public class FlagVarPanel extends VariablePanel {
         //
         missingValue = new LabeledTextBox("Missing value:", "7em", "10em", null, null);
         //
-        addnInfoValue = new LabeledTextArea("Other info:", "7em", "10em", "54em");
+        addnInfoValue = new LabeledTextArea("Other info:", "7em", "8em", "54em");
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
-import gov.noaa.pmel.dashboard.client.metadata.VariablesTabPanel;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
 

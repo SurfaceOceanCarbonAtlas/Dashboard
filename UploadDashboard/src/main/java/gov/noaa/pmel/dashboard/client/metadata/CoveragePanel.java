@@ -83,7 +83,7 @@ public class CoveragePanel extends Composite {
         earlyDateValue = new LabeledTextBox("Earliest data date:", "11em", "12em", DATE_UNIT_TEXT, "7em");
         lateDateValue = new LabeledTextBox("Latest data date:", "11em", "12em", DATE_UNIT_TEXT, "7em");
         //
-        regionsValue = new LabeledTextArea("Geographic names:", "11em", "10em", "44.5em");
+        regionsValue = new LabeledTextArea("Geographic names:", "11em", "8em", "44.5em");
 
         initWidget(uiBinder.createAndBindUi(this));
 

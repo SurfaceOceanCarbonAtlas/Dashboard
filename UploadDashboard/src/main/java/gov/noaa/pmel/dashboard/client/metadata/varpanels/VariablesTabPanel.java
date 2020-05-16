@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.client.metadata;
+package gov.noaa.pmel.dashboard.client.metadata.varpanels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -15,15 +15,8 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.AirPressureVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.AquGasConcVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.BioDataVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.FlagVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.GasConcVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.GenDataVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.InstDataVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.TemperatureVarPanel;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.VariablePanel;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;

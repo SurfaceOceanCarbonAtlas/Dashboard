@@ -4,7 +4,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import gov.noaa.pmel.dashboard.client.metadata.VariablesTabPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioData;
 
 import java.util.HashSet;

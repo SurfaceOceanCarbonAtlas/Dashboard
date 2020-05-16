@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.client.metadata;
+package gov.noaa.pmel.dashboard.client.metadata.pipanels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -11,6 +11,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 

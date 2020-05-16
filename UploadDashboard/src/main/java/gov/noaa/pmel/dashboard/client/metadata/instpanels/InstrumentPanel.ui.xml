@@ -3,11 +3,13 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
              xmlns:my="urn:import:gov.noaa.pmel.dashboard.client.metadata">
 
-    <ui:style src="EditSocatMetadata.css"/>
+    <ui:style src="../EditSocatMetadata.css"/>
 
     <g:FlowPanel>
-        <g:Label addStyleNames="{style.header}" ui:field="headerLabel"/>
-        <my:InvestigatorPanel ui:field="subPanel"/>
+        <g:FlowPanel addStyleNames="{style.rowpanel}">
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
+            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
+        </g:FlowPanel>
     </g:FlowPanel>
 
 </ui:UiBinder>

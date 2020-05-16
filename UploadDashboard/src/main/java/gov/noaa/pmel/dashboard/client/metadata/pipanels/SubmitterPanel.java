@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.client.metadata;
+package gov.noaa.pmel.dashboard.client.metadata.pipanels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -6,6 +6,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 

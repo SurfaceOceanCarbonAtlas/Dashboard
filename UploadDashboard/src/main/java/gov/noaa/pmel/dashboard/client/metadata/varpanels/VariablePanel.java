@@ -5,7 +5,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
-import gov.noaa.pmel.dashboard.client.metadata.VariablesTabPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.util.HashSet;

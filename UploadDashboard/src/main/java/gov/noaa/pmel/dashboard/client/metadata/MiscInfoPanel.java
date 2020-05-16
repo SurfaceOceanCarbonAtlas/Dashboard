@@ -86,15 +86,15 @@ public class MiscInfoPanel extends Composite {
         //
         projectValue = new LabeledTextBox("Research project:", "11em", "52em", null, null);
         //
-        synopsisValue = new LabeledTextArea("Project synopsis:", "11em", "5em", "52em");
+        synopsisValue = new LabeledTextArea("Project synopsis:", "11em", "4em", "52em");
         //
-        purposeValue = new LabeledTextArea("Project Purpose:", "11em", "10em", "52em");
+        purposeValue = new LabeledTextArea("Project Purpose:", "11em", "4em", "52em");
         //
-        refsValue = new LabeledTextArea("References:", "11em", "10em", "52em");
+        refsValue = new LabeledTextArea("References:", "11em", "8em", "52em");
         //
-        portsValue = new LabeledTextArea("Ports of call:", "11em", "5em", "52em");
+        portsValue = new LabeledTextArea("Ports of call:", "11em", "4em", "52em");
         //
-        addnInfoValue = new LabeledTextArea("Other information:", "11em", "10em", "52em");
+        addnInfoValue = new LabeledTextArea("Other information:", "11em", "8em", "52em");
 
         initWidget(uiBinder.createAndBindUi(this));
 
