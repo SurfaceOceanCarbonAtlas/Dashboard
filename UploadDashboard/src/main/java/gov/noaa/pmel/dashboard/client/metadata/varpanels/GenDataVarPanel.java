@@ -7,6 +7,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
@@ -15,7 +16,7 @@ import java.util.HashSet;
 
 public class GenDataVarPanel extends FlagVarPanel {
 
-    interface GenDataVarPanelUiBinder extends UiBinder<FlowPanel,GenDataVarPanel> {
+    interface GenDataVarPanelUiBinder extends UiBinder<ScrollPanel, GenDataVarPanel> {
     }
 
     private static final GenDataVarPanelUiBinder uiBinder = GWT.create(GenDataVarPanelUiBinder.class);

@@ -5,22 +5,25 @@
 
     <ui:style src="../EditSocatMetadata.css"/>
 
-    <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fullNameValue"/>
+
+    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fullNameValue"/>
+            </g:FlowPanel>
+            <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="varTypeList"/>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="unitValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="accuracyValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="precisionValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="missingValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="flagNameValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
         </g:FlowPanel>
-        <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="varTypeList"/>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="unitValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="accuracyValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="precisionValue"/>
-        </g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="missingValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="flagNameValue"/>
-        </g:FlowPanel>
-        <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
-    </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

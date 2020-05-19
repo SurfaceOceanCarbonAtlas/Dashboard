@@ -4,13 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 
 import java.util.HashSet;
 
 public class AirPressureVarPanel extends InstDataVarPanel {
 
-    interface AirPressureVarPanelUiBinder extends UiBinder<FlowPanel,AirPressureVarPanel> {
+    interface AirPressureVarPanelUiBinder extends UiBinder<ScrollPanel, AirPressureVarPanel> {
     }
 
     private static final AirPressureVarPanelUiBinder uiBinder = GWT.create(AirPressureVarPanelUiBinder.class);

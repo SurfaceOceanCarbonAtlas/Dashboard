@@ -7,6 +7,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
@@ -17,7 +18,7 @@ import java.util.HashSet;
 
 public class FlagVarPanel extends VariablePanel {
 
-    interface FlagVarPanelUiBinder extends UiBinder<FlowPanel,FlagVarPanel> {
+    interface FlagVarPanelUiBinder extends UiBinder<ScrollPanel, FlagVarPanel> {
     }
 
     private static final FlagVarPanelUiBinder uiBinder = GWT.create(FlagVarPanelUiBinder.class);

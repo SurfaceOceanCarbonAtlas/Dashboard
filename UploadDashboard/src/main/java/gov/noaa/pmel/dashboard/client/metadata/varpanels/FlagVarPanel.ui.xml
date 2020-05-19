@@ -5,15 +5,17 @@
 
     <ui:style src="../EditSocatMetadata.css"/>
 
-    <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fullNameValue"/>
+    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="fullNameValue"/>
+            </g:FlowPanel>
+            <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="varTypeList"/>
+            <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="unitValue"/>
+            <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="missingValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
         </g:FlowPanel>
-        <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="varTypeList"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="unitValue"/>
-        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="missingValue"/>
-        <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
-    </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

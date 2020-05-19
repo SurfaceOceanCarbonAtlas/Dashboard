@@ -4,13 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 
 import java.util.HashSet;
 
 public class TemperatureVarPanel extends InstDataVarPanel {
 
-    interface TemperatureVarPanelUiBinder extends UiBinder<FlowPanel,TemperatureVarPanel> {
+    interface TemperatureVarPanelUiBinder extends UiBinder<ScrollPanel, TemperatureVarPanel> {
     }
 
     private static final TemperatureVarPanelUiBinder uiBinder = GWT.create(TemperatureVarPanelUiBinder.class);

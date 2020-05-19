@@ -4,13 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 
 import java.util.HashSet;
 
 public class InstDataVarPanel extends GenDataVarPanel {
 
-    interface InstDataVarPanelUiBinder extends UiBinder<FlowPanel,InstDataVarPanel> {
+    interface InstDataVarPanelUiBinder extends UiBinder<ScrollPanel, InstDataVarPanel> {
     }
 
     private static final InstDataVarPanelUiBinder uiBinder = GWT.create(InstDataVarPanelUiBinder.class);

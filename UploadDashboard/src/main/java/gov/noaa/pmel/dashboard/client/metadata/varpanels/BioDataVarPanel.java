@@ -4,13 +4,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioData;
 
 import java.util.HashSet;
 
 public class BioDataVarPanel extends InstDataVarPanel {
 
-    interface BioDataVarPanelUiBinder extends UiBinder<FlowPanel,BioDataVarPanel> {
+    interface BioDataVarPanelUiBinder extends UiBinder<ScrollPanel, BioDataVarPanel> {
     }
 
     private static final BioDataVarPanelUiBinder uiBinder = GWT.create(BioDataVarPanelUiBinder.class);
