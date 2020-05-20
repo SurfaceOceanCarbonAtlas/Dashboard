@@ -8,8 +8,8 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
@@ -18,18 +18,18 @@ import java.util.HashSet;
 
 public class InstrumentPanel extends Composite {
 
-    interface InstrumentPanelUiBinder extends UiBinder<FlowPanel,InstrumentPanel> {
+    interface InstrumentPanelUiBinder extends UiBinder<ScrollPanel,InstrumentPanel> {
     }
 
-    private static InstrumentPanelUiBinder uiBinder = GWT.create(InstrumentPanelUiBinder.class);
+    private static final InstrumentPanelUiBinder uiBinder = GWT.create(InstrumentPanelUiBinder.class);
 
     @UiField(provided = true)
     final LabeledTextBox idValue;
     @UiField(provided = true)
     final LabeledTextBox nameValue;
 
-    private Instrument inst;
-    private HTML header;
+    private final Instrument inst;
+    private final HTML header;
 
     /**
      * Creates a FlowPanel associated with the given Instrument.

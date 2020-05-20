@@ -7,9 +7,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
 import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
@@ -19,10 +19,10 @@ import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import java.util.ArrayList;
 
 public class InvestigatorsTabPanel extends Composite {
-    interface InvestigatorsTabPanelUiBinder extends UiBinder<ScrollPanel,InvestigatorsTabPanel> {
+    interface InvestigatorsTabPanelUiBinder extends UiBinder<FlowPanel,InvestigatorsTabPanel> {
     }
 
-    private static InvestigatorsTabPanelUiBinder uiBinder = GWT.create(InvestigatorsTabPanelUiBinder.class);
+    private static final InvestigatorsTabPanelUiBinder uiBinder = GWT.create(InvestigatorsTabPanelUiBinder.class);
 
     @UiField
     Label headerLabel;

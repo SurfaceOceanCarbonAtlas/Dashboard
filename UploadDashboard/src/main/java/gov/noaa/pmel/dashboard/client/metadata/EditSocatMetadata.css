@@ -8,43 +8,36 @@
 .cellpanel {
     display: inline;
     width: min-content;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin: 0 0.5em;
 }
 
 .dockpanel {
-    width: 78em;
+    width: 80em;
     height: 35em;
 }
 
 .header {
     font-size: medium;
     font-weight: bold;
-    margin-top: 0;
-    margin-bottom: 0.5em;
-    margin-left: 0;
+    margin: 0.5em 0;
 }
 
 .mainpanel {
-    width: 68em;
+    width: 70em;
     height: 100%;
 }
 
 .modbutton {
     display: inline;
+    font-size: medium;
     width: 12em;
-    margin-left: 6em;
+    margin-left: 14em;
 }
 
 .rowpanel {
     display: block;
     width: max-content;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0.5em 0;
 }
 
 .scrollpanel {
@@ -61,10 +54,7 @@
 
 .sidepanel {
     background-color: #AACCEE;
-    margin-top: 0;
-    margin-bottom: 0;
-    margin-left: 0.5em;
-    margin-right: 0.5em;
+    margin: 0 0.5em;
 }
 
 .tabpanel {

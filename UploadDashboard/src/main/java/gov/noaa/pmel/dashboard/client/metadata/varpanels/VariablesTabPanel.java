@@ -10,9 +10,9 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
 import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
@@ -53,10 +53,10 @@ public class VariablesTabPanel extends Composite {
             new Variable().getSimpleName()
     ));
 
-    interface VariablesTabPanelUiBinder extends UiBinder<ScrollPanel,VariablesTabPanel> {
+    interface VariablesTabPanelUiBinder extends UiBinder<FlowPanel,VariablesTabPanel> {
     }
 
-    private static VariablesTabPanelUiBinder uiBinder = GWT.create(VariablesTabPanelUiBinder.class);
+    private static final VariablesTabPanelUiBinder uiBinder = GWT.create(VariablesTabPanelUiBinder.class);
 
     @UiField
     Label headerLabel;
@@ -90,27 +90,119 @@ public class VariablesTabPanel extends Composite {
         variablePanels = new ArrayList<VariablePanel>(variables.size());
         // Add a panel for each variable
         for (int k = 0; k < variables.size(); k++) {
-            replacePanel(k, variables.get(k));
+            addPanel(k, variables.get(k));
         }
-        addButton.setText("Append another");
-        addButton.setTitle("Adds a new variable description to the end of the list");
+        addButton.setText("Add another");
+        addButton.setTitle("Adds a new variable description after the currently displayed one");
         removeButton.setText("Remove current");
         removeButton.setTitle("Removes the currently displayed variable description");
     }
 
     /**
-     * Generate a VariablePanel for the given variable with the given header. If the index specified
-     * is the current number of panels, the panel is added to the end of the list of variable panels;
-     * otherwise, the panel replaces the current panel at the given index.
+     * Initialized the type list for a VariablePanel instance.  Assumes the type list has not yet been
+     * initialized.  Appropriate values are assigned to the variable type list and selects the appropriate
+     * value for the type of variable given.  Also adds the callback to the type list to change to the
+     * appropriate panel for a newly selected variable type.
+     */
+    public void assignVariableTypeList(LabeledListBox typeList, Variable vari, VariablePanel panel) {
+        for (String name : varTypeListNames) {
+            typeList.addItem(name);
+        }
+        int k = varTypeSimpleNames.indexOf(vari.getSimpleName());
+        if ( k < 0 ) {
+            UploadDashboard.showMessage("Unexpected variable type of " +
+                    SafeHtmlUtils.htmlEscape(vari.getSimpleName()));
+        }
+        typeList.setSelectedIndex(k);
+        typeList.addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+                changeVariableType(variablePanels.indexOf(panel), typeList.getSelectedIndex());
+            }
+        });
+    }
+
+    /**
+     * @param index
+     *         show the VariablePanel at this index; does nothing if invalid
+     */
+    public void showPanel(int index) {
+        if ( (index < 0) || (index >= variablePanels.size()) )
+            return;
+        mainPanel.selectTab(index, true);
+    }
+
+    /**
+     * @return the list of updated variables
+     */
+    public ArrayList<Variable> getUpdatedVariables() {
+        ArrayList<Variable> variables = new ArrayList<Variable>(variablePanels.size());
+        for (VariablePanel panel : variablePanels) {
+            variables.add(panel.getUpdatedVariable());
+        }
+        return variables;
+    }
+
+    @UiHandler("addButton")
+    void addButtonOnClick(ClickEvent event) {
+        Variable vari;
+        int index = mainPanel.getSelectedIndex();
+        if ( (index >= 0) && (index < variablePanels.size()) ) {
+            // make a copy of the currently selected Variable
+            vari = variablePanels.get(index).getUpdatedVariable();
+            vari = (Variable) (vari.duplicate(null));
+            // erase data that must be specific for this variable
+            vari.setColName(null);
+            vari.setFullName(null);
+        }
+        else {
+            // Should never happen
+            vari = new Variable();
+        }
+        index++;
+        addPanel(index, vari);
+        mainPanel.selectTab(index, true);
+    }
+
+    @UiHandler("removeButton")
+    void removeButtonOnClick(ClickEvent event) {
+        removePanel(mainPanel.getSelectedIndex());
+    }
+
+    /**
+     * Removes the indicated panel from the tab panel.  On return, the selected panel will be
+     * the next panel in the list, or the last panel if the panel removed was the last panel.
+     * This will not remove the panel if there is no other panel remaining; instead, an error
+     * message is presented to the user.
      *
      * @param index
-     *         index of the panel to be replaced; if the size of the current list,
-     *         append the panel instead of replacing a panel
-     * @param vari
-     *         variable to associate with this panel
+     *         remove the panel at this index; if invalid, does nothing
      */
-    private void replacePanel(int index, Variable vari) {
-        // Allow the addition of a panel; otherwise it must replace an existing panel
+    private void removePanel(int index) {
+        int numPanels = variablePanels.size();
+        if ( numPanels < 2 ) {
+            UploadDashboard.showMessage("There must be at least one variable");
+            return;
+        }
+        if ( (index < 0) || (index >= numPanels) )
+            return;
+        variablePanels.remove(index);
+        mainPanel.remove(index);
+        numPanels--;
+        if ( index == numPanels )
+            index--;
+        mainPanel.selectTab(index, true);
+    }
+
+    /**
+     * Adds a panel appropriate for the given variable at the given index in the tab panel.
+     *
+     * @param index
+     *         insert panel at this index; if invalid, an error message is presented to the user
+     * @param vari
+     *         variable to be associated with this panel
+     */
+    private void addPanel(int index, Variable vari) {
         if ( (index < 0) || (index > variablePanels.size()) ) {
             UploadDashboard.showMessage("Unexpected invalid replacement panel index of " + index);
             return;
@@ -148,40 +240,8 @@ public class VariablesTabPanel extends Composite {
                 return;
         }
         panel.initialize();
-        if ( index == variablePanels.size() ) {
-            variablePanels.add(panel);
-            mainPanel.add(panel, header);
-        }
-        else {
-            variablePanels.set(index, panel);
-            mainPanel.remove(index);
-            mainPanel.insert(panel, header, index);
-        }
-        showPanel(index);
-    }
-
-    /**
-     * Initialized the type list for a VariablePanel instance.  Assumes the type list has not yet been
-     * initialized.  Appropriate values are assigned to the variable type list and selects the appropriate
-     * value for the type of variable given.  Also adds the callback to the type list to change to the
-     * appropriate panel for a newly selected variable type.
-     */
-    public void assignVariableTypeList(LabeledListBox typeList, Variable vari, VariablePanel panel) {
-        for (String name : varTypeListNames) {
-            typeList.addItem(name);
-        }
-        int k = varTypeSimpleNames.indexOf(vari.getSimpleName());
-        if ( k < 0 ) {
-            UploadDashboard.showMessage("Unexpected variable type of " +
-                    SafeHtmlUtils.htmlEscape(vari.getSimpleName()));
-        }
-        typeList.setSelectedIndex(k);
-        typeList.addChangeHandler(new ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-                changeVariableType(variablePanels.indexOf(panel), typeList.getSelectedIndex());
-            }
-        });
+        variablePanels.add(index, panel);
+        mainPanel.insert(panel, header, index);
     }
 
     /**
@@ -233,67 +293,11 @@ public class VariablesTabPanel extends Composite {
                 UploadDashboard.showMessage("Unexpect variable type of " + SafeHtmlUtils.htmlEscape(simpleName));
                 return;
         }
-        replacePanel(varIdx, vari);
-    }
-
-    /**
-     * @param index
-     *         show the VariablePanel at this index; does nothing if invalid
-     */
-    public void showPanel(int index) {
-        if ( (index < 0) || (index >= variablePanels.size()) )
-            return;
-        mainPanel.selectTab(index, true);
-    }
-
-    /**
-     * @return the list of updated variables
-     */
-    public ArrayList<Variable> getUpdatedVariables() {
-        ArrayList<Variable> variables = new ArrayList<Variable>(variablePanels.size());
-        for (VariablePanel panel : variablePanels) {
-            variables.add(panel.getUpdatedVariable());
-        }
-        return variables;
-    }
-
-    @UiHandler("addButton")
-    void addButtonOnClick(ClickEvent event) {
-        int numPanels = variablePanels.size();
-        Variable vari;
-        int index = mainPanel.getSelectedIndex();
-        if ( (index >= 0) && (index < numPanels) ) {
-            // make a copy of the currently selected Variable
-            vari = variablePanels.get(index).getUpdatedVariable();
-            vari = (Variable) (vari.duplicate(null));
-            // erase data that must be specific for this variable
-            vari.setColName(null);
-            vari.setFullName(null);
-        }
-        else {
-            // Should never happen
-            vari = new Variable();
-        }
-        replacePanel(numPanels, vari);
-        mainPanel.selectTab(numPanels, true);
-    }
-
-    @UiHandler("removeButton")
-    void removeButtonOnClick(ClickEvent event) {
-        int numPanels = variablePanels.size();
-        if ( numPanels < 2 ) {
-            UploadDashboard.showMessage("There must be at least one variable");
-            return;
-        }
-        int index = mainPanel.getSelectedIndex();
-        if ( (index < 0) || (index >= numPanels) )
-            return;
-        variablePanels.remove(index);
-        mainPanel.remove(index);
-        numPanels--;
-        if ( index == numPanels )
-            index--;
-        mainPanel.selectTab(index, true);
+        // Add the new panel first and then remove the old panel to avoid problems if there is only one panel
+        addPanel(varIdx + 1, vari);
+        // Since the new panel was positioned after the one to be removed,
+        // then new panel will then be the one selected after removal
+        removePanel(varIdx);
     }
 
 }

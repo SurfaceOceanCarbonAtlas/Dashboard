@@ -53,7 +53,7 @@ public class InvestigatorPanel extends Composite {
     final LabeledTextBox phoneValue;
 
     private final Investigator investigator;
-    private HTML header;
+    private final HTML header;
 
     /**
      * Creates a FlowPanel associated with the given Investigator.

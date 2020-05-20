@@ -15,7 +15,7 @@ public class SubmitterPanel extends Composite {
     interface SubmitterPanelUiBinder extends UiBinder<FlowPanel,SubmitterPanel> {
     }
 
-    private static SubmitterPanelUiBinder uiBinder = GWT.create(SubmitterPanelUiBinder.class);
+    private static final SubmitterPanelUiBinder uiBinder = GWT.create(SubmitterPanelUiBinder.class);
 
     @UiField
     Label headerLabel;
@@ -44,8 +44,7 @@ public class SubmitterPanel extends Composite {
      * @return the updated Submitter; never null
      */
     public Submitter getUpdatedSumitter() {
-        Submitter submitter = (Submitter) (subPanel.getUpdatedInvestigator());
-        return submitter;
+        return (Submitter) (subPanel.getUpdatedInvestigator());
     }
 
 }

@@ -5,11 +5,13 @@
 
     <ui:style src="../EditSocatMetadata.css"/>
 
-    <g:FlowPanel>
-        <g:FlowPanel addStyleNames="{style.rowpanel}">
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
-            <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
+    <g:ScrollPanel>
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
+            </g:FlowPanel>
         </g:FlowPanel>
-    </g:FlowPanel>
+    </g:ScrollPanel>
 
 </ui:UiBinder>

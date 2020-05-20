@@ -6,7 +6,7 @@
     <ui:style src="../EditSocatMetadata.css"/>
 
 
-    <g:ScrollPanel addStyleNames="{style.scrollpanel}">
+    <g:ScrollPanel>
         <g:FlowPanel>
             <g:FlowPanel addStyleNames="{style.rowpanel}">
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="columnNameValue"/>
