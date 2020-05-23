@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
@@ -23,7 +24,7 @@ public class BioDataTest {
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
-    private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
     private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "Krill_Count";
@@ -36,7 +37,7 @@ public class BioDataTest {
     private static final String METHOD_DESCRIPTION = "Directly measured";
     private static final String METHOD_REFERENCE = "a very old reference";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final HashSet<String> ANALYZER_NAMES = new HashSet<String>(Arrays.asList("Video Analyzer"));
+    private static final MultiNames ANALYZER_NAMES = new MultiNames("Video Analyzer");
 
     private static final String BIOLOGICAL_SUBJECT = "Krill";
     private static final String SPECIES_ID = "12345";
@@ -48,7 +49,7 @@ public class BioDataTest {
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
         assertEquals(BIOLOGICAL_SUBJECT, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -80,7 +81,7 @@ public class BioDataTest {
         var.setSpeciesId(SPECIES_ID);
         assertEquals(SPECIES_ID, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -113,7 +114,7 @@ public class BioDataTest {
         assertEquals(LIFE_STAGE, var.getLifeStage());
         assertEquals(EMPTY_STRING, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -153,12 +154,12 @@ public class BioDataTest {
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
         assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
         var.setInstrumentNames(ANALYZER_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
         var.setInstrumentNames(null);
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
         var.setMethodDescription(METHOD_DESCRIPTION);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
     }
 
     @Test
@@ -169,7 +170,7 @@ public class BioDataTest {
         var.setMissVal(MISSING_VALUE);
 
         BioData biovar = new BioData(var);
-        assertEquals(EMPTY_HASHSET, biovar.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, biovar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, biovar.getResearcher());
         assertEquals(EMPTY_STRING, biovar.getMethodReference());
         assertEquals(EMPTY_STRING, biovar.getMethodDescription());

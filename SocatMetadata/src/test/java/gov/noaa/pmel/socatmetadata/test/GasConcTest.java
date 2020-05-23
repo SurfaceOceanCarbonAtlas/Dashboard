@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
@@ -7,7 +8,6 @@ import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -22,7 +22,7 @@ public class GasConcTest {
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
-    private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
     private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "xCO2_atm";
@@ -47,10 +47,7 @@ public class GasConcTest {
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final ArrayList<String> INSTRUMENT_NAMES = new ArrayList<String>(Arrays.asList(
-            "Equilibrator",
-            "Equilibrator LICOR"
-    ));
+    private static final MultiNames INSTRUMENT_NAMES = new MultiNames("Equilibrator, Equilibrator LICOR");
 
     private static final String DRYING_METHOD = "Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).";
     private static final String WATER_VAPOR_CORRECTION = "Another standard data reduction method";
@@ -61,7 +58,7 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getDryingMethod());
         var.setDryingMethod(DRYING_METHOD);
         assertEquals(DRYING_METHOD, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -93,7 +90,7 @@ public class GasConcTest {
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertEquals(WATER_VAPOR_CORRECTION, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_PERSON, var.getResearcher());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
@@ -144,14 +141,14 @@ public class GasConcTest {
         assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
 
         var.setInstrumentNames(INSTRUMENT_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
         var.setInstrumentNames(null);
 
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
 
         var.setMethodDescription(METHOD_DESCRIPTION);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
     }
 
     @Test

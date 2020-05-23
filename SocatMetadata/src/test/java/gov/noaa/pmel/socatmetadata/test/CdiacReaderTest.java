@@ -3,6 +3,7 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
@@ -40,6 +41,7 @@ import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class CdiacReaderTest {
@@ -217,7 +219,7 @@ public class CdiacReaderTest {
         stamp = new Datestamp(2015, 1, 29, 0, 0, 0);
         assertEquals(coverage.toString(), stamp, coverage.getEndDatestamp());
         assertEquals(coverage.toString(), Coverage.WGS84, coverage.getSpatialReference());
-        assertEquals(coverage.toString(), 0, coverage.getGeographicNames().size());
+        assertTrue(coverage.toString(), coverage.getGeographicNames().isEmpty());
 
         ArrayList<Instrument> instruments = mdata.getInstruments();
         assertEquals(instruments.toString(), 8, instruments.size());
@@ -454,10 +456,10 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 2, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator"));
-            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("CO2 Sensor", strSet.pop());
+            assertEquals("Equilibrator", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof GasConc);
@@ -508,9 +510,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("CO2 Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof GasConc);
@@ -559,9 +561,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("CO2 Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof GasConc);
@@ -600,9 +602,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator Pressure Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("Equilibrator Pressure Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof AirPressure);
@@ -637,9 +639,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Atmospheric Pressure Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("Atmospheric Pressure Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof AirPressure);
@@ -672,9 +674,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator Temperature Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("Equilibrator Temperature Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof Temperature);
@@ -705,9 +707,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Water Temperature Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("Water Temperature Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof Temperature);
@@ -739,9 +741,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Salinity Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("Salinity Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertFalse(instDataVar instanceof Temperature);
@@ -782,10 +784,10 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "Sampling Depth: 5 meters", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 2, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("Equilibrator"));
-            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("CO2 Sensor", strSet.pop());
+            assertEquals("Equilibrator", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof GasConc);
@@ -837,9 +839,9 @@ public class CdiacReaderTest {
             assertEquals(instDataVar.toString(), "", instDataVar.getSamplingElevation());
             assertEquals(instDataVar.toString(), "", instDataVar.getStorageMethod());
             assertEquals(instDataVar.toString(), "", instDataVar.getReplication());
-            HashSet<String> strSet = instDataVar.getInstrumentNames();
-            assertEquals(instDataVar.toString(), 1, strSet.size());
-            assertTrue(instDataVar.toString(), strSet.contains("CO2 Sensor"));
+            MultiNames strSet = instDataVar.getInstrumentNames();
+            assertEquals("CO2 Sensor", strSet.pop());
+            assertNull(strSet.pop());
             assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
 
             assertTrue(instDataVar instanceof GasConc);

@@ -3,6 +3,7 @@ package gov.noaa.pmel.socatmetadata.translate;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
@@ -33,9 +34,7 @@ import org.jdom2.input.SAXBuilder;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -491,7 +490,7 @@ public class CdiacReader extends DocumentHandler {
             datestamp = timestamp;
         coverage.setEndDatestamp(datestamp);
 
-        TreeSet<String> regions = new TreeSet<String>();
+        MultiNames regions = new MultiNames();
         for (Element regElem : getElementList(null, GEO_REGION_ELEMENT_NAME)) {
             String name = regElem.getTextTrim();
             if ( !name.isEmpty() )
@@ -532,7 +531,7 @@ public class CdiacReader extends DocumentHandler {
                     MultiString addnInfo = new MultiString();
                     co2WaterEqu.setReportTemperature("equilibrator temperature");
                     co2WaterEqu.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    co2WaterEqu.setInstrumentNames(Arrays.asList("Equilibrator", "CO2 Sensor"));
+                    co2WaterEqu.setInstrumentNames(new MultiNames("Equilibrator, CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2WaterEqu.setObserveType("Time Series");
                     else
@@ -573,7 +572,7 @@ public class CdiacReader extends DocumentHandler {
                     MultiString addnInfo = new MultiString();
                     co2WaterSst.setReportTemperature("SST");
                     co2WaterSst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    co2WaterSst.setInstrumentNames(Arrays.asList("Equilibrator", "CO2 Sensor"));
+                    co2WaterSst.setInstrumentNames(new MultiNames("Equilibrator, CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2WaterSst.setObserveType("Time Series");
                     else
@@ -613,7 +612,7 @@ public class CdiacReader extends DocumentHandler {
                     GasConc co2AtmActual = new GasConc(var);
                     MultiString addnInfo = new MultiString();
                     co2AtmActual.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    co2AtmActual.setInstrumentNames(Collections.singletonList("CO2 Sensor"));
+                    co2AtmActual.setInstrumentNames(new MultiNames("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2AtmActual.setObserveType("Time Series");
                     else
@@ -651,7 +650,7 @@ public class CdiacReader extends DocumentHandler {
                     GasConc co2AtmInterp = new GasConc(var);
                     MultiString addnInfo = new MultiString();
                     co2AtmInterp.setMeasureMethod(MethodType.COMPUTED);
-                    co2AtmInterp.setInstrumentNames(Collections.singletonList("CO2 Sensor"));
+                    co2AtmInterp.setInstrumentNames(new MultiNames("CO2 Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         co2AtmInterp.setObserveType("Time Series");
                     else
@@ -686,7 +685,7 @@ public class CdiacReader extends DocumentHandler {
                     Temperature sst = new Temperature(var);
                     MultiString addnInfo = new MultiString();
                     sst.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    sst.setInstrumentNames(Collections.singletonList("Water Temperature Sensor"));
+                    sst.setInstrumentNames(new MultiNames("Water Temperature Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         sst.setObserveType("Time Series");
                     else
@@ -720,7 +719,7 @@ public class CdiacReader extends DocumentHandler {
                     Temperature tequ = new Temperature(var);
                     MultiString addnInfo = new MultiString();
                     tequ.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    tequ.setInstrumentNames(Collections.singletonList("Equilibrator Temperature Sensor"));
+                    tequ.setInstrumentNames(new MultiNames("Equilibrator Temperature Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         tequ.setObserveType("Time Series");
                     else
@@ -754,7 +753,7 @@ public class CdiacReader extends DocumentHandler {
                     AirPressure slp = new AirPressure(var);
                     MultiString addnInfo = new MultiString();
                     slp.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    slp.setInstrumentNames(Collections.singletonList("Atmospheric Pressure Sensor"));
+                    slp.setInstrumentNames(new MultiNames("Atmospheric Pressure Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         slp.setObserveType("Time Series");
                     else
@@ -791,7 +790,7 @@ public class CdiacReader extends DocumentHandler {
                     AirPressure pequ = new AirPressure(var);
                     MultiString addnInfo = new MultiString();
                     pequ.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    pequ.setInstrumentNames(Collections.singletonList("Equilibrator Pressure Sensor"));
+                    pequ.setInstrumentNames(new MultiNames("Equilibrator Pressure Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         pequ.setObserveType("Time Series");
                     else
@@ -828,7 +827,7 @@ public class CdiacReader extends DocumentHandler {
                     InstData sal = new InstData(var);
                     MultiString addnInfo = new MultiString();
                     sal.setMeasureMethod(MethodType.MEASURED_INSITU);
-                    sal.setInstrumentNames(Collections.singletonList("Salinity Sensor"));
+                    sal.setInstrumentNames(new MultiNames("Salinity Sensor"));
                     if ( PlatformType.MOORING.equals(platformType) )
                         sal.setObserveType("Time Series");
                     else

@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared.variable;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import java.util.HashSet;
  */
 public class InstData extends GenData implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1051703471507308823L;
+    private static final long serialVersionUID = -4128682981000861807L;
 
     private String observeType;
     private MethodType measureMethod;
@@ -26,7 +27,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
     private String analysisTemperature;
     private String replication;
     private Person researcher;
-    private HashSet<String> instrumentNames;
+    private MultiNames instrumentNames;
 
     /**
      * Create with all fields empty.
@@ -45,7 +46,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
         analysisTemperature = "";
         replication = "";
         researcher = new Person();
-        instrumentNames = new HashSet<String>();
+        instrumentNames = new MultiNames();
     }
 
     /**
@@ -67,7 +68,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
             analysisTemperature = other.analysisTemperature;
             replication = other.replication;
             researcher = (Person) (other.researcher.duplicate(null));
-            instrumentNames = new HashSet<String>(other.instrumentNames);
+            instrumentNames = new MultiNames(other.instrumentNames);
         }
         else {
             observeType = "";
@@ -82,7 +83,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
             analysisTemperature = "";
             replication = "";
             researcher = new Person();
-            instrumentNames = new HashSet<String>();
+            instrumentNames = new MultiNames();
         }
     }
 
@@ -302,44 +303,21 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
     }
 
     /**
-     * @return the list of names of instruments used to sample or analyze this variable; never null but may be empty.
-     *         Any strings given are guaranteed to be strings with content (not blank).
+     * @return the set of names of instruments used to sample or analyze this variable; never null but may be empty.
      */
-    public HashSet<String> getInstrumentNames() {
-        return new HashSet<String>(instrumentNames);
-    }
-
-    /**
-     * Calls {@link #setInstrumentNames(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param instrumentNames
-     *         assign as the list of names of instruments used to sample or analyze this variable;
-     *         if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any analyzer name given is null or blank
-     */
-    public void setInstrumentNames(HashSet<String> instrumentNames) throws IllegalArgumentException {
-        setInstrumentNames((Iterable<String>) instrumentNames);
+    public MultiNames getInstrumentNames() {
+        return new MultiNames(instrumentNames);
     }
 
     /**
      * @param instrumentNames
-     *         assign as the list of names of instruments used to sample or analyze this variable;
-     *         if null, an empty list is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any analyzer name given is null or blank
+     *         assign as the set of names of instruments used to sample or analyze this variable;
+     *         if null, an empty set of names is assigned
      */
-    public void setInstrumentNames(Iterable<String> instrumentNames) throws IllegalArgumentException {
+    public void setInstrumentNames(MultiNames instrumentNames) {
         this.instrumentNames.clear();
         if ( instrumentNames != null ) {
             for (String name : instrumentNames) {
-                if ( name == null )
-                    throw new IllegalArgumentException("null instrument name given");
-                name = name.trim();
-                if ( name.isEmpty() )
-                    throw new IllegalArgumentException("blank instrument name given");
                 this.instrumentNames.add(name);
             }
         }
@@ -365,7 +343,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
         var.analysisTemperature = analysisTemperature;
         var.replication = replication;
         var.researcher = (Person) (researcher.duplicate(null));
-        var.instrumentNames = new HashSet<String>(instrumentNames);
+        var.instrumentNames = new MultiNames(instrumentNames);
         return var;
     }
 

@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.test;
 
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import org.junit.Test;
 
@@ -11,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,17 +26,14 @@ public class CoverageTest {
     private static final NumericString EMPTY_LONGITUDE = new NumericString(null, Coverage.LONGITUDE_UNITS);
     private static final NumericString EMPTY_LATITUDE = new NumericString(null, Coverage.LATITUDE_UNITS);
     private static final Datestamp EMPTY_DATESTAMP = new Datestamp();
-    private static final TreeSet<String> EMPTY_NAMESET = new TreeSet<String>();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
 
     private static final NumericString WESTERN_LONGITUDE = new NumericString("146.23", Coverage.LONGITUDE_UNITS);
     private static final NumericString EASTERN_LONGITUDE = new NumericString("-120.45", Coverage.LONGITUDE_UNITS);
     private static final NumericString SOUTHERN_LATITUDE = new NumericString("15.36", Coverage.LATITUDE_UNITS);
     private static final NumericString NORTHERN_LATITUDE = new NumericString("45.03", Coverage.LATITUDE_UNITS);
     private static final String SPATIAL_REFERENCE = "NAD 83";
-    private static final TreeSet<String> GEOGRAPHIC_NAMES = new TreeSet<String>(Arrays.asList(
-            "North Pacific",
-            "Tropical Pacific"
-    ));
+    private static final MultiNames GEOGRAPHIC_NAMES = new MultiNames("North Pacific, Tropical Pacific");
 
     private static final Datestamp START_DATESTAMP = new Datestamp(2015, 1, 5, -1, -1, -1);
     private static final Datestamp EARLIEST_DATA_DATE = new Datestamp(2015, 1, 5, 13, 25, 53);
@@ -322,7 +319,7 @@ public class CoverageTest {
         Coverage coverage = new Coverage();
         assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
         coverage.setGeographicNames(GEOGRAPHIC_NAMES);
-        TreeSet<String> nameSet = coverage.getGeographicNames();
+        MultiNames nameSet = coverage.getGeographicNames();
         assertEquals(GEOGRAPHIC_NAMES, nameSet);
         assertNotSame(GEOGRAPHIC_NAMES, nameSet);
         assertNotSame(nameSet, coverage.getGeographicNames());
@@ -341,18 +338,6 @@ public class CoverageTest {
         assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
         coverage.setSpatialReference("\t");
         assertEquals(EMPTY_NAMESET, coverage.getGeographicNames());
-        try {
-            coverage.setGeographicNames(Arrays.asList("North Pacific", null, "Tropical Pacific"));
-            fail("setGeographicNames with null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            coverage.setGeographicNames(Arrays.asList("North Pacific", "\n", "Tropical Pacific"));
-            fail("setGeographicNames with blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
     }
 
     @Test

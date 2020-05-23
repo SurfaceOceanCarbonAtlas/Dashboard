@@ -3,6 +3,7 @@ package gov.noaa.pmel.socatmetadata.translate;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
@@ -471,7 +472,7 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_MANIPULATION_METHOD_ELEMENT_NAME, var.getManipulationDescription());
         setElementText(ancestor, VARIABLE_DURATION_ELEMENT_NAME, var.getDuration());
 
-        HashSet<String> strSet = var.getInstrumentNames();
+        MultiNames strSet = var.getInstrumentNames();
         if ( !strSet.isEmpty() ) {
             for (Instrument inst : instruments) {
                 if ( !strSet.contains(inst.getName()) )

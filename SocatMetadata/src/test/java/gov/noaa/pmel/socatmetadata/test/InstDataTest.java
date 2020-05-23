@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import gov.noaa.pmel.socatmetadata.shared.person.Person;
@@ -25,7 +26,7 @@ public class InstDataTest {
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
-    private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
     private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "SST_C";
@@ -52,7 +53,7 @@ public class InstDataTest {
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
     private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final HashSet<String> INSTRUMENT_NAMES = new HashSet<String>(Arrays.asList("Ship's SST sensor"));
+    private static final MultiNames INSTRUMENT_NAMES = new MultiNames("Ship's SST sensor");
 
     @Test
     public void testGetSetColName() {
@@ -439,7 +440,7 @@ public class InstDataTest {
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         assertEquals(MEASURE_TEMPERATURE, var.getAnalysisTemperature());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         assertEquals(EMPTY_STRING, var.getDuration());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
         assertEquals(EMPTY_STRING, var.getSamplingElevation());
@@ -528,9 +529,9 @@ public class InstDataTest {
     @Test
     public void testGetSetInstrumentNames() {
         InstData var = new InstData();
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
         var.setInstrumentNames(INSTRUMENT_NAMES);
-        HashSet<String> names = var.getInstrumentNames();
+        MultiNames names = var.getInstrumentNames();
         assertEquals(INSTRUMENT_NAMES, names);
         assertNotSame(INSTRUMENT_NAMES, names);
         assertNotSame(names, var.getInstrumentNames());
@@ -555,21 +556,9 @@ public class InstDataTest {
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setInstrumentNames(null);
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
-        var.setInstrumentNames(EMPTY_ARRAYLIST);
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
-        try {
-            var.setInstrumentNames(Arrays.asList("something", null, "else"));
-            fail("calling setInstrumentNames with a null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setInstrumentNames(Arrays.asList("something", "\n", "else"));
-            fail("calling setInstrumentNames with a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
+        var.setInstrumentNames(EMPTY_NAMESET);
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
     }
 
     @Test
@@ -585,7 +574,7 @@ public class InstDataTest {
         var.setAddnInfo(ADDN_INFO);
 
         InstData instDataVar = new InstData(var);
-        assertEquals(EMPTY_HASHSET, instDataVar.getInstrumentNames());
+        assertEquals(EMPTY_NAMESET, instDataVar.getInstrumentNames());
         assertEquals(EMPTY_PERSON, instDataVar.getResearcher());
         assertEquals(EMPTY_STRING, instDataVar.getReplication());
         assertEquals(EMPTY_STRING, instDataVar.getAnalysisTemperature());
@@ -627,12 +616,12 @@ public class InstDataTest {
         var.setMeasureMethod(MethodType.MEASURED_INSITU);
         assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
         var.setInstrumentNames(INSTRUMENT_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
         var.setInstrumentNames(null);
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
         var.setMethodDescription(METHOD_DESCRIPTION);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
     }
 
     @Test

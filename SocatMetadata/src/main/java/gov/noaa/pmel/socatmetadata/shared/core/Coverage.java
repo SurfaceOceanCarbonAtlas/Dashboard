@@ -4,14 +4,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 /**
  * Information about the longitude, latitude, and time coverage of data in a dataset
  */
 public class Coverage implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 4301952297875355625L;
+    private static final long serialVersionUID = 5771797461681037171L;
 
     public static final String LONGITUDE_UNITS = "dec deg E";
     public static final String LATITUDE_UNITS = "dec deg N";
@@ -26,7 +25,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
     private Datestamp startDatestamp;
     private Datestamp endDatestamp;
     private String spatialReference;
-    private TreeSet<String> geographicNames;
+    private MultiNames geographicNames;
 
     /**
      * Create with empty longitudes, empty latitudes, invalid times,
@@ -42,7 +41,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
         startDatestamp = new Datestamp();
         endDatestamp = new Datestamp();
         spatialReference = WGS84;
-        geographicNames = new TreeSet<String>();
+        geographicNames = new MultiNames();
     }
 
     /**
@@ -320,39 +319,18 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
      * @return the set of geographic names; never null but may be empty.
      *         Any names given are guaranteed to be non-blank strings.
      */
-    public TreeSet<String> getGeographicNames() {
-        return new TreeSet<String>(geographicNames);
-    }
-
-    /**
-     * Calls {@link #setGeographicNames(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param geographicNames
-     *         assign as the list of geographic names; if null, an empty set is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any name given is null or blank
-     */
-    public void setGeographicNames(TreeSet<String> geographicNames) throws IllegalArgumentException {
-        setGeographicNames((Iterable<String>) geographicNames);
+    public MultiNames getGeographicNames() {
+        return new MultiNames(geographicNames);
     }
 
     /**
      * @param geographicNames
-     *         assign as the list of geographic names; if null, an empty set is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if any name given is null or blank
+     *         assign as the list of geographic names; if null, an empty set of names is assigned
      */
-    public void setGeographicNames(Iterable<String> geographicNames) throws IllegalArgumentException {
+    public void setGeographicNames(MultiNames geographicNames) {
         this.geographicNames.clear();
         if ( geographicNames != null ) {
             for (String name : geographicNames) {
-                if ( name == null )
-                    throw new IllegalArgumentException("null geographic region name given");
-                name = name.trim();
-                if ( name.isEmpty() )
-                    throw new IllegalArgumentException("blank geographic region name given");
                 this.geographicNames.add(name);
             }
         }
@@ -374,7 +352,7 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
         coverage.startDatestamp = new Datestamp(startDatestamp);
         coverage.endDatestamp = new Datestamp(endDatestamp);
         coverage.spatialReference = spatialReference;
-        coverage.geographicNames = new TreeSet<String>(geographicNames);
+        coverage.geographicNames = new MultiNames(geographicNames);
         return coverage;
     }
 
