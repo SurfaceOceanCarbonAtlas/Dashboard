@@ -69,7 +69,18 @@ public class PlatformPanel extends Composite {
         }
 
         // The following will assign the values in the labels and text fields
-        getUpdatedPlatform();
+        idValue.setText(platform.getPlatformId());
+        nameValue.setText(platform.getPlatformName());
+        int idx = platformTypeList.indexOf(platform.getPlatformType());
+        if ( idx >= 0 )
+            typeList.setSelectedIndex(idx);
+        ownerValue.setText(platform.getPlatformOwner());
+        countryValue.setText(platform.getPlatformCountry());
+
+        // If the platform type is unknown, see if it can guess the type
+        possiblyUpdatePlatformType();
+
+        markInvalids();
     }
 
     @UiHandler("idValue")
@@ -159,21 +170,6 @@ public class PlatformPanel extends Composite {
      * @return the updated Platform; never null
      */
     public Platform getUpdatedPlatform() {
-        // In case erroneous input leaves mismatches,
-        // first update the displayed content in case this is from a save-and-continue
-        idValue.setText(platform.getPlatformId());
-        nameValue.setText(platform.getPlatformName());
-        int idx = platformTypeList.indexOf(platform.getPlatformType());
-        if ( idx >= 0 )
-            typeList.setSelectedIndex(idx);
-        ownerValue.setText(platform.getPlatformOwner());
-        countryValue.setText(platform.getPlatformCountry());
-
-        // If the platform type is unknown, see if it can guess the type
-        possiblyUpdatePlatformType();
-
-        markInvalids();
-
         return platform;
     }
 

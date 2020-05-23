@@ -102,8 +102,24 @@ public class MiscInfoPanel extends Composite {
 
         this.info = info;
 
-        // The following will assign the values in the labels and text fields
-        getUpdatedMiscInfo();
+        nameValue.setText(info.getDatasetName());
+        sectionValue.setText(info.getSectionName());
+        doiValue.setText(info.getDatasetDoi());
+        accessValue.setText(info.getAccessId());
+        citationValue.setText(info.getCitation());
+        websiteValue.setText(info.getWebsite());
+        downloadValue.setText(info.getDownloadUrl());
+        fundAgencyValue.setText(info.getFundingAgency());
+        fundTitleValue.setText(info.getFundingTitle());
+        fundIdValue.setText(info.getFundingId());
+        projectValue.setText(info.getResearchProject());
+        synopsisValue.setText(info.getSynopsis());
+        purposeValue.setText(info.getPurpose());
+        refsValue.setText(info.getReferences().asOneString());
+        portsValue.setText(info.getPortsOfCall().asOneString());
+        addnInfoValue.setText(info.getAddnInfo().asOneString());
+
+        markInvalids();
     }
 
     @UiHandler("nameValue")
@@ -289,32 +305,10 @@ public class MiscInfoPanel extends Composite {
             addnInfoValue.markValid();
     }
 
-
     /**
      * @return the updated MiscInfo; never null
      */
     public MiscInfo getUpdatedMiscInfo() {
-        // In case erroneous input leaves mismatches,
-        // first update the displayed content in case this is from a save-and-continue
-        nameValue.setText(info.getDatasetName());
-        sectionValue.setText(info.getSectionName());
-        doiValue.setText(info.getDatasetDoi());
-        accessValue.setText(info.getAccessId());
-        citationValue.setText(info.getCitation());
-        websiteValue.setText(info.getWebsite());
-        downloadValue.setText(info.getDownloadUrl());
-        fundAgencyValue.setText(info.getFundingAgency());
-        fundTitleValue.setText(info.getFundingTitle());
-        fundIdValue.setText(info.getFundingId());
-        projectValue.setText(info.getResearchProject());
-        synopsisValue.setText(info.getSynopsis());
-        purposeValue.setText(info.getPurpose());
-        refsValue.setText(info.getReferences().asOneString());
-        portsValue.setText(info.getPortsOfCall().asOneString());
-        addnInfoValue.setText(info.getAddnInfo().asOneString());
-
-        markInvalids();
-
         return info;
     }
 

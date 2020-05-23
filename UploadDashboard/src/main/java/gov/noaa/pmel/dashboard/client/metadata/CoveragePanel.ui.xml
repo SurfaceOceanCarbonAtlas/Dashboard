@@ -24,7 +24,7 @@
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="earlyDateValue"/>
             <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="lateDateValue"/>
         </g:FlowPanel>
-        <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="regionsValue"/>
+        <my:LabeledTextBox addStyleNames="{style.areapanel}" ui:field="regionsValue"/>
     </g:FlowPanel>
 
 </ui:UiBinder>

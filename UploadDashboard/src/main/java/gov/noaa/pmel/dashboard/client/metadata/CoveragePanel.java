@@ -12,10 +12,10 @@ import gov.noaa.pmel.dashboard.client.UploadDashboard;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
 import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 
 import java.util.HashSet;
-import java.util.TreeSet;
 
 public class CoveragePanel extends Composite {
 
@@ -47,7 +47,7 @@ public class CoveragePanel extends Composite {
     @UiField(provided = true)
     final LabeledTextBox lateDateValue;
     @UiField(provided = true)
-    final LabeledTextArea regionsValue;
+    final LabeledTextBox regionsValue;
 
     private final Coverage coverage;
     private final Datestamp today;
@@ -83,7 +83,7 @@ public class CoveragePanel extends Composite {
         earlyDateValue = new LabeledTextBox("Earliest data date:", "11em", "12em", DATE_UNIT_TEXT, "7em");
         lateDateValue = new LabeledTextBox("Latest data date:", "11em", "12em", DATE_UNIT_TEXT, "7em");
         //
-        regionsValue = new LabeledTextArea("Geographic names:", "11em", "8em", "44.5em");
+        regionsValue = new LabeledTextBox("Geographic names:", "11em", "44.5em", null, null);
 
         initWidget(uiBinder.createAndBindUi(this));
 
@@ -95,8 +95,18 @@ public class CoveragePanel extends Composite {
         origEarlyDate = coverage.getEarliestDataDate();
         origLateDate = coverage.getLatestDataDate();
 
-        // The following will assign the values in the labels and text fields
-        getUpdatedCoverage();
+        spacialValue.setText(coverage.getSpatialReference());
+        southLatValue.setText(coverage.getSouthernLatitude().getValueString());
+        northLatValue.setText(coverage.getNorthernLatitude().getValueString());
+        westLonValue.setText(coverage.getWesternLongitude().getValueString());
+        eastLonValue.setText(coverage.getEasternLongitude().getValueString());
+        startDateValue.setText(coverage.getStartDatestamp().fullOrPartialString());
+        endDateValue.setText(coverage.getEndDatestamp().fullOrPartialString());
+        earlyDateValue.setText(coverage.getEarliestDataDate().fullOrPartialString());
+        lateDateValue.setText(coverage.getLatestDataDate().fullOrPartialString());
+        regionsValue.setText(coverage.getGeographicNames().asOneString());
+
+        markInvalids(null);
     }
 
     @UiHandler("spacialValue")
@@ -241,14 +251,7 @@ public class CoveragePanel extends Composite {
 
     @UiHandler("regionsValue")
     void regionsValueOnValueChanged(ValueChangeEvent<String> event) {
-        String[] pieces = regionsValue.getText().split("\n");
-        TreeSet<String> regions = new TreeSet<String>();
-        for (String str : pieces) {
-            String reg = str.trim();
-            if ( !reg.isEmpty() )
-                regions.add(reg);
-        }
-        coverage.setGeographicNames(regions);
+        coverage.setGeographicNames(new MultiNames(regionsValue.getText()));
         markInvalids(null);
     }
 
@@ -355,25 +358,6 @@ public class CoveragePanel extends Composite {
      * @return the update Coverage object; never null
      */
     public Coverage getUpdatedCoverage() {
-        // Because erroneous input can leave mismatches,
-        // first update the displayed content in case this is from a save-and-continue
-        spacialValue.setText(coverage.getSpatialReference());
-        southLatValue.setText(coverage.getSouthernLatitude().getValueString());
-        northLatValue.setText(coverage.getNorthernLatitude().getValueString());
-        westLonValue.setText(coverage.getWesternLongitude().getValueString());
-        eastLonValue.setText(coverage.getEasternLongitude().getValueString());
-        startDateValue.setText(coverage.getStartDatestamp().fullOrPartialString());
-        endDateValue.setText(coverage.getEndDatestamp().fullOrPartialString());
-        earlyDateValue.setText(coverage.getEarliestDataDate().fullOrPartialString());
-        lateDateValue.setText(coverage.getLatestDataDate().fullOrPartialString());
-        String regions = "";
-        for (String name : coverage.getGeographicNames()) {
-            regions += name + "\n";
-        }
-        regionsValue.setText(regions);
-
-        markInvalids(null);
-
         return coverage;
     }
 

@@ -22,6 +22,29 @@
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="missingValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="flagNameValue"/>
             </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="sampleLocValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="sampleElevValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="observeTypeValue"/>
+                <my:LabeledListBox addStyleNames="{style.cellpanel}" ui:field="measureMethodValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="methodDescValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="methodRefsValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="manipDescValue"/>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="storageMethodValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="durationValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="analysisTempValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="replicationValue"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="researcherValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="instrumentsValue"/>
+            </g:FlowPanel>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
         </g:FlowPanel>
     </g:ScrollPanel>

@@ -21,8 +21,8 @@
                         <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="investigatorsButton"/>
                         <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="platformButton"/>
                         <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="coverageButton"/>
-                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="variablesButton"/>
                         <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="instrumentsButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="variablesButton"/>
                         <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="miscInfoButton"/>
                     </g:FlowPanel>
                 </g:west>

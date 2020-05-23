@@ -64,16 +64,16 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     public static final String INVESTIGATOR_TAB_TEXT = "Investigators";
     public static final String PLATFORM_TAB_TEXT = "Platform";
     public static final String COVERAGE_TAB_TEXT = "Coverage";
-    public static final String VARIABLES_TAB_TEXT = "Data fields";
     public static final String INSTRUMENTS_TAB_TEXT = "Instruments";
+    public static final String VARIABLES_TAB_TEXT = "Data fields";
     public static final String MISC_INFO_TAB_TEXT = "Information";
 
     private static final String SUBMITTER_TAB_HELP = "Contact information for the submitter of this dataset";
     private static final String INVESTIGATOR_TAB_HELP = "Information about each of the principal investigator of this dataset";
     private static final String PLATFORM_TAB_HELP = "Information about the platform (ship, mooring, etc.) used in this dataset";
     private static final String COVERAGE_TAB_HELP = "Information about the spatial and time coverage of this dataset";
-    private static final String VARIABLES_TAB_HELP = "Information about each data field (variable) reported in this dataset";
     private static final String INSTRUMENTS_TAB_HELP = "Information about each instrument used in this dataset";
+    private static final String VARIABLES_TAB_HELP = "Information about each data field (variable) reported in this dataset";
     private static final String MISC_INFO_TAB_HELP = "Various information about this dataset not describe elsewhere";
 
     interface EditSocatMetadataPageUiBinder extends UiBinder<Widget,EditSocatMetadataPage> {
@@ -103,9 +103,9 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     @UiField
     Button coverageButton;
     @UiField
-    Button variablesButton;
-    @UiField
     Button instrumentsButton;
+    @UiField
+    Button variablesButton;
     @UiField
     Button miscInfoButton;
 
@@ -124,8 +124,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     private InvestigatorsTabPanel investigatorsPanel;
     private PlatformPanel platformPanel;
     private CoveragePanel coveragePanel;
-    private VariablesTabPanel variablesPanel;
     private InstrumentsTabPanel instrumentsPanel;
+    private VariablesTabPanel variablesPanel;
     private MiscInfoPanel miscInfoPanel;
 
     // Singleton instance of this page
@@ -150,8 +150,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         investigatorsButton.setText(INVESTIGATOR_TAB_TEXT);
         platformButton.setText(PLATFORM_TAB_TEXT);
         coverageButton.setText(COVERAGE_TAB_TEXT);
-        variablesButton.setText(VARIABLES_TAB_TEXT);
         instrumentsButton.setText(INSTRUMENTS_TAB_TEXT);
+        variablesButton.setText(VARIABLES_TAB_TEXT);
         miscInfoButton.setText(MISC_INFO_TAB_TEXT);
 
         // Assign the hover helps for the category buttons
@@ -159,16 +159,16 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         investigatorsButton.setTitle(INVESTIGATOR_TAB_HELP);
         platformButton.setTitle(PLATFORM_TAB_HELP);
         coverageButton.setTitle(COVERAGE_TAB_HELP);
-        variablesButton.setTitle(VARIABLES_TAB_HELP);
         instrumentsButton.setTitle(INSTRUMENTS_TAB_HELP);
+        variablesButton.setTitle(VARIABLES_TAB_HELP);
         miscInfoButton.setTitle(MISC_INFO_TAB_HELP);
 
         submitterPanel = null;
         investigatorsPanel = null;
         platformPanel = null;
         coveragePanel = null;
-        variablesPanel = null;
         instrumentsPanel = null;
+        variablesPanel = null;
         miscInfoPanel = null;
     }
 
@@ -252,22 +252,22 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         if ( investigators.isEmpty() )
             investigators.add(new Investigator());
 
-        // Make sure there is at least one variable specified, even if it is completely blank
-        ArrayList<Variable> variables = metadata.getVariables();
-        if ( variables.isEmpty() )
-            variables.add(new Variable());
-
         // Make sure there is at least one instrument specified, even if it is completely blank
         ArrayList<Instrument> instruments = metadata.getInstruments();
         if ( instruments.isEmpty() )
             instruments.add(new Instrument());
 
+        // Make sure there is at least one variable specified, even if it is completely blank
+        ArrayList<Variable> variables = metadata.getVariables();
+        if ( variables.isEmpty() )
+            variables.add(new Variable());
+
         submitterPanel = new SubmitterPanel(dataset, metadata.getSubmitter());
         investigatorsPanel = new InvestigatorsTabPanel(dataset, investigators);
         platformPanel = new PlatformPanel(dataset, metadata.getPlatform());
         coveragePanel = new CoveragePanel(dataset, metadata.getCoverage(), today);
-        variablesPanel = new VariablesTabPanel(dataset, variables);
         instrumentsPanel = new InstrumentsTabPanel(dataset, instruments);
+        variablesPanel = new VariablesTabPanel(dataset, variables);
         miscInfoPanel = new MiscInfoPanel(dataset, metadata.getMiscInfo());
 
         mainPanel.clear();
@@ -275,13 +275,13 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         mainPanel.add(investigatorsPanel);
         mainPanel.add(platformPanel);
         mainPanel.add(coveragePanel);
-        mainPanel.add(variablesPanel);
         mainPanel.add(instrumentsPanel);
+        mainPanel.add(variablesPanel);
         mainPanel.add(miscInfoPanel);
 
         investigatorsPanel.showPanel(0);
-        variablesPanel.showPanel(0);
         instrumentsPanel.showPanel(0);
+        variablesPanel.showPanel(0);
 
         // Highlight the submitterButton and show the submitterPanel
         submitterButton.setFocus(true);
@@ -308,14 +308,14 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         mainPanel.showWidget(3);
     }
 
-    @UiHandler("variablesButton")
-    void variablesButtonOnClick(ClickEvent event) {
-        mainPanel.showWidget(4);
-    }
-
     @UiHandler("instrumentsButton")
     void instrumentsButtonOnClick(ClickEvent event) {
         mainPanel.showWidget(5);
+    }
+
+    @UiHandler("variablesButton")
+    void variablesButtonOnClick(ClickEvent event) {
+        mainPanel.showWidget(4);
     }
 
     @UiHandler("miscInfoButton")
@@ -355,8 +355,8 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
         metadata.setInvestigators(investigatorsPanel.getUpdatedInvestigators());
         metadata.setPlatform(platformPanel.getUpdatedPlatform());
         metadata.setCoverage(coveragePanel.getUpdatedCoverage());
-        metadata.setVariables(variablesPanel.getUpdatedVariables());
         metadata.setInstruments(instrumentsPanel.getUpdatedInstruments());
+        metadata.setVariables(variablesPanel.getUpdatedVariables());
         metadata.setMiscInfo(miscInfoPanel.getUpdatedMiscInfo());
 
         UploadDashboard.showWaitCursor();
