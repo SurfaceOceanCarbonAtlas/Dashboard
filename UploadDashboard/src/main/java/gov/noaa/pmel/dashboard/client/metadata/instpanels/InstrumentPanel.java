@@ -1,105 +1,79 @@
 package gov.noaa.pmel.dashboard.client.metadata.instpanels;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
-import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 
 import java.util.HashSet;
 
-public class InstrumentPanel extends Composite {
+public abstract class InstrumentPanel extends Composite {
 
-    interface InstrumentPanelUiBinder extends UiBinder<ScrollPanel,InstrumentPanel> {
-    }
-
-    private static final InstrumentPanelUiBinder uiBinder = GWT.create(InstrumentPanelUiBinder.class);
-
-    @UiField(provided = true)
-    final LabeledTextBox idValue;
-    @UiField(provided = true)
-    final LabeledTextBox nameValue;
-
-    private final Instrument inst;
-    private final HTML header;
+    protected final Instrument instr;
+    protected final HTML header;
+    protected final InstrumentsTabPanel parentPanel;
 
     /**
-     * Creates a FlowPanel associated with the given Instrument.
+     * Create an appropriate Panel for this instrument
      *
-     * @param inst
-     *         associate this panel with this Instrument; cannot be null
+     * @param instr
+     *         instrument metadata being edited
      * @param header
-     *         header that should be updated when appropriate values change; cannot be null
+     *         tab associated with this Panel
+     * @param parentPanel
+     *         TabPanel containing and controlling this panel
      */
-    public InstrumentPanel(Instrument inst, HTML header) {
-        nameValue = new LabeledTextBox("Name:", "7em", "20em", null, null);
-        idValue = new LabeledTextBox("ID:", "7em", "20em", null, null);
-
-        initWidget(uiBinder.createAndBindUi(this));
-
-        this.inst = inst;
+    public InstrumentPanel(Instrument instr, HTML header, InstrumentsTabPanel parentPanel) {
+        this.instr = instr;
         this.header = header;
-
-        // The following will assign the values in the labels and text fields
-        getUpdatedInstrument();
+        this.parentPanel = parentPanel;
     }
 
-    @UiHandler("nameValue")
-    void nameValueOnValueChange(ValueChangeEvent<String> event) {
-        inst.setName(nameValue.getText());
-        markInvalids();
-    }
+    /**
+     * Calls the initWidget method of this Composite with the appropriate Widget
+     * and then call the finishInitialization method.
+     */
+    public abstract void initialize();
 
-    @UiHandler("idValue")
-    void idValueOnValueChange(ValueChangeEvent<String> event) {
-        inst.setId(idValue.getText());
-        markInvalids();
+    /**
+     * Finish the initialization steps that come after the call to initWidget.
+     * This method should be extended to initialize widgets that are added in
+     * subclasses and then the superclass method called.  The top level version
+     * of this method calls the markInvalids method.
+     */
+    protected void finishInitialization() {
+        markInvalids(null);
     }
 
     /**
      * Indicate which fields contain invalid values and which contain acceptable values.
+     * This method should be extended to indicate invalid and acceptable fields for widgets
+     * that are added in subclasses.  The set of invalid field names, if known, is passed
+     * along simply to prevent repeated calling of the invalidFieldNames method of the variable.
+     *
+     * @param invalids
+     *         set of invalid field names; if null, set is obtained by calling
+     *         the invalidFieldNames method of the variable
      */
-    private void markInvalids() {
-        HashSet<String> invalids = inst.invalidFieldNames();
+    protected void markInvalids(HashSet<String> invalids) {
+        if ( invalids == null )
+            invalids = instr.invalidFieldNames();
 
         String oldVal = header.getHTML();
-        SafeHtml val = SafeHtmlUtils.fromString(inst.getReferenceName());
+        SafeHtml val = SafeHtmlUtils.fromString(instr.getReferenceName());
         if ( !invalids.isEmpty() )
             val = UploadDashboard.invalidLabelHtml(val);
         if ( !val.asString().equals(oldVal) )
             header.setHTML(val);
-
-        if ( invalids.contains("name") )
-            nameValue.markInvalid();
-        else
-            nameValue.markValid();
-
-        if ( invalids.contains("id") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
     }
 
     /**
      * @return the updated Instrument; never null
      */
     public Instrument getUpdatedInstrument() {
-        // In case erroneous input leaves mismatches,
-        // first update the displayed content in case this is from a save-and-continue
-        nameValue.setText(inst.getName());
-        idValue.setText(inst.getId());
-
-        markInvalids();
-
-        return inst;
+        return instr;
     }
 
 }

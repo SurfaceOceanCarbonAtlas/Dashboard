@@ -72,7 +72,7 @@ public class VariablesTabPanel extends Composite {
     /**
      * Creates a {@link TabLayoutPanel} with add and remove buttons underneath.
      * The tab panel contains {@link VariablePanel} panels for each variable.
-     * The add button will append an new VariablePanel (and thus, a new Variable) and display it.
+     * The add button will add an new VariablePanel (and thus, a new Variable) and display it.
      * The remove button will remove the currently selected VariablePanel (and its associated Variable)
      * and show the next VariablePanel, or the last VariablePanel if there is no next VariablePanel.
      * <p>
