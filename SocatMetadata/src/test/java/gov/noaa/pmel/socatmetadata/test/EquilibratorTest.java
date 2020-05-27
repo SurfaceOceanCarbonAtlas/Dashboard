@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class EquilibratorTest {
         )), sampler.invalidFieldNames());
 
         sampler.setName(NAME);
-        sampler.setInstrumentNames(Arrays.asList("TemperatureSensor", "PressureSensor", "CO2Sensor"));
+        sampler.setInstrumentNames(new MultiNames("TemperatureSensor, PressureSensor, CO2Sensor"));
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         assertEquals(new HashSet<String>(Arrays.asList(
                 "chamberWaterVol", "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting"

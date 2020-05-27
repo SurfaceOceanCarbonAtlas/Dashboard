@@ -11,13 +11,30 @@ import java.util.HashSet;
  */
 public class Analyzer extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -1355870685018481799L;
+    private static final long serialVersionUID = -5333209654241534103L;
 
     private String calibration;
 
+    /**
+     * Create with all fields empty
+     */
     public Analyzer() {
         super();
         calibration = "";
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public Analyzer(Instrument instr) {
+        super(instr);
+        if ( instr instanceof Analyzer ) {
+            Analyzer other = (Analyzer) instr;
+            calibration = other.calibration;
+        }
+        else {
+            calibration = "";
+        }
     }
 
     /**

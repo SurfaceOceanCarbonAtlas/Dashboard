@@ -303,7 +303,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
     }
 
     /**
-     * @return the set of names of instruments used to sample or analyze this variable; never null but may be empty.
+     * @return the set of instrument names used to sample or analyze this variable; never null but may be empty.
      */
     public MultiNames getInstrumentNames() {
         return new MultiNames(instrumentNames);
@@ -311,16 +311,11 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
 
     /**
      * @param instrumentNames
-     *         assign as the set of names of instruments used to sample or analyze this variable;
-     *         if null, an empty set of names is assigned
+     *         assign as the set of instrument names used to sample or analyze this variable;
+     *         if null, an empty name set is assigned
      */
     public void setInstrumentNames(MultiNames instrumentNames) {
-        this.instrumentNames.clear();
-        if ( instrumentNames != null ) {
-            for (String name : instrumentNames) {
-                this.instrumentNames.add(name);
-            }
-        }
+        this.instrumentNames = new MultiNames(instrumentNames);
     }
 
     @Override

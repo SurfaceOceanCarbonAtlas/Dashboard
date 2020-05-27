@@ -33,7 +33,6 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -941,10 +940,8 @@ public class CdiacReader extends DocumentHandler {
         // equilibrator.setModel(model); - not specified
 
         // The following are always added below
-        equilibrator.setInstrumentNames(Arrays.asList(
-                "Equilibrator Temperature Sensor",
-                "Equilibrator Pressure Sensor"
-        ));
+        equilibrator.setInstrumentNames(
+                new MultiNames("Equilibrator Temperature Sensor, Equilibrator Pressure Sensor"));
 
         equilibrator.setEquilibratorType(getElementText(null, EQUI_TYPE_ELEMENT_NAME));
         String volumeDesc = getElementText(null, EQUI_VOLUME_ELEMENT_NAME);

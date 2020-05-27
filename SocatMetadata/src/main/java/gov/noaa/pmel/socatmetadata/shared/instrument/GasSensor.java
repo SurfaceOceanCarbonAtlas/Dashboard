@@ -15,13 +15,28 @@ import java.util.HashSet;
  */
 public class GasSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8883755394488095375L;
+    private static final long serialVersionUID = 2379043549622620201L;
 
     private ArrayList<CalibrationGas> calibrationGases;
 
     public GasSensor() {
         super();
         calibrationGases = new ArrayList<CalibrationGas>();
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public GasSensor(Instrument instr) {
+        super(instr);
+        if ( instr instanceof GasSensor ) {
+            GasSensor other = (GasSensor) instr;
+            calibrationGases = new ArrayList<CalibrationGas>(other.calibrationGases);
+        }
+        else {
+            calibrationGases = new ArrayList<CalibrationGas>();
+        }
+
     }
 
     /**

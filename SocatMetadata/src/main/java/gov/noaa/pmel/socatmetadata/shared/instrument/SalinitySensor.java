@@ -12,7 +12,21 @@ import java.io.Serializable;
  */
 public class SalinitySensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 1596978904478727528L;
+    private static final long serialVersionUID = -7130523261980394610L;
+
+    /**
+     * Create with all fields empty.
+     */
+    public SalinitySensor() {
+        super();
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public SalinitySensor(Instrument instr) {
+        super(instr);
+    }
 
     @Override
     public Object duplicate(Object dup) {

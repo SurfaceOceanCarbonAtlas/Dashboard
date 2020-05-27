@@ -12,7 +12,7 @@ import java.util.HashSet;
  */
 public class Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -5484453751264048509L;
+    private static final long serialVersionUID = -2811676849378371053L;
 
     private String name;
     private String id;
@@ -29,6 +29,26 @@ public class Instrument implements Duplicable, Serializable, IsSerializable {
         manufacturer = "";
         model = "";
         addnInfo = new MultiString();
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public Instrument(Instrument instr) {
+        if ( instr != null ) {
+            name = instr.name;
+            id = instr.id;
+            manufacturer = instr.manufacturer;
+            model = instr.model;
+            addnInfo = new MultiString(instr.addnInfo);
+        }
+        else {
+            name = "";
+            id = "";
+            manufacturer = "";
+            model = "";
+            addnInfo = new MultiString();
+        }
     }
 
     /**

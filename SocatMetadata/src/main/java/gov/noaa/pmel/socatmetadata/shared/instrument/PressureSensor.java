@@ -12,7 +12,21 @@ import java.io.Serializable;
  */
 public class PressureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -3136690229558714813L;
+    private static final long serialVersionUID = 4856334897519145429L;
+
+    /**
+     * Create with all fields empty.
+     */
+    public PressureSensor() {
+        super();
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public PressureSensor(Instrument instr) {
+        super(instr);
+    }
 
     @Override
     public Object duplicate(Object dup) {

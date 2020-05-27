@@ -35,9 +35,7 @@ import org.junit.Test;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -238,10 +236,8 @@ public class CdiacReaderTest {
 
             assertTrue(inst instanceof Sampler);
             Sampler sampler = (Sampler) inst;
-            assertEquals(new HashSet<String>(Arrays.asList(
-                    "Equilibrator Pressure Sensor",
-                    "Equilibrator Temperature Sensor"
-            )), sampler.getInstrumentNames());
+            assertEquals(new MultiNames("Equilibrator Pressure Sensor, Equilibrator Temperature Sensor"),
+                    sampler.getInstrumentNames());
 
             assertTrue(inst instanceof Equilibrator);
             Equilibrator equilibrator = (Equilibrator) inst;

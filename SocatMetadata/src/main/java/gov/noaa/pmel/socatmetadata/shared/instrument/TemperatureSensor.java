@@ -12,7 +12,21 @@ import java.io.Serializable;
  */
 public class TemperatureSensor extends Analyzer implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 9000521138173709256L;
+    private static final long serialVersionUID = -1721024204233250085L;
+
+    /**
+     * Create with all fields empty
+     */
+    public TemperatureSensor() {
+        super();
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public TemperatureSensor(Instrument instr) {
+        super(instr);
+    }
 
     @Override
     public Object duplicate(Object dup) {

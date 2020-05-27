@@ -690,7 +690,7 @@ public class OcadsWriter extends DocumentHandler {
                 setElementText(ancestor, EQUILIBRATOR_VENTED_ELEMENT_NAME, equil.getVenting());
                 setElementText(ancestor, EQUILIBRATOR_WATER_FLOW_RATE_ELEMENT_NAME, equil.getWaterFlowRate());
                 setElementText(ancestor, EQUILIBRATOR_GAS_FLOW_RATE_ELEMENT_NAME, equil.getGasFlowRate());
-                HashSet<String> attachInstNames = inst.getInstrumentNames();
+                MultiNames attachInstNames = inst.getInstrumentNames();
                 if ( !attachInstNames.isEmpty() ) {
                     for (Instrument attachInst : instruments) {
                         if ( attachInstNames.contains(attachInst.getName()) ) {

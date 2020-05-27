@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Equilibrator extends Sampler implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = 887297891729486226L;
+    private static final long serialVersionUID = -4920425243391678443L;
 
     private String equilibratorType;
     private String chamberVol;
@@ -32,6 +32,32 @@ public class Equilibrator extends Sampler implements Duplicable, Serializable, I
         waterFlowRate = "";
         gasFlowRate = "";
         venting = "";
+    }
+
+    /**
+     * Create using as many of the values in the given instrument subclass as possible.
+     */
+    public Equilibrator(Instrument instr) {
+        super(instr);
+        if ( instr instanceof Equilibrator ) {
+            Equilibrator other = (Equilibrator) instr;
+            equilibratorType = other.equilibratorType;
+            chamberVol = other.chamberVol;
+            chamberWaterVol = other.chamberWaterVol;
+            chamberGasVol = other.chamberGasVol;
+            waterFlowRate = other.waterFlowRate;
+            gasFlowRate = other.gasFlowRate;
+            venting = other.venting;
+        }
+        else {
+            equilibratorType = "";
+            chamberVol = "";
+            chamberWaterVol = "";
+            chamberGasVol = "";
+            waterFlowRate = "";
+            gasFlowRate = "";
+            venting = "";
+        }
     }
 
     @Override

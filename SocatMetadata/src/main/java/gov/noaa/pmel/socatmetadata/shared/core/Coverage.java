@@ -317,7 +317,6 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
 
     /**
      * @return the set of geographic names; never null but may be empty.
-     *         Any names given are guaranteed to be non-blank strings.
      */
     public MultiNames getGeographicNames() {
         return new MultiNames(geographicNames);
@@ -325,15 +324,10 @@ public class Coverage implements Duplicable, Serializable, IsSerializable {
 
     /**
      * @param geographicNames
-     *         assign as the list of geographic names; if null, an empty set of names is assigned
+     *         assign as the set of geographic names; if null, an empty name set is assigned
      */
     public void setGeographicNames(MultiNames geographicNames) {
-        this.geographicNames.clear();
-        if ( geographicNames != null ) {
-            for (String name : geographicNames) {
-                this.geographicNames.add(name);
-            }
-        }
+        this.geographicNames = new MultiNames(geographicNames);
     }
 
     @Override

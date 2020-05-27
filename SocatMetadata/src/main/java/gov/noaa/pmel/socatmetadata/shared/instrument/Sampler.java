@@ -2,6 +2,7 @@ package gov.noaa.pmel.socatmetadata.shared.instrument;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -11,60 +12,47 @@ import java.util.HashSet;
  */
 public class Sampler extends Instrument implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -8878532090544959160L;
+    private static final long serialVersionUID = -1170130500429810550L;
 
-    private HashSet<String> instrumentNames;
+    private MultiNames instrumentNames;
 
     /**
      * Create with all fields empty.
      */
     public Sampler() {
         super();
-        instrumentNames = new HashSet<String>();
+        instrumentNames = new MultiNames();
     }
 
     /**
-     * @return the set of names of attached instruments (primarily sensors); never null but may be empty.
-     *         The set will not contain any null or blank names.
+     * Create using as many of the values in the given instrument subclass as possible.
      */
-    public HashSet<String> getInstrumentNames() {
-        return new HashSet<String>(instrumentNames);
-    }
-
-    /**
-     * Calls {@link #setInstrumentNames(Iterable)}; added to satisfy JavaBean requirements.
-     *
-     * @param instrumentNames
-     *         assign as the set of names of attached instruments (primarily sensors);
-     *         if null, an empty set is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the set contains null or blank strings
-     */
-    public void setInstrumentNames(HashSet<String> instrumentNames) throws IllegalArgumentException {
-        setInstrumentNames((Iterable<String>) instrumentNames);
-    }
-
-    /**
-     * @param instrumentNames
-     *         assign as the set of names of attached instruments (primarily sensors);
-     *         if null, an empty set is assigned
-     *
-     * @throws IllegalArgumentException
-     *         if the set contains null or blank strings
-     */
-    public void setInstrumentNames(Iterable<String> instrumentNames) throws IllegalArgumentException {
-        this.instrumentNames.clear();
-        if ( instrumentNames != null ) {
-            for (String name : instrumentNames) {
-                if ( name == null )
-                    throw new IllegalArgumentException("null instrument name given");
-                name = name.trim();
-                if ( name.isEmpty() )
-                    throw new IllegalArgumentException("blank instrument name given");
-                this.instrumentNames.add(name);
-            }
+    public Sampler(Instrument instr) {
+        super(instr);
+        if ( instr instanceof Sampler ) {
+            Sampler other = (Sampler) instr;
+            instrumentNames = new MultiNames(other.instrumentNames);
         }
+        else {
+            instrumentNames = new MultiNames();
+        }
+
+    }
+
+    /**
+     * @return the name set of attached instruments (primarily sensors); never null but may be empty.
+     */
+    public MultiNames getInstrumentNames() {
+        return new MultiNames(instrumentNames);
+    }
+
+    /**
+     * @param instrumentNames
+     *         assign as the name set of attached instruments (primarily sensors);
+     *         if null, an empty name set is assigned
+     */
+    public void setInstrumentNames(MultiNames instrumentNames) {
+        this.instrumentNames = new MultiNames(instrumentNames);
     }
 
     @Override
@@ -85,7 +73,7 @@ public class Sampler extends Instrument implements Duplicable, Serializable, IsS
         else
             sampler = (Sampler) dup;
         super.duplicate(sampler);
-        sampler.instrumentNames = new HashSet<String>(instrumentNames);
+        sampler.instrumentNames = new MultiNames(instrumentNames);
         return sampler;
     }
 
