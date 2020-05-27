@@ -32,6 +32,12 @@
             </g:FlowPanel>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="methodDescValue"/>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="methodRefsValue"/>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="reportTempValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="tempCorrectValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="dryMethodValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="waterCorrectValue"/>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="manipDescValue"/>
             <g:FlowPanel addStyleNames="{style.rowpanel}">
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="storageMethodValue"/>

@@ -1,20 +1,28 @@
 package gov.noaa.pmel.dashboard.client.metadata.varpanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
 
 import java.util.HashSet;
 
 public class GasConcVarPanel extends InstDataVarPanel {
 
-    interface GasConcVarPanelUiBinder extends UiBinder<ScrollPanel, GasConcVarPanel> {
+    interface GasConcVarPanelUiBinder extends UiBinder<ScrollPanel,GasConcVarPanel> {
     }
 
     private static final GasConcVarPanelUiBinder uiBinder = GWT.create(GasConcVarPanelUiBinder.class);
+
+    @UiField(provided = true)
+    final LabeledTextArea dryMethodValue;
+    @UiField(provided = true)
+    final LabeledTextArea waterCorrectValue;
 
     /**
      * Creates a FlowPanel associated with the given GasConc metadata.
@@ -27,7 +35,9 @@ public class GasConcVarPanel extends InstDataVarPanel {
      */
     public GasConcVarPanel(GasConc conc, HTML header, VariablesTabPanel parentPanel) {
         super(conc, header, parentPanel);
-        // TODO: Create the provided widgets added by this panel
+
+        dryMethodValue = new LabeledTextArea("Drying method:", "7em", "4em", "50em");
+        waterCorrectValue = new LabeledTextArea("Water vapor correction:", "7em", "4em", "50em");
     }
 
     @Override
@@ -39,9 +49,24 @@ public class GasConcVarPanel extends InstDataVarPanel {
     @Override
     protected void finishInitialization() {
         GasConc conc = (GasConc) vari;
-        // TODO: Assign the values in the text fields added in this panel
 
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        dryMethodValue.setText(conc.getDryingMethod());
+        waterCorrectValue.setText(conc.getWaterVaporCorrection());
+
+        dryMethodValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                conc.setDryingMethod(dryMethodValue.getText());
+                markInvalids(null);
+            }
+        });
+        waterCorrectValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                conc.setWaterVaporCorrection(waterCorrectValue.getText());
+                markInvalids(null);
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -53,6 +78,15 @@ public class GasConcVarPanel extends InstDataVarPanel {
             invalids = ((GasConc) vari).invalidFieldNames();
 
         // TODO: Appropriately mark the labels of fields added in this panel
+        if ( invalids.contains("dryingMethod") )
+            dryMethodValue.markInvalid();
+        else
+            dryMethodValue.markValid();
+
+        if ( invalids.contains("waterVaporCorrection") )
+            waterCorrectValue.markInvalid();
+        else
+            waterCorrectValue.markValid();
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

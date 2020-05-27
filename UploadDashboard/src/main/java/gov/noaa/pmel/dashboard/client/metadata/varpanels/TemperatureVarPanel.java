@@ -2,7 +2,6 @@ package gov.noaa.pmel.dashboard.client.metadata.varpanels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
@@ -11,7 +10,7 @@ import java.util.HashSet;
 
 public class TemperatureVarPanel extends InstDataVarPanel {
 
-    interface TemperatureVarPanelUiBinder extends UiBinder<ScrollPanel, TemperatureVarPanel> {
+    interface TemperatureVarPanelUiBinder extends UiBinder<ScrollPanel,TemperatureVarPanel> {
     }
 
     private static final TemperatureVarPanelUiBinder uiBinder = GWT.create(TemperatureVarPanelUiBinder.class);
@@ -26,7 +25,8 @@ public class TemperatureVarPanel extends InstDataVarPanel {
      */
     public TemperatureVarPanel(Temperature temper, HTML header, VariablesTabPanel parentPanel) {
         super(temper, header, parentPanel);
-        // TODO: Create the provided widgets added by this panel
+
+        // Nothing to add
     }
 
     @Override
@@ -37,10 +37,7 @@ public class TemperatureVarPanel extends InstDataVarPanel {
 
     @Override
     protected void finishInitialization() {
-        Temperature temper = (Temperature) vari;
-        // TODO: Assign the values in the text fields added in this panel
-
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        // Nothing to add
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -51,7 +48,7 @@ public class TemperatureVarPanel extends InstDataVarPanel {
         if ( invalids == null )
             invalids = ((Temperature) vari).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        // Nothing to add
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

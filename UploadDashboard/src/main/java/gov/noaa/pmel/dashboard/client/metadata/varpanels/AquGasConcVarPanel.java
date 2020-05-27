@@ -1,20 +1,28 @@
 package gov.noaa.pmel.dashboard.client.metadata.varpanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 
 import java.util.HashSet;
 
 public class AquGasConcVarPanel extends GasConcVarPanel {
 
-    interface AquGasConcVarPanelUiBinder extends UiBinder<ScrollPanel, AquGasConcVarPanel> {
+    interface AquGasConcVarPanelUiBinder extends UiBinder<ScrollPanel,AquGasConcVarPanel> {
     }
 
     private static final AquGasConcVarPanelUiBinder uiBinder = GWT.create(AquGasConcVarPanelUiBinder.class);
+
+    @UiField(provided = true)
+    final LabeledTextBox reportTempValue;
+    @UiField(provided = true)
+    final LabeledTextBox tempCorrectValue;
 
     /**
      * Creates a FlowPanel associated with the given AquGasConc metadata.
@@ -27,7 +35,9 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
      */
     public AquGasConcVarPanel(AquGasConc conc, HTML header, VariablesTabPanel parentPanel) {
         super(conc, header, parentPanel);
-        // TODO: Create the provided widgets added by this panel
+
+        reportTempValue = new LabeledTextBox("Analysis temperature:", "7em", "20em", null, null);
+        tempCorrectValue = new LabeledTextBox("Temperature correction:", "7em", "20em", null, null);
     }
 
     @Override
@@ -39,9 +49,24 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
     @Override
     protected void finishInitialization() {
         AquGasConc conc = (AquGasConc) vari;
-        // TODO: Assign the values in the text fields added in this panel
 
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        reportTempValue.setText(conc.getReportTemperature());
+        tempCorrectValue.setText(conc.getTemperatureCorrection());
+
+        reportTempValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                conc.setReportTemperature(reportTempValue.getText());
+                markInvalids(null);
+            }
+        });
+        tempCorrectValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                conc.setTemperatureCorrection(tempCorrectValue.getText());
+                markInvalids(null);
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -52,7 +77,15 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
         if ( invalids == null )
             invalids = ((AquGasConc) vari).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        if ( invalids.contains("reportTemperature") )
+            reportTempValue.markInvalid();
+        else
+            reportTempValue.markValid();
+
+        if ( invalids.contains("temperatureCorrection") )
+            tempCorrectValue.markInvalid();
+        else
+            tempCorrectValue.markValid();
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

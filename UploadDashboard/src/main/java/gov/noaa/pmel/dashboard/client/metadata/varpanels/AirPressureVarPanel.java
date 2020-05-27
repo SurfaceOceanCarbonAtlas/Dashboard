@@ -1,20 +1,26 @@
 package gov.noaa.pmel.dashboard.client.metadata.varpanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 
 import java.util.HashSet;
 
 public class AirPressureVarPanel extends InstDataVarPanel {
 
-    interface AirPressureVarPanelUiBinder extends UiBinder<ScrollPanel, AirPressureVarPanel> {
+    interface AirPressureVarPanelUiBinder extends UiBinder<ScrollPanel,AirPressureVarPanel> {
     }
 
     private static final AirPressureVarPanelUiBinder uiBinder = GWT.create(AirPressureVarPanelUiBinder.class);
+
+    @UiField(provided = true)
+    final LabeledTextArea pressCorrectValue;
 
     /**
      * Creates a FlowPanel associated with the given AirPressure metadata
@@ -27,7 +33,8 @@ public class AirPressureVarPanel extends InstDataVarPanel {
      */
     public AirPressureVarPanel(AirPressure press, HTML header, VariablesTabPanel parentPanel) {
         super(press, header, parentPanel);
-        // TODO: Create the provided widgets added by this panel
+        //
+        pressCorrectValue = new LabeledTextArea("Pressure correction:", "7em", "4em", "50em");
     }
 
     @Override
@@ -39,9 +46,16 @@ public class AirPressureVarPanel extends InstDataVarPanel {
     @Override
     protected void finishInitialization() {
         AirPressure press = (AirPressure) vari;
-        // TODO: Assign the values in the text fields added in this panel
 
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        pressCorrectValue.setText(press.getPressureCorrection());
+
+        pressCorrectValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                press.setPressureCorrection(pressCorrectValue.getText());
+                markInvalids(null);
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -52,7 +66,10 @@ public class AirPressureVarPanel extends InstDataVarPanel {
         if ( invalids == null )
             invalids = ((AirPressure) vari).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        if ( invalids.contains("pressureCorrection") )
+            pressCorrectValue.markInvalid();
+        else
+            pressCorrectValue.markValid();
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

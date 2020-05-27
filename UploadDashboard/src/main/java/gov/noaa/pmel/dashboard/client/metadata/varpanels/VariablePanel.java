@@ -39,8 +39,9 @@ public abstract class VariablePanel extends Composite {
 
     /**
      * Finish the initialization steps that come after the call to initWidget.
-     * This method should be extended to initialize widgets that are added in subclasses
-     * and then the superclass method called.
+     * This method should be extended to initialize widgets that are added in
+     * subclasses and then the superclass method called.  The top level version
+     * of this method calls the markInvalids method.
      */
     protected void finishInitialization() {
         markInvalids(null);
