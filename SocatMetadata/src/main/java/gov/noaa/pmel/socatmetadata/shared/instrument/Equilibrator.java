@@ -102,7 +102,7 @@ public class Equilibrator extends Sampler implements Duplicable, Serializable, I
 
     /**
      * @param chamberVol
-     *         assign as the totla volume of the equilibrator chamber; if null or blank, an empty string is assigned
+     *         assign as the total volume of the equilibrator chamber; if null or blank, an empty string is assigned
      */
     public void setChamberVol(String chamberVol) {
         this.chamberVol = (chamberVol != null) ? chamberVol.trim() : "";

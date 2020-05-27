@@ -53,10 +53,12 @@ public class MultiNames implements Iterable<String>, IsSerializable, Serializabl
      *         Any blank names obtained from parsing are ignored
      */
     public void add(String namestring) {
-        for (String strval : namestring.split(",+")) {
-            strval = strval.trim();
-            if ( !strval.isEmpty() )
-                nameSet.add(strval);
+        for (String strline : namestring.split("\\R+")) {
+            for (String strval : strline.split(",+")) {
+                strval = strval.trim();
+                if ( !strval.isEmpty() )
+                    nameSet.add(strval);
+            }
         }
     }
 
