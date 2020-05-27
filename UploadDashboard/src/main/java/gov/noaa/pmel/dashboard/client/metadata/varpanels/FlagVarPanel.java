@@ -5,7 +5,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
@@ -18,7 +17,7 @@ import java.util.HashSet;
 
 public class FlagVarPanel extends VariablePanel {
 
-    interface FlagVarPanelUiBinder extends UiBinder<ScrollPanel, FlagVarPanel> {
+    interface FlagVarPanelUiBinder extends UiBinder<ScrollPanel,FlagVarPanel> {
     }
 
     private static final FlagVarPanelUiBinder uiBinder = GWT.create(FlagVarPanelUiBinder.class);
@@ -48,8 +47,8 @@ public class FlagVarPanel extends VariablePanel {
     public FlagVarPanel(Variable vari, HTML header, VariablesTabPanel parentPanel) {
         super(vari, header, parentPanel);
         // Create the provided widgets added by this panel
-        columnNameValue = new LabeledTextBox("Column name:", "7em", "18.5em", null, null);
-        fullNameValue = new LabeledTextBox("Full name:", "9em", "24em", null, null);
+        columnNameValue = new LabeledTextBox("Column name:", "7em", "23em", null, null);
+        fullNameValue = new LabeledTextBox("Full name:", "8em", "23em", null, null);
         //
         varTypeList = new LabeledListBox("Type:", "7em", null, null, null);
         //
@@ -57,7 +56,7 @@ public class FlagVarPanel extends VariablePanel {
         //
         missingValue = new LabeledTextBox("Missing value:", "7em", "10em", null, null);
         //
-        addnInfoValue = new LabeledTextArea("Other info:", "7em", "8em", "54em");
+        addnInfoValue = new LabeledTextArea("Other info:", "7em", "8em", "56em");
     }
 
     @Override
@@ -126,30 +125,11 @@ public class FlagVarPanel extends VariablePanel {
             invalids = vari.invalidFieldNames();
 
         // Appropriately mark the labels of fields added in this panel
-        if ( invalids.contains("colName") )
-            columnNameValue.markInvalid();
-        else
-            columnNameValue.markValid();
-
-        if ( invalids.contains("fullName") )
-            fullNameValue.markInvalid();
-        else
-            fullNameValue.markValid();
-
-        if ( invalids.contains("varUnit") )
-            unitValue.markInvalid();
-        else
-            unitValue.markValid();
-
-        if ( invalids.contains("missVal") )
-            missingValue.markInvalid();
-        else
-            missingValue.markValid();
-
-        if ( invalids.contains("addnInfo") )
-            addnInfoValue.markInvalid();
-        else
-            addnInfoValue.markValid();
+        columnNameValue.markInvalid(invalids.contains("colName"));
+        fullNameValue.markInvalid(invalids.contains("fullName"));
+        unitValue.markInvalid(invalids.contains("varUnit"));
+        missingValue.markInvalid(invalids.contains("missVal"));
+        addnInfoValue.markInvalid(invalids.contains("addnInfo"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

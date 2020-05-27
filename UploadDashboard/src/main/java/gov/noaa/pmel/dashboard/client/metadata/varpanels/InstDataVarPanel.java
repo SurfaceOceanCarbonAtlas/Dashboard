@@ -84,26 +84,26 @@ public class InstDataVarPanel extends GenDataVarPanel {
     public InstDataVarPanel(InstData instvar, HTML header, VariablesTabPanel parentPanel) {
         super(instvar, header, parentPanel);
         //
-        sampleLocValue = new LabeledTextBox("Sampling location:", "7em", "20em", null, null);
-        sampleElevValue = new LabeledTextBox("Sampling elevation:", "7em", "20em", null, null);
+        sampleLocValue = new LabeledTextBox("Sampling location:", "7em", "23em", null, null);
+        sampleElevValue = new LabeledTextBox("Sampling elevation:", "8em", "23em", null, null);
         //
-        observeTypeValue = new LabeledTextBox("Observation type:", "7em", "20em", null, null);
-        measureMethodValue = new LabeledListBox("Measurement method:", "7em", null, null, null);
+        observeTypeValue = new LabeledTextBox("Obs. type:", "7em", "23em", null, null);
+        measureMethodValue = new LabeledListBox("Method:", "8em", null, null, null);
         //
-        methodDescValue = new LabeledTextArea("Method description:", "7em", "8em", "50em");
+        methodDescValue = new LabeledTextArea("Method description:", "7em", "8em", "56em");
         //
-        methodRefsValue = new LabeledTextArea("Method references:", "7em", "4em", "50em");
+        methodRefsValue = new LabeledTextArea("Method references:", "7em", "4em", "56em");
         //
-        manipDescValue = new LabeledTextArea("Manipulations:", "7em", "4em", "50em");
+        manipDescValue = new LabeledTextArea("Manipulations:", "7em", "4em", "56em");
         //
-        storageMethodValue = new LabeledTextBox("Storage method:", "7em", "20em", null, null);
-        durationValue = new LabeledTextBox("Duration:", "7em", "20em", null, null);
+        storageMethodValue = new LabeledTextBox("Storage method:", "7em", "23em", null, null);
+        durationValue = new LabeledTextBox("Duration:", "8em", "23em", null, null);
         //
-        analysisTempValue = new LabeledTextBox("Analysis temp:", "7em", "20em", null, null);
-        replicationValue = new LabeledTextBox("Replication:", "7em", "20em", null, null);
+        analysisTempValue = new LabeledTextBox("Analysis temp:", "7em", "23em", null, null);
+        replicationValue = new LabeledTextBox("Replication:", "8em", "23em", null, null);
         //
-        researcherValue = new LabeledTextBox("Investigator:", "7em", "20em", null, null);
-        instrumentsValue = new LabeledTextBox("Instrument(s):", "7em", "20em", null, null);
+        researcherValue = new LabeledTextBox("Investigator:", "7em", "23em", null, null);
+        instrumentsValue = new LabeledTextBox("Instrument(s):", "8em", "23em", null, null);
     }
 
     @Override
@@ -251,70 +251,19 @@ public class InstDataVarPanel extends GenDataVarPanel {
         if ( invalids == null )
             invalids = ((InstData) vari).invalidFieldNames();
 
-        if ( invalids.contains("samplingLocation") )
-            sampleLocValue.markInvalid();
-        else
-            sampleLocValue.markValid();
-
-        if ( invalids.contains("samplingElevation") )
-            sampleElevValue.markInvalid();
-        else
-            sampleElevValue.markValid();
-
-        if ( invalids.contains("observeType") )
-            observeTypeValue.markInvalid();
-        else
-            observeTypeValue.markValid();
-
-        if ( invalids.contains("measureMethod") )
-            measureMethodValue.markInvalid();
-        else
-            measureMethodValue.markValid();
-
-        if ( invalids.contains("methodDescription") )
-            methodDescValue.markInvalid();
-        else
-            methodDescValue.markValid();
-
-        if ( invalids.contains("methodReference") )
-            methodRefsValue.markInvalid();
-        else
-            methodRefsValue.markValid();
-
-        if ( invalids.contains("manipulationDescription") )
-            manipDescValue.markInvalid();
-        else
-            manipDescValue.markValid();
-
-        if ( invalids.contains("storageMethod") )
-            storageMethodValue.markInvalid();
-        else
-            storageMethodValue.markValid();
-
-        if ( invalids.contains("duration") )
-            durationValue.markInvalid();
-        else
-            durationValue.markValid();
-
-        if ( invalids.contains("analysisTemperature") )
-            analysisTempValue.markInvalid();
-        else
-            analysisTempValue.markValid();
-
-        if ( invalids.contains("replication") )
-            replicationValue.markInvalid();
-        else
-            replicationValue.markValid();
-
-        if ( invalids.contains("researcher") )
-            researcherValue.markInvalid();
-        else
-            researcherValue.markValid();
-
-        if ( invalids.contains("instrumentNames") )
-            instrumentsValue.markInvalid();
-        else
-            instrumentsValue.markValid();
+        sampleLocValue.markInvalid(invalids.contains("samplingLocation"));
+        sampleElevValue.markInvalid(invalids.contains("samplingElevation"));
+        observeTypeValue.markInvalid(invalids.contains("observeType"));
+        measureMethodValue.markInvalid(invalids.contains("measureMethod"));
+        methodDescValue.markInvalid(invalids.contains("methodDescription"));
+        methodRefsValue.markInvalid(invalids.contains("methodReference"));
+        manipDescValue.markInvalid(invalids.contains("manipulationDescription"));
+        storageMethodValue.markInvalid(invalids.contains("storageMethod"));
+        durationValue.markInvalid(invalids.contains("duration"));
+        analysisTempValue.markInvalid(invalids.contains("analysisTemperature"));
+        replicationValue.markInvalid(invalids.contains("replication"));
+        researcherValue.markInvalid(invalids.contains("researcher"));
+        instrumentsValue.markInvalid(invalids.contains("instrumentNames"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

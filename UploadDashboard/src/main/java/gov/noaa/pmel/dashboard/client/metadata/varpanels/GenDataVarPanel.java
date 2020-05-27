@@ -5,7 +5,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
@@ -16,7 +15,7 @@ import java.util.HashSet;
 
 public class GenDataVarPanel extends FlagVarPanel {
 
-    interface GenDataVarPanelUiBinder extends UiBinder<ScrollPanel, GenDataVarPanel> {
+    interface GenDataVarPanelUiBinder extends UiBinder<ScrollPanel,GenDataVarPanel> {
     }
 
     private static final GenDataVarPanelUiBinder uiBinder = GWT.create(GenDataVarPanelUiBinder.class);
@@ -43,7 +42,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         accuracyValue = new LabeledTextBox("Accuracy:", "7em", "10em", "", "5em");
         precisionValue = new LabeledTextBox("Precision:", "7em", "10em", "", "5em");
         //
-        flagNameValue = new LabeledTextBox("QC column:", "7em", "19em", null, null);
+        flagNameValue = new LabeledTextBox("QC column:", "8em", "23em", null, null);
     }
 
     @Override
@@ -118,20 +117,9 @@ public class GenDataVarPanel extends FlagVarPanel {
             invalids = ((GenData) vari).invalidFieldNames();
 
         // Appropriately mark the labels of fields added in this panel
-        if ( invalids.contains("accuracy") )
-            accuracyValue.markInvalid();
-        else
-            accuracyValue.markValid();
-
-        if ( invalids.contains("precision") )
-            precisionValue.markInvalid();
-        else
-            precisionValue.markValid();
-
-        if ( invalids.contains("flagColName") )
-            flagNameValue.markInvalid();
-        else
-            flagNameValue.markValid();
+        accuracyValue.markInvalid(invalids.contains("accuracy"));
+        precisionValue.markInvalid(invalids.contains("precision"));
+        flagNameValue.markInvalid(invalids.contains("flagColName"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

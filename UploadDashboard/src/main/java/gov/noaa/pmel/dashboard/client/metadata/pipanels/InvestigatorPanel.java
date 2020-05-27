@@ -199,70 +199,19 @@ public class InvestigatorPanel extends Composite {
                 header.setHTML(val);
         }
 
-        if ( invalids.contains("firstName") )
-            firstNameValue.markInvalid();
-        else
-            firstNameValue.markValid();
-
-        if ( invalids.contains("middle") )
-            middleInitValue.markInvalid();
-        else
-            middleInitValue.markValid();
-
-        if ( invalids.contains("lastName") )
-            lastNameValue.markInvalid();
-        else
-            lastNameValue.markValid();
-
-        if ( invalids.contains("idType") )
-            idTypeValue.markInvalid();
-        else
-            idTypeValue.markValid();
-
-        if ( invalids.contains("id") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
-
-        if ( invalids.contains("organization") )
-            orgValue.markInvalid();
-        else
-            orgValue.markValid();
-
-        if ( invalids.contains("streets") )
-            streetsValue.markInvalid();
-        else
-            streetsValue.markValid();
-
-        if ( invalids.contains("city") )
-            cityValue.markInvalid();
-        else
-            cityValue.markValid();
-
-        if ( invalids.contains("region") )
-            regionValue.markInvalid();
-        else
-            regionValue.markValid();
-
-        if ( invalids.contains("zipCode") )
-            zipValue.markInvalid();
-        else
-            zipValue.markValid();
-
-        if ( invalids.contains("country") )
-            countryValue.markInvalid();
-        else
-            countryValue.markValid();
-
-        if ( invalids.contains("email") )
-            emailValue.markInvalid();
-        else
-            emailValue.markValid();
-
-        if ( invalids.contains("phone") )
-            phoneValue.markInvalid();
-        else
-            phoneValue.markValid();
+        firstNameValue.markInvalid(invalids.contains("firstName"));
+        middleInitValue.markInvalid(invalids.contains("middle"));
+        lastNameValue.markInvalid(invalids.contains("lastName"));
+        idTypeValue.markInvalid(invalids.contains("idType"));
+        idValue.markInvalid(invalids.contains("id"));
+        orgValue.markInvalid(invalids.contains("organization"));
+        streetsValue.markInvalid(invalids.contains("streets"));
+        cityValue.markInvalid(invalids.contains("city"));
+        regionValue.markInvalid(invalids.contains("region"));
+        zipValue.markInvalid(invalids.contains("zipCode"));
+        countryValue.markInvalid(invalids.contains("country"));
+        emailValue.markInvalid(invalids.contains("email"));
+        phoneValue.markInvalid(invalids.contains("phone"));
     }
 
     /**

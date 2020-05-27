@@ -140,30 +140,11 @@ public class PlatformPanel extends Composite {
     private void markInvalids() {
         HashSet<String> invalids = platform.invalidFieldNames();
 
-        if ( invalids.contains("platformId") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
-
-        if ( invalids.contains("platformName") )
-            nameValue.markInvalid();
-        else
-            nameValue.markValid();
-
-        if ( invalids.contains("platformType") )
-            typeList.markInvalid();
-        else
-            typeList.markValid();
-
-        if ( invalids.contains("owner") )
-            ownerValue.markInvalid();
-        else
-            ownerValue.markValid();
-
-        if ( invalids.contains("country") )
-            countryValue.markInvalid();
-        else
-            countryValue.markValid();
+        idValue.markInvalid(invalids.contains("platformId"));
+        nameValue.markInvalid(invalids.contains("platformName"));
+        typeList.markInvalid(invalids.contains("platformType"));
+        ownerValue.markInvalid(invalids.contains("owner"));
+        countryValue.markInvalid(invalids.contains("country"));
     }
 
     /**

@@ -92,23 +92,25 @@ public class LabeledTextArea extends Composite implements HasText, HasValue<Stri
     }
 
     /**
-     * Highlights the prefix text to indicate the TextArea value is invalid.
+     * If isInvalid is true, adds highlighting of the prefix text to indicate the TextBox value is invalid.
+     * If isInvalid is false, removes the highlighting of the prefix text (resets it to normal),
+     * to indicate the TextBox value is valid.
+     *
+     * @param isInvalid
+     *         is the value invalid (true) or valid (false)
      */
-    public void markInvalid() {
-        if ( valid ) {
-            prefixHtml.setHTML(invalidValueHtml);
-            valid = false;
+    public void markInvalid(boolean isInvalid) {
+        if ( isInvalid ) {
+            if ( valid ) {
+                prefixHtml.setHTML(invalidValueHtml);
+                valid = false;
+            }
         }
-    }
-
-    /**
-     * Removes any highlighting of the prefix text performed by {@link #markInvalid()};
-     * thus, resets the prefix text to indicate the TextArea value is acceptable.
-     */
-    public void markValid() {
-        if ( !valid ) {
-            prefixHtml.setHTML(validValueHtml);
-            valid = true;
+        else {
+            if ( !valid ) {
+                prefixHtml.setHTML(validValueHtml);
+                valid = true;
+            }
         }
     }
 

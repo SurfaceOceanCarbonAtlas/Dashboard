@@ -38,10 +38,10 @@ public class BioDataVarPanel extends InstDataVarPanel {
     public BioDataVarPanel(BioData biovar, HTML header, VariablesTabPanel parentPanel) {
         super(biovar, header, parentPanel);
         //
-        bioSubjectValue = new LabeledTextBox("Life stage:", "7em", "50em", null, null);
+        bioSubjectValue = new LabeledTextBox("Life stage:", "7em", "56em", null, null);
         //
-        speciesIdValue = new LabeledTextBox("Species ID:", "7em", "20em", null, null);
-        lifeStageValue = new LabeledTextBox("Life stage:", "7em", "20em", null, null);
+        speciesIdValue = new LabeledTextBox("Species ID:", "7em", "23em", null, null);
+        lifeStageValue = new LabeledTextBox("Life stage:", "8em", "23em", null, null);
     }
 
     @Override
@@ -89,20 +89,9 @@ public class BioDataVarPanel extends InstDataVarPanel {
         if ( invalids == null )
             invalids = ((BioData) vari).invalidFieldNames();
 
-        if ( invalids.contains("biologicalSubject") )
-            bioSubjectValue.markInvalid();
-        else
-            bioSubjectValue.markValid();
-
-        if ( invalids.contains("speciesId") )
-            speciesIdValue.markInvalid();
-        else
-            speciesIdValue.markValid();
-
-        if ( invalids.contains("lifeStage") )
-            lifeStageValue.markInvalid();
-        else
-            lifeStageValue.markValid();
+        bioSubjectValue.markInvalid(invalids.contains("biologicalSubject"));
+        speciesIdValue.markInvalid(invalids.contains("speciesId"));
+        lifeStageValue.markInvalid(invalids.contains("lifeStage"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

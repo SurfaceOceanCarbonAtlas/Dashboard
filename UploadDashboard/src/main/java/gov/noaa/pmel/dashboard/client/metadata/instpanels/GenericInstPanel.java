@@ -7,6 +7,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
@@ -26,6 +27,8 @@ public class GenericInstPanel extends InstrumentPanel {
     final LabeledTextBox nameValue;
     @UiField(provided = true)
     final LabeledTextBox idValue;
+    @UiField(provided = true)
+    final LabeledListBox instTypeList;
     @UiField(provided = true)
     final LabeledTextBox manufacturerValue;
     @UiField(provided = true)
@@ -47,13 +50,15 @@ public class GenericInstPanel extends InstrumentPanel {
     public GenericInstPanel(Instrument instr, HTML header, InstrumentsTabPanel parentPanel) {
         super(instr, header, parentPanel);
 
-        nameValue = new LabeledTextBox("Name:", "7em", "20em", null, null);
-        idValue = new LabeledTextBox("Serial number/ID:", "7em", "20em", null, null);
+        nameValue = new LabeledTextBox("Name:", "7em", "23em", null, null);
+        idValue = new LabeledTextBox("Serial/ID:", "8em", "23em", null, null);
         //
-        manufacturerValue = new LabeledTextBox("Manufacturer:", "7em", "20em", null, null);
-        modelValue = new LabeledTextBox("Model:", "7em", "20em", null, null);
+        instTypeList = new LabeledListBox("Instrument type:", "7em", null, null, null);
         //
-        addnInfoValue = new LabeledTextArea("Other info:", "7em", "8em", "50em");
+        manufacturerValue = new LabeledTextBox("Manufacturer:", "7em", "23em", null, null);
+        modelValue = new LabeledTextBox("Model:", "8em", "23em", null, null);
+        //
+        addnInfoValue = new LabeledTextArea("Other info:", "7em", "8em", "56em");
     }
 
     @Override
@@ -69,6 +74,9 @@ public class GenericInstPanel extends InstrumentPanel {
         manufacturerValue.setText(instr.getManufacturer());
         modelValue.setText(instr.getModel());
         addnInfoValue.setText(instr.getAddnInfo().asOneString());
+
+        // Assign the instrument types list and callback
+        parentPanel.assignInstrumentTypeList(instTypeList, instr, this);
 
         nameValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
@@ -115,30 +123,11 @@ public class GenericInstPanel extends InstrumentPanel {
         if ( invalids == null )
             invalids = instr.invalidFieldNames();
 
-        if ( invalids.contains("name") )
-            nameValue.markInvalid();
-        else
-            nameValue.markValid();
-
-        if ( invalids.contains("id") )
-            idValue.markInvalid();
-        else
-            idValue.markValid();
-
-        if ( invalids.contains("manufacturer") )
-            manufacturerValue.markInvalid();
-        else
-            manufacturerValue.markValid();
-
-        if ( invalids.contains("model") )
-            modelValue.markInvalid();
-        else
-            modelValue.markValid();
-
-        if ( invalids.contains("addnInfo") )
-            addnInfoValue.markInvalid();
-        else
-            addnInfoValue.markValid();
+        nameValue.markInvalid(invalids.contains("name"));
+        idValue.markInvalid(invalids.contains("id"));
+        manufacturerValue.markInvalid(invalids.contains("manufacturer"));
+        modelValue.markInvalid(invalids.contains("model"));
+        addnInfoValue.markInvalid(invalids.contains("addnInfo"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

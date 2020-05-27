@@ -34,7 +34,7 @@ public class AirPressureVarPanel extends InstDataVarPanel {
     public AirPressureVarPanel(AirPressure press, HTML header, VariablesTabPanel parentPanel) {
         super(press, header, parentPanel);
         //
-        pressCorrectValue = new LabeledTextArea("Pressure correction:", "7em", "4em", "50em");
+        pressCorrectValue = new LabeledTextArea("Pressure correction:", "7em", "4em", "56em");
     }
 
     @Override
@@ -66,10 +66,7 @@ public class AirPressureVarPanel extends InstDataVarPanel {
         if ( invalids == null )
             invalids = ((AirPressure) vari).invalidFieldNames();
 
-        if ( invalids.contains("pressureCorrection") )
-            pressCorrectValue.markInvalid();
-        else
-            pressCorrectValue.markValid();
+        pressCorrectValue.markInvalid(invalids.contains("pressureCorrection"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

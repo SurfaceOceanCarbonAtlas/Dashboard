@@ -36,8 +36,8 @@ public class GasConcVarPanel extends InstDataVarPanel {
     public GasConcVarPanel(GasConc conc, HTML header, VariablesTabPanel parentPanel) {
         super(conc, header, parentPanel);
 
-        dryMethodValue = new LabeledTextArea("Drying method:", "7em", "4em", "50em");
-        waterCorrectValue = new LabeledTextArea("Water vapor correction:", "7em", "4em", "50em");
+        dryMethodValue = new LabeledTextArea("Drying method:", "7em", "4em", "56em");
+        waterCorrectValue = new LabeledTextArea("Water vapor correction:", "7em", "4em", "56em");
     }
 
     @Override
@@ -77,16 +77,8 @@ public class GasConcVarPanel extends InstDataVarPanel {
         if ( invalids == null )
             invalids = ((GasConc) vari).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
-        if ( invalids.contains("dryingMethod") )
-            dryMethodValue.markInvalid();
-        else
-            dryMethodValue.markValid();
-
-        if ( invalids.contains("waterVaporCorrection") )
-            waterCorrectValue.markInvalid();
-        else
-            waterCorrectValue.markValid();
+        dryMethodValue.markInvalid(invalids.contains("dryingMethod"));
+        waterCorrectValue.markInvalid(invalids.contains("waterVaporCorrection"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

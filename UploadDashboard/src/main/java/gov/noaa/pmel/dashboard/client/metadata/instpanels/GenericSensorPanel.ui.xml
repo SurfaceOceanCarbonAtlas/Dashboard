@@ -10,6 +10,7 @@
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
             </g:FlowPanel>
+            <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="instTypeList"/>
             <g:FlowPanel addStyleNames="{style.rowpanel}">
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="manufacturerValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="modelValue"/>

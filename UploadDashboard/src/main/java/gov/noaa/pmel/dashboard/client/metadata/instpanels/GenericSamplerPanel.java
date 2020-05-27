@@ -1,9 +1,14 @@
 package gov.noaa.pmel.dashboard.client.metadata.instpanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
 
 import java.util.HashSet;
@@ -15,6 +20,9 @@ public class GenericSamplerPanel extends GenericInstPanel {
     }
 
     private static final GenericSamplerPanelUiBinder uiBinder = GWT.create(GenericSamplerPanelUiBinder.class);
+
+    @UiField(provided = true)
+    final LabeledTextBox sensorsValue;
 
     /**
      * Creates a FlowPanel associated with the given generic sampler metadata
@@ -30,7 +38,7 @@ public class GenericSamplerPanel extends GenericInstPanel {
     public GenericSamplerPanel(Sampler instr, HTML header, InstrumentsTabPanel parentPanel) {
         super(instr, header, parentPanel);
 
-        // TODO: Create the provided widgets added by this panel
+        sensorsValue = new LabeledTextBox("Sensor names:", "7em", "56em", null, null);
     }
 
     @Override
@@ -43,9 +51,13 @@ public class GenericSamplerPanel extends GenericInstPanel {
     protected void finishInitialization() {
         Sampler sampler = (Sampler) instr;
 
-        // TODO: Assign the values in the text fields added in this panel
-
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        sensorsValue.setText(sampler.getInstrumentNames().asOneString());
+        sensorsValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                sampler.setInstrumentNames(new MultiNames(sensorsValue.getText()));
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -56,7 +68,7 @@ public class GenericSamplerPanel extends GenericInstPanel {
         if ( invalids == null )
             invalids = ((Sampler) instr).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        sensorsValue.markInvalid(invalids.contains("instrumentNames"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

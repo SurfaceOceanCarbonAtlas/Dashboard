@@ -303,55 +303,16 @@ public class CoveragePanel extends Composite {
         if ( (addnField != null) && !addnField.trim().isEmpty() )
             invalids.add(addnField.trim());
 
-        if ( invalids.contains("spatialReference") )
-            spacialValue.markInvalid();
-        else
-            spacialValue.markValid();
-
-        if ( invalids.contains("southernLatitude") )
-            southLatValue.markInvalid();
-        else
-            southLatValue.markValid();
-
-        if ( invalids.contains("northernLatitude") )
-            northLatValue.markInvalid();
-        else
-            northLatValue.markValid();
-
-        if ( invalids.contains("westernLongitude") )
-            westLonValue.markInvalid();
-        else
-            westLonValue.markValid();
-
-        if ( invalids.contains("easternLongitude") )
-            eastLonValue.markInvalid();
-        else
-            eastLonValue.markValid();
-
-        if ( invalids.contains("startDatestamp") )
-            startDateValue.markInvalid();
-        else
-            startDateValue.markValid();
-
-        if ( invalids.contains("endDatestamp") )
-            endDateValue.markInvalid();
-        else
-            endDateValue.markValid();
-
-        if ( invalids.contains("earliestDataDate") )
-            earlyDateValue.markInvalid();
-        else
-            earlyDateValue.markValid();
-
-        if ( invalids.contains("latestDataDate") )
-            lateDateValue.markInvalid();
-        else
-            lateDateValue.markValid();
-
-        if ( invalids.contains("geographicNames") )
-            regionsValue.markInvalid();
-        else
-            regionsValue.markValid();
+        spacialValue.markInvalid(invalids.contains("spatialReference"));
+        southLatValue.markInvalid(invalids.contains("southernLatitude"));
+        northLatValue.markInvalid(invalids.contains("northernLatitude"));
+        westLonValue.markInvalid(invalids.contains("westernLongitude"));
+        eastLonValue.markInvalid(invalids.contains("easternLongitude"));
+        startDateValue.markInvalid(invalids.contains("startDatestamp"));
+        endDateValue.markInvalid(invalids.contains("endDatestamp"));
+        earlyDateValue.markInvalid(invalids.contains("earliestDataDate"));
+        lateDateValue.markInvalid(invalids.contains("latestDataDate"));
+        regionsValue.markInvalid(invalids.contains("geographicNames"));
     }
 
     /**

@@ -224,85 +224,22 @@ public class MiscInfoPanel extends Composite {
     private void markInvalids() {
         HashSet<String> invalids = info.invalidFieldNames();
 
-        if ( invalids.contains("datasetName") )
-            nameValue.markInvalid();
-        else
-            nameValue.markValid();
-
-        if ( invalids.contains("sectionName") )
-            sectionValue.markInvalid();
-        else
-            sectionValue.markValid();
-
-        if ( invalids.contains("datasetDoi") )
-            doiValue.markInvalid();
-        else
-            doiValue.markValid();
-
-        if ( invalids.contains("accessId") )
-            accessValue.markInvalid();
-        else
-            accessValue.markValid();
-
-        if ( invalids.contains("citation") )
-            citationValue.markInvalid();
-        else
-            citationValue.markValid();
-
-        if ( invalids.contains("website") )
-            websiteValue.markInvalid();
-        else
-            websiteValue.markValid();
-
-        if ( invalids.contains("downloadUrl") )
-            downloadValue.markInvalid();
-        else
-            downloadValue.markValid();
-
-        if ( invalids.contains("fundingAgency") )
-            fundAgencyValue.markInvalid();
-        else
-            fundAgencyValue.markValid();
-
-        if ( invalids.contains("fundingTitle") )
-            fundTitleValue.markInvalid();
-        else
-            fundTitleValue.markValid();
-
-        if ( invalids.contains("fundingId") )
-            fundIdValue.markInvalid();
-        else
-            fundIdValue.markValid();
-
-        if ( invalids.contains("researchProject") )
-            projectValue.markInvalid();
-        else
-            projectValue.markValid();
-
-        if ( invalids.contains("synopsis") )
-            synopsisValue.markInvalid();
-        else
-            synopsisValue.markValid();
-
-        if ( invalids.contains("purpose") )
-            purposeValue.markInvalid();
-        else
-            purposeValue.markValid();
-
-        if ( invalids.contains("references") )
-            refsValue.markInvalid();
-        else
-            refsValue.markValid();
-
-        if ( invalids.contains("portsOfCall") )
-            portsValue.markInvalid();
-        else
-            portsValue.markValid();
-
-        if ( invalids.contains("addnInfo") )
-            addnInfoValue.markInvalid();
-        else
-            addnInfoValue.markValid();
+        nameValue.markInvalid(invalids.contains("datasetName"));
+        sectionValue.markInvalid(invalids.contains("sectionName"));
+        doiValue.markInvalid(invalids.contains("datasetDoi"));
+        accessValue.markInvalid(invalids.contains("accessId"));
+        citationValue.markInvalid(invalids.contains("citation"));
+        websiteValue.markInvalid(invalids.contains("website"));
+        downloadValue.markInvalid(invalids.contains("downloadUrl"));
+        fundAgencyValue.markInvalid(invalids.contains("fundingAgency"));
+        fundTitleValue.markInvalid(invalids.contains("fundingTitle"));
+        fundIdValue.markInvalid(invalids.contains("fundingId"));
+        projectValue.markInvalid(invalids.contains("researchProject"));
+        synopsisValue.markInvalid(invalids.contains("synopsis"));
+        purposeValue.markInvalid(invalids.contains("purpose"));
+        refsValue.markInvalid(invalids.contains("references"));
+        portsValue.markInvalid(invalids.contains("portsOfCall"));
+        addnInfoValue.markInvalid(invalids.contains("addnInfo"));
     }
 
     /**

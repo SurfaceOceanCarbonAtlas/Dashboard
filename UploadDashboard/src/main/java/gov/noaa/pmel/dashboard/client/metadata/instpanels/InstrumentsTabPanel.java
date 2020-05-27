@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import gov.noaa.pmel.dashboard.client.UploadDashboard;
 import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
-import gov.noaa.pmel.dashboard.client.metadata.varpanels.VariablePanel;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
@@ -105,7 +104,7 @@ public class InstrumentsTabPanel extends Composite {
      * value for the type of instrument given.  Also adds the callback to the type list to change to the
      * appropriate panel for a newly selected instrument type.
      */
-    public void assignInstrumentTypeList(LabeledListBox typeList, Instrument instr, VariablePanel panel) {
+    public void assignInstrumentTypeList(LabeledListBox typeList, Instrument instr, InstrumentPanel panel) {
         for (String name : instrTypeListNames) {
             typeList.addItem(name);
         }

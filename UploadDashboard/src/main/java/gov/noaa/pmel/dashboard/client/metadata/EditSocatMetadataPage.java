@@ -310,12 +310,12 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
 
     @UiHandler("instrumentsButton")
     void instrumentsButtonOnClick(ClickEvent event) {
-        mainPanel.showWidget(5);
+        mainPanel.showWidget(4);
     }
 
     @UiHandler("variablesButton")
     void variablesButtonOnClick(ClickEvent event) {
-        mainPanel.showWidget(4);
+        mainPanel.showWidget(5);
     }
 
     @UiHandler("miscInfoButton")

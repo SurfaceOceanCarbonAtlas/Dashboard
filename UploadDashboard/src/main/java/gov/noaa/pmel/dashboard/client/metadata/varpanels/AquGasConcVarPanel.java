@@ -36,8 +36,8 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
     public AquGasConcVarPanel(AquGasConc conc, HTML header, VariablesTabPanel parentPanel) {
         super(conc, header, parentPanel);
 
-        reportTempValue = new LabeledTextBox("Analysis temperature:", "7em", "20em", null, null);
-        tempCorrectValue = new LabeledTextBox("Temperature correction:", "7em", "20em", null, null);
+        reportTempValue = new LabeledTextBox("Analysis temperature:", "7em", "23em", null, null);
+        tempCorrectValue = new LabeledTextBox("Temperature correction:", "8em", "23em", null, null);
     }
 
     @Override
@@ -77,15 +77,8 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
         if ( invalids == null )
             invalids = ((AquGasConc) vari).invalidFieldNames();
 
-        if ( invalids.contains("reportTemperature") )
-            reportTempValue.markInvalid();
-        else
-            reportTempValue.markValid();
-
-        if ( invalids.contains("temperatureCorrection") )
-            tempCorrectValue.markInvalid();
-        else
-            tempCorrectValue.markValid();
+        reportTempValue.markInvalid(invalids.contains("reportTemperature"));
+        tempCorrectValue.markInvalid(invalids.contains("temperatureCorrection"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);
