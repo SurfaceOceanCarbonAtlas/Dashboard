@@ -84,8 +84,8 @@ public class InstDataVarPanel extends GenDataVarPanel {
     public InstDataVarPanel(InstData instvar, HTML header, VariablesTabPanel parentPanel) {
         super(instvar, header, parentPanel);
         //
-        sampleLocValue = new LabeledTextBox("Sampling location:", "7em", "23em", null, null);
-        sampleElevValue = new LabeledTextBox("Sampling elevation:", "8em", "23em", null, null);
+        sampleLocValue = new LabeledTextBox("Sampling loc.:", "7em", "23em", null, null);
+        sampleElevValue = new LabeledTextBox("Sampling elev.:", "8em", "23em", null, null);
         //
         observeTypeValue = new LabeledTextBox("Obs. type:", "7em", "23em", null, null);
         measureMethodValue = new LabeledListBox("Method:", "8em", null, null, null);

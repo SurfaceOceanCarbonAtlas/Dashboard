@@ -42,7 +42,7 @@ public class GenDataVarPanel extends FlagVarPanel {
         accuracyValue = new LabeledTextBox("Accuracy:", "7em", "10em", "", "5em");
         precisionValue = new LabeledTextBox("Precision:", "7em", "10em", "", "5em");
         //
-        flagNameValue = new LabeledTextBox("QC column:", "8em", "23em", null, null);
+        flagNameValue = new LabeledTextBox("QC column:", "7em", "24em", null, null);
     }
 
     @Override

@@ -1,9 +1,13 @@
 package gov.noaa.pmel.dashboard.client.metadata.instpanels;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
 
 import java.util.HashSet;
@@ -15,6 +19,9 @@ public class GenericSensorPanel extends GenericInstPanel {
     }
 
     private static final GenericSensorPanelUiBinder uiBinder = GWT.create(GenericSensorPanelUiBinder.class);
+
+    @UiField(provided = true)
+    final LabeledTextArea calibrationValue;
 
     /**
      * Creates a FlowPanel associated with the given generic sensor metadata
@@ -30,7 +37,7 @@ public class GenericSensorPanel extends GenericInstPanel {
     public GenericSensorPanel(Analyzer instr, HTML header, InstrumentsTabPanel parentPanel) {
         super(instr, header, parentPanel);
 
-        // TODO: Create the provided widgets added by this panel
+        calibrationValue = new LabeledTextArea("Calibration", "7em", "8em", "56em");
     }
 
     @Override
@@ -43,9 +50,14 @@ public class GenericSensorPanel extends GenericInstPanel {
     protected void finishInitialization() {
         Analyzer sensor = (Analyzer) instr;
 
-        // TODO: Assign the values in the text fields added in this panel
-
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        calibrationValue.setText(sensor.getCalibration());
+        calibrationValue.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                sensor.setCalibration(calibrationValue.getText());
+                markInvalids(null);
+            }
+        });
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -56,7 +68,7 @@ public class GenericSensorPanel extends GenericInstPanel {
         if ( invalids == null )
             invalids = ((Analyzer) instr).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        calibrationValue.markInvalid(invalids.contains("calibration"));
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);

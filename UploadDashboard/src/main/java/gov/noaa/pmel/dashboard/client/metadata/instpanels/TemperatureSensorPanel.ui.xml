@@ -15,7 +15,8 @@
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="manufacturerValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="modelValue"/>
             </g:FlowPanel>
-            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue" />
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="calibrationValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
         </g:FlowPanel>
     </g:ScrollPanel>
 

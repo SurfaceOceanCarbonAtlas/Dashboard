@@ -30,7 +30,7 @@ public class PressureSensorPanel extends GenericSensorPanel {
     public PressureSensorPanel(PressureSensor instr, HTML header, InstrumentsTabPanel parentPanel) {
         super(instr, header, parentPanel);
 
-        // TODO: Create the provided widgets added by this panel
+        // Nothing more to add
     }
 
     @Override
@@ -41,11 +41,7 @@ public class PressureSensorPanel extends GenericSensorPanel {
 
     @Override
     protected void finishInitialization() {
-        PressureSensor sensor = (PressureSensor) instr;
-
-        // TODO: Assign the values in the text fields added in this panel
-
-        // TODO: Add the handlers for widgets added by this panel (UiHandler not seen in subclasses)
+        // Nothing more to add
 
         // Finish initialization, including marking invalid fields
         super.finishInitialization();
@@ -56,7 +52,7 @@ public class PressureSensorPanel extends GenericSensorPanel {
         if ( invalids == null )
             invalids = ((PressureSensor) instr).invalidFieldNames();
 
-        // TODO: Appropriately mark the labels of fields added in this panel
+        // Nothing more to add
 
         // Finish marking labels and the tab for this panel
         super.markInvalids(invalids);
