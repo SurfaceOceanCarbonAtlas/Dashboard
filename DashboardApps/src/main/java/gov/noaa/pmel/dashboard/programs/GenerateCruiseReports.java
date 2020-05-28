@@ -888,6 +888,12 @@ public class GenerateCruiseReports {
             "dist_to_land: estimated distance to major land mass in kilometers (up to 1000 km)",
             "GVCO2: atmospheric xCO2 in micromole per mole interpolated from NOAA Greenhouse Gas Reference ",
             "    1979-01-01 to 2019-01-01 surface CO2 data (see: https://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php)",
+            "xCO2water_equ_dry: measured xCO2 (water) in micromole per mole at equilibrator temperature (dry air)",
+            "xCO2water_SST_dry: measured xCO2 (water) in micromole per mole at sea surface temperature (dry air)",
+            "pCO2water_equ_wet: measured pCO2 (water) in microatmospheres at equilibrator temperature (wet air)",
+            "pCO2water_SST_wet: measured pCO2 (water) in microatmospheres at sea surface temperature (wet air)",
+            "fCO2water_equ_wet: measured fCO2 (water) in microatmospheres at equilibrator temperature (wet air)",
+            "fCO2water_SST_wet: measured fCO2 (water) in microatmospheres at sea surface temperature (wet air)",
             "fCO2rec: fCO2 in microatmospheres recomputed from the raw data (see below)",
             "fCO2rec_src: algorithm for generating fCO2rec from the raw data (0:not generated; 1-14, see below)",
             "fCO2rec_flag: WOCE flag for this fCO2rec value (2:good, 3:questionable, 4:bad, 9:not generated; see below)",
@@ -923,6 +929,12 @@ public class GenerateCruiseReports {
             "ETOPO2_depth [m]\t" +
             "dist_to_land [km]\t" +
             "GVCO2 [umol/mol]\t" +
+            "xCO2water_equ_dry [umol/mol]\t" +
+            "xCO2water_SST_dry [umol/mol]\t" +
+            "pCO2water_equ_wet [uatm]\t" +
+            "pCO2water_SST_wet [uatm]\t" +
+            "fCO2water_equ_wet [uatm]\t" +
+            "fCO2water_SST_wet [uatm]\t" +
             "fCO2rec [uatm]\t" +
             "fCO2rec_src\t" +
             "fCO2rec_flag";
@@ -1066,15 +1078,9 @@ public class GenerateCruiseReports {
 
         // For multicruise reports, remove duplicate data points.
         // Region restrictions, if any, only apply to multicruise reports.
-        TreeSet<DataPoint> prevDatPts;
-        Integer sectimeIdx;
-        Integer regionIdx;
-        Integer xco2WaterTEquIdx;
-        Integer xco2WaterSSTIdx;
-        Integer pco2WaterTEquIdx;
-        Integer pco2WaterSSTIdx;
-        Integer fco2WaterTEquIdx;
-        Integer fco2WaterSSTIdx;
+        TreeSet<DataPoint> prevDatPts = null;
+        Integer sectimeIdx = null;
+        Integer regionIdx = null;
         if ( multicruise ) {
             prevDatPts = new TreeSet<DataPoint>();
 
@@ -1093,53 +1099,37 @@ public class GenerateCruiseReports {
             }
             else
                 regionIdx = null;
-
-            // These values are not reported in multicruise reports
-            xco2WaterTEquIdx = null;
-            xco2WaterSSTIdx = null;
-            pco2WaterTEquIdx = null;
-            pco2WaterSSTIdx = null;
-            fco2WaterTEquIdx = null;
-            fco2WaterSSTIdx = null;
         }
-        else {
-            // Duplicates not checked in single-cruise reports
-            prevDatPts = null;
-            sectimeIdx = null;
-            // Single-cruise reports are never region-specific
-            regionIdx = null;
 
-            // These values are reported in single-cruise reports
-            xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
-            if ( xco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName());
+        Integer xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
+        if ( xco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName());
 
-            xco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_SST_DRY);
-            if ( xco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.XCO2_WATER_SST_DRY.getVarName());
+        Integer xco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_SST_DRY);
+        if ( xco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.XCO2_WATER_SST_DRY.getVarName());
 
-            pco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_TEQU_WET);
-            if ( pco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.PCO2_WATER_TEQU_WET.getVarName());
+        Integer pco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_TEQU_WET);
+        if ( pco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PCO2_WATER_TEQU_WET.getVarName());
 
-            pco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_SST_WET);
-            if ( pco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.PCO2_WATER_SST_WET.getVarName());
+        Integer pco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_SST_WET);
+        if ( pco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PCO2_WATER_SST_WET.getVarName());
 
-            fco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_TEQU_WET);
-            if ( fco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.FCO2_WATER_TEQU_WET.getVarName());
+        Integer fco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_TEQU_WET);
+        if ( fco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_WATER_TEQU_WET.getVarName());
 
-            fco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_SST_WET);
-            if ( fco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
-        }
+        Integer fco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_SST_WET);
+        if ( fco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
 
         for (int j = 0; j < dataVals.getNumSamples(); j++) {
             if ( multicruise ) {
@@ -1296,43 +1286,41 @@ public class GenerateCruiseReports {
             else
                 fmtr.format("%#.3f\t", (Double) value);
 
-            if ( !multicruise ) {
-                value = dataVals.getStdVal(j, xco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, xco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, xco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, xco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, pco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, pco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, pco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, pco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, fco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, fco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, fco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
-            }
+            value = dataVals.getStdVal(j, fco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
             value = dataVals.getStdVal(j, fco2RecIdx);
             if ( value == null ) {
