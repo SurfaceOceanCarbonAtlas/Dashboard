@@ -211,12 +211,14 @@ public class GenerateCruiseReports {
         String origUrl = cruise.getSourceURL();
         if ( DashboardUtils.STRING_MISSING_VALUE.equals(origUrl) )
             origUrl = NOT_AVAILABLE_TAG;
-        String socatDoi = cruise.getEnhancedDOI();
-        if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDoi) )
-            socatDoi = NOT_AVAILABLE_TAG;
-        String socatUrl = cruise.getEnhancedURL();
-        if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatUrl) )
-            socatUrl = NOT_AVAILABLE_TAG;
+        /*
+         * String socatDoi = cruise.getEnhancedDOI();
+         * if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDoi) )
+         *     socatDoi = NOT_AVAILABLE_TAG;
+         * String socatUrl = cruise.getEnhancedURL();
+         * if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatUrl) )
+         *     socatUrl = NOT_AVAILABLE_TAG;
+         */
 
         // Get the list of additional document filenames associated with this cruise.
         // Use what the QC-ers see - the directory listing.
@@ -231,11 +233,11 @@ public class GenerateCruiseReports {
         PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
         try {
             ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion,
-                    origDoi, origUrl, socatDoi, socatUrl, qcFlag, addlDocs, report);
+                    origDoi, origUrl, qcFlag, addlDocs, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, false);
             printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersion,
-                    origDoi, socatDoi, qcFlag, null, false);
+                    origDoi, qcFlag, null, false);
         } finally {
             report.close();
         }
@@ -269,8 +271,10 @@ public class GenerateCruiseReports {
         ArrayList<String> socatVersionList = new ArrayList<String>(numDatasets);
         ArrayList<String> origDoiList = new ArrayList<String>(numDatasets);
         ArrayList<String> origUrlList = new ArrayList<String>(numDatasets);
-        ArrayList<String> socatDoiList = new ArrayList<String>(numDatasets);
-        ArrayList<String> socatUrlList = new ArrayList<String>(numDatasets);
+        /*
+         * ArrayList<String> socatDoiList = new ArrayList<String>(numDatasets);
+         * ArrayList<String> socatUrlList = new ArrayList<String>(numDatasets);
+         */
         ArrayList<String> qcFlagList = new ArrayList<String>(numDatasets);
         ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
         ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
@@ -337,14 +341,16 @@ public class GenerateCruiseReports {
                 if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
                     value = NOT_AVAILABLE_TAG;
                 origUrlList.add(value);
-                value = cruise.getEnhancedDOI();
-                if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
-                    value = NOT_AVAILABLE_TAG;
-                socatDoiList.add(value);
-                value = cruise.getEnhancedURL();
-                if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
-                    value = NOT_AVAILABLE_TAG;
-                socatUrlList.add(value);
+                /*
+                 * value = cruise.getEnhancedDOI();
+                 * if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                 *     value = NOT_AVAILABLE_TAG;
+                 * socatDoiList.add(value);
+                 * value = cruise.getEnhancedURL();
+                 * if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                 *     value = NOT_AVAILABLE_TAG;
+                 * socatUrlList.add(value);
+                 */
                 omeMetaList.add(metadataHandler.getOmeFromFile(upperExpo, DashboardServerUtils.OME_FILENAME));
                 upperExpoList.add(upperExpo);
             }
@@ -367,7 +373,7 @@ public class GenerateCruiseReports {
         PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
         try {
             ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList, socatVersionList,
-                    origDoiList, origUrlList, socatDoiList, socatUrlList, qcFlagList, addlDocsList, report);
+                    origDoiList, origUrlList, qcFlagList, addlDocsList, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, true);
             // Read and report the data for one dataset at a time
@@ -383,7 +389,7 @@ public class GenerateCruiseReports {
                     warnMsgs.add(msg);
                 }
                 printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersionList.get(k),
-                        origDoiList.get(k), socatDoiList.get(k), qcFlagList.get(k), regionID, true);
+                        origDoiList.get(k), qcFlagList.get(k), regionID, true);
             }
         } finally {
             report.close();
@@ -404,10 +410,6 @@ public class GenerateCruiseReports {
      *         DOI for the original data
      * @param origUrl
      *         URL for the landing page of the original data
-     * @param socatDoi
-     *         DOI for this SOCAT-enhanced data
-     * @param socatUrl
-     *         landing page URL for this SOCAT-enhanced data
      * @param qcFlag
      *         QC flag to report in the preamble
      * @param addlDocs
@@ -417,9 +419,8 @@ public class GenerateCruiseReports {
      *
      * @return list of warnings about the generated preamble; never null but may be empty
      */
-    private ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta,
-            String socatVersion, String origDoi, String origUrl, String socatDoi, String socatUrl,
-            String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
+    private ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, String socatVersion,
+            String origDoi, String origUrl, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
         String upperExpo = omeMeta.getDatasetId();
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -431,8 +432,10 @@ public class GenerateCruiseReports {
         report.println("Principal Investigator(s): " + omeMeta.getPINames());
         report.println("DOI for the original data: " + origDoi);
         report.println("    or see: " + origUrl);
-        report.println("DOI of this SOCAT-enhanced data: " + socatDoi);
-        report.println("    or see: " + socatUrl);
+        /*
+         * report.println("DOI of this SOCAT-enhanced data: " + socatDoi);
+         * report.println("    or see: " + socatUrl);
+         */
         report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
         report.println("    or see: " + SOCAT_MAIN_URL);
         report.println();
@@ -440,7 +443,7 @@ public class GenerateCruiseReports {
         // Additional references - add expocode suffix for clarity
         report.println("Supplemental documentation reference(s):");
         for (String filename : addlDocs) {
-            report.println("    " + filename);
+            report.println("    " + upperExpo + "/" + filename);
         }
         report.println();
 
@@ -515,8 +518,8 @@ public class GenerateCruiseReports {
             "PI(s)\t" +
             "Data Source DOI\t" +
             "Data Source Reference\t" +
-            "SOCAT DOI\t" +
-            "SOCAT Reference\t" +
+            // "SOCAT DOI\t" +
+            // "SOCAT Reference\t" +
             "Westmost Longitude\t" +
             "Eastmost Longitude\t" +
             "Southmost Latitude\t" +
@@ -540,10 +543,6 @@ public class GenerateCruiseReports {
      *         list of DOIs, one per dataset, for the original data
      * @param origUrlList
      *         list of landing page URLs, one per dataset, for the original data
-     * @param socatDoiList
-     *         list of DOIs, one per dataset, for the SOCAT-enhanced data
-     * @param socatUrlList
-     *         list of landing page URLs, one per dataset, for the SOCAT-enhanced data
      * @param qcFlagList
      *         list of QC flags, one per dataset, to report
      * @param addlDocsList
@@ -555,8 +554,7 @@ public class GenerateCruiseReports {
      */
     private ArrayList<String> printMetadataPreamble(String regionName, ArrayList<DashboardOmeMetadata> omeMetaList,
             ArrayList<String> socatVersionList, ArrayList<String> origDoiList, ArrayList<String> origUrlList,
-            ArrayList<String> socatDoiList, ArrayList<String> socatUrlList, ArrayList<String> qcFlagList,
-            ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
+            ArrayList<String> qcFlagList, ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
         report.println("SOCAT data report created: " + dateStamp);
@@ -596,11 +594,13 @@ public class GenerateCruiseReports {
             report.print(origUrlList.get(k));
             report.print("\t");
 
-            report.print(socatDoiList.get(k));
-            report.print("\t");
-
-            report.print(socatUrlList.get(k));
-            report.print("\t");
+            /*
+             * report.print(socatDoiList.get(k));
+             * report.print("\t");
+             *
+             * report.print(socatUrlList.get(k));
+             * report.print("\t");
+             */
 
             try {
                 double westLon = omeMeta.getWestmostLongitude();
@@ -683,7 +683,7 @@ public class GenerateCruiseReports {
                     isFirst = false;
                 else
                     report.print("; ");
-                report.print(filename);
+                report.print(upperExpo + "/" + filename);
             }
 
             report.println();
@@ -779,7 +779,7 @@ public class GenerateCruiseReports {
             "Expocode: unique identifier for the data set from which this data was obtained",
             "version: version of SOCAT where this enhanced data first appears",
             "Source_DOI: DOI for the data source (the original data)",
-            "SOCAT_DOI: DOI for this SOCAT-enhanced data",
+            // "SOCAT_DOI: DOI for this SOCAT-enhanced data",
             "QC_Flag: Data set QC flag",
             "yr: 4-digit year of the time (UTC) of the measurement",
             "mon: month of the time (UTC) of the measurement",
@@ -824,7 +824,7 @@ public class GenerateCruiseReports {
     public static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
             "Source_DOI\t" +
-            "SOCAT_DOI\t" +
+            // "SOCAT_DOI\t" +
             "QC_Flag\t" +
             "yr\t" +
             "mon\t" +
@@ -863,7 +863,7 @@ public class GenerateCruiseReports {
             "Expocode: unique identifier for the data set from which this data was obtained",
             "version: version of SOCAT where this enhanced data first appears",
             "Source_DOI: DOI for the data source (the original data)",
-            "SOCAT_DOI: DOI for this SOCAT-enhanced data",
+            // "SOCAT_DOI: DOI for this SOCAT-enhanced data",
             "QC_Flag: Data set QC flag",
             "yr: 4-digit year of the time (UTC) of the measurement",
             "mon: month of the time (UTC) of the measurement",
@@ -908,7 +908,7 @@ public class GenerateCruiseReports {
     public static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
             "Source_DOI\t" +
-            "SOCAT_DOI\t" +
+            // "SOCAT_DOI\t" +
             "QC_Flag\t" +
             "yr\t" +
             "mon\t" +
@@ -950,8 +950,6 @@ public class GenerateCruiseReports {
      *         version for this SOCAT-enhanced dataset
      * @param origDoi
      *         DOI for the original dataset
-     * @param socatDoi
-     *         DOI for this SOCAT-enhanced dataset
      * @param qcFlag
      *         dataset QC flag value for this dataset
      * @param regionID
@@ -963,7 +961,7 @@ public class GenerateCruiseReports {
      *         if false, print single-cruise data strings
      */
     private void printDataStrings(PrintWriter report, StdDataArray dataVals, String expocode, String version,
-            String origDoi, String socatDoi, String qcFlag, String regionID, boolean multicruise) throws IOException {
+            String origDoi, String qcFlag, String regionID, boolean multicruise) throws IOException {
         // Indices to data columns that will be reported
         // All data columns should exist, although they may not have any valid values
         Integer longitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LONGITUDE);
@@ -1158,7 +1156,7 @@ public class GenerateCruiseReports {
             fmtr.format("%s\t", expocode);
             fmtr.format("%s\t", version);
             fmtr.format("%s\t", origDoi);
-            fmtr.format("%s\t", socatDoi);
+            // fmtr.format("%s\t", socatDoi);
             fmtr.format("%s\t", qcFlag);
 
             Object value;
