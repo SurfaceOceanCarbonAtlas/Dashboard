@@ -326,48 +326,28 @@ def getAlternateURL(myurl):
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('', file=sys.stderr)
-        print('    Usage:  ' + sys.argv[0] + '  OCADS_Archive_DOIs.tsv', file=sys.stderr)
+        print('    Usage:  ' + sys.argv[0] + '  OCADS_Archive_URLs.txt', file=sys.stderr)
         print('', file=sys.stderr)
-        print('    Reads expocodes (fourth column), URLs (fifth column), and DOIs (sixth column) ', file=sys.stderr)
-        print('    from the TSV file, reads the XML from each URL to extract more expocodes and ', file=sys.stderr)
-        print('    possibly a DOI, then writes out triplets of expocode, landing page URL, and ', file=sys.stderr)
+        print('    Reads URLs from the file, reads the XML from each URL to extract expocodes ', file=sys.stderr)
+        print('    and a DOI, then writes out triplets of expocode, landing page URL, and ', file=sys.stderr)
         print('    DOI to standard output. ', file=sys.stderr)
         print('', file=sys.stderr)
         print('    If the value in the URL column for a row is not present or does not start with ', file=sys.stderr)
         print('    "http", the row is skipped.  If the URL is for an XML file, or an XML file can be ', file=sys.stderr)
         print('    obtained by adding ";view=xml;responseType=text/xml" to the URL, this XML file ', file=sys.stderr)
-        print('    is examined for additional expocodes and possibly a DOI. ', file=sys.stderr)
-        print('', file=sys.stderr)
-        print('    If the value in the DOI column for a row is not present or does not resemble ', file=sys.stderr)
-        print('    a DOI, then the XML file from the URL for the row is examined for a DOI. ', file=sys.stderr)
-        print('', file=sys.stderr)
-        print('    If the value in the expocode column for a row is a double-quoted (optional), ', file=sys.stderr)
-        print('    comma-separated list of values instead of a single value, then each value in ', file=sys.stderr)
-        print('    the list which resembles an expocode is used as an expocode associated with ', file=sys.stderr)
-        print('    the URL and DOI for that row.  Furthermore, if an XML file can be obtained ', file=sys.stderr)
-        print('    from the URL given in the row, any expocodes given in that XML file are also ', file=sys.stderr)
-        print('    associated with the URL and DOI for that row. ', file=sys.stderr)
+        print('    is examined for expocodes and a DOI. ', file=sys.stderr)
         print('', file=sys.stderr)
         sys.exit(1)
     tsvfile = open(sys.argv[1])
 
     try:
         for dataline in tsvfile:
-            pieces = dataline.split('\t')
+            origurl = dataline.strip()
 
             print('', file=sys.stderr)
-            print('Examining: "' + dataline.strip('\r\n') + '"', file=sys.stderr)
+            print('Examining: "' + origurl + '"', file=sys.stderr)
             sys.stderr.flush()
 
-            if len(pieces) < 5:
-                print('    Warning: ignoring entry; insufficient number of values', file=sys.stderr)
-                continue
-            if len(pieces) > 5:
-                doi = getDOIFromValue(pieces[5])
-            else:
-                doi = None
-
-            origurl = pieces[4].strip()
             if not origurl.startswith('http'):
                 print('    Warning: ignoring entry; no URL found', file=sys.stderr)
                 continue
@@ -393,23 +373,10 @@ if __name__ == '__main__':
                     print('        or the site: ' + alturl, file=sys.stderr)
                 continue
 
-            givenexpos = getExpocodes(linkedobjs)
-            for value in pieces[3].strip().strip('"').split(','):
-                value = getExpocodeFromValue(value)
-                if value and (value not in givenexpos):
-                    givenexpos.add(value)
-                    print('    Warning: expocode "' + value + '" not given in the XML', file=sys.stderr)
-            if not givenexpos:
+            expoSet = getExpocodes(linkedobjs)
+            if not expoSet:
                 print('    Warning: ignoring entry; no expocodes found', file=sys.stderr)
                 continue
-
-            doiSet = getDois(linkedobjs)
-            # make sure any given DOI is present
-            if doi and (doi not in doiSet):
-                doiSet.add(doi)
-                print('    Warning: DOI "' + doi + '" not given in the XML', file=sys.stderr)
-            # allow missing DOIs since there will be a landing page
-            # allow multiple DOIs - maybe okay?
 
             urlSet = getLandingLinks(linkedobjs)
             if len(urlSet) == 0:
@@ -423,7 +390,11 @@ if __name__ == '__main__':
                     print('        ' + url, file=sys.stderr)
                 continue
 
-            for expo in givenexpos:
+            doiSet = getDois(linkedobjs)
+            # allow missing DOIs since there will be a landing page
+            # allow multiple DOIs - it happens
+
+            for expo in expoSet:
                 for doi in doiSet:
                     print(expo + '\t' + url + '\t' + doi)
 
