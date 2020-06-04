@@ -1,7 +1,8 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 
 import re
 import sys
+import time
 
 if sys.version_info[0] > 2:
     from urllib.request import urlopen
@@ -64,19 +65,87 @@ def getUrlFromDoi(mydoi):
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print('', file=sys.stderr)
-        print('    Usage:  ' + sys.argv[0] + '  DOI', file=sys.stderr)
+        print('    Usage:  ' + sys.argv[0] + '  propsfilenames', file=sys.stderr)
         print('', file=sys.stderr)
-        print('    Prints the given DOI, a tab, and the landing page URL for the given DOI.  ', file=sys.stderr)
-        print('    If this is an OCADS URL with an accesssion ID, the standard OCADS landing ', file=sys.stderr)
+        print('    For each properties file listed in the given file, if a DOI is given for the ', file=sys.stderr)
+        print('    original data but a URL is not given, obtains the URL associated with the DOI ', file=sys.stderr)
+        print('    and then prints a tab-seperated line to stdout giving the properties filename, ', file=sys.stderr)
+        print('    the URL, and the DOI. ', file=sys.stderr)
+        print('    If the URL is an OCADS URL with an accesssion ID, the standard OCADS landing ', file=sys.stderr)
         print('    page URL (which is typically a redirect) is returned if this URL redirects ', file=sys.stderr)
-        print('    to the same landing page URL as the DOI.  If no URL is associated with the ', file=sys.stderr)
-        print('    given DOI, an error is print to stderr and nothing is printed to stdout. ', file=sys.stderr)
+        print('    to the same landing page URL as the DOI. ', file=sys.stderr)
+        print('    If no URL is associated with the given DOI, an error is print to stderr and ', file=sys.stderr)
+        print('    nothing is printed to stdout. ', file=sys.stderr)
         print('', file=sys.stderr)
         sys.exit(1)
-    doi = sys.argv[1]
+    propnamesfilename = sys.argv[1]
 
-    url = getUrlFromDoi(doi)
-    if not url:
-        print("No URL found for DOI " + doi, file=sys.stderr)
-        sys.exit(1)
-    print(doi + '\t' + url)
+    ORIGDATADOI = "origdatadoi="
+    SOURCEDOI = "sourcedoi="
+    SOURCEURL = "sourceurl="
+
+    doiurls = {}
+    propnamesfile = open(propnamesfilename)
+    try:
+        for propfilename in propnamesfile:
+            propfilename = propfilename.strip()
+            propfile = open(propfilename)
+            try:
+                for propline in propfile:
+                    propline = propline.strip()
+
+                    doi = None
+                    url = None
+                    if propline.startswith(ORIGDATADOI):
+                        doival = propline[len(ORIGDATADOI):]
+                        if doival:
+                            if doi:
+                                print("More than one original-data DOI for " + propfilename)
+                                continue
+                            doi = doival
+                    elif propline.startswith(SOURCEDOI):
+                        doival = propline[len(SOURCEDOI):]
+                        if doival:
+                            if doi:
+                                print("More than one original-data DOI for " + propfilename)
+                                continue
+                            doi = doival
+                    elif propline.startswith(SOURCEURL):
+                        urlval = propline[len(SOURCEURL):]
+                        if urlval:
+                            if url:
+                                print("More than one original-data URL for " + propfilename)
+                                continue
+                            url = urlval
+
+                    if doi and not url:
+                        try:
+                            url = doiurls[doi]
+                        except KeyError:
+                            # Possibility of multiple DOIs
+                            urllist = []
+                            for mydoi in doi.split(' ; '):
+                                try:
+                                    myurl = doiurls[mydoi]
+                                except KeyError:
+                                    time.sleep(1)
+                                    myurl = getUrlFromDoi(mydoi)
+                                    if myurl:
+                                        doiurls[mydoi] = myurl
+                                if myurl and myurl not in urllist:
+                                    urllist.append(myurl)
+                            for myurl in urllist:
+                                if not url:
+                                    url = myurl
+                                else:
+                                    url += ' ; ' + myurl
+                            if url:
+                                doiurls[doi] = url
+                        if url:
+                            print(propfilename + '\t' + url + '\t' + doi)
+                        else:
+                            print("No URL found for DOI " + doi + " given in " + propfilename, file=sys.stderr)
+            finally:
+                propfile.close()
+    finally:
+        propnamesfile.close()
