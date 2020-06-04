@@ -67,7 +67,7 @@ public class InstrumentsTabPanel extends Composite {
     @UiField
     Button removeButton;
 
-    ArrayList<InstrumentPanel> instrumentPanels;
+    private final ArrayList<InstrumentPanel> instrumentPanels;
 
     /**
      * Creates a {@link TabLayoutPanel} with add and remove buttons underneath.
@@ -204,7 +204,7 @@ public class InstrumentsTabPanel extends Composite {
      */
     private void addPanel(int index, Instrument instr) {
         if ( (index < 0) || (index > instrumentPanels.size()) ) {
-            UploadDashboard.showMessage("Unexpected invalid replacement panel index of " + index);
+            UploadDashboard.showMessage("Unexpected invalid panel index of " + index);
             return;
         }
         InstrumentPanel panel;

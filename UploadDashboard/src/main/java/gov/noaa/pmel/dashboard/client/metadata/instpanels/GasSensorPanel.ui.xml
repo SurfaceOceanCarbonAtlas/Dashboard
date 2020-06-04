@@ -15,6 +15,11 @@
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="manufacturerValue"/>
                 <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="modelValue"/>
             </g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <g:HTML addStyleNames="{style.calibgasprefix}" ui:field="gasesHtml"/>
+                <g:TabLayoutPanel barUnit="EM" barHeight="2" addStyleNames="{style.calibgasvalue}"
+                                  ui:field="gasesTabPanel"/>
+            </g:FlowPanel>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="calibrationValue"/>
             <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
         </g:FlowPanel>

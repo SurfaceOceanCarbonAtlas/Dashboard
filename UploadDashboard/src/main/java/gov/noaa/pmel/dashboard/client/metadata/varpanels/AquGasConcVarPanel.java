@@ -36,7 +36,7 @@ public class AquGasConcVarPanel extends GasConcVarPanel {
     public AquGasConcVarPanel(AquGasConc conc, HTML header, VariablesTabPanel parentPanel) {
         super(conc, header, parentPanel);
 
-        reportTempValue = new LabeledTextBox("Analysis temperature:", "7em", "23em", null, null);
+        reportTempValue = new LabeledTextBox("Report temperature:", "7em", "23em", null, null);
         tempCorrectValue = new LabeledTextBox("Temperature correction:", "8em", "23em", null, null);
     }
 
