@@ -230,7 +230,7 @@ public class GenerateCruiseReports {
         }
 
         // Generate the report
-        PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
+        PrintWriter report = new PrintWriter(reportFile, "UTF-8");
         try {
             ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion,
                     origDoi, origUrl, qcFlag, addlDocs, report);
@@ -370,7 +370,7 @@ public class GenerateCruiseReports {
             addlDocsList.add(addlDocs);
         }
 
-        PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
+        PrintWriter report = new PrintWriter(reportFile, "UTF-8");
         try {
             ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList, socatVersionList,
                     origDoiList, origUrlList, qcFlagList, addlDocsList, report);
