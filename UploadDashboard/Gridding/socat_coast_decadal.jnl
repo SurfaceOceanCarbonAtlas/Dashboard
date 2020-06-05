@@ -4,10 +4,10 @@
  ! min and max the fco2 min and max.
 
 can mode upcase
-use "/home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc"
+use SOCAT_qrtrdeg_gridded_coast_monthly.nc
 set mem/siz=600
 
-define symbol outfile = /home/data/socat/v2020/SOCAT_coastal_gridded_decadal.nc
+define symbol outfile = SOCAT_coastal_gridded_decadal.nc
 sp rm -f outfile
 
 

@@ -6,7 +6,7 @@ cancel var/all
 cancel data/all
 
 
-define symbol infile = ($1%/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_v2020.nc%)
+define symbol infile = $1%SOCAT_tracks_gridded_monthly.nc%
 
 use "($infile)"
 define symbol report = report_`FCO2_COUNT_NOBS,return=dset`.txt

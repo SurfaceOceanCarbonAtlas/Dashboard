@@ -6,8 +6,8 @@
 SET MEM/SIZ=300
 can mode upcase
 
-USE "/home/data/socat/v2020/SOCAT_triples_v2020_fco2.nc"
-DEFINE SYMBOL gridded_outfile = /home/data/socat/v2020/SOCAT_tracks_gridded_monthly_v2020.nc
+USE SOCAT_ABCD_data_for_gridding.nc
+DEFINE SYMBOL gridded_outfile = SOCAT_tracks_gridded_monthly.nc
 
 show data/outfile=gridding_months.txt/clobber
 
@@ -27,7 +27,7 @@ let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
 ! Triples have time with origin at start of 1970.
 ! This script defines i1, i2, del used in the loop below
 
-GO define_dates_v2020
+GO define_grid_time_axes
 
 DEFINE SYMBOL file_qual = CLOBBER  ! First time CLOBBER, afterwards APPEND to the file.
 

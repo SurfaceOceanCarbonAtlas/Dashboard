@@ -16,7 +16,7 @@ DEFINE AXIS/Y=-90:90:0.25/EDGES/UNITS=degrees_north ylat
 ! ignore non-coastal locations in calls to tracks2grid_mask_ave_xyt
 let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
 
-use "/home/users/ansley/socat/SOCAT_project_from_svn/ingest_scripts/dist2land/dist2land20_burke.nc"
+use dist2land20_burke.nc
 use etopo20
 let mask400 = if dist2land[d=1,gx=xlon,gy=ylat] lt 400 then 1 else 0
 let ocean_mask = if rose[d=2,gx=xlon,gy=ylat] LE 0 then 1 else 0
@@ -37,7 +37,7 @@ let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
 
 
 !Data contains lat,lon,date,data_id,cruise_id,cruise_no,fco2_rec
-USE "/home/data/socat/v2020/SOCAT_triples_v2020_fco2.nc"
+USE SOCAT_ABCD_data_for_gridding.nc
 show data/outfile=quarter_gridding_months.txt/clobber
 
 set data 2
@@ -48,16 +48,16 @@ set data 2
 ! the tracks2grid_std_xyt function allocates lots of work space
 
 let del = 6
-GO define_dates_v2020.jnl `del`
+GO define_grid_time_axes.jnl `del`
 
 DEFINE SYMBOL file_qual = CLOBBER  ! First time CLOBBER, afterwards APPEND to the file.
 
 ! This name will be appended to, writing separate files with the different variables
-DEFINE SYMBOL gridded_outfile = /home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020
+DEFINE SYMBOL gridded_outfile = SOCAT_tracks_gridded_monthly_quarterdeg
 
 ! Do the calculation in chunks, not to load the whole output grid at once.
 
-! upper index of this loop needs to be > imax from define_dates_v2020
+! upper index of this loop needs to be > imax from define_grid_time_axes
 repeat/range=1:`imax+20`:1 ( \
  LET ii = i[i=`i1`:`i2`];\
  GO fco2_xyt_stats_qrtr; \

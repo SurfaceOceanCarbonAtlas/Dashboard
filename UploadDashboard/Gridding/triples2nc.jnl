@@ -1,38 +1,21 @@
 ! triples2nc
-! from Hankin's triples2nc.jnl
-! Run using double-precision Ferret
-
-! convert the ASCII file of SOCAT triples written by the database
+!
+! Convert the ASCII file of SOCAT "triples" data from QC Flags A-D, WOCE-flag 2
 ! into a netCDF file
-
+!
 ! the format of the data that this script is designed to handle is 
-
-!data_id latitude        longitude       datetime        expocode        fCO2rec
-!1       -39.632000      -60.809998      1986-06-27 16:42:00     06AQ19860627    319.063988
-!2       -39.700001      -60.677002      1986-06-27 17:12:00     06AQ19860627    317.875346
-!3       -39.768002      -60.542999      1986-06-27 17:42:00     06AQ19860627    322.844617
-
-
-! Alert: Before running this script use the wc command to make sure that
-! maxobs is larger than the size of the file 
-
-! 31 May 2016
-!wc --lines  /home/users/ksmith/socat5_abcd_woce2_data.tsv
-!21484306
-
-! minus 1 for the header line
-define symbol nobs = 21484305
-
-
-! This file with Cruise Flags A-D only, WOCE-flag 2
+! data_id	latitude	longitude	datetime	expocode	fCO2rec	SST	salinity
+! 1	49.827970	-2.815118	2018-08-14 18:55:03	069920180814	477.196384	16.083	34.953
+! 2	49.827570	-2.815443	2018-08-14 18:55:13	069920180814	476.790538	16.079	34.951
+! ....
 ! 
 
-define symbol infile = /home/data/socat/v2020/SOCATv2020All_ABCD_W2_data.tsv
-define symbol outfile = /home/data/socat/v2020/SOCAT_triples_v2020_fco2.nc
+define symbol infile = SOCAT_ABCD_data_for_gridding.tsv
+define symbol outfile = SOCAT_ABCD_data_for_gridding.nc
 
 ! Get the number of obs directly
 
-let num = {spawn:'wc --lines ($infile)'}
+let num = {spawn:'wc -l ($infile)'}
 define symbol wc = `num`
 let len = `strindex ("($wc)", "($infile)")` - 1
 
@@ -40,9 +23,6 @@ define symbol nobs = `substring("($wc)", 1, len)`
 
 ! minus 1 for header line
 define symbol nobs =`($nobs)-1`
-
-! test
-pause
 
 set memory/size=600   ! Need > 400 to load all the data at once from ascii
 can mode upcase
@@ -78,11 +58,6 @@ show data
 
 go add_global_attribute ($outfile)
 
-
-! reading and saving takes about 1.5 minute for v2020
-
-message ready to write data to ($outfile) ?
-
 set var/outtype=float/units="degrees_north" lat
 set var/outtype=float/units="degrees_east" lon
 set var/outtype=float/units="uatm" fco2_rec
@@ -93,15 +68,3 @@ sp date
 save/append/file="($outfile)" lat,lon,date,data_id,cruise_id,cruise_no,fco2_rec,sst,salinity
 sp date
 
-! Write a mask variable: if etopo1 > 0 then mask out data
-! THIS IS NOT USED and it takes forever. Skip it.
-EXIT/SCRIPT
-
-can data/all
-can var/all
-use "($outfile)"
-use etopo1
-
-let topo_elev = samplexy(rose[d=2], lon[d=1], lat[d=1])
-let/bad=999 mask_land = if topo_elev LE 0 then 1 else 0
-save/outtype=int/append/file="($outfile)" mask_land

@@ -1,7 +1,7 @@
 ! Compute the coastal mask  
 
-use "/home/data/socat/dist2land20_burke.nc"
-define symbol outfile = /home/data/socat/coast_mask_quarter.nc
+use dist2land20_burke.nc
+define symbol outfile = coast_mask_quarter.nc
 
 ! Define grid as for tracks2grid_monthly_quarterdeg.jnl
 DEFINE AXIS/X=-180:180.0:0.25/EDGES/UNITS=degrees_east/MODULO xlon
@@ -35,7 +35,7 @@ can var/all
 ! Check
 
 use "($outfile)"
-use "/home/data/socat/dist2land20_burke.nc"
+use dist2land20_burke.nc"
 set view full
 shade COAST_MASK[d=1]
 def view/x=0:1/y=0:1 full2

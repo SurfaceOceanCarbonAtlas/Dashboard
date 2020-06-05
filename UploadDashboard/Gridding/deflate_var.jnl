@@ -7,10 +7,10 @@
 ! Assumes ($var) is defined which is fco2, sst, or ($var)
 
 cancel data/all
-use "/home/data/socat/coast_mask_quarter_noland.nc"
+use coast_mask_quarter_noland.nc
 
 
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_count_nobs.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_count_nobs.nc
 let/units="`($var)_count_nobs,return=units`"/title="`($var)_count_nobs,return=title`" coast_($var)_count_nobs = ($var)_count_nobs* coast_mask[d=1]
 
 let L1 = 1
@@ -22,7 +22,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_ave_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_ave_unwtd.nc
 let/units="`($var)_ave_unwtd,return=units`"/title="`($var)_ave_unwtd,return=title`" coast_($var)_ave_unwtd = ($var)_ave_unwtd* coast_mask[d=1]
 
 let L1 = 1
@@ -34,7 +34,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_ave_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_ave_weighted.nc
 let/units="`($var)_ave_weighted,return=units`"/title="`($var)_ave_weighted,return=title`" coast_($var)_ave_weighted = ($var)_ave_weighted* coast_mask[d=1]
 
 let L1 = 1
@@ -46,7 +46,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_max_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_max_unwtd.nc
 let/units="`($var)_max_unwtd,return=units`"/title="`($var)_max_unwtd,return=title`" coast_($var)_max_unwtd = ($var)_max_unwtd* coast_mask[d=1]
 
 let L1 = 1
@@ -58,7 +58,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_min_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_min_unwtd.nc
 let/units="`($var)_min_unwtd,return=units`"/title="`($var)_min_unwtd,return=title`" coast_($var)_min_unwtd = ($var)_min_unwtd* coast_mask[d=1]
 
 let L1 = 1
@@ -70,7 +70,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 !can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_std_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_std_unwtd.nc
 let/units="`($var)_std_unwtd,return=units`"/title="`($var)_std_unwtd,return=title`" coast_($var)_std_unwtd = ($var)_std_unwtd* coast_mask[d=1]
 
 let L1 = 1
@@ -82,7 +82,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_($var)_std_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_($var)_std_weighted.nc
 let/units="`($var)_std_weighted,return=units`"/title="`($var)_std_weighted,return=title`" coast_($var)_std_weighted = ($var)_std_weighted* coast_mask[d=1]
 
 let L1 = 1

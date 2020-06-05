@@ -1,24 +1,22 @@
 ! Apply the coastal mask to the quarter-gridded monthly SOCAT variables
-! Save them with /DEFLATE to save space. (Uses only 1% of the space of a
-! netcdf3 file.)
-! Use the time axis from the monthly data to set up the loops for 
-! compressing the data.
+! Save them with /DEFLATE to save space.  (Uses only 1% of the space of a netcdf3 file.)
+! Use the time axis from the monthly data to set up the loops for compressing the data.
 
 can mode upcase
 cancel data/all
 can var/all
-define symbol outfile = /home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc
+define symbol outfile = SOCAT_qrtrdeg_gridded_coast_monthly.nc
 
 set mem/siz=600
 set list/deflate=1
 set list/file="($outfile)"
 set list/outtype=float
 
-GO add_global_attribute  /home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc
+GO add_global_attribute SOCAT_qrtrdeg_gridded_coast_monthly.nc
 
-use "/home/data/socat/coast_mask_quarter_noland.nc"
+use coast_mask_quarter_noland.nc
 
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_count_ncruise.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_count_ncruise.nc"
 let/units="`count_ncruise,return=units`"/title="`count_ncruise,return=title`" coast_count_ncruise = count_ncruise* coast_mask[d=1]
 
 ! Set up loop to save as compressed data 200 timesteps at a time
@@ -58,7 +56,7 @@ GO deflate_var
 
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lat_offset_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_lat_offset_unwtd.nc
 let/units="`lat_offset_unwtd,return=units`"/title="`lat_offset_unwtd,return=title`" coast_lat_offset_unwtd = lat_offset_unwtd* coast_mask[d=1]
 
 let L1 = 1
@@ -70,7 +68,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lon_offset_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_lon_offset_unwtd.nc"
 let/units="`lon_offset_unwtd,return=units`"/title="`lon_offset_unwtd,return=title`" coast_lon_offset_unwtd = lon_offset_unwtd* coast_mask[d=1]
 
 let L1 = 1

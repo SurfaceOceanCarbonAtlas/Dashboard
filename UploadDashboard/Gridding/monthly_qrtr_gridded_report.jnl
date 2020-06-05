@@ -4,7 +4,7 @@ set mem/siz=400
 cancel var/all
 cancel data/all
 
-define symbol infile = $1%/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020%
+define symbol infile = $1%SOCAT_tracks_gridded_monthly_quarterdeg.nc%
 
 use ($infile)_count_ncruise.nc
 define symbol report = report_`count_ncruise,return=dset`.txt
@@ -45,7 +45,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_count_nobs.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_count_nobs.nc
 stat FCO2_COUNT_NOBS($subregion)
 say/append/outfile="($report)" FCO2_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -61,7 +61,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_ave_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_ave_weighted.nc
 stat FCO2_AVE_WEIGHTED($subregion)
 say/append/outfile="($report)" FCO2_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -73,7 +73,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_ave_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_ave_unwtd.nc
 stat FCO2_AVE_UNWTD($subregion)
 say/append/outfile="($report)" FCO2_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -85,7 +85,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_min_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_min_unwtd.nc
 stat FCO2_MIN_UNWTD($subregion)
 say/append/outfile="($report)" FCO2_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -99,7 +99,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_max_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_max_unwtd.nc
 stat FCO2_MAX_UNWTD($subregion)
 say/append/outfile="($report)" FCO2_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -113,7 +113,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_std_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_std_weighted.nc
 stat FCO2_STD_WEIGHTED($subregion)
 say/append/outfile="($report)" FCO2_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -124,7 +124,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_std_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_fco2_std_unwtd.nc
 stat FCO2_STD_UNWTD($subregion)
 say/append/outfile="($report)" FCO2_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" FCO2_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -140,7 +140,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_count_nobs.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_count_nobs.nc
 stat SST_COUNT_NOBS($subregion)
 say/append/outfile="($report)" SST_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" SST_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -156,7 +156,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_ave_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_ave_weighted.nc
 stat sst_AVE_WEIGHTED($subregion)
 say/append/outfile="($report)" sst_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -167,7 +167,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_ave_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_ave_unwtd.nc
 stat sst_AVE_UNWTD($subregion)
 say/append/outfile="($report)" sst_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -178,7 +178,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_min_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_min_unwtd.nc
 stat sst_MIN_UNWTD($subregion)
 say/append/outfile="($report)" sst_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -192,7 +192,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_max_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_max_unwtd.nc
 stat sst_MAX_UNWTD($subregion)
 say/append/outfile="($report)" sst_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -205,7 +205,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_std_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_std_weighted.nc
 stat sst_STD_WEIGHTED($subregion)
 say/append/outfile="($report)" sst_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -216,7 +216,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_std_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_sst_std_unwtd.nc
 stat sst_STD_UNWTD($subregion)
 say/append/outfile="($report)" sst_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" sst_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -232,7 +232,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_count_nobs.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_count_nobs.nc
 stat SALINITY_COUNT_NOBS($subregion)
 say/append/outfile="($report)" SALINITY_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" SALINITY_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -248,7 +248,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_ave_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_ave_weighted.nc
 stat salinity_AVE_WEIGHTED($subregion)
 say/append/outfile="($report)" salinity_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -259,7 +259,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_ave_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_ave_unwtd.nc
 stat salinity_AVE_UNWTD($subregion)
 say/append/outfile="($report)" salinity_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -270,7 +270,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_min_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_min_unwtd.nc
 stat salinity_MIN_UNWTD($subregion)
 say/append/outfile="($report)" salinity_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -284,7 +284,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_max_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_max_unwtd.nc
 stat salinity_MAX_UNWTD($subregion)
 say/append/outfile="($report)" salinity_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -297,7 +297,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_std_weighted.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_std_weighted.nc
 stat salinity_STD_WEIGHTED($subregion)
 say/append/outfile="($report)" salinity_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -308,7 +308,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_std_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_salinity_std_unwtd.nc
 stat salinity_STD_UNWTD($subregion)
 say/append/outfile="($report)" salinity_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" salinity_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -321,7 +321,7 @@ say/append/outfile="($report)" .
 ! ----------------------
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lat_offset_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_lat_offset_unwtd.nc
 stat LAT_OFFSET_UNWTD($subregion)
 say/append/outfile="($report)" LAT_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" LAT_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
@@ -333,7 +333,7 @@ say/append/outfile="($report)" .
 say/append/outfile="($report)" .
 
 can dat/all
-use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lon_offset_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_lon_offset_unwtd.nc
 stat LON_OFFSET_UNWTD($subregion)
 say/append/outfile="($report)" LON_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
 say/append/outfile="($report)" LON_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`

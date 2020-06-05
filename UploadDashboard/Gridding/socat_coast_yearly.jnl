@@ -4,10 +4,10 @@
  ! min and max the fco2 min and max.
 
 can mode upcase
-use "/home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly.nc"
+use SOCAT_qrtrdeg_gridded_coast_monthly.nc
 set mem/siz=800
 
-define symbol outfile = /home/data/socat/v2020/SOCAT_coastal_gridded_yearly.nc
+define symbol outfile = SOCAT_coastal_gridded_yearly.nc
 sp rm -f outfile
 
 ! IF ($file_qual"0|CLOBBER>1|*>0")  global title attribute
@@ -15,7 +15,7 @@ GO add_global_attribute ($outfile)
 DEFINE SYMBOL file_qual = APPEND
 
 ! Define output time axis
-go define_dates_v2020
+go define_grid_time_axes
 
 ! Regrid each variable to the yearly axis using the appropriate transform.
 
