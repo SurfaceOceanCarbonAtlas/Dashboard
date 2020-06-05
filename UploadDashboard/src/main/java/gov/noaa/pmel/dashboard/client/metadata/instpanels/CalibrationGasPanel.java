@@ -64,7 +64,7 @@ public class CalibrationGasPanel extends Composite {
         frequencyValue = new LabeledTextBox("Frequency:", "7em", "20em", null, null);
         supplierValue = new LabeledTextBox("Supplier:", "7em", "20em", null, null);
         concValue = new LabeledTextBox("Concentration:", "7em", "17em", CalibrationGas.GAS_CONCENTRATION_UNIT, "3em");
-        accuracyValue = new LabeledTextBox("Frequency:", "7em", "17em", CalibrationGas.GAS_CONCENTRATION_UNIT, "3em");
+        accuracyValue = new LabeledTextBox("Accuracy:", "6.5em", "17em", CalibrationGas.GAS_CONCENTRATION_UNIT, "3em");
         initWidget(uiBinder.createAndBindUi(this));
 
         this.calibrationGas = gas;
@@ -148,9 +148,10 @@ public class CalibrationGasPanel extends Composite {
             refname += " - " + type;
         SafeHtml tabhtml = SafeHtmlUtils.fromString(refname);
         if ( invalids.isEmpty() )
-            header.setHTML(UploadDashboard.invalidLabelHtml(tabhtml));
-        else
             header.setHTML(tabhtml);
+        else
+            header.setHTML(UploadDashboard.invalidLabelHtml(tabhtml));
+
         // indicate which fields are invalid
         typeValue.markInvalid(invalids.contains("type"));
         idValue.markInvalid(invalids.contains("id"));

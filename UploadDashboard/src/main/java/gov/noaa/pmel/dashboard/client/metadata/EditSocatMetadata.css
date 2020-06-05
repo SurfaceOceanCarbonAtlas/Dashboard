@@ -24,14 +24,15 @@
     margin-top: 4px;
     margin-bottom: 4px;
     margin-left: 0;
-    margin-right: 0.5em;
+    margin-right: 1em;
 }
 
 .calibgasvalue {
+    display: inline-block;
     float: none;
     font-size: medium;
-    width: 56em;
-    height: 16em;
+    width: 59em;
+    height: 14em;
     margin: 0;
 }
 
