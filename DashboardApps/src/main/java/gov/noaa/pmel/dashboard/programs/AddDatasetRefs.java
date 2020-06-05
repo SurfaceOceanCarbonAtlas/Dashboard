@@ -69,11 +69,7 @@ public class AddDatasetRefs {
             return "dataset " + upperExpo + " does not exist";
 
         String msg = null;
-        boolean proceed = (replaceOld || (cruise.getSourceDOI().isEmpty() && cruise.getSourceURL().isEmpty()));
-        if ( !proceed ) {
-            msg = "existing original-data references for " + upperExpo + " was not changed";
-        }
-        else {
+        if ( replaceOld || cruise.getSourceDOI().isEmpty() ) {
             if ( origDoi != null ) {
                 String doi = origDoi.trim();
                 if ( !doi.isEmpty() ) {
@@ -81,7 +77,10 @@ public class AddDatasetRefs {
                     cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
                     msg = "updated the original-data DOI for " + upperExpo + " to " + doi + " and marking as archived";
                 }
+
             }
+        }
+        if ( replaceOld || cruise.getSourceURL().isEmpty() ) {
             if ( origUrl != null ) {
                 String url = origUrl.trim();
                 if ( !url.isEmpty() ) {
@@ -95,15 +94,7 @@ public class AddDatasetRefs {
             }
         }
 
-        proceed = (replaceOld || (cruise.getEnhancedDOI().isEmpty() && cruise.getEnhancedURL().isEmpty()));
-        if ( !proceed ) {
-            if ( msg != null )
-                msg += "\n";
-            else
-                msg = "";
-            msg += "existing SOCAT-enhanced references for " + upperExpo + " was not changed";
-        }
-        else {
+        if ( replaceOld || cruise.getEnhancedDOI().isEmpty() ) {
             if ( enhancedDoi != null ) {
                 String doi = enhancedDoi.trim();
                 if ( !doi.isEmpty() ) {
@@ -115,6 +106,8 @@ public class AddDatasetRefs {
                     msg += "updated the SOCAT-enhanced DOI for " + upperExpo + " to " + doi;
                 }
             }
+        }
+        if ( replaceOld || cruise.getEnhancedURL().isEmpty() ) {
             if ( enhancedUrl != null ) {
                 String url = enhancedUrl.trim();
                 if ( !url.isEmpty() ) {
