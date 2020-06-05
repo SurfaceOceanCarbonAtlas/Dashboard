@@ -117,7 +117,8 @@ public class DatasetSubmitter {
             if ( Boolean.TRUE.equals(dataset.isEditable()) ) {
                 try {
                     // Get the OME metadata for this dataset
-                    DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(datasetId, DashboardServerUtils.OME_FILENAME);
+                    DashboardMetadata omeInfo = metadataHandler
+                            .getMetadataInfo(datasetId, DashboardServerUtils.OME_FILENAME);
                     if ( !version.equals(omeInfo.getVersion()) ) {
                         omeInfo.setVersion(version);
                         metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " +
@@ -170,12 +171,21 @@ public class DatasetSubmitter {
                     // Standardize the data and perform the automated data checks.
                     // Saves the messages from the standardization and automated data checks.
                     // Assigns dataCheckStatus, numErrorRows, numWarnRows, checkerFlags, and userFlags in dataset
+                    // Also updates dsgMdata with the lon/lat/time limits of data not WOCE-4
                     StdUserDataArray userStdData = datasetChecker.standardizeDataset(dataset, dsgMData);
                     if ( DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(dataset.getDataCheckStatus()) ) {
                         errorMsgs.add(datasetId + ": unacceptable; check data check error messages " +
                                 "(missing lon/lat/time or uninterpretable values)");
                         continue;
                     }
+                    // Copy the lon/lat/time limits to OME.xml and save
+                    omeMData.setWestmostLongitude(dsgMData.getWestmostLongitude());
+                    omeMData.setEastmostLongitude(dsgMData.getEastmostLongitude());
+                    omeMData.setSouthmostLatitude(dsgMData.getSouthmostLatitude());
+                    omeMData.setNorthmostLatitude(dsgMData.getNorthmostLatitude());
+                    omeMData.setDataBeginTime(dsgMData.getBeginTime());
+                    omeMData.setDataEndTime(dsgMData.getEndTime());
+                    metadataHandler.saveOmeToFile(omeMData, "Update lon/lat/time limits");
 
                     // Add the automated data checker data QC flags to the appropriate data QC columns
                     userStdData.addAutomatedDataQC();
