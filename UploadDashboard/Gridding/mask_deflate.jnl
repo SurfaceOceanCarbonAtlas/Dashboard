@@ -1,0 +1,85 @@
+! Apply the coastal mask to the quarter-gridded monthly SOCAT variables
+! Save them with /DEFLATE to save space. (Uses only 1% of the space of a
+! netcdf3 file.)
+! Use the time axis from the monthly data to set up the loops for 
+! compressing the data.
+
+can mode upcase
+cancel data/all
+can var/all
+define symbol outfile = /home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc
+
+set mem/siz=600
+set list/deflate=1
+set list/file="($outfile)"
+set list/outtype=float
+
+GO add_global_attribute  /home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc
+
+use "/home/data/socat/coast_mask_quarter_noland.nc"
+
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_count_ncruise.nc"
+let/units="`count_ncruise,return=units`"/title="`count_ncruise,return=title`" coast_count_ncruise = count_ncruise* coast_mask[d=1]
+
+! Set up loop to save as compressed data 200 timesteps at a time
+
+let Ln = `coast_count_ncruise,return=lsize` 
+let del = 200
+let nr = INT(Ln/del) + 1
+
+let L1 = 1
+let L2 = `L1+del-1`
+
+DEFINE SYMBOL appendflag = clobber
+
+repeat/range=1:`nr` (\
+save/($appendflag)/L=`L1`:`L2`/ncformat=4 coast_count_ncruise;\
+LET L1 = `L1+del`; IF `L1 GT Ln` THEN EXIT/LOOP;\
+let L2 = `L2+del`;\
+IF `L2 GT Ln` THEN LET L2 = `Ln`;\
+DEFINE SYMBOL appendflag = append)
+
+! Check the time axis length
+cancel var coast_count_ncruise
+use ($outfile)
+show data 2
+show data 3
+show grid coast_count_ncruise; say check time axes; pause
+can data 3
+
+DEFINE SYMBOL var = fco2
+GO deflate_var
+
+DEFINE SYMBOL var = sst
+GO deflate_var
+
+DEFINE SYMBOL var = salinity
+GO deflate_var
+
+
+can data 2
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lat_offset_unwtd.nc"
+let/units="`lat_offset_unwtd,return=units`"/title="`lat_offset_unwtd,return=title`" coast_lat_offset_unwtd = lat_offset_unwtd* coast_mask[d=1]
+
+let L1 = 1
+let L2 = `L1+del-1`
+repeat/range=1:`nr` (\
+save/append/L=`L1`:`L2`/ncformat=4 coast_lat_offset_unwtd;\
+LET L1 = `L1+del`; IF `L1 GT Ln` THEN EXIT/LOOP;\
+let L2 = `L2+del`;\
+IF `L2 GT Ln` THEN LET L2 = `Ln`)
+
+can data 2
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lon_offset_unwtd.nc"
+let/units="`lon_offset_unwtd,return=units`"/title="`lon_offset_unwtd,return=title`" coast_lon_offset_unwtd = lon_offset_unwtd* coast_mask[d=1]
+
+let L1 = 1
+let L2 = `L1+del-1`
+repeat/range=1:`nr` (\
+save/append/L=`L1`:`L2`/ncformat=4 coast_lon_offset_unwtd;\
+LET L1 = `L1+del`; IF `L1 GT Ln` THEN EXIT/LOOP;\
+let L2 = `L2+del`;\
+IF `L2 GT Ln` THEN LET L2 = `Ln`)
+
+
+can data/all

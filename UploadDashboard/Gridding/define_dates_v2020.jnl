@@ -1,0 +1,40 @@
+! Define variables for defining the time axis
+! for gridding triples file to monthly gridded
+! datsets.
+! SOCAT v2020 data from 1970 through the end of 2019.
+
+LET end_year = 2019
+
+can mode upcase
+LET del = $1"60"  ! months per chunk, 60 for 5-year.
+
+! for entire time period of SOCAT v2020 
+! (+1 because the axis is defined with /edges)
+
+let ni = (end_year - 1970 + 1)*12 + 1
+
+let ni = `ni`  ! v2020 data goes through the end of December 2019
+
+LET ii = i[i=1:`ni`]
+
+! Triples have time with origin at start of 1970.
+LET offset1970 = DAYS1900(1970,1,1)
+LET month = MOD(ii-1,12)+1
+LET year = 1970 + INT((ii-1)/12)
+
+! whole axis. When doing a year at a time this gets redefined.
+DEFINE AXIS/T0="01-JAN-1970"/EDGES/UNITS=days tmnth = DAYS1900(year,month,1) - offset1970
+sh axis tmnth
+
+! Yearly axis
+let ny = `ni`  ! yearly axis through the end of end_year
+let year12 = year[i=1:`ny`:12]
+let month12 = month[i=1:`ny`:12]
+DEFINE AXIS/T0="01-JAN-1970"/EDGES/UNITS=days tyear = DAYS1900(year12,month12,1) - offset1970
+sh axis tyear
+
+! Repeat and do the calculation for 5-year intervals.
+LET i1 = 1
+LET i2 = `del+1`
+
+let imax = `ni`  

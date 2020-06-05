@@ -1,0 +1,51 @@
+! compute cruiseDensity
+
+! create a coarse resolution XYT grid that can be used to anticipate the
+! volume of data in an arbitrary XYT region
+
+SET MEM/SIZ=300
+can mode upcase
+
+USE "/home/data/socat/v2020/SOCAT_triples_v2020_fco2.nc"
+DEFINE SYMBOL gridded_outfile = /home/data/socat/v2020/SOCAT_tracks_gridded_monthly_v2020.nc
+
+show data/outfile=gridding_months.txt/clobber
+
+DEFINE AXIS/X=-179.5:179.5:1/UNITS=degrees_east/MODULO xlon
+DEFINE AXIS/Y=-89.5:89.5:1/UNITS=degrees_north ylat
+
+LET dx = `0.5* xbox[gx=xlon,i=1]`
+LET dy = `0.5* ybox[gy=ylat,j=1]`
+
+
+! dont mask out any data in calls to tracks2grid_mask_ave_xyt
+let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
+
+!Data contains lat,lon,date,data_id,cruise_id,cruise_no,fco2_rec
+
+
+! Triples have time with origin at start of 1970.
+! This script defines i1, i2, del used in the loop below
+
+GO define_dates_v2020
+
+DEFINE SYMBOL file_qual = CLOBBER  ! First time CLOBBER, afterwards APPEND to the file.
+
+! Do the calculation in chunks, not to load the whole output grid at once.
+
+repeat/range=1:10:1 ( \
+ LET ii = i[i=`i1`:`i2`]; \ 
+ GO fco2_xyt_stats_year.jnl; \
+ LET i1 = `i2`; \
+ LET i2 = `i2+del`; \
+ IF `i2 GT imax` THEN LET i2 = `imax`; \
+ IF `i1 GE imax` THEN exit/loop; \
+ )
+
+
+! Make a summary report about the data variables with a bit
+! of sanity checking
+
+go monthly_gridded_report ($gridded_outfile)
+
+

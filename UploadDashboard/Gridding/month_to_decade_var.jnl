@@ -1,0 +1,68 @@
+! month_to_decade_var.jnl
+! regrid variables, e.g. all the monthly 1-degree gridded
+! fco2 or sst variables, to the yearly axis
+!
+! A symbol ($var) is assumed to be set which is the variable
+! fco2, sst, salinity.  
+
+! Use @SUM same for count_nobs
+define symbol invar = ($var)_count_nobs  
+define symbol op = SUM
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+! append to dataset
+let/bad=-9999/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/outtype=int/file="($outfile)"/($file_qual) ($invar)_decade
+
+
+! For ($var) weighted and unweighted averages, use @AVE.
+define symbol invar = ($var)_ave_weighted
+define symbol op = AVE
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! append to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/outtype=float/file="($outfile)"/($file_qual) ($invar)_decade
+
+
+define symbol invar = ($var)_ave_unwtd
+define symbol op = AVE
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! append to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/outtype=float/file="($outfile)"/($file_qual) ($invar)_decade
+
+
+! For ($var) min and max, use the min and max.
+define symbol invar = ($var)_min_unwtd
+define symbol op = MIN
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! append to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/outtype=float/file="($outfile)"/($file_qual) ($invar)_decade
+
+! For ($var) min and max, use the min and max.
+define symbol invar = ($var)_max_unwtd
+define symbol op = MAX
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! append to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/outtype=float/file="($outfile)"/($file_qual) ($invar)_decade
+

@@ -1,0 +1,97 @@
+ ! Compute decadal averages of SOCAT coastal quarter-degree gridded data:
+ ! sum the counts
+ ! average the fco2 averages
+ ! min and max the fco2 min and max.
+
+can mode upcase
+use "/home/data/socat/v2020/SOCAT_qrtrdeg_gridded_coast_monthly_v2020.nc"
+set mem/siz=600
+
+define symbol outfile = /home/data/socat/v2020/SOCAT_coastal_gridded_decadal.nc
+sp rm -f outfile
+
+
+! Add global title attribute
+GO add_global_attribute ($outfile)
+DEFINE SYMBOL file_qual = APPEND
+
+
+! Define output time axis
+let year = 1900+{70,80,90,100,110,120}
+let month = 1
+let day = 1
+define axis/units=days/t0=01-JAN-1900/edges tdecade = days1900(year, month, 1)
+
+
+! Regrid each variable to the decadal axis using the appropriate transform.
+
+define symbol invar = coast_count_ncruise  ! count_ncruise or ($invar)
+define sym op = SUM
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! Sum for each month, adding to the dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/($file_qual) ($invar)_decade
+
+! Now the same for count_nobs
+define symbol invar = coast_count_nobs  ! count_ncruise or count_nobs
+define symbol op = SUM
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+! add to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/append ($invar)_decade
+
+
+! For FCO2 variables, average.
+define symbol invar = coast_fco2_ave_weighted
+define symbol op = AVE
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! add to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/append ($invar)_decade
+
+! For FCO2 variables, average.
+define symbol invar = coast_fco2_ave_unwtd
+define symbol op = AVE
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! add to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/append ($invar)_decade
+
+! For FCO2 min and max, use the min and max.
+define symbol invar = coast_fco2_min_unwtd
+define symbol op = MIN
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! add to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/append ($invar)_decade
+
+! For FCO2 min and max, use the min and max.
+define symbol invar = coast_fco2_max_unwtd
+define symbol op = MAX
+
+define symbol title_out=`($invar)[d=1],return=title`
+define symbol units_out=`($invar)[d=1],return=units`
+
+
+! add to dataset
+let/title="($title_out)"/units="($units_out)"  ($invar)_decade = ($invar)[gt=tdecade@($op)]
+save/file="($outfile)"/append ($invar)_decade

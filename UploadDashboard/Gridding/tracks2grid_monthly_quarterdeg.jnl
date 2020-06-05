@@ -1,0 +1,75 @@
+! compute cruiseDensity
+
+! create a coarse resolution XYT grid that can be used to anticipate the
+! volume of data in an arbitrary XYT region
+ 
+SET MEM/SIZ=200
+can mode upcase
+
+DEFINE AXIS/X=-180:180.0:0.25/EDGES/UNITS=degrees_east/MODULO xlon
+!DEFINE AXIS/X=-180:0.0:0.25/EDGES/UNITS=degrees_east xlon
+!DEFINE AXIS/X=0.25:180.0:0.25/EDGES/UNITS=degrees_east xlon
+
+DEFINE AXIS/Y=-90:90:0.25/EDGES/UNITS=degrees_north ylat
+
+
+! ignore non-coastal locations in calls to tracks2grid_mask_ave_xyt
+let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
+
+use "/home/users/ansley/socat/SOCAT_project_from_svn/ingest_scripts/dist2land/dist2land20_burke.nc"
+use etopo20
+let mask400 = if dist2land[d=1,gx=xlon,gy=ylat] lt 400 then 1 else 0
+let ocean_mask = if rose[d=2,gx=xlon,gy=ylat] LE 0 then 1 else 0
+
+! bad-flag is an integer so we can save this as INT
+let/bad=-99/title="Continental Margin Mask" coast_mask = mask400* ocean_mask
+
+! Save this
+set var/outtype=int coast_mask
+save/clobber/file=coast_mask_quarter_noland.nc coast_mask
+can var/all; can data/all
+
+
+can data/all; use coast_mask_quarter_noland.nc
+let maskvar = coast_mask[d=1]
+
+let maskvar = 1 + 0*x[gx=xlon] + 0*y[gy=ylat]
+
+
+!Data contains lat,lon,date,data_id,cruise_id,cruise_no,fco2_rec
+USE "/home/data/socat/v2020/SOCAT_triples_v2020_fco2.nc"
+show data/outfile=quarter_gridding_months.txt/clobber
+
+set data 2
+
+
+! Define variables for defining the monthly time axis
+! If computing fco2_std_weighted, then do just 6 months at a time: 
+! the tracks2grid_std_xyt function allocates lots of work space
+
+let del = 6
+GO define_dates_v2020.jnl `del`
+
+DEFINE SYMBOL file_qual = CLOBBER  ! First time CLOBBER, afterwards APPEND to the file.
+
+! This name will be appended to, writing separate files with the different variables
+DEFINE SYMBOL gridded_outfile = /home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020
+
+! Do the calculation in chunks, not to load the whole output grid at once.
+
+! upper index of this loop needs to be > imax from define_dates_v2020
+repeat/range=1:`imax+20`:1 ( \
+ LET ii = i[i=`i1`:`i2`];\
+ GO fco2_xyt_stats_qrtr; \
+ LET i1 = `i2`; \
+ LET i2 = `i2+del`; \
+ IF `i2 GT imax` THEN LET i2 = `imax`; \
+ IF `i1 GE imax` THEN exit/loop; \
+ )
+
+
+! Make a summary report about the data variables with a bit
+! of sanity checking
+
+go monthly_qrtr_gridded_report ($gridded_outfile)
+

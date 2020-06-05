@@ -1,0 +1,349 @@
+\can mode verify
+set mem/siz=400
+
+cancel var/all
+cancel data/all
+
+define symbol infile = $1%/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020%
+
+use ($infile)_count_ncruise.nc
+define symbol report = report_`count_ncruise,return=dset`.txt
+
+SAY --- Making report file with statistics on the variables in ($infile) files.
+SAY --- Use data since 1995 only and and y=-10:70
+SAY --- 
+
+set redirect/clobber/tee/file=report_dummy.txt
+
+! The grid is big. This is a sanity check on the processing, so use a subregion.
+! v3 used l=`llen-239`:`llen`.  Add 12 months
+
+let llen = `count_ncruise,RETURN=lsize`
+define symbol subregion = [l=`llen-251`:`llen`,y=-10:70]
+
+say/clobber/outfile="($report)" statistics for `count_ncruise,RETURN=dset`.nc
+say/append/outfile="($report)" file history  `..history`
+say/append/outfile="($report)" Use data since Jan 1995 and y=-10:70
+
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat COUNT_NCRUISE($subregion)
+say/append/outfile="($report)" COUNT_NCRUISE min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" COUNT_NCRUISE good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- COUNT_NCRUISE cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- COUNT_NCRUISE must be all valid. Reports ($STAT_NBAD) missing
+
+let npos = if count_ncruise gt 0 then 1
+stat npos($subregion)
+say/append/outfile="($report)" COUNT_NCRUISE GT 0 good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_count_nobs.nc"
+stat FCO2_COUNT_NOBS($subregion)
+say/append/outfile="($report)" FCO2_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- FCO2_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+let npos = if FCO2_COUNT_NOBS gt 0 then 1
+stat npos($subregion)
+say/append/outfile="($report)" FCO2_COUNT_NOBS GT 0 good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_ave_weighted.nc"
+stat FCO2_AVE_WEIGHTED($subregion)
+say/append/outfile="($report)" FCO2_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_AVE_WEIGHTED must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_AVE_WEIGHTED values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_ave_unwtd.nc"
+stat FCO2_AVE_UNWTD($subregion)
+say/append/outfile="($report)" FCO2_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_AVE_UNWTD must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_AVE_UNWTD values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_min_unwtd.nc"
+stat FCO2_MIN_UNWTD($subregion)
+say/append/outfile="($report)" FCO2_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_MIN_UNWTD must be nonnegative
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_MIN_UNWTD values > 1000
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_max_unwtd.nc"
+stat FCO2_MAX_UNWTD($subregion)
+say/append/outfile="($report)" FCO2_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_MAX_UNWTD must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_MAX_UNWTD values > 1000?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of FCO2_MAX_UNWTD=($STAT_MIN) less than min of FCO2_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of FCO2_MAX_UNWTD=($STAT_MAX) less than max of FCO2_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_std_weighted.nc"
+stat FCO2_STD_WEIGHTED($subregion)
+say/append/outfile="($report)" FCO2_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_fco2_std_unwtd.nc"
+stat FCO2_STD_UNWTD($subregion)
+say/append/outfile="($report)" FCO2_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_STD_UNWTD must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+! ----------------------
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_count_nobs.nc"
+stat SST_COUNT_NOBS($subregion)
+say/append/outfile="($report)" SST_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SST_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- SST_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+let npos = if SST_COUNT_NOBS gt 0 then 1
+stat npos($subregion)
+say/append/outfile="($report)" SST_COUNT_NOBS GT 0 good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_ave_weighted.nc"
+stat sst_AVE_WEIGHTED($subregion)
+say/append/outfile="($report)" sst_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- sst_AVE_WEIGHTED values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_ave_unwtd.nc"
+stat sst_AVE_UNWTD($subregion)
+say/append/outfile="($report)" sst_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- sst_AVE_UNWTD values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_min_unwtd.nc"
+stat sst_MIN_UNWTD($subregion)
+say/append/outfile="($report)" sst_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- sst_MIN_UNWTD must be nonnegative
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- sst_MIN_UNWTD values > 1000
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_max_unwtd.nc"
+stat sst_MAX_UNWTD($subregion)
+say/append/outfile="($report)" sst_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- sst_MAX_UNWTD values > 1000?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of sst_MAX_UNWTD=($STAT_MIN) less than min of sst_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of sst_MAX_UNWTD=($STAT_MAX) less than max of sst_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_std_weighted.nc"
+stat sst_STD_WEIGHTED($subregion)
+say/append/outfile="($report)" sst_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- sst_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_sst_std_unwtd.nc"
+stat sst_STD_UNWTD($subregion)
+say/append/outfile="($report)" sst_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" sst_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- sst_STD_UNWTD must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+! ----------------------
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_count_nobs.nc"
+stat SALINITY_COUNT_NOBS($subregion)
+say/append/outfile="($report)" SALINITY_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SALINITY_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- SALINITY_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+let npos = if SALINITY_COUNT_NOBS gt 0 then 1
+stat npos($subregion)
+say/append/outfile="($report)" SALINITY_COUNT_NOBS GT 0 good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_ave_weighted.nc"
+stat salinity_AVE_WEIGHTED($subregion)
+say/append/outfile="($report)" salinity_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- salinity_AVE_WEIGHTED values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_ave_unwtd.nc"
+stat salinity_AVE_UNWTD($subregion)
+say/append/outfile="($report)" salinity_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- salinity_AVE_UNWTD values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_min_unwtd.nc"
+stat salinity_MIN_UNWTD($subregion)
+say/append/outfile="($report)" salinity_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- salinity_MIN_UNWTD must be nonnegative
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- salinity_MIN_UNWTD values > 1000
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_max_unwtd.nc"
+stat salinity_MAX_UNWTD($subregion)
+say/append/outfile="($report)" salinity_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- salinity_MAX_UNWTD values > 1000?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of salinity_MAX_UNWTD=($STAT_MIN) less than min of salinity_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of salinity_MAX_UNWTD=($STAT_MAX) less than max of salinity_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_std_weighted.nc"
+stat salinity_STD_WEIGHTED($subregion)
+say/append/outfile="($report)" salinity_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- salinity_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_salinity_std_unwtd.nc"
+stat salinity_STD_UNWTD($subregion)
+say/append/outfile="($report)" salinity_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" salinity_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- salinity_STD_UNWTD must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+! ----------------------
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lat_offset_unwtd.nc"
+stat LAT_OFFSET_UNWTD($subregion)
+say/append/outfile="($report)" LAT_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" LAT_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `ABS(($STAT_MIN)) GT 1` THEN say/append/outfile="($report)" --------- Min LAT_OFFSET_UNWTD must be between -1 and 1
+if `ABS(($STAT_MAX)) GT 1` THEN say/append/outfile="($report)" --------- Max LAT_OFFSET_UNWTD must be between -1 and 1
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+can dat/all
+use "/home/data/socat/v2020/SOCAT_tracks_gridded_monthly_quarterdeg_v2020_lon_offset_unwtd.nc"
+stat LON_OFFSET_UNWTD($subregion)
+say/append/outfile="($report)" LON_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" LON_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `ABS(($STAT_MIN)) GT 1` THEN say/append/outfile="($report)" --------- Min LON_OFFSET_UNWTD must be between -1 and 1
+if `ABS(($STAT_MAX)) GT 1` THEN say/append/outfile="($report)" --------- Max LON_OFFSET_UNWTD must be between -1 and 1
+
+!cancel redirect
+
+sp cat ($report)
+sp rm report_dummy.txt
+
+set mode/last verify
+
