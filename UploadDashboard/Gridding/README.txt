@@ -24,8 +24,8 @@
        pause: check time axis.
 
 4. Run the shell scripts to add global and variable summary attributes to the files.
-   - gridded_coastal_monthly_comments.txt
-   - gridded_decadal_comments.txt
-   - gridded_monthly_comments.txt
-   - gridded_yearly_comments.txt
+   - gridded_coastal_monthly_comments.csh
+   - gridded_decadal_comments.csh
+   - gridded_monthly_comments.csh
+   - gridded_yearly_comments.csh
 
