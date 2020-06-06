@@ -1,0 +1,42 @@
+!header.jnl
+! argument 1 is a script that opens the dataset
+! argument 2 is the name of the xml file to write
+! Requires Ferret v6.5 or higher
+
+cancel mode verify
+IF `($ferret_version) LT 6.5` THEN
+ say header.jnl requires Ferret v6.5 or higher
+ exit/script
+ENDIF
+
+go "$1"
+DEFINE SYMBOL output_xml_file = $2
+
+! Do not write scale attributes to the xml. 
+! We could check for and fix valid_range, actual_range,
+! and unpacked_valid_range attributes too.
+
+! If it is a virtual dataset then nvars is 0
+
+LET nvars = ..nvars
+
+IF `nvars GT 0` THEN
+  let varnames = ..varnames
+  REPEAT/I=1:`nvars` ( \
+   DEFINE SYMBOl ii = `i`; \
+   DEFINE SYMBOl varn = `varnames[i=($ii)]`; \
+   IF `STRINDEX("($varn)", "_bnds") EQ 0` THEN; \
+   LET attnames = ($varn).attnames; \
+   IF `is_element_of_str(attnames, "add_offset")   GT 0` THEN cancel attribute ($varn).add_offset; \
+   IF `is_element_of_str(attnames, "scale_factor") GT 0` THEN cancel attribute ($varn).scale_factor; \
+   ENDIF )
+ENDIF
+
+say/quiet/outfile="($output_xml_file)"/clobber <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+say/quiet/outfile="($output_xml_file)"/append <data>
+
+show data/var/xml/append/outfile="($output_xml_file)" 1
+
+IF `($ferret_version) LT 6.85` THEN \
+  show axis/all/xml/append/outfile="($output_xml_file)"
+say/quiet/append/outfile="($output_xml_file)" </data> 

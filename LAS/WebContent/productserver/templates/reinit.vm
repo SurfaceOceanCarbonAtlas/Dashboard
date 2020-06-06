@@ -1,0 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+#parse ("/productserver/templates/revision.vm")
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+<title>LAS Output</title></head>
+<body bgcolor="white">
+<h3>This $!title LAS Product Server (Revision: $revision)</h3>
+<h4>$!message</h4>
+
+</pre>
+</body>
+</html>

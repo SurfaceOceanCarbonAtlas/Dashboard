@@ -1,0 +1,574 @@
+<project name="BAKER" default="dist" basedir=".">
+
+	<property environment="env" />
+	<property name="app.name" value="@APPNAME@" />
+	<property name="jakarta.home" value="@JAKARTA_HOME@" />
+	<property name="jakarta.lib" value="@JAKARTA_LIB@" />
+        <property name="map_version" value="1.1"/>
+        <property name="version" value="8.6.9"/>
+	<property name="deploy.home"
+		value="${jakarta.home}/webapps/${app.name}" />
+	<property name="dist.war"
+		value="${jakarta.home}/webapps/${app.name}.war" />
+	<property name="build.compiler.emacs" value="true" />
+	<target name="revision">
+		<exec executable="./bin/revision.sh"
+			failifexecutionfails="false" />
+	</target>
+
+	<target name="prepare" depends="revision">
+		<mkdir dir="WebContent/WEB-INF/classes" />
+		<mkdir dir="WebContent/docs" />
+		<copy todir="WebContent/WEB-INF/classes">
+			<fileset dir="JavaSource">
+				<include name="resources/**" />
+				<include name="**.properties" />
+				<include name="**.xml" />
+			</fileset>
+		</copy>
+		<mkdir dir="conf/server/custom/las_servlet/src" />
+		<mkdir dir="conf/server/custom/las_servlet/web/images" />
+		<mkdir dir="conf/server/custom/las_servlet/web" />
+		<mkdir dir="conf/server/custom/las_servlet/web/images" />
+	</target>
+	<target name="iosp" depends="compile">
+		<mkdir dir="dist/lib" />
+		<jar jarfile="dist/lib/ferret_iosp.jar"
+			basedir="WebContent/WEB-INF/classes"
+			includes="gov/noaa/pmel/tmap/iosp/**, gov/noaa/pmel/tmap/ftds/**, resources/iosp/FerretConfig.xml, resources/iosp/**"
+			excludes="dods**, thredds**, ucar**" />
+	</target>
+
+	<target name="javadoc-all">
+		<delete dir="WebContent/docs" />
+		<javadoc access="public" author="true" destdir="WebContent/docs"
+			doctitle="The Java Live Access Server" nodeprecated="false"
+			nodeprecatedlist="false" noindex="false" nonavbar="false"
+			notree="false" overview="overview.html"
+			packagenames="gov.noaa.pmel.tmap.iosp,gov.noaa.pmel.tmap.las.jdom,gov.noaa.pmel.tmap.ferret.server.dodstype,org.iges.anagram.service,gov.noaa.pmel.tmap.las.product.request,gov.noaa.pmel.tmap.las.service.java,gov.noaa.pmel.tmap.las.service.ferret,gov.noaa.pmel.tmap.ferret.server.importer,gov.noaa.pmel.tmap.ferret.server.dodsservice,org.iges.anagram.filter,gov.noaa.pmel.tmap.las.filter,org.iges.util,gov.noaa.pmel.tmap.las.product.server,gov.noaa.pmel.tmap.ferret.server,gov.noaa.pmel.tmap.las.service,gov.noaa.pmel.tmap.las.ui.state,gov.noaa.pmel.tmap.las.service.database,gov.noaa.pmel.tmap.las.service.drds,gov.noaa.pmel.tmap.las.ui,gov.noaa.pmel.tmap.las.util,org.iges.anagram"
+			source="1.5" sourcepath="JavaSource" splitindex="true" use="true"
+			version="true">
+			<classpath>
+				<pathelement path="classes" />
+				<fileset dir="WebContent/WEB-INF/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${jakarta.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javadoc>
+	</target>
+
+	<target name="javadoc">
+		<delete dir="WebContent/docs" />
+		<javadoc access="public" author="true" destdir="WebContent/docs"
+			doctitle="The Java Live Access Server" nodeprecated="false"
+			nodeprecatedlist="false" noindex="false" nonavbar="false"
+			notree="false" overview="overview.html"
+			packagenames="gov.noaa.pmel.tmap.iosp,gov.noaa.pmel.tmap.las.jdom,gov.noaa.pmel.tmap.las.product.request,gov.noaa.pmel.tmap.las.service.java,gov.noaa.pmel.tmap.las.service.ferret,gov.noaa.pmel.tmap.las.filter,gov.noaa.pmel.tmap.las.product.server,gov.noaa.pmel.tmap.las.service,gov.noaa.pmel.tmap.las.service.database,gov.noaa.pmel.tmap.las.service.drds,gov.noaa.pmel.tmap.las.util"
+			source="1.5" sourcepath="JavaSource" splitindex="true" use="true"
+			version="true">
+			<classpath>
+				<pathelement path="classes" />
+				<fileset dir="WebContent/WEB-INF/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${jakarta.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javadoc>
+	</target>
+
+
+	<target name="clean">
+		<delete dir="WebContent/WEB-INF/classes/gov" />
+		<delete dir="WebContent/WEB-INF/classes/au" />
+		<delete dir="WebContent/WEB-INF/classes/dods" />
+		<delete dir="WebContent/WEB-INF/classes/gnu" />
+		<delete dir="WebContent/WEB-INF/classes/resources" />
+		<delete file="${app.name}.war" />
+	</target>
+
+
+	<target name="compile" depends="prepare">
+		<javac srcdir="JavaSource"
+			includes="gov/**,au/**,org/**,dods/**,gnu/**"
+			destdir="WebContent/WEB-INF/classes" debug="on" optimize="off"
+			deprecation="off" includeantruntime="false">
+			<classpath>
+				<pathelement path="classes" />
+				<fileset dir="WebContent/WEB-INF/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${jakarta.lib}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="dist" depends="prepare,compile">
+		<war jarfile="${app.name}.war"
+			webxml="WebContent/WEB-INF/web.xml">
+			<classes dir="WebContent/WEB-INF/classes" includes="**" />
+			<fileset dir="WebContent">
+				<include name="examples/**" />
+				<include name="TimeSeries/**" />
+				<include name="VizGal/**" />
+				<include name="classes/**" />
+				<include name="productserver/**" />
+				<include name="fds/**" />
+				<include name="output/**" />
+				<include name="images/**" />
+				<include name="css/**" />
+				<include name="html/**" />
+				<include name="JavaScript/**" />
+				<include name="docs/**" />
+				<include name="doc/**" />
+				<include name="WEB-INF/**" />
+				<include name="**.html" />
+				<include name="**.vm" />
+				<include name="**.css" />
+				<include name="**.htm" />
+				<include name="**.js" />
+				<include name="**.jsp" />
+                                <exclude name="WEB-INF/lib/gwt-dev*.jar"/>
+                                <exclude name="WEB-INF/lib/gwt-user*.jar"/>
+                                <exclude name="WEB-INF/classes/resources/iosp/**"/>
+			</fileset>
+			<fileset dir="conf/server/custom/las_servlet/web">
+				<include name="images/**" />
+			</fileset>
+			<fileset dir="conf/server/custom/las_servlet">
+				<include name="web/**/*.ht*" />
+			</fileset>
+                        <manifest>
+                            <section name="common">
+                                <attribute name="Title" value="Live Access Server (LAS)"/>
+                                <attribute name="Version" value="${version}"/>
+                            </section>
+                        </manifest>
+		</war>
+	</target>
+
+	<target name="deploy-iosp" depends="dist">
+		<!-- Delete old IOSP code. -->
+		<delete
+			dir="${jakarta.home}/webapps/thredds/WEB-INF/classes/gov/noaa/pmel/tmap" />
+		<delete
+			dir="${jakarta.home}/webapps/thredds/WEB-INF/classes/resources/iosp" />
+		<!-- Deploy new IOSP code. -->
+		<copy todir="${jakarta.home}/webapps/thredds/WEB-INF/classes">
+			<fileset dir="WebContent/WEB-INF/classes">
+				<include name="gov/noaa/pmel/tmap/iosp/**" />
+			</fileset>
+			<fileset dir="JavaSource">
+				<include name="resources/iosp/**" />
+			</fileset>
+		</copy>
+		<copy file="JavaSource/resources/ferret/FerretBackendConfig.xml"
+			tofile="${jakarta.home}/webapps/thredds/WEB-INF/classes/resources/iosp/FerretConfig.xml" />
+	</target>
+	<target name="deploy" depends="dist">
+		<!-- Delete old IOSP code. -->
+		<delete
+			dir="${jakarta.home}/webapps/thredds/WEB-INF/classes/gov/noaa/pmel/tmap" />
+		<delete
+			dir="${jakarta.home}/webapps/thredds/WEB-INF/classes/resources/iosp" />
+		<!-- Deploy new IOSP code. -->
+		<copy todir="${jakarta.home}/webapps/thredds/WEB-INF/classes">
+			<fileset dir="WebContent/WEB-INF/classes">
+				<include name="gov/noaa/pmel/tmap/iosp/**" />
+			</fileset>
+			<fileset dir="JavaSource">
+				<include name="resources/iosp/**" />
+			</fileset>
+		</copy>
+		<copy file="JavaSource/resources/ferret/FerretBackendConfig.xml"
+			tofile="${jakarta.home}/webapps/thredds/WEB-INF/classes/resources/iosp/FerretConfig.xml" />
+		<!-- remove any symbolic links because the delete task follows symbolic links -->
+		<exec executable="find">
+			<arg line="${deploy.home} -type l -delete" />
+		</exec>
+		<delete dir="${deploy.home}" />
+		<copy file="${app.name}.war" tofile="${dist.war}" />
+	</target>
+	<target name="lps-lbes" depends="prepare,compile">
+		<war jarfile="${app.name}.war"
+			webxml="WebContent/WEB-INF/web.xml">
+			<classes dir="WebContent/WEB-INF/classes" includes="**" />
+			<fileset dir="WebContent">
+				<include
+					name="classes/gov/noaa/pmel/tmap/las/filter/**" />
+				<include name="classes/gov/noaa/pmel/tmap/las/jdom/**" />
+				<include
+					name="classes/gov/noaa/pmel/tmap/las/product/**" />
+				<include
+					name="classes/gov/noaa/pmel/tmap/las/service/**" />
+				<include name="productserver/**" />
+				<include name="fds/**" />
+				<include name="output/**" />
+				<include name="images/**" />
+				<include name="WEB-INF/**" />
+				<include name="**.html" />
+				<include name="**.htm" />
+				<include name="**.js" />
+				<include name="**.jsp" />
+			</fileset>
+		</war>
+	</target>
+
+	<target name="lps-lbes-deploy" depends="prepare,compile,lps-lbes">
+		<delete dir="${ps-deploy.home}" />
+		<copy file="${app.name}.war" tofile="${dist.war}" />
+	</target>
+
+	<target name="lps-lbes-clean">
+		<delete dir="WebContent/classes/gov/noaa/pmel/tmap/las/filter" />
+		<delete dir="WebContent/classes/gov/noaa/pmel/tmap/las/jdom" />
+		<delete dir="WebContent/classes/gov/noaa/pmel/tmap/las/product" />
+		<delete dir="WebContent/classes/gov/noaa/pmel/tmap/las/service" />
+		<delete dir="WebContent/WEB-INF/classes/resources" />
+		<delete file="${app.name}.war" />
+	</target>
+	<!-- Targets for addXML 
+
+            ant addxml-compile  # will compile the code
+            ant addxml-build    # depends on compile and will make a jar file in dist/lib/addXML.jar which is used by bin/addXML.sh
+            ant addxml-dist     # creates a directory dist/addxml which is suitable to be tarred and distributed
+            ant addxml          # used to build the distribution copy after ant-dist (everything is relative to /dist/addxml
+            ant dist-clean      # cleans up the distribution directory
+
+        -->
+	<property name="addxml-src" value="JavaSource" />
+	<property name="addxml-build" value="build" />
+	<property name="addxml-dist" value="dist" />
+	<target name="addxml-init">
+		<tstamp />
+		<mkdir dir="${addxml-build}" />
+	</target>
+	<target name="addxml-compile" depends="addxml-init">
+		<copy file="${addxml-src}/gov/noaa/pmel/tmap/addxml/log4j2.xml"
+			tofile="${addxml-build}/log4j2.xml" />
+		<javac
+			srcdir="${addxml-src}"
+			destdir="${addxml-build}">
+			<classpath>
+				<fileset id="addxml-libs"
+					dir="WebContent/WEB-INF/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${jakarta.lib}">
+                	<include name="**/*.jar" />
+                </fileset>
+			</classpath>
+		</javac>
+	</target>
+	<target name="addxml-build" depends="addxml-compile">
+		<mkdir dir="${addxml-dist}/lib" />
+		<jar jarfile="${addxml-dist}/lib/addXML.jar"
+			basedir="${addxml-build}" />
+	</target>
+        <target name="addxml-jar">
+		<delete dir="${addxml-build}" />
+		<mkdir dir="${addxml-build}" />
+		<mkdir dir="${addxml-dist}/lib" />
+		<javac
+			srcdir="${addxml-src}/gov/noaa/pmel/tmap/exception:${addxml-src}/gov/noaa/pmel/tmap/jdom:${addxml-src}/gov/noaa/pmel/tmap/addxml:${addxml-src}/uk/ac/rdg/resc/edal"
+			destdir="${addxml-build}">
+			<classpath>
+				<fileset id="addxml-libs"
+					dir="WebContent/WEB-INF/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<jar jarfile="${addxml-dist}/lib/addXML.jar"
+			basedir="${addxml-build}" />
+        </target>
+	<target name="addxml-clean">
+		<delete dir="${addxml-build}" />
+	</target>
+	<target name="addxml-dist">
+		<mkdir dir="dist/addxml" />
+		<mkdir dir="dist/addxml/src/gov/noaa/pmel/tmap/addxml" />
+		<mkdir dir="dist/addxml/src/uk/ac/rdg/resc/edal/time" />
+		<mkdir dir="dist/addxml/bin" />
+		<mkdir dir="dist/addxml/lib" />
+		<copy todir="dist/addxml/src/gov/noaa/pmel/tmap/addxml">
+			<fileset dir="JavaSource/gov/noaa/pmel/tmap/addxml">
+				<include name="*.java" />
+			</fileset>
+		</copy>
+		<copy todir="dist/addxml/src/uk/ac/rdg/resc/edal/time">
+			<fileset dir="JavaSource/uk/ac/rdg/resc/edal/time">
+				<include name="*.java" />
+			</fileset>
+		</copy>
+		<copy file="JavaSource/gov/noaa/pmel/tmap/addxml/log4j.xml"
+			tofile="dist/addxml/src/gov/noaa/pmel/tmap/addxml/log4j.xml" />
+		<copy file="WebContent/WEB-INF/lib/joda-time-2.1.jar"
+			todir="dist/addxml/lib" />
+		<copy file="WebContent/WEB-INF/lib/JSAP_1.03a.jar"
+			todir="dist/addxml/lib" />
+		<copy file="WebContent/WEB-INF/lib/netcdfAll-4.3.jar"
+			todir="dist/addxml/lib" />
+		<copy file="WebContent/WEB-INF/lib/log4j-1.2.13.jar"
+			todir="dist/addxml/lib" />
+		<copy file="bin/catalogClean.sh" todir="dist/addxml/bin" />
+		<copy file="bin/addXML.sh.in"
+			tofile="dist/addxml/bin/addXML.sh" />
+		<chmod file="dist/addxml/bin/addXML.sh" perm="755" />
+		<copy file="build.xml.in" tofile="dist/addxml/build.xml" />
+		<copy file="bin/README_catalogCleaner.html"
+			tofile="dist/addxml/README_catalogCleaner.html" />
+		<copy file="bin/README" tofile="dist/addxml/README" />
+	</target>
+	<target name="addxml">
+		<unjar src="lib/joda-time-2.1.jar" dest="${addxml-build}" />
+		<unjar src="lib/JSAP_1.03a.jar" dest="${addxml-build}" />
+		<unjar src="lib/netcdfAll-4.3.jar" dest="${addxml-build}" />
+		<unjar src="lib/log4j-1.2.13.jar" dest="${addxml-build}" />
+		<unjar src="lib/commons-cli-1.2.jar" dest="${addxml-build}" />
+		<javac srcdir="src/gov/noaa/pmel/tmap/addxml:src/uk/ac/rdg/resc/edal"
+			destdir="${addxml-build}">
+			<classpath>
+				<fileset id="addxml-libs" dir="lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+		<mkdir dir="${addxml-dist}/lib" />
+		<copy file="src/gov/noaa/pmel/tmap/addxml/log4j.xml"
+			todir="${addxml-dist}/lib" />
+		<jar jarfile="${addxml-dist}/lib/addXML.jar"
+			basedir="${addxml-build}" />
+	</target>
+	<target name="addxml-distclean">
+		<delete dir="dist" />
+	</target>
+
+  <!-- Targets for creating a distribution of the map widget that can be used by other projects.  -->
+
+  <target name="mapwidget-dist">
+     <mkdir dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/util" />
+     <mkdir dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/map" />
+     <mkdir dir="dist/olmapwidget/bin" />
+     <mkdir dir="dist/olmapwidget/lib" />
+     <mkdir dir="dist/olmapwidget/war" />
+     <mkdir dir="dist/olmapwidget/war/JavaScript/frameworks/OpenLayers" />
+     <mkdir dir="dist/olmapwidget/war/JavaScript/components/css" />
+     <mkdir dir="dist/olmapwidget/war/OLMapWidget" />
+     <copy todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/map">
+        <fileset dir="JavaSource/gov/noaa/pmel/tmap/las/client/map">
+           <include name="**/*.java"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/util">
+        <fileset dir="JavaSource/gov/noaa/pmel/tmap/las/client/util">
+           <include name="**/*.java"/>
+           <exclude name="**/Util.java"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/serializable">
+        <fileset dir="JavaSource/gov/noaa/pmel/tmap/las/client/serializable">
+           <include name="**/RegionSerializable.java"/>
+           <include name="**/Serializable.java"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/openlayers">
+        <fileset dir="JavaSource/gov/noaa/pmel/tmap/las/client/openlayers">
+           <include name="**/*.java"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/war/JavaScript/components/css">
+        <fileset dir="WebContent/JavaScript/components/css">
+           <include name="**/*.css"/>
+           <include name="**/*.html"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/war/JavaScript/components/images">
+        <fileset dir="WebContent/JavaScript/components/images">
+           <include name="**/*.*"/>
+        </fileset>
+     </copy>
+     <copy todir="dist/olmapwidget/war/JavaScript/frameworks/OpenLayersExtensions">
+        <fileset dir="WebContent/JavaScript/frameworks/OpenLayersExtensions">
+           <include name="**/*.*"/>
+        </fileset>
+     </copy>
+     <copy file="JavaSource/gov/noaa/pmel/tmap/las/NativeMapWidget.gwt.xml" todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget"/>
+     <copy file="JavaSource/gov/noaa/pmel/tmap/las/OLMapWidget.gwt.xml" todir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget"/>
+     <copy file="WebContent/OLMapWidget/mapwidget.html" todir="dist/olmapwidget/war/OLMapWidget"/>
+     <copy file="build.xml.in" tofile="dist/olmapwidget/build.xml"/>
+     <copy file="bin/ol-compile.sh" todir="dist/olmapwidget/bin"/>
+     <copy file="WebContent/WEB-INF/lib/gwt-openlayers-client-0.5.jar" todir="dist/olmapwidget/lib"/>
+     <chmod file="dist/olmapwidget/bin/ol-compile.sh" perm="755" />
+     <replaceregexp byline="true">
+        <regexp pattern="gov.noaa.pmel.tmap.las.client"/>
+        <substitution expression="com.weathertopconsulting.olmapwidget.client"/>
+        <fileset dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/">
+           <include name="*.xml"/>
+        </fileset>
+        <fileset dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/map">
+           <include name="*.java"/>
+        </fileset>
+        <fileset dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/serializable">
+           <include name="*.java"/>
+        </fileset>
+        <fileset dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/util">
+           <include name="*.java"/>
+           <exclude name="Util.java"/>
+        </fileset>
+        <fileset dir="dist/olmapwidget/src/com/weathertopconsulting/olmapwidget/client/openlayers">
+           <include name="*.java"/>
+        </fileset>
+     </replaceregexp>
+  </target>
+  <target name="mapwidget">
+     <exec executable="./bin/ol-compile.sh" failifexecutionfails="false"/>
+     <tar destfile="../olmapwidget.${map_version}.tar" basedir="../olmapwidget/war"/>
+     <javac srcdir="src">
+         <classpath>
+             <fileset id="mapwidget-libs" dir="lib">
+                  <include name="**/*.jar" />
+             </fileset>
+             <fileset id="gwt-libs" dir="/home/@JAKARTA_HOME@/../gwt">
+                  <include name="**/*.jar" />
+             </fileset>
+         </classpath>
+     </javac>
+     <jar jarfile="../olmapwidget.${map_version}.jar" basedir="../olmapwidget/src">
+         <fileset dir="../olmapwidget/src">
+             <include name="**/*.java" />
+             <include name="**/*.class" />
+         </fileset>
+     </jar>
+     <tar destfile="../olmapwidget_css_images.${map_version}.tar" basedir="../olmapwidget/war">
+           <fileset dir="../olmapwidget/war">
+                <include name="images/**" />
+                <include name="css/**" />
+                <include name="JavaScript/frameworks/OpenLayersExtentions**" />
+           </fileset>
+     </tar>
+  </target>
+  <target name="mapwidget-clean">
+     <delete dir="dist/olmapwidget" />
+     <delete file="dist/olmapwidget.${map_version}.jar" />
+     <delete file="dist/olmapwidget.${map_version}.tar" />
+     <delete file="dist/olmapwidget.${map_version}.tar.gz" />
+  </target>
+    <path id="test.classpath">
+        <pathelement location="WebContent/WEB-INF/classes"/>
+        <pathelement location="WebContent/JavaScript/components/WEB-INF/classes"/>
+        <pathelement location="test-classes"/>
+        <pathelement location="lib/junit-4.8.2.jar"/>
+        <pathelement location="lib/antlr-runtime-3.1.1.jar"/>
+        <pathelement location="lib/easymock-3.0.jar"/>
+        <pathelement location="lib/gwt-test-utils-0.36.jar"/>
+        <pathelement location="lib/gwt-test-utils-csv-0.36.jar"/>
+        <pathelement location="lib/jackson-core-asl-1.9.1.jar"/>
+        <pathelement location="lib/javassist-3.15.0-GA.jar"/>
+        <pathelement location="lib/slf4j-api-1.6.1.jar"/>
+        <pathelement location="lib/mockito-all-1.8.5.jar"/>
+        <pathelement location="lib/selenium-jars/apache-mime4j-0.6.jar"/>
+        <pathelement location="lib/selenium-jars/bsh-1.3.0.jar"/>
+        <pathelement location="lib/selenium-jars/cglib-nodep-2.1_3.jar"/>
+        <pathelement location="lib/selenium-jars/commons-codec-1.6.jar"/>
+        <pathelement location="lib/selenium-jars/commons-collections-3.2.1.jar"/>
+        <pathelement location="lib/selenium-jars/commons-exec-1.1.jar"/>
+        <pathelement location="lib/selenium-jars/commons-jxpath-1.3.jar"/>
+        <pathelement location="lib/selenium-jars/commons-lang-2.6.jar"/>
+        <pathelement location="lib/selenium-jars/commons-logging-1.1.1.jar"/>
+        <pathelement location="lib/selenium-jars/cssparser-0.9.5.jar"/>
+        <pathelement location="lib/selenium-jars/hamcrest-core-1.1.jar"/>
+        <pathelement location="lib/selenium-jars/hamcrest-library-1.1.jar"/>
+        <pathelement location="lib/selenium-jars/htmlunit-2.9.jar"/>
+        <pathelement location="lib/selenium-jars/htmlunit-core-js-2.9.jar"/>
+        <pathelement location="lib/selenium-jars/httpclient-4.1.3.jar"/>
+        <pathelement location="lib/selenium-jars/httpcore-4.1.3.jar"/>
+        <pathelement location="lib/selenium-jars/httpmime-4.1.3.jar"/>
+        <pathelement location="lib/selenium-jars/ini4j-0.5.2.jar"/>
+        <pathelement location="lib/selenium-jars/jcommander-1.13.jar"/>
+        <pathelement location="lib/selenium-jars/jna-3.4.0.jar"/>
+        <pathelement location="lib/selenium-jars/jna-platform-3.4.0.jar"/>
+        <pathelement location="lib/selenium-jars/json-20080701.jar"/>
+        <pathelement location="lib/selenium-jars/junit-dep-4.10.jar"/>
+        <pathelement location="lib/selenium-jars/nekohtml-1.9.15.jar"/>
+        <pathelement location="lib/selenium-jars/protobuf-java-2.4.1.jar"/>
+        <pathelement location="lib/selenium-jars/sac-1.3.jar"/>
+        <pathelement location="lib/selenium-jars/serializer-2.7.1.jar"/>
+        <pathelement location="lib/selenium-jars/testng-6.0.1-nobsh-noguice.jar"/>
+        <pathelement location="lib/selenium-jars/xalan-2.7.1.jar"/>
+        <pathelement location="lib/selenium-jars/xercesImpl-2.9.1.jar"/>
+        <pathelement location="lib/selenium-jars/xml-apis-1.3.04.jar"/>
+        <pathelement location="lib/selenium-jars/guava-12.0.jar"/>
+        <pathelement location="lib/selenium-jars/netty-3.2.7.Final.jar"/>
+        <pathelement location="lib/selenium-jars/operadriver-0.14.jar"/>
+        <pathelement location="lib/selenium-jars/selenium-java-2.25.0.jar"/>
+        <pathelement location="lib/selenium-jars/webbit-0.4.8-SNAPSHOT.jar"/>
+        <!-- <path refid="EAR Libraries.libraryclasspath"/>
+        <path refid="Web App Libraries.libraryclasspath"/>
+        <path refid="Java EE 5 Libraries.libraryclasspath"/>
+        <path refid="GWT SDK [GWT (2) - 2.4.0].libraryclasspath"/> -->
+    </path>
+    <target name="build-test-init">
+        <mkdir dir="test-classes"/>
+        <copy includeemptydirs="false" todir="test-classes">
+            <fileset dir="test">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target depends="build-test-init" name="build-test">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="test-classes" source="${source}">
+            <src path="test"/>
+            <classpath refid="test.classpath"/>
+        </javac>
+    </target>
+	<target depends="build-test" name="test">
+		<property name="test.lib" value="lib" />
+		<property name="build.dir" value="test-classes" />
+		<property name="build.tests" value="test-classes" />
+		<property name="src.tests" value="test" />
+		<property name="reports.tests" value="reports" />
+		<mkdir dir="${reports.tests}" />
+		<junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+		  <classpath>
+			<fileset dir="${test.lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		    <pathelement location="${build.tests}"/>
+			<pathelement path="WebContent/WEB-INF/classes" />
+			<fileset dir="WebContent/WEB-INF/lib">
+				<include name="**/*.jar" />
+			</fileset>
+			<fileset dir="${jakarta.lib}">
+				<include name="**/*.jar" />
+			</fileset>
+		    <!-- <pathelement path="${java.class.path}"/> -->
+		  </classpath>
+
+		  <!-- formatter type="plain"/>
+
+		  <test name="my.test.TestCase" haltonfailure="no" outfile="result">
+		    <formatter type="xml"/>
+		  </test -->
+
+		  <batchtest fork="yes" todir="${reports.tests}">
+		    <formatter type="xml"/>
+		    <fileset dir="${src.tests}">
+		      <include name="**/*Test*.java"/>
+			  <exclude name="**/AllTests.java"/>
+				  <exclude name="**/TestMessages.java"/>
+				  <exclude name="**/HelpMenuBarImplTest.java"/>
+		    </fileset>
+		  </batchtest>
+		</junit>
+		<junitreport/>
+	</target>
+</project>

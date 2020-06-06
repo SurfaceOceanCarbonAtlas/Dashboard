@@ -1,0 +1,64 @@
+! curvi_nrst_ztslice.jnl
+! Define the x and y point to sample at 
+
+   IF `($region_y_lo"0|*>1")` THEN
+      IF `($region_y_lo) GT 0` THEN DEFINE SYMBOL ynslab = ($region_y_lo)N
+      IF `($region_y_lo) LT 0` THEN DEFINE SYMBOL ynslab = `-1*($region_y_lo)`S
+   ENDIF
+
+   IF `($num) eq 0` THEN
+      IF `($region_y_lo"0|*>1")` THEN DEFINE SYMBOL alt_y_lab = LATITUDE: ($ynslab)
+      IF `($region_x_lo"0|*>1")` THEN DEFINE SYMBOL alt_x_lab = LONGITUDE: ($region_x_lo)E
+   ELSE
+      IF `($alt_y_lab"0|*>1") NE 0` THEN 
+         IF `($region_y_lo"0|*>1")` THEN DEFINE SYMBOL alt2 = LATITUDE: ($ynslab) 
+	 IF `STRCMP("($alt2)", "($alt_y_lab)") NE 0` THEN 
+            DEFINE SYMBOL alt_y_lab = ($alt_y_lab) minus ($ynslab)
+	 ELSE
+	    CANCEL SYMBOL alt_y_lab
+	 ENDIF
+      ENDIF
+      IF `($alt_x_lab"0|*>1") NE 0` THEN 
+         DEFINE SYMBOL alt2 = LONGITUDE: ($region_x_lo)E
+	 IF `STRCMP("($alt2)", "($alt_x_lab)") NE 0` THEN 
+            DEFINE SYMBOL alt_x_lab = ($alt_x_lab) minus ($region_x_lo)E
+	 ELSE
+	    CANCEL SYMBOL alt_x_lab
+	 ENDIF
+      ENDIF
+   ENDIF
+
+   LET fer_plot_var($var_num) = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($region_x_lo), ($region_y_lo))
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = fer_plot_var($var_num)
+
+   DEFINE SYMBOL needs_url 1
+
+! Define upper-left labels with the longitude region
+   
+   IF `($upper_left_done"0|*>1") EQ 0` THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+      DEFINE SYMBOL upper_left_($n_left_labels"0") = LONGITUDE: ($region_x_lo)E
+      IF `($region_x_lo) LT 0` THEN 
+          DEFINE SYMBOL west_region_x_lo = `-1* ($region_x_lo)`
+         DEFINE SYMBOL upper_left_($n_left_labels"0") = LONGITUDE: ($west_region_x_lo)W
+      ENDIF
+      DEFINE SYMBOL longitude_lab = ($upper_left_($n_left_labels"0"))
+
+! Define upper-left labels with the latitude region
+
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+      DEFINE SYMBOL upper_left_($n_left_labels"0") = LATITUDE: ($region_y_lo)N
+      DEFINE SYMBOL latitude_lab = LATITUDE: ($region_y_lo)N
+      IF `($region_y_lo) LT 0` THEN 
+         DEFINE SYMBOL south_region_y_lo = `-1* ($region_y_lo)`
+         DEFINE SYMBOL upper_left_($n_left_labels"0") = LATITUDE: ($south_region_y_lo)S
+      ENDIF
+      DEFINE SYMBOL latitude_lab = ($upper_left_($n_left_labels"0"))
+      DEFINE SYMBOL upper_left_done = 1
+   ENDIF
+
+! End of file ------------curvi_nrst_ztslice.jnl--------------------------

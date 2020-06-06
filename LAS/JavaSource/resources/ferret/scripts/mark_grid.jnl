@@ -1,0 +1,387 @@
+! Mark grid points. Options are no, subsample (tests if subsampling needed)
+! or all to force marking all points. 
+
+! 7-Oct-2008 Make the sets of the xpts and ypts (in whatever direction)
+!            based on the coordinates in the chosen region and with 
+!            striding applied.
+! March 2014 Check for degenerate regions
+
+
+!  XY view
+
+IF ($ferret_view"|xy>1|*>0") THEN
+   IF ($native_curvilinear_xy"0") THEN 
+      LET xpts = xcoord[i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+      LET ypts = ycoord[i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+      LET mvar = xcoord  ! for modulo-ing below
+   ELSE
+      LET mvar = ($ferret_plot_var)
+      LET xpts =   X[GX=mvar,($region_0_x)] + 0*Y[GY=mvar,($region_0_y)]
+      LET ypts = 0*X[GX=mvar,($region_0_x)] +   Y[GY=mvar,($region_0_y)]
+   ENDIF
+
+   LET mark_xmin = `xpts[x=@min,y=@min]`
+   LET mark_xmax = `xpts[x=@max,y=@max]`
+   LET mark_ymin = `ypts[x=@min,y=@min]`
+   LET mark_ymax = `ypts[x=@max,y=@max]`
+
+   IF `(mark_xmin EQ mark_xmax) OR (mark_ymax EQ mark_ymin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+
+   LET xx =  X[GX=mvar]
+   LET yy =  Y[GY=mvar]
+   LET nx = `xx,return=isize`
+   LET ny = `yy,return=jsize`
+   LET x_pct = nx*($region_x_range)/(mark_xmax - mark_xmin)
+   LET y_pct = ny*($region_y_range)/(mark_ymax - mark_ymin)
+
+
+   LET subsample = `( x_pct GT ($PPL$XPIXEL)/10 ) + ( y_pct GT ($PPL$YPIXEL)/10) GT 0`
+
+! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dx = 1
+      LET dy = 1
+      IF `( x_pct GT ($PPL$XPIXEL)/10 )` THEN LET dx = MAX(1, `INT ( 10*x_pct/($PPL$XPIXEL) )` )
+      IF `( y_pct GT ($PPL$YPIXEL)/10 )` THEN LET dy = MAX(1, `INT ( 10*y_pct/($PPL$YPIXEL) )` )
+      IF ($native_curvilinear_xy"0") THEN 
+         let xc = xcoord
+         let yc = ycoord
+         let imin = `xc,return=istart`
+         let imax = `xc,return=iend`
+         let jmin = `xc,return=jstart`
+         let jmax = `xc,return=jend`
+         LET xpts = xc[i=`imin`:`imax`:`dx`,j=`jmin`:`jmax`:`dy`]
+         LET ypts = yc[i=`imin`:`imax`:`dx`,j=`jmin`:`jmax`:`dy`]
+      ELSE
+         LET xx =  X[GX=mvar]
+         LET yy =  Y[GY=mvar]
+	 let xsiz = `xx,return=isize`
+	 let ysiz = `yy,return=jsize`
+         LET xpts =   xx[i=1:`nx`:`dx`] + 0*yy[j=1:`ny`:`dy`]
+         LET ypts = 0*xx[i=1:`nx`:`dx`] +   yy[j=1:`ny`:`dy`]
+      ENDIF
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts,ypts
+
+   ! PLOT/VS does not automatically treat values as modulo 
+
+   PLOT/OVER/VS/COLOR=black/SYMBOL=dot/NOLAB xpts+360, ypts
+   PLOT/OVER/VS/COLOR=black/SYMBOL=dot/NOLAB xpts-360, ypts  
+
+ENDIF
+!  XZ view
+
+IF ($ferret_view"|xz>1|*>0") THEN
+   IF ($native_Z_plot"0") THEN
+      LET xpts = xval
+      LET zpts = zval
+      LET mvar = ($FERRET_PLOT_BASE_VAR)
+   ELSE
+      LET mvar = ($ferret_plot_var)
+      LET xpts =   X[GX=mvar,($region_0_x)] + 0*Z[GZ=mvar,($region_0_z)]
+      LET zpts = 0*X[GX=mvar,($region_0_x)] +   Z[GZ=mvar,($region_0_z)]
+   ENDIF
+   
+   LET mark_xmin = `xpts[x=@min,z=@min]`
+   LET mark_xmax = `xpts[x=@max,z=@max]`
+   LET mark_zmin = `zpts[x=@min,z=@min]`
+   LET mark_zmax = `zpts[x=@max,z=@max]`
+
+   IF `(mark_xmin EQ mark_xmax) OR (mark_zmax EQ mark_zmin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+
+   LET nx = `xpts,return=isize`
+   LET nz = `xpts,return=ksize`
+   LET x_pct = nx*($region_x_range)/(mark_xmax - mark_xmin)
+   LET z_pct = nz*($region_z_range)/(mark_zmax - mark_zmin)
+
+   LET subsample = `( x_pct GT ($PPL$XPIXEL)/10 ) + ( z_pct GT ($PPL$YPIXEL)/10) GT 0 `
+
+!! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dx = 1
+      LET dz = 1
+      IF `( x_pct GT ($PPL$XPIXEL)/10 )` THEN LET dx = MAX(1, `INT ( 10*x_pct/($PPL$XPIXEL) )` )
+      IF `( z_pct GT ($PPL$YPIXEL)/10 )` THEN LET dz = MAX(1, `INT ( 10*z_pct/($PPL$YPIXEL) )` )
+
+      IF  ($native_Z_plot"0") THEN
+
+         LET i1 = `xval,return=istart`
+         LET ie = `xval,return=iend`
+         LET k1 = `xval,return=kstart`
+         LET ke = `xval,return=kend`
+
+         LET xpts = xval[i=`i1`:`ie`:`dx`,k=`k1`:`ke`:`dz`]
+         LET zpts = zval[i=`i1`:`ie`:`dx`,k=`k1`:`ke`:`dz`]
+      ELSE
+         LET xx =  X[GX=mvar]
+         LET zz =  Z[GZ=mvar]
+
+         LET i1 = `xx,return=istart`
+         LET ie = `xx,return=iend`
+         LET k1 = `zz,return=kstart`
+         LET ke = `zz,return=kend`
+
+         LET xpts =   xx[i=`i1`:`ie`:`dx`] + 0*zz[k=`k1`:`ke`:`dz`]
+         LET zpts = 0*xx[i=`i1`:`ie`:`dx`] +   zz[k=`k1`:`ke`:`dz`]
+      ENDIF
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts,zpts
+
+   ! PLOT/VS does not automatically treat values as modulo 
+
+   IF `mark_xmin LT ($PPL$XMIN)` THEN \
+      PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts+360, zpts
+
+   IF `mark_xmax GT ($PPL$XMAX)` THEN \
+     PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts-360, zpts  
+
+ENDIF
+
+
+!  XT view
+
+IF ($ferret_view"|xt>1|*>0") THEN
+   LET mvar = ($ferret_plot_var)
+   LET xpts =   X[GX=mvar,($region_0_x)] + 0*T[GT=mvar,($region_0_t)]
+   LET tpts = 0*X[GX=mvar,($region_0_x)] +   T[GT=mvar,($region_0_t)]
+
+   LET mark_xmin = `xpts[x=@min,t=@min]`
+   LET mark_xmax = `xpts[x=@max,t=@max]`
+   LET mark_tmin = `tpts[x=@min,t=@min]`
+   LET mark_tmax = `tpts[x=@max,t=@max]`
+
+   IF `(mark_xmin EQ mark_xmax) OR (mark_tmax EQ mark_tmin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+   
+   LET tt =  T[GT=mvar]
+   DEFINE SYMBOL region_t_range = `tt[t=@max] - tt[t=@min]`
+
+   LET nx = `xpts,return=isize`
+   LET nt = `xpts,return=lsize`
+   LET x_pct = nx*($region_x_range)/(mark_xmax - mark_xmin)
+   LET t_pct = nt*($region_t_range)/(mark_tmax - mark_tmin)
+
+   LET subsample = `( x_pct GT ($PPL$XPIXEL)/10 ) + ( t_pct GT ($PPL$YPIXEL)/10) GT 0 `
+
+! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dx = 1
+      LET dt = 1
+      IF `( x_pct GT ($PPL$XPIXEL)/10 )` THEN LET dx = MAX(1, `INT ( 10*x_pct/($PPL$XPIXEL) )` )
+      IF `( t_pct GT ($PPL$YPIXEL)/10 )` THEN LET dt = MAX(1, `INT ( 10*t_pct/($PPL$YPIXEL) )` )
+
+      LET xx =  X[GX=mvar]
+      LET tt =  T[GT=mvar]
+      LET xpts =   xx[i=1:`nx-1`:`dx`] + 0*tt[l=1:`nt-1`:`dt`]
+      LET tpts = 0*xx[i=1:`nx-1`:`dx`] +   tt[l=1:`nt-1`:`dt`]
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts,tpts
+
+   ! PLOT/VS does not automatically treat values as modulo 
+
+   IF `mark_xmin LT ($PPL$XMIN)` THEN \
+      PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts+360, tpts
+
+   IF `mark_xmax GT ($PPL$XMAX)` THEN \
+     PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB xpts-360, tpts  
+
+ENDIF
+
+
+!  YZ view
+
+IF ($ferret_view"|yz>1|*>0") THEN
+   IF ($native_Z_plot"0") THEN
+      LET ypts = yval
+      LET zpts = zval
+   ELSE
+      LET mvar = ($ferret_plot_var)
+      LET ypts =   Y[GY=mvar,($region_0_y)] + 0*Z[GZ=mvar,($region_0_z)]
+      LET zpts = 0*Y[GY=mvar,($region_0_y)] +   Z[GZ=mvar,($region_0_z)]
+   ENDIF
+   
+   LET mark_ymin = `ypts[y=@min,z=@min]`
+   LET mark_ymax = `ypts[y=@max,z=@max]`
+   LET mark_zmin = `zpts[y=@min,z=@min]`
+   LET mark_zmax = `zpts[y=@max,z=@max]`
+
+   IF `(mark_ymin EQ mark_ymax) OR (mark_zmax EQ mark_zmin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+ 
+   LET ny = `ypts,return=jsize`
+   LET nz = `ypts,return=ksize`
+   LET y_pct = ny*($region_y_range)/(mark_ymax - mark_ymin)
+   LET z_pct = nz*($region_z_range)/(mark_zmax - mark_zmin)
+
+   LET subsample = `( y_pct GT ($PPL$XPIXEL)/10 ) + ( z_pct GT ($PPL$YPIXEL)/10) GT 0 `
+
+! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dy = 1
+      LET dz = 1
+      IF `( y_pct GT ($PPL$XPIXEL)/10 )` THEN LET dy = MAX(1, `INT ( 10*y_pct/($PPL$XPIXEL) )` )
+      IF `( z_pct GT ($PPL$YPIXEL)/10 )` THEN LET dz = MAX(1, `INT ( 10*z_pct/($PPL$YPIXEL) )` )
+
+      IF  ($native_Z_plot"0") THEN
+
+         LET j1 = `yval,return=jstart`
+         LET je = `yval,return=jend`
+         LET k1 = `yval,return=kstart`
+         LET ke = `yval,return=kend`
+
+         LET ypts = yval[j=`j1`:`je`:`dy`,k=`k1`:`ke`:`dz`]
+         LET zpts = zval[j=`j1`:`je`:`dy`,k=`k1`:`ke`:`dz`]
+      ELSE
+         LET yy =  Y[GY=mvar]
+         LET zz =  Z[GZ=mvar]
+         
+         LET j1 = `yy,return=jstart`
+         LET je = `yy,return=jend`
+         LET k1 = `zz,return=kstart`
+         LET ke = `zz,return=kend`
+
+         LET ypts =   yy[j=`j1`:`je`:`dy`] + 0*zz[k=`k1`:`ke`:`dz`]
+         LET zpts = 0*yy[j=`j1`:`je`:`dy`] +   zz[k=`k1`:`ke`:`dz`]
+      ENDIF
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB ypts,zpts
+
+ENDIF
+
+
+!  YT view
+
+IF ($ferret_view"|yt>1|*>0") THEN
+   LET mvar = ($ferret_plot_var)
+   LET ypts =   Y[GY=mvar,($region_0_y)] + 0*T[GT=mvar,($region_0_t)]
+   LET tpts = 0*Y[GY=mvar,($region_0_y)] +   T[GT=mvar,($region_0_t)]
+   
+   LET mark_ymin = `ypts[y=@min,t=@min]`
+   LET mark_ymax = `ypts[y=@max,t=@max]`
+   LET mark_tmin = `tpts[y=@min,t=@min]`
+   LET mark_tmax = `tpts[y=@max,t=@max]`
+
+   IF `(mark_ymin EQ mark_ymax) OR (mark_tmax EQ mark_tmin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+
+   LET tt =  T[GT=mvar]
+   DEFINE SYMBOL region_t_range = `tt[t=@max] - tt[t=@min]`
+
+   LET ny = `ypts,return=jsize`
+   LET nt = `ypts,return=lsize`
+   LET y_pct = ny*($region_y_range)/(mark_ymax - mark_ymin)
+   LET t_pct = nt*($region_t_range)/(mark_tmax - mark_tmin)
+   LET subsample = `( y_pct GT ($PPL$YPIXEL)/10 ) + ( t_pct GT ($PPL$XPIXEL)/10) GT 0 `
+
+! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dy = 1
+      LET dt = 1
+      IF `( y_pct GT ($PPL$YPIXEL)/10 )` THEN LET dy = MAX(1, `INT ( 10*y_pct/($PPL$YPIXEL) )` )
+      IF `( t_pct GT ($PPL$XPIXEL)/10 )` THEN LET dt = MAX(1, `INT ( 10*t_pct/($PPL$XPIXEL) )` )
+
+      LET yy =  Y[GY=mvar]
+      LET tt =  T[GT=mvar]
+      LET ypts =   yy[j=1:`ny-1`:`dy`] + 0*tt[l=1:`nt-1`:`dt`]
+      LET tpts = 0*yy[j=1:`ny-1`:`dy`] +   tt[l=1:`nt-1`:`dt`]
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB tpts,ypts
+
+ENDIF
+
+!  ZT view
+
+IF ($ferret_view"|zt>1|*>0") THEN
+
+   IF ($native_Z_plot"0") THEN
+      IF ($FERRET_PLOT_BASE_VAR"0|*>1") THEN 
+         LET mvar = ($FERRET_PLOT_BASE_VAR)
+      ELSE
+         LET mvar = ($FERRET_PLOT_VAR)
+      ENDIF 
+      LET zpts = zval
+      LET tpts = tval
+   ELSE
+      LET mvar = ($ferret_plot_var)
+      LET zpts =   Z[GZ=mvar,($region_0_z)] + 0*T[GT=mvar,($region_0_t)]
+      LET tpts = 0*Z[GZ=mvar,($region_0_t)] + T[GT=mvar,($region_0_t)]
+   ENDIF
+
+   LET mark_zmin = `zpts[z=@min,t=@min]`
+   LET mark_zmax = `zpts[z=@max,t=@max]`
+   LET mark_tmin = `tpts[z=@min,t=@min]`
+   LET mark_tmax = `tpts[z=@max,t=@max]`
+
+   IF `(mark_zmin EQ mark_zmax) OR (mark_tmax EQ mark_tmin)` THEN
+        LET subsample = 0
+	EXIT/SCRIPT
+   ENDIF
+
+   LET tt =  T[GT=mvar]
+   DEFINE SYMBOL region_t_range = `tt[t=@max] - tt[t=@min]`
+
+   LET nz = `zpts,return=ksize`
+   LET nt = `zpts,return=lsize`
+   LET z_pct = nz*($region_z_range)/(mark_zmax - mark_zmin)
+   LET t_pct = nt*($region_t_range)/(mark_tmax - mark_tmin)
+   LET subsample = `( z_pct GT ($PPL$YPIXEL)/10 ) + ( t_pct GT ($PPL$XPIXEL)/10) GT 0 `
+
+! If points are dense, and ferret_mark_grid is subsample, then subsample.
+
+   IF `subsample AND ($ferret_mark_grid"0|subsample>1|*>0")` THEN
+      LET dz = 1
+      LET dt = 1
+      IF `( z_pct GT ($PPL$YPIXEL)/10 )` THEN LET dz = MAX(1, `INT ( 10*z_pct/($PPL$YPIXEL) )` )
+      IF `( t_pct GT ($PPL$XPIXEL)/10 )` THEN LET dt = MAX(1, `INT ( 10*t_pct/($PPL$XPIXEL) )` )
+
+      IF  ($native_Z_plot"0") THEN
+
+         LET L1 = `zval,return=lstart`
+         LET lf = `zval,return=lend`
+         LET k1 = `zval,return=kstart`
+         LET ke = `zval,return=kend`
+
+         LET zpts = zval[k=`k1`:`ke`:`dz`,l=`L1`:`lf`:`dt`]
+         LET tpts = tval[k=`k1`:`ke`:`dz`,l=`L1`:`lf`:`dt`]
+      ELSE
+         LET zz =  Z[GZ=mvar]
+         LET tt =  T[GT=mvar]
+
+         LET k1 = `zz,return=kstart`
+         LET ke = `zz,return=kend`
+         LET L1 = `tt,return=lstart`
+         LET Lf = `tt,return=lend`
+
+         LET zpts =   zz[k=`k1`:`ke`:`dz`] + 0*tt[l=`L1`:`lf`:`dt`]
+         LET tpts = 0*zz[k=`k1`:`ke`:`dz`] +   tt[l=`L1`:`lf`:`dt`]
+      ENDIF
+   ENDIF
+
+   PLOT/OVER/VS/COLOR=BLACK/SYMBOL=dot/NOLAB tpts,zpts
+
+ENDIF
+
+
+! End of file ----------------- mark_grid.jnl ------------------------------------

@@ -1,0 +1,42 @@
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.i18n.I18N" />
+	<inherits name="com.google.gwt.json.JSON" />
+
+        <source path="client">
+           <exclude name="**/inventory/**"/>
+           <exclude name="**/Inventory.java"/>
+        </source>
+
+
+	<!-- Inherit the default GWT style sheet. You can change -->
+	<!-- the theme of your GWT application by uncommenting -->
+	<!-- any one of the following lines. -->
+	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
+	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome"/> -->
+	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark"/> -->
+	<inherits name='org.gwtopenmaps.openlayers.OpenLayers' />
+	<!-- The nifty printing utility -->
+	<inherits name='br.com.freller.tool.PrintTest' />
+	<!-- not needed for this code, but other things in the package need it. -->
+	<inherits name="com.google.gwt.maps.GoogleMaps" />
+    <!-- GWT Joda Time implementation. -->
+    <inherits name='org.gwttime.Time' />
+	<!-- GWT MVP classes -->
+	<!-- <inherits name="com.google.gwt.place.Place" /> -->
+	<inherits name="com.google.gwt.activity.Activity" />
+	<!-- This allows Java statements like: -->
+	<!-- ClientFactory clientFactory = GWT.create(ClientFactory.class); -->
+	<!-- instead of: -->
+	<!-- ClientFactory clientFactory = GWT.create(ClientFactoryImpl.class); -->
+	<replace-with class="gov.noaa.pmel.tmap.las.client.ClientFactoryImpl">
+		<when-type-is class="gov.noaa.pmel.tmap.las.client.ClientFactory" />
+	</replace-with>
+
+	<inherits name="com.google.gwt.xml.XML" />
+	<!-- Specify the app entry point class. -->
+	<entry-point class='gov.noaa.pmel.tmap.las.client.map.NativeMapWidget' />
+	<stylesheet src="../css/OLMapWidget.css" />
+</module>

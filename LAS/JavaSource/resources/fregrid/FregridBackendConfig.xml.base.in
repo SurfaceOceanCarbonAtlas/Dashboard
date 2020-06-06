@@ -1,0 +1,41 @@
+<application>
+	<invoker base_dir="resources/fregrid"
+                 executable="@FREGRID@"
+                 time_limit="200" template_dir="templates" 
+                 output_dir="@WEBAPPS@/@APPNAME@/output"
+                 http_base_url = "http://@SERVLET_ROOT_URL@/@APPNAME@/output"
+                 iosp_script_dir="resources/iosp/scripts"
+                 iosp_temp_dir="@TDS_TEMP@"
+                 iosp_data_dir="@TDS_DYNADATA@"
+                 las_tfds_data_dir="@TDS_DATA@"
+                 iosp_base_dir="resources/iosp"
+                 opendap_base_url = "http://@SERVLET_ROOT_URL@/thredds/dodsC/output"/>
+	<cacher dataset="true" dataset_queue_size="10000" dataset_size="40"
+		subset="true" subset_queue_size="10000" meta="true"
+		meta_queue_size="10000" />
+        <messages>
+           <message type="startsWith" level="error">
+              <key>Error</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="startsWith" level="error">
+              <key>REQUIRED:</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="contains" level="error">
+              <key>unrecognized</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="startsWith" level="error">
+              <key>FATAL</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+    </messages>

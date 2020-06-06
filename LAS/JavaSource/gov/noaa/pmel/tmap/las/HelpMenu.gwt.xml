@@ -1,0 +1,61 @@
+<module>
+
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.i18n.I18N" />
+	<inherits name="com.google.gwt.user.Debug" />
+	<inherits name="com.google.gwt.json.JSON" />
+
+	<!-- This will allow logger messages to show in the client's browser: -->
+	<!-- <inherits name="com.google.gwt.logging.Logging"/> -->
+
+
+        <source path="client">
+           <exclude name="**/inventory/**"/>
+           <exclude name="**/Inventory.java"/>
+        </source>
+
+
+	<!-- Inherit the default GWT style sheet. You can change -->
+	<!-- the theme of your GWT application by uncommenting -->
+	<!-- any one of the following lines. -->
+	<inherits name='com.google.gwt.user.theme.standard.Standard' />
+	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome"/> -->
+	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark"/> -->
+	<!-- <inherits name="com.google.gwt.maps.GoogleMaps" /> -->
+	<!-- <inherits name='org.gwtopenmaps.openlayers.OpenLayers' /> -->
+
+	<inherits name="com.google.gwt.xml.XML" />
+
+	<!-- GWT Joda Time implementation. -->
+	<inherits name='org.gwttime.Time' />
+
+	<!-- JUnit allows testing to work -->
+	<inherits name="com.google.gwt.junit.JUnit" />
+    <set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
+	<inherits name='org.gwtopenmaps.openlayers.OpenLayers' />
+	<!-- GWT MVP classes -->
+	<!-- <inherits name="com.google.gwt.place.Place" /> -->
+	<inherits name="com.google.gwt.activity.Activity" />
+	<!-- This allows Java statements like: -->
+	<!-- ClientFactory clientFactory = GWT.create(ClientFactory.class); -->
+	<!-- instead of: -->
+	<!-- ClientFactory clientFactory = GWT.create(ClientFactoryImpl.class); -->
+	<replace-with class="gov.noaa.pmel.tmap.las.client.ClientFactoryImpl">
+		<when-type-is class="gov.noaa.pmel.tmap.las.client.ClientFactory" />
+	</replace-with>
+
+	<!-- The nifty printing utility -->
+<!-- 	<inherits name='br.com.freller.tool.PrintTest' /> -->
+
+	<!-- Specify the app entry point class. -->
+	<entry-point class='gov.noaa.pmel.tmap.las.client.HelpMenu' />
+
+	<!-- Specify the application specific style sheet. -->
+<!-- 	<stylesheet src="../css/OLMapWidget.css" /> -->
+	<!-- Moved reference from the UI.vm file so it will take precedence over 
+		the GWT theme and show in debug mode. -->
+	<stylesheet src="../css/LAS.css" />
+
+
+</module>

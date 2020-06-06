@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+
+#set($dsIDs = $las_request.getDatasetIDs())
+
+#set($dataset = $las_config.getDataset($dsIDs.get(0)))
+
+<title>LAS Info for $dataset.name</title>
+</head>
+<body bgcolor="white">
+
+#foreach ($dsID in $dsIDs)
+   #set($dataset = $las_config.getDataset($dsID))
+   <h2>$dataset.name
+   #if ( $dataset.doc != "null" && "$!dataset.doc" != "" )
+      (<a href="$dataset.doc">More info...</a>)
+   #end
+   </h2>
+   #if ( $dataset.hasDocumentation() ) 
+      #set($docu = $dataset.documentation)
+      <b>Summary:</b><br>
+      <p>
+      $docu.summary
+      </p>
+      #set($contacts = $docu.contacts)
+      #if ( $contacts.size() > 0 ) 
+      <b>Contacts:</b><br>
+      #end
+      #foreach ($cont in $contacts)
+      <ul>
+      <li><a href="$cont.URL">$cont.name</a></li>
+      #if ( $cont.email != "" || $cont.role != "" )
+         <ul>
+      #end
+      #if ( $cont.role != "" ) 
+         <li>Role: $cont.role</li>
+      #end
+      #if ( $cont.email != "" ) 
+         <li>Email: <a href="mailto:$cont.email">$cont.email</a></li>
+      #end
+      #if ( $cont.email != "" || $cont.role != "" )
+         </ul>
+      #end
+      </ul>
+      #end
+   #end
+   <hr>
+   #set($variables = $las_config.getVariables($dsID))
+   #set($varID = $variables.get(0).getID())
+   #set($grid = $las_config.getGrid($dsID, $varID))
+   #set($axes = $grid.getAxes())
+   #set($colspan = $axes.size())
+   #if ( $grid.hasAxis("t") ) 
+      #set($taxis = $grid.getTime())
+      #set($colspan = $colspan+2)
+   #end
+   <a href="getMetadata.do?dsid=$dsID">Hide the OPeNDAP URLs</a><br><br>
+   <table border="1" cellpadding="4">
+   <tr><th rowspan="2" bgcolor="#dddddd">Name</th><th bgcolor="#c0cbe7" colspan="$colspan">The URL to access these data via <a href="http://opendap.org">OPeNDAP</a></th></tr>
+   <tr>
+   #foreach ($axis in $axes)
+      <th> $axis.type - Range</th>
+   #end
+   #if ( $grid.hasAxis("t") ) 
+      <th> t - Range</th>
+   #end
+   <th>Units</th>
+   </tr>
+   #foreach( $var in $variables) 
+      <tr>
+         #set($grid = $las_config.getGrid($dsID, $var.ID))
+         <td rowspan="2" bgcolor="#dddddd">$var.name</td>
+         <td colspan="$colspan" bgcolor="#c0cbe7">
+         #set($varID = $var.ID)
+         LAS F-TDS URL:&nbsp;<a href="${las_config.getFTDSURL($dsID, $varID)}.html">$las_config.getFTDSURL($dsID, $varID)</a>
+         #if ( "$las_config.getDataAccessURL($dsID, $varID, false)" !=  "${las_config.getFTDSURL($dsID, $varID)}" && $las_config.getDataAccessURL($dsID, $varID, false).startsWith("http") )
+                <br>Original OPeNDAP URL:&nbsp;<a href="${las_config.getDataAccessURL($dsID, $varID, false)}.html">$las_config.getDataAccessURL($dsID, $varID, false)</a>
+         #end
+         </td>
+      </tr>
+      <tr>
+      #foreach ($axis in $axes)
+      <td align="center"> $axis.lo : $axis.hi </td>
+      #end
+      #if ( $grid.hasAxis("t") ) 
+      #set($taxis = $grid.getTime())
+      <td align="center"> $taxis.getLo() : $taxis.hi </td>
+      #end
+      <td align="center"> $!var.getUnits() </td>
+      </tr>
+   #end
+   
+   
+   </table>
+
+#end ## foreach dsID
+
+</body>
+</html>
+

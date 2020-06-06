@@ -1,0 +1,23 @@
+! Compare the axes of two variables. If they are unequal we will
+! not reconcile variables by adding 0*var2 to var1.
+! Need to have the dataset for each variable.
+
+CANCEL SYMBOL cancel_it
+DEFINE SYMBOL axi = `($data_$1_var)[d=($dset$1%1%)],RETURN=$3axis`
+DEFINE SYMBOL axn = `($data_$2_var)[d=($dset$2%1%)],RETURN=$3axis`
+IF `STRCMP("($axi)", "($axn)") NE 0` THEN DEFINE SYMBOL cancel_it = 1
+
+! Also check whether they are equal in size, within 1.  IF they are,
+! they are likely staggered grids. If not exit with the nice error msg.
+
+IF ($cancel_it"0|*>1") THEN
+   DEFINE SYMBOL iindex = ($3"0|X>i|Y>j|Z>k|T>l")
+   IF `($iindex"0|0|*>1") NE 0` THEN 
+      LET siz1 = `($data_$1_var),RETURN=($iindex)size`
+      LET siz2 = `($data_$2_var),RETURN=($iindex)size`
+      IF `ABS(siz1-siz2) NE 1` THEN 
+         MESSAGE/ERROR **ERROR The variables must have the same dimensions: ($data_0_var), ($data_1_var)
+         EXIT/PROGRAM
+      ENDIF
+   ENDIF
+ENDIF

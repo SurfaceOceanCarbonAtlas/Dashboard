@@ -1,0 +1,48 @@
+<application>
+	<invoker base_dir="resources/fregrid"
+                 executable="/home/porter/rhs/gridspec/tools_20071113/bin/fregrid"
+                 time_limit="200" template_dir="templates" 
+                 output_dir="/home/rhs/tomcat/webapps/baker/output"
+                 http_base_url="http://strider.weathertopconsulting.com:8880/baker/output"
+                 iosp_script_dir="resources/iosp/scripts"
+                 iosp_temp_dir="/home/rhs/workspace/baker/conf/server/temp"
+                 iosp_data_dir="/home/rhs/workspace/baker/conf/server/data/dynamic"
+                 las_tfds_data_dir="/home/rhs/workspace/baker/conf/server/data"
+                 iosp_base_dir="resources/iosp"
+                 opendap_base_url = "http://porter.pmel.noaa.gov:8920/thredds/dodsC/output"/>
+	<cacher dataset="true" dataset_queue_size="10000" dataset_size="40"
+		subset="true" subset_queue_size="10000" meta="true"
+		meta_queue_size="10000" />
+        <messages>
+           <message type="startsWith" level="error">
+              <key>Error</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="startsWith" level="error">
+              <key>REQUIRED:</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="contains" level="error">
+              <key>unrecognized</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+           <message type="startsWith" level="error">
+              <key>FATAL</key>
+              <text>
+                An error occurred in the service that was creating your product.
+              </text>
+           </message>
+    </messages>
+ <environment>
+        <variable>
+            <name>NPES</name>
+             <value>1</value>
+        </variable>
+</environment>
+</application>

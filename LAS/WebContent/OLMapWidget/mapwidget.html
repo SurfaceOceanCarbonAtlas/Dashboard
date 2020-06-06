@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<title>Example for using the OL Map Widget with native
+			JavaScript code.</title>
+		<script type="text/javascript" language="javascript"
+			src="../JavaScript/components/com.weathertopconsulting.olmapwidget.NativeMapWidget/com.weathertopconsulting.olmapwidget.NativeMapWidget.nocache.js"></script>
+		<script type="text/javascript" language="javascript"
+			src="../JavaScript/frameworks/OpenLayers/OpenLayers.js"></script>
+		<script type="text/javascript" language="javascript"
+			src="../JavaScript/frameworks/OpenLayersExtensions/DrawSingleFeature.js"></script>
+		<script type="text/javascript" language="javascript"
+			src="../JavaScript/frameworks/OpenLayersExtensions/HorizontalPath.js"></script>
+		<script type="text/javascript" language="javascript"
+			src="../JavaScript/frameworks/OpenLayersExtensions/VerticalPath.js"></script>
+
+		<script type="text/javascript" language="javascript">
+        // Set the current south, north, west, east and delta (space between data points)
+        function init() {
+           
+            window.setMapTool("xy");
+            window.setMapDataExtent(-90, 90, -180, 180, 1);
+            
+            
+        }
+         var featureAddedCallback = function() {
+             addtext("New feature placed n="+window.getMapYhi()+" s="+window.getMapYlo()+" e="+window.getMapXhi()+" w="+window.getMapXlo()+"\n");
+         }
+    
+         var featureModifiedCallback = function() {
+            addtext("Feature was modified n="+window.getMapYhi()+" s="+window.getMapYlo()+" e="+window.getMapXhi()+" w="+window.getMapXlo()+"\n");
+         }
+         var mapMovedCallback = function() {
+             addtext("The map moved.  Current selection is: n="+window.getMapYhi()+" s="+window.getMapYlo()+" e="+window.getMapXhi()+" w="+window.getMapXlo()+"\n");
+         }
+         function addtext(text) {
+              
+              document.event_record.widget_event.value = document.event_record.widget_event.value+= text;      
+              textareaelem = document.getElementById('w_event');
+              textareaelem.scrollTop = textareaelem.scrollHeight;
+         }
+    </script>
+
+
+
+	</head>
+
+	<body onLoad="init()">
+
+		<h1>
+			OpenLayers Map Widget
+		</h1>
+		<p>
+			This widget allows users to select rectangles, vertical lines,
+			horizontal lines and points on the map. It reports back when the
+			selection changes and can be queried for the current state of the
+			selection.
+		</p>
+		<p>
+			We use it in the
+			<a href="https://ferret.pmel.noaa.gov/NVODS/">National Virtual
+				Ocean Data Server</a> and as a part of the
+			<a href="https://ferret.pmel.noaa.gov/LAS/"> Live Access Server</a> (an
+			open source tool for web-based display and analysis of earth science
+			data).
+		</p>
+
+		<table>
+			<tr></tr>
+			<td id="ol_map_widget"></td>
+			<td bgcolor="lightblue">
+				<h4>
+					Map Selection Tool
+				</h4>
+				<form action="" method="" name="tool">
+					<input type="radio" name="tool" value="xy"
+						onClick="window.setMapTool('xy');" checked>
+					Lat/Lon Rectangle
+					<br />
+					<input type="radio" name="tool" value="x"
+						onClick="window.setMapTool('x');">
+					Latitude Line
+					<br />
+					<input type="radio" name="tool" value="y"
+						onClick="window.setMapTool('y');">
+					Longitude Line
+					<br />
+					<input type="radio" name="tool" value="pt"
+						onClick="window.setMapTool('pt');">
+					Point
+					<br />
+				</form>
+			</td>
+			<td bgcolor="lightblue">
+				<h4>
+					Restrict Data Region
+				</h4>
+				<form action="" method="" name="region">
+					<table>
+						<tr>
+							<td>
+								<input type="radio" name="region" value="global_0"
+									onClick="window.setMapDataExtent(-90, 90, -180, 180, 1);"
+									checked>
+								Global (0)
+								<br />
+								<input type="radio" name="region" value="global_180"
+									onClick="window.setMapDataExtent(-90, 90, 0, 360, 1);">
+								Global (180)
+								<br />
+								<input type="radio" name="region" value="africa"
+									onClick="window.setMapDataExtent(-40, 40, -20, 60, 1);">
+								Africa
+								<br />
+								<input type="radio" name="region" value="asia"
+									onClick="window.setMapDataExtent(0, 80, 40, 180, 1);">
+								Asia
+								<br />
+								<input type="radio" name="region" value="asia"
+									onClick="window.setMapDataExtent(-50, 0, 110, 180, 1);">
+								Australia
+								<br />
+								<input type="radio" name="region" value="europe"
+									onClick="window.setMapDataExtent(30, 75, -10, 40, 1);">
+								Europe
+								<br />
+								<input type="radio" name="region" value="North America"
+									onClick="window.setMapDataExtent(10, 75, -170, -50, 1);">
+								North America
+								<br />
+								<input type="radio" name="region" value="South America"
+									onClick="window.setMapDataExtent(-60, 15, -90, -30, 1);">
+								South America
+								<br />
+							</td>
+							<td>
+								<input type="radio" name="region" value="Indian Ocean"
+									onClick="window.setMapDataExtent(-75, 30, 20, 120, 1);">
+								Indian Ocean
+								<br />
+								<input type="radio" name="region" value="North Atlantic"
+									onClick="window.setMapDataExtent(0, 70, -80, 20, 1);">
+								North Atlantic
+								<br />
+								<input type="radio" name="region" value="Equatorial Atlantic"
+									onClick="window.setMapDataExtent(-30, 30, -80, 20, 1);">
+								Equatorial Atlantic
+								<br />
+								<input type="radio" name="region" value="Equatorial Atlantic"
+									onClick="window.setMapDataExtent(-75, 10, -80, 20, 1);">
+								South Atlantic
+								<br />
+								<input type="radio" name="region" value="North Pacific"
+									onClick="window.setMapDataExtent(0, 70, 110, 260, 1);">
+								North Pacific
+								<br />
+								<input type="radio" name="region" value="North Pacific"
+									onClick="window.setMapDataExtent(-30, 30, 135, 285, 1);">
+								Equatorial Pacific
+								<br />
+								<input type="radio" name="region" value="North Pacific"
+									onClick="window.setMapDataExtent(-75, 0, 150, 290, 1);">
+								South Pacific
+								<br />
+							</td>
+						</tr>
+					</table>
+				</form>
+				<form action="" method="" name="event_record">
+					<textarea id="w_event" name="widget_event" rows="5" cols="90"
+						wrap="wrap"></textarea>
+				</form>
+
+				<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
+					style="position: absolute; width: 0; height: 0; border: 0"></iframe>
+	</body>
+</html>

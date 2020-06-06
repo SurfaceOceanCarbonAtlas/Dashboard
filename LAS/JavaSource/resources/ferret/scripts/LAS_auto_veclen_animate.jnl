@@ -1,0 +1,182 @@
+! LAS_auto_veclen_animate.jnl
+! ACM 6/24/2010
+!
+! Based on a variables value over its entire time range, set strides
+! if needed to quickly get stats on the variable. Use this to set 
+! a consistent vector length (as is done for color levels).
+! 
+! Vector xskip,yskip will always be consistent: is based on the grid and
+! region, not on the data.
+!
+! This script should be done BEFORE any other striding is done.
+! It operates on the variable on its entire native unstrided grid.
+
+! Determine striding for speed in operating the STAT command
+LET memsize = 0.5* 1.e6
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+DEFINE SYMBOL ferret_vector_1 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title_1 "($data_title) ($data_units)"
+DEFINE SYMBOL ferret_vector_1_noregion ($ferret_plot_var_0_noregion)
+
+GO LAS_initialize_data 1
+DEFINE SYMBOL ferret_vector_2 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title "($ferret_plot_title_1), ($data_title) ($data_units)"
+DEFINE SYMBOL ferret_vector_2_noregion ($ferret_plot_var_1_noregion)
+
+! See if the vector components are on staggered grids
+GO LAS_check_staggered
+
+! If the user or configuration sets the length, we are done.
+IF ($ferret_vector_length"0|*>1") THEN EXIT/SCRIPT
+
+! Apply to the variable on the requested region in x, y, z and all time.
+
+IF `($ferret_vector_1"0|*>1") EQ 0` THEN EXIT/SCRIPT  ! e.g. for insitu plots may not have a plot_var
+
+LET pvar = ($ferret_vector_1_noregion)
+
+LET las_plotvar = pvar[($region_full)]
+
+IF `($do_curvi_xy"0")` THEN  
+   LET las_plotvar = pvar[i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax),($region_zt)]
+ENDIF
+
+
+IF `($do_curvi_xy"0|*>1") EQ 0` THEN 
+   LET var_size = ABS( `pvar,RETURN=size`)
+   DEFINE SYMBOL var_dim = `pvar,RETURN=shape`
+   LET ndims = STRLEN("($var_dim)")
+
+   LET max_size = `INT( 1+ ((var_size/memsize))/ndims )`
+   LET pvar = ($ferret_xyz_var)
+ELSE
+   DEFINE SYMBOL ferret_plot_var = las_plotvar
+   LET max_size = 50
+ENDIF
+
+! Apply native striding if possible
+
+IF ($regrid_fcn"0|*>1") THEN 
+   DEFINE SYMBOL no_native_strides_xy = 1
+   GO LAS_autolev_regridded_from_curv
+ELSE  !!! regrid_fcn
+
+! region syms dont apply to native curv grid directly
+
+IF `($do_curvi_xy"0")` THEN
+   GO LAS_autolev_curvi
+
+ELSE
+   LET xsize = `pvar,RETURN=isize`
+   DEFINE SYMBOL xstride = `INT(xsize/10)`
+   IF `($xstride) LT 2` THEN CANCEL SYMBOL xstride
+   
+   LET ysize = `pvar,RETURN=jsize`
+   DEFINE SYMBOL ystride = `INT(ysize/10)`
+   IF `($ystride) LT 2` THEN CANCEL SYMBOL ystride
+
+ENDIF ! do_curvi_xy
+
+ENDIF  !!! regrid_fcn
+
+
+IF ($index_strides"0|*>1") THEN 
+   DEFINE SYMBOL ppvar = ($data_var)[d=($data_num),($index_strides)]
+   LET anim_stridevar = ($ferret_plot_var_noregion)
+   DEFINE SYMBOL ppvar = anim_stridevar[($index_strides)]
+ELSE
+   DEFINE SYMBOL ppvar = pvar
+ENDIF
+
+! Can always use native strides in z and t
+
+! Should be only one Z anyway for xy animations, but this wont hurt,
+LET zsize  `pvar,RETURN=ksize`
+DEFINE SYMBOL zstride = `INT(zsize/10)`
+IF `($zstride) LT 2` THEN CANCEL SYMBOL zstride
+
+! The time range specifies the whole t region.
+LET tsize  `($ppvar),RETURN=lsize`   
+
+LET strd_lo = 1
+LET anim_timevar = ($ppvar)
+LET tt = t[gt=anim_timevar]
+
+LET strd_hi = `tt,return=lsize`
+
+! The incoming t region is the region over which to animate...
+LET LL = L[gt=($data_var)[d=($data_num)]]
+LET strd_lo = `LL[t="($region_t_lo)"]`
+LET strd_hi = `LL[t="($region_t_hi)"]`
+LET tsize = `strd_hi - strd_lo + 1`
+
+IF ($ferret_time_step"0|*>1") THEN
+   LET strd_del = ($ferret_time_step)
+   IF `(tsize/strd_del) GT max_size` THEN 
+      LET strd_test = tsize/max_size
+      LET strd_fact = INT(strd_test/($ferret_time_step))
+      LET strd_del = ($ferret_time_step)* strd_fact
+      IF `strd_del LE 2` THEN LET strd_del = 2
+   ENDIF 
+ELSE
+   LET strd_del = 1
+   IF `tsize GT max_size` THEN 
+      LET strd_del = `INT(tsize/10)`
+      IF `strd_del LE 2` THEN LET strd_del = 2
+   ENDIF 
+ENDIF
+
+DEFINE SYMBOL tstride = `strd_del`
+
+IF `($index_strides"0|*>1") EQ 0` THEN 
+   IF `($xstride"0") GT 1` THEN SET AXIS/STRIDE=($xstride) `pvar,RETURN=xaxis`
+   IF `($ystride"0") GT 1` THEN SET AXIS/STRIDE=($ystride) `pvar,RETURN=yaxis`
+   DEFINE SYMBOL ppvar = pvar
+ENDIF
+IF `($zstride"0") GT 1` THEN SET AXIS/STRIDE=($zstride) `pvar,RETURN=zaxis`
+IF `($tstride"0") GT 1` THEN SET AXIS/STRIDE=($tstride) `pvar,RETURN=taxis`
+
+LET speed = (($ferret_vector_1_noregion)^2 + ($ferret_vector_2_noregion)^2) ^ 0.5
+
+IF ($index_strides"0|*>1") THEN 
+   DEFINE SYMBOL las_ppvar = speed[($index_strides)]
+   IF ($region_zt) THEN DEFINE SYMBOL las_ppvar = speed[($index_strides),($region_zt)]
+ELSE
+   DEFINE SYMBOL las_ppvar = speed[($region_full)]
+ENDIF
+
+STAT ($las_ppvar)
+
+IF `($STAT_NGOOD) NE 0` THEN
+  LET vec_len = `($stat_mean) + ($stat_std)`
+ELSE
+  LET vec_len = 10  ! No valid data, see list_frames
+ENDIF
+DEFINE SYMBOL ferret_vector_length = `vec_len,PREC=2`
+
+
+! Restore original axes
+IF `($index_strides"0|*>1") EQ 0` THEN 
+
+IF `($xstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=xaxis`
+  CANCEL SYMBOL xstride
+ENDIF
+IF `($ystride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=yaxis`
+  CANCEL SYMBOL ystride
+ENDIF
+IF `($zstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=zaxis`
+  CANCEL SYMBOL zstride
+ENDIF
+IF `($tstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=taxis`
+  CANCEL SYMBOL tstride
+ENDIF
+
+
+! End of file ------------LAS_auto_veclen_animate.jnl--------------------------
+

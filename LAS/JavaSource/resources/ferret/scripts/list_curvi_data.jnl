@@ -1,0 +1,181 @@
+! list_curvi_data.jnl
+!
+! Author: ansley 
+! Date: 3/2007 
+! 3/29/2007 ACM Fix logic interpreting contents of ferret_interpolate_data 
+!
+! 22-Apr-2008 If there is a transformation, write a new attribute, transform_history
+!             Previously tried to append to the existing history attribute but if that
+!             contained special characters such as ; Ferret had parsing problems.
+!
+! 20-Mar-2013 Fix LAS ticket 1511. Keep axis names in their original form, no upcase,
+!             and don't rename them according to the subset. 
+!             Also write the URL of the original dataset.
+!
+! List a variable with its curviliear coordinate data to a netCDF file.
+! Based on list_data.jnl
+
+! Skip the stuff about "if a duplicate variable name is assigned for netcdf listings..."
+! Is that used in current LAS structure?
+
+CANCEL MODE INTERPOLATE  ! important when evaluating the size limits
+
+! Define the output name; symbol ferret_list_var comes in with the coordinate
+! variables appended. Remove that.
+
+DEFINE SYMBOL ferret_list_var ($data_var)[d=($data_num)]
+IF ($region_zt"0|*>1) THEN DEFINE SYMBOL ferret_list_var ($data_var)[d=($data_num), ($region_zt)]
+
+! Set up a history attribute for the variable, and a text variable with
+! the same information for ascii and text output.
+
+SET DATA/SAVE
+SET DATA ($data_num)
+LET attlist = ($data_var_nq).attnames
+
+IF `IS_ELEMENT_OF_STR(attlist, "history") GT 0` THEN 
+   SET ATTRIBUTE/OUTPUT ($data_var_nq).history
+ENDIF
+
+IF ($data_var_transform"0|*>1") THEN 
+    DEFINE attribute ($data_var_nq).transform_history  "($data_var)($data_var_transform)"
+    SET ATTRIBUTE/OUTPUT ($data_var_nq).transform_history
+    DEFINE SYMBOL var_history ($data_var)($data_var_transform)"
+    LET var_hist = "($var_history)"
+    SET VAR/TITLE="($data_title)($data_var_transform)" ($data_var)
+ENDIF
+
+
+SET DATA/RESTORE
+SET DATA ($data_num)
+
+! Define an attribute containing the names of the curvilinear coordinate varibles
+
+! See if there is a  z and/or t axis; if the RETURN= is not the same as NORMAL
+! then will add the name to the coordinates attribute.
+
+DEFINE SYMBOL zcoord_name = `($data_0_var),RETURN=zaxis`
+IF `(STRINDEX("($zcoord_name)", "NORMAL") EQ 1) + \
+    (STRLEN("($zcoord_name)") EQ STRLEN("NORMAL") ) EQ 2` THEN
+   CANCEL SYMBOL zcoord_name
+ENDIF
+DEFINE SYMBOL tcoord_name = `($data_0_var),RETURN=taxis`
+IF `(STRINDEX("($tcoord_name)", "NORMAL") EQ 1) + \
+    (STRLEN("($tcoord_name)") EQ STRLEN("NORMAL") ) EQ 2` THEN
+   CANCEL SYMBOL tcoord_name
+ENDIF
+DEFINE ATTRIBUTE/OUTPUT ($data_var_nq).coordinates = "($ferret_curvi_coord_lon) ($ferret_curvi_coord_lat) ($zcoord_name) ($tcoord_name)"
+
+! Call CURV_RANGE to get the I,J range for the requested output rectangle
+
+GO get_curv_coord_bbox
+
+! Now get the start, stop and size information
+DEFINE SYMBOL isize `($clon_imax) - ($clon_imin) + 1`
+DEFINE SYMBOL jsize `($clat_jmax) - ($clat_jmin) + 1`
+
+LET testvar = ($data_($var_num)_var)[($region_zt)]
+DEFINE SYMBOL kmin `testvar,return=kstart`
+DEFINE SYMBOL kmax `testvar,return=kend`
+DEFINE SYMBOL ksize `testvar,return=ksize`
+DEFINE SYMBOL lmin `testvar,return=lstart`
+DEFINE SYMBOL lmax `testvar,return=lend`
+DEFINE SYMBOL lsize `testvar,return=lsize`
+
+! RETURN=*start returns 0 if the axis is an undefined axis
+! This messes messes up the repeat loop below if the data is chunked.
+! A few more lines of code to handle this.
+
+IF `($kmin) LT 1` THEN DEFINE SYMBOL kmin 1
+IF `($kmax) LT 1` THEN DEFINE SYMBOL kmax 1
+IF `($lmin) LT 1` THEN DEFINE SYMBOL lmin 1
+IF `($lmax) LT 1` THEN DEFINE SYMBOL lmax 1
+
+! the default is set under 1/4 of Ferret's memory allowing for LET definitions 
+LET max_size = ($MAX_LIST_SIZE"1000000")  ! use this for debugging, too
+LET max_size =  100000
+
+! Size of the data variable 
+LET size = ($isize)*($jsize)*($ksize)*($lsize) 
+
+! default chunk sizes
+LET jchunk = ($jsize) ! dflt size = full span
+LET kchunk = ($ksize)
+LET lchunk = INT(max_size/size * ($lsize))
+
+! if mode interpolate is desired
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE 
+
+! First write the curvilinear coordinates
+
+! list coordinates just once if this is a vector variable
+IF `($ferret_coordinates_done"0|*>1") EQ 0` THEN
+   
+   IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN 
+      LET var_coord_note = "Listing Curvilinear Coordinate Fields Then Data Field"
+      LIST($listqual)/APPEND/NOHEAD/FORMAT=(A)/FILE="($result_ferret_listing_filename)" var_coord_note
+   ENDIF
+   
+   DEFINE SYMBOL ferret_list_xcoords ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+   DEFINE SYMBOL ferret_list_ycoords ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+   LIST($listqual)/APPEND/FILE/($frmt) ($ferret_list_xcoords)
+   LIST($listqual)/APPEND/FILE/($frmt) ($ferret_list_ycoords)
+
+   DEFINE SYMBOL ferret_coordinates_done = 1
+ENDIF
+
+!SET DATA ($data_num)
+SET VAR/TITLE="($data_title)($data_var_transform)" ($data_var)
+SET ATTRIBUTE/OUTPUT ($data_var_nq).coordinates 
+
+SET VAR/name=old_($var_num) ($data_($var_num)_var)
+LET/TITLE="($data_title)($data_var_transform)"/UNITS="`old_($var_num),RETURN=units`" \
+($data_($var_num)_var) = old_($var_num)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+SET ATTR/LIKE=old_($var_num) ($data_($var_num)_var)
+
+IF `size LE max_size` THEN
+
+   ! ... list in one big chunk
+   !     This special case is not strictly necessary -- the logic for listing
+   !     large files also works for small ... but with some overhead
+
+   DEFINE SYMBOL ferret_list_var ($data_($var_num)_var)
+
+   IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN  
+      IF ($var_history"0|*>1") THEN LIST($listqual)/APPEND/NOHEAD/FORMAT=(A)/FILE="($result_ferret_listing_filename)" var_hist
+   ENDIF
+
+   LIST($listqual)/APPEND/FILE/($frmt) ($data_($var_num)_var)
+ELSE
+
+   DEFINE SYMBOL ferret_list_var ($data_var)[d=($data_num)]
+
+   ! determine how to break the listing into small chunks
+   ! chunk along L axis. If still too big then along K axis, too. If still ...
+   IF `lchunk EQ 0` THEN
+     LET lchunk = 1
+     LET kchunk =  INT(max_size/(size/($lsize)) * ($ksize))
+     IF `kchunk EQ 0` THEN
+       LET kchunk = 1
+       LET jchunk =  INT(max_size/(size/(($lsize)*($ksize))) * ($jsize) )
+       IF `jchunk EQ 0` THEN
+         LET jchunk = 1
+         ! always list a full span in I ... possibly exceeding max_size
+       ENDIF
+     ENDIF
+   ENDIF
+   LET jtop = MIN(j+jchunk-1, ($clat_jmax) )
+   LET ktop = MIN(k+kchunk-1, ($kmax) )
+   LET ltop = MIN(l+lchunk-1, ($lmax) )
+
+   IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN  
+      IF ($var_history"0|*>1") THEN LIST($listqual)/APPEND/NOHEAD/FORMAT=(A)/FILE="($result_ferret_listing_filename)" var_hist
+   ENDIF
+
+     ! ... netCDF output in chunks
+   REPEAT/L=($lmin):($lmax):`lchunk` REPEAT/K=($kmin):($kmax):`kchunk` REPEAT/J=($clat_jmin):($clat_jmax):`jchunk` (LIST($listqual)/APPEND/FILE/($frmt)/J=`j`:`jtop`/K=`k`:`ktop`/L=`l`:`ltop`/JLIMITS=($clat_jmin):($clat_jmax)/KLIMITS=($kmin):($kmax)/I=($clon_imin):($clon_imax) ($data_($var_num)_var); CANC MEM/ALL)
+
+ENDIF
+
+! End of script ---------- list_curvi_data.jnl----------------------------
+

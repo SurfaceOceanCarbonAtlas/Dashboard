@@ -1,0 +1,10 @@
+.section_title {  font-weight: bold; font-size: 12pt}
+.section_item {  font-weight: bold}
+.section_text {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+.top {  font-family: Arial, Helvetica, sans-serif; font-size: 10pt}
+.redbold {color:red; font-size:10pt; font-family:arial; font-weight:bold; text-decoration:
+none}
+.definition { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; font-weight: normal}
+.term { font-family: Arial, Helvetica, sans-serif; font-size: 10pt ; font-weight: bold}
+td.nav {  color:black; font-family: Arial, Helvetica, sans-serif; font-size: 12pt; text-decoration:none}
+a.nav {  color:black; font-family: Arial, Helvetica, sans-serif; font-size: 12pt; text-decoration:none}

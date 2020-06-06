@@ -1,0 +1,1 @@
+-d $symbols.get("data_0_dataset_ID"),$symbols.get("data_1_dataset_ID") -v $las_backendrequest.getPropertyValuesCommaSeparated("climate_analysis_regions") -s $las_backendrequest.getTlo(0, "YYYY") -e $las_backendrequest.getThi(0, "YYYY") -t $las_backendrequest.getTlo(1, "YYYY") -f $las_backendrequest.getThi(1, "YYYY") -a $symbols.get("climate_analysis_type")

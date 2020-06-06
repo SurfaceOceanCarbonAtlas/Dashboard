@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Standards Mode", which gives better cross    -->
+<!-- browser compatibility to the application.     -->
+<!-- Omitting this line leaves most browsers in    -->
+<!-- "Quirks mode", emulating the bugs in older    -->
+<!-- browser versions.                             -->
+
+<html>
+  <head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>LAS Column Editor</title>
+    
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <!--  strider.weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xSi6Ygk863vw1oXTT1cyritDYiIOhSs8NJgobGDysmECbXI_Ld9bweUlA"
+      type="text/javascript"></script>
+    -->
+    <!--  weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xTCqQI3Sj7hqI6Uh8C-ytlVpmJc8xS3dXHdpRVUOyawacVodlU95YCvWg"
+      type="text/javascript"></script>
+    -->
+    <!-- localhost
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRutBJbRgJeVagWzAByU3KazihaXg"
+      type="text/javascript"></script>
+       -->
+    <script type="text/javascript" language="javascript" src="../../JavaScript/components/DateWidget.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/components/LASRequest.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/components/xmldom.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/frameworks/OpenLayers/OpenLayers.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/frameworks/OpenLayersExtensions/DrawSingleFeature.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/frameworks/OpenLayersExtensions/HorizontalPath.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/frameworks/OpenLayersExtensions/VerticalPath.js"></script>
+    <script type="text/javascript" language="javascript" src="../../JavaScript/frameworks/OpenLayersExtensions/JumpPath.js"></script>
+    
+    <script type="text/javascript" language="javascript" src="../../JavaScript/components/gov.noaa.pmel.tmap.las.ColumnEditor/gov.noaa.pmel.tmap.las.ColumnEditor.nocache.js"></script>
+    <link rel="stylesheet" href="../../JavaScript/components/css/OLMapWidget.css" type="text/css">
+    <link rel="stylesheet" href="../../JavaScript/components/css/LAS.css" type="text/css">
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+  <body>
+<TABLE CELLPADDING="0" CELLSPACING="0" BORDER="0" WIDTH="100%">
+	<TBODY>
+		<TR>
+			<TD bgcolor="#7391AD"  height="10px" width="280px" align="left">
+				<div style="position: relative; width: 280px; height: 10px;margin-right:2px">
+					<a href="https://ferret.pmel.noaa.gov/LAS/" target="_new"><span class="top_link_title">Live Access Server</span></a>
+					<span style="position: absolute; top: 0px; left: 150px; font-size:7pt; color:#FFFFFC;">
+				        
+					</span>
+				</div>
+			</TD>  			
+	                <td bgcolor="#7391AD" align="right" >
+		           <a class="top_link_left"  href="$server_config.getFTDSBase()" target="_new">OPeNDAP (F-TDS) / THREDDS</a> 
+			</td>
+	  	</TR>
+	  	<TR>
+			<TD bgcolor="#7391AD" valign="top" align="left">
+				<div style="position:relative;height:33px;overflow:hidden;width:100%;margin-right:0px;margin-left:0px;border-bottom:1pt solid #FFFFFC">
+					<span  style="color:Black;position:relative;left:10px;top:0px;height:35px;font-weight:bold;font-size:18pt;position:absolute;">$las_config.getTitle(): Column Editor</span>
+					<span  style="color:Black;position:relative;left:12px;top:0px;height:35px;font-weight:bold;font-size:18pt;position:absolute;">$las_config.getTitle(): Column Editor</span>
+					<span  style="color:Black;position:relative;left:10px;top:2px;height:35px;font-weight:bold;font-size:18pt;position:absolute;">$las_config.getTitle(): Column Editor</span>
+					<span  style="color:Black;position:relative;left:12px;top:2px;height:35px;font-weight:bold;font-size:18pt;position:absolute;">$las_config.getTitle(): Column Editor</span>
+					<span  style="color:#FFFFFC;position:relative;left:11px;top:1px;height:35px;font-weight:bold;font-size:18pt;position:absolute;">$las_config.getTitle(): Column Editor</span>
+				</div>
+			</TD>
+                	<TD id="headerBottomRight" bgcolor="#7391AD" width="55px" valign="top" style="align:right;border-bottom:1pt solid #FFFFFC">
+				<link rel="stylesheet" href="JavaScript/ui/LASUI.css" type="text/css"/>
+				<script type="text/javascript" language="javascript" src="JavaScript/components/gov.noaa.pmel.tmap.las.HelpMenu/gov.noaa.pmel.tmap.las.HelpMenu.nocache.js"></script>
+                	</TD>
+		</TR>
+	</TBODY>
+</TABLE>
+
+  <div id="id_list"></div>
+  <br>
+  <div id="comment"></div>
+  <br>
+  <div id="table_header"></div>
+  <br>
+  <div id="data"></div>
+
+ #parse("productserver/templates/V7UIFooter.vm")
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>			
+  </body>
+</html>

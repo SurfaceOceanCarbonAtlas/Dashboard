@@ -1,0 +1,28 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  LAS_redefine_variable.jnl
+! 
+! Author: Ansley
+! Date: 2010/09/08
+! 
+! Redefine ferret_plot_var, to be called after REGION_FULL has been changed.
+
+DEFINE SYMBOL ferret_plot_var = ($data_var)[d=($data_num),($region_full)]
+
+DEFINE SYMBOL ferret_plot_base_var = ($ferret_plot_var) 
+DEFINE SYMBOL ferret_plot_base_var_($num) = ($ferret_plot_var) 
+
+! Needed for transform_seasonal, save variable definition without any
+! time-region information that may be added, and also with the time region only
+
+DEFINE SYMBOL ferret_xyz_var = ($data_var)[d=($data_num),($region_xyz)]
+DEFINE SYMBOL ferret_t_var = ($data_var)[d=($data_num),($region_t)]
+
+! ferret_x_var needed for listing data to files
+DEFINE SYMBOL ferret_x_var = ($data_var)[d=($data_num),($region_x)]
+IF `($region_x"0|*>1) EQ 0` THEN DEFINE SYMBOL ferret_x_var = ($data_var)[d=($data_num)]
+
+! Apply any transforms that may have been specified.
+GO LAS_transforms ($num)
+
+
+! End of ------------LAS_redefine_variable.jnl--------------------------

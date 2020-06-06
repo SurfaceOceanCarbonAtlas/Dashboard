@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+LAS_HOME="@PWD@"
+TOMCAT_LIB="@JAKARTA_LIB@"
+if [ "$JAVA_HOME" == "" ]
+then
+   echo "Please set the JAVA_HOME environment variable"
+   exit
+fi
+if [ "$LAS_HOME" == "" ]
+then
+   echo "Please edit the lasTest.sh file and set the home directory of your las installation."
+   exit
+fi
+$JAVA_HOME/bin/java -cp $JAKARTA_LIB/*:$LAS_HOME/WebContent/WEB-INF/lib/*:$LAS_HOME/WebContent/WEB-INF/classes gov.noaa.pmel.tmap.las.test.LASTest "$@"

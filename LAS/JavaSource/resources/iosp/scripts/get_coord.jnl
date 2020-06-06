@@ -1,0 +1,123 @@
+\cancel mode verify
+! get_coord.jnl  
+!
+!  1/2007 ACM
+!  7/2007 ACM test to see if the axis name is a pseudo-variable name. If so, then find a variable
+!             in the dataset which has that axis, and use it to define the coordinates
+!
+! Issues a command to SAVE/FILE=$1/CLOBBER data from a coordinate variable in dataset according 
+! to indices and strides given as arguments. Assumes the dataset has already been opened.
+!
+! arguments:  1 output file name
+!             2 dataset URL
+!             3 variable name (coordinate variable name)
+!             4 The index direction I,J,K or L 
+!             5, 6, 7  low index, high index, stride for coordinates
+!
+! After this script is run, the value of the Ferret symbol $fer_last_error contains 
+! an error string if an unexpected error was encountered.
+
+set mem/siz=100
+
+! Save the dataset number of the current dataset
+SET DATA/SAVE
+
+! First see if there is a dataset.
+! SET DATA "($2)"
+
+! Write output in original upper-or lower-case spelling of variables
+! and axis names
+
+CANCEL MODE UPCASE
+
+! Place the inputs into variables for later convenience.
+
+LET lo_index_1 = $5"1"
+LET hi_index_1 = $6"1"
+LET stride_1 = $7"1"
+
+
+! The axis name may be a pseudo-variable X,Y,Z,T (or I,J,K,L ?)
+! If so then we cant use the syntax LET COORDS = x[gx=$3]
+! Instead find a variable with that axis an use x[gx=($varname)]
+
+LET its_pseudoname = 0
+DEFINE SYMBOL axname = `UPCASE ("$3")`
+
+IF `STRCMP("($axname)", "X") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "Y") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "Z") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "T") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "E") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "F") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "I") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "J") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "K") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "L") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "M") EQ 0` THEN LET its_pseudoname = 1
+IF `STRCMP("($axname)", "N") EQ 0` THEN LET its_pseudoname = 1
+
+IF `its_pseudoname` then
+   LET nvars = `..nvars`
+   REPEAT/RANGE=1:`nvars`/name=q (\
+      DEFINE SYMBOL qq = `q`; LET vname = ..varnames[i=($qq)];  \
+      DEFINE SYMBOL myvar = `vname`;  \
+      DEFINE SYMBOL itsax = `($myvar), RETURN=($3)axis` ; \
+      IF `STRINDEX("($itsax)", "NORMAL" ) NE 0` THEN EXIT/LOOP)
+ELSE
+   DEFINE SYMBOL myvar = $3
+ENDIF
+
+! Get the direction I,J,K, L, M, N. Use this to generate the indices required
+
+
+
+DEFINE SYMBOL shape = `UPCASE("($4)")`
+
+IF `STRINDEX("($shape)", "I") GT 0` THEN
+! write the coordinates as X coordinates.
+   LET COORDS = x[gx=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[i=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+IF `STRINDEX("($shape)", "J") GT 0` THEN
+! write the coordinates as Y coordinates.
+   LET COORDS = y[gy=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[j=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+IF `STRINDEX("($shape)", "K") GT 0` THEN
+! write the coordinates as Z coordinates.
+   LET COORDS = z[gz=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[k=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+IF `STRINDEX("($shape)", "L") GT 0` THEN
+
+! write the coordinates as T coordinates.
+   LET COORDS = t[gt=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[l=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+IF `STRINDEX("($shape)", "M") GT 0` THEN
+
+! write the coordinates as E coordinates.
+   LET COORDS = _e[ge=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[m=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+IF `STRINDEX("($shape)", "N") GT 0` THEN
+
+! write the coordinates as F coordinates.
+   LET COORDS = _f[gf=($myvar)]
+   SET VAR/outtype=float coords
+   SAVE/FILE="$1"/CLOBBER COORDS[n=`lo_index_1`:`hi_index_1`:`stride_1`]
+ENDIF
+
+! Done writing data variable. exit
+!EXIT/SCRIPT

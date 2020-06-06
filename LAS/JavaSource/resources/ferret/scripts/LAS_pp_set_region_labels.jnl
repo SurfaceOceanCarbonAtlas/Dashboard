@@ -1,0 +1,196 @@
+! LAS_pp_set_region_labels.jnl
+
+! Set up the region labels that will be in the upper left of the plot.
+!
+! Called by prop_prop_plot.jnl
+! 7/2010    ACM updates for V7.2 multi-variable plots
+
+! NOTE: We can add to this if/when the two variables may have
+! different regions, e.g. different depths or times. Now there
+! are just one set of region symbols. Some variables may not have
+! all dimensions, e.g. a surface variable plotted with others that
+! have depth axes.  So call for each variable, and define each symbol
+! only if the one for that direction is not already defined.
+
+IF `($have_lon_lab"0|*>1") EQ 0` THEN
+   IF `(STRCMP("($fview%A%)", "X") NE 0) AND ($region_x_lo"0|*>1")` THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+      DEFINE AXIS/X=0:359.99:.01/UNIT=degrees/MODULO xqencode
+      LET xq = X[GX=xqencode]
+      LET xq1 = ($REGION_0_X_LO)
+      IF `xq1 LT 0` THEN LET xq1 = `($REGION_0_X_LO)+360`
+      LET xq2 = ($REGION_0_X_HI)
+      IF `xq2 LT 0` THEN LET xq2 = `($REGION_0_X_HI)+360`
+      SET REGION/x=`xq1`:`xq2`
+      DEFINE SYMBOL zf = `-1*($region_x_lo"0")`
+      IF `($region_x_lo"0") EQ ($region_x_hi"($zf)")` THEN
+         DEFINE SYMBOL upper_left_($n_left_labels) = Longitude: `xq,RETURN=xstart,PREC=4`
+	 DEFINE SYMBOL longitude_0_lab = ($upper_left_($n_left_labels"0"))
+      ELSE
+         DEFINE SYMBOL upper_left_($n_left_labels) = Longitude: `xq,RETURN=xstart,PREC=4` to `xq,RETURN=xend,PREC=4`
+	 DEFINE SYMBOL longitude_0_lab = ($upper_left_($n_left_labels"0"))
+      ENDIF
+      DEFINE SYMBOL have_lon_lab = 1
+      CANCEL VAR xq
+      CANCEL AXIS xqencode
+   ENDIF
+ENDIF
+
+IF `($have_lat_lab"0|*>1") EQ 0` THEN
+   IF `(STRCMP("($fview%A%)", "Y") NE 0) AND ($region_y_lo"0|*>1")` THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+      DEFINE AXIS/Y=90S:90N:.01/UNIT=degrees yqencode
+      LET yq = y[gy=yqencode]
+      SET REGION/($region_y)
+      DEFINE SYMBOL zf = `-1*($region_y_lo"0")`
+
+      IF `($region_y_lo"0") EQ ($region_y_hi"($zf)")` THEN
+         DEFINE SYMBOL upper_left_($n_left_labels) = Latitude: `yq,RETURN=ystart,PREC=4`
+      ELSE
+         DEFINE SYMBOL upper_left_($n_left_labels) = Latitude: `yq,RETURN=ystart,PREC=4` to `yq,RETURN=yend,PREC=4`
+      ENDIF
+      DEFINE SYMBOL latitude_0_lab = ($upper_left_($n_left_labels"0"))
+
+      DEFINE SYMBOL have_lat_lab = 1
+      CANCEL VAR yq
+      CANCEL AXIS yqencode
+   ENDIF
+ENDIF
+CAN REGION
+
+IF `($have_z_lab"0|*>1") EQ 0` THEN
+   DEFINE SYMBOL has_depth = `($ferret_plot_var),RETURN=isdepth`
+   DEFINE SYMBOL do_z_lab = 1
+   IF `STRINDEX("($has_depth)", "NORMAL") NE 0` THEN DEFINE SYMBOL do_z_lab = 0
+   DEFINE SYMBOL varshape = `($ferret_plot_var),RETURN=shape`  ! for curvi grids also check shape
+   IF `(STRINDEX("($varshape)", "Z") EQ 0) and ($do_curvi_xy"0)` THEN DEFINE SYMBOL do_z_lab = 0
+
+   IF `(STRCMP("($fview%A%)", "Z") NE 0) AND  ($region_z_lo"0|*>1") AND ($do_z_lab"0")` THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+
+      IF `($ferret_plot_var),RETURN=isdepth` THEN
+         DEFINE SYMBOL dqual = /DEPTH
+         DEFINE SYMBOL zlabel = Depth
+      ELSE
+         DEFINE SYMBOL zlabel = Altitude
+      ENDIF
+
+! Perhaps region symbols are set, from the request, but the variable does not
+! have a Z axis.  If so just define the label with the z region.
+
+      DEFINE SYMBOL zst =  `($ferret_plot_var),RETURN=zstart`
+      IF `STRCMP("($zst)", "*") NE 0` THEN
+
+         DEFINE AXIS/z=`($ferret_plot_var),RETURN=zstart`:`($ferret_plot_var),RETURN=zend`:0.1/units="`($ferret_plot_var),RETURN=zunits`"($dqual) zqencode
+         LET zq = z[gz=zqencode]
+         SET REGION/($region_z)
+         DEFINE SYMBOL zf = `-1*($region_z_lo"0")`
+
+         IF `($region_z_lo"0") EQ ($region_z_hi"($zf)")` THEN
+            DEFINE SYMBOL upper_left_($n_left_labels) = ($zlabel): `zq,RETURN=zstart,PREC=4` `($ferret_plot_var),RETURN=zunits`
+         ELSE
+           DEFINE SYMBOL upper_left_($n_left_labels) = ($zlabel): `zq,RETURN=zstart,PREC=4` to `zq,RETURN=zend,PREC=4` `($ferret_plot_var),RETURN=zunits`
+         ENDIF
+         DEFINE SYMBOL depth_0_lab = ($upper_left_($n_left_labels"0"))
+      
+         CANCEL VAR zq
+         CANCEL AXIS zqencode
+      ELSE
+         DEFINE SYMBOL depth_0_lab = ($region_z)
+      ENDIF
+
+      DEFINE SYMBOL have_z_lab = 1
+   ENDIF
+ENDIF
+CAN REGION
+
+DEFINE SYMBOL do_t = 1
+DEFINE SYMBOL do_t = `($ferret_plot_var),RETURN=taxis`
+!
+IF `STRINDEX("($do_t)", "NORMAL") NE 0` THEN 
+   DEFINE SYMBOL do_t = 0
+   IF ($its_trajectory_corr"0|*>1") THEN DEFINE SYMBOL do_t = 1
+ELSE 
+   DEFINE SYMBOL do_t = 1
+ENDIF
+
+IF `($have_time_lab"0|*>1") EQ 0` THEN
+   IF `(STRCMP("($fview%A%)", "T") NE 0) OR ($its_prop_prop_plot"0|*>1")` THEN
+   IF `($region_t_lo"0|*>1") AND ($do_t"0")` THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+
+      IF `STRINDEX ("($region_t_lo)", ":") GT 0` THEN
+         DEFINE SYMBOL tprec = minutes
+      ELSE
+         DEFINE SYMBOL tprec = days
+      ENDIF
+
+      IF ($its_trajectory_corr"0|*>1") THEN  ! trajectory plots, just use the region as given
+         IF ($region_t"0|*>1") THEN  DEFINE SYMBOL time_0_lab = ($region_t_lo):($region_t_hi)
+      ELSE
+
+         DEFINE SYMBOL do_t0 = `($data_0_var)[d=($dset0)],RETURN=taxis`
+         IF `STRINDEX("($do_t0)", "NORMAL") NE 0` THEN 
+            DEFINE SYMBOL do_t0 = 0
+         ELSE 
+            DEFINE SYMBOL do_t0 = 1
+         ENDIF
+         DEFINE SYMBOL do_t1 = `($data_1_var)[d=($dset1)],RETURN=taxis`
+         IF `STRINDEX("($do_t1)", "NORMAL") NE 0` THEN 
+            DEFINE SYMBOL do_t1 = 0
+         ELSE 
+            DEFINE SYMBOL do_t1 = 1
+         ENDIF
+   
+         IF ($do_t0) THEN
+            LET tt = t[gt=($data_0_var),d=($dset0)]
+         ELIF ($do_t1) THEN
+            LET tt = t[gt=($data_1_var),d=($dset1)]
+         ENDIF
+         LET tlo_coord = tt[t="($region_t_lo)"]
+         LET thi_coord = tt[t="($region_t_hi)"]
+   
+         IF `STRCMP("($region_t_lo"0")", "($region_t_hi%-999%)") EQ 0` THEN
+            DEFINE SYMBOL upper_left_($n_left_labels) = `TAX_DATESTRING(tlo_coord, tt, "($tprec)")`
+         ELSE
+            DEFINE SYMBOL upper_left_($n_left_labels) = `TAX_DATESTRING(tlo_coord, tt, "($tprec)")` to `TAX_DATESTRING(thi_coord, tt, "($tprec)")`
+         ENDIF
+         DEFINE SYMBOL time_0_lab = ($upper_left_($n_left_labels"0"))
+
+      ENDIF
+
+      DEFINE SYMBOL have_time_lab = 1
+   
+   ENDIF
+   ENDIF
+ENDIF
+
+! Do we need a YEAR label?  If its a 1-D Time plot then we do
+IF ($its_prop_prop_plot"0|*>1") THEN
+LET L_time = `($ferret_plot_var),return=Lsize`
+IF `(($have_year_lab"0|*>1") EQ 0) AND (L_time GT 1)` THEN
+   IF `(STRCMP("($fview%A%)", "T") EQ 0) AND ($region_t_lo"0|*>1") AND ($do_t"0")` THEN
+      PLOT/SET ($ferret_plot_var)
+
+      IF `($labnum_year%0|*>1%)` THEN
+         DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+         DEFINE SYMBOL upper_left_($n_left_labels) = ($lab($labnum_year))
+         DEFINE SYMBOL have_year_lab = 1
+      ENDIF
+      IF ($time_0_lab"0|*>1") THEN 
+         DEFINE SYMBOL time_0_lab ($time_lab) ($upper_left_($n_left_labels"0"))
+      ELSE
+         DEFINE SYMBOL time_0_lab ($upper_left_($n_left_labels"0"))
+      ENDIF
+
+   ENDIF
+ENDIF
+ENDIF
+
+IF ($longitude_0_lab"0|*>1") THEN DEFINE SYMBOL longitude_lab ($longitude_0_lab)
+IF ($latitude_0_lab"0|*>1") THEN DEFINE SYMBOL  latitude_lab ($latitude_0_lab)
+IF ($depth_0_lab"0|*>1") THEN DEFINE SYMBOL depth_lab ($depth_0_lab)
+IF ($time_0_lab"0|*>1") THEN DEFINE SYMBOL time_lab ($time_0_lab)
+
+! End of LAS_pp_set_region_labels.jnl -----------------------------------------
+

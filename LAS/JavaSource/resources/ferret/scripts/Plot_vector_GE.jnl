@@ -1,0 +1,56 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! $Author: ACM $
+!
+! Plot_vector.jnl decides which script to call to make a 2D vector plot.
+! as in Plot_2D.jnl, choose the direction and call the appropriate script
+!
+! Set the gif filename, changing it from .gif to the name from this request
+! Set up to write info to the debug log so that FshowGO can be used
+GO LAS_initial_setup
+
+IF ($ferret_view"|xt>1|*>0") THEN
+
+   !! Make a plot in XT...
+   go xt_vector_plot
+
+ELIF ($ferret_view"|xy>1|*>0") THEN
+
+   !! Make a plot in XY...
+   ! Redefine a few symbols for Google-Earth style plots
+   DEFINE SYMBOL ferret_margins = false
+   DEFINE SYMBOL qualifiers = ($qualifiers)/NOAXES
+   DEFINE SYMBOL ferret_land_type = contour
+   DEFINE SYMBOL ferret_google_plot = 1
+   !always use large size for plots on GE
+   DEFINE SYMBOL ferret_size = 0.8333
+
+   DEFINE SYMBOL its_GE = `STRINDEX( "($operation_ID)", "_GE" ) NE 0` 
+   IF ($its_GE"0|*>1") THEN
+      go xy_vector_plot
+   ENDIF
+
+ELIF ($ferret_view"|xz>1|*>0") THEN
+
+   !! Make a plot in XZ...
+   go xz_vector_plot
+
+ELIF ($ferret_view"|yt>1|*>0") THEN
+
+   !! Make a plot in YT...
+   go yt_vector_plot
+
+ELIF ($ferret_view"|yz>1|*>0") THEN
+
+   !! Make a plot in YZ...
+   go yz_vector_plot
+
+ELIF ($ferret_view"|zt>1|*>0") THEN
+
+   !! Make a plot in ZT...
+   go zt_vector_plot
+
+ELSE
+  say " **ERROR: Attempt to make a plot in ($ferret_view) with 2D vector plot script."
+ENDIF
+

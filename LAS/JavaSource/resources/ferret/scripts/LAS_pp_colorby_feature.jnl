@@ -1,0 +1,331 @@
+
+! LAS_pp_colorby_feature.jnl
+! Draw the correlation plot with icons colored by feature ID.
+
+! Create the 'feature' variables and symbols
+! Create a new title that includes subsampling info
+
+! Restart setting plot qualifiers for correlation plot. 
+
+! 3/14/2018  Initial changes to take advantage of PyFerret symbols to replace
+!            use of slow outlined polygons.  Currently only draws triangles,
+!            need to implelement a list of symbol names replacing /sym=triufill
+
+DEFINE SYMBOL qualifiers = /NOLAB
+
+DEFINE SYMBOL py_syms = `($program_name"0|PyFerret>1|*>0") AND ($FERRET_VERSION) GE 7.32`
+
+IF `($data_1_var"0|*>1") EQ 0` THEN
+  MESSAGE/ERROR **ERROR Correlation product requires two variables to be selected
+  EXIT/PROGRAM
+ENDIF
+
+LET n_in_mask = constraints_mask[i=@ngd]
+IF `n_in_mask eq 0` THEN 
+  DEFINE SYMBOL put_label = 1 
+  EXIT/SCRIPT
+ENDIF
+
+DEFINE SYMBOL feature_max = `($rowvar),RETURN=size`
+
+! The mask is 1 for start of features 
+
+LET feature_id = _M[GE=featurevar]
+LET feature_len =($rowvar)
+
+IF ($subset_mask"0|*>1") THEN
+   LET feature_id = ESEQUENCE(subset_mask) * _M[GE=featurevar]
+   LET feature_len = ESEQUENCE(subset_mask) * ($rowvar)
+ENDIF
+
+LET idvar = EXPND_BY_LEN(feature_id, ($rowvar), ($rowvar)[m=@sum])
+
+
+
+! Masking for constraints may mean not all are shown. Recompute cruises_shown.
+
+LET idvar_masked = idvar * var_mask
+LET count_nf = 0
+LET count_orig = 0
+
+IF `($feature_max) LE ($feature_max_labels)` THEN
+   REPEAT/RANGE=1:`($rowvar),RETURN=msize`/NAME=ic (\
+    DEFINE SYMBOL ic = `ic` ;\
+    DEFINE SYMBOL nf = `idvar_masked[I=@LOC:($ic)]` ;\
+    DEFINE SYMBOL cruise_is = ($nf"0|bad>0|*>($ic)") ;\
+    LET count_nf = `count_nf +  ($nf"0|bad>0|*>1")` ;\
+    IF `($cruise_is) GT 0` THEN LET count_orig = `count_orig + ($rowvar)[m=($cruise_is)]`;\ 
+   )
+ELSE
+   LET count_nf = `($rowvar),RETURN=msize`
+   LET count_orig = idvar_masked[i=@ngd]
+ENDIF
+
+DEFINE SYMBOL cruises_shown = `count_nf`
+DEFINE SYMBOL prof_traj_shown = `count_nf`
+
+LET decimate_size = count_orig
+
+! Now we have the full size of desired cruise selection. Do the decimation if any on 
+! the full set so as to keep placeholders for all the cruises (decimating cruises , 
+! that are all-blank, lose the start and end of cruises)
+
+LET feature_id = _M[GE=featurevar]
+LET feature_len =($rowvar)
+
+! This section setting up obs_mask, for non-lon-lat plots, which do not use decimation.
+LET all_feature_id = _M[GE=featurevar]
+LET all_idvar = EXPND_BY_LEN(all_feature_id, ($rowvar), ($rowvar)[m=@sum])
+
+LET tmask = IF all_idvar[i=@ddb] EQ 1 THEN 1 ELSE 0
+LET obs_mask1 = tmask[gx=($ferret_plot_var_0)@ASN]
+LET obs_mask2 = IF i[gx=($ferret_plot_var_0)] EQ 1 THEN 1 ELSE 0
+LET obs_mask = IF (obs_mask1+obs_mask2) EQ 1 THEN 1
+
+
+LET pvar = constraints_mask* ($ferret_plot_var_0)
+IF ($pvar_reset"0|*>1") THEN LET pvar = constraints_mask* ($pvar_reset)
+LET qvar = constraints_mask* ($ferret_plot_var_1)
+LET dvar =  idvar
+
+LET pvar = constraints_mask* (xvar)
+LET qvar = constraints_mask* (yvar)
+
+LET data_1_var_c =  EXPNDI_BY_Z(pvar, obs_mask, `nfeatures`, `longest`)
+LET data_var_c =  EXPNDI_BY_Z(qvar, obs_mask, `nfeatures`, `longest`)
+
+! Decimation for longitude/latitude plots
+! Dont decimate for prop-prop plots when we have a subset mask!
+
+LET num_decimate = 1000
+!LET num_decimate = 10000
+IF `($numobs) LT num_decimate` THEN LET num_decimate = -1  ! separate cruises but dont decimate
+
+
+IF `($ferret_plot_var_0"0|longitude>1|*>0") AND ($ferret_plot_var_1"0|latitude>1|*>0") AND\
+  (($numobs) GE num_decimate) AND (($subset_mask"0|*>1) EQ 0)` THEN
+
+! Decimation always?
+! IF `(($numobs) GE num_decimate)` THEN
+
+   DEFINE SYMBOL is_decimate = 1
+
+   LET pxvar = constraints_mask* ($ferret_plot_var_0)
+   IF ($pvar_reset"0|*>1") THEN LET pxvar = constraints_mask*  ($pvar_reset) ! see LAS_xytvar_setup
+   LET qyvar = constraints_mask* ($ferret_plot_var_1)
+   
+   LET var_data = idvar
+   
+   DEFINE SYMBOL data_x_var = if idvar then pxvar
+   DEFINE SYMBOL data_y_var =  if idvar then qyvar
+   
+   DEFINE SYMBOL data_x_var = pxvar
+   DEFINE SYMBOL data_y_var = qyvar
+   DEFINE SYMBOL data_var = idvar
+   
+   ! Arguments are 
+   !  min # points for doing decimation 
+   !  lon/lat tolerance for piecewise decimation
+   !  var tolerance (var at lon/lat)
+   
+   LET tol1 = `MAX(($region_x_range)/($ppl$xpixel), ($region_y_range)/($ppl$ypixel))`
+   LET tol1 = `MIN(($region_x_range)/($ppl$xpixel), ($region_y_range)/($ppl$ypixel))`
+   LET tol1 = MAX(`tol1`,0.001)
+   let tol2 = 0.01
+   list tol1, tol2
+
+   DEFINE SYMBOL decimate_fraction = 0.1
+   GO setup_dsg_variables `num_decimate` `tol1` `tol2` 0.1
+
+   LET pvar = ($data_x_var)
+   LET qvar = ($data_y_var)
+   LET dvar = ($data_var)
+
+! data_var is the feature index at each obs index i, with a gap between features.
+! Find where the features start now that they are sampled. (Need to remove the gaps
+! between features that the script introduces...)
+
+   LET index_sampled = if ($data_var) then ($data_var) else ($data_var)[i=@shf:-1]
+   LET new_feature = index_sampled[i=@ddb]
+   LET decimated_mask1 = IF new_feature NE 0 THEN 1 ELSE 0
+   LET decimated_mask2 = IF I[gx=($data_var)] EQ 1 THEN 1 ELSE 0
+   LET ndmask = `pvar,return=isize`
+   LET decimated_mask  = IF (decimated_mask1[i=1:`ndmask`] + decimated_mask2[i=1:`ndmask`]) EQ 1 THEN 1
+   
+   ! This value of longest is now wrong, but it's too big so should be harmless.
+   
+
+   LET data_1_var_c =  EXPNDI_BY_Z(pvar, decimated_mask, `nfeatures`, `longest`)
+   LET data_var_c =  EXPNDI_BY_Z(qvar, decimated_mask, `nfeatures`, `longest`)
+   LET data_var_d =  EXPNDI_BY_Z(dvar, decimated_mask, `nfeatures`, `longest`)
+
+   LET dmask =  subset_mask * data_var_d
+   DEFINE SYMBOL have_dmask = 1
+
+   DEFINE SYMBOL ngood_data = `pvar[i=@ngd]`
+
+ENDIF  ! Decimation for longitude/latitude plots
+
+! Set up to plot the data and the linear fit
+LET pmask =  subset_mask * data_1_var_c
+LET qmask =  subset_mask * data_var_c
+
+LET p = XSEQUENCE( subset_mask * data_1_var_c)
+LET q = XSEQUENCE( subset_mask * data_var_c)
+
+! Set up to make polygon plot. If there are not too many features
+! color the data according to feature.
+
+DEFINE SYMBOL qualifiers = ($qualifiers)/OVER/NOAXES/NOKEY/NOLAB/
+
+IF `($feature_max) LE ($feature_max_labels)` THEN
+   DEFINE SYMBOL ferret_poly_palette = ten_by_levels
+   DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=($ferret_poly_palette)
+
+! If undefined, set polygon scale according to number of points
+   IF ($ferret_poly_scale"1|*>0") THEN 
+      GO LAS_set_poly_scale
+      DEFINE SYMBOL ferret_poly_scale 0.5*($ferret_poly_scale)
+   ENDIF
+
+! *** draw outlines only when running Ferret.  Too slow in PyFerret.
+   IF `($ferret_poly_scale) GE 0.4` THEN
+      IF ($program_name"0|Ferret>1|*>0") THEN \
+       DEFINE SYMBOL qualifiers = ($qualifiers)/LINE/THICK=1
+    ENDIF
+
+ELSE
+   DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=black
+   DEFINE SYMBOL poly_scale = 0.4
+   DEFINE SYMBOL plot_using_sym = 1
+ENDIF
+
+! *** draw outlines only when running Ferret.  Too slow in PyFerret.
+IF ($program_name"0|Ferret>1|*>0") THEN DEFINE SYMBOL qualifiers = ($qualifiers)/LINE
+
+DEFINE SYMBOL poly_command POLY($qualifiers)
+DEFINE SYMBOL line_color = blue
+
+DEFINE SYMBOL pysym_command = PLOT/VS/OVER/NOLAB/NOKEY/ribbon/highlight/PALETTE=($ferret_poly_palette)/siz=0.15
+
+IF `( ($feature_max) LE ($feature_max_labels) ) AND ( ($DATA_COUNT) eq 3 )` THEN
+
+   LET p = XSEQUENCE( subset_mask * data_1_var_c)  ! for regression line
+   LET q = XSEQUENCE( subset_mask * data_var_c)
+
+   ! Use different color for each feature 1-10, 11-21, ...
+   ! Use different symbols for each set of 10
+
+   LET ncolors = 10
+   LET nshapes = 20
+   LET polygon_set = `INT(0.5+($feature_max)/nshapes)`
+   IF `polygon_set*nshapes LT ($feature_max)`  THEN LET polygon_set = `polygon_set+1`
+
+! See polyshape script for the list of available pre-defined shapes.
+
+! Set the shapes with the same script as in the script 200symbols.jnl
+! Also sets the names of PyFerret symbols to match those shapes.
+
+   GO LAS_pp_set_feature_shapes
+
+   LET cmax = `MIN(($feature_max),ncolors)`
+   LET c1 = 1
+   DEFINE SYMBOL poly_command ($poly_command)/LEVELS=(`c1`,`cmax+1`,1)
+   DEFINE SYMBOL pysym_command ($pysym_command)/LEVELS=(`c1`,`cmax+1`,1)
+
+   LET ishape = 1
+   LET icolor = 1
+
+   LET colr_index = MOD(i[i=1:`nfeatures`],`ncolors`)
+   LET allcolors = IF colr_index EQ 0 THEN `ncolors` ELSE colr_index 
+   IF `($have_dmask"0|*>1") EQ 0` THEN LET dmask = subset_mask * allcolors + 0*qmask
+
+   LET transpmask = TRANSPOSE_XZ(pmask)
+   LET transqmask = TRANSPOSE_XZ(qmask)
+   LET transdmask = TRANSPOSE_XZ(dmask)
+
+   LET c1 = 1
+   LET cn = `ncolors`
+
+   REPEAT/RANGE=1:`nfeatures`:`ncolors`/NAME=ic (\
+    DEFINE SYMBOL ishape = `ishape`;\
+    LET zx = transpmask[k=`c1`:`cn`];\
+    LET zy = transqmask[k=`c1`:`cn`];\
+    LET zd = transdmask[k=`c1`:`cn`];\
+    DEFINE AXIS/X=1:`(cn-c1+1)*longest`:1 long_x;\
+    LET lxx = x[gx=long_x];\
+    LET xpolydat = RESHAPE(zx,lxx);\
+    LET ypolydat = RESHAPE(zy,lxx);\
+    LET colorplus = 0;\
+    IF ($is_decimate"0|*>1") THEN LET colorplus = (ishape-1)*ncolors;\
+    LET dpolydat = RESHAPE(zd-`colorplus`, lxx);\
+    LET all_mask = IF xpolydat+ypolydat+dpolydat THEN 1;\
+    LET all_x = COMPRESSI(all_mask*xpolydat);\   
+    LET all_y = COMPRESSI(all_mask*ypolydat);\
+    LET all_d = COMPRESSI(all_mask*dpolydat);\
+    LET ndo_it = `all_x[i=@ngd]`;\
+    LET do_it = `ndo_it GT 0`;\
+    LET/units=($lon_units"dum") plot_x = all_x[i=1:`ndo_it`];\   
+    LET plot_y = all_y[i=1:`ndo_it`];\
+    LET plot_d = all_d[i=1:`ndo_it`];\
+     ;\
+     IF `do_it AND ($connect_dots"0|0|1|*>1")` THEN \
+     PLOT/NOAX/VS/OVER/LINE=6/DASH=(0.1,0.04,0.1,0.04)/NOLAB xpolydat, ypolydat ;\
+     ;\
+     DEFINE SYMBOL color_command = GO polymark ($poly_command) plot_x, plot_y, plot_d, ($shape($ishape)), ($poly_scale) ;\
+     IF ($py_syms"0") THEN DEFINE SYMBOL color_command = ($pysym_command)/sym=($pyshape($ishape)) plot_x, plot_y, plot_d;\
+    IF `do_it` THEN ($color_command); \
+     ;\
+     LET c1 = `c1 + ncolors`;\
+     LET cn = `cn + ncolors`;\
+     IF `cn GT nfeatures` THEN LET cn = `nfeatures`;\
+     LET ishape = `ishape+1`;\
+     PPL shaset protect;\
+     )
+
+! Note need to protect the colors from one set of 10 to the next
+  
+ELSE ! all features, do as a PLOT not a POLY command, much faster
+
+   PLOT/VS/NOLAB/over/sym=19/siz=.12 p,q
+   DEFINE SYMBOL ngood_data = `p[i=@ngd]`
+ENDIF
+
+
+   
+! If location(s) of a crossover has been sent, mark them.
+! This might be one point, or two, comma-separated.
+
+! Do the check this way because the ferret_crossover symbols may contain
+! a list of numbers, not just a single value.
+DEFINE SYMBOL crossover = "($ferret_crossover_lat%nothing%)" 
+IF `STRCMP(($crossover), "nothing") NE 0` THEN 
+   LET crosslon1 = {($ferret_crossover_lon)}
+   LET crosslon2 = IF crosslon1 LT ($xaxis_min) THEN crosslon1 + 360 ELSE crosslon1
+   LET cross_lon = IF crosslon2 GT ($xaxis_max) THEN crosslon2 - 360 ELSE crosslon2
+   LET cross_lat = {($ferret_crossover_lat)}
+   DEFINE SYMBOL cross_sym_siz = 0.2
+
+! Diamond inside a square
+!   PLOT/VS/OVER/NOKEY/SYM=30/siz=($cross_sym_siz)/color=12 `cross_lon`,`cross_lat`
+!   PLOT/VS/OVER/NOKEY/SYM=18/siz=`($cross_sym_siz)*1.2`/color=9 `cross_lon`,`cross_lat`
+
+! Or an arrow pointing up at the spot.
+!   LET cross_lat_lower = `cross_lat - ($cross_sym_siz)/(($ppl$ylen)/(($yaxis_max)-($yaxis_min)))`
+!   PLOT/VS/OVER/NOKEY/SYM=46/siz=`($cross_sym_siz)*1.5`/color=13 `cross_lon`,`cross_lat_lower`
+!   PLOT/VS/OVER/NOKEY/SYM=46/siz=`($cross_sym_siz)*1.2`/color=9 `cross_lon`,`cross_lat_lower`
+!   PLOT/VS/OVER/NOKEY/SYM=27/siz=0.08/color=3 `cross_lon`,`cross_lat`
+
+! Or a small circle inside a large one, green
+!   PLOT/VS/OVER/NOKEY/SYM=27/siz=0.04/color=3 cross_lon, cross_lat
+!   PLOT/VS/OVER/NOKEY/SYM=27/siz=0.28/color=9 cross_lon, cross_lat
+
+   
+! Or a light-blue fill inside a black circle
+   PLOT/VS/OVER/NOKEY/SYM=21/siz=0.26/color=LightBlue/thick=2 cross_lon, cross_lat
+   PLOT/VS/OVER/NOKEY/SYM=27/siz=0.26/color=LightBlue/thick=2 cross_lon, cross_lat
+ENDIF
+
+DEFINE SYMBOL nout_lonlat = ($ngood_data)
+
+! End of file ------------ LAS_pp_colorby_feature.jnl--------------------------

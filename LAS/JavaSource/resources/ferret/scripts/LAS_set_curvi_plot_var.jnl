@@ -1,0 +1,105 @@
+! LAS_set_curvi_plot_var.jnl
+!      4/2013 ACM Implement the Ferret property ferret_start_memory
+!      4/2014 ACM Difference plots needed tweaks to clon_imax and clat_jmax
+!     10/2018 ACM With /MODULO qualifier on fill and shade plots, no need
+!                 for m360 or p360 overlay variables. 
+!     10/2018 ACM Redefine $ferret_plot_var  to use index range
+
+! Unless its a prop/prop plot, label as a native curv plot.
+! This first section moved from transform_curvi_xy
+
+DEFINE SYMBOL native_lab = Native Curvilinear Plot
+IF ($its_prop_prop_plot"0|*>1") THEN 
+   CANCEL SYMBOL native_lab 
+ELSE
+   IF `($curvi_note"0|*>1") EQ 0` THEN
+      DEFINE SYMBOL note_num = `($note_num"0") + 1`
+      DEFINE SYMBOL note_($note_num)_lab = ($native_lab)
+	 DEFINE SYMBOL curvi_note = 1
+   ENDIF
+   IF ($ferret_annotations"0|*>1") THEN CANCEL SYMBOL native_lab
+ENDIF
+
+DEFINE SYMBOL native_curvilinear_xy = 1
+
+! and if the longitudes are in a different modulo branch than requested add /MODULO
+
+IF `($ferret_lon_modulo"1|1|0|yes>1|no>0|*>0") AND ( ($num) GT 0 )` THEN 
+   LET outside = 0
+   IF ($ferret_curv_lon_min"0|*>1") THEN 
+      LET xc1 = ($ferret_curv_lon_min)
+   ELSE
+      LET strd = (($clat_jmax)-($clat_jmin))/100
+	  IF `strd LT 1` THEN LET strd  = 1
+      LET xc1 = xcoord[i=($clon_imin),j=($clat_jmin):($clat_jmax):`strd`]
+   ENDIF
+   IF ($ferret_curv_lon_max"0|*>1") THEN 
+      LET xcn = ($ferret_curv_lon_max)
+   ELSE
+      LET strd = (($clat_jmax)-($clat_jmin))/100
+	 IF `strd LT 1` THEN LET strd  = 1
+      LET xcn = xcoord[i=($clon_imax),j=($clat_jmin):($clat_jmax):`strd`]
+   ENDIF
+   LET outside = `xc1 GT ($region_x_lo)` + `xcn LT ($region_x_hi)`
+   IF `($ferret_lon_modulo"1|1|0|yes>1|no>0|*>0") AND outside GT 0 AND \
+     ($itsa_vector_plot"0") EQ 0` THEN 
+
+       DEFINE SYMBOL ferret_lon_modulo = 1 
+       DEFINE SYMBOL clon_imin 1
+       DEFINE SYMBOL clon_imax `($ferret_curvi_coord_lon)[j=1,x=@NGD]`
+       
+       IF `(($clon_imin) + ($clon_imax)*($xstride)) GT ixmax AND (($xstride) GT 1)` THEN \
+	    DEFINE SYMBOL clon_imax = `($clon_imax)-($xstride)`
+	    
+	 DEFINE SYMBOL clat_jmin = `MAX(1, INT(($clat_jmin)/($ystride)) )`
+         DEFINE SYMBOL clat_jmax = `MIN(jymax, INT(($clat_jmax)/($ystride)) )`
+	 IF `(($clat_jmin) + ($clat_jmax)*($ystride)) GT jymax AND (($ystride) GT 1)` THEN \
+	    DEFINE SYMBOL clat_jmax = `($clat_jmax)-($ystride)`
+
+   ENDIF
+ENDIF
+
+! Define the plot vars with computed lon and lat index range
+! End of section moved from transform_curvi_xy
+
+! Get the range of I,J needed to grab the region. Use it to define the plot or output variable.
+
+LET/TITLE="Longitude"/units=degrees xcoord = \
+       ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+LET/TITLE="Latitude"/units=degrees  ycoord = \ 
+       ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+LET/d=($data_num) plot_var = ($data_var)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+IF ($region_zt"0|*>1") THEN LET/d=($data_num) plot_var = \
+     ($data_var)[d=($data_num),($region_zt),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+IF ($region_($which_var)_zt"0|*>1") THEN LET/d=($data_num) plot_var = \
+     ($data_var)[d=($data_num),($region_($which_var)_zt),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+DEFINE SYMBOL ferret_plot_base_var = ($data_var)[d=($data_num),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+IF ($region_zt"0|*>1") THEN DEFINE SYMBOL ferret_plot_base_var = \
+     ($data_var)[d=($data_num),($region_zt),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+IF ($region_($which_var)_zt"0|*>1") THEN DEFINE SYMBOL ferret_plot_base_var = \
+     ($data_var)[d=($data_num),($region_($which_var)_zt),i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+DEFINE SYMBOL ferret_plot_base_var_($which_var) ($ferret_plot_base_var)
+
+DEFINE SYMBOL ferret_plot_var ($expr1)plot_var[d=($data_num)]($expr2), xcoord, ycoord
+IF ($region_zt"0|*>1") THEN \
+   DEFINE SYMBOL ferret_plot_var ($expr1)plot_var[d=($data_num)]($expr2), xcoord, ycoord
+
+DEFINE SYMBOL ferret_plot_title "($expr1)($data_title)($expr2) ($data_units) ($native_lab)"
+
+IF ($expr3"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)plot_var[d=($data_num)]($expr3)plot_var[d=($data_num)]($expr4), xcoord, ycoord
+   IF ($region_zt"0|*>1") THEN DEFINE SYMBOL ferret_plot_var \
+     ($expr1)plot_var[d=($data_num)]($expr3)plot_var[d=($data_num)]($expr4), xcoord, ycoord
+   DEFINE SYMBOL ferret_plot_title "($expr1)($data_title)($expr3)($data_title)($expr4) ($data_units) ($native_lab)"
+ENDIF
+
+! Use index limits in 1st argument to curvilinear plot commands not XY world coordinates
+
+DEFINE SYMBOL ferret_plot_var = ($ferret_plot_base_var), xcoord, ycoord
+
+! End of file ------------ LAS_set_curvi_plot_var.jnl-------------------------------
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>The LAS GWT Client package.</title>
+</head>
+<body>
+This package contains all of the LAS GWT UI code, including reusable widgets for date selection, generation of LAS UI 
+Requests, map selections and display of LAS output.
+<h4>Top Level Classes</h4>
+The {@link gov.noaa.pmel.tmap.las.client.BaseUI} class can be used as a base class for a complete LAS UI.  The base 
+class includes a set of left-hand navigation controls which includes a data set picker, a selector for choosing an operation, 
+an axis widget group which includes all of the axes selection elements needed for a particular operation and data set, plot options
+controls and a update button to refresh the plot.  The base UI can be instantiated with one or 
+more {@link gov.noaa.pmel.tmap.las.client.laswidget.OutputPanel} objects which can submit product requests and can catch 
+and display the LAS product request output.
+
+Implementors should sub-class the BaseUI and provide the appropriate Handler classes that implement what you want to happen when
+a new data set is selected, when a new operation is selected and when the apply button is pressed (usually call the {@link gov.noaa.pmel.tmap.las.client.laswidget.OutputPanel#refreshPlot(Map, boolean, boolean)} method
+in your {@link gov.noaa.pmel.tmap.las.client.laswidget.OutputPanel} objects).
+
+{@link gov.noaa.pmel.tmap.las.client.VizGal} and {@link gov.noaa.pmel.tmap.las.client.TestUI} are examples of sub-classes of BaseUI that
+implement all of the necessary Handlers and use the OutputPanel to display results.
+
+{@link gov.noaa.pmel.tamp.las.client.TimeSeries} and {@link gov.noaa.pmel.tamp.las.client.TimeSeriesMap} are examples of interfaces
+specifically for display of stations on a map and the creation of time series plots from the station data.  They do not use the BaseUI.
+First is based on a OpenLayers map and uses {@link gov.noaa.pmel.tmap.las.client.OLTimeSeriesMap.java} as the map interface.  
+The second uses Google maps for GWT.
+
+{@link gov.noaa.pmel.tamp.las.client.rpc.RPCService}, {@link gov.noaa.pmel.tamp.las.client.rpc.RPCServiceAsync} and 
+{@link gov.noaa.pmel.tamp.las.client.rpc.RPCException} are all the pieces that set up the interface to the GWT RPC for LAS.
+</body>
+</html>

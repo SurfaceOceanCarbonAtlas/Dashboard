@@ -1,0 +1,83 @@
+! set_deg_min_sec.jnl
+! When deg_min_sec formatting of axes is requested, see which axes 
+! this applies to and decide whether to call dms or just dm.
+
+CANCEL SYMBOL use_dms
+CANCEL SYMBOL xform_dms
+CANCEL SYMBOL yform_dms
+
+CAN MODE LONG
+CAN MODE LAT
+
+! If its a curvilinear native plot (not regridded to rect.), get the information
+! from the curvilinear coordinate variables
+
+IF `($ferret_curvi_coord_lat"0|*>1") + ($constraint_0_lhs"1|Curv_to_Rect_Regridding>0|*>1") EQ 2` THEN
+  IF `STRINDEX("($ferret_view)", "x") GT 0` THEN 
+     DEFINE SYMBOL coord_units = `($ferret_curvi_coord_lon)[d=($data_num)],RETURN=units`
+     IF `STRINDEX ("($coord_units)", "deg") GT 0` THEN
+         DEFINE SYMBOL xform_dms = dm
+         DEFINE SYMBOL use_dms 1
+         LET coord_lo = ($ferret_curvi_coord_lon)[d=($data_num),x=@min,y=@min]
+         LET coord_hi = ($ferret_curvi_coord_lon)[d=($data_num),x=@max,y=@max]
+         IF `coord_hi - coord_lo LT 0.5` THEN DEFINE SYMBOL xform_dms = dms
+         IF `coord_hi - coord_lo GE 5` THEN CANCEL SYMBOL xform_dms
+     ENDIF
+  ENDIF
+
+  IF `STRINDEX("($ferret_view)", "y") GT 0` THEN 
+
+  DEFINE SYMBOL coord_units = `($ferret_curvi_coord_lat)[d=($data_num)],RETURN=units`
+     IF `STRINDEX ("($coord_units)", "deg") GT 0` THEN
+         DEFINE SYMBOL yform_dms = dm
+         DEFINE SYMBOL use_dms 1
+         LET coord_lo = ($ferret_curvi_coord_lat)[d=($data_num),x=@min,y=@min]
+         LET coord_hi = ($ferret_curvi_coord_lat)[d=($data_num),x=@max,y=@max]
+         IF `coord_hi - coord_lo LT 0.5` THEN DEFINE SYMBOL yform_dms = dms
+         IF `coord_hi - coord_lo GE 5` THEN CANCEL SYMBOL yform_dms
+     ENDIF
+  ENDIF
+
+ELSE
+
+! units of degrees can be on any axis.
+   
+   DEFINE SYMBOL data_shape `($ferret_plot_base_var),RETURN=shape`
+ 
+   DEFINE SYMBOL direc = `SUBSTRING ("($data_shape)", 0, 1)`
+   DEFINE SYMBOL coord_units = `($ferret_plot_base_var),RETURN=($direc)units`
+   IF `STRINDEX ("($coord_units)", "deg") GT 0` THEN
+      DEFINE SYMBOL xform_dms = dm
+      DEFINE SYMBOL use_dms 1
+      LET coord_lo = `($ferret_plot_base_var),RETURN=($direc)start`
+      LET coord_hi = `($ferret_plot_base_var),RETURN=($direc)end`
+      IF `coord_hi - coord_lo LT 0.5` THEN DEFINE SYMBOL xform_dms = dms
+      IF `coord_hi - coord_lo GE 5` THEN CANCEL SYMBOL xform_dms
+
+         list coord_lo, coord_hi, coord_hi - coord_lo
+! For 2D plots, a YT plot will have the Y axis in the horizontal direction
+      IF `STRINDEX("($data_shape)", "YT") GT 0` THEN
+         DEFINE SYMBOL yform_dms ($xform_dms)
+         CANCEL SYMBOL xform_dms
+      ENDIF
+   
+   ENDIF
+
+! Check for units of degrees on the second axis, if this is a 2D plot
+
+   IF `STRLEN("($data_shape)") GT 1` THEN
+      DEFINE SYMBOL direc = `SUBSTRING ("($data_shape)", 2, 1)`
+      DEFINE SYMBOL coord_units = `($ferret_plot_base_var),RETURN=($direc)units`
+      IF `STRINDEX ("($coord_units)", "deg") GT 0` THEN
+         DEFINE SYMBOL yform_dms = dm
+         DEFINE SYMBOL use_dms 1
+         LET coord_lo = `($ferret_plot_base_var),RETURN=($direc)start`
+         LET coord_hi = `($ferret_plot_base_var),RETURN=($direc)end`
+         IF `coord_hi - coord_lo LT 0.5` THEN DEFINE SYMBOL yform_dms = dms
+         IF `coord_hi - coord_lo GE 5` THEN CANCEL SYMBOL yform_dms
+      ENDIF
+   ENDIF
+
+ENDIF
+SET MODE/LAST LONG
+SET MODE/LAST LAT

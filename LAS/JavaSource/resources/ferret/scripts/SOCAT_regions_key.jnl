@@ -1,0 +1,46 @@
+! SOCAT_regions_key
+! Label the key with SOCAT QC region
+
+! --------
+LET n_key_levs = 8
+
+IF ($horizontal_key"0|*>1") THEN
+
+LET vht = (($ppl$ylen) + ($ppl$yorg)) * 1.15
+IF ($vp_height"0|*>1") THEN LET vht = ($vp_height)
+
+LET rem = vht - (($ppl$ylen) + ($ppl$yorg))
+LET ymaxx = 0.18*($ppl$ylen)
+LET key_hi = MIN (`($ppl$yorg) + ($ppl$ylen) + ymaxx`,`vht-0.051*rem`)
+
+LET key_lo = (($ppl$yorg) + ($ppl$ylen) + 0.18*MIN (rem,ymaxx))
+LET key_lo = (($ppl$ylen) + 0.18*MIN (rem,ymaxx))
+LET key_inc = `0.1 * (key_hi - key_lo)`
+
+LET key_hi = `key_lo + 8.0*key_inc`
+LET key_hi = `key_lo + 2.0*key_inc + 0.15`
+
+let keylen = `x2-x1`
+let keydel = keylen/`n_key_levs`
+let keystart = x1 - ($ppl$xorg) + keydel/2
+
+! key_hi-0.07-1,0,.05,l
+
+LABEL/NOUSER `keydel*0+keystart`,`key_hi`,0,0,.09,"North<NL>Atlantic"
+
+LABEL/NOUSER `keydel*1+keystart`,`key_hi`,0,0,.09," <NL>Coastal"
+
+LABEL/NOUSER `keydel*2+keystart`,`key_hi`,0,0,.09," <NL>Indian"
+
+LABEL/NOUSER `keydel*3+keystart`,`key_hi`,0,0,.09,"North<NL>Pacific"
+
+LABEL/NOUSER `keydel*4+keystart`,`key_hi`,0,0,.09," <NL>Southern"
+
+LABEL/NOUSER `keydel*5+keystart`,`key_hi`,0,0,.09,"Tropical<NL>Pacific"
+
+LABEL/NOUSER `keydel*6+keystart`,`key_hi`,0,0,.09,"Tropical<NL>Atlantic"
+
+LABEL/NOUSER `keydel*7+keystart`,`key_hi`,0,0,.09," <NL>Arctic"
+
+! ----- End of SOCAT_regions_key.jnl ------------------------------------------------
+

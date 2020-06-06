@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+<title>LAS Output</title></head>
+<body bgcolor="white">
+#set ($error=$las_response.getResult("error"))
+#if ( $error != "" )
+<h3>An error occurred creating your product.</h3>
+The information below contains the messages that were written to standard output
+and standard error.
+<hr>
+<pre>
+$error
+</pre>
+#else
+Request String: $las_request.toJavaScriptSafeString();
+<table border="1">
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>size</td><td>$!las_request.getProperty("ferret", "size")</td></tr>
+<tr><td>format</td><td>$!las_request.getProperty("ferret", "format")</td></tr>
+<tr><td>contour_levels</td><td>$!las_request.getProperty("ferret", "contour_levels")</td></tr>
+<tr><td>use_ref_map</td><td>$!las_request.getProperty("ferret", "use_ref_map")</td></tr>
+</table>
+#set($use_ref_map=$las_request.getProperty("ferret", "use_ref_map"))
+<table>
+  <tr>
+     <td colspan="2">Plot</td>
+  </tr>
+  <tr>
+      <td>
+         <img border="0" src="$las_response.getResult("image1")">
+      </td>
+  </tr>
+    
+  #if( $use_ref_map=="1" )
+    <tr>
+     <td colspan="2">Reference Map</td>
+  </tr>  
+  <tr>
+      <td>
+         <img border="0" src="$las_response.getResult("ref_map")">
+      </td>
+  </tr>
+  #end
+    <tr>
+     <td colspan="2">Map Scale Information</td>
+  </tr>
+  <tr>
+      <td>
+          <table border="1">
+              <tr>
+                 <th>Attribute</th><th>value</th>
+              </tr>
+              <tr>
+                 <td>X Pixels per Inch</td><td>$las_map_scale.getXPixelsPerInch()</td>
+              </tr>
+              <tr>
+                 <td>Y Pixels per Inch</td><td>$las_map_scale.getYPixelsPerInch()</td>
+              </tr>
+              <tr>
+                 <td>X Plot Dimension</td><td>$las_map_scale.getXPlotSize()</td>
+              </tr>
+              <tr>
+                 <td>Y Plot Dimension</td><td>$las_map_scale.getYPlotSize()</td>
+              </tr>
+              <tr>
+                 <td>X Offset from Left</td><td>$las_map_scale.getXOffsetFromLeft()</td>
+              </tr>
+              <tr>
+                 <td>Y Offset from Bottom</td><td>$las_map_scale.getYOffsetFromBottom()</td>
+              </tr>
+              <tr>
+                 <td>X Axis Lower Left</td><td>$las_map_scale.getXAxisLowerLeft()</td>
+              </tr>
+              <tr>
+                 <td>Y Lower Left</td><td>$las_map_scale.getYAxisLowerLeft()</td>
+              </tr>
+              <tr>
+                 <td>X Axis Upper Right</td><td>$las_map_scale.getXAxisUpperRight()</td>
+              </tr>
+              <tr>
+                 <td>Y Axis Upper Right</td><td>$las_map_scale.getYAxisUpperRight()</td>
+              </tr>
+           </table>
+      </td>
+  </tr>
+  #if ( $debug=="true" || $debug=="debug" ) 
+    <tr>
+     <td colspan="2">STDOUT/STDERR</td>
+  </tr>
+  <tr>
+     <td>
+       <iframe src="$las_response.getResult("debug")" width="600">
+           Missing debug output.
+        </iframe>
+     </td>
+  </tr>
+  #end
+</table>
+#end
+</body>
+</html>

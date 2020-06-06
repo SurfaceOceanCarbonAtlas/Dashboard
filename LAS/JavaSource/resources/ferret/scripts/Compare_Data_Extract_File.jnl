@@ -1,0 +1,15 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: rhs $
+!
+! Extracting to a netCDF file and some text and table files have different
+! options in the UI.  Need to separate them at this level to keep the UI
+! happy.  All the Data_Extract* scripts launch the same list_data.jnl script.
+!
+! The format symbol is called data_format in the options file.  Don't know why.  Rather than mess
+! with figuring out if it affects the old ui, just assign it here. The data_format will be one of 
+! one of "tsv" "csv" "asc".
+
+IF ($ferret_data_format_format"0|*>1") THEN DEFINE SYMBOL ferret_data_format = ($ferret_data_format_format)
+DEFINE SYMBOL ferret_format = asc
+GO list_data_difference

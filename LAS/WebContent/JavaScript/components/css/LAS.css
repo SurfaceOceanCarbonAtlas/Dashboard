@@ -1,0 +1,377 @@
+/** Add css rules here for your application. */
+/* Table style for data tables with alternating colors. */
+
+	/*  Define the background color for all the ODD background rows  */
+	.DataTable tr:nth-child(odd){ 
+		background: #F3E7C9;
+	}
+	/*  Define the background color for all the EVEN background rows  */
+	.DataTable tr:nth-child(even){
+		background: #FFFFFF;
+	}
+
+
+/* CSS for the WOCE flag editor. */
+.EDITOR-PushButton-up,
+.EDITOR-PushButton-up-hovering,
+.EDITOR-PushButton-up-disabled,
+.EDITOR-PushButton-down,
+.EDITOR-PushButton-down-hovering,
+.EDITOR-PushButton-down-disabled {
+  margin: 0;
+  text-decoration: none;
+  background: url("../images/hborder.png") repeat-x 0px -27px;
+}
+.EDITOR-PushButton-up,
+.EDITOR-PushButton-up-hovering,
+.EDITOR-PushButton-up-disabled {
+  padding: 1px 3px 1px 3px;
+}
+.EDITOR-PushButton-up {
+  border: 1px outset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-PushButton-up-hovering {
+  border: 1px outset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-PushButton-up-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: .5;
+  filter: alpha(opacity=40);
+  zoom: 1;
+}
+.EDITOR-PushButton-down,
+.EDITOR-PushButton-down-hovering,
+.EDITOR-PushButton-down-disabled {
+  padding: 2px 2px 1px 3px;
+}
+.EDITOR-PushButton-down {
+  border: 1px inset #666;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-PushButton-down-hovering {
+  border: 1px inset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-PushButton-down-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: 0.5;
+  filter: alpha(opacity=40);
+  zoom: 1;
+}
+
+
+
+.EDITOR-ToggleButton-up,
+.EDITOR-ToggleButton-up-hovering,
+.EDITOR-ToggleButton-up-disabled,
+.EDITOR-ToggleButton-down,
+.EDITOR-ToggleButton-down-hovering,
+.EDITOR-ToggleButton-down-disabled {
+  margin: 0;
+  text-decoration: none;
+  background: url("../images/hborder.png") repeat-x 0px -27px;
+}
+.EDITOR-ToggleButton-up,
+.EDITOR-ToggleButton-up-hovering,
+.EDITOR-ToggleButton-up-disabled {
+  padding: 1px 3px 1px 3px;
+}
+.EDITOR-ToggleButton-up {
+  border: 1px outset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-ToggleButton-up-hovering {
+  border: 1px outset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-ToggleButton-up-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: .5;
+  zoom: 1;
+  filter: alpha(opacity=40);
+}
+.EDITOR-ToggleButton-down,
+.EDITOR-ToggleButton-down-hovering,
+.EDITOR-ToggleButton-down-disabled {
+  padding: 2px 2px 1px 3px;
+}
+.EDITOR-ToggleButton-down {
+  background-position: 0 -513px;
+  border: 1px inset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-ToggleButton-down-hovering {
+  background-position: 0 -513px;
+  border: 1px inset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.EDITOR-ToggleButton-down-disabled {
+  background-position: 0 -513px;
+  border: 1px inset #ccc;
+  cursor: default;
+  opacity: .5;
+  zoom: 1;
+  filter: alpha(opacity=40);
+}
+.top-right {
+	float: right;
+}
+/*ENDOF WOCE Editor styles */
+.dirty {
+	background-color: yellow;
+}
+.nowrap {	
+	white-space: nowrap;
+	font-size:18px;
+    padding-top:5px;
+    padding-bottom:5px;
+    padding-right:10px;
+    padding-left:8px;
+}
+.nowrap-brown {
+	white-space: nowrap;
+	background-color: #F3E7C9;
+	font-size:18px;
+    padding-top:5px;
+    padding-bottom:5px;
+    padding-right:10px;
+    padding-left:8px;
+}
+.datatable {
+    table-collapse: collapse;
+    border: 2px solid black;
+    padding-top:4px;
+    padding-bottom:4px;
+    padding-right:4px;
+    padding-left:4px;
+}
+.headertable {
+    padding-top:4px;
+    padding-bottom:4px;
+    padding-right:4px;
+    padding-left:4px;
+}
+/* End of CSS for the WOCE flag editor. */
+.menulabel {
+	white-space: nowrap;
+}
+.allnone {
+	font-size: 12px;
+}
+.current-item {
+	font-size:18px;
+}
+.current-item:hover {
+	cursor: pointer;
+}
+.dropdown-item {
+	font-size:18px;
+}
+.dropdown-item:hover {
+	background-color: #F3E7C9;
+	cursor: pointer;
+}
+.gwt-PushButton-APPLY-NEEDED {
+	color: red;
+}
+.gwt-MenuItem-APPLY-NEEDED {
+	color: red;
+}
+
+.gwt-PushButton-SMALLER {
+	padding: 0px;
+	font-size: .8em;
+	margin: 1px;
+	padding: 1px;
+}
+
+.IN-LINE-BUTTON {
+	display: inline-block;
+	width: 40px;
+}
+.IN-LINE {
+	display: inline-block;
+}
+
+.gwt-ToggleButton-SMALLER {
+	padding: 0px;
+	font-size: .8em;
+	margin: 1px;
+	padding: 1px;
+}
+.gwt-StackLayoutPanelHeader-SMALLER {
+	font-size: .8em;
+}
+/*
+.gwt-Anchor-CONSTRAINT:link    {color:#900B09; background-color:transparent}
+.gwt-Anchor-CONSTRAINT:visited {color:#900B09; background-color:transparent}
+.gwt-Anchor-CONSTRAINT:active  {color:#FF0000; background-color:transparent}
+*/
+.gwt-Anchor-CONSTRAINT:hover { background-color:#ECECEC; color:red; text-decoration:underline; }
+
+.gwt-Anchor-CONSTRAINT {
+	cursor: pointer;
+}
+.gwt-ListBox-PADDING {
+	padding: 3px;
+}
+.gwt-RadioButton-PADDING {
+	padding: 4px;
+}
+.gwt-Anchor-PADDING {
+	padding-right: 8px;
+}
+
+.gwt-Label-PADDING {
+	padding: 4px;
+}
+
+.OL_MAP-ToggleButton-WIDTH {
+	margin: 0;
+	width: 30px;
+	height: 30px;
+}
+
+.gwt-TextBox-SMALLER {
+	padding: 0px;
+	font-size: 0.75em;
+}
+
+.regularBackground {
+	background-color: #ACE;
+}
+
+.panelBackground {
+	background-color: #CAE;
+}
+
+.highlightSelection {
+	background-color: #F5DEB3;
+}
+
+.selection {
+	background-color: #D2B48C;
+}
+
+.noBottomBorder {
+	border-top: 1px solid blue;
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+	border-bottom: none;
+}
+
+.noTopBottomBorder {
+	border-top: none;
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+	border-bottom: none;
+}
+
+.noTopBorder {
+	border-top: none;
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+	border-bottom: 1px solid blue;
+}
+
+.HEADER-WIDTH {
+	word-wrap: pre;
+	min-width: 72em;
+	width: 1150px;
+	overflow: auto;
+}
+
+.gwt-VerticalPanel-BORDER {
+	align: top;
+	border-top: 1px solid blue;
+	border-left: 1px solid blue;
+	border-right: 1px solid blue;
+	border-bottom: 1px solid blue;
+}
+.allBorder {
+	border-top: 1px solid #d0e4f6;
+	border-left: 1px solid #d0e4f6;
+	border-right: 1px solid #d0e4f6;
+	border-bottom: 1px solid #d0e4f6;
+	padding: 3px;
+}
+.allBorderGray {
+	border-top: 1px solid lightgray;
+	border-left: 1px solid lightgray;
+	border-right: 1px solid lightgray;
+	border-bottom: 1px solid lightgray;
+	padding: 3px;
+}
+
+.padding30 {
+	padding: 30px;
+}
+
+.las-align-right {
+	text-align: right;
+}
+
+.hideextra {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 5px;
+}
+
+.TinyBlue {
+	background-color: #ACE;
+	font-size: .75em;
+}
+
+.gwt-TextBox {
+	padding: 0px;
+	font-size: 0.8em;
+	color: black;
+}
+
+.gwt-ListBox {
+	font-size: 0.8em;
+	color: black;
+}
+.map-size {
+	height: 240px;
+}
+.no-map-size {
+	height: 18px;
+	line-height: 18px;
+}
+.footer {
+  position: absolute;
+  bottom: 30px;
+  clear: both;
+}
+.navbar {
+  width: 314px;
+  overflow: hidden;
+  float: left;
+}
+#output {
+   position: absolute;
+   left: 328px;  /* left nav is 300 + 3 + 3 (margin) + 2 + 2 (padding) + 3 + 3 (border) + 6 map margin + 2 pixels of gap.
+   padding: 2px;
+   margin: 3px;
+   border: 3px solid #ccc;
+   overflow: hidden;
+}

@@ -1,0 +1,157 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  list_grid_insitu.jnl
+!
+! $Author: Jing Y Li
+! $Date: 2008/05/05
+!
+! Extracts xy location for locations of insitu data 
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data_osmc 0
+
+!**********************************************************************
+! for each grid point, output its
+! - location (lon, lat)
+! - time
+!**********************************************************************
+! What if the x locations are a modulo-360 distance outside the region?
+! Define a new variable with the data plus or minus 360.
+
+DEFINE SYMBOL data_x_var_xmod = ($data_x_var)
+
+LET data_x = ($data_x_var)
+LET data_xmin = data_x[x=@min,y=@min,z=@min,t=@min]
+LET data_xmax = data_x[x=@max,y=@max,z=@max,t=@max]
+IF `data_xmax LT ($region_x_lo)` THEN
+   DEFINE SYMBOL data_x_var_xmod = ($data_x_var)+360
+ENDIF
+
+IF `data_xmin GT ($region_x_hi)` THEN
+   DEFINE SYMBOL data_x_var_xmod = ($data_x_var)-360
+ENDIF
+
+!LET data_x_1 = IF ($data_x_var) LT ($region_x_lo) THEN ($data_x_var)+360 ELSE ($data_x_var)
+!LET data_x_out = IF data_x_1 GT ($region_x_hi) THEN data_x_1-360 ELSE data_x_1 
+
+!
+LET data_time = 'CTIME'
+
+LET thi = data_time[x=@max]
+LET tlo = data_time[x=@min]
+
+!empty netcdf file
+IF `thi EQ -9999` THEN
+  SET LIST/FILE="($result_ferret_listing_filename)"
+  let aa = "****"
+  LIST/NOHEADER/NOROWHEADER/CLOBBER/FILE aa
+ELSE
+  ! This gets the string "hours" out of the units string which is  "hours since 1970-01-01 00:00:00"
+  ! Or you could just know this and  DEFINE SYMBOL tax_units = hours
+  DEFINE SYMBOL tax_att_units = `ctime.units`
+  LET spac = STRINDEX("($tax_att_units)"," ")
+  DEFINE SYMBOL tax_units = `SUBSTRING("($tax_att_units)", 1, spac-1)`
+
+  ! Define a time axis with the same origin and units as the variable in the data.
+  DEFINE AXIS/T0="`ctime.time_origin`"/T=`tlo`:`thi`:1/UNITS=($tax_units) timeaxis
+  LET tt = t[gt=timeaxis]
+
+  ! Now this will be the date strings. It doesn't matter that data_time is
+  ! still just on the original x axis.
+  LET time_strings = TAX_DATESTRING (data_time, tt, "seconds")
+  !LIST/nohead/norowhead time_strings
+
+  SET LIST/FILE="($result_ferret_listing_filename)"
+  !LIST/NOHEADER/NOROWHEADER/CLOBBER/FORMAT=(f7.2, f7.2,f7.2,f7.2)/FILE ($data_x_var_xmod), ($data_y_var), depth, temperature
+  !LIST/NOHEADER/NOROWHEADER/CLOBBER/FORMAT=(f7.2, f7.2, A20)/FILE ($data_x_var_xmod), ($data_y_var),time_strings
+  LIST/NOHEADER/NOROWHEADER/CLOBBER/FILE ($data_x_var_xmod),($data_y_var),time_strings, plat_id, country, type
+
+  !LET xml = "<?xml version='1.0' encoding='UTF-8'?>"
+  !define variable len = STRLEN(xml)
+  !define symbol fmt = A`len`
+  !list/norowhead/nohead/clobber/format=(($fmt))/FILE xml
+
+  !root of the xml file
+  !LET f = "<ob_points>"
+  !list/norowhead/nohead/format=(A11)/FILE/append f
+
+  !LET f = "</ob_points>"
+  !list/norowhead/nohead/format=(A12)/FILE/append f
+ENDIF
+
+!*************************************************************************
+!output some info about the LAS request, which will be used to create the
+!description for place marks
+!*************************************************************************
+SET LIST/FILE="($result_las_request_info_filename)"
+LET xml = "<?xml version='1.0' encoding='UTF-8'?>"
+define variable len = STRLEN(xml)
+define symbol fmt = A`len`
+list/norowhead/nohead/clobber/format=(($fmt))/FILE xml
+
+!root of the xml file
+LET f = "<las_req_info>"
+list/norowhead/nohead/format=(A14)/FILE/append f
+
+!==================
+! output dataset ID
+!==================
+LET dsID = "($data_0_dataset_ID)"
+define variable len = STRLEN(dsID)
+define symbol fmt = A`len`
+list/nohead/format=("<dataset_id>",($fmt),"</dataset_id>")/FILE/append dsID
+
+!===================
+! output variable ID
+!===================
+LET varID = "($data_0_ID)"
+define variable len = STRLEN(varID)
+define symbol fmt = A`len`
+list/nohead/format=("<variable_id>",($fmt),"</variable_id>"))/FILE/append varID
+
+!===================
+! output colorBy
+!===================
+LET colorBy = "($ferret_colorBy)"
+!LET colorBy = "country"
+define variable len = STRLEN(colorBy)
+define symbol fmt = A`len`
+list/nohead/format=("<colorBy>",($fmt),"</colorBy>"))/FILE/append colorBy
+
+!===================
+! output tlo and thi
+!===================
+LET tlo = "($region_0_t_lo)"
+LET thi = "($region_0_t_hi)"
+LET f = "<t_region>"        
+list/norowhead/nohead/format=(A10)/FILE/append f
+
+define variable len = STRLEN(tlo)
+define symbol fmt = A`len`
+list/nohead/format=("<t_lo>",($fmt),"</t_lo>")/FILE/append tlo
+
+define variable len = STRLEN(thi)
+define symbol fmt = A`len`
+list/nohead/format=("<t_hi>",($fmt),"</t_hi>")/FILE/append thi
+
+LET f = "</t_region>"
+list/norowhead/nohead/format=(A11)/FILE/append f
+
+LET zlo = "($region_0_z_lo)"
+LET zhi = "($region_0_z_hi)"
+LET f = "<z_region>"
+list/norowhead/nohead/format=(A10)/FILE/append f
+
+define variable len = STRLEN(zlo)
+define symbol fmt = A`len`
+list/nohead/format=("<z_lo>",($fmt),"</z_lo>")/FILE/append zlo
+
+define variable len = STRLEN(zhi)
+define symbol fmt = A`len`
+list/nohead/format=("<z_hi>",($fmt),"</z_hi>")/FILE/append zhi
+
+LET f = "</z_region>"
+list/norowhead/nohead/format=(A11)/FILE/append f
+
+LET f = "</las_req_info>"
+list/norowhead/nohead/format=(A15)/FILE/append f
+

@@ -1,0 +1,110 @@
+! LAS_draw_xy_vector_plot.jnl
+! 
+! Draw an XY vector plot.  This may be a single vector pair or 
+! a difference plot. The scripts that call this are expected
+! to have opened the datasets, defined regions and made settings
+! based on plot options. Non-difference plots may set up for Google
+! Earth plot. They define either the symbol
+!
+!   ferret_vector_variable, if the vector variables are on a rectilinear grid
+! or 
+!   ferret_curvi_base_var, if the vector variables are on a curvilinear grid.  
+!
+!
+! Draw  the plot. 
+
+! Flowline style vectors do not apply subsampling.
+! First do w/o flowline, to allow for vector_labels_reset, then do flowline plot.
+
+! First do w/o flowline, to allow for vector_labels_reset, then do flowline plot.
+IF ($flowline_vectors"0") THEN 
+   IF ($native_curvilinear_xy"0") THEN 
+   
+      VECTOR/TITLE=" "/SET ($ferret_curvi_base_var), xcoord, ycoord
+      GO vector_labels_reset
+      IF ($ferret_annotations"0|*>1") THEN DEFINE SYMBOL qualifiers = ($qualifiers)/NOLAB
+      VECTOR($qualifiers)/TITLE=" " ($ferret_curvi_base_var), xcoord, ycoord
+      IF ($ferret_annotations"0|*>1") THEN LABEL/NOUSER 2,`($ppl$ylen)+0.2`, 0, 1, 0.1, ($PPL_VECLEN)
+
+      VECTOR($qualifiers)/TITLE=" "/OVER/NOLAB  ($ferret_curvi_base_var), xcoord-360, ycoord
+
+   ELSE
+      VECTOR/TITLE=" "/SET ($ferret_vector_variable)
+      GO vector_labels_reset
+      IF ($ferret_annotations"0|*>1") THEN DEFINE SYMBOL qualifiers = ($qualifiers)/NOLAB
+      VECTOR($qualifiers)/TITLE=" " ($ferret_vector_variable)
+      IF ($ferret_annotations"0|*>1") THEN LABEL/NOUSER 2,`($ppl$ylen)+0.2`, 0, 1, 0.1, ($PPL_VECLEN)
+   ENDIF
+
+   EXIT/SCRIPT
+ENDIF
+
+! use XSKIP and YSKIP as qualifiers if given
+IF ($ferret_vector_subsampling"0") THEN
+
+   IF ($native_curvilinear_xy"0") THEN 
+
+      VECTOR($qualifiers)/TITLE=" "/XSKIP=`xs`/YSKIP=`ys`/SET \
+       ($ferret_curvi_base_var), xcoord, ycoord
+       GO vector_labels_reset
+       PPL VECTOR,`xs`,`ys` 
+      
+      VECTOR($qualifiers)/TITLE=" "/XSKIP=`xs`/YSKIP=`ys`/OVER/NOLAB \
+       ($ferret_curvi_base_var), xcoord-360, ycoord
+
+   ELSE
+      VECTOR($qualifiers)/TITLE=" "/XSKIP=`xs`/YSKIP=`ys`/SET \
+       ($ferret_vector_variable)
+       GO vector_labels_reset
+       PPL VECTOR,`xs`,`ys` 
+
+   ENDIF
+
+ELSE
+   IF ($native_curvilinear_xy"0") THEN 
+   ! Get the automatic vector skip values, then plot, making PPL settings.
+      VECTOR($qualifiers)/TITLE=" "/NOLAB/NOAX/color=8 \
+      ($ferret_curvi_base_var), xcoord, ycoord
+
+      VECTOR($qualifiers)/TITLE=" "/SET \
+      ($ferret_curvi_base_var), xcoord, ycoord
+       GO vector_labels_reset
+       PPL VECTOR, ($PPL_VEC_XSKIP), ($PPL_VEC_YSKIP)
+
+      VECTOR($qualifiers)/TITLE=" "/OVER/NOLAB/SET \
+       ($ferret_curvi_base_var), xcoord-360, ycoord
+       GO vector_labels_reset
+       PPL VECTOR/over, ($PPL_VEC_XSKIP), ($PPL_VEC_YSKIP)
+
+   ELSE
+
+      ! Get the automatic vector skip values, then plot, making PPL settings.
+      VECTOR($qualifiers)/TITLE=" "/NOLAB/NOAX/color=8 \
+         ($ferret_vector_variable)
+
+      VECTOR($qualifiers)/TITLE=" "/SET ($ferret_vector_variable)
+       GO vector_labels_reset
+       PPL VECTOR, ($PPL_VEC_XSKIP), ($PPL_VEC_YSKIP)
+   ENDIF
+ENDIF
+
+! Label with skip, if skip >1 in either direction
+IF `( ($PPL_VEC_XSKIP"0") GT 1)  OR (($PPL_VEC_YSKIP"0") GT 1)` THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = \
+    Vector subsampling x=($PPL_VEC_XSKIP), y=($PPL_VEC_YSKIP) 
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+ELIF ($ferret_vector_subsampling"0") THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = \
+    Vector subsampling x=`xs`, y=`ys`
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+ENDIF
+
+! End of file ------------LAS_draw_xy_vector_plot.jnl--------------------------

@@ -1,0 +1,113 @@
+! LAS_set_GE_placemarks.jnl
+
+! Set up for GE placemarks; called by 
+! list_grid. 
+
+! compute stride value for Google Earth placemarks, these values are 
+! different from the strides for memory management or plot size. 
+! The xycoord is set in LAS_setup_strides_GE.jnl
+
+GO LAS_setup_strides_GE
+
+CANCEL MODE long
+CANCEL MODE lat
+
+
+IF ($region_x_lo"0|*>1") THEN
+
+   DEFINE SYMBOL xstride_coord = `INT(xycoord)`
+   LET min_pl = MIN(3, `INT(($region_x_range)/10)`)
+   IF `(($region_x_range) LT 90) AND \
+       (($region_x_range)/($xstride_coord) LT min_pl)` THEN
+
+      DEFINE SYMBOL  xstride_coord = `($xstride_coord)/2` 
+
+   ! Make sure there are a reasonable number of points in each direction
+      REPEAT/RANGE=1:5 (IF `($region_x_range)/($xstride_coord) LT min_pl` THEN \
+        DEFINE SYMBOL xstride_coord = `($xstride_coord)/2`  )
+
+   ENDIF
+
+ENDIF
+
+IF ($region_y_lo"0|*>1") THEN
+
+   DEFINE SYMBOL ystride_coord = `INT(xycoord)`   ! stride value in y
+
+   ! Make sure there are a reasonable number of points in each direction
+   LET min_pl = MIN(3, `INT(($region_x_range)/10)`)
+   IF `(($region_y_range) LT 60) AND \
+       (($region_y_range)/($ystride_coord) LT min_pl)` THEN
+
+      DEFINE SYMBOL ystride_coord = `($ystride_coord)/2` 
+
+   ! Make sure there is more than one point in each direction
+      REPEAT/RANGE=1:5 (IF `($region_y_range)/($ystride_coord) LT min_pl` THEN \
+        DEFINE SYMBOL  ystride_coord = `($ystride_coord)/2` )
+
+   ENDIF
+
+ENDIF
+
+! First rectilinear case 
+IF `($native_curvilinear_xy"0|*>1") EQ 0` THEN
+
+  IF ($region_x_lo"0|*>1") THEN
+
+    ! data's native resolution in x (the first dx may be 
+    ! too large if this is a subspan modulo axis, so look at I=2)
+    DEFINE SYMBOL data_xcoord = `xbox[gx=($data_var),x=($region_x_lo)]`
+    DEFINE SYMBOL data_xcoord = `xbox[gx=($data_var),I=2]`
+
+    ! make sure xstride_coord is not less than the data's native resolution
+    IF `($xstride_coord) LT ($data_xcoord)` THEN \
+       DEFINE SYMBOL xstride_coord = ($data_xcoord)
+    ENDIF
+
+  IF ($region_y_lo"0|*>1") THEN
+            
+    ! data's native resolution in y
+    DEFINE SYMBOL data_ycoord = `ybox[gy=($data_var),J=2]`
+
+    ! make sure ystride_coord is not less than the data's native resolution
+    IF `($ystride_coord) LT ($data_ycoord)` THEN \
+        DEFINE SYMBOL ystride_coord = ($data_ycoord)
+
+  ENDIF
+
+ELSE  ! curvilinear
+
+! For native curvilinear plots the strides are index strides.
+! compute stride value for Google Earth placemarks
+
+  IF ($region_x_lo"0|*>1") THEN
+
+    ! data's  nominal resolution in x
+    DEFINE SYMBOL data_xcoord = `($region_x_range)/(($clon_imax) - ($clon_imin))`
+
+    DEFINE SYMBOL xstride_coord = `INT(0.5+($xstride_coord)/($data_xcoord))`   ! istride value in y
+
+    ! make sure index stride xstride_coord is at least 1
+    IF `($xstride_coord) LT 1` THEN DEFINE SYMBOL xstride_coord = 1
+
+  ENDIF
+
+  IF ($region_y_lo"0|*>1") THEN
+
+    ! data's  nominal resolution in y
+    DEFINE SYMBOL data_ycoord = `($region_y_range)/(($clat_jmax) - ($clat_jmin))`
+
+    DEFINE SYMBOL ystride_coord = `INT(0.5+($ystride_coord)/($data_ycoord))`   ! jstride value in y
+
+    ! make sure index stride ystride_coord is at least 1
+    IF `($ystride_coord) LT 1` THEN DEFINE SYMBOL ystride_coord = 1
+
+  ENDIF
+
+ENDIF
+
+! Cleanup
+SET MODE/LAST long
+SET MODE/LAST lat
+
+! End of $RCSfile ------------LAS_set_GE_placemarks.jnl--------------------------

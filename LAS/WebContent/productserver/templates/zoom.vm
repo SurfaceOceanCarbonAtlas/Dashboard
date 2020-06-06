@@ -1,0 +1,125 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS Output -- $las_config.getTitle()</title>
+
+		<style media="all" type="text/css">
+			@import "JavaScript/ui/LASUI.css";
+		</style>
+</head>
+<body onload="initializeLASRequest(); loadMap(); resizeme()">
+  	<div id="img_body" name="img_body"></div>
+</body>
+
+<script language="JavaScript" src="JavaScript/components/xmldom.js"></script>
+<script language="JavaScript" src="JavaScript/components/LASRequest.js"></script>
+<SCRIPT language="JavaScript" src="JavaScript/components/MapWidget.js"></SCRIPT>
+<script language="JavaScript">
+var myMapWidget = {};  //put it in a global variable, or else you'll lose it.
+var Req = {}; //Same goes for the LAS request object
+var axisLow = "";
+var axisHi = "";
+#if($request.getParameter('openid')!='')
+var openid = "$request.getParameter('openid')";
+#else
+var openid =  "";
+#end
+/* 
+*  load the initial XY image that was requested from LAS
+*/
+function loadMap (){
+	var args = {
+                   'DOMNode' : document.getElementById('img_body'), // the container Node
+                   'onafterdraw' : function () {submitXML()},      //a function to fire after drawing (talk to me about this one)
+                   'plot_area' : {                              // defining the plot region within the image
+                           'offX' : $las_map_scale.getXOffsetFromLeft(),
+                           'offY' : $las_map_scale.getYOffsetFromTop(),
+                           'width' : $las_map_scale.getXPlotSize(),
+                           'height' : $las_map_scale.getYPlotSize()
+                   },
+                   'img' : {                                   //the image
+                           'src' : "$las_response.getResult("plot_image")",
+                           'width' : $las_map_scale.getXImageSize(),
+                           'height' :$las_map_scale.getYImageSize(),
+                           'extent' : {                                       //coordinate extent of the image being passed
+                               'x' : {
+                                   'min' : $las_map_scale.getXAxisLowerLeft(),
+                                   'max' : $las_map_scale.getXAxisUpperRight()
+                               },
+                               'y' : {
+                                   'min' : $las_map_scale.getYAxisLowerLeft(),
+                                   'max' : $las_map_scale.getYAxisUpperRight()
+                               }
+                           }
+                       }
+                  }
+
+	if('$las_map_scale.getAxis_vertical_positive()'=='down') {
+		args.img.extent.y.max = parseFloat('$las_map_scale.getYAxisLowerLeft()');
+		args.img.extent.y.min =  parseFloat('$las_map_scale.getYAxisUpperRight()');
+	}
+	if('$las_map_scale.getAxis_horizontal_positive()'=='left') {
+                args.img.extent.x.max = parseFloat('$las_map_scale.getXAxisLowerLeft()');
+                args.img.extent.x.min =  parseFloat('$las_map_scale.getXAxisUpperRight()');
+        }
+
+
+	myMapWidget = new MapWidget(args);
+    
+    parent.updateMapSelection(args.img.extent.y.min, args.img.extent.y.max, args.img.extent.x.min, args.img.extent.x.max);
+
+
+}
+
+function initializeLASRequest() {
+  Req = new LASRequest('$las_request.toJavaScriptSafeString()');
+}
+function submitXML() {
+
+  if ((myMapWidget.extents.selection.grid.x.min == myMapWidget.extents.selection.grid.x.max) || (myMapWidget.extents.selection.grid.y.min == myMapWidget.extents.selection.grid.y.max)) { 
+  } else {
+    H_axis = '$las_map_scale.getAxis_horizontal()';
+    V_axis = '$las_map_scale.getAxis_vertical()';
+    H_axis_lc = '$las_map_scale.getAxis_horizontal().toLowerCase()';
+    V_axis_lc = '$las_map_scale.getAxis_vertical().toLowerCase()';
+    axes="xyzt";
+    if(H_axis_lc&&axes.search(H_axis_lc)>=0) 
+    	Req.setRange(H_axis_lc,myMapWidget.extents.selection.grid.x.min,myMapWidget.extents.selection.grid.x.max);
+    else if (Req.getOperation().indexOf('prop_prop_plot')>=0) {
+	 Req.addVariableConstraint(Req.getDataset(0), H_axis,"le",myMapWidget.extents.selection.grid.x.max,"hmax");
+    	 Req.addVariableConstraint(Req.getDataset(0), H_axis,"ge",myMapWidget.extents.selection.grid.x.min,"hmin");
+    }
+    if(V_axis_lc&&axes.search(V_axis_lc)>=0)
+	Req.setRange(V_axis_lc,myMapWidget.extents.selection.grid.y.min,myMapWidget.extents.selection.grid.y.max);
+    else if (Req.getOperation().indexOf('prop_prop_plot')>=0){
+	 Req.addVariableConstraint(Req.getDataset(0), V_axis,"le",myMapWidget.extents.selection.grid.y.max,"vmax");
+         Req.addVariableConstraint(Req.getDataset(0), V_axis,"ge",myMapWidget.extents.selection.grid.y.min,"vmin");	
+    }
+    var URL = './ProductServer.do?xml=' + escape(Req.getXMLText());
+    if(openid!="")
+	URL+="&openid="+openid;
+    document.location = URL;
+  }
+}
+function resizeme () {
+	if(parent!=self) 
+       	 if(parent.document.getElementById("output")) {
+		 	parent.document.getElementById("output").height=window.screen.height+20;
+                 	parent.document.getElementById("output").width=window.screen.width+20;
+	}
+}
+</script>
+</html>
+#end

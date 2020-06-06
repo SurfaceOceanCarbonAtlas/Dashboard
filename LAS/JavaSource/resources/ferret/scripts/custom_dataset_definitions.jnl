@@ -1,0 +1,47 @@
+! custom_dataset_definitions.jnl
+!
+! Define the symbol ferret_is_socat, and define the scripts 
+! that will be called.
+
+
+LET global_attnames = ..attnames
+IF `IS_ELEMENT_OF_STR(global_attnames, "title") GT 0` THEN
+  DEFINE SYMBOL dataset_title_att = `..title`
+  IF `STRINDEX("($dataset_title_att)", "SOCAT") GT 0` THEN DEFINE SYMBOL ferret_is_socat = 1
+ENDIF
+IF `STRINDEX("($data_($num)_dataset_id)", "SOCAT") GT 0` THEN DEFINE SYMBOL ferret_is_socat = 1
+
+IF ($ferret_is_socat"0") THEN 
+   DEFINE SYMBOL custom_dataset = socat
+   DEFINE SYMBOL custom_init = SOCAT_initialize
+   DEFINE SYMBOL custom_setup_vars = SOCAT_setup_variables
+   DEFINE SYMBOL custom_color_key = SOCAT_custom_colorbar
+   DEFINE SYMBOL custom_post_trajectory = SOCAT_mark_moorings
+
+   DEFINE SYMBOL ferret_land_palette = brown_soft
+
+! When listing all the variables to a csv or tab-delimtied file, 
+! skip redundant and unnecessary names.
+! These will be in addition to "($feature_variable)", "($rowvar)"
+! which are found after initializing the dataset
+
+DEFINE SYMBOL custom_skip_listnames = "longitude", "latitude", \
+"time", "tmonth", "day_of_year", "sample_number", "lon360", \
+"fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep" , \
+ "fCO2_from_pCO2_water_sst_100humidity_uatm" , \
+ "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa" , \
+ "fCO2_insitu_from_fCO2_water_equi_uatm" , \
+ "fCO2_insitu_from_fCO2_water_sst_100humidty_uatm" , \
+ "fCO2_from_pCO2_water_water_equi_temp" , \
+ "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa" , \
+ "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm" , \
+ "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa" , \
+ "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep" , \
+ "fCO2_from_pCO2_water_water_equi_temp_ncep" , \
+ "fCO2_insitu_from_xCO2_water_sst_dry_ppm" , \
+ "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", \
+ "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep"
+ENDIF
+
+
+!---------------- end of custom_dataset_definitions.jnl -------------------------

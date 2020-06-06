@@ -1,0 +1,93 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_initialize_data_std.jnl
+! 
+! Author: ansley 
+!
+! The LAS_initialize_data.jnl script takes care of everything having to
+! do with initializing a datset for later use.
+!
+! LAS_initialize_data.jnl takes an argument that specifies which data
+! item [0|1|2|3|...] to create symbols for. 
+!
+! 3/2007:
+! split up previous version of LAS_initialize_data.jnl into two;
+! initialize the dataset and define the plot (or output listing) variable.
+! This allows the custom init scripts to call LAS_initialize_dataset, then
+! issue commands for the customization, then call LAS_initialize_variable
+!
+! 8/2007:
+! The custom init scripts now consist of only SET DATA and the custom commands.
+! This lets F-TDS run first and call the init script to create the data set
+! that will be used by the Ferret product script. When F-TDS is done it will 
+! not send the symbol ferret_init_script to the product scripts so we will just skip
+! that step.
+!
+! 8/2007:
+! Some of the custom init scripts previously contained commands like SET MEMORY
+! or SET MODE which are intended to be executed by the product script These need
+! to be separated from commands for fixing grids or regridding which are executed
+! prior to the product script being run by F-TDS. These commands are to be specified
+! in the dataset configuration as ferret_init_commands, whose the value is a set
+! of Ferret commands separated by semicolons.
+!
+! 10/4/2016  fixes so init scripts still work
+!  1/ 2020   improved error messages on initializing dataset
+!  1/20/2020 For multiple variables (e.g. a csv listing of vars) do not run init script multiple times
+!
+GO LAS_initialize_dataset ($1"0")
+
+IF ($fer_last_error"0|0|1|*>1") THEN
+  DEFINE SYMBOL error_status = ERROR
+  DEFINE SYMBOL error_type = DATA
+  DEFINE SYMBOL error_string = The ($data_var) source file -- ($data_url) did not open successfully.
+  EXIT/SCRIPT
+ENDIF
+
+! Errors set in initialization of dataset ...
+IF ($error_status"0|ERROR>1|*>1") THEN 
+    MESSAGE/ERRORR **ERROR ($error_string)
+   EXIT/PROGRAM
+ENDIF
+
+! Generally don't want to run init scripts more than once; variables 
+! have been renamed.
+
+IF `($ferret_init_script"0|*>1") AND ($init_script_done"0") EQ 0` THEN 
+   GO ($ferret_init_script) ($dset($1"0"))
+   DEFINE SYMBOL init_script_done = 1
+ENDIF
+
+IF ($ferret_init_commands"0|*>1") THEN 
+  ($ferret_init_commands)
+ENDIF
+
+IF `($data_var"0|*>1") EQ 0` THEN DEFINE SYMBOL data_var = ($data_($num)_var)
+IF `($data_orig_var"0|*>1") EQ 0` THEN DEFINE SYMBOL data_orig_var = ($data_($num)_var)
+
+GO LAS_initialize_variable 
+DEFINE SYMBOL variable_($1"0")_lab = ($data_title) ($data_units)
+
+IF `STRINDEX("($variable_($1"0")_lab)", "e=") GT 0` THEN 
+   IF `STRINDEX("($variable_($1"0")_lab)", "Average") GT 0` THEN DEFINE SYMBOL ens_lab = Realizations: averaged all
+!   DEFINE SYMBOL variable_($1"0")_lab = ($data_0_name) ($data_units)
+ENDIF
+
+IF `($its_prop_prop_plot"0|*>1") EQ 0` THEN
+   IF ($variable_lab"0|*>1") THEN 
+      DEFINE SYMBOL variable_lab = ($variable_lab), ($data_title) ($data_units)
+   ELSE
+      DEFINE SYMBOL variable_lab = ($data_title) ($data_units)
+   ENDIF
+ENDIF
+IF `($its_prop_prop_plot"0|*>1")` THEN DEFINE SYMBOL variable_lab = ($data_title) ($data_units)
+
+!sh sym variable_lab
+!LET bracket = `STRINDEX("($variable_lab)", "[")`
+!IF `bracket EQ 1` THEN DEFINE SYMBOL variable_lab = ($variable_($1"0")_lab)
+
+IF `STRLEN("($ferret_view)") GT 1 AND ($its_prop_prop_plot"0|*>1") EQ 0 AND \
+($itsa_vector_plot"0|*>1") EQ 0` THEN DEFINE SYMBOL qualifiers = ($qualifiers)/KEY=CONT
+
+IF ($ferret_expression"0|*>1") THEN GO LAS_expression
+
+! End of $RCSfile ------------LAS_initialize_data.jnl--------------------------

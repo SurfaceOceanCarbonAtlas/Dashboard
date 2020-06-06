@@ -1,0 +1,134 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+  background-color: #CCC;
+}
+
+/*
+ * Elements identified by HTML tag
+ */
+
+
+/*
+ * Elements identified by id  (begin with '#')
+ */
+
+/* Overall table */
+
+#LSS_Table {
+  background-color: #FFF;
+  border-spacing: 4px;
+  color: black;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+#LSS_Table .LSS_banner {
+  color: #579;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Options row */
+
+#LSS_Table .LSS_optionTable {
+  background-color: #ACE;
+  border-spacing: 0;
+  padding: 6px;
+}
+
+#LSS_optionLabel {
+  font-family: Times New Roman, serif;
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+/* Control row */
+
+#LSS_controlTable {
+  border: 2px solid black;
+  padding: 4px;
+  width: 100%;
+}
+
+#LSS_G1Title {
+  color: #D33;
+  font-weight: bold;
+}
+
+#LSS_G1Bold {
+  color: #000;
+  font-weight: bold;
+}
+
+#LSS_modeCell {
+  border: 1px solid black;
+  padding: 2px;
+  width: 8em;
+  text-align: center;
+}
+
+#LSS_modeAnchor {
+  color: black;
+  text-decoration: none;
+}
+
+/* Images row */
+
+#LSS_imagesTable {
+  padding: 0px;
+}
+
+/*
+ * Elements identified by class (begin with '.')
+ */
+
+.regularBackground {
+  background-color: #ACE;
+}
+
+.anomalyBackground {
+  background-color: #8C8;
+}
+
+.downloadingBackground {
+  background-color: #ECA;
+}
+
+.LSS_imageCell {
+  padding: 2px;
+  text-align: center;
+}
+
+.LSS_imageCell img{
+  border: none;
+}
+
+.CCell_las_message {
+  font-family: sans-serif;
+  font-weight: bold;
+  color: #E33;
+}
+
+.CCell_text {
+  font-family: sans-serif;
+  font-weight: normal;
+}
+
+.CCell_exception_message {
+  font-family: courier;
+  font-weight: normal;
+}
+
+.CCell_error_link {
+  font-family: Times,serif;
+  font-weight: normal;
+}
+
+.LSS_footer {
+  font-family: Times New Roman, serif;
+  font-size: 10pt;
+  font-weight: normal;
+}

@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+ADDXML_HOME="@PWD@"
+TOMCAT_HOME="@JAKARTA_HOME@"
+if [ "$JAVA_HOME" == "" ]
+then
+   echo "Please set the JAVA_HOME environment variable"
+   exit
+fi
+if [ "$ADDXML_HOME" == "" ]
+then
+   echo "Please edit the addDiscrete.sh file and set the home directory of your addXML installation."
+   exit
+fi
+if [ "$TOMCAT_HOME" == "" ]
+then
+   echo "Please edit the addDiscrete.sh file and set the home directory of your tomcat installation."
+   exit
+fi
+$JAVA_HOME/bin/java -cp "$TOMCAT_HOME/lib/*:$ADDXML_HOME/JavaSource:$ADDXML_HOME/dist/lib/addXML.jar:$ADDXML_HOME/WebContent/WEB-INF/lib/*" gov.noaa.pmel.tmap.addxml.ErddapScanner "$@"

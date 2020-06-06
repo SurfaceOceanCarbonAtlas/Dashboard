@@ -1,0 +1,209 @@
+! transform_seasonal.jnl
+! 
+! ACM 9/29/2006
+!     4/2007 ACM Apply Ferret symbols for any expression that may have been defined
+
+set mode ver:always
+
+! Example file running a transform to define and regrid to a seasonal axis.
+
+! Seasonal regridding; if the incoming data is on a modulo time axis,
+! make this a modulo regridding.
+
+! incoming symbols define the regridding and where its to be centered
+!   DEFINE SYMBOL constraint_0_op = eq
+!   DEFINE SYMBOL constraint_0_lhs = Seasonal_Regridding
+!   DEFINE SYMBOL constraint_0_rhs = DJF or JFM or FMA
+!   DEFINE SYMBOL constraint_0_type = text
+
+
+! If there is no T axis (a time-averaged variable) then return an error.
+IF `($region_t_lo"0|*>1") EQ 0` THEN 
+   DEFINE SYMBOL error_string = Sorry. This server cannot yet perform a time analysis and a seasonal constraint together.
+   MESSAGE/ERROR **ERROR ($error_string)
+   EXIT/SCRIPT
+ENDIF
+
+
+! When this is an XY, XZ, or XZ plot, with no time dependence, cancel mode interpolate.
+! We still define a seasonal time axis and regrid to it, and then sample that at the requested
+! time. The sampling cannot be done via interpolation when we really just have one time step
+
+IF `STRCMP("($region_t_lo)", "($region_t_hi)") EQ 0` THEN
+    CANCEL MODE INTERPOLATE
+    DEFINE SYMBOL ferret_interpolate_data = 0
+ENDIF
+
+! See if a regridding operation was sent in. If not use defalt linear regridding.
+IF ($ferret_seasonal_transform"0|*>1") THEN DEFINE SYMBOL regrid_op = @($ferret_seasonal_transform)
+
+! First check whether the incoming time axis is a modulo axis...
+! If there is a modulo attribute, check that its value isnt  = NO
+
+LET tmod = 0
+DEFINE SYMBOL data_t = `($data_var),RETURN=taxis`
+
+LET all_attnames = (($data_t)).attnames
+IF `IS_ELEMENT_OF_STR(all_attnames, "modulo") GE 1` THEN 
+   LET tmod = 1
+   DEFINE SYMBOL modulo_val = MODULO_IS_`(($data_t)).modulo`
+   DEFINE SYMBOL up_modulo_val = `UPCASE ("($modulo_val)")`
+   IF `STRCMP("($up_modulo_val)", "MODULO_IS_NO") EQ 0`  THEN LET tmod = 0
+ENDIF 
+
+! If the original data is on a modulo time axis, regrid to
+! a modulo seasonal time axis
+
+IF `tmod` THEN
+
+   IF `($constraint_0_rhs"0|DJF>1|*>0)` THEN \
+   DEFINE AXIS/T/MODULO/UNITS=months/EDGES/t0=1-jan-0000 tseas = {12.,15,18.,21.,24.}
+
+   IF `($constraint_0_rhs"0|JFM>1|*>0)` THEN \
+   DEFINE AXIS/T/MODULO/UNITS=months/EDGES/t0=1-jan-0000 tseas = {0.,3.,6.,9.,12.}
+
+   IF `($constraint_0_rhs"0|FMA>1|*>0)` THEN \
+   DEFINE AXIS/T/MODULO/UNITS=months/EDGES/t0=1-jan-0000 tseas = {1.,4.,7.,10.,13.}
+
+   LET the_var_tseas($var_num)_mod = ($ferret_plot_var)
+   LET the_var_tseas($var_num)_mod_noregion = ($ferret_plot_var_noregion)
+
+   LET regrid_var_tseas($var_num)_mod = the_var_tseas($var_num)_mod[GT=tseas@MOD]
+   LET regrid_var_tseas($var_num)_mod_noregion = the_var_tseas($var_num)_mod_noregion[GT=tseas@MOD]
+
+   DEFINE SYMBOL ferret_plot_var ($expr1)regrid_var_tseas($var_num)_mod($expr2)
+   DEFINE SYMBOL ferret_plot_var_noregion ($expr1)the_var_tseas($var_num)_mod_noregion($expr2)
+
+   DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units) Seasonal regrid"
+
+   IF ($expr3"0|*>1") THEN
+      DEFINE SYMBOL ferret_plot_var ($expr1)regrid_var_tseas($var_num)_mod($expr3)regrid_var_tseas($var_num)_mod($expr4)
+      DEFINE SYMBOL ferret_plot_var_noregion \
+       ($expr1)regrid_var_tseas($var_num)_mod_noregion($expr3)regrid_var_tseas($var_num)_mod_noregion($expr4)
+      DEFINE SYMBOL ferret_plot_title "($expr1)($data_title)($expr3)($data$data_title_var)($expr4) Seasonal regrid"
+   ENDIF
+
+! When this is an XY, XZ, or XZ plot, with no time dependence, we want to regrid 
+! the requested month and surrounding months to the seasonal point requested,
+! and return that.
+
+   IF `STRCMP("($region_t_lo)", "($region_t_hi)") EQ 0` THEN
+   
+      LET tindex = L[GT=($data_var)]
+
+      LET nt = `($data_var),RETURN=lsize` 
+      IF `nt LE 1` THEN
+         EXIT/SCRIPT    ! If the data does not vary in T, just return
+      ELSE
+
+         LET the_var_tseas($var_num)_mod = ($ferret_xyz_var)
+         LET regrid_var_tseas($var_num)_mod = the_var_tseas($var_num)_mod[GT=tseas($regrid_op), T=($region_t_lo)]
+
+      ENDIF
+   ENDIF
+
+   EXIT/SCRIPT
+ENDIF
+
+!ELSE
+
+! Seasonal regridding, over the time range
+! specified by the user, centered as requested.
+
+! Define the three-month seasonal axis
+
+!   time_org will be the date string for the time origin: 
+!   January before the first seasonal point (which may be December) 
+
+LET the_var_tseas($var_num) = ($ferret_plot_var)
+LET the_var_tseas($var_num)_noregion = ($ferret_plot_var_noregion)
+
+LET tt = t[gt=the_var_tseas($var_num)]
+LET year1 = tax_year (tt[t="($region_t_lo)"], tt)
+LET month1 = tax_month(tt[t="($region_t_lo)"], tt)
+
+IF `($constraint_0_rhs"0|FMA>1|*>0")` THEN 
+   IF `month1 LT 2` THEN LET year1 = `year1 - 1`
+ENDIF
+
+DEFINE SYMBOL time_org = "16-Jan-`year1` 12:00"
+
+! Get the last year of the time series, then
+! num_years = lastyear-firstyear+1 
+
+LET yearend = TAX_YEAR(tt[T="($region_t_hi)"], tt)
+LET nmonths = (yearend - year1 + 1) * 12
+
+! Define the seasonal time axis
+
+IF `($constraint_0_rhs"0|DJF>1|*>0")` THEN 
+   DEFINE AXIS/T0=($time_org)/UNITS=months/T=0:`nmonths`:3 tseas
+ENDIF
+
+IF `($constraint_0_rhs"0|JFM>1|*>0")` THEN 
+   DEFINE AXIS/T0=($time_org)/UNITS=months/T=1:`nmonths`:3 tseas
+ENDIF
+
+IF `($constraint_0_rhs"0|FMA>1|*>0)` THEN 
+  DEFINE AXIS/T0=($time_org)/UNITS=months/T=2:`nmonths`:3 tseas
+  IF `month1 LT 2` THEN 
+!     LET year1 = `year1` - 1
+     LET nmonths = `nmonths` + 12
+     DEFINE AXIS/T0=($time_org)/UNITS=months/T=2:`nmonths`:3 tseas
+  ENDIF
+ENDIF
+
+! Define the regridded variable
+
+LET regrid_var_tseas($var_num) = the_var_tseas($var_num)[GT=tseas($regrid_op)]
+LET regrid_var_tseas($var_num)_noregion = the_var_tseas($var_num)_noregion[GT=tseas($regrid_op)]
+
+! When this is an XY, XZ, or XZ plot, with no time dependence, we want to regrid 
+! the requested month and surrounding months to the seasonal point requested,
+! and return that.
+
+IF `STRCMP("($region_t_lo)", "($region_t_hi)") EQ 0` THEN
+   LET tindex = L[GT=($data_var)]
+   LET nt = `($data_var),RETURN=lsize` 
+
+   IF `nt LE 1` THEN
+      EXIT/SCRIPT    ! If the data does not vary in T, just return
+   ELSE
+
+! Define a short region 2 months on either side of the time requested.
+! (MODE INTERPOLATE needs to be off so we get integer index values)
+
+      CAN MODE INTERPOLATE
+      LET L1 = MAX(`tindex[t=($region_t_lo)]-2`, 1)
+      LET Ln = MIN(`tindex[t=($region_t_lo)]+2`, `nt`)
+      SET MODE/LAST INTERPOLATE
+      LET the_var_tseas($var_num) = ($ferret_xyz_var)
+
+      LET the_var_expanded_t = the_var_tseas($var_num)[L=`L1`:`LN`]
+      LET regrid_var_tseas($var_num) = the_var_expanded_t[T=($region_t_lo),GT=tseas($regrid_op)]
+
+      LET the_var_tseas($var_num)_noregion = ($ferret_plot_var_noregion)
+      LET the_var_expanded_t_noregion = the_var_tseas($var_num)_noregion[L=`L1`:`LN`]
+      LET regrid_var_tseas($var_num)_noregion = the_var_expanded_t_noregion[T=($region_t_lo),GT=tseas($regrid_op)]
+
+
+   ENDIF
+ENDIF
+
+DEFINE SYMBOL ferret_plot_var ($expr1)regrid_var_tseas($var_num)($expr2)
+DEFINE SYMBOL ferret_plot_var_noregion ($expr1)regrid_var_tseas($var_num)_noregion($expr2)
+DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units) Seasonal Regrid"
+
+IF ($expr3"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)regrid_var_tseas($var_num)($expr3)($data_var)regrid_var_tseas($var_num)($expr4)
+   DEFINE SYMBOL ferret_plot_var_noregion ($expr1)regrid_var_tseas($var_num)_noregion($expr3)($data_var)regrid_var_tseas($var_num)_noregion($expr4)
+   DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr3) ($data_title) ($expr4) Seasonal Regrid"
+ENDIF
+
+DEFINE SYMBOL ferret_plot_base_var = ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_base_var_($num) = ($ferret_plot_var)
+
+! ENDIF  ! not modulo
+DEFINE SYMBOL data_var_transform = , Seasonal Regrid
+
+! End of $RCSfile ---------- transform_seasonal.jnl----------------------------

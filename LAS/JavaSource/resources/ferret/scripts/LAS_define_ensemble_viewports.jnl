@@ -1,0 +1,78 @@
+! LAS_define_ensemble_viewports.jnl
+!
+! Define viewports for all the plots. Vertical profiles for ZE,
+! time series for TE.
+!
+
+IF ($fview"0|ZE>1|*>0") THEN
+
+! The viewports, one for each ensemble member being plotted are used to plot the 
+! individual profiles, all with the same horizontal range
+
+LET y1 = 0.05
+LET y2 = 0.95
+LET x1 = 0.12
+
+LET delta_e = 1
+LET ene = num_ens
+
+LET del = `(0.98-x1)/(ene)`
+LET x2 = `x1 + del - 0.04`
+
+! This viewport will be used to draw the axis at the left 
+
+DEF VIEW/AXES/YLIM=`y1`:`y2`/XLIM=`x1`:0.98 bigview
+DEF VIEW/AXES/YLIM=`y1`:`y2`/XLIM=`x1`:0.98 bigview2
+
+LET x1 = `x1+0.02`
+
+LET count = 0
+REPEAT/RANGE=`mlo`:`mhi`:`delta_e`/NAME=q (  \
+   LET count = `count+1`;\
+   IF `count GT ene` THEN EXIT/LOOP;  \
+   DEF VIEW/AXES/YLIM=`y1`:`y2`/XLIM=`x1`:`x2` rt_`q`; \
+   LET x1 = `x1 + del`; \
+   LET x2 = `x2 + del`)
+
+ENDIF  ! ZE
+
+
+IF ($fview"0|TE>1|*>0") THEN 
+
+! The viewports, one for each ensemble member being plotted are used to plot the 
+! individual time series, all with the same vertical range
+
+
+LET y2 = 0.88
+LET upper_vpx = 0.9
+
+IF ($ferret_annotations"0|*>1") THEN 
+   LET upper_vpx = 0.98
+   LET y2 = 0.98
+ENDIF
+LET ytop = `y2`
+
+LET delta_e = 1
+LET ene = num_ens
+
+LET del = `(y2 - 0.08)/(ene)`
+LET y1 = `y2 - del` + 0.04
+
+LET count = 0
+REPEAT/RANGE=`mlo`:`mhi`:`delta_e`/NAME=q (  \
+   LET count = `count+1`;\
+   IF `count GT ene` THEN EXIT/LOOP;  \
+   DEF VIEW/AXES/XLIM=0.1:`upper_vpx`/YLIM=`y1`:`y2` rt_`q`; \
+   LET y1 = `y1 - del`; \
+   LET y2 = `y2 - del`)
+
+! This viewport will be used to draw the axis at the bottom 
+
+   DEF VIEW/AXES/XLIM=0.1:`upper_vpx`/YLIM=0.095:`ytop` bigview
+   DEF VIEW/AXES/XLIM=0.1:`upper_vpx`/YLIM=0.095:`ytop` bigview2
+   CANCEL SYMBOL ferret_plot_key
+
+ENDIF  ! TE
+
+
+!  ----------------- End of LAS_define_ensemble_viewports ------------------------------------

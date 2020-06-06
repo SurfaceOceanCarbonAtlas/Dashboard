@@ -1,0 +1,51 @@
+
+! Overlay additional cartography data (land mask, outlines, rivers, ...)
+! For land outline, if the region is smaller than 60 degrees in x or 30 degrees in y,
+! use the more-detailed land outline script land_detail.jnl
+
+! Save any levels symbols from the plot thats been drawn,
+! so they can be output to the result map file.
+
+IF ($ferret_land_script"0|*>1") THEN
+   GO ($ferret_land_script)
+   EXIT/SCRIPT
+ENDIF
+
+IF ($LEV_NUM"0|*>1") THEN
+   IF ($LEV_OPNLEVS"0|*>1") THEN DEFINE SYMBOL SAVE_OPNLEVS = ($LEV_OPNLEVS)
+   IF ($LEV_MIN"0|*>1") THEN DEFINE SYMBOL SAVE_MINLEV = ($LEV_MIN)
+   IF ($LEV_MAX"0|*>1") THEN DEFINE SYMBOL SAVE_MAXLEV = ($LEV_MAX)
+   IF ($LEV_DEL"0|*>1") THEN DEFINE SYMBOL SAVE_DELLEV = ($LEV_DEL)
+ENDIF
+
+
+! Setup when doing Vector plots on Google Earth
+IF `($its_GE"0|*>1") AND ($ferret_vector_1"0|*>1")` THEN
+!
+!   SET MODE LINECOLORS:7
+!   PPL COLOR,7,100,50,0  ! orange lines
+!   IF `($ferret_land_type"0|contour>1|*>0")` THEN DEFINE SYMBOL ferret_land_arg = 8
+
+   IF `($ferret_land_type"0|contour>1|*>0")` THEN DEFINE SYMBOL ferret_land_arg = 7
+
+ENDIF
+
+IF ($ferret_land_type"1|none>0|contour>0|filled>1|shade>1|default>1|*>0") THEN
+  GO LAS_fland 
+ELIF ($ferret_land_type"0|none>0|contour>1|filled>0|*>0") THEN
+  IF `( ($region_x_range"360") LT 60) OR ( ($region_y_range) LT 30)` THEN
+!     DEFINE SYMBOL ferret_land_arg = thick
+     GO land_detail ($ferret_land_arg)
+  ELSE
+     GO land  ($ferret_land_arg)
+  ENDIF
+ENDIF
+
+! Restore levels symbols 
+
+IF ($LEV_NUM"0|*>1") THEN
+   IF ($SAVE_OPNLEVS"0|*>1") THEN DEFINE SYMBOL LEV_OPNLEVS = ($SAVE_OPNLEVS)
+   IF ($SAVE_MINLEV"0|*>1") THEN DEFINE SYMBOL LEV_MIN = ($SAVE_MINLEV)
+   IF ($SAVE_MAXLEV"0|*>1") THEN DEFINE SYMBOL LEV_MAX = ($SAVE_MAXLEV)
+   IF ($SAVE_DELLEV"0|*>1") THEN DEFINE SYMBOL LEV_DEL = ($SAVE_DELLEV)
+ENDIF

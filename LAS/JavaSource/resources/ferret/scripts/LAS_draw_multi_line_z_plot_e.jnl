@@ -1,0 +1,87 @@
+! LAS_draw_multi_line_z_plot_e.jnl
+!  Do a multi-line 1-D plot in z. 
+! 7/2010    ACM updates for V7.2 multi-variable plots
+!  4/06/13 Input is an averaged variable. Plot it with
+!          all of the member variables as colored lines.
+
+GO LAS_open_window
+
+PPL AXLSZE,,0.08
+PPL AXNSIG,,2
+
+LET save_count = ($data_count)
+PLOT($qualifiers)($qualifiers_0)/NOKEY/SET ($plot_arg)
+   IF `($ferret_dep_axis_scale"0|*>1")` THEN PPL YAXIS ($ferret_dep_axis_scale)
+   ppl txlsze,0.07
+   PPL xlab
+   PPL ylab ($data_0_units)
+   DEFINE SYMBOL data_count = 1  ! just so the region labels script will work
+   GO reset_labels
+PPL PLOT
+
+DEFINE SYMBOL data_count = `save_count`
+
+! Make the first line thick
+LET thicker = 2
+PLOT/OVER/NOLAB/THICK=`thicker`/COLOR=BLACK/LINE ($ferret_plot_var_0)
+
+IF ($labnum_calend%0|*>1%) THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = ($lab($labnum_calend))
+   DEFINE SYMBOL calendar_lab = ($upper_left_($n_left_labels"0"))
+ENDIF
+
+DEFINE SYMBOL ax_vert_save = ($ax_vert"D")
+DEFINE SYMBOL ax_horiz_save = ($ax_horiz"D")
+
+DEFINE SYMBOL yaxis_min_save = ($yaxis_min)
+DEFINE SYMBOL yaxis_max_save = ($yaxis_max)
+
+! Draw the legend.
+
+! Make an invisible xy plot. The legline script doesnt work well with z and t plots.
+IF `($two_axes"0") EQ 1` THEN DEFINE SYMBOL data_count = 2
+
+DEFINE VIEWPORT/x=0:1/y=0:1 overview
+show view
+SET VIEW overview
+PLOT/NOLAB/NOAX/I=1:2/VLIM=100:102 i/0
+
+! The start (x,y) position for each line drawn on the key
+LET x1 = -0.2
+IF `($data_count) GT 3` THEN LET x1 = -0.5
+IF `(($data_count) GT 3) AND (title_len GT 40)` THEN LET x1 = -0.6
+LET xkey = {`x1` , `x1` , `x1` , `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`,     0, 0}
+LET ykey = {-0.65, -0.85, -1.05,            -0.65,             -0.85,             -1.05, -1.25, -1.25}
+
+LET titlesiz = 0.11
+IF `title_len GE 40 AND ($data_count"0") GT 3` THEN LET titlesiz = 0.10
+IF `title_len GE 50 AND ($data_count"0") GT 3` THEN LET titlesiz = 0.09
+IF `title_len GE 60 AND ($data_count"0") GT 3` THEN LET titlesiz = 0.08
+
+
+DEFINE SYMBOL thicksave = ($thicknum)
+DEFINE SYMBOL thicknum = 2
+DEFINE SYMBOL legend_qual = /LINE
+
+REPEAT/range=1:`($data_count)`/NAME=m (; \
+   DEFINE SYMBOL m = `m`;  \
+   DEFINE SYMBOL lnum = `m-1` ; \
+   LET xpos = xkey[i=($m)]; LET ypos = ykey[i=($m)]; \
+   GO LAS_legend_line \
+   `xpos+x1` 0.3 `ypos` `m + ($nlinecolors)*($thicknum)` `titlesiz` "($ferret_title_($lnum))" ($legend_qual);\   
+   DEFINE SYMBOL thicknum = ($thicksave); \
+)
+
+! The results script needs the actual axis directions. Restore them.
+
+DEFINE SYMBOL ax_vert = ($ax_vert_save)
+IF ($ax_vert"|D>1|*>0") THEN CANCEL SYMBOL ax_vert
+DEFINE SYMBOL ax_horiz = ($ax_horiz_save)
+IF ($ax_horiz"|D>1|*>0") THEN CANCEL SYMBOL ax_horiz
+
+DEFINE SYMBOL yaxis_min = ($yaxis_min_save)
+DEFINE SYMBOL yaxis_max = ($yaxis_max_save)
+
+! --------------- End of LAS_draw_multi_line_z_plot  ---------------------------
+

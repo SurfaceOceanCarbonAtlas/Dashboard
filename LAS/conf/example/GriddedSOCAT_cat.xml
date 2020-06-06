@@ -1,0 +1,100 @@
+<category name="SOCAT Gridded Data">
+  <category name="SOCAT v2019" sort_order="009">
+    <category name="SOCAT v2019 decadal 1x1 gridded" ID="SOCATv2019_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v2019 decadal 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v2019 annual 1x1 gridded" ID="SOCATv2019_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v2019 annual 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v2019 monthly 1x1 gridded" ID="SOCATv2019_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v2019 monthly 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v2019 monthly coastal, quarter-degree grid" ID="SOCATv2019_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v2019 monthly coastal, quarter-degree grid"/>
+    </category>
+  </category> 
+  <category name="SOCAT v6" sort_order="010">
+    <category name="SOCAT v6 decadal 1x1 gridded" ID="SOCATv6_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v6 decadal 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v6 annual 1x1 gridded" ID="SOCATv6_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v6 annual 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v6 monthly 1x1 gridded" ID="SOCATv6_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v6 monthly 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v6 monthly coastal, quarter-degree grid" ID="SOCATv6_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v6 monthly coastal, quarter-degree grid"/>
+    </category>
+  </category> 
+  <category name="SOCAT v5" sort_order="011">
+    <category name="SOCAT v5 decadal 1x1 gridded" ID="SOCATv5_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v5 decadal 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v5 annual 1x1 gridded" ID="SOCATv5_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v5 annual 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v5 monthly 1x1 gridded" ID="SOCATv5_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v5 monthly 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v5 monthly coastal, quarter-degree grid" ID="SOCATv5_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v5 monthly coastal, quarter-degree grid"/>
+    </category>
+  </category> 
+  <category name="SOCAT v4" sort_order="012">
+    <category name="SOCAT v4 decadal 1x1 gridded" ID="SOCATv4_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v4 decadal 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v4 annual 1x1 gridded" ID="SOCATv4_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v4 annual 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v4 monthly 1x1 gridded" ID="SOCATv4_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v4 monthly 1x1 gridded"/>
+    </category>
+    <category name="SOCAT v4 monthly coastal, quarter-degree grid" ID="SOCATv4_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v4 monthly coastal, quarter-degree grid"/>
+    </category>
+  </category> 
+  <category name="SOCAT v3" sort_order="013">
+     <category name="SOCAT v3 decadal 1x1 gridded" ID="SOCATv3_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v3 decadal 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v3 annual 1x1 gridded" ID="SOCATv3_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v3 annual 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v3 monthly 1x1 gridded" ID="SOCATv3_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v3 monthly 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v3 monthly coastal, quarter-degree grid" ID="SOCATv3_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v3 monthly coastal, quarter-degree grid"/>
+     </category>
+  </category>
+  <category name="SOCAT v2" sort_order="014">
+     <category name="SOCAT v2 decadal 1x1 gridded" ID="SOCATv2_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v2 decadal 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v2 annual 1x1 gridded" ID="SOCATv2_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v2 annual 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v2 monthly 1x1 gridded" ID="SOCATv2_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v2 monthly 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v2 monthly coastal, quarter-degree grid" ID="SOCATv2_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v2 monthly coastal, quarter-degree grid"/>
+     </category>
+  </category>
+  <category name="SOCAT v1.5" sort_order="015">
+     <category name="SOCAT v1.5 decadal 1x1 gridded" ID="SOCATv1r5_gridded_decadal" doc="doc/SOCAT_gridded_decadal.html" sort_order="001">
+      <filter action="apply-dataset" equals="SOCAT v1.5 decadal 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v1.5 annual 1x1 gridded" ID="SOCATv1r5_gridded_yearly" doc="doc/SOCAT_gridded_yearly.html" sort_order="002">
+      <filter action="apply-dataset" equals="SOCAT v1.5 annual 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v1.5 monthly 1x1 gridded" ID="SOCATv1r5_gridded_monthly" doc="doc/SOCAT_gridded_monthly.html" sort_order="003">
+      <filter action="apply-dataset" equals="SOCAT v1.5 monthly 1x1 gridded"/>
+     </category>
+     <category name="SOCAT v1.5 monthly coastal, quarter-degree grid" ID="SOCATv1r5_quarter_coastal" doc="doc/SOCAT_gridded_quarterdeg_monthly.html" sort_order="004">
+      <filter action="apply-dataset" equals="SOCAT v1.5 monthly coastal, quarter-degree grid"/>
+     </category>
+  </category>
+</category>

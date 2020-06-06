@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<h<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+ <title>Hawaii Climatology Example</title>
+<!-- 
+ * Imported libaries:
+ *
+ * xmldom.js              Parses the LASRequest XML.  Used by LASRequest.js.
+ * LASRequest.js          Provides an API for accessing/modifying LASRequest elements.
+ *
+ * NOTE:  This example has to go up one directory '../' to find 'JavaScript/components/'
+ * NOTE:  because this example is found in WebContent/examples/.  
+ * NOTE:  Any pages you include directly in the WebContent/ directory won't need '../'.
+--> 
+  <script type="text/javascript" src="../JavaScript/components/xmldom.js"></script>
+  <script type="text/javascript" src="../JavaScript/components/LASRequest.js"></script>
+
+  <script type="text/javascript">
+
+/**
+ * Initialize the LASRequest object when the page is loaded.
+ */
+function initialize() {
+  Req = new LASRequest('');
+  Req.setProperty('ferret','view','t');
+  Req.setProperty('ferret','set_aspect','default');
+  Req.setRange('x',-157.7);
+  Req.setRange('y',21.2);
+  Req.setRange('t','15-Jan','15-Dec');
+}
+
+/**
+ * Submit the LASRequest to the LAS ProductServer.
+ *
+ * NOTE:  As above, we need to go up one directory '../' to find 'ProductServer.do'.
+ */
+function submitXML() {
+  updateLASRequest();
+  var URL = '../ProductServer.do?xml=' + escape(Req.getXMLText()); 
+  var window_decorations = "menubar=yes, location=yes, toobar=yes, resizable=yes, scrollbars=yes";
+  var dataWindow = window.open(URL, "DataWindowName", window_decorations);
+  dataWindow.focus();
+}
+
+/**
+ * Use any user selected parameters to update the LASRequest.
+ */
+function updateLASRequest() {
+// First the variable, then the operation
+  var operationString = '';
+  var variableString = '';
+  with (document.inputForm) {
+    for (i=0;i<variable.length;i++) {
+      if (variable[i].checked) variableString = variable[i].value;
+    }
+    for (i=0;i<operation.length;i++) {
+      if (operation[i].checked) operationString = operation[i].value;
+    }
+  }
+
+// Add the choices to the Request
+// NOTE: each operation must also set a ferret property named 'format'.
+  Req.setVariable('coads_climatology_cdf',variableString);
+  Req.setOperation(operationString);
+  if (operationString == 'Plot_1D') {
+    //Req.setProperty('ferret','format','line');
+  } else {
+    Req.setProperty('ferret','data_format','tsv');
+  }
+}
+
+
+/**
+ * Creates an alert box containing the LASRequest XML.
+ */
+function alertXML() {
+  updateLASRequest();
+  alert(Req.getXMLText());
+}
+
+  </script>
+</head>
+
+<body onload="initialize()">
+
+  <p align="center">
+    <b><i><font size="6">Don't you wish you were here?</font></i></b>
+  </p>
+
+  <p align="center">
+  <img src="Hanauma_Bay.jpg" alt="Hanauma Bay, Oahu">
+  </p>
+
+  <p align="center">
+  <b><font size="5">Check out the annual climatology for Oahu</font></b>
+  </p>
+
+  <form name="inputForm">
+
+    <div align="center">
+      <table>
+        <tbody>
+          <tr>
+            <td valign="top">
+              <font size="+1">Choose a variable:</font><br>
+              <input name="variable" type="radio" value="airt" checked="checked"> Air Temperature<br>
+              <input name="variable" type="radio" value="sst"> Sea Surface Temperature<br>
+              <input name="variable" type="radio" value="wspd"> Wind Speed
+            </td>
+
+<!--
+A note on products.
+
+You'll need to look at $LAS_HOME/conf/server/ui.xml to see how products are named.
+Each line will contain something like these:
+
+	<item values="Plot_1D,line,2">Line plot</item>
+	<item values="Data_Extract_File,asc,20">ASCII file</item>
+
+The two values are the 'operation' and the 'format' and need to be specified
+as arguments to Req.setOperation().
+-->
+
+            <td valign="top">
+              <font size="+1">Choose a product:</font><br>
+              <input name="operation" type="radio" value="Plot_1D" checked="checked">Plot<br>
+              <input name="operation" type="radio" value="Data_Extract_File">Table
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div align="center">
+      <input name="xml" type="hidden">
+      <input value="See the request." onclick="alertXML()" type="button"> &nbsp;
+      <input value="Get the data!" onclick="submitXML()" type="button">
+    </div>
+
+  </form>
+
+  <p>
+Please see the <a target="_blank" href="http://ferret.pmel.noaa.gov/LAS/documentation/developer-documentation/javascript-components-v2.x/">javascript component documentation</a>
+for more information on using the LAS components for creating simple user interfaces.
+  </p>
+
+</body>
+</html>
+

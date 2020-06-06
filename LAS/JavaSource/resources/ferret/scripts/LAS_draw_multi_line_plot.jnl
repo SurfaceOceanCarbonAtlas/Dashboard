@@ -1,0 +1,272 @@
+! LAS_draw_multi_line_plot.jnl
+!  Do a multi-line 1-D plot. 
+! Arguments (optional) 1 throug 4: Viewport limits
+! for DEFINE VIEWPORT/AXES definitions, within which to draw
+! the set of lines.  Other viewports defined within this space
+!  xvp_lo, xvp_hi, yvp_lo, yvp_hi
+
+! 7/2010    ACM updates for V7.2 multi-variable plots
+! 11/2017 *acm* Dont label plots with units of "units" or "none"
+! 12/2017 *acm* Apply positive=down attribute if all variables in a
+!               units-group have that setting.
+! 10/2019 *acm* For time plots if there's a year-label needed, save symbol
+!               to be added to the annotations
+! 10/2019 *acm* Fix use of plot_pos_down_* symbols so vertical axis doesn't
+!               get incorrectly flipped.
+
+set mode ver:always
+
+LET xvf = ($1%0.1%)
+LET xvl = ($2%0.9%)
+
+let yvf = ($3%0.16%)  ! 0.2 >> 0.16
+LET yvl = ($4%0.98%)
+
+IF `STRCMP("($vpname%AA%)", "AA") EQ 0` THEN DEFINE SYMBOL vpname = vp
+
+IF `($nstations"0|*>1") EQ 0` THEN 
+   DEFINE SYMBOL nstations = 1
+   LET nstations = 1
+ENDIF
+
+IF `($margin_del"0|*>1") EQ 0` THEN DEFINE SYMBOL margin_del = 0.08
+
+LET margin_del = ($margin_del)
+IF `($data_count) LE 2` then LET margin_del = 0
+
+
+CANCEL MODE GRATICULE
+DEFINE SYMBOL qualifiers_0 = /VGRATICULE=DASH,COLOR=($graticuleColor))
+IF `($ferret_use_graticules"1|none>0|notic>0|*>1) EQ 0` THEN CANCEL SYMBOL qualifiers_0
+
+GO LAS_pp_set_region_labels  ! for first dataset/variable
+
+! Initialize datasets beyond the first one. Keep
+! titles for the plot legend and units for labeling 
+! the plot axes.
+
+IF `($data_count"0") GT 6` THEN 
+   DEFINE SYMBOL data_count = 6
+   DEFINE SYMBOL reset_count = 1
+ENDIF
+
+! Are these settings already done because this was called by Timeseries_station_plot?
+IF `($have_multiline_defs"0|*>1") EQ 0` THEN
+   
+   DEFINE SYMBOL units_0 = `UPCASE("($data_0_units)")`
+   DEFINE SYMBOL all_units_same = 1
+   
+   REPEAT/range=1:`($data_count)-1`/NAME=qdat (  \
+     DEFINE SYMBOL qdat = `qdat`;\
+     GO LAS_initialize_region ($qdat) ;  \
+     GO LAS_initialize_data  ($qdat) ;\
+     GO LAS_check_var_direction;\
+     IF ($error_status"0|*>1") THEN EXIT/LOOP;\
+     DEFINE SYMBOL plot_arg = ($plot_arg),($ferret_plot_var);\
+     DEFINE SYMBOL ferret_plot_var_($qdat) = ($ferret_plot_var);\ 
+     DEFINE SYMBOL ferret_title_($qdat) = ($ferret_plot_title);\ 
+     LET tlen = STRLEN("($ferret_title_($qdat))");\
+     LET title_len = `MAX(tlen, title_len)`;\
+     DEFINE SYMBOL units_($qdat) = `UPCASE("($data_($qdat)_units)")`;\
+     DEFINE SYMBOL all_units_same = `($all_units_same) AND (STRCMP("($units_0)", "($units_($qdat))") EQ 0)`;\
+     GO LAS_pp_set_region_labels \
+   )
+   DEFINE SYMBOL plot_vars_0 = ($plot_arg)
+
+ENDIF ! have_multiline_defs
+
+IF `($all_units_same"0|0|1") AND ($ferret_use_graticules"1|none>0|notic>0|white>0|*>1)` THEN
+   IF ($ferret_use_graticules"0|black>1") THEN
+      DEFINE SYMBOL qualifiers = ($qualifiers)/HGRAT=(DASH,COLOR=black)
+   ELSE
+      DEFINE SYMBOL qualifiers = ($qualifiers)/HGRAT=(DASH,COLOR=7)
+   ENDIF
+ENDIF
+
+! If default graticules setting, and units are all the same, put
+! graticules on both axes.
+IF `($all_units_same"0|0|*>1") AND ($qualifiers_0"0|*>1")` THEN 
+   CANCEL SYMBOL qualifiers_0
+   SET MODE GRATICULE:(DASH,COLOR=($graticuleColor))
+ENDIF
+
+! No title; variable names and units are listed in the legend.
+DEFINE SYMBOL qualifiers = ($qualifiers)/TITLE=" "
+
+! If there are two variables with different units, scale each independently, putting
+! one dependent axis on the left an the other on the right.
+
+! If line style is just symbols, we need to do lines separately to get different colors.
+! match the colors in the palette six_line_colors.spk which will be used to draw the legend
+
+DEFINE SYMBOL ferret_palette = six_line_colors
+DEFINE SYMBOL ferret_fill_levels = (0,`nstations+1`,1)
+IF `($nstations) EQ 1` THEN DEFINE SYMBOL ferret_fill_levels = (0,`($data_count)+1`,1)
+
+
+DEFINE SYMBOL leg_color0 = blue
+DEFINE SYMBOL leg_color1 = red
+DEFINE SYMBOL leg_color2 = green
+DEFINE SYMBOL leg_color3 = lightblue
+DEFINE SYMBOL leg_color4 = purple
+DEFINE SYMBOL leg_color5 = black
+
+IF `(($data_count) GE 2)` THEN
+
+! More than 1 variable and Units Not same
+
+   PPL AXLSZE,,0.08
+   PPL AXNSIG,,2
+   
+   IF `($ferret_use_graticules"0|none>0|notic>0*>1) EQ 0` THEN CANCEL SYMBOL qualifiers_0
+
+! Set up groups of variables with common units to plot together 
+! ($plot_vars_0) with units ($group_label_0)
+! ($plot_vars_1) with units ($group_label_1) etc.
+
+   IF `($nunit_grp"0|*>1") EQ 0` THEN GO collect_units_vars
+
+! Are the units really different?  May have differed only by case
+   IF `($nunit_grp"1") EQ 1 ` THEN DEFINE SYMBOL all_units_same = 1
+
+ENDIF 
+
+! Draw the plot
+
+LET maxlablen = 0
+REPEAT/RANGE=2:`($nunit_grp"1")`/NAME=m (\
+   DEFINE SYMBOL vm = `m-1`;\
+   PLOT/SET ($plot_vars_($vm)) ;\
+   LET maxlablen = `MAX(maxlablen, STRLEN("($PPL$YMIN1)"))`;\
+   LET maxlablen = `MAX(maxlablen, STRLEN("($PPL$YMAX1)"))`)
+
+! Set a year-label for the annotations if Ferret has added an upper-left year label
+IF `(($have_year_lab"0|*>1") EQ 0) AND ($labnum_year%0|*>1%)` THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = ($lab($labnum_year))
+   DEFINE SYMBOL year_lab = ($lab($labnum_year))
+   DEFINE SYMBOL have_year_lab = 1
+ENDIF
+
+! Draw any other plot axes scaled for each set of variables with common units
+! Plot axis with first set of units will be on the left.
+! Draw the plots for other sets of variables as /SYM=dot/COLOR=8 (COLOR=white) so that
+! only the axis shows. The variables will be plotted individually below
+! so that we can control the line color.
+
+! Draw the sets of lines with common units, each in a viewport
+LET xvl = `xvl - margin_del* (($nunit_grp"1")-2)`
+IF `(($nstations) EQ 1) AND (maxlablen GT 6)` THEN LET xvl = `xvl - (0.012*(maxlablen-6)/2)`
+
+LET labloc = 0.5 + 0.03*maxlablen
+
+! First draw the vertical axes. 
+! Set up the vertical-range symbols (The PPL RANGE call with high #tics sets up 
+! for plots that take up most of the window)
+! IF postitive=down is set for all variables in the group, reverse the vertical axis 
+
+
+DEFINE VIEWPORT/AXES/TEXT=0.85/x=`xvf`:`xvl`/y=`yvf`:`yvl` vg($vpname)
+SET VIEW vg($vpname)
+IF `($nstations) GT 1` THEN SHADE/NOAX/NOLAB/NOKEY/PAL=gray_pale/X=1:10/Y=1:10 x+y
+LET xvlv = `xvl`
+
+REPEAT/RANGE=1:`($nunit_grp"1")`/NAME=m (\
+   DEFINE SYMBOL vm = `m-1`;\
+   DEFINE VIEWPORT/AXES/TEXT=0.85/x=`xvf`:`xvlv`/y=`yvf`:`yvl` v($vpname)($vm);\
+   SET VIEW v($vpname)($vm);\
+   PLOT/SET ($plot_vars_($vm));\
+   LET vplotnum = STRLEN("($has_($vm))");\
+   GO LAS_get_lines_min_max `vplotnum`;\
+   PPL %range `vlimylo`, `vlimyhi`, 10;\
+   DEFINE SYMBOL qualifiers_g($vm) = /VLIM=($ppl$range_low):($ppl$range_high);\
+   IF ($plot_pos_down_($vm)"0|0|1|*>1") THEN DEFINE SYMBOL qualifiers_g($vm) = /VLIM=($ppl$range_high):($ppl$range_low);\
+   IF `($vm) GT 0` THEN;\
+      PLOT/AXES=0,0,0,1($qualifiers_g($vm))/SYM=dot/COLOR=8/NOLAB {0,1};\
+      LET do_lab = ($group_label_($vm)"0|NONE>0|none>0|units>0|*>1");\
+      IF `do_lab` THEN LABEL/NOUSER `($ppl$xlen) + labloc`, `($ppl$ylen)/2`, 0, 90, 0.12, @AC($group_label_($vm));\
+      LET xvlv = `xvlv + margin_del`;\
+   ENDIF)
+
+! Draw the first variable
+! If there is just one, draw the RH axis
+
+DEFINE SYMBOL axqual = /AXES=1,1,1,0
+IF ($nohoriz"0") THEN  DEFINE SYMBOL axqual = /AXES=0,0,1,0
+
+IF `($all_units_same"0|0|1") EQ 1` THEN 
+   DEFINE SYMBOL axqual = /AXES=1,1,1,1
+   IF ($nohoriz"0") THEN  DEFINE SYMBOL axqual = /AXES=0,0,1,1
+ENDIF
+
+DEFINE SYMBOL vm = 0
+DEFINE VIEWPORT/AXES/TEXT=0.85/x=`xvf`:`xvl`/y=`yvf`:`yvl` v0_v($vpname)($vm)
+DEFINE VIEWPORT/AXES/TEXT=0.85/x=`xvf`:`xvl`/y=`yvf`:`yvl` v0_dup
+SET VIEW v0_v($vpname)($vm)
+
+IF ($ferret_view"1|t>0|*>1") THEN SET MODE GRATICULE:(DASH,COLOR=($graticuleColor))
+
+! Draw the first line to capture the year-label if any.  Draw again below with /NOLAB and other qualifiers.
+! Set a year-label for the annotations if Ferret has added an upper-left year label
+
+PLOT ($ferret_plot_var_($vm))
+
+IF `(($have_year_lab"0|*>1") EQ 0) AND ($labnum_year%0|*>1%)` THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = ($lab($labnum_year))
+   DEFINE SYMBOL year_lab = ($lab($labnum_year))
+   DEFINE SYMBOL have_year_lab = 1
+ENDIF
+
+PLOT($qualifiers)($qualifiers_0)($qualifiers_g($vm))($axqual)/COLOR=($leg_color($vm))/NOLAB ($ferret_plot_var_($vm))
+
+LET do_lab = ($group_label_($vm)"0|NONE>0|none>0|units>0|*>1")
+IF `do_lab` THEN LABEL/NOUSER `0 - labloc`, `($ppl$ylen)/2`, 0, 90, 0.12, @AC($group_label_($vm))
+
+REPEAT/RANGE=2:($data_count)/name=m (\
+   DEFINE SYMBOL vm = `m-1`;\
+   DEFINE VIEWPORT/AXES/TEXT=0.85/x=`xvf`:`xvl`/y=`yvf`:`yvl` v0_($vpname)($vm);\
+   SET VIEW v0_($vpname)($vm);\
+   PLOT($qualifiers)($qualifiers_g($var_grp($vm)))/AXES=0,0,0,0/COLOR=($leg_color($vm))/NOLAB ($ferret_plot_var_($vm));\
+   IF `($ferret_title_($vm)"0|*>1") AND ($do_legend"0|0|*>1")` THEN DEFINE SYMBOL variable_lab = ($variable_lab), ($ferret_title_($vm));\
+   )
+
+! Grandfather in the style for Dart timeseries: Overlay the first variable again.
+IF `($data_count"0|2>1|*>0") AND ($nstations"0") EQ 1 AND ($all_units_same"0|0|1")` THEN 
+    SET VIEW v0_dup
+    PLOT($qualifiers)($qualifiers_g0))/over/AXES=0,0,0,0/COLOR=blue/NOLAB ($ferret_plot_var_0)
+ENDIF
+
+IF ($labnum_calend%0|*>1%) THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = ($lab($labnum_calend))
+   DEFINE SYMBOL calendar_lab = ($upper_left_($n_left_labels"0"))
+ENDIF
+
+IF ($station_label"0|*>1") THEN LABEL/NOUSER `vxlo`, `($ppl$ylen)*0.9`, -1,0,0.12 @AS($station_label)
+
+DEFINE SYMBOL ax_vert_save = ($ax_vert"D")
+DEFINE SYMBOL ax_horiz_save = ($ax_horiz"D")
+DEFINE SYMBOL xax_min_save = ($xaxis_min)
+DEFINE SYMBOL xax_max_save = ($xaxis_max)
+
+! Draw the legend.
+
+
+DEFINE SYMBOL thicksave = ($thicknum)
+DEFINE SYMBOL thicknum = 2
+DEFINE SYMBOL legend_qual = /LINE/THICK=($thicknum)
+
+IF ($do_legend"0|0|*>1") THEN  GO LAS_lineplot_legend ($data_count) ($ferret_palette)
+
+! The results script needs the actual axis directions. Restore them.
+
+DEFINE SYMBOL ax_vert = ($ax_vert_save)
+IF ($ax_vert"|D>1|*>0") THEN CANCEL SYMBOL ax_vert
+DEFINE SYMBOL ax_horiz = ($ax_horiz_save)
+IF ($ax_horiz"|D>1|*>0") THEN CANCEL SYMBOL ax_horiz
+
+DEFINE SYMBOL xaxis_min = ($xax_min_save)
+DEFINE SYMBOL xaxis_max = ($xax_max_save)
+
+! --------------- End of LAS_draw_multi_line_plot  ---------------------------

@@ -1,0 +1,25 @@
+! curvi_sample_tslice.jnl
+! Define single x y point to sample at
+
+LET sample_xpts = {($region_x_lo)}
+LET sample_ypts = {($region_y_lo)}
+
+LET fer_plot_var = SAMPLEXY_CURV_AVG( \
+  ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+  ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  sample_xpts, sample_ypts)
+
+DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+
+LET sample_var($var_num) = x[gx=sample_x,x=($region_x_lo)] + y[gy=sample_y,y=($region_y_lo)]  + \
+      t[gt=fer_plot_var]
+      
+IF ($region_z"0|*>1") THEN LET sample_var($var_num) = x[gx=sample_x,x=($region_x_lo)] + \
+      y[gy=sample_y,y=($region_y_lo)]  + \
+      t[gt=fer_plot_var] + z[gz=fer_plot_var,($region_z)]
+
+LET/units="($data_($var_num)_units)" sampled_var($var_num) = RESHAPE(fer_plot_var, sample_var($var_num))
+DEFINE SYMBOL needs_url 1
+! End of file ------------curvi_sample_tslice.jnl--------------------------

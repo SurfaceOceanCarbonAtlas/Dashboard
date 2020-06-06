@@ -1,0 +1,287 @@
+/** Add css rules here for your application. */
+body {
+  font-family:arial,sans-serif
+}
+
+div,td {
+  color:#000000
+}
+
+a:link {
+  color:#0000cc
+}
+     
+a:visited {
+  color:#551a8b
+}
+
+a:active {
+  color:#ff0000
+}
+
+button {
+  display: block;
+  font-size: 16pt
+}
+
+.widePanel {
+  width: 100%
+}
+
+img {
+  margin-top: 0px;
+}
+
+.small-banner {
+	color:#dd8888;
+	font-size: 12pt
+}
+.banner {
+	color:#dd8888;
+	font-size: 16pt;
+	font-style: bold
+}
+.right-small-banner {
+	color:#dd8888;
+	font-size: 12pt;
+	text-align:right
+}
+.map-button {
+  
+  font:small Arial,sans-serif;
+  
+}
+.map-button-from-docs {
+  textDecoration:underline;
+  color:#0000cc;
+  backgroundColor:white;
+  font:small Arial;
+  border:1px solid black;
+  padding:2px;
+  marginBottom:3px;
+  textAlign:center;
+  width:6em;
+  cursor:pointer;
+}
+
+.las-MenuBar
+{
+    border                      :   1px solid #666;
+    margin                      :   0 auto;
+    background-color            :   #eee;
+    font-size                   :   70%;
+    padding                     :   4px;
+}
+.las-MenuBar table
+{
+    border-collapse             :   separate;
+    border                      :   1px solid #00f;
+}
+.las-MenuBar .gwt-MenuItem
+{
+
+    cursor                      :   hand;
+    cursor                      :   pointer;
+
+    border                      :   1px solid #999;
+    padding                     :   10px 15px;
+}
+.las-MenuBar .gwt-MenuItem-selected
+{
+    background-color            :   #fff;
+}
+
+@charset "utf-8";
+/* CSS Document */
+body {
+  background-color: #CCC;
+}
+
+/*
+ * Elements identified by HTML tag
+ */
+
+
+/*
+ * Elements identified by id  (begin with '#')
+ */
+
+/* Overall table */
+
+.LSS_Table {
+  background-color: #FFF;
+  border-spacing: 4px;
+  color: black;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+.blackBorder {
+	border: 1px;
+	color: black;
+	padding: 4px;
+	text-align: center;
+}
+
+.blueBorder {
+	border: 2px;
+	color: blue;
+	padding: 4px;
+	text-align: center;
+}
+
+.LSS_Table .LSS_banner {
+  color: #579;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: center;
+}
+
+/* Options row */
+
+.LSS_Table .LSS_optionTable {
+  background-color: #ACE;
+  border-spacing: 0;
+  padding: 6px;
+}
+
+.LSS_optionLabel {
+  font-family: Times New Roman, serif;
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+/* Control row */
+
+.LSS_controlTable {
+  border: 2px solid black;
+  padding: 4px;
+  width: 100%;
+}
+
+.LSS_axisControls {
+  border: 4px solid black;
+  padding: 4px;
+  width: 100%;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  
+  vertical-align: center;
+}
+
+.LSS_middle {
+	display: block;
+    margin-left: auto;
+    margin-right: auto 
+}
+
+.LSS_G1Title {
+  color: #D33;
+  font-weight: bold;
+}
+
+.LSS_G1Bold {
+  color: #000;
+  font-weight: bold;
+}
+
+.LSS_modeCell {
+  border: 1px solid black;
+  padding: 2px;
+  width: 8em;
+  text-align: center;
+}
+
+.LSS_modeAnchor {
+  color: black;
+  text-decoration: none;
+}
+
+/* Images row */
+
+.LSS_imagesTable {
+  padding: 0px;
+}
+
+/*
+ * Elements identified by class (begin with '.')
+ */
+.red {
+	color: #F44;
+}
+.black {
+	color: #000;
+}
+
+.regularBackground {
+  background-color: #ACE;
+}
+
+.anomalyBackground {
+  background-color: #8C8;
+}
+
+.downloadingBackground {
+  background-color: #ECA;
+}
+
+.panelSettingsColor {
+	background-color: #CAE;
+}
+
+.LSS_imageCell {
+  padding: 2px;
+  text-align: center;
+}
+
+.LSS_imageCell img{
+  border: none;
+}
+
+.CCell_las_message {
+  font-family: sans-serif;
+  font-weight: bold;
+  color: #E33;
+}
+
+.CCell_text {
+  font-family: sans-serif;
+  font-weight: normal;
+}
+
+.CCell_exception_message {
+  font-family: courier;
+  font-weight: normal;
+}
+
+.CCell_error_link {
+  font-family: Times,serif;
+  font-weight: normal;
+}
+
+.LSS_footer {
+  font-family: Times New Roman, serif;
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+.las-vertical-align-center {
+	vertical-align: center;
+}
+
+.las-align-center {
+	text-align: center;
+}
+
+.las-align-right {
+	text-align: right;
+}
+
+.las-centerButton {
+	width						: 170px;
+	padding						:	0px;
+}
+

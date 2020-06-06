@@ -1,0 +1,232 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+#*  --- this is a multi-line Velocity Template comment
+     The region information for some these applications are acquired by calling
+     special methods in the LASRegionIndex class (getFerretRegion, getOPeNDAPConstraint.  
+     String are easier to manipulate in Java and the template is much cleaner as 
+     a result.  However, if you need to introduce a new app with a new syntax
+     for setting the region you can get an ArrayList of HashMaps of HashMaps
+     with the region information.  Each section contains a HashMap called x, y, 
+     z, and t if that axis is defined.  Each of the x, y, z and t HashMaps
+     have a "hi" and a "lo".
+          
+ This nested loop set loops through all of the sections and the axis in the region index file:
+ 
+ #set ($sections = $las_region_index.getSections())
+ #foreach ($section in $sections)
+     #foreach ($key in $section.keySet())
+         #set ($axis = $section.get($key))
+         The $key axis has hi=$axis.get("hi") and lo=$axis.get("lo")
+     #end
+ #end
+ 
+       
+*#
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<title>LAS OUTPUT</title>
+		<style type="text/css">
+		   div.color {
+		      background: rgb(204,204,255);
+		      padding: 0.5em;
+		      border: solid;
+		      border-width: thin;
+		      font-family: monospace;
+		   }
+		   div.red {
+		      background: rgb(204,100,100);
+		      padding: 0.5em;
+		      border: solid;
+		      border-width: thin;
+		      font-family: monospace;
+		   }
+		</style>
+	</head>
+
+	<body>
+	    <div class="red">
+               Matlab users please note that if you have requested a longitude range that 
+               runs across the "branch cut" of the underlying dataset you will be provided 
+               with two separate subregions of data to load into your workspace.  This  
+               situation will occur, for example, when the underlying dataset is defined 
+               from -180 to 180 degrees longitude and you request a 40 degree span of 
+               the Pacific Ocean running from 160e to 160w longitude.
+	    </div>
+		<h3>
+			Desktop Application Data Access Scripts
+		</h3>
+		<p>
+		This page contains OPeNDAP URLs for each variable you selected and
+		provides example data access scripts for three OPeNDAP enabled
+		applications: Ferret, Matlab and GrADS.
+		<p>
+		<b>Note: </b>Each variable has its own OPeNDAP URL.
+		<p>
+		<a href="http://www.opendap.org">Visit the OPeNDAP web site</a> for more information about the protocol and what it can do.
+		<p>
+		The OPeNDAP URL to your selected variables:
+		<p>
+		<blockquote>
+		    #set($vars = $las_request.getVariables())
+		    #foreach ($var in $vars)
+		       $las_config.getFTDSURL($var)<br>
+		    #end
+			<p>
+			These OPeNDAP links can be viewed in a browser to get more
+			information about these data:
+			<br>
+			#set($vars = $las_request.getVariables())
+			#foreach ( $var in $vars )
+			   <a href="${las_config.getFTDSURL($var)}.info">INFO</a> (Information)
+			<br>
+			   <a href="${las_config.getFTDSURL($var)}.das">DAS</a>&nbsp;&nbsp; (Data Attribute Structure)
+			<br>
+			   <a href="${las_config.getFTDSURL($var)}.dds">DDS</a>&nbsp;&nbsp; (Data Description Structure)
+			#end
+		</blockquote>
+		#if ( $las_region_index.getNumberOfSections() > 1 ) 
+		<br>
+		<b>Note: </b>Your region wraps around the modulo line of the longitude axis 
+		so two OPeNDAP constraint expressions are needed (one for each section 
+		of your selected region). 
+		#end
+		<br>
+		The following commands can be used to open this OPeNDAP URL in the
+		desktop application:
+		<br>
+		<br>
+		<a href="https://ferret.pmel.noaa.gov/" title="Ferret Web Site">
+			Ferret</a>:
+		<br><blockquote>
+		    <div class="color">
+		    #set($vars = $las_request.getVariables())
+			#foreach ( $var in $vars )
+			   set data &quot;${las_config.getFTDSURL($var)}&quot;<br>
+		    #end
+			<br>
+			$las_region_index.getFerretRegion()
+			<br>
+			</div>
+		</blockquote>
+		<br>
+		<a href="http://www.iges.org/grads/" title="GrADS Page">
+			GrADS</a>:
+	    
+		<br><blockquote>
+		<div class="color">
+		#set($vars = $las_request.getVariables())
+	    #foreach ( $var in $vars )
+		    sdfopen ${las_config.getFTDSURL($var)}<br>
+		#end
+		#set ($original = $las_region_index.getOriginalRegion())        
+            #foreach ($key in $original.keySet())
+                #set ($axis = $original.get($key))
+                   #if ( $key == "x")
+                      set lon $axis.get("lo") $axis.get("hi")<br>
+                   #end
+                   #if ( $key == "y")
+                      set lat $axis.get("lo") $axis.get("hi")<br>
+                   #end
+                   #if ( $key == "z")
+                      set level $axis.get("index_lo") $axis.get("index_hi")<br>
+                   #end
+                   #if ( $key == "t")
+                      set t $axis.get("index_lo") $axis.get("index_hi")<br>
+                   #end
+            #end
+	    </div>
+		</blockquote>
+		<a href="http://sourceforge.net/apps/trac/njtbx/wiki" title="Matlab via netCDF-Java Toolbox">
+			Matlab via netCDF-Java Toolbox</a>:
+		<blockquote>
+		<br>	
+		<div class="color">
+			## 
+			#if ( $las_region_index.getZ_lo(0) == "" && ($las_region_index.getT_lo(0).trim().length() != 0 && $las_region_index.getT_lo(0).trim().length() > 7) )
+			## No z-axis, use the original coordinate values...
+			## Don't know what matlab does with climo times, so try to only use "real" times in this section.
+			#set($vars = $las_request.getVariables())
+	           #foreach ( $var in $vars )  
+	           #set($vars = $las_request.getVariables())
+                   #foreach ( $var in $vars )                
+                     #set ($original = $las_region_index.getOriginalRegion())        
+                       #foreach ($key in $original.keySet())
+                          #set ($axis = $original.get($key))
+                            #if ( $key == "x")
+                               #set ($xlo=$axis.get("lo"))
+                               #set ($xhi= $axis.get("hi"))
+                            #end
+                            #if ( $key == "y")
+                               #set ($ylo=$axis.get("lo"))
+                               #set ($yhi= $axis.get("hi"))
+                            #end
+                            #if ( $key == "z")
+                               #set ($zlo=$axis.get("lo"))
+                               #set ($zhi= $axis.get("hi"))
+                            #end
+                            #if ( $key == "t")
+                               #set ($tlo=$axis.get("lo"))
+                               #set ($thi= $axis.get("hi"))
+                               #if ($tlo == $thi)
+                                  #set($timeString = "'$tlo'")
+                               #else
+                                  #set($timeString = "'$tlo','$thi'")
+                               #end
+                            #end
+                       #end
+                          url='${las_config.getFTDSURL($var)}';<br>
+                          #if ( $original.keySet().contains("t") )
+                              [${las_config.getVariableName($var)},grid]=nj_subsetGrid(url,'${las_config.getVariableName($var)}',[$xlo $xhi $ylo $yhi ],$timeString) <br>
+                          #else
+                              [${las_config.getVariableName($var)},grid]=nj_subsetGrid(url,'${las_config.getVariableName($var)}',[$xlo $xhi $ylo $yhi ]) <br>
+ 
+                          #end
+                       #end
+	           #end
+			#else
+			## In the case where the z-axis exists we must use the index access...
+			    #set($i=0)
+			    #set ($sections = $las_region_index.getSections())
+                #foreach ($section in $sections)             
+                   #set($vars = $las_request.getVariables())
+	               #foreach ( $var in $vars )                         
+	    	          url='${las_config.getFTDSURL($var)}';<br>
+                      [${las_config.getVariableName($var)},grid]= nj_grid_varget(url,'${las_config.getVariableName($var)}',$las_region_index.getStartCount($i)) <br>
+	    	       #end
+	    	    #set($i=$i+1)
+                #end
+            #end  ## end of has z test
+		</div>
+		</blockquote>
+		<a href="http://www.mathworks.com/products/matlab/" title="Matlab via loaddap">
+			Matlab via loaddods</a>:
+		<blockquote>
+		<br>	
+		<div class="color">
+			#set ($sections = $las_region_index.getSections())
+			#set($i=0)
+            #foreach ($section in $sections)             
+               #set($vars = $las_request.getVariables())
+	           #foreach ( $var in $vars )                
+                          $las_region_index.getRangesCovered($i)<br>
+		          xx_${las_config.getVariableName($var)} = loaddap('${las_config.getFTDSURL($var)}?${las_config.getVariableName($var)}$las_region_index.getOPeNDAPConstraint($i)') <br>
+		       #end
+		    #set($i=$i+1)
+            #end
+		</div>
+		</blockquote>
+		<br>
+	</body>
+</html>
+#end

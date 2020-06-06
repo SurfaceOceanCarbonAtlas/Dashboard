@@ -1,0 +1,203 @@
+! LAS_zt_as_points
+! When the Ferret property ferret_points_zt is defined, use the variable 
+! (e.g. pressure) that it points to, and draw the plot as a pressure as a
+! function of time colored by the data_var variable.
+!
+! NOTE: **********
+! The Z region given is to be interpreted as pressure range. This only works if
+! the number of levels is similar to the depth range. 
+!       **********
+!
+! The Ferret properties to set are
+! 
+!  <points_zt>PRES</points_zt>  The name of the vertical variable to use, e.g. pressure or depth
+!  <zt_down>1</zt_down>         Set to 1 if the vertical-direction variable is poisitive down, 0 otherwise
+
+! 2/6/2017 *acm
+
+! 
+IF `($ferret_view"0|zt>1|*>0")  EQ 0` THEN 
+   DEFINE SYMBOL error_string = "2D plot as points is implemented only for ZT plots"
+   GO LAS_error_msg
+ENDIF
+
+! The value of symbol ($ferret_points_zt) is the nama of a variable to use as the z-axis
+! variable, e.g. pressure, determining the range and the z axis.
+
+LET varnames = ..varnames
+IF `IS_ELEMENT_OF_STR_N(varnames, "($ferret_points_zt)") EQ 0` THEN 
+   DEFINE SYMBOL error_string = \
+   "Request for drawing ZT as points expects the variable ($ferret_points_zt), Not found"
+   GO LAS_error_msg
+ENDIF
+
+
+DEFINE SYMBOL zvvar = ($ferret_points_zt)
+
+! Check for valid data in pressure and the color-by variable
+
+LET var = ($ferret_var_0)
+LET nvpts = var[x=@ngd,y=@ngd,z=@ngd,t=@ngd]
+
+
+! Get the vertical range to use and draw an underlay plot; Z-T
+! Apply the z-region as a constraint on pressure, not a grid limit.
+
+LET zvar_region = ($zvvar)[($region_xyt)]
+LET zvar_plim = IF zvar_region GE ($region_z_lo) AND zvar_region LT ($region_z_hi) THEN zvar_region
+
+LET nppts = zvar_plim[x=@ngd,y=@ngd,z=@ngd,t=@ngd]
+
+! If no data, just make a blank plot with a label and exit
+IF `nppts LE 1 OR nvpts lE 1` THEN 
+   PLOT/NOAX/NOLAB/VLIM=-1:1/HLIM=-1:1 {0,0}, {1,1}
+   LABEL/NOUSER `0.5*($ppl$xlen)`,`0.5*($ppl$ylen)`,0,0,0.15 No Valid Data
+
+! Add any labels that have been defined  
+! Save the plot and results
+   GO labels_above_plot
+   GO LAS_results box
+   EXIT/SCRIPT
+ENDIF
+
+! Set up to draw the ZT plot
+
+! Set up the Ferret plot title
+DEFINE SYMBOL split_title = ($ferret_plot_title)
+GO LAS_split_title
+DEFINE SYMBOL ferret_plot_title = ($split_title)
+
+! Is the ($ferret_points_zt) variable describing pressure or depth, e.g. positive-down?
+
+DEFINE SYMBOL zunits = `($zvvar),return=units`
+LET attnames = ($zvvar).attnames
+
+DEFINE SYMBOL reverse_vert = 0
+
+IF `IS_ELEMENT_OF_STR_N(attnames, "positive")` THEN 
+   DEFINE SYMBOL posdirec = `($zvvar).positive`
+   DEFINE SYMBOL reverse_vert = ($posdirec"0|DOWN>1|down>1|*>0")
+ENDIF
+
+! Look for a standard_name of depth, or one of the sea_floor_depth_below names:
+IF `IS_ELEMENT_OF_STR_N(attnames, "standard_name")` THEN 
+   DEFINE SYMBOL posdirec = `($zvvar).standard_name`
+   DEFINE SYMBOL reverse_vert = ($posdirec"0|DEPTH>1|depth>1|*>0")
+   IF `STRINDEX("($posdirec)", "sea_floor_depth") GT 0` THEN DEFINE SYMBOL reverse_vert = 1
+ENDIF
+
+! Is there a property that tells us this is positive-down?
+IF ($ferret_zt_down"0|1|0|*>1") THEN DEFINE SYMBOL reverse_vert = 1
+
+
+LET npts = zvar_plim[x=@ngd,y=@ngd,z=@ngd,t=@ngd]
+IF `npts LE 1` THEN 
+   DEFINE SYMBOL error_string = "No valid data in ($zvvar). Cannot draw plot for ($zvvar) vs time"
+   GO LAS_error_msg
+ENDIF
+
+! Define nice vertical limits
+PPL %RANGE `zvar_plim[z=@min,t=@min]`, `zvar_plim[z=@max,t=@max]`, 10
+
+LET zvlo = ($PPL$RANGE_LOW)
+LET zvhi = ($PPL$RANGE_HIGH)
+
+IF `ABS(zvhi - zvlo) LT 0.1` THEN 
+   DEFINE SYMBOL error_string = "No variation in ($zvvar). Cannot draw plot for ($zvvar) vs time"
+   GO LAS_error_msg
+ENDIF
+
+IF ($reverse_vert) THEN
+   LET dum  = `zvlo,prec=7` 
+   LET zvlo = `zvhi,prec=7`
+   LET zvhi = dum
+ENDIF
+
+! Time-z underlay plot
+
+! define time variable and do a Z-T underlay plot
+
+! Get nice time limits
+LET tvar = t[gt=($zvvar)] + 0*($zvvar)
+
+LET ttvar = tvar[($region_xyt)]
+ppl %range `ttvar[z=@min,t=@min]`, `ttvar[z=@max,t=@max]`, 10
+
+LET tlo = ($PPL$RANGE_LOW)
+LET thi = ($PPL$RANGE_HIGH)
+
+! Draw the 3-argument Ribbon plot
+
+! Set symbol characteristics, based on amount of data.
+LET fvar = xsequence(($ferret_var_0))
+LET sizsym = 0.14
+LET thicksym = 2
+
+IF `fvar[i=@ngd] GT 200` THEN 
+   LET sizsym = 0.06
+   LET thicksym = 1
+ENDIF
+IF `fvar[i=@ngd] GT 1000` THEN LET sizsym = 0.04
+
+
+DEFINE SYMBOL data_plotted_min = 0
+DEFINE SYMBOL data_plotted_max = 0
+
+! Define a mask on the color-by variable which is the pressure range
+! used in the plot.
+
+LET colorvar = ($ferret_plot_var_noregion)
+LET mask = IF zvar_plim THEN 1
+
+LET cvar = colorvar[($region_xyt)] * mask
+
+! Do a PLOT/SET to load the colors so levels will be set
+PLOT/VS/RIBBON/SET ttvar, zvar_plim, cvar
+
+! Set the time axis on the horizontal plot
+PLOT/VLIM=`zvlo`:`zvhi`/hlim=`tlo`:`thi`/nolab/z=($region_z_lo"1") zvar_plim*0 + zvhi/0
+
+PLOT/OVER/VS/NOLAB/RIBBON/SYM=25/thick=`thicksym`/siz=`sizsym`/AX=0,0,0,0\
+   ($qualifiers)/KEY=horiz ttvar, zvar_plim, cvar
+
+! Label the Z axis with units of the z-var
+ANNOTATE/NORM/XPOS=-0.05/YPOS=0.5/HALIGN=0/ANGLE=90/SIZ=0.14 "`($zvvar),RETURN=units`"
+
+! One of the results is the data min and max. Save those here.
+
+LET cminmax =  MINMAX(cvar)
+
+DEFINE SYMBOL data_plotted_min = `cminmax[x=1],prec=7`
+DEFINE SYMBOL data_plotted_max = `cminmax[x=2],prec=7`
+
+! Add a note in the annotations box.
+! Include a url if it is specified. IF the letters url are
+! part of the note text, substitute the url for url. Otherwise,
+! if a URL is given, just use the entire note text in the link.
+
+IF ($ferret_add_a_note"0|*>1") THEN 
+   DEFINE SYMBOL new_note = ($ferret_add_a_note)
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   IF ($ferret_url_for_note"0|*>1") THEN
+      LET nl = STRLEN("($ferret_add_a_note)")
+      LET iu = MAX(1, STRINDEX("($ferret_add_a_note)", "url") )
+      IF `iu GT 1` THEN 
+         DEFINE SYMBOL new_note1 = `SUBSTRING("($ferret_add_a_note)", 1, iu-1)`
+         DEFINE SYMBOL new_note2 = `SUBSTRING("($ferret_add_a_note)", iu+4, nl)` 
+      ELSE
+         DEFINE SYMBOL new_note2 = ($ferret_add_a_note)
+      ENDIF
+      DEFINE SYMBOL new_note = ($new_note1) (<a target=&quot;_blank&quot; href=($ferret_url_for_note)>($new_note2)</a>)
+   ENDIF
+   DEFINE SYMBOL note_($note_num)_lab = ($new_note)
+ENDIF
+GO labels_above_plot
+
+
+! Save the results
+
+GO LAS_results box
+
+
+! End of file ------------ LAS_zt_as_points.jnl--------------------------
+

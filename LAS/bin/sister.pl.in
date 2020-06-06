@@ -1,0 +1,137 @@
+#!@PERL@
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+use Config;
+use lib ('../xml/perl','.', '../xml/perl/install/lib/' . $Config{version},
+         '../xml/perl/install/lib/site_perl/' . $Config{version},
+         '../xml/perl/install/lib/perl5/' . $Config{version},
+         '../xml/perl/install/lib/perl5/site_perl/' . $Config{version});
+use LWP::UserAgent;
+use URI::URL;
+use URI::Escape;
+use strict;
+use Getopt::Long;
+my (%Opts, $Separator);
+
+sub genXML {
+    my $xmlHead = qq{<?xml version="1.0"?><lasRequest href="file:las.xml" useCache="false">};
+    my $xmlLink = "";
+    my $xmlProp = "";
+    my $xmlFoot = qq{</lasRequest>};
+
+    if ($Opts{v}) {
+      $xmlLink = qq{<link match="/lasdata/operations/getVersion"/>};
+    } elsif ($Opts{c}) {
+      $xmlLink = qq{<link match="/lasdata/operations/getConfig"/>};
+    } elsif ($Opts{p}) {
+      $xmlLink = qq{<link match="/lasdata/operations/getPackage"/>};
+      if ($Opts{f}) {
+        $xmlProp = qq{<properties><get_package><force_new>true</force_new></get_package></properties>};
+      }
+    } else {
+      $xmlLink = qq{<link match="/lasdata/operations/getVersion"/>};
+    }
+
+    my $xml = $xmlHead . $xmlLink . $xmlProp . qq{<args></args>} . $xmlFoot;
+    return 'xml=' . uri_escape($xml);
+}
+
+sub usage {
+    print STDERR "Usage: sister.pl [-v] [-c] [-p -f] url\n";
+    print STDERR "       -v              returns the LAS product server version\n";
+    print STDERR "       -c              returns the LAS Configuration xml\n";
+    print STDERR "       -p              returns the LAS Configuration package URL\n";
+    print STDERR "       -f              used with '-p', forces creation of a new Configuration package\n";
+    print STDERR "\n";
+    print STDERR "Example: sister.pl -c http://ferret.pmel.noaa.gov/NVODS-bin/LASserver.pl\n\n";
+    exit 1;
+}
+
+use Getopt::Std;
+getopts('vcpf', \%Opts);
+
+my $urlstr = shift;
+if (!defined($urlstr)){
+    usage;
+}
+
+my $xml = &genXML();
+my $hdrs = new HTTP::Headers;
+my $url = new URI::URL($urlstr);
+my $req = new HTTP::Request('POST', $url, $hdrs);
+$req->content_type('application/x-www-form-urlencoded');
+$req->content($xml);
+    
+my $ua = new LWP::UserAgent;
+my ($resp, $loc);
+
+while(1){
+  $resp = $ua->request($req);
+  $loc = $resp->header('Location');
+  last if ! $loc;
+  $url = new URI::URL($loc);
+  $req = new HTTP::Request('GET', $url, $hdrs);
+}
+
+if (!$resp->is_success){
+
+  print STDERR "Request failed\n";
+  print $resp->error_as_HTML;
+  exit 1;
+
+} else {
+
+  my $result = $resp->content;
+
+  if (!$Opts{p}) {
+
+    # Print out the result unless it's a package request
+    print $result;
+
+  } else {
+
+    if ($result =~ /DISABLED/) {
+      print <<EOF;
+
+Remote requets for packages are DISABLED at this LAS.
+
+Please contact the LAS installer and have them enable requests with the
+following two lines in LAS_config.pl
+
+  allow_sisters        => 'true',
+  allow_sister_driven  => 'true'
+
+EOF
+    } else {
+      print "\n";
+      my ($urlstr,$mtime,$size) = $result =~ /.*package url=\"(.*)\" mtime=\"(\d*)\" size=\"(\d*)\".*/;
+      $url = new URI::URL($urlstr);
+      $req = HTTP::Request->new(GET => $url);
+      $resp = $ua->request($req);
+      my ($file) = $urlstr =~ /.*output\/(.*\.tar).*/;
+      if ($resp->is_success){
+        if (-e $file) {
+          print "  ...deleting old version of $file\n";
+          unlink $file or die "Can't delete $file\n";
+        }
+        $result = $resp->content;
+        print "  ...downloading $urlstr\n     $size bytes created at mtime=$mtime\n\n";
+        open OUTPUT, ">$file" or die "Can't open file $file";
+        print OUTPUT $result;
+        close OUTPUT;
+      } else {
+        die "Couldn't download URL: $url: ", $resp->message, "\n";
+      }
+
+    }
+
+  }
+
+}
+
+
+

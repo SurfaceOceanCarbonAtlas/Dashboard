@@ -1,0 +1,121 @@
+! prop_prop_constraints.jnl
+! Define a mask that captures variable constraints for Prop-Prop plots
+
+! Argument 1 is the variable id
+! Argument 2 is the variable to apply constraints to.  This is 
+! the variable after region, striding and XSEQUENCE are applied.
+
+! A constraint comesas a set of 4 symbols
+! each var ge one value and le another value.
+
+!   constraint_n_lhs  is the variable name
+!   constraint_n_op   is the operation (le, ge)
+!   constraint_n_rhs  is the value 
+!   constraint_n_type must be "variable"  (will there be other types of constraints?)
+
+DEFINE SYMBOL translate_math = 1
+
+! Define var_mask variable with all of the variable constraints.
+! When there is a longitude constraint, define symbols with the values,
+! to be used in making the map underlying prop-prop plots.
+
+LET vnames = ..varnames
+
+DEFINE SYMBOL var_mask = var_mask_0
+LET var_mask_0 = 1  ! may be redefined below.
+LET nmaskx = 0
+
+! Gridded variables and mask-by variables are handled with XSEQUENCE after the 
+! space/time region is applied
+DEFINE SYMBOL apply_region = 0
+IF ($shape0"0|*>1") THEN 
+   IF `STRLEN("($shape0)") GT 1` THEN DEFINE SYMBOL apply_region = 1
+ENDIF
+
+! Define mask based on constraints. Check for variable constraints on 
+! a quoted variable e.g. 'K'
+
+REPEAT/RANGE=0:100/NAME=ic (\
+  DEF SYM ic = `ic`;\
+  IF `($constraint_($ic)_lhs"0|*>1") EQ 0` THEN EXIT/LOOP;\
+  DEF SYM cvar = ($constraint_($ic)_lhs);\
+  DEF SYM cvarnq = ($constraint_($ic)_lhs);\
+  GO LAS_unquote_string cvarnq;\
+  LET has_var = `(IS_ELEMENT_OF_STR_N(vnames, "($cvarnq)") GT 0) OR (IS_ELEMENT_OF_STR_N(vnames, "($cvarnq)_") GT 0)`;\
+  IF `has_var EQ 0` THEN EXIT/CYCLE;\
+  IF `IS_ELEMENT_OF_STR_N(vnames, "($cvar)_") GT 0` THEN DEF SYM cvar = ($cvar)_;\
+  IF `($constraint_($ic)_type"0|variable>1|*>0") EQ 0` THEN EXIT/CYCLE;\
+  LET var_mask_($ic) = IF ($cvar) ($constraint_($ic)_op) ($constraint_($ic)_rhs) THEN 1; \
+  LET nc = `($cvar),RETURN=isize`;\
+  IF `(nc NE npts) AND ($rowvar"0|*>1")` THEN DEF SYM cvar = SEPARATE(($cvar), ($rowvar), 0); \
+  LET var_mask_($ic) = IF ($cvar) ($constraint_($ic)_op) ($constraint_($ic)_rhs) THEN 1; \
+  IF ($apply_region) THEN LET var_mask_($ic) = IF ($cvar)[($region_full)] ($constraint_($ic)_op) ($constraint_($ic)_rhs) THEN 1;\
+  IF ($constraint_($ic)_rhs"0|NaN>1|*>0") THEN LET var_mask_($ic) = IF ($cvar) THEN 1;\
+  LET nmaskx = `nmaskx+1`;\
+  IF `nmaskx GT 1` THEN DEF SYM var_mask = ($var_mask)* var_mask_($ic) ;\
+  )
+  
+! Handle details for constraints in longitude and time
+
+REPEAT/RANGE=0:100/NAME=ic (\
+  DEF SYM ic = `ic`;\
+  IF `($constraint_($ic)_lhs"0|*>1") EQ 0` THEN EXIT/LOOP;\
+  LET reset_lon = 0;\
+  IF `STRINDEX("($constraint_($ic)_lhs%0%)", "longitude")` THEN;\
+    LET reset_lon = ` ($constraint_($ic)_rhs"0|NaN>0|*") GT 180 AND ($its_listing"0")` ;\
+    DEF SYM constraint_($ic)_rhs = `($constraint_($ic)_rhs)-360` ;\
+    IF `($constraint_($ic)_op"0|gt>1|*>0")` THEN DEF SYM constr_lon_min = ($constraint_($ic)_rhs) ;\
+    IF `($constraint_($ic)_op"0|le>1|*>0")` THEN DEF SYM constr_lon_max = ($constraint_($ic)_rhs) ;\
+  ENDIF;\  
+  IF `STRINDEX("($constraint_($ic)_lhs%0%)", "time") AND ($constraint_($ic)_op"0|gt>1|*>0")` THEN DEF SYM constr_tim_min = ($constraint_($ic)_rhs) ;\
+  IF `STRINDEX("($constraint_($ic)_lhs%0%)", "time") AND ($constraint_($ic)_op"0|le>1|*>0")` THEN DEF SYM constr_tim_max = ($constraint_($ic)_rhs) ;\
+  )
+ 
+! Subsequent script expects constr_lon_max to be defined if constr_lon_min is, and 
+! constr_tim_max to be defined if constr_tim_min is.
+! If that constraint was not defined, use the data max
+
+IF `($constr_lon_min"-1.e34|*>1") NE -1.e34` THEN
+   IF `($constr_lon_max"-1.e34|*>1") EQ -1.e34` THEN DEFINE SYMBOL constr_lon_max = `longitude[x=@max,y=@max,z=@max,t=@max,e=@max,f=@max]`
+ENDIF
+
+IF `($constr_tim_min"-1.e34|*>1") NE -1.e34` THEN
+   IF `($constr_tim_max"-1.e34|*>1") EQ -1.e34` THEN DEFINE SYMBOL constr_tim_max = `time[x=@max,y=@max,z=@max,t=@max,e=@max,f=@max]`
+ENDIF
+
+IF `nmaskx GT 0` THEN LET var_mask = xsequence(($var_mask))
+
+! Now look for text constraints.  If the constraint is on the feature variable, ignore it.
+! Those constrataints will be passed as a Ferret property.
+
+LET ntxtconstr = 0
+REPEAT/RANGE=0:100/NAME=ic (\
+  DEF SYM ic = `ic`;\
+  IF `($constraint_($ic)_lhs"0|*>1") EQ 0` THEN EXIT/LOOP;\
+  DEF SYM cvar = ($constraint_($ic)_lhs);\
+  IF `($cvar"0|($feature_variable%A%)>0|*>1") EQ 0` THEN EXIT/CYCLE;\
+  LET ignore = 0;\
+  IF ($ignore_vars"0|*>1") THEN LET ignore = \
+   `(IS_ELEMENT_OF_STR_N(ignore_constraints, "($cvar)") GT 0) OR \
+   (IS_ELEMENT_OF_STR_N(ignore_constraints, "($cvar)_") GT 0)`;\
+  IF `ignore GE 0` THEN EXIT/CYCLE;\
+  IF `($constraint_($ic)_type"0|text>1|*>0") EQ 1` THEN LET ntxtconstr = `ntxtconstr+1`;\
+  )
+
+DEF SYM ic = 0
+LET i_mask = _m[ge=($rowvar)]
+DEF SYM itxt = 0
+DEFINE SYMBOL text_mask = 0
+
+IF `ntxtconstr EQ 0` THEN EXIT/SCRIPT
+
+REPEAT/RANGE=0:100/NAME=ic (GO set_text_constraints;\
+ IF `text_constraints_done EQ 1` THEN EXIT/LOOP)
+
+! Text masks are zero and 1 so they can be added.
+! Now make it a mask with missing and 1, to multiply with var_mask
+
+LET text_mask_zero = ($text_mask)
+LET text_mask = IF text_mask_zero NE 0 THEN 1
+
+! End of  ------------- prop_prop_constraints.jnl--------------------------

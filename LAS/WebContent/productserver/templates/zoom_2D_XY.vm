@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS Output -- $las_config.getTitle()</title>
+
+		<style media="all" type="text/css">
+			@import "JavaScript/ui/LASUI.css";
+		</style>
+</head>
+<body onload="initializeLASRequest(); loadMap()">
+  	<div id="img_body" name="img_body"></div>
+</body>
+
+<script language="JavaScript" src="JavaScript/components/xmldom.js"></script>
+<script language="JavaScript" src="JavaScript/components/LASRequest.js"></script>
+<SCRIPT language="JavaScript" src="JavaScript/components/MapWidget.js"></SCRIPT>
+<script language="JavaScript">
+
+var myMapWidget = {};  //put it in a global variable, or else you'll lose it.
+var Req = {}; //Same goes for the LAS request object
+var axisLow = "";
+var axisHi = "";
+/* 
+*  load the initial XY image that was requested from LAS
+*/
+function loadMap (){
+	var args = {
+                   'DOMNode' : document.getElementById('img_body'), // the container Node
+                   'onafterdraw' : function () {submitXML()},      //a function to fire after drawing (talk to me about this one)
+                   'plot_area' : {                              // defining the plot region within the image
+                           'offX' : $las_map_scale.getXOffsetFromLeft(),
+                           'offY' : $las_map_scale.getYOffsetFromTop(),
+                           'width' : $las_map_scale.getXPlotSize(),
+                           'height' : $las_map_scale.getYPlotSize()
+                   },
+                   'img' : {                                   //the image
+                           'src' : "$las_response.getResult("plot_image")",
+			   'width' : $las_map_scale.getXImageSize(),
+                           'height' :$las_map_scale.getYImageSize(),
+                           'extent' : {                                       //coordinate extent of the image being passed
+                               'x' : {
+                                   'min' : $las_map_scale.getXAxisLowerLeft()-1,
+                                   'max' : $las_map_scale.getXAxisUpperRight()+1
+                               },
+                               'y' : {
+                                   'min' : $las_map_scale.getYAxisLowerLeft()-1,
+                                   'max' : $las_map_scale.getYAxisUpperRight()+1
+                               }
+                           }
+                       }
+                  }
+	myMapWidget = new MapWidget(args);
+
+}
+
+function initializeLASRequest() {
+  Req = new LASRequest('$las_request.toJavaScriptSafeString()');
+}
+function submitXML() {
+
+/*
+* figure out what view this and use the axis values (ie x or y), to get the ranges.  Not 
+`* really needed for the XY zoom, but leave it in because we will need for other views
+*/
+
+  if ((myMapWidget.extents.selection.grid.x.min == myMapWidget.extents.selection.grid.x.max) || (myMapWidget.extents.selection.grid.y.min == myMapWidget.extents.selection.grid.y.max)) {
+    alert ("Please select an XY region, and not a line");
+  } else {
+    var view = Req.getProperty('ferret','view');
+    axisLow = view.substr(0,1);
+    axisHi = view.substr(1,1);
+    if (myMapWidget.extents.selection.grid.x.min) {
+     Req.setRange(axisLow,myMapWidget.extents.selection.grid.x.min,myMapWidget.extents.selection.grid.x.max);
+     Req.setRange(axisHi,myMapWidget.extents.selection.grid.y.min,myMapWidget.extents.selection.grid.y.max);
+    }
+   
+    var URL = './ProductServer.do?xml=' + escape(Req.getXMLText());
+    if(parent.LAS)
+	if(parent.LAS.onPlotUnload)
+		parent.LAS.onPlotUnload();
+    document.location = URL;
+  }
+}
+</script>
+</html>

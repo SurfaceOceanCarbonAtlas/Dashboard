@@ -1,0 +1,143 @@
+! make_c_lab.jnl
+! Called by set_constraint_labels. 
+! 
+! 4/2017    *acm* Set a flag: constraints choose platforms
+!
+! Make the label from constraints. Calld as a second
+! script as the command line from a single REPEAT
+! statement containing all the commands could get too long.
+! Fix to let the rhs for month ranges have multiple items, 
+! given in a comma-separated list
+!
+! Is there a constraint that selects the platform specifically? 
+! (E.G. used for marking SOCAT moorings.)
+
+IF ($lhs"0|vessel_name>1|expocode>1|platform_type>1|vessel_type>1|platform_name>1|*>0") THEN \
+    DEFINE SYMBOL constrain_by_platform = 1
+
+! Is it where the data-var is not NaN? If so then don't try to make
+! black sysmbols at missing-values, and no need for (0 missing) on labels
+
+! Remove single-quotes from around a variable title thats 
+! quoted because its a reserved name
+
+IF ($rhs_quoted) THEN 
+   DEFINE SYMBOL ($lhs)_quoted = 1
+   DEFINE SYMBOL rhs = ($lhs)_($v)_is_quoted
+ENDIF
+
+IF `($rhs"|NaN>1|*>0")+($op"|NE>1|*>0") EQ 2` THEN 
+   IF `($lhs"|($data_0_ID)>1|*>0")` THEN DEF SYM has_missing = 0
+   DEFINE SYMBOL provisional_title = Where ($lhs) is valid  ! save this
+ENDIF
+
+! is lhs a variable in single quotes
+GO LAS_unquote_string lhs
+
+DEFINE SYMBOL translate_math = 1
+IF ($ferret_annotations%0|*>1%) THEN DEFINE SYMBOL translate_math = 0
+
+LET strvar = "($rhs)"
+IF `STRINDEX(strvar, "'") GT 0` THEN
+   LET slen = `STRLEN(strvar)`
+   LET s1 = `STRINDEX(strvar, "'")`
+   DEFINE SYMBOL rhs = `SUBSTRING(strvar, s1+1, slen-2)`
+ENDIF
+
+! RHS for month ranges may be a comma-separated list
+LET month_labels = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
+
+IF ($lhs"0|month>1|*>0") THEN 
+   IF `STRINDEX(strvar, ",") EQ 0` THEN 
+     DEFINE SYMBOL nmask_labels = `($nmask_labels"0") + 1` 
+     DEFINE SYMBOL imonth = `MAX(1, INT(($rhs)) )`
+     DEFINE SYMBOL mask_title_($nmask_labels) = Months `month_labels[i=($imonth)]`
+   ELSE
+     LET rhslen = `STRLEN(strvar)`
+     LET commaloc = `STRINDEX(strvar, ",") `
+     DEFINE SYMBOL m1 = `SUBSTRING(strvar, 1, commaloc-1)`
+     DEFINE SYMBOL nmask_labels = `($nmask_labels"0") + 1` 
+     DEFINE SYMBOL imonth = `MAX(1, INT(($m1)) )`
+     DEFINE SYMBOL mask_title_($nmask_labels) = Months `month_labels[i=($imonth)]`
+     DEFINE SYMBOL rhs2 = `SUBSTRING(strvar, commaloc+1, rhslen-commaloc+1)`
+
+     DEFINE SYMBOL mask_label_long = 0
+     REPEAT/RANGE=1:`rhslen` (\
+     LET strvar2 = "($rhs2)" ;\
+     LET rhslen = `STRLEN(strvar2)` ;\
+     LET commaloc = `STRINDEX(strvar2, ",") ` ;\
+     IF `commaloc EQ 0` THEN DEFINE SYMBOL m1 = ($rhs2);\
+     IF `commaloc NE 0` THEN DEFINE SYMBOL m1 = `SUBSTRING(strvar2, 1, commaloc-1)` ;\
+     DEFINE SYMBOL imonth = `MAX(1, INT(($m1)) )`;\
+     DEFINE SYMBOL mask_title_($nmask_labels) = ($mask_title_($nmask_labels)), `month_labels[i=($imonth)]` ;\
+     IF `commaloc EQ 0` THEN EXIT/LOOP ;\
+     IF `STRLEN("($mask_title_($nmask_labels))") GT 100 AND ($mask_label_long) EQ 0` THEN DEFINE SYMBOL mask_title_($nmask_labels) = ($mask_title_($nmask_labels))<NL>;\
+     IF `STRLEN("($mask_title_($nmask_labels))") GT 100` THEN DEFINE SYMBOL mask_label_long = 1;\
+     DEFINE SYMBOL rhs2 = `SUBSTRING(strvar2, commaloc+1, rhslen-commaloc+1)` ;\
+     )
+     IF ($mask_label_long"0|*>1") THEN DEFINE SYMBOL nmask_labels = `($nmask_labels"0") + 1`  ! add space for extra line
+     
+   ENDIF
+
+ELIF ($lhs"0|ident_ID>1|*>0") THEN 
+  DEFINE SYMBOL nmask_labels = `($nmask_labels"0") + 1` 
+   DEFINE SYMBOL mask_title_($nmask_labels) = Data from ID ($c_s) @AS($rhs)
+   IF ($math_sym_convert"0|no_convert>1") THEN DEFINE SYMBOL mask_title_($nmask_labels) = Data from ID ($c_s) ($rhs)
+
+ELSE 
+DEFINE SYMBOL nmask_labels = `($nmask_labels"0") + 1`
+GO remove_underscores ($lhs)
+DEFINE SYMBOL lhs = ($Var_Lab) 
+IF ($op"0|*>1") THEN DEFINE SYMBOL op = `UPCASE("($op)")` 
+DEFINE SYMBOL math_op_sym = ($op)
+IF ($math_sym_convert"1|no_convert>0") THEN GO op_math_sym ($translate_math) ($op) 
+DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhs)
+
+! Show time constraint as a formatted time
+IF `($lhs"|time>1|TIME>1|*>0")` THEN
+   IF `($timevar"0|*>1") EQ 0` THEN DEFINE SYMBOL timevar = time
+   CANCEL SYMBOL rhsdate
+   IF `($timeaxis"0|*>1") EQ 0` THEN 
+      LET amin = ($timevar)[i=@MIN]
+      LET amax = ($timevar)[i=@MAX]
+      DEFINE SYMBOL is_time = 1
+      GO LAS_is_range amin amax
+      CANCEL SYMBOL is_time
+      LET since_loc = STRINDEX("`($data_t_var"time").units`","since") - 2
+      IF `since_loc GT 1` THEN 
+         LET tunits = SUBSTRING("`($data_t_var"time").units`",1,`since_loc`)
+         DEFINE SYMBOL tunits = `tunits`
+      ENDIF
+      DEFINE AXIS/T=`ax_lo`:`ax_hi`:`del_ax`/T0="`($data_t_var"time").time_origin`"/units=($tunits) timeaxis
+      DEFINE SYMBOl timeaxis = timeaxis
+   ENDIF
+   LET tt = t[gt=($timeaxis)]
+   LET nt = `tt,RETURN=lsize`
+   LET tn = tt[L=`nt`]
+   DEFINE SYMBOL tn = `tn`
+   IF `($rhs) GE tt[L=1] AND ($rhs) LE ($tn)` THEN
+      DEFINE SYMBOL rhsdate = `TAX_DATESTRING( tt[t=($rhs)], tt, "hours")`
+      DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhsdate)
+   ELIF `($rhs) LT tt[L=1]` THEN
+      DEFINE SYMBOL rhsdate = `TAX_DATESTRING( tt[L=1], tt, "hours")`
+      DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhsdate)
+   ELIF `($rhs) GT ($tn)` THEN
+      DEFINE SYMBOL rhsdate = `TAX_DATESTRING( ($tn), tt, "hours")`
+      DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhsdate)
+   ENDIF
+   IF ($rhsdate"0|*>1") THEN DEFINE SYMBOL rhs ($rhsdate)
+ENDIF
+
+! Is it where a var is not NaN? If so then title was saved above
+
+IF `($rhs"|NaN>1|*>0")+($op"|NE>1|*>0") EQ 2` THEN 
+   DEFINE SYMBOL mask_title_($nmask_labels) = ($provisional_title)
+ENDIF
+
+IF `STRCMP("($lhs_last)", "($lhs% %)") EQ 0` THEN GO combine_titles 
+   DEFINE SYMBOL lhs_last = ($lhs)
+   DEFINE SYMBOL op_last = ($op)
+   DEFINE SYMBOL rhs_last = ($rhs) 
+ENDIF
+
+!-----------------End of make_c_lab ---------------------------------

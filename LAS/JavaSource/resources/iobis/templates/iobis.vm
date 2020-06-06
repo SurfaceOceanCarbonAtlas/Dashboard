@@ -1,0 +1,23 @@
+## Velocity info: http://velocity.apache.org/engine/devel/user-guide.html#about_this_guide
+## Currently, the constraint is generated in IobisTool and this isn't used.
+##
+## #set($x=$dapperBackendRequest.getDatabaseProperty("longitude"))
+## #set($y=$dapperBackendRequest.getDatabaseProperty("latitude"))
+## #set($z=$dapperBackendRequest.getDatabaseProperty("depth"))
+## #set($t=$dapperBackendRequest.getDatabaseProperty("time"))
+## #set($v=$dapperBackendRequest.getVariablesAsString())
+## #set($pre="$x,$y,$z,$t,$v")
+## ## xRange may have 0,1,2 values; the others are "" or a constraint
+## #set($xRange=$dapperBackendRequest.getAxisConstraintArrayList("x")) 
+## #set($yRange=$dapperBackendRequest.getAxisConstraint("y"))
+## #set($zRange=$dapperBackendRequest.getAxisConstraint("z"))
+## #set($tRange=$dapperBackendRequest.getAxisConstraint("t"))
+## #set($post="$yRange$zRange$tRange")
+## #if ($xRange.size() == 0) 
+## $pre$post
+## #elseif ($xRange.size() == 1) 
+## $pre$xRange.get(0)$post
+## #elseif ($xRange.size() == 2) 
+## $pre$xRange.get(0)$post
+## $pre$xRange.get(1)$post
+## #end

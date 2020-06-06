@@ -1,0 +1,20 @@
+! SOCAT_custom_colorbar.jnl
+! Specially labeled keys
+
+IF `($ferret_is_socat"0|*>1") EQ 0` THEN EXIT/SCRIPT
+
+DEFINE SYMBOL color_key_done = 0
+
+IF ($ferret_plot_key"0|qc_flag>1|*>0") THEN
+   ppl shakey ,0,0.0000001,100,,,`x1`,`x2`,`y1`,`y2`
+   GO SOCAT_qckey ttvar
+   DEFINE SYMBOL color_key_done = 1
+ENDIF
+
+IF ($ferret_plot_key"0|region_id>1|*>0") THEN
+   ppl shakey ,0,0.0000001,100,,,`x1`,`x2`,`y1`,`y2`
+   GO SOCAT_regions_key ttvar
+   DEFINE SYMBOL color_key_done = 1
+ENDIF
+
+! ----- End of SOCAT_custom_colorbar.jnl ------------------------------------------------

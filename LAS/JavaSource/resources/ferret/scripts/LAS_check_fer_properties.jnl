@@ -1,0 +1,83 @@
+! LAS_check_fer_properties.jnl
+! 
+! Author: ansley
+! $Date: 2010/10/13
+!
+! Sanity check on Ferret properties.
+! Add to this as needed
+!
+
+IF ($ferret_dep_axis_scale"0|*>1") THEN
+   LET slen = STRLEN("($ferret_dep_axis_scale)")
+   LET c1 = STRINDEX("($ferret_dep_axis_scale)", ",")
+
+! is there a comma?
+
+   IF `c1 EQ 0` THEN 
+      DEFINE SYMBOL error_status = ERROR
+      DEFINE SYMBOL error_type = OPTION
+      DEFINE SYMBOL error_action = Checking user inputs  
+      DEFINE SYMBOL error_string = "Invalid values entered forDependent axis scale. Require a list of 3 values: lo,hi[,delta] where [,delta] is optional."
+      GO LAS_error_msg 
+      EXIT/PROGRAM
+   ENDIF
+
+! Get the first 2 values,and if a second comma get delta value
+
+   DEFINE SYMBOL v1 = `SUBSTRING("($ferret_dep_axis_scale)", 1, c1-1)`
+   DEFINE SYMBOL remainder = `SUBSTRING("($ferret_dep_axis_scale)", c1+1, slen-c1)`
+   LET slen = STRLEN("($remainder)")
+   LET c1 = STRINDEX("($remainder)", ",")
+
+   IF `c1 EQ 0` THEN 
+     DEFINE SYMBOL v2 = ($remainder)
+  ELSE
+     DEFINE SYMBOL v2 = `SUBSTRING("($remainder)", 1, c1-1)`
+     DEFINE SYMBOL del = `SUBSTRING("($remainder)", c1+1, slen - c1)`
+  ENDIF
+
+! See if first 2 items are numbers, and lo not equal hi. Other numeric
+! values including lo > hi will yield a successful plot (which may have 
+! bad scaling).
+
+  DEFINE SYMBOL diffstr = `STRFLOAT("($v2)") - STRFLOAT("($v1)") `
+  IF `STRCMP("($diffstr)", "bad") EQ 0` THEN
+     DEFINE SYMBOL error_status = ERROR
+     DEFINE SYMBOL error_type = OPTION
+     DEFINE SYMBOL error_action = Checking user inputs  
+     DEFINE SYMBOL error_string = "Invalid values entered forDependent axis scale. hi and lo not numeric"
+     GO LAS_error_msg 
+     EXIT/PROGRAM
+  ENDIF
+
+! If they are equal then Ferret hangs.
+  LET diff = ($diffstr)
+  IF `diff EQ 0` THEN  
+     DEFINE SYMBOL error_status = ERROR
+     DEFINE SYMBOL error_type = OPTION
+     DEFINE SYMBOL error_action = Checking user inputs  
+     DEFINE SYMBOL error_string = "Invalid values entered forDependent axis scale. hi must be larger than lo"
+     GO LAS_error_msg 
+     EXIT/PROGRAM
+  ENDIF
+
+! If there is a del, see if its numeric. Any numeric value will yield a successful
+! plot (which may have bad scaling).
+
+  IF ($del"0|*>1") THEN
+     DEFINE SYMBOL delstr = `STRFLOAT("($del)")`
+     IF `STRCMP("($delstr)", "bad") EQ 0` THEN
+        DEFINE SYMBOL error_status = ERROR
+        DEFINE SYMBOL error_type = OPTION
+        DEFINE SYMBOL error_action = Checking user inputs  
+        DEFINE SYMBOL error_string = "Invalid values entered forDependent axis scale. delta not numeric"
+
+	GO LAS_error_msg 
+        EXIT/PROGRAM
+     ENDIF
+  ENDIF
+
+ENDIF ! Checks on ferret_dep_axis_scale
+
+! End of file ------------ LAS_check_fer_properties.jnl-------------------------------
+

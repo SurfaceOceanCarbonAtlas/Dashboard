@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title></title>
+</head>
+
+<body>
+<h1>Using catalogCleaner.sh</h1>
+<blockquote> 
+  <p><b><em>The catalogCleaner attempts to search through massive THREDDS catalogs 
+    and find collections of OPeNDAP URLs which contain grids suitable for use 
+    with LAS.</em></b><br>
+  </p>
+</blockquote>
+<hr>
+<h3>Running the Cleaner<br />
+</h3>
+<p>The script takes four command line arguments:</p>
+<p>bin/catalogCleaner.sh /home/rhs/workspace/baker/toclean.xml true catalogs server</p>
+<h3>Argument One (the file name of the server-side catalog or the URL of the client 
+  catalog to read)</h3>
+<p>This is either a local server-side configuration catalog or a remote client 
+  catalog URL.<br />
+</p>
+<h3>Argument Two (aggregations: true|false)<br />
+</h3>
+<p>The second controls whether the cleaner attempts to create aggregations when 
+  it finds collections of unaggregated OPeNDAP accessible dataset. If set to true, 
+  the ncML will be build and placed in the output catalog. If set to false, the 
+  need for aggregation will be noted in a property (&lt;property name="aggregationNeeded" 
+  value="true"/&gt; for the parent data set and the individual OPeNDAP accessible 
+  URLs will not be included.</p>
+<h3>Argument Three (output type: catalogs|dataset)<br />
+</h3>
+<p>The third argument controls the type of output in the resulting "clean" catalog. 
+  If the value is set to "catalogs" collections of OPeNDAP accessible URLs that 
+  don't need aggregation and contain lat/lon grids will be put into the clean 
+  catalogs as &lt;catalogRef&gt; elements pointing to the container dataset. If 
+  the value is set to "datasets" each individual OPeNDAP accessible data set URL 
+  which contains a grid will be listed in the output catalog. The advantage of 
+  this is that the catalog will be strictly "clean". The advantage of the other 
+  is that changes (particularly additions) in the remote catalog will show up 
+  in any server that is serving the "clean" catalog.</p>
+<h3>Argument Four (input type: server|client)<br />
+</h3>
+<p>The final argument tells the cleaner software what type of catalog is being 
+  read. If the value is "server" then the server expects a simple catalog with 
+  many &lt;catalogRef&gt; elements. If the value is "client" then it expects to 
+  see a remote client catalog.</p>
+<p>In the server case, the cleaner treats each catalogRef separately and will 
+  produce a separate "clean" catalog for each. I will also rewrite the input catalog 
+  to refer to the new clean catalogs. Additionally, the action performed on each 
+  catalogRef can be controlled with properties. For example:</p>
+<pre>&lt;?xml version="1.0" encoding="utf-8"?&gt;<br />&lt;catalog xmlns="http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0" xmlns:xlink="http://www.w3.org/1999/xlink" name="GEO-IDE Thredds server" version="1.0.1"&gt;<br />&lt;catalogRef xlink:title="ggg" xlink:href="http://oceanwatch.pfeg.noaa.gov/thredds/catalog.xml"&gt;<br />    &lt;property name="stop" value="Aqua MODIS, NPP, Pacific Ocean"/&gt;<br />    &lt;property name="skip" value="PaCOOS"/&gt;<br />&lt;/catalogRef&gt;<br />&lt;/catalog&gt;<br /></pre>
+<p>The cleaner understand two types of properties. The one called stop will cause 
+  the cleaner to stop processing a catalog when it reaches a member data set which 
+  contains the text in the value attribute in its name. This is a strict sub-string 
+  match. (Regular expression could be added if needed). Only one stop properlty 
+  is allowed. If more than one are listed then the cleaner uses the last one it 
+  finds.</p>
+<p>The skip property causes the cleaner to skip data sets which have the text 
+  in the value in their name. This is a strict sub-string match. (Regular expression 
+  could be added if needed). More than one skip property is allowed.</p>
+<p>In the client case, the cleaner just processes the entire catalog as best it 
+  can.<br />
+</p>
+<p>Obviously, if you are attempting to clean a complicated catalog as a client, 
+  you can simply build a small server-side catalog like the one above and use 
+  it to control the processing of the client catalog.</p>
+<p>There are constants in the CatalogCleaner class which control how many files 
+  get checked. We could move those to properties if that would help.<br />
+</p>
+<hr>
+by Roland Schweitzer last modified 2010-01-28 09:34 
+<hr>
+<address>
+</address>
+</body> </html>

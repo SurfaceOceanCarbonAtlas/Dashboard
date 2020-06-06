@@ -1,0 +1,131 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! $Header$ LAS_XY_overlay_basemap.jnl
+!
+! Overlays a basemap based on the data in ($basemap_url) and ($basemap_var).
+!
+!      11/2017  Add topo015 as an option
+!
+! By default an appropriate etopo dataset is used to plot gray continents.
+
+! Set defaults for any 'basemap_~' symbols that are not yet defined
+SET DATA/SAVE
+
+DEFINE SYMBOL basemap_area = `( ($region_x_range) * ($region_y_range) )/ (360 * 180)`
+
+! assuming the topo_url was already defined, use it 
+! (possibility of a custom land-map url here? )
+
+IF ($topo_url"0|*>1") THEN 
+   DEFINE SYMBOL basemap_url = ($topo_url) 
+ELSE
+
+   DEFINE SYMBOL basemap_url = ($basemap_url"etopo20")
+
+   IF `($basemap_area) LT 0.25` THEN 
+     DEFINE SYMBOL basemap_url = ($basemap_url"etopo5")
+
+     GO LAS_define_etopo
+
+     IF `($basemap_area) LT 0.05` THEN
+        IF ($topo2_url"0|*>1") THEN DEFINE SYMBOL basemap_url = "($topo2_url)"
+     ENDIF  
+
+     IF `($basemap_area) LT 0.01` THEN
+       IF ($topo1_url"0|*>1") THEN DEFINE SYMBOL basemap_url = "($topo1_url)"
+     ENDIF
+
+     IF `($basemap_area) LT 0.005` THEN
+      IF ($topo_015_url"0|*>1") THEN DEFINE SYMBOL basemap_url = "($topo_015_url)"
+     ENDIF
+
+   ENDIF
+ENDIF
+
+DEFINE SYMBOL basemap_fill_type = FILL
+
+DEFINE SYMBOL basemap_var = ($basemap_var"rose")
+DEFINE SYMBOL basemap_palette = ($basemap_palette"gray")
+DEFINE SYMBOL basemap_fill_type = ($basemap_fill_type"shade|fill|*>shade")
+!DEFINE SYMBOL basemap_levels = ($basemap_levels"(0,10000,10000)")
+
+! TODO:  Is the region setting for Z and T sufficient?
+
+DEFINE SYMBOL basemap_region_z = ($basemap_region_z"k=1")
+DEFINE SYMBOL basemap_region_t = ($basemap_region_t"l=1")
+
+SET DATA ($basemap_url)
+
+DEFINE SYMBOL basemap_data_num = `($basemap_var),return=dsetnum`
+
+! Plot the data
+
+DEFINE SYMBOL map_region_x = ($region_x)
+IF `($REGION_X_RANGE) EQ 360` THEN
+   DEFINE SYMBOL map_region_x = X=`($region_x_lo)-1`:`($region_x_hi)+1`
+ENDIF
+
+LET basevar = ($basemap_var)[d=($basemap_data_num),($map_region_x),($region_y),($basemap_region_z),($basemap_region_t)]
+
+! For smallest regions, refine using a small amount of regridding - 
+! too much makes the land look blocky, but just a factor of 2 
+! helps.
+
+LET basei = `basevar,RETURN=isize`
+LET basej = `basevar,RETURN=jsize`
+IF `basei LT 300 OR basej LT 300` THEN
+   DEFINE SYMBOL refinemap = 1
+   LET nfinex = MIN(300, 2*basei)
+   LET nfiney = MIN(300, 2*basej)
+   DEFINE AXIS/($map_region_x)/UNITS=`rose,RETURN=xunits`/NPOINTS=`nfinex` finerlon
+   DEFINE AXIS/($region_y)/UNITS=`rose,RETURN=yunits`/NPOINTS=`nfiney` finerlat
+   LET basevar = ($basemap_var)[d=($basemap_data_num),\
+   ($map_region_x),($region_y),($basemap_region_z),($basemap_region_t),\
+    GX=finerlon, gy=finerlat]
+ENDIF
+
+LET topo_dx = `xbox[GX=($basemap_var),I=1]`
+LET topo_dy = `ybox[GY=($basemap_var),J=1]`
+
+IF `(($region_x_range) LT topo_dx) OR  (($region_y_range) LT topo_dx)` THEN
+   DEFINE SYMBOL topo_regrid = 1
+   IF `($region_x_range) EQ 0` THEN  
+      DEFINE AXIS/UNITS=degrees_east/MODULO/x=`($region_x_lo)-topo_dx`:`($region_x_lo)+topo_dx`/NPOINTS=5 x_super_fine
+   ELSE
+      DEFINE AXIS/UNITS=degrees_east/MODULO/($region_x)/NPOINTS=5 x_super_fine
+   ENDIF
+   IF `($region_y_range) EQ 0` THEN  
+      DEFINE AXIS/UNITS=degrees_north/MODULO/y=`($region_y_lo)-topo_dx`:`($region_y_lo)+topo_dx`/NPOINTS=5 y_super_fine
+   ELSE
+      DEFINE AXIS/UNITS=degrees_north/($region_y)/NPOINTS=5 y_super_fine
+   ENDIF
+   DEFINE GRID/X=x_super_fine/y=y_super_fine g_super_fine
+
+   LET basevar = ($basemap_var)[d=($basemap_data_num),GXY=g_super_fine,($basemap_region_z),($basemap_region_t)]
+!   DEFINE SYMBOL basemap_xformat = PPL XFOR (dms)
+!   DEFINE SYMBOL basemap_yformat = PPL YFOR (dms)
+ENDIF
+
+IF ($basemap_fill_type"FILL|FILL>1|fill>1|*>0") THEN
+   SHADE/NOLABELS/NOKEY/PALETTE=($basemap_palette)/LEVELS=($basemap_levels)/SET basevar
+   ($basemap_xformat)
+   ($basemap_yformat)
+   ($basemap_axisformatting)
+   PPL SHADE
+!!!!!   FILL/OVER/NOLABELS/NOKEY/PALETTE=($basemap_palette)/LEVELS=($basemap_levels) basevar
+
+ELSE
+  ($basemap_fill_type)/NOLABELS/NOKEY/PALETTE=($basemap_palette)/LEVELS=($basemap_levels)/SET basevar
+   ($basemap_xformat)
+   ($basemap_yformat)
+   ($basemap_axisformatting)
+   PPL SHADE
+
+ENDIF
+
+! Clean up
+   say BASEMAP LandResolution IS ($basemap_url)  Region area is ($basemap_area)
+
+CANCEL DATA ($basemap_url)
+
+SET DATA/RESTORE
+!-------------------------- end of LAS_XY_overlay_basemap-------------------

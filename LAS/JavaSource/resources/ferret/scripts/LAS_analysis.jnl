@@ -1,0 +1,98 @@
+! LAS_analysis.jnl
+!
+! Called by LAS_initialize_data.jnl
+!
+! If there a DEFINE VARIABLE request, set symbols to capture the operations.
+! Example one operation
+!         
+
+!   DEFINE SYMBOL data_0_analysis_label = MERIDIONAL WIND_1
+!   DEFINE SYMBOL data_0_analysis_axis_count = 1
+!   DEFINE SYMBOL data_0_analysis_axis_0_op = ave
+!   DEFINE SYMBOL data_0_analysis_axis_0_type = t
+!   DEFINE SYMBOL data_0_analysis_axis_0_lo = 15-Jan
+!   DEFINE SYMBOL data_0_analysis_axis_0_hi = 15-Dec
+
+! Example 2 operations
+
+!   DEFINE SYMBOL data_0_analysis_label = TEMPERATURE_avexy
+!   DEFINE SYMBOL data_0_analysis_axis_count = 2
+!   DEFINE SYMBOL data_0_analysis_axis_op_0 = ave
+!   DEFINE SYMBOL data_0_analysis_axis_type_0 = x
+!   DEFINE SYMBOL data_0_analysis_axis_lo_0 = -180.0
+!   DEFINE SYMBOL data_0_analysis_axis_hi_0 = 180.0
+!   DEFINE SYMBOL data_0_analysis_axis_op_1 = ave
+!   DEFINE SYMBOL data_0_analysis_axis_type_1 = y
+!   DEFINE SYMBOL data_0_analysis_axis_lo_1 = -89.5
+!   DEFINE SYMBOL data_0_analysis_axis_hi_1 = 89.5
+
+! Define some punctuation symbols
+DEFINE SYMBOL comma = ,
+DEFINE SYMBOL colon = :
+DEFINE SYMBOL equals = =
+DEFINE SYMBOL ampersand = @
+
+! New data variable name
+DEFINE SYMBOL data_var_name = ($data_0_analysis_label)
+
+! Define expression for first operation e.g. ,x=-180.0:180.0@ave 
+! which will go on the end of the region specification
+
+CANCEL SYMBOL data_analysis_expr
+DEFINE SYMBOL data_analysis_expr0 = ($comma)($data_0_analysis_axis_0_type)($equals)($data_0_analysis_axis_0_lo)($colon)($data_0_analysis_axis_0_hi)($ampersand)($data_0_analysis_axis_0_op)
+
+DEFINE SYMBOL data_analysis_expr = ($data_analysis_expr0)
+
+! Define expressions for all axes specified.
+! There may be up to four axes (Could have more operations if the operations didn't
+! reduce axes to a point, but all our opertions currently are ones that reduce the 
+! dimension by 1.) Could do all of this in a loop.
+
+IF `($data_0_analysis_axis_count"0") GE 2` THEN
+DEFINE SYMBOL data_analysis_expr1 = ($comma)($data_0_analysis_axis_1_type)($equals)($data_0_analysis_axis_1_lo)($colon)($data_0_analysis_axis_1_hi)($ampersand)($data_0_analysis_axis_1_op)
+  DEFINE SYMBOL data_analysis_expr = ($data_analysis_expr0)($data_analysis_expr1)
+ENDIF
+
+IF `($data_0_analysis_axis_count"0") GE 3` THEN
+DEFINE SYMBOL data_analysis_expr2 = ($comma)($data_0_analysis_axis_2_type)($equals)($data_0_analysis_axis_2_lo)($colon)($data_0_analysis_axis_2_hi)($ampersand)($data_0_analysis_axis_2_op)
+  DEFINE SYMBOL data_analysis_expr = ($data_analysis_expr0)($data_analysis_expr1)($data_analysis_expr2)
+ENDIF
+
+IF `($data_0_analysis_axis_count"0") GE 4` THEN
+DEFINE SYMBOL data_analysis_expr3 = ($comma)($data_0_analysis_axis_3_type)($equals)($data_0_analysis_axis_3_lo)($colon)($data_0_analysis_axis_3_hi)($ampersand)($data_0_analysis_axis_3_op)
+  DEFINE SYMBOL data_analysis_expr = ($data_analysis_expr0)($data_analysis_expr1)($data_analysis_expr2)($data_analysis_expr3)
+ENDIF
+
+let land_ocean_mask = 0
+IF ($data_0_analysis_oceanmask"0") THEN LET land_ocean_mask = 1
+IF ($data_0_analysis_landmask"0") THEN LET land_ocean_mask = 1
+IF `land_ocean_mask` THEN
+   
+! Decide on a bathymetry variable to use
+   let lon_range = `($region_X_hi"0") - ($region_X_lo"0")`
+   let lat_range = `($region_Y_hi"0") - ($region_Y_lo"0")`
+   IF `lon_range EQ 0` THEN LET lon_range = 1
+   IF `lat_range EQ 0` THEN LET lat_range = 1
+   let fland_area = `(lon_range * lat_range) / (360 * 180)`
+   IF `fland_area LT 0.04` THEN
+     define symbol fland_resolution 05
+   ELIF `fland_area LT 0.1` THEN
+     define symbol fland_resolution 20
+   ELIF `fland_area LT 0.2` THEN
+     define symbol fland_resolution 40
+   ELSE
+     define symbol fland_resolution 60
+   ENDIF
+
+   define symbol fland_resolution 20
+
+   SET DATA etopo($fland_resolution)
+
+   LET land_dsetnum = `rose,return=dsetnum`
+   LET rose_on_grid = rose[d=`land_dsetnum`,gxy=($data_var)[d=($data_num)]]
+
+   IF ($data_0_analysis_landmask"0|*>1") THEN LET mask_def = IF rose_on_grid GT 0 THEN 1
+   IF ($data_0_analysis_oceanmask"0|*>1") THEN LET mask_def = IF rose_on_grid LT 0 THEN 1
+
+   LET analysis_mask = mask_def[($region_xy)]
+ENDIF

@@ -1,0 +1,7 @@
+
+! Inner loop called by check_curv_linear.jnl
+
+   REPEAT/RANGE=($clat_jmin):($clat_jmax):`jinc`/NAME=n (\
+      LET/QUIET lon_ij = ($ferret_curvi_coord_lon)[d=($data_num),i=`m`,j=`n`]; \
+      IF `lon_ij NE lon_first` THEN LET/QUIET lon_is_const = 0;\
+      IF `lon_is_const EQ 0` THEN EXIT/LOOP);

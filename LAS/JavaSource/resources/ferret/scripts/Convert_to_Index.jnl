@@ -1,0 +1,24 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: Roland $
+!
+! Conver_to_Index.jnl translates XYZT ranges to IJKL ranges.
+!
+
+! Define symbols associated with the regign and data and perform any
+! initialization needed for this dataset.
+!
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+DEFINE SYMBOL result_xyzt_ijkl_filename "($result_index_filename)"
+
+GO LAS_xyzt_ijkl

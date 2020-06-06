@@ -1,0 +1,197 @@
+<datasets>
+  <socat_v2019_monthly name="SOCAT v2019 monthly 1x1 gridded"
+                       url="/home/data/socat/v2019/SOCATv2019_tracks_gridded_monthly.nc"
+                       doc="doc/SOCAT_gridded_monthly.html">
+    <properties>
+      <ferret>
+        <contour_style>raster</contour_style>
+        <timelab_res>month</timelab_res>
+        <palette>rainbow</palette>
+      </ferret>
+    </properties>
+    <variables>
+      <lat_offset_unwtd-socat_v2019_monthly name="Latitude average offset from cell center" units="Deg N" url="#lat_offset_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </lat_offset_unwtd-socat_v2019_monthly>
+      <lon_offset_unwtd-socat_v2019_monthly name="Longitude average offset from cell center" units="Deg E" url="#lon_offset_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </lon_offset_unwtd-socat_v2019_monthly>
+      <count_ncruise-socat_v2019_monthly name="Number of cruises" units="count" url="#count_ncruise">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </count_ncruise-socat_v2019_monthly>
+      <fco2_count_nobs-socat_v2019_monthly name="Number of fCO2 obs" units="count" url="#fco2_count_nobs">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </fco2_count_nobs-socat_v2019_monthly>
+      <fco2_max_unwtd-socat_v2019_monthly name="fCO2 max" units="uatm" url="#fco2_max_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MAX</seasonal_transform>
+          </ferret>
+        </properties>
+      </fco2_max_unwtd-socat_v2019_monthly>
+      <fco2_ave_weighted-socat_v2019_monthly name="fCO2 mean - per cruise weighted" units="uatm" url="#fco2_ave_weighted">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </fco2_ave_weighted-socat_v2019_monthly>
+      <fco2_ave_unwtd-socat_v2019_monthly name="fCO2 mean - unweighted all obs" units="uatm" url="#fco2_ave_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </fco2_ave_unwtd-socat_v2019_monthly>
+      <fco2_min_unwtd-socat_v2019_monthly name="fCO2 min" units="uatm" url="#fco2_min_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MIN</seasonal_transform>
+          </ferret>
+        </properties>
+      </fco2_min_unwtd-socat_v2019_monthly>
+      <fco2_std_weighted-socat_v2019_monthly name="fCO2 std dev - per cruise weighted" units="uatm" url="#fco2_std_weighted">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </fco2_std_weighted-socat_v2019_monthly>
+      <fco2_std_unwtd-socat_v2019_monthly name="fCO2 std dev - unweighted all obs" units="uatm" url="#fco2_std_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+             <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </fco2_std_unwtd-socat_v2019_monthly>
+      <sst_count_nobs-socat_v2019_monthly name="Number of SST obs" units="count" url="#sst_count_nobs">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </sst_count_nobs-socat_v2019_monthly>
+      <sst_max_unwtd-socat_v2019_monthly name="SST max" units="degrees C" url="#sst_max_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MAX</seasonal_transform>
+          </ferret>
+        </properties>
+      </sst_max_unwtd-socat_v2019_monthly>
+      <sst_ave_weighted-socat_v2019_monthly name="SST mean - per cruise weighted" units="degrees C" url="#sst_ave_weighted">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </sst_ave_weighted-socat_v2019_monthly>
+      <sst_ave_unwtd-socat_v2019_monthly name="SST mean - unweighted all obs" units="degrees C" url="#sst_ave_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </sst_ave_unwtd-socat_v2019_monthly>
+      <sst_min_unwtd-socat_v2019_monthly name="SST min" units="degrees C" url="#sst_min_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MIN</seasonal_transform>
+          </ferret>
+        </properties>
+      </sst_min_unwtd-socat_v2019_monthly>
+      <sst_std_weighted-socat_v2019_monthly name="SST std dev - per cruise weighted" units="degrees C" url="#sst_std_weighted">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </sst_std_weighted-socat_v2019_monthly>
+      <sst_std_unwtd-socat_v2019_monthly name="SST std dev - unweighted all obs" units="degrees C" url="#sst_std_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+             <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </sst_std_unwtd-socat_v2019_monthly>
+      <salinity_count_nobs-socat_v2019_monthly name="Number of salinity obs" units="count" url="#salinity_count_nobs">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </salinity_count_nobs-socat_v2019_monthly>
+      <salinity_max_unwtd-socat_v2019_monthly name="salinity max" units="PSU" url="#salinity_max_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MAX</seasonal_transform>
+          </ferret>
+        </properties>
+      </salinity_max_unwtd-socat_v2019_monthly>
+      <salinity_ave_weighted-socat_v2019_monthly name="salinity mean - per cruise weighted" units="PSU" url="#salinity_ave_weighteD">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </salinity_ave_weighted-socat_v2019_monthly>
+      <salinity_ave_unwtd-socat_v2019_monthly name="salinity mean - unweighted all obs" units="PSU" url="#salinity_ave_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+      </salinity_ave_unwtd-socat_v2019_monthly>
+      <salinity_min_unwtd-socat_v2019_monthly name="salinity min" units="PSU" url="#salinity_min_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MIN</seasonal_transform>
+          </ferret>
+        </properties>
+      </salinity_min_unwtd-socat_v2019_monthly>
+      <salinity_std_weighted-socat_v2019_monthly name="salinity std dev - per cruise weighted" units="PSU" url="#salinity_std_weighted">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </salinity_std_weighted-socat_v2019_monthly>
+      <salinity_std_unwtd-socat_v2019_monthly name="salinity std dev - unweighted all obs" units="PSU" url="#salinity_std_unwtd">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TMNTH-socat_v2019_monthly" />
+        <properties>
+          <ferret>
+             <fill_levels>40v,0min</fill_levels>
+          </ferret>
+        </properties>
+      </salinity_std_unwtd-socat_v2019_monthly>
+    </variables>
+  </socat_v2019_monthly>
+</datasets>
+<grids>
+  <grid-XLON-YLAT-TMNTH-socat_v2019_monthly>
+    <link match="/lasdata/axes/XLON-x-socat_v2019_monthly" />
+    <link match="/lasdata/axes/YLAT-y-socat_v2019_monthly" />
+    <link match="/lasdata/axes/TMNTH-t-socat_v2019_monthly" />
+  </grid-XLON-YLAT-TMNTH-socat_v2019_monthly>
+</grids>
+<axes>
+  <XLON-x-socat_v2019_monthly type="x" units="degrees_east">
+    <arange start="-179.5" size="360" step="1" />
+  </XLON-x-socat_v2019_monthly>
+  <YLAT-y-socat_v2019_monthly type="y" units="degrees_north">
+    <arange start="-89.5" size="180" step="1" />
+  </YLAT-y-socat_v2019_monthly>
+  <TMNTH-t-socat_v2019_monthly type="t" units="month">
+    <arange start="1970-01-16 12:00:00" size="588" step="1" />
+  </TMNTH-t-socat_v2019_monthly>
+</axes>

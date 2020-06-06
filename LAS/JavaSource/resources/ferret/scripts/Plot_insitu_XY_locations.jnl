@@ -1,0 +1,26 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: rhs $
+!
+! Set a couple of variables and call the script that does the work.
+
+! Set the gif filename, changing it from .gif to the name from this request
+! Set up to write info to the debug log so that FshowGO can be used
+GO LAS_initial_setup
+
+!CANCEL SYMBOL data_0_var
+IF ($database_access_0_longitude"0|1|*>1) THEN 
+DEFINE SYMBOL data_0_x_var = ($database_access_0_longitude)
+ELSE
+DEFINE SYMBOL data_0_x_var = ($tabledap_access_0_longitude)
+ENDIF
+
+IF ($database_access_0_latitude"0|1|*>1) THEN 
+DEFINE SYMBOL data_0_y_var = ($database_access_0_latitude)
+ELSE
+DEFINE SYMBOL data_0_y_var = ($tabledap_access_0_latitude)
+ENDIF
+
+
+
+go xy_insitu_poly

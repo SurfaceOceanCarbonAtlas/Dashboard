@@ -1,0 +1,59 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_transforms.jnl
+! 
+! $Author: ansley $
+! $Date: 2006/09/27  $
+! 2007/3/13 ACM changes for all slices of curvilinear data.
+! 4/2007    ACM Apply Ferret symbols for any expression that may have been defined
+
+!
+! LAS_transforms.jnl applies one or more transforms to $ferret_plot_var
+
+! This script is called from LAS_initialize_data after the region and
+! data have been initialized.
+! Argument is the variable number (0 or 1 if this is a comparison) 
+
+DEFINE SYMBOL num ($1"0")
+
+!  Transform to 3-month seasonal averages, with desired centering
+IF `($constraint_0_lhs"0|Seasonal_Regridding>1|*>0")` THEN 
+   DEFINE SYMBOL data_var_transform = , Seasonal Regridding
+   GO transform_seasonal.jnl
+   DEFINE SYMBOL data_dup_varname ($data_($num)_var)_regrid
+   DEFINE SYMBOL data_title = ($ferret_plot_title)
+ENDIF
+
+! Transform to 1-season per year, centered on any month, with season being 1, 3, or 5 months long.
+IF `STRINDEX("($constraint_0_lhs"0")", "Season_length") GT 0` THEN 
+   DEFINE SYMBOL data_var_transform = , Season_1_per_year
+   GO transform_1_season_per_year ($num)
+   DEFINE SYMBOL data_dup_varname ($data_($num)_var)_regrid
+   DEFINE SYMBOL do_trans_1_seas_per_year = 1
+   DEFINE SYMBOL data_title = ($ferret_plot_title)
+ENDIF
+
+! See if the grid is curvilinear in XY, Hybrid Z or both
+
+DEFINE SYMBOL do_curvi_xy = 0
+DEFINE SYMBOL do_hybrid_z = 0
+DEFINE SYMBOL do_curvi_xy_and_hybrid_z = 0
+
+GO LAS_get_coords_att
+
+IF ($ferret_curvi_coord_lat"0|*>1") THEN DEFINE SYMBOL do_curvi_xy = 1
+IF ($ferret_curvi_coord_lat"0|*>1") THEN DEFINE SYMBOL native_curvilinear_xy = 1
+IF ($ferret_thk_var"0|*>1") THEN  DEFINE SYMBOL do_hybrid_z = 1
+IF `($do_curvi_xy) + ($do_hybrid_z) EQ 2` THEN DEFINE SYMBOL do_curvi_xy_and_hybrid_z = 1
+
+IF ($do_curvi_xy_and_hybrid_z) THEN GO transform_hybrid_z_curvi_xy
+
+! Set up to deal with hybrid-Z data. 
+IF `($do_hybrid_z) AND ($do_curvi_xy_and_hybrid_z"0") EQ 0` THEN \
+   GO transform_hybrid_z.jnl
+
+! Set up to deal with curvilinear XY data
+
+IF ($do_curvi_xy) THEN GO transform_curvi_xy.jnl
+
+! End of $RCSfile ------------LAS_transforms.jnl-------------------------------
+

@@ -1,0 +1,26 @@
+! LAS_initialize_var_levels.jnl
+! called by 2D color plot scripts
+
+! Mark whether there are contour levels set on first entry. 
+! Compute automatic open-ended levels.
+
+! consolidate here so that all 2D plots use only ferret_fill_levels.
+! Allow for config that may have used ferret_contour levels instead or also.
+
+IF ($ferret_fill_levels"0|*>1") THEN
+   IF ($ferret_contour_levels"0|*>1") THEN CANCEL SYMBOL ferret_contour_levels
+ELSE
+   IF ($ferret_contour_levels"0|*>1") THEN DEFINE SYMBOL ferret_fill_levels ($ferret_contour_levels)
+ENDIF
+
+IF `($data_num) EQ 1` THEN
+   IF ($ferret_fill_levels"0|*>1") THEN DEFINE SYMBOL input_fill_levels = 1
+
+   IF `STRLEN("($ferret_view)") GE 2` THEN
+      LET do_levels =  `(STRINDEX("($operation_ID)", "Plot") GT 0) OR (STRINDEX("($operation_ID)", "zoom") GT 0) OR  (STRINDEX("($operation_ID)", "poly") GT 0)`
+      IF `do_levels` THEN GO LAS_auto_levels
+   ENDIF
+ENDIF
+
+! End of file ------------ LAS_initialize_var_levels.jnl--------------------------
+

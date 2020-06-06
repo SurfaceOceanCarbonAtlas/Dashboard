@@ -1,0 +1,43 @@
+<html>
+<head title="SOCAT Subsampling"></head>
+<body>
+<h1>SOCAT Subsampling</h1>
+<hr>
+<font size="4">
+<p> 
+The SOCAT data collection represents a large volume of data which cannot all 
+be visualized in the map images.
+In order to achieve satisfactory performance when rendering maps over wide 
+geographic areas, it is necessary for the SOCAT Data Viewer to reduce the 
+number of data points to be displayed.  
+</p>
+<p> 
+A piecewise-linear-approximation algorithm(*) is used to reduce the data 
+volume for plotting.  
+The path of a cruise is reduced to a sequence of linear line segments 
+connecting longitude, latitude, fCO2_recommended triples.  
+Points are omitted when their positions do not deviate from a linear segment 
+connecting 3-tuples by more than 1 degree for position and 4 uatm for fCO2_rec. 
+This approach assures a faithful visual representation of the ship's path and 
+assures that all significant local extrema of fCO2_rec are retained.  
+The reduction factor relative to the full dataset is approximately 3%.  
+Maps that are based upon the reduced data report an approximation of the 
+total number of points, computed as the number of points plotted divided by 
+the reduction factor.
+<p> 
+The subsampled data is used for requests covering more than 10% of the earth 
+area, when no other selections have been to constrain the data shown. 
+The full non-decimated data may be requested by choosing 
+"Use full resolution data set" in the Plot Options menu.
+</p>
+<br><br>
+<p>
+(*) D.G. Wilson, "Piecewise linear approximations of fewest line segments", 
+AFIPS '72 (Spring) Proceedings of the May 16-18, 1972, spring joint computer 
+conference, pp 187-198.  Available at <a target="_blank" 
+href="http://www.computer.org/csdl/proceedings/afips/1972/5079/00/50790187.pdf">
+http://www.computer.org/csdl/proceedings/afips/1972/5079/00/50790187.pdf</a>
+<p>
+</font>
+</body>
+</html>

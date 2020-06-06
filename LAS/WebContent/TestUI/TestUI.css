@@ -1,0 +1,101 @@
+/** Add css rules here for your application. */
+body {
+  font-family:arial,sans-serif
+}
+
+div,td {
+  color:#000000
+}
+
+a:link {
+  color:#0000cc
+}
+     
+a:visited {
+  color:#551a8b
+}
+
+a:active {
+  color:#ff0000
+}
+
+button {
+  display: block;
+  font-size: 16pt
+}
+
+.widePanel {
+  width: 100%
+}
+
+img {
+  margin-top: 0px;
+}
+
+.small-banner {
+	color:#dd8888;
+	font-size: 12pt
+}
+.banner {
+	color:#dd8888;
+	font-size: 16pt;
+	font-style: bold
+}
+.right-small-banner {
+	color:#dd8888;
+	font-size: 12pt;
+	text-align:right
+}
+.map-button {
+  
+  font:small Arial,sans-serif;
+  
+}
+.map-button-from-docs {
+  textDecoration:underline;
+  color:#0000cc;
+  backgroundColor:white;
+  font:small Arial;
+  border:1px solid black;
+  padding:2px;
+  marginBottom:3px;
+  textAlign:center;
+  width:6em;
+  cursor:pointer;
+}
+
+.las-MenuBar
+{
+    border                      :   1px solid #666;
+    margin                      :   0 auto;
+    background-color            :   #eee;
+    font-size                   :   70%;
+    padding                     :   4px;
+}
+.las-MenuBar table
+{
+    border-collapse             :   separate;
+    border                      :   1px solid #00f;
+}
+.las-MenuBar .gwt-MenuItem
+{
+
+    cursor                      :   hand;
+    cursor                      :   pointer;
+
+    border                      :   1px solid #999;
+    padding                     :   10px 15px;
+}
+.las-MenuBar .gwt-MenuItem-selected
+{
+    background-color            :   #fff;
+}
+
+.las-centerButton {
+	width						: 170px;
+	padding						:	0px;
+}
+.las-buttonPanel {
+	padding						:	0px;
+}
+

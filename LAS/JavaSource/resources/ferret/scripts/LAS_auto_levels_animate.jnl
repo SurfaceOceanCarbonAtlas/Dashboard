@@ -1,0 +1,352 @@
+! LAS_auto_levels_animate.jnl
+! ACM 8/22/2007
+!
+! acm 9/11/07 If its a descriptor file Ferret wont allow striding. 
+!             check for that case and just set num levels.
+! acm* 2/2010 Set up a few things and then Use Ferret-s open-ended levels 
+!             if the levs havent been set by the user or configuration.
+!             Allow for old algorithm if older Ferret is in place.
+
+! Based on a variables value over its entire range, set strides
+! if needed to quickly get stats on the variable. Use this to set levels.
+
+! Argument: the variable to use in setting the levels.
+
+! The symbol ferret_center_levels, if set to 1, forces the levels
+! to be 2 std above and below zero. Otherwise use 2 std above 
+! and below the data mean
+
+! This script should be done BEFORE any other striding is done.
+! It operates on the variable on its entire native unstrided grid.
+
+! input_fill_levels and input_contour_levels are symbols that are defined in 
+! LAS_initialize_variable.jnl, telling whether settings for levels were
+! made 
+
+! Determine striding for speed in operating the STAT command
+LET memsize = 0.5* 1.e6
+
+! Make sure its a 2D plot operation.
+
+DEFINE SYMBOL op = `UPCASE("($operation_ID)")`
+
+!IF `($ferret_view"|xy>1|*>0") NE 1` THEN EXIT/SCRIPT
+IF `STRINDEX("($op)", "VECTOR") GT 0` THEN EXIT/SCRIPT
+
+IF `STRINDEX("($op)", "ANIMATION") EQ 0` THEN EXIT/SCRIPT
+
+! NOTE: animations have not been implemented for difference plots.
+! If its a compare plot, and if the ($ferret_diff_var) is not yet defined, 
+! just return.
+
+IF `($ferret_diff_var"1|*>0") AND STRINDEX("($op)", "COMPARE_PLOT") NE 0` THEN 
+   EXIT/SCRIPT
+ENDIF 
+
+! Remove any previous native striding
+
+IF ($xstride"0|1>0|*>1") THEN CANCEL AXIS/STRIDE `($data_var)[d=($data_num)],RETURN=xaxis`
+IF ($ystride"0|1>0|*>1") THEN CANCEL AXIS/STRIDE `($data_var)[d=($data_num)],RETURN=yaxis`
+IF ($tstride"0|1>0|*>1") THEN CANCEL AXIS/STRIDE `($data_var)[d=($data_num)],RETURN=taxis`
+IF ($zstride"0|1>0|*>1") THEN CANCEL AXIS/STRIDE `($data_var)[d=($data_num)],RETURN=zaxis`
+CANCEL SYMBOL xstride
+CANCEL SYMBOL ystride
+CANCEL SYMBOL tstride
+CANCEL SYMBOL zstride
+
+DEFINE SYMBOL ferret_center_levels ($ferret_center_levels"0|1|TRUE>1|*>0")
+
+! See if centered levels were requested, either by setting the symbol ferret_center_levels
+! or with a contour_levels or fill_levels that is centered.
+
+! See if centered levels were requested, either by setting the symbol ferret_center_levels
+! or with a contour_levels or fill_levels that is centered.
+
+! If contour levels requested with levels of nC, e.g. 20C, then get the value to
+! set num_fine_levels in the %RANGE command below
+
+! In general if other levels spec is given, return. However if it is a simple number, 
+! use that to set the number of fine levels.
+
+IF ($ferret_contour_levels"0|*>1") THEN
+   DEFINE SYMBOL up_contour_levels = `UPCASE("($ferret_contour_levels)")`
+   LET nc = `STRINDEX("($up_contour_levels)", "C")`
+   DEFINE SYMBOL ferret_center_levels = `nc GT 0`
+   IF `nc GT 0` THEN
+      LET slen = STRLEN ("($up_contour_levels)") 
+      IF `slen GT 1` THEN DEFINE SYMBOL num_fine_levels = `SUBSTRING ("($up_contour_levels)", 1, slen-1)`
+      IF `slen GT 1` THEN DEFINE SYMBOL num_fine_levels_contour = ($num_fine_levels)
+      CANCEL SYMBOL input_contour_levels  ! we will redefine the levels in this script
+   ENDIF
+   LET other = `STRINDEX("($up_contour_levels)", "D")` + \
+      `STRINDEX("($up_contour_levels)", "(")`+ \
+      `STRINDEX("($up_contour_levels)", ".")`
+   IF `nc EQ 0 AND other EQ 0` THEN 
+      DEFINE SYMBOL num_fine_levels = ($ferret_contour_levels) ! How to test that this is just a number??
+      DEFINE SYMBOL num_fine_levels_contour = ($num_fine_levels)
+      CANCEL SYMBOL input_contour_levels  ! we will redefine the levels in this script
+   ENDIF
+
+   IF `nc EQ 0 AND other NE 0` THEN  EXIT/SCRIPT
+ENDIF
+
+
+IF ($ferret_fill_levels"0|*>1") THEN
+   DEFINE SYMBOL up_fill_levels = `UPCASE("($ferret_fill_levels)")`
+   LET nc = `STRINDEX("($up_fill_levels)", "C")`
+   DEFINE SYMBOL ferret_center_levels = `nc GT 0`
+   IF `nc GT 0` THEN 
+      LET slen = STRLEN ("($up_fill_levels)") 
+      IF `slen GT 1` THEN DEFINE SYMBOL num_fine_levels = `SUBSTRING ("($up_fill_levels)", 1, slen-1)`
+      CANCEL SYMBOL input_fill_levels  ! we will redefine the levels in this script
+   ENDIF
+   LET other = `STRINDEX("($ferret_fill_levels)", "D")` + \
+      `STRINDEX("($ferret_fill_levels)", "(")`+ \
+      `STRINDEX("($ferret_fill_levels)", ".")`
+   IF `nc EQ 0 AND other EQ 0` THEN 
+      DEFINE SYMBOL num_fine_levels = ($ferret_fill_levels)  ! How to test that this is just a number??
+      CANCEL SYMBOL input_fill_levels  ! we will redefine the levels in this script
+   ENDIF
+   
+   say IF `nc EQ 0 AND other NE 0` THEN EXIT/SCRIPT
+
+   IF `nc EQ 0 AND other NE 0` THEN EXIT/SCRIPT
+ENDIF
+
+! Apply to the variable on the requested region in x, y, z and all time.
+
+IF `($ferret_plot_var"0|*>1") EQ 0` THEN EXIT/SCRIPT  !e.g. for insitu plots may not have a plot_var
+
+
+LET max_size = 50
+IF `($do_curvi_xy"0|0|*>1") EQ 0` THEN 
+
+   LET pvar = ($ferret_plot_var)
+   LET var_size = ABS( `pvar,RETURN=size`)
+   DEFINE SYMBOL var_dim = `pvar,RETURN=shape`
+   LET ndims = STRLEN("($var_dim)")
+   
+   IF `var_size GT memsize` THEN \
+   LET max_size = `INT( 1+ ((var_size/memsize))/ndims )`
+ELSE
+   DEFINE SYMBOL ferret_plot_var = pvar
+   LET max_size = 50
+ENDIF
+
+! Apply native striding if possible
+
+IF ($regrid_fcn"0|*>1") THEN 
+   DEFINE SYMBOL no_native_strides_xy = 1
+   GO LAS_autolev_regridded_from_curv
+ELSE  !!! regrid_fcn
+
+! region syms dont apply to native curv grid directly
+
+IF `($do_curvi_xy"0")` THEN
+   GO LAS_autolev_curvi
+
+ELSE
+   LET xsize = `pvar,RETURN=isize`
+   DEFINE SYMBOL xstride = `INT(xsize/10)`
+   IF `($xstride) LT 2` THEN CANCEL SYMBOL xstride
+   
+   LET ysize = `pvar,RETURN=jsize`
+   DEFINE SYMBOL ystride = `INT(ysize/10)`
+   IF `($ystride) LT 2` THEN CANCEL SYMBOL ystride
+
+ENDIF ! do_curvi_xy
+
+ENDIF  !!! regrid_fcn
+
+
+IF ($index_strides"0|*>1") THEN 
+   DEFINE SYMBOL ppvar = ($data_var)[d=($data_num),($index_strides)]
+   LET anim_stridevar = ($ferret_plot_var_noregion)
+   DEFINE SYMBOL ppvar = anim_stridevar[($index_strides)]
+ELSE
+   DEFINE SYMBOL ppvar = pvar
+ENDIF
+
+! Can always use native strides in z and t
+
+! Should be only one Z anyway for xy animations, but this wont hurt,
+LET zsize  `pvar,RETURN=ksize`
+DEFINE SYMBOL zstride = `INT(zsize/10)`
+IF `($zstride) LT 2` THEN CANCEL SYMBOL zstride
+
+! The time range specifies the whole t region.
+LET tsize  `($ppvar),RETURN=lsize`   
+
+LET strd_lo = 1
+LET anim_timevar = ($ppvar)
+LET tt = t[gt=anim_timevar]
+
+LET strd_hi = `tt,return=lsize`
+
+! The incoming t region is the region over which to animate...
+LET LL = L[gt=($data_var)[d=($data_num)]]
+LET strd_lo = `LL[t="($region_t_lo)"]`
+LET strd_hi = `LL[t="($region_t_hi)"]`
+LET tsize = `strd_hi - strd_lo + 1`
+
+IF ($ferret_time_step"0|1>0|*>1") THEN
+   LET strd_del = ($ferret_time_step)
+   IF `(tsize/strd_del) GT max_size` THEN 
+      LET strd_test = tsize/max_size
+      LET strd_fact = INT(strd_test/($ferret_time_step))
+      LET strd_del = ($ferret_time_step)* strd_fact
+      IF `strd_del LE 2` THEN LET strd_del = 1
+   ENDIF 
+
+   IF `strd_del LT 10` THEN 
+      LET strd_del = `INT(10/($ferret_time_step))* ($ferret_time_step)`
+      IF `strd_del LE 2` THEN LET strd_del = 1
+   ENDIF
+   IF `INT(tsize/strd_del) LT 2` THEN LET strd_del = 1
+
+ELSE
+   LET strd_del = 1
+   IF `tsize GT max_size` THEN 
+      LET strd_del = `INT(tsize/20)`
+      IF `strd_del LE 2` THEN LET strd_del = 1
+   ENDIF 
+ENDIF
+
+DEFINE SYMBOL tstride = `strd_del`
+
+IF ($index_strides"0|*>1") THEN 
+   DEFINE SYMBOL ppvar = ($data_var)[d=($data_num),($index_strides)]
+   LET anim_stridevar = ($ferret_plot_var_noregion)
+   DEFINE SYMBOL ppvar = anim_stridevar[($index_strides)]
+ELSE
+   DEFINE SYMBOL ppvar = pvar
+ENDIF
+
+IF `($index_strides"0|*>1") EQ 0` THEN 
+   IF `($xstride"0") GT 1` THEN SET AXIS/STRIDE=($xstride) `pvar,RETURN=xaxis`
+   IF `($ystride"0") GT 1` THEN SET AXIS/STRIDE=($ystride) `pvar,RETURN=yaxis`
+   DEFINE SYMBOL ppvar = pvar
+ENDIF
+IF `($zstride"0") GT 1` THEN SET AXIS/STRIDE=($zstride) `pvar,RETURN=zaxis`
+
+IF `($tstride"0") GT 1` THEN SET AXIS/STRIDE=($tstride) `pvar,RETURN=taxis`
+
+! Use Ferrets variance-based levels.
+LET varxd = ($ppvar)
+DEFINE SYMBOL shapevar = `varxd,RETURN=shape`
+   
+! When we have used striding, RETURN=size doesnt work well
+LET csiz = 1
+DEFINE SYMBOL vsiz = 1
+IF `STRINDEX("($shapevar)", "X") GT 0` THEN 
+   LET cvar = x[gx=varxd]
+   IF `($do_curvi_xy"0|*>1") EQ 0` THEN LET cvar = x[gx=varxd,($region_x)]
+   LET csiz = `cvar,RETURN=isize`
+   DEFINE SYMBOL vsiz = `csiz * ($vsiz) `
+ENDIF
+IF `STRINDEX("($shapevar)", "Y") GT 0` THEN 
+   LET cvar = y[gy=varxd]
+   IF `($do_curvi_xy"0|*>1") EQ 0` THEN LET cvar = y[gy=varxd,($region_y)]
+   LET csiz = `cvar,RETURN=jsize`
+   DEFINE SYMBOL vsiz = `csiz * ($vsiz)`
+ENDIF
+IF `STRINDEX("($shapevar)", "Z") GT 0` THEN 
+   LET cvar = z[gz=varxd]
+   IF `($do_curvi_xy"0|*>1") EQ 0` THEN LET cvar = z[gz=varxd,($region_z)]
+   LET csiz = `cvar,RETURN=ksize`
+   DEFINE SYMBOL vsiz = `csiz * ($vsiz)`
+ENDIF
+IF `STRINDEX("($shapevar)", "T") GT 0` THEN 
+   LET cvar = t[gt=varxd]
+   IF `($do_curvi_xy"0|0|*>1") EQ 0` THEN LET cvar = t[gt=varxd,($region_t)]
+   LET csiz = `cvar,RETURN=lsize`
+
+   DEFINE SYMBOL vsizxyz = ($vsiz)
+   DEFINE SYMBOL vsiz = `csiz * ($vsiz)`
+ENDIF
+
+DEFINE SYMBOL vsizxyz = ($vsiz)
+
+LET isqr = INT(($vsiz)^0.5)
+
+DEFINE AXIS/y=1:`isqr`:1 yshortaxis
+DEFINE AXIS/x=1:`INT(($vsiz)/isqr)`:1 xhalfaxis
+LET varshape = x[gx=xhalfaxis] + y[gy=yshortaxis]
+LET var1d = XSEQUENCE(($ppvar))
+LET var2d = RESHAPE(var1d, varshape)
+IF ($ferret_center_levels) THEN 
+  SHADE/LEV=($num_fine_levels)vc var2d
+ELSE
+
+  SHADE/LEV=($num_fine_levels)v var2d
+ENDIF
+
+! There seems to be another striding bug in all versions of NetCDF,
+! or a problem with with handling some datasets.
+! The last timestep gets set to all zeros for some stride requests.
+! Look for this and dont use that last step that was returned.
+! For instance, this dataset
+! http://data1.gfdl.noaa.gov:8380/thredds3/dodsC/CM2.0_Cntr-ITFblock_R1_ocean_tripolar_monthly_01010101-02001231  
+! list thetao[x=46,y=-10,z=5,l=1:1150:50]
+
+! Here is a test for this and commands to skip those zero's.
+LET ipts = `var1d,RETURN=isize`
+LET last = var1d
+IF `ipts GT 10` THEN LET last = var1d[i=`ipts-10`:`ipts`]
+IF  `last[i=@min] EQ 0 AND last[i=@max] EQ 0` THEN 
+   LET fsiz = `ipts-($vsizxyz)`
+   IF `fsiz LT 1` THEN LET fsiz = ipts
+   LET fix1d = var1d[i=1:`fsiz`]
+
+   LET isqr = INT(fsiz^0.5)
+
+   DEFINE AXIS/y=1:`isqr`:1 yshortaxis
+   DEFINE AXIS/x=1:`INT(($vsiz)/isqr)`:1 xhalfaxis
+   LET varshape = x[gx=xhalfaxis] + y[gy=yshortaxis]
+   LET var2d = RESHAPE(fix1d, varshape)
+   IF ($ferret_center_levels) THEN 
+     SHADE/LEV=($num_fine_levels)vc var2d
+   ELSE
+   
+     SHADE/LEV=($num_fine_levels)v var2d
+   ENDIF
+ENDIF
+! End of hack around the "other striding bug".
+
+! Require open levels on both ends - in case an extreme value was missed.
+IF ($LEV_OPNLEVS"0|*>1") THEN 
+
+   IF `STRINDEX("($LEV_OPNLEVS)", "(-inf)") EQ 0` THEN \
+ DEFINE SYMBOL LEV_OPNLEVS = (-inf)($LEV_OPNLEVS)
+   IF `STRINDEX("($LEV_OPNLEVS)", "(inf)") EQ 0` THEN \
+ DEFINE SYMBOL LEV_OPNLEVS = ($LEV_OPNLEVS)(inf)
+
+   DEFINE SYMBOL ferret_fill_levels = ($LEV_OPNLEVS)
+   DEFINE SYMBOL ferret_contour_levels = ($LEV_OPNLEVS)
+
+ENDIF
+
+! Restore original axes
+IF `($index_strides"0|*>1") EQ 0` THEN 
+
+IF `($xstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=xaxis`
+  CANCEL SYMBOL xstride
+ENDIF
+IF `($ystride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=yaxis`
+  CANCEL SYMBOL ystride
+ENDIF
+IF `($zstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=zaxis`
+  CANCEL SYMBOL zstride
+ENDIF
+
+IF `($tstride"0") GT 1` THEN 
+  CANCEL AXIS/STRIDE `pvar,RETURN=taxis`
+  CANCEL SYMBOL tstride
+ENDIF
+
+ENDIF
+! End of file ------------LAS_auto_levels_animate.jnl--------------------------
+

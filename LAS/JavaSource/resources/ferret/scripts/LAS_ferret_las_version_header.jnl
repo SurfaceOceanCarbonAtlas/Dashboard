@@ -1,0 +1,25 @@
+! Write whatever header we want onto a plot, across the top.
+! 
+
+! Overall header at the very top.
+! TODO: ACM 10/21/08 When we have this set up, pass in a label for
+! the LAS version in the symbol ferret_las_version
+
+IF `($ferret_las_version"0|*>1") EQ 0` THEN \
+   DEFINE SYMBOL ferret_las_version = 8.
+
+IF ($program_name"0|PyFerret>1|*>0") THEN
+    DEFINE SYMBOL las_ferret_header_label = LAS ($ferret_las_version)/PyFerret ($FERRET_VERSION)   NOAA/PMEL
+ELSE
+    DEFINE SYMBOL las_ferret_header_label = LAS ($ferret_las_version)/Ferret ($FERRET_VERSION)     NOAA/PMEL
+ENDIF
+
+DEFINE SYMBOL ferret_version_lab = ($FERRET_VERSION)
+DEFINE SYMBOL las_version_lab = LAS($ferret_las_version"8.")
+DEFINE SYMBOL header_lab = (NOAA/PMEL)
+
+
+IF ($ferret_annotations%0|*>1%) THEN EXIT/SCRIPT
+
+LABEL/NOUSER `($ppl$xlen)/2`, `($ppl$ylen)+1.2+0.2*($extra_y_space"0")`, 0, 0, 0.12, ($las_ferret_header_label)
+

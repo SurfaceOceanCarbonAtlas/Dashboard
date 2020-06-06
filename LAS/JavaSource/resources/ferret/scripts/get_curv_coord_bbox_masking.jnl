@@ -1,0 +1,70 @@
+! get_curv_coord_bbox_masking.jnl
+!
+! An alternative to get_curv_coord_bbox.jnl which uses mapping functions.
+!
+! get the I,J range from curvilinear coordinate variables for
+! the requested output rectangle defined by 
+!    ($region_x_lo):($region_x_hi)
+!    ($region_y_lo):($region_y_hi)
+!
+!  Use masking to create a single variable defined only where the curvilinear
+!  coordinate variables are defined and in the region range.
+!
+! The output is returned as symbols 
+
+! clon_imin
+! clon_imax
+! clat_jmin
+! clat_jmax
+
+LET  box_longitude = ($ferret_curvi_coord_lon)[d=($data_num)]
+LET  box_latitude = ($ferret_curvi_coord_lat)[d=($data_num)]
+
+! See if this is a rectangle or a line; if a line then expand
+! the region to make a rectangle.
+
+IF `($region_x_hi) GT ($region_x_lo)` THEN
+   LET box_x_lo = ($region_x_lo)
+   LET box_x_hi = ($region_x_hi) 
+ELSE
+   LET box_x_lo = `($region_x_lo) - 4.`
+   LET box_x_hi = `($region_x_hi) + 4.`
+ENDIF
+
+LET box_lon_min = box_longitude[x=@min,y=@min]
+LET box_lon_max = box_longitude[x=@max,y=@max]
+
+! See if this is a rectangle or a line; if a line then expand
+! the region to make a rectangle.
+
+IF `($region_y_hi) GT ($region_y_lo)` THEN
+   LET box_y_lo = ($region_y_lo)
+   LET box_y_hi = ($region_y_hi) 
+ELSE
+   LET box_y_lo = `($region_y_lo) - 4.`
+   LET box_y_hi = `($region_y_hi) + 4.`
+ENDIF
+
+LET lon_masklo = IF box_longitude GE `box_x_lo` THEN 1
+LET lon_maskhi = IF box_longitude LE `box_x_hi` THEN 1
+
+LET lat_masklo = IF box_latitude GE `box_y_lo` THEN 1
+LET lat_maskhi = IF box_latitude LE `box_y_hi` THEN 1
+
+LET box_range = lat_masklo * lat_maskhi * box_latitude * lon_masklo* lon_maskhi * box_longitude
+LET mask = IF box_range THEN 1 
+
+LET xlocations = mask * (i[GX=box_longitude] + 0*j[GY=box_longitude])
+LET ylocations = mask * (0*i[GX=box_longitude] + j[GY=box_longitude])
+
+DEFINE SYMBOL clon_imin = `xlocations[X=@MIN,Y=@MIN]`
+DEFINE SYMBOL clon_imax = `xlocations[X=@MAX,Y=@MAX]`
+
+! If the region extends over the branch cut, send the whole range of indices to samplexy_curv
+IF ($two_slices"0") THEN
+   DEFINE SYMBOL clon_imin 1
+   DEFINE SYMBOL clon_imax `box_longitude,return=isize`
+ENDIF
+
+DEFINE SYMBOL clat_jmin = `ylocations[X=@MIN,Y=@MIN]`
+DEFINE SYMBOL clat_jmax = `ylocations[X=@MAX,Y=@MAX]`

@@ -1,0 +1,33 @@
+! reshape_list_var.jnl
+!
+! When writing a variable to an ascii file from list_traj_data.jnl,
+! metadata variables need to be expanding to the obs axis.
+
+DEFINE SYMBOL reshape_var = ($1)
+
+
+DEFINE SYMBOL trajshape = `($reshape_var),RETURN=shape`
+LET shapeit = `($trajshape"0|E>1|POINT>1|*>0)`
+
+IF `shapeit EQ 0` THEN EXIT/SCRIPT
+
+LET gettype = ($reshape_var)
+DEFINE SYMBOL vtype = `gettype,RETURN=dtype`
+DEFINE SYMBOL is_string = ($vtype"0|CHAR>1|*>0")
+
+DEFINE SYMBOL expnd_fcn = EXPND_BY_LEN
+IF ($is_string) THEN DEFINE SYMBOL expnd_fcn = EXPND_BY_LEN_STR
+
+LET total_obs = `longitude,return=isize`
+SET var/name=($reshape_var)_in ($reshape_var)
+
+LET ($reshape_var)_xpnd = ($expnd_fcn)(($reshape_var)_in, ($rowvar), `total_obs`)
+LET/TITLE="`($reshape_var)_in,RETURN=title`" ($reshape_var) = RESHAPE (($reshape_var)_xpnd, longitude) 
+
+! add units if the original variable had units.
+DEF SYM ($reshape_var)_units = `($reshape_var)_in,RETURN=units`NoUnItS
+IF `STRCMP("($($reshape_var)_units)", "NoUnItS") NE 0` THEN 
+   SET VAR/UNITS="`($reshape_var)_in,RETURN=units`" ($reshape_var) 
+ENDIF
+
+! End of script ---------- reshape_list_var.jnl----------------------------

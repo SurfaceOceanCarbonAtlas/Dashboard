@@ -1,0 +1,74 @@
+! cruise_list_mask.jnl
+! If a cruise list is defined, set up the mask.
+
+
+! Format the cruise list and define the mask.  Do this just once - 
+! Once the all_subset is defined then the list mask is all set.
+
+IF `($ferret_cruise_list"0|*>1") EQ 0` THEN 
+   LET cruise_mask_obs = 1 
+   EXIT/SCRIPT
+ENDIF
+
+IF `($all_subset"0|*>1")` THEN EXIT/SCRIPT
+
+LET all_len = STRLEN("($ferret_cruise_list)")
+LET subset_len = `all_len`
+
+! Initialize, first cruise id in symbol all_subset
+
+DEFINE SYMBOL subset_list = ($ferret_cruise_list)
+LET s1 = 1
+LET s2 =  `STRINDEX("($subset_list)", ",")`
+IF `s2 EQ 0` THEN LET s2 = subset_len+1
+DEFINE SYMBOL one_cruise = "`SUBSTRING("($subset_list)", 1,s2-1)`"
+DEFINE SYMBOl all_subset = ($one_cruise)
+DEFINE SYMBOL subset_list= ($all_subset)
+
+IF `s2 NE 0` THEN 
+   LET s1 = `s1+s2`
+   IF `s1 LT all_len` THEN 
+      DEFINE SYMBOL subset_list= `SUBSTRING("($ferret_cruise_list)",s1,subset_len-s2)`
+      LET subset_len = STRLEN("($subset_list)")
+   ENDIF
+ENDIF
+
+! If more in the list, add them.
+
+IF `(s2 NE 0) AND (s1 LT all_len)` THEN
+   REPEAT/RANGE=1:200 ( ;\
+     LET s2 =  `STRINDEX("($subset_list)", ",")`;\
+     IF `s2 EQ 0` THEN LET s2 = subset_len+1;\
+     DEFINE SYMBOL one_cruise = "`SUBSTRING("($subset_list)", 1,s2-1)`";\
+     DEFINE SYMBOl all_subset = ($all_subset),($one_cruise);\
+     IF `s2 EQ 0` THEN EXIT/LOOP;\
+     LET s1 = `s1+s2`;\
+     IF `s1 GE all_len` THEN EXIT/LOOP;\
+     DEFINE SYMBOL subset_list= `SUBSTRING("($ferret_cruise_list)",s1,subset_len-s2)`;\
+     LET subset_len = STRLEN("($subset_list)");\
+     )
+ENDIF
+
+LET subset_ids = {($all_subset)}
+
+! Define a mask to use on the entire list of values: plot or not to plot
+! the polygons on the prop-prop plot.
+list varnames
+
+IF `IS_ELEMENT_OF_STR_N(varnames, "($trajectory_variable)") NE 0` THEN 
+   LET subm_ids = IF ELEMENT_INDEX_STR_N(($trajectory_variable), subset_ids) GT 0 THEN 1
+
+! apply mask as data_var_c* subset_mask
+   LET subset_mask = XSEQUENCE(subm_ids) + 0*i[gx=xmask_axis]  ! put it on a non-abstract axis
+ELSE
+   LET n_subset = `rowsize,RETURN=msize`
+   LET subset_mask = 1 + 0*i[i=1:`n_subset`]
+ENDIF
+
+DEFINE SYMBOL cruises_shown = `subset_mask[i=@sum]`
+DEFINE SYMBOL subset_mask = 1  ! mask is defined
+LET cruise_mask = subset_mask  ! used in the key when color-by-cruise
+
+LET cruise_mask_obs = EXPND_BY_LEN(cruise_mask,rowsize,`rowsize[m=@sum]`)
+
+!---------------- end of cruise_list_mask.jnl -------------------------

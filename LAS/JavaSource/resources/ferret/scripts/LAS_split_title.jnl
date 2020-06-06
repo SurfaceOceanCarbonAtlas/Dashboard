@@ -1,0 +1,33 @@
+! LAS_split_title.jnl
+
+! If a title is long, split into multiple lines at the location of an addition
+! to the title.
+
+IF ($ferret_annotations"0|*>1") THEN  EXIT/SCRIPT
+
+LET slen = STRLEN ("($split_title)")
+
+IF `slen GT 80` THEN
+   LET slen2 = INT(slen/2)
+   LET split_loc = `STRRINDEX("($split_title)", "Regridded")`
+
+   IF `split_loc GT 0` THEN
+      DEFINE SYMBOL upper_right_first = ($split_title)
+      DEFINE SYMBOL upper_right_first = `SUBSTRING("($upper_right_first)", 0, split_loc-1)` ;\
+      DEFINE SYMBOL upper_right_last = `SUBSTRING("($split_title)", split_loc, slen-split_loc+1)`
+      DEFINE SYMBOL split_title = ($upper_right_first)<NL>($upper_right_last)
+   ELIF `STRRINDEX("($split_title)", "Native") GT 0` THEN
+      LET split_loc = `STRRINDEX("($split_title)", "Native")`
+
+      IF `split_loc GT 0` THEN
+         DEFINE SYMBOL upper_right_first = ($split_title)
+         DEFINE SYMBOL upper_right_first = `SUBSTRING("($upper_right_first)", 0, split_loc-1)` ;\
+         DEFINE SYMBOL upper_right_last = `SUBSTRING("($split_title)", split_loc, slen-split_loc+1)`
+         DEFINE SYMBOL split_title = ($upper_right_first)<NL>($upper_right_last)
+      ENDIF
+
+   ENDIF
+
+ENDIF
+
+! End of $RCSfile ------------ LAS_split_title.jnl--------------------------

@@ -1,0 +1,46 @@
+! LAS_setup_next_frame.jnl
+! 10/2018
+!
+! When drawing a set of animation frames from LAS_animate_all.jnl
+! set up the next timestep, and clear out some symbol settings for the
+! next run of the plot script.
+!
+! This runs inside a loop where lstep is the index on the time axis for
+! the current plot. Base names for the plot file and debug files are set
+! - lstep is the index on the time axis for the current plot. 
+! - tvar is the timesteps
+! - result_plot_image_base is the directory and start of the plot-image name
+! - image_ext is the extension, .png or .gif etc
+! - result_debug_filename_base is the directory and start of the debug file
+! - dig is the number of digits needed to count the steps 
+
+DEFINE SYMBOL lstep = `lstep`
+DEFINE SYMBOL region_0_t_lo = `TAX_DATESTRING(t[gt=tvar,L=($lstep)], t[gt=tvar], "seconds")`
+DEFINE SYMBOL region_0_t_hi = ($region_0_t_lo)
+
+! For the plot-file and debug file names, make a symbol with the step number, 
+! pre-padded with zeros so the files will sort in order
+
+LET iplot = `iplot + 1`
+DEFINE SYMBOL iplot = `iplot`
+LET idig =  dig-`STRLEN("($iplot)")`
+DEFINE SYMBOL stepnum = `SUBSTRING(zeros, 1, idig)`($iplot)
+
+DEFINE SYMBOL result_plot_image_filename = ($result_plot_image_base)_($stepnum).($image_ext)
+
+DEFINE SYMBOL result_debug_filename = ($result_debug_filename_base)_($stepnum).txt
+
+! Reset these so each plot is a regular LAS-plot with its own debug file
+
+CANCEL redirect
+SET REDIRECT/APPEND/TEE/file="($result_debug_filename)" STDOUT,STDERR
+CANCEL SYMBOL n_right_labels
+CANCEL SYMBOL *qual*
+CANCEL SYMBOL variable_lab
+
+CANCEL WINDOW/ALL
+SET WINDOW/NEW
+
+! Now the main LAS_animate_all.jnl will run the plot script.
+
+! End of file ------------ LAS_setup_next_frame.jnl--------------------------

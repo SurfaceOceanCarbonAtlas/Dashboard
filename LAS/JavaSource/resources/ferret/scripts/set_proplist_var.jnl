@@ -1,0 +1,44 @@
+! set_proplist_var.jnl
+!
+!
+! 10/18/2017 ACM
+! setup for extra variables added to prop-prop style data listings
+! making sure definitions are unique to each variable requested
+
+IF ($ferret_plot_var_($list_var)"0|time_>0|($feature_variable)>0|longitude_>0|latitude_>0|*>1") THEN 
+   
+LET gettype = ($ferret_plot_var_($list_var))
+DEFINE SYMBOL vtype = `gettype,RETURN=dtype`
+IF ($vtype"0|CHAR>1|*>0") THEN DEFINE SYMBOL is_string = 1
+
+LET ii = i[g=($timevar)]
+LET iindices = IF constraints_mask THEN ii
+LET compress_mask = COMPRESSI(iindices)
+LET nok = `compress_mask[i=@ngd]`
+
+IF `STRINDEX("($data_($list_var)_var_in)", "'") EQ 1` THEN \
+        DEFINE SYMBOL data_($list_var)_var_in = ($data_($list_var)_var)1
+LET/TITLE="($data_($list_var)_title)"/UNITS="($data_($list_var)_units)" ($data_($list_var)_var_in) = SAMPLEI (zvar($list_var), compress_mask[i=1:`nok`])
+
+! expand metadata variables onto the X axis
+DEFINE SYMBOL zshape = `($ferret_plot_var_($list_var)),RETURN=shape`
+IF `($zshape"0|E>1|POINT>1|*>0)` THEN
+   ! Expand all strings into obs axis
+   IF ($is_string"0|*>1") THEN 
+      LET ($ferret_plot_var_($list_var))_xpnd = EXPND_BY_LEN_STR(($ferret_plot_var_($list_var)), ($rowvar), `($rowvar)[m=@sum]`)
+   ELSE
+      LET ($ferret_plot_var_($list_var))_xpnd = EXPND_BY_LEN(($ferret_plot_var_($list_var)), ($rowvar), `($rowvar)[m=@sum]`)
+   ENDIF
+   
+   IF `STRINDEX("($data_($list_var)_var_in)", "'") EQ 1` THEN \
+        DEFINE SYMBOL data_($list_var)_var_in = ($data_($list_var)_var)1
+   LET/TITLE="($data_($list_var)_title)"/UNITS="($data_($list_var)_units)" ($data_($list_var)_var_in) = SAMPLEI (($ferret_plot_var_($list_var))_xpnd, compress_mask[i=1:`nok`])
+ENDIF
+
+LET nlist = `nlist + 1`
+DEFINE SYMBOL vars_out = ($vars_out), ($data_($list_var)_var_in)
+
+
+ENDIF
+
+! ----- End of set_proplist_var.jnl ------------------------------------------------

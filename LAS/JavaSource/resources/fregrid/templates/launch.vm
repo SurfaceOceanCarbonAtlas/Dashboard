@@ -1,0 +1,7 @@
+#set($var0 = $las_backendrequest.getVariables().get(0))
+#set($infile = $las_backendrequest.getDataAttribute($var0, "url"))
+#set($base = $las_backendrequest.getDataAttribute($var0, "url_base"))
+#set($vars = $las_backendrequest.getVariablesAsString())
+#set($netcdf = $las_backendrequest.getResultAsFile("netcdf"))
+--input_mosaic /home/porter/rhs/gridspec/tools_20071113/data/output/C48_mosaic.nc --input_dir $base --input_file $infile --scalar_field $vars --output_mosaic /home/porter/rhs/gridspec/tools_20071113/data/output/N45_mosaic.nc --interp_method conserve_order1 --output_file $netcdf --check_conserve
+

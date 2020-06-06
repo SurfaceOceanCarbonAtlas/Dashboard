@@ -1,0 +1,28 @@
+## Velocity info: http://velocity.apache.org/engine/devel/user-guide.html#about_this_guide
+## Dapper docs: http://www.epic.noaa.gov/epic/software/dapper/dapperdocs/conventions/
+## This sample url doesn't work in a browser, only via opendap library:
+## url=http://las.pfeg.noaa.gov/dods/ndbc/all_noaa_time_series.cdp?location.LON,location.LAT,
+##   location.DEPTH,location.profile.TIME,location.profile.WSPD1,location.profile.BAR1
+##   &location.LON>=235.45001&location.LON<=235.47&location.LAT>=40.77&location.LAT<=40.789997
+##   &location.profile.TIME>=1072915199999&location.profile.TIME<=1072918800001
+##
+#set($x=$dapperBackendRequest.getDatabaseProperty("longitude"))
+#set($y=$dapperBackendRequest.getDatabaseProperty("latitude"))
+#set($z=$dapperBackendRequest.getDatabaseProperty("depth"))
+#set($t=$dapperBackendRequest.getDatabaseProperty("time"))
+#set($v=$dapperBackendRequest.getVariablesAsString())
+#set($pre="$x,$y,$z,$t,$v")
+## xRange may have 0,1,2 values; the others are "" or a constraint
+#set($xRange=$dapperBackendRequest.getAxisConstraintArrayList("x")) 
+#set($yRange=$dapperBackendRequest.getAxisConstraint("y"))
+#set($zRange=$dapperBackendRequest.getAxisConstraint("z"))
+#set($tRange=$dapperBackendRequest.getAxisConstraint("t"))
+#set($post="$yRange$zRange$tRange")
+#if ($xRange.size() == 0) 
+$pre$post
+#elseif ($xRange.size() == 1) 
+$pre$xRange.get(0)$post
+#elseif ($xRange.size() == 2) 
+$pre$xRange.get(0)$post
+$pre$xRange.get(1)$post
+#end

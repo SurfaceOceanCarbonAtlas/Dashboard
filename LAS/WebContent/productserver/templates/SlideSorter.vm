@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+  <head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+    <title>SlideSorter</title>
+<!-- 
+ * Imported libaries:
+ *
+ * xmldom.js              Parses the LASRequest XML.  Used by LASRequest.js.
+ * json.js                Parses the LASResponse JSON.  Used by LASResponse.js.
+ * sarissa.js             Cross-browser wrapper for AJAX communication.
+ * LatitudeWidget.js      Creates and populates a Latitude Selector.
+ * LongitudeWidget.js     Creates and populates a Longitude Selector.
+ * MenuWidget.js          Creates and populates a basic Selector (menu).
+ * DateWidget.js          Creates and populates a date Widget (group of Selectors).
+ * LASRequest.js          Provides an API for accessing/modifying LASRequest elements.
+ * LASResponse.js         Provides an API for accessing LASResponse elements.
+ * LASGrid.js             Provides an API for accessing LAS Grid elements.
+ * LASContentCell.js      Creates and populates DOM elements according to content type.
+ * LASSlideSorter.js      Creates a menu-controlled slide sorter of content cells
+-->
+    <script type="text/javascript" src="JavaScript/components/xmldom.js"></script>
+    <script type="text/javascript" src="JavaScript/components/json.js"></script>
+    <script type="text/javascript" src="JavaScript/components/sarissa.js"></script>
+    <script type="text/javascript" src="JavaScript/components/MenuWidget.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LatitudeWidget.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LongitudeWidget.js"></script>
+    <script type="text/javascript" src="JavaScript/components/DateWidget.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LASRequest.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LASResponse.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LASGrid.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LASContentCell.js"></script>
+    <script type="text/javascript" src="JavaScript/components/LASSlideSorter.js"></script>
+    <script type="text/javascript">
+
+
+var dsid = "coads_climatology_cdf";
+var varid = "sst";
+
+#set( $view = $las_request.getProperty('ferret','view') )
+var view = '$view';
+
+// NOTE:  The dimensions of these arrays should match the # of rows and columns
+// NOTE:  in the optionRows and optionCols Selectors.
+var data_minima = [[999999,999999,999999,999999,999999,999999],
+                   [999999,999999,999999,999999,999999,999999],
+                   [999999,999999,999999,999999,999999,999999],
+                   [999999,999999,999999,999999,999999,999999]];
+var data_maxima = [[-999999,-999999,-999999,-999999,-999999,-999999],
+                   [-999999,-999999,-999999,-999999,-999999,-999999],
+                   [-999999,-999999,-999999,-999999,-999999,-999999],
+                   [-999999,-999999,-999999,-999999,-999999,-999999]];
+
+var oldAnomalyMode = 0;
+
+function initializeLASSlideSorter() {
+  // NOTE:  Req must be defined before LSS because the LSS object uses the Req
+  // NOTE:  object in createLASRequest() when the LSS object is initialized.
+  ReqImg = new LASRequest('$las_request.toJavaScriptSafeString()');
+  ReqA = new LASRequest('$las_request.toJavaScriptSafeString()');
+  dsid = ReqImg.getDataset();
+  varid = ReqImg.getVariable();
+
+  // set options field to values in request
+  var user_option;
+  if (view == 'x' || view == 'y' || view == 'z' || view == 't') {
+    user_option = ReqImg.getProperty('ferret','dep_axis_scale');
+  } else {
+    user_option = ReqImg.getProperty('ferret','fill_levels');
+  }
+  if (user_option) {
+    document.getElementById('LSS_optionTextField').value = user_option;
+  }
+  
+  // Get the JSON representation of the Grid associated with this
+  // dataset and variable.
+  ## The tepmlating language has no access to javascript variables
+  ## so we must get dsID and varID the 'template way'
+  #set($dsID = $las_request.datasetIDs.get(0))
+  #set($varID = $las_request.variableIDs.get(0))
+  #set($grid = $las_config.getGrid($dsID,$varID))
+  #set($grid_JSON = $grid.toJSON().toString())
+  var gridJSON = '$grid_JSON';
+
+  // See if there are any 'compressed' axes
+  var analysisAxes = new Object();
+  #set($analysisAxes = $las_request.getAnalysisAxes($dsID,$varID))
+  #foreach ($analysisAxis in $analysisAxes)
+    analysisAxes["$analysisAxis"] = 1;
+  #end
+
+  // First, make sure we can parse the gridJSON object
+  var Grid;
+  var JSONObject;
+  try {
+    var JSONObject = gridJSON.parseJSON();
+  } catch(e) {
+    alert('Error parsing gridJSON as JSON.');
+    return;
+  }
+
+  try {
+    Grid = new LASGrid(JSONObject);
+  } catch(e) {
+    // TODO:  Create Error Cell with this text?
+    alert(e);
+    return;
+  }
+
+  // At this point we have what we hope is a valid Grid.
+
+  // Clear the LSSInitObject();
+  LSSInitObject = new Object();
+
+  // Define any 'ensemble' axis if present
+  ## Use the dsid and varid created earlier
+  #set($var = $las_config.getVariable($dsID,$varID))
+  #set($properties = $var.getProperties('ensemble'))
+  // Hack to check if the ensemble property is defined
+  #set($hasEnsemble = 0)
+  #foreach ($property in $properties)
+    #set($hasEnsemble = 1)
+  #end
+  #if ($hasEnsemble == 1)
+    #set($initial_value = $properties.get(0).getValue())
+  LSSInitObject["ensemble"] = new Object();
+  LSSInitObject["ensemble"].title = 'Ensemble';
+  LSSInitObject["ensemble"].initial_value = '$initial_value'
+  LSSInitObject["ensemble"].type = 'menuWidget';
+  menuContents = new Array;
+    #set($counter = 0)
+    #foreach ($property in $properties)
+      #set($member_dsID = $property.value)
+      #set($member_name = $las_config.getDataset($member_dsID).getName())
+  menuContents[$counter] = new Array('$member_name','$member_dsID');
+      #set($counter = $counter + 1)
+    #end
+  LSSInitObject["ensemble"].data = menuContents
+  #end
+
+  // Create the Longitude axis menus
+
+  if (view != 'x' && view != 'xy' && view != 'xz' && view != 'xt') {
+    if (Grid.hasAxis('x') && !analysisAxes["x"]) {
+      LSSInitObject["x"] = new Object();
+      LSSInitObject["x"].title = 'Longitude';
+      LSSInitObject["x"].initial_value = ReqImg.getRangeLo('x');
+      if (Grid.getAxis('x').v) {
+        LSSInitObject["x"].type = 'menuWidget';
+        LSSInitObject["x"].data = Grid.getMenu('x');
+      } else {
+// NOTE:  If it doesn't have a 'v' array it must have an 'arange'
+        LSSInitObject["x"].type = 'longitudeWidget';
+        LSSInitObject["x"].data = new Object();
+        LSSInitObject["x"].data.lo = Grid.getLo('x');
+        LSSInitObject["x"].data.hi = Grid.getHi('x');
+        LSSInitObject["x"].data.delta = Grid.getDelta('x');
+      }
+    }
+  }
+    
+  if (view != 'y' && view != 'xy' && view != 'yz' && view != 'yt') {
+    if (Grid.hasAxis('y') && !analysisAxes["y"]) {
+      LSSInitObject["y"] = new Object();
+      LSSInitObject["y"].title = 'Latitude';
+      LSSInitObject["y"].initial_value = ReqImg.getRangeLo('y');
+      if (Grid.getAxis('y').v) {
+        LSSInitObject["y"].type = 'menuWidget';
+        LSSInitObject["y"].data = Grid.getMenu('y');
+      } else {
+// NOTE:  If it doesn't have a 'v' array it must have an 'arange'
+        LSSInitObject["y"].type = 'latitudeWidget';
+        LSSInitObject["y"].data = new Object();
+        LSSInitObject["y"].data.lo = Grid.getLo('y');
+        LSSInitObject["y"].data.hi = Grid.getHi('y');
+        LSSInitObject["y"].data.delta = Grid.getDelta('y');
+      }
+    }
+  }
+    
+  if (view != 'z' && view != 'xz' && view != 'yz' && view != 'zt') {
+    if (Grid.hasAxis('z') && !analysisAxes["z"]) {
+      LSSInitObject["z"] = new Object();
+      LSSInitObject["z"].title = 'Depth';
+      LSSInitObject["z"].initial_value = ReqImg.getRangeLo('z');
+      LSSInitObject["z"].type = 'menuWidget';
+      if(Grid.hasMenu('z'))
+         LSSInitObject["z"].data = Grid.getMenu('z');
+      else if (Grid.hasArange('z')) {
+	 LSSInitObject["z"].data = [];
+         for (var v = parseFloat(Grid.getLo('z')); v <=  parseFloat(Grid.getHi('z')) ; v += parseFloat(Grid.getDelta('z'))) 
+            LSSInitObject["z"].data.push([v, v]);
+	}
+    }
+  }
+
+  if (view != 't' && view != 'xt' && view != 'yt' && view != 'zt') {
+    if (Grid.hasAxis('t') && !analysisAxes["t"]) {
+      LSSInitObject["t"] = new Object();
+      LSSInitObject["t"].title = 'Time';
+      LSSInitObject["t"].initial_value = ReqImg.getRangeLo('t');
+      if (Grid.getDisplayType('t') == 'menu') {
+        LSSInitObject["t"].type = 'menuWidget';
+        LSSInitObject["t"].data = Grid.getMenu('t');
+      } else {
+// NOTE:  If it's not of type 'menu' it must be of type 'widget'
+        LSSInitObject["t"].type = 'dateWidget';
+        LSSInitObject["t"].render_format = Grid.getRenderFormat('t');
+        LSSInitObject["t"].data = new Object();
+        LSSInitObject["t"].data.lo = Grid.getLo('t');
+        LSSInitObject["t"].data.hi = Grid.getHi('t');
+        LSSInitObject["t"].data.tUnits = Grid.getUnits('t'); //units of time axis
+        LSSInitObject["t"].data.tDelta = Grid.getDelta('t'); //step of time axis
+      }
+    }
+  }
+
+  // Choose an initial menu
+
+  var initial_menu;
+
+  if ($hasEnsemble == 1) {
+    initial_menu = 'ensemble';
+  } else {
+    if (view.indexOf('t') == -1 && Grid.hasAxis('t') && !analysisAxes["t"]) {
+      initial_menu = 't';
+    } else {
+      if (view.indexOf('z') == -1 && Grid.hasAxis('z') && !analysisAxes["z"]) {
+        initial_menu = 'z';
+      } else {
+        if (view.indexOf('y') == -1 && Grid.hasAxis('y') && !analysisAxes["y"]) {
+          initial_menu = 'y';
+        } else {
+          if (view.indexOf('x') == -1 && Grid.hasAxis('x') && !analysisAxes["x"]) {
+            initial_menu = 'x';
+          }
+        }
+      }
+    }
+  }
+
+  if (!initial_menu) {
+
+    alert('This variable exists only on the axes used in the plot.  No comparison is possible with this variable');
+
+  } else {
+
+    // Obtain the number of rows and columns from the UI
+      var rowSelect = document.getElementById('optionRows');
+      var rows = rowSelect.options[rowSelect.selectedIndex].value;
+      var colSelect = document.getElementById('optionCols');
+      var cols = colSelect.options[colSelect.selectedIndex].value;
+
+    // Initialize the SlideSorter
+    LSS = new LASSlideSorter(document.LASSlideSorterForm,LSSInitObject);
+    LSS.render("LASSlideSorter",rows,cols,initial_menu);
+  }
+
+}
+
+
+/**
+ * Updates the LASRequest to reflect the current state of the user interface.
+ * @param AA AssociativeArray object of menu titles and user selected values
+ * @return LASRequest
+ */
+function createLASRequest(AA) {
+
+// Get the row and column info from AA
+  var row = AA.row;
+  var col = AA.col;
+
+// Initialize the individual cell request to the original request 
+  LASReq = new LASRequest('$las_request.toJavaScriptSafeString()');
+
+  LASReq.prefix = 'ProductServer.do?xml=';
+
+/*
+ * TODO:  Delete this section and replace it with code to set the selector
+ * TODO:  to whatever the user chose in the LAS UI.
+// NOTE:  In order to create a different default size for the SlideSorter
+// NOTE:  I had to create a new menu name.  Of course, that property won't
+// NOTE:  be understood by the Ferret scripts that expect 'size', so here
+// NOTE:  we switch back by adding the 'size' property.
+  var size_SS = LASReq.getProperty('ferret','size_SS');
+  if (size_SS == null) {
+    LASReq.setProperty('ferret','size','0.2')
+  } else {
+    LASReq.setProperty('ferret','size',size_SS)
+  }
+*/
+
+// Obtain the size from the UI and apply it.
+  var sizeSelect = document.getElementById('optionSize');
+  var user_size = sizeSelect.options[sizeSelect.selectedIndex].value;
+  LASReq.setProperty('ferret','size',user_size)
+
+// TODO:  Need to query the SlideSorter to determine the view instead of
+// TODO:  of having it always set to the view of the original request.
+  LASReq.setProperty('ferret','view',view);
+
+// If we are switching from one mode to another we need to remove any 
+// previously defined contour levels/scaling.
+  if (oldAnomalyMode != AA.anomalyMode) {
+    document.getElementById('LSS_optionTextField').value = '';
+    oldAnomalyMode = AA.anomalyMode;
+  }
+
+// Set the contour levels/scaling if defined
+  var user_option =  document.getElementById('LSS_optionTextField').value;
+  if (view == 'x' || view == 'y' || view == 'z' || view == 't') {
+    if ( AA.anomalyMode == 1 ) {
+      if (row != 1 || col != 1) {
+        LASReq.setProperty('ferret','dep_axis_scale',user_option);
+      }
+    } else {
+      LASReq.setProperty('ferret','dep_axis_scale',user_option);
+    }
+  } else {
+    if ( AA.anomalyMode == 1 ) {
+      if (row != 1 || col != 1) {
+        LASReq.setProperty('ferret','fill_levels',user_option);
+      }
+    } else {
+      LASReq.setProperty('ferret','fill_levels',user_option);
+    }
+  }
+
+
+// User modification of the Ensemble axis is special in that it replaces the variable
+  if (AA.ensemble) {
+    LASReq.replaceVariable(AA.ensemble,varid,0);
+  }
+
+// All other user modifications replace an axis
+  if (view != 'x' && view != 'xy' && view != 'xz' && view != 'xt') {
+    if (AA.x) {
+      LASReq.setRange('x',AA.x);
+    }
+  }
+  if (view != 'y' && view != 'xy' && view != 'yz' && view != 'yt') {
+    if (AA.y) {
+      LASReq.setRange('y',AA.y);
+    }
+  }
+  if (view != 'z' && view != 'xz' && view != 'yz' && view != 'zt') {
+    if (AA.z) {
+      LASReq.setRange('z',AA.z);
+    }
+  }
+  if (view != 't' && view != 'xt' && view != 'yt' && view != 'zt') {
+    if (AA.t) {
+      LASReq.setRange('t',AA.t);
+    }
+  }
+
+  if (view == 'x' || view == 'y' || view == 'z' || view == 't') {
+    LASReq.setOperation('Plot_1D');
+  } else {
+    if (view == 'xy') {
+      LASReq.setOperation('Plot_2D_XY');
+    } else {
+      LASReq.setOperation('Plot_2D');
+    }
+  }
+
+// Anomly calculations will require the following after the basic request is formed
+// o add another variable
+// o add a new region (index #1)
+// o add a range to the new region (region 1)
+
+  if ( AA.anomalyMode == 1 ) {
+
+// Anomalies calculations only allowed for single variable requests.
+
+    while (LASReq.getVariable(1)) {
+      LASReq.removeVariable(1);
+      LASReq.removeRegion(1);
+    }
+
+// Don't create the anomaly request for the upper left cell
+
+    if (row != 1 || col != 1) {
+      AA = LSS.getCellAA(1,1);
+
+// All anomaly cells use 'fill_levels=50c' by default
+    if (!LASReq.getProperty('ferret','fill_levels')) {
+      LASReq.setProperty('ferret','fill_levels','50c');
+    }
+
+// Need to add a dummy variable here because the addRegion/AddVariable
+// methods of LASRequest.js will not always add at the end of the <args>
+// node list when there are duplicate <link ...> or <region ...> nodes.
+// Using 'DUMMY' guarantees that addRegion will place the new region at
+// the end.  Then we just replace 'DUMMY'.
+// All this is necessary because order is important in comparison 
+// requests.
+
+      LASReq.addVariable('DUMMY','DUMMY');
+      LASReq.addRegion();
+
+      if (AA.ensemble) {
+        LASReq.replaceVariable(AA.ensemble,varid,1);
+      } else {
+        LASReq.replaceVariable(dsid,varid,1);
+      }    
+
+// Now duplicate for variable[1] any analyses attached to variable[0].
+// See the LASRequest documentation for details on the Analysis object returned.
+     
+      var Analysis = LASReq.getAnalysis(0);
+      if (Analysis) {
+        LASReq.setAnalysis(1,Analysis);
+      }
+
+// Now set any additional ranges
+
+      if (view != 'x' && view != 'xy' && view != 'xz' && view != 'xt') {
+        if (AA.x) {
+          LASReq.setRange('x',AA.x,AA.x,1);
+        }
+      }
+      if (view != 'y' && view != 'xy' && view != 'yz' && view != 'yt') {
+        if (AA.y) {
+          LASReq.setRange('y',AA.y,AA.y,1);
+        }
+      }
+      if (view != 'z' && view != 'xz' && view != 'yz' && view != 'zt') {
+        if (AA.z) {
+          LASReq.setRange('z',AA.z,AA.z,1);
+        }
+      }
+      if (view != 't' && view != 'xt' && view != 'yt' && view != 'zt') {
+        if (AA.t) {
+          LASReq.setRange('t',AA.t,AA.t,1);
+        }
+      }
+
+// Finally, set the operation to 'Compare_Plot'
+
+      LASReq.setOperation('Compare_Plot');
+    }
+  }
+
+  return LASReq;
+}
+
+/**
+ * Handles the LASResponse returned from the XMLHTTP request sent in
+ * the LASSlideSorter_loadContentCell() method.
+ * The handleLASResponse() method creates the appropriate DOM elements
+ * based on the LASResponse and inserts appropriate content into those
+ * DOM elements.
+ */
+function handleLASResponse(LASResponseText,row,col,Request) {
+
+  var contentCell_id = "LSS_ContentCell" + row + col; 
+
+  var aGif_id = "aGif" + row + col;
+  var aGif = document.getElementById(aGif_id);
+  var a1 = aGif.parentNode.parentNode.parentNode.parentNode.parentNode;
+  var a2 = aGif.parentNode.parentNode.parentNode.parentNode;
+  var a3 = aGif.parentNode.parentNode.parentNode;
+  if (LSS.anomalyMode == 0) {
+    a1.className = a1.className.replace(/downloadingBackground/,'regularBackground');
+    a2.className = a2.className.replace(/downloadingBackground/,'regularBackground');
+    a3.className = a3.className.replace(/downloadingBackground/,'regularBackground');
+  } else {
+    a1.className = a1.className.replace(/downloadingBackground/,'anomalyBackground');
+    a2.className = a2.className.replace(/downloadingBackground/,'anomalyBackground');
+    a3.className = a3.className.replace(/downloadingBackground/,'anomalyBackground');
+  }
+  aGif.style.visibility = 'hidden';
+
+  // First, make sure we can parse the LASResponse
+  var Response;
+  try {
+    var JSONObject = LASResponseText.parseJSON();
+    Response = new LASResponse(JSONObject);
+  } catch(e) {
+    // TODO:  Create Error Cell with this text?
+    alert('Error parsing LASResponse:  ' + e);
+    return;
+  }
+
+  // We have a valid JSON object.
+
+  var CCell = new LASContentCell();
+  CCell.render(contentCell_id);
+
+  // Create a URL that links to a large image so that the ContentCell
+  // can make images clickable and add it to the Response object.
+
+  Request.setProperty('ferret','size','1.0');
+  Response.large_img_url = Request.prefix + escape(Request.getXMLText()); 
+
+  if ( Response.isError() ) {
+    CCell.display(Response,'las_message');
+  } else {
+    // First, send another request for the map_scale information
+    var url = Response.getMapScaleURL()
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.open('GET', url, true);
+    xmlhttp.onreadystatechange = function() {
+      if (xmlhttp.readyState == 4) {
+        handleMapScaleResponse(xmlhttp.responseText,row,col);
+      }
+    }
+    xmlhttp.send(null);
+    // Now update the ContentCell
+    CCell.display(Response,'plot_image');
+  }           
+}
+
+/**
+ * Use methods from xmldom.js (required library for the SlideSorter) to 
+ * access the map_scale information.
+ */
+function handleMapScaleResponse(MapScaleResponseText,row,col) {
+  var DOM = new XMLDoc(MapScaleResponseText,_MapScale_parseError);
+  data_min = Number(DOM.selectNodeText("/data_min"));
+  data_max = Number(DOM.selectNodeText("/data_max"));
+  data_minima[row-1][col-1] = data_min;
+  data_maxima[row-1][col-1] = data_max;
+  var debug_point = 1;
+}
+
+/**
+ * Error handler passed to XMLDoc creation method.
+ * @private
+ */
+function _MapScale_parseError(e) {
+  alert(e);
+}
+
+/**
+ *
+ */
+function autoScale() {
+  // Get the global_min and global_max
+  numRows = LSS.numRows;
+  numCols = LSS.numCols;
+  global_min = 999999.0;
+  global_max = -999999.0;
+  for (var row=0; row<numRows; row++) {
+    for (var col=0; col<numCols; col++) {
+      if ( LSS.anomalyMode == 0 || (LSS.anomalyMode == 1 && row+col != 0) ) {
+        if (data_minima[row][col] < global_min) {
+          global_min = data_minima[row][col];
+        }
+        if (data_maxima[row][col] > global_max) {
+          global_max = data_maxima[row][col];
+        }
+      }
+    }
+  }
+
+  // Algorithm from range.F subroutine in Ferret source code
+
+  var umin = global_min;
+  var umax = global_max;
+  var nints = 20;
+
+  var temp = (umax - umin) / nints;
+  if (temp == 0.0) {
+    temp = umax;
+  }
+
+  var nt = Math.floor(Math.log(temp) / Math.LN10);
+  if (temp < 1.0) {
+    nt = nt - 1;
+  }
+  var pow = Math.pow(10,nt);
+  temp = temp / pow;
+
+  var dint = 10.0 * pow;
+  if (temp < Math.SQRT2) {
+    dint = pow;
+  } else {
+    if (temp < Math.sqrt(10.0)) {
+      dint = 2.0 * pow;
+    } else {
+      if (temp < Math.sqrt(50.0)) {
+        dint = 5.0 * pow;
+      }
+    }
+  }
+
+  var fm = umin / dint;
+  var m = Math.floor(fm);
+  if (m < 0) {
+    m = m - 1;
+  }
+  var uminr = Math.round(1000000 * dint * m) / 1000000;
+    
+  fm = umax / dint;
+  m = Math.floor(fm);
+  if (m > 0) {
+    m = m + 1;
+  }
+  var umaxr = Math.round(1000000 * dint * m) / 1000000;
+  
+  // END OF FERRET ALGORITHM
+
+  // Only use 4 significant digits
+
+  // Modify the optionTextField and submit the request
+  fill_levels = '(' + uminr + ',' + umaxr + ',' + dint + ')';
+  document.getElementById('LSS_optionTextField').value = fill_levels;
+  applyOptions();
+}
+
+/**
+ *
+ */
+function applyOptions() {
+  LSS.loadAllImages();
+}
+
+
+  </script>
+
+  <style type="text/css" media="all">
+    @import "JavaScript/components/SlideSorter.css";
+  </style>
+</head>
+
+<body onload="initializeLASSlideSorter()">
+
+  <form id="LSS_Form" name="LASSlideSorterForm" onSubmit="return false">
+    <div id="LSS_Container">
+
+  	<table id="LSS_Table">
+      <tbody>
+        <tr><td><table><tbody>
+        <tr class="LSS_optionRow">
+          <td>
+            <select id="optionRows" onchange="javascript:initializeLASSlideSorter()">
+              <option value="1">1 row</option>
+              <option selected value="2">2 rows</option>
+              <option value="3">3 rows</option>
+              <option value="4">4 rows</option>
+            </select> 
+          </td>
+          <td>
+            <select id="optionCols" onchange="javascript:initializeLASSlideSorter()">
+              <option value="1">1 column</option>
+              <option selected value="2">2 columns</option>
+              <option value="3">3 columns</option>
+              <option value="4">4 columns</option>
+              <option value="5">5 columns</option>
+              <option value="6">6 columns</option>
+            </select> 
+          </td>
+          <td>
+            <select id="optionSize" onchange="javascript:applyOptions()">
+              <option value="0.02">tiny</option>
+              <option value="0.06667">small</option>
+              <option selected value="0.25">medium</option>
+              <option value="0.8333">large</option>
+            </select> 
+          </td>
+          <td>
+#if ($view == 'x' || $view == 'y' || $view == 'z' || $view == 't')
+            <span id="LSS_optionLabel">Dependent axis scale</span>
+#else
+            <span id="LSS_optionLabel">Color fill levels</span>
+#end
+            <input id="LSS_optionTextField" type="text" name="LSS_optionTextField" onchange="javascript:applyOptions()"></input>
+          </td>
+
+          <td>
+            <input id="AutoScaleButton" type="button" value="Auto-scale" onclick="javascript:autoScale()"></input>
+          </td>
+
+        </tbody></table></td></tr>
+
+<!--
+The SlideSorter render() method invoked during initialization above will 
+automatically build the SlideSorter table inside the 'LASSlideSorter' DOM element.
+-->
+
+        <tr class="LSS_slideSorterRow">
+          <td id="LASSlideSorter"> </td>
+        </tr>
+
+        <tr>
+          <td class="LSS_footer">
+            The LAS comparison plot interface was originally inspired by the
+            <a href="http://www.ngdc.noaa.gov/wist/">Web Image Slide Tray</a> from NOAA/NGDC.
+          </td>
+        </tr>
+
+      </tbody>
+  	</table>
+
+    </div>
+  </form>
+
+</body>
+
+</html>

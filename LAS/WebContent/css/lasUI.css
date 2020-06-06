@@ -1,0 +1,139 @@
+A {
+	FONT-SIZE: 10pt
+}
+TD {
+	FONT-SIZE: 10pt
+}
+A.nav {
+	FONT-SIZE: 12pt; COLOR: black; FONT-FAMILY: Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+TD.navhighlight {
+	FONT-WEIGHT: bold; FONT-SIZE: 12pt; COLOR: black; FONT-FAMILY: Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+TD.navgray {
+	FONT-SIZE: 12pt; COLOR: gray; FONT-FAMILY: Arial, Helvetica, sans-serif; TEXT-DECORATION: none
+}
+.error {
+	COLOR: red
+}
+.spacer {
+	FONT-SIZE: 2pt
+}
+.indent {
+	MARGIN-LEFT: 20pt; TEXT-INDENT: -10pt
+}
+A.dataset {
+	FONT-WEIGHT: bold; FONT-SIZE: 10pt; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+TD.variable {
+	FONT-WEIGHT: bold; FONT-SIZE: 10pt; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+A.redbold {
+	FONT-WEIGHT: bold; FONT-SIZE: 10pt; COLOR: red; FONT-FAMILY: arial; TEXT-DECORATION: none
+}
+.redbold {
+	FONT-WEIGHT: bold; FONT-SIZE: 10pt; COLOR: red; FONT-FAMILY: arial; TEXT-DECORATION: none
+}
+TD.advice {
+	BACKGROUND-POSITION: left center; FONT-WEIGHT: bold; FONT-SIZE: 12px; BACKGROUND-IMAGE: url(../images/adv_blank.gif); COLOR: #003399; BACKGROUND-REPEAT: no-repeat; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+TD.advice_noimg {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; COLOR: #003399; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.subheading {
+	FONT-WEIGHT: bold; FONT-SIZE: 14px; COLOR: #003399; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+.heading {
+	FONT-WEIGHT: bold; FONT-SIZE: 14pt; COLOR: #003399; FONT-FAMILY: Arial, Helvetica, sans-serif
+}
+TD.banner {
+	FONT-WEIGHT: bold; FONT-SIZE: 14pt; COLOR: white; FONT-FAMILY: arial; TEXT-DECORATION: none
+}
+TD.bannertitle {
+	FONT-WEIGHT: bold; FONT-SIZE: 14pt; COLOR: black; FONT-FAMILY: arial; TEXT-DECORATION: none
+}
+
+.t {
+  COLOR: #07519a; BACKGROUND-COLOR: #ebf3fb; FONT-WEIGHT: bold; FONT-SIZE: 12pt; FONT-FAMILY: Arial, Helvetica, sans-serif;
+}  
+
+
+
+.showHide {
+	BORDER-RIGHT: #92b0dd 1px solid; BORDER-TOP: #92b0dd 1px solid; BORDER-LEFT: #92b0dd 1px solid; BORDER-BOTTOM: #92b0dd 1px solid
+}
+
+
+
+
+.heading H2 {
+	border: solid 0px red; COLOR: #07519a; FONT-FAMILY: tahoma,sans-serif; font-size: 12px; 
+}
+
+.chrome5 {
+	width: 62%; BORDER-RIGHT: #aacbee 1px solid; BORDER-TOP: #aacbee 1px solid; MARGIN: 6px 6px 12px; BORDER-LEFT: #aacbee 1px solid; BORDER-BOTTOM: #aacbee 1px solid
+}
+
+.chrome5 H2 {
+	PADDING-RIGHT: 6px; PADDING-LEFT: 6px; PADDING-BOTTOM: 3px; MARGIN: 0px 0px 6px; COLOR: #666; PADDING-TOP: 3px; BORDER-BOTTOM: #aacbee 1px solid; BACKGROUND-COLOR: #ebf3fb
+}
+
+.chrome5 H2 A {
+	COLOR: #07519a; BACKGROUND-COLOR: transparent
+}
+
+.exp_arrow {
+  float: right; margin-right: 10px; cursor: pointer;
+}
+
+.prod {
+	COLOR: #B8860B; FONT-SIZE: 8pt;
+}
+
+.linkTxt {
+	width: 97%; COLOR: #0000CD; margin-right:20px; margin-bottom: 10px; text-align: right; FONT-SIZE: 8pt; cursor: pointer;
+}
+
+.opt {
+	display: inline; COLOR: #B8860B; cursor: pointer; border: solid 1px red;
+}
+
+.opt1 {
+	COLOR: #B8860B;
+}
+
+.opt_m {
+	display: none; height: 20px;
+}
+
+.ttt {
+	display: inline; height: 100%; PADDING-RIGHT: 6px; PADDING-LEFT: 26px; PADDING-BOTTOM: 10%; MARGIN: 0px 0px 6px; COLOR: #666; BACKGROUND-COLOR: #ebf3fb
+}
+
+.txt {
+	BACKGROUND-COLOR: transparent;
+}
+
+/*for drawing rubber band etc*/
+.rubberBox {
+  position: absolute; 
+  visibility: hidden; 
+  width:0px; 
+  height:0px; 
+  line-height:0px; 
+  border:2px solid #FFFF00;
+/*  border:2px solid red;*/
+}
+
+.vRangeBox {
+  border: 2px green;
+  border-style: solid none;
+}
+
+.hRangeBox {
+  border: red 2px;
+  border-style: none solid;
+}
+
+
+

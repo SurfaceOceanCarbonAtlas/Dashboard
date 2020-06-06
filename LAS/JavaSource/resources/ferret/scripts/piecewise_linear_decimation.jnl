@@ -1,0 +1,163 @@
+! piecewise_linear_decimation.jnl.jnl
+!
+! Redefine data_var, data_x_var, data_y_var
+
+!
+!
+! Arguments are 
+!  min # points for doing decimation 
+!  var1 tolerance for piecewise decimation (lon on map plots)
+!  var2 tolerance (lat on map plots)
+!  var3 tolerance (var at lon/lat for map plots)
+
+   
+LET tol1 = `MAX(($region_x_range)/($ppl$xpixel), ($region_y_range)/($ppl$ypixel))`
+LET tol1 = `MIN(($region_x_range)/($ppl$xpixel), ($region_y_range)/($ppl$ypixel))`
+LET tol1 = MAX(`tol1`,0.001)
+let tol2 = 0.01
+list tol1, tol2
+
+   DEFINE SYMBOL decimate_fraction = 0.1
+
+! * Insert gaps between cruises
+! * Fix longitudes crossing the dateline.
+! * If the amount of data is large, also decimate
+!   via piecewise linear fit.
+
+GO setup_dsg_variables
+
+! Only decimate if there is a lot of data
+
+LET min_decimate = ($1"200000")
+
+! Allow for a Ferret property to turn this feature off
+!   <decimate_traj>0</decimate_traj>
+
+IF `($ferret_decimate_traj"1|0|*>1") EQ 0` THEN LET min_decimate = `npts + 1`
+
+IF `npts LT min_decimate OR min_decimate LT 0` THEN 
+   CANCEL SYMBOL piecewise_decimation
+   EXIT/SCRIPT
+ENDIF
+
+DEFINE SYMBOL piecewise_decimation = 1
+IF `($ferret_memory"25.6") LT 200` THEN SET MEM/SIZ=200
+
+LET nf = npts
+LET control = 2
+
+LET lontol = ($2"0.01")
+LET lattol = ($3"0.01")
+
+! stat var_with_gaps
+! LET var_tol = 0.5* (($stat_std)^0.5)
+
+LET ranger = MINMAX(var_with_gaps)
+
+DEF SYM range2 = `ranger[i=2]`
+DEF SYM range1 = `ranger[i=1]`
+IF `($range2"|bad>1|*>0) OR ($range1"|bad>1|*>0)` THEN 
+   LET newvar = {0,10}
+   LET ranger = MINMAX(newvar)
+ELIF `ABS(($range2"|bad>1|*")) GT 1.e20 OR ABS(($range1"|bad>1|*")) GT 1.e20` THEN
+   LET newvar1 = IF var_with_gaps GT  -1.e20 THEN var_with_gaps
+   LET newvar =  IF newvar1 LT 1.e20 then newvar1
+   LET ranger = MINMAX(newvar)
+   list ranger
+ENDIF
+
+LET var_tol = `0.001* (ranger[i=2] - ranger[i=1])`
+
+LET vartol = ($4"`var_tol`")
+
+LET decimate_lonlat = PIECEWISE3(\
+ lon_with_gaps, lat_with_gaps, var_with_gaps, control, lontol, lattol, vartol)
+
+!IF `(color_by_feature EQ 1) AND ( ($its_prop_prop_plot"0|*>1") EQ 0)` THEN \
+IF `(color_by_feature EQ 1)` THEN \
+LET decimate_lonlat = PIECEWISE3(\
+ lon_with_gaps, lat_with_gaps, lat_with_gaps, control, lontol, lattol, lattol)
+
+! This makes entirely sure we will call PIECEWISE3 only once.
+SAVE/FILE="($data_0_url).nc"/clobber decimate_lonlat
+can var decimate_lonlat
+USE "($data_0_url).nc"
+DEFINE SYMBOL filesample = `decimate_lonlat,RETURN=dsetnum`
+set data 1
+
+LET nout_lonlat = `decimate_lonlat[d=($filesample),i=@ngd]`
+
+DEFINE SYMBOL nout_lonlat = `nout_lonlat`
+
+LET xsamplepts = XSEQUENCE(decimate_lonlat[d=($filesample),i=1:($nout_lonlat)])
+
+LET good_sample = IF xsamplepts GT 0 THEN xsamplepts
+LEt nsample = `good_sample[i=@ngd]`
+
+LET nout_lonlat =  `nsample`
+DEFINE SYMBOL nout_lonlat = `nout_lonlat`
+SAY `nout_lonlat/npts` Decimation fraction
+DEFINE SYMBOL decimation_fraction = `nout_lonlat/npts,prec=4`
+
+DEFINE AXIS/X=1:($nout_lonlat):1 xsample_axis
+LET samplepts = xsamplepts[gx=xsample_axis@asn] 
+
+! Prevent calling decimation function later for a second time
+
+SAVE/APPEND/FILE="($result_annotations_filename).nc" samplepts
+CAN DATA ($filesample)
+CANCEL VAR samplepts
+USE "($result_annotations_filename).nc"
+SET DATA 1
+! If the decimation returns most of the data, don't do it.
+
+LET varsample = SAMPLE_FAST_I(var_with_gaps, samplepts[d=($filesample)])
+LET ngood_sampled = `varsample[i=@ngd]`
+
+IF `(nout_lonlat/($ngood_data)) GT 0.8` THEN
+   DEFINE SYMBOL data_var = var_with_gaps
+   DEFINE SYMBOL data_x_var = lon_with_gaps
+   DEFINE SYMBOL data_y_var = lat_with_gaps
+   
+   LET nout_lonlat = `($data_var)[i=@ngd]`
+   DEFINE SYMBOL nout_lonlat = `nout_lonlat` 
+   CANCEL SYMBOL piecewise_decimation
+   CANCEL SYMBOL decimation_fraction
+   EXIT/SCRIPT
+ENDIF
+
+! If the decimation returns just about no data, don't do it.
+IF `(nout_lonlat/($ngood_data)) LT 0.005` THEN
+   DEFINE SYMBOL data_var = var_with_gaps
+   DEFINE SYMBOL data_x_var = lon_with_gaps
+   DEFINE SYMBOL data_y_var = lat_with_gaps
+
+   LET nout_lonlat = `($data_var)[i=@ngd]`
+   DEFINE SYMBOL nout_lonlat = `nout_lonlat` 
+   CANCEL SYMBOL piecewise_decimation
+   CANCEL SYMBOL decimation_fraction
+
+   EXIT/SCRIPT
+ENDIF
+
+! If there is a missing value in the fco2's make a gap in lon/lat there as well. Otherwise 
+! The ribbon plot with /miss=blank still fills halfway to the next location with a color, 
+! and that next location may be the next cruise, halfway around the world.
+
+LET lons = if var_with_gaps then lon_with_gaps
+LET lats = if var_with_gaps then lat_with_gaps
+
+LET varsample = SAMPLE_FAST_I(var_with_gaps, samplepts[d=($filesample)])
+LET lonsample = SAMPLE_FAST_I(lons, samplepts[d=($filesample)])
+LET latsample = SAMPLE_FAST_I(lats, samplepts[d=($filesample)])
+
+DEFINE SYMBOL data_var = varsample
+DEFINE SYMBOL data_x_var = lonsample
+DEFINE SYMBOL data_y_var = latsample
+load lonsample
+load latsample 
+load varsample
+
+! End of file ------------ piecewise_linear_decimation.jnl--------------------------
+
+

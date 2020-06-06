@@ -1,0 +1,3 @@
+<category name="Continental Margin Definition" ID="SOCAT_dist2land" doc="doc/DistanceToLand.html">
+  <filter action="apply-dataset" equals="Continental Margin Definition"/>
+</category>

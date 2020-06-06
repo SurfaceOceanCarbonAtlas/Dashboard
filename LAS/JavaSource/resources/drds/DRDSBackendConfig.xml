@@ -1,0 +1,4 @@
+<drds_servers>
+   <drds name="NWIOOS Server" url="http://nwioos.coas.oregonstate.edu:8080/dods/drds/"/>
+   <drds name="CIMT Server" url="http://cimt.dyndns.org:8080/dods/drds/"/>
+</drds_servers>

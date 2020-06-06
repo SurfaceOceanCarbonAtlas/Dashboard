@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+  <constant name="struts.action.extension" value="action,do"/>
+  <constant name="struts.action.excludePattern" value="/css/*,/doc/*,/docs/*,/images/*,/JavaScript/*,/output/*,/productserver/*,/*.html,/*.css"/>
+  <constant name="struts.configuration.xml.reload" value="true"/>
+  <include file="struts-default.xml"/>
+  <package name="default" extends="struts-default" namespace="/">
+    <default-interceptor-ref name="defaultStack"/>
+    <action name="ProductServer" class="gov.noaa.pmel.tmap.las.product.server.ProductServerAction">
+      <result name="error">productserver/templates/error.vm</result>
+      <result name="lazy_start">productserver/templates/lazy_start.vm</result>
+      <result name="maintenance">productserver/templates/maintenance.vm</result>
+      <result name="info">productserver/templates/info.vm</result>
+      <result name="ftds_down">productserver/templates/ftds_down.vm</result>
+      <result name="cancel">productserver/templates/cancel.vm</result>
+      <result name="progress">productserver/templates/progress.vm</result>
+      <result name="template">${template}</result>
+      <interceptor-ref name="basicStack"/>
+    </action>
+    <action name="CacheManager" class="gov.noaa.pmel.tmap.las.ui.CacheManager">
+      <result name="cache">productserver/templates/cache.vm</result>
+    </action>
+    <action name="getAnnotations" class="gov.noaa.pmel.tmap.las.ui.GetAnnotations">
+      <result name="template">${template}</result>
+    </action>
+    <action name="getCategories" class="gov.noaa.pmel.tmap.las.ui.GetCategories"/>
+    <action name="getConfig" class="gov.noaa.pmel.tmap.las.ui.GetConfig"/>
+    <action name="getCrossovers" class="gov.noaa.pmel.tmap.las.ui.GetCrossovers"/>
+    <action name="getDataConstraints" class="gov.noaa.pmel.tmap.las.ui.GetDataConstraints"/>
+    <action name="getDatasets" class="gov.noaa.pmel.tmap.las.ui.GetDatasets"/>
+    <action name="getGrid" class="gov.noaa.pmel.tmap.las.ui.GetGrid"/>
+    <action name="getMetadata" class="gov.noaa.pmel.tmap.las.ui.GetMetadata">
+      <result name="template">${template}</result>
+    </action>
+    <action name="getOperations" class="gov.noaa.pmel.tmap.las.ui.GetOperations"/>
+    <action name="getOptions" class="gov.noaa.pmel.tmap.las.ui.GetOptions"/>
+    <action name="getRegions" class="gov.noaa.pmel.tmap.las.ui.GetRegions"/>
+    <action name="getTestResults" class="gov.noaa.pmel.tmap.las.ui.GetTestResults">
+      <result name="ui">UI.vm</result>
+      <result name="test_results">productserver/templates/test_results.vm</result>
+      <result name="full_test_results"/>
+      <result name="test_result_full"/>
+      <result name="test_result"/>
+    </action>
+    <action name="getTestResults" class="gov.noaa.pmel.tmap.las.ui.GetTestResults">
+      <result name="error">productserver/templates/error.vm</result>
+    </action>
+    <action name="getTrajectoryTable" class="gov.noaa.pmel.tmap.las.ui.GetTrajectoryTable">
+      <result name="error">productserver/templates/error.vm</result>
+    </action>
+    <action name="getUI" class="gov.noaa.pmel.tmap.las.ui.GetUI">
+      <result name="error">productserver/templates/error.vm</result>
+    </action>
+    <action name="getUI7" class="gov.noaa.pmel.tmap.las.ui.GetUI7">
+      <result name="V7UI">"productserver/templates/V7UI.vm"</result>
+    </action>
+    <action name="getVariable" class="gov.noaa.pmel.tmap.las.ui.GetVariable"/>
+    <action name="getVariables" class="gov.noaa.pmel.tmap.las.ui.GetVariables"/>
+    <action name="getVariables" class="gov.noaa.pmel.tmap.las.ui.GetVariables"/>
+    <action name="getViews" class="gov.noaa.pmel.tmap.las.ui.GetViews"/>
+    <action name="GEServer" class="gov.noaa.pmel.tmap.las.service.kml.GEServerAction"/>
+    <action name="ReInit" class="gov.noaa.pmel.tmap.las.ui.ReInit">
+      <result name="reinit">productserver/templates/reinit.vm</result>
+    </action>
+    <action name="resolveURL" class="gov.noaa.pmel.tmap.las.ui.ResolveURL"/>
+    <action name="saveEdits" class="gov.noaa.pmel.tmap.las.ui.SaveEdits">
+      <result name="error">productserver/templates/error.vm</result>
+      <result name="edits">productserver/templates/edits.vm</result>
+    </action>
+    <action name="saveQC" class="gov.noaa.pmel.tmap.las.ui.SaveQC">
+      <result name="error">productserver/templates/error.vm</result>
+      <result name="qc">productserver/templates/qc.vm</result>
+    </action>
+  </package>
+</struts>

@@ -1,0 +1,7 @@
+<dapper_servers>
+   <dapper name="PFEG Dapper Server"       url="http://las.pfeg.noaa.gov/dods/"/>
+   <dapper name="PMEL Dapper Server"       url="http://dapper.pmel.noaa.gov/dapper"/>
+   <!-- <dapper name="IPRC APDRC Dapper Server" url="http://apdrc.soest.hawaii.edu:9090/dapper/"/>
+     now seems to be http://apdrc1.soest.hawaii.edu:8080/dods/  but no data -->
+   <dapper name="OSCAR Dapper Server"      url="http://www.epic.noaa.gov/dapper/oscar/"/>
+</dapper_servers>

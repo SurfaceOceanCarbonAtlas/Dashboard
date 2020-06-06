@@ -1,0 +1,12 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_error_msg.jnl
+! 
+! Author: ansley 
+! Date: 2010/09
+!
+
+MESSAGE/ERROR " "
+MESSAGE/ERROR **ERROR ($error_string)
+EXIT/PROGRAM
+
+! --------------- End of LAS_error_msg  ---------------------------

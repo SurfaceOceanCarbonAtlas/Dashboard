@@ -1,0 +1,27 @@
+    $las_backendrequest.getXhi()
+    $las_backendrequest.getMissingConstraint()
+    select BB.Cnt Cnt,CC.country country,AA.id id,AA.latitude latitude,AA.longit
+ude longitude,to_char(ob_date,'YYYYMMDDHH24MISS'),CC.type type
+    from
+        osmc_observation AA,
+        ( select
+              A.id ID,
+              trunc(A.ob_date) OB_DAY,
+              max(A.rowid) ROW_,
+              Count(*) Cnt
+          from
+              osmc_observation A,
+              osmc_platform B
+          where
+              A.id=B.id
+              and A.ob_date between to_date('$las_backendrequest.getTlo("yyyy-MM-dd hh:mm:ss")','yyyy-mm-dd hh24:mi:ss') and to_date($las_backendrequest.getThi("yyyy-MM-dd hh:mm:ss"),'yyyy-mm-dd hh24:mi:ss') AND (A.longitude>=$las_backendrequest.getXlo() AND A.longitude<=$las_backendrequest.getXhi()) AND (A.latitude>=$las_backendrequest.getYlo() AND A.latitude<=$las_backendrequest.getYhi())
+          group by
+              A.id,
+              trunc(A.ob_date)
+         ) BB,
+        osmc_platform CC
+    where
+        BB.id = AA.id
+        and CC.id = AA.id
+        and BB.row_ = AA.rowid
+    order by 1

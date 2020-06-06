@@ -1,0 +1,86 @@
+/* DEBUG INFO:  Running OCDMS.vm */
+## Templated SQL query for the OCDMS
+##
+## This template is used for the standard plots.
+
+## Basic elements from <properties><database_access>
+
+#set ($table=$las_backendrequest.getDatabaseProperty("db_table"))
+#set ($time=$las_backendrequest.getDatabaseProperty("time"))
+#set ($lat=$las_backendrequest.getDatabaseProperty("latitude"))
+#set ($lon=$las_backendrequest.getDatabaseProperty("longitude"))
+#set ($depth=$las_backendrequest.getDatabaseProperty("depth"))
+#set ($cruiseID=$las_backendrequest.getDatabaseProperty("cruiseID"))
+#set ($missing=$las_backendrequest.getDatabaseProperty("missing"))
+
+## Higher level functions provided by the back end java code
+
+#set ($region=$las_backendrequest.getRegionAsConstraint())
+#set ($var = $las_backendrequest.getVariablesAsString())
+#set ($con = $las_backendrequest.getConstraintString("AND"))
+
+
+#parse("OCDMS_data_options.vm")
+
+#set ($var_not_null = "")
+#set ($variables = $las_backendrequest.getVariables())
+#foreach ($variable in $variables)
+/* DEBUG INFO: variable $velocityCount = $variable */
+	#if ($variable == "metadata_ID")
+		#set ($variable = "metadata.metadata_ID")
+	#end
+  #set ($var_not_null = "($variable IS NOT NULL) AND $var_not_null")
+#end
+
+#parse("OCDMS_subsampling.vm")
+
+## TODO:  Configure datasets to identify 'cruiseID' and then use '$cruiseID' below
+
+## NOTE:  Get an additional variable for property/property plots
+#set ($prop_var=$las_backendrequest.getProperty("ferret","prop_var"))
+
+## NOTE 1:  Use Velocity formal references for ${table} so that the '.metadata' coming immediately
+## NOTE 1:  afterward won't be interpreted as a property of the $table object.
+##
+## NOTE 2:  The data must be orderd by cruise_ID in order to properly calculate the # of cruises
+## Hack to allow anomoly from gridded data.
+
+#if ($var == "pCO2_anomaly")
+   #set ($var = "pCO2_sw")
+#end
+#if ($var == "flag" || $var == "region_ID")
+   #set ($subquery = "ASCII($var)")
+#elseif ($var == "metadata_ID")
+   #set ($subquery = "${table}.metadata_ID")
+#elseif ($var == "coord_time")
+   #set ($subquery = "hours_1970")
+#elseif ($var == "coord_lat")
+   #set ($subquery = "latitude")
+#elseif ($var == "coord_lon")
+   #set ($subquery = "longitude")
+#else
+   #set ($subquery = $var)
+#end
+
+#if ($prop_var == "flag" || $prop_var == "region_ID")
+   #set ($propsubquery = "ASCII($prop_var)")
+#elseif ($prop_var == "metadata_ID")
+   #set ($propsubquery = "${table}.metadata_ID")
+#elseif ($prop_var == "coord_time")
+   #set ($propsubquery = "hours_1970")
+#elseif ($prop_var == "coord_lat")
+   #set ($propsubquery = "latitude")
+#elseif ($prop_var == "coord_lon")
+   #set ($propsubquery = "longitude")
+#else
+   #set ($propsubquery = $prop_var)
+#end
+
+SELECT cruise_ID, subsample, $lat,$lon, IFNULL($subquery,$missing) AS $var
+FROM $table
+LEFT JOIN metadata ON 
+${table}.metadata_ID = metadata.metadata_ID
+WHERE $region $data_options.replace("coord_lat", "latitude").replace("coord_lon","longitude").replace("coord_time","hours_1970") 
+ORDER BY ${table}.metadata_ID, $time
+LIMIT 120005
+

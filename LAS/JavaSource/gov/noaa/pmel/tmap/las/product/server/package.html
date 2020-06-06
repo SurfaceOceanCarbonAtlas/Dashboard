@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+
+  @(#)package.html	1.60 98/01/27
+
+This software was developed by the Thermal Modeling and Analysis
+Project(TMAP) of the National Oceanographic and Atmospheric
+Administration's (NOAA) Pacific Marine Environmental Lab(PMEL),
+hereafter referred to as NOAA/PMEL/TMAP.
+
+Access and use of this software shall impose the following
+obligations and understandings on the user. The user is granted the
+right, without any fee or cost, to use, copy, modify, alter, enhance
+and distribute this software, and any derivative works thereof, and
+its supporting documentation for any purpose whatsoever, provided
+that this entire notice appears in all copies of the software,
+derivative works and supporting documentation.  Further, the user
+agrees to credit NOAA/PMEL/TMAP in any publications that result from
+the use of this software or in any product that includes this
+software. The names LiveMap, Live Access Server, TMAP, NOAA and/or
+PMEL, however, may not be used in any advertising or publicity to
+endorse or promote any products or commercial entity unless specific
+written permission is obtained from NOAA/PMEL/TMAP. The user also
+understands that NOAA/PMEL/TMAP is not obligated to provide the user
+with any support, consulting, training or assistance of any kind with
+regard to the use, operation and performance of this software nor to
+provide the user with any updates, revisions, new versions or "bug
+fixes".
+
+THIS SOFTWARE IS PROVIDED BY NOAA/PMEL/TMAP "AS IS" AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL NOAA/PMEL/TMAP BE LIABLE FOR ANY SPECIAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
+
+-->
+</head>
+<body bgcolor="white">
+
+This package implements the controller framework (currently a single Struts Action class) that
+is responsible for taking in client LAS requests, utilizing the services need to create the
+requested product, assembling the product (if requested) and returning the product to the 
+requesting client.
+
+The webapp http://host:port/baker/ProductServer.do takes a single query string argument
+(with a parameter name "xml") which is the encoded XML User Interface request for the product that the
+client wants created.
+
+If the URL is invoked with no query string arguments, it produces a small summary of
+itself (more links should be added to the report to facilitate distributing the configuration and query
+parameters to dump the config information should also be added).
+
+<h2>Related Documentation</h2>
+
+For overviews, tutorials, examples, guides, and tool documentation, please see:
+<ul>
+  <li><a href="struts.apache.org">More about Struts.  (We use the good old Action Framework 1.3+)</a>
+</ul>
+
+<!-- Put @see and @since tags down here. -->
+
+</body>
+</html>

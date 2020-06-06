@@ -1,0 +1,323 @@
+! LAS_set_strides_nonative.jnl
+! ACM
+
+! From the region and the grid we can define striding. Compute strides 
+! based first on Ferret memory and then if it is a graphics product, on 
+! pixel size. 
+
+! This script is for the cases where we arent doing native striding:
+! data from descriptor files or from files which have had an axis 
+! changed (e.g. curvilinear data in the rectilinear portion of the grid).
+
+! ---------------------------------------------------------------------
+! Determine striding based on the memory allocation
+
+! 10-Jul-2008 ACM  Fixes for Google Earth placemark strides
+
+DEFINE SYMBOL memsize = ($FERRET_MEMORY"6.4")* 1.e6
+
+! Cannot do native striding if this is a descriptor dataset, or if it is
+! from a curvilienar dataset but working in the rectilinear portion. In 
+! this case set up index strides.
+
+LET las_plotvar = ($data_var)[d=($data_num),($region_xyzt)]
+
+DEFINE SYMBOL nvars = ($data_count)
+
+! If ($data_count) larger than 1 add the size of the variables.
+LET las_plotvar = ($ferret_plot_var) 
+DEFINE SYMBOL var_size = ($var_size"0") + `las_plotvar,RETURN=size`
+
+! The exception to the above is side-by-side plots; each var loaded separately
+IF `STRINDEX( "($operation_ID)", "Side" ) NE 0` THEN 
+  DEFINE SYMBOL var_size = `las_plotvar,RETURN=size`
+  LET nvars = 1
+ENDIF
+
+IF `($num)+1 EQ ($nvars)` THEN
+   LET varsiz `las_plotvar,RETURN=size`
+   DEFINE SYMBOL stride_for_mem = `INT( 1+ varsiz/(.5*($memsize)) )`
+
+ENDIF
+
+! If not a graphics product, apply the strides for memory
+
+IF `STRINDEX( "($operation_ID)", "Plot" ) EQ 0 AND \
+    STRINDEX( "($operation_ID)", "zoom" ) EQ 0 AND \
+    STRINDEX( "($operation_ID)", "Anim" ) EQ 0 AND \
+    STRINDEX( "($operation_ID)", "Grid_for_GE" ) EQ 0` THEN
+   IF `($stride_for_mem"0") GT 1` THEN
+   
+      IF `($region_x_range"0|*>1") GT 0` THEN
+         LET strd_lo = `i[gx=las_plotvar,x=($region_x_lo)]`
+         LET strd_hi = `i[gx=las_plotvar,x=($region_x_hi)]`
+         DEFINE SYMBOL set_ndx_strides = i=`strd_lo`:`strd_hi`:($stride_for_mem)
+         DEFINE SYMBOL add_to_title = Stride ($stride_for_mem) in X
+         DEFINE SYMBOL xstride = ($stride_for_mem)
+      ELSE
+         DEFINE SYMBOL set_ndx_strides = ($region_x)
+      ENDIF
+   
+      IF `($region_y_range"0|*>1") GT 0` THEN
+         LET strd_lo = `j[gy=las_plotvar,y=($region_y_lo)]`
+         LET strd_hi = `j[gy=las_plotvar,y=($region_y_hi)]`
+         IF ($set_ndx_strides"0|*>1") THEN
+           DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),j=`strd_lo`:`strd_hi`:($stride_for_mem"1")
+         ELSE
+           DEFINE SYMBOL set_ndx_strides = j=`strd_lo`:`strd_hi`:($stride_for_mem"1")
+         ENDIF
+         DEFINE SYMBOL ystride = ($stride_for_mem)
+         DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in Y
+      ELSE
+         IF ($set_ndx_strides"0|*>1") THEN
+           DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_y)
+         ELSE
+           DEFINE SYMBOL set_ndx_strides = ($region_y)
+         ENDIF
+      ENDIF
+   
+      IF `($region_z_range"0|*>1") GT 0` THEN
+         LET strd_lo = `k[gz=las_plotvar,z=($region_z_lo)]`
+         LET strd_hi = `k[gz=las_plotvar,z=($region_z_hi)]`
+         IF ($set_ndx_strides"0|*>1") THEN
+           DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),k=`strd_lo`:`strd_hi`:($stride_for_mem)
+         ELSE
+           DEFINE SYMBOL set_ndx_strides = k=`strd_lo`:`strd_hi`:($stride_for_mem)
+         ENDIF
+         DEFINE SYMBOL zstride = ($stride_for_mem)
+         DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in Z
+      ELSE
+         IF ($set_ndx_strides"0|*>1") THEN
+           DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_z)
+         ELSE
+           DEFINE SYMBOL set_ndx_strides = ($region_z)
+         ENDIF
+      ENDIF
+         
+      IF `STRINDEX( "($operation_ID)", "Animation" ) EQ 0` THEN
+   
+         IF `($region_t"0|*>1") GT 0` THEN 
+            LET strd_lo = `L[gt=las_plotvar,t="($region_t_lo)"]`
+            LET strd_hi = `L[gt=las_plotvar,t="($region_t_hi)"]`
+            IF ($set_ndx_strides"0|*>1") THEN
+               DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),L=`strd_lo`:`strd_hi`:($stride_for_mem)
+            ELSE
+              DEFINE SYMBOL set_ndx_strides = L=`strd_lo`:`strd_hi`:($stride_for_mem)
+            ENDIF
+            DEFINE SYMBOL tstride = ($stride_for_mem)
+            DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in T
+         ELSE
+            IF ($set_ndx_strides"0|*>1") THEN
+              DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_t)
+            ELSE
+              DEFINE SYMBOL set_ndx_strides = ($region_t)
+            ENDIF
+         ENDIF
+   
+         IF ($set_ndx_strides"0|*>1") THEN \
+         DEFINE SYMBOL ferret_plot_var = ($expr1)($data_var)[d=($data_num),($set_ndx_strides)]($expr2)
+
+      ENDIF
+   ENDIF  !stride_for_mem
+
+   EXIT/SCRIPT
+ENDIF
+
+!  ---------------------------------------------------------------------
+! Or, for graphics products, do striding by pixel size, often larger stride than
+! needed to fit in Ferret memory
+
+LET maxpix = 600  ! default
+IF ($ferret_size"0|0.06667>1|*>0") THEN LET maxpix = 300  ! small
+IF ($ferret_size"0|0.25>1|*>0")    THEN LET maxpix = 500  ! medium
+IF ($ferret_size"0|0.5>1|*>0")     THEN LET maxpix = 600  ! default
+IF ($ferret_size"0|0.8333>1|*>0")  THEN LET maxpix = 700  ! large
+
+IF `STRINDEX("($operation_ID)", "Anim" ) GT 0` THEN LET maxpix = 50
+
+
+IF `($ferret_google_plot"0|0|*>1")` THEN LET  maxpix = `2*maxpix`
+
+IF `($region_x_range"0|0|*>1")` THEN 
+   LET xx = x[gx=($data_var)[d=($data_num)]]  
+   LET pixsize = `xx[($region_x)@ngd]` 
+   IF ($ferret_google_plot"0|*>1") THEN
+     IF `STRINDEX( "($operation_ID)", "Grid" ) NE 0` THEN
+       LET nx = `xx[($region_x)@ngd]` !total no. of grid points in x axis, will be used by the Google Earth placemarks
+     ENDIF
+   ENDIF
+
+   IF `pixsize GT maxpix` THEN DEFINE SYMBOL xstride = `INT((pixsize/maxpix)+1)`
+   DEFINE SYMBOL xstride = `MAX(($xstride"1"), ($stride_for_mem"1"))`
+   IF `($xstride) GT 1` THEN 
+      LET strd_lo = `i[gx=las_plotvar,x=($region_x_lo)]`
+      LET strd_hi = `i[gx=las_plotvar,x=($region_x_hi)]`
+      DEFINE SYMBOL set_ndx_strides = i=`strd_lo`:`strd_hi`:($xstride)
+      DEFINE SYMBOL add_to_title = Stride ($xstride) in X
+   ELSE
+      IF `($region_x"0|*>1")` THEN DEFINE SYMBOL set_ndx_strides = ($region_x)
+   ENDIF
+ELSE
+   IF `($region_x"0|*>1")` THEN DEFINE SYMBOL set_ndx_strides = ($region_x)
+ENDIF
+
+IF `($region_y_range"0|0|*>1")` THEN 
+   LET yy = y[gy=($data_var)[d=($data_num)]]
+   LET pixsize = `yy[($region_y)@ngd]`
+   IF ($ferret_google_plot"0|*>1") THEN
+     IF `STRINDEX( "($operation_ID)", "Grid" ) NE 0` THEN
+       LET ny = `yy[($region_y)@ngd]` !total no. of grid points in y axis, will be used by the Google Earth placemarks
+     ENDIF
+   ENDIF
+
+   IF `pixsize GT maxpix` THEN DEFINE SYMBOL ystride = `2*INT((pixsize/maxpix)+1)`
+   DEFINE SYMBOL ystride = `MAX(($ystride"1"), ($stride_for_mem"1"))`
+   IF `($ystride) GT 1` THEN 
+      LET strd_lo = `j[gy=las_plotvar,y=($region_y_lo)]`
+      LET strd_hi = `j[gy=las_plotvar,y=($region_y_hi)]`
+      IF ($set_ndx_strides"0|*>1") THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),j=`strd_lo`:`strd_hi`:($ystride)
+      ELSE
+         DEFINE SYMBOL set_ndx_strides = j=`strd_lo`:`strd_hi`:($ystride)
+      ENDIF
+      DEFINE SYMBOL add_to_title = Stride ($ystride) in Y
+   ELSE
+      IF `($set_ndx_strides"0|*>1") AND ($region_y"0|*>1")` THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_y)
+      ELSE
+         DEFINE SYMBOL set_ndx_strides = ($region_y)
+      ENDIF
+   ENDIF
+ELSE
+   IF `($set_ndx_strides"0|*>1") AND ($region_y"0|*>1")` THEN
+      DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_y)
+   ELSE
+      DEFINE SYMBOL set_ndx_strides = ($region_y)
+   ENDIF
+ENDIF
+
+IF ($region_z_range"0|0|*>1") THEN 
+   LET zz = z[gz=($data_var)[d=($data_num)]]
+   LET pixsize = `zz[($region_z)@ngd]`
+
+   IF `pixsize GT maxpix` THEN DEFINE SYMBOL astride = `2*INT((pixsize/maxpix)+1)`
+   DEFINE SYMBOL zstride = `MAX(($zstride"1"), ($stride_for_mem"1"))`
+   IF `($zstride) GT 1` THEN 
+      LET strd_lo = `k[gz=las_plotvar,z=($region_z_lo)]`
+      LET strd_hi = `k[gz=las_plotvar,z=($region_z_hi)]`
+      IF ($set_ndx_strides"0|*>1") THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),k=`strd_lo`:`strd_hi`:($zstride)
+      ELSE
+         DEFINE SYMBOL set_ndx_strides = k=`strd_lo`:`strd_hi`:($zstride)
+      ENDIF
+      DEFINE SYMBOL add_to_title = Stride ($zstride) in Z
+   ELSE
+      IF `($set_ndx_strides"0|*>1") AND ($region_z"0|*>1")` THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_z)
+      ELSE
+         IF ($region_z"0|*>1") THEN DEFINE SYMBOL set_ndx_strides = ($region_z)
+      ENDIF
+   ENDIF
+ELSE
+   IF `($set_ndx_strides"0|*>1") AND ($region_z"0|*>1")` THEN
+      DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_z)
+   ELSE
+      IF ($region_z"0|*>1") THEN DEFINE SYMBOL set_ndx_strides = ($region_z)
+   ENDIF
+ENDIF
+
+LET trange = STRCMP("($region_t_lo%0%)", "($region_t_hi%1%)")
+IF `($region_t"0|0|*>1") AND ( ($DO_TRANS_1_SEAS_PER_YEAR"0") EQ 0) AND \
+    trange NE 0` THEN     
+
+   LET tt = t[gt=($data_var)[d=($data_num)]]
+   LET pixsize = `tt[($region_t)@ngd]`   
+
+   DEFINE SYMBOL tstride = `INT((pixsize/maxpix)+1)`
+   DEFINE SYMBOL tstride = `MAX(($tstride"1"), ($stride_for_mem"1"))`
+   IF `($tstride) GT 1` THEN 
+      LET strd_lo = `L[gt=las_plotvar,t="($region_t_lo)"]`
+      LET strd_hi = `L[gt=las_plotvar,t="($region_t_hi)"]`
+      IF ($set_ndx_strides"0|*>1") THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),L=`strd_lo`:`strd_hi`:($tstride)
+      ELSE
+         DEFINE SYMBOL set_ndx_strides = L=`strd_lo`:`strd_hi`:($tstride)
+      ENDIF
+      DEFINE SYMBOL add_to_title = Stride ($tstride) in T
+   ELSE
+      IF ($set_ndx_strides"0|*>1") THEN
+         DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_t)
+      ELSE
+         IF ($region_t"0|*>1") THEN DEFINE SYMBOL set_ndx_strides = ($region_t)
+      ENDIF
+   ENDIF
+ENDIF
+IF `($region_t"0|0|*>1") AND ( ($DO_TRANS_1_SEAS_PER_YEAR"0") EQ 0) AND \
+    trange EQ 0` THEN  
+   IF ($set_ndx_strides"0|*>1") THEN
+      DEFINE SYMBOL set_ndx_strides = ($set_ndx_strides),($region_t)
+   ELSE
+      IF ($region_t"0|*>1") THEN DEFINE SYMBOL set_ndx_strides = ($region_t)
+   ENDIF
+ENDIF
+
+! Add a label about the striding at the upper left.
+
+LET need_comma = 0
+IF `($xstride"0|1>0|*>1") + ($ystride"0|1>0|*>1") + ($zstride"0|1>0|*>1") + ($tstride"0|1>0|*>1") GT 0` THEN
+
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = Subsampled 
+
+   IF `($xstride"0|1>0|*>1")` THEN 
+      DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)) ($xstride) in X
+      LET need_comma = 1
+   ENDIF
+
+   IF `($ystride"0|1>0|*>1")` THEN 
+      IF `need_comma GT 0` THEN DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)),  
+      DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)) ($ystride) in Y
+      LET need_comma = 1
+   ENDIF
+
+   IF `($zstride"0|1>0|*>1")` THEN 
+      IF `need_comma GT 0` THEN DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)),  
+      DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)) ($zstride) in Z
+      LET need_comma = 1
+   ENDIF
+
+   IF `($tstride"0|1>0|*>1")` THEN 
+      IF `need_comma GT 0` THEN DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)),  
+      DEFINE SYMBOL upper_left_($n_left_labels) =\
+         ($upper_left_($n_left_labels)) ($tstride) in T
+      LET need_comma = 1
+   ENDIF
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+ENDIF
+
+! Set this for list_grid
+IF ($ferret_google_plot"0|*>1") THEN
+
+    IF `STRINDEX( "($operation_ID)", "Grid" ) NE 0` THEN
+       DEFINE SYMBOL xstride_coord = `INT(360*($xstride"1")/nx)`
+       DEFINE SYMBOL ystride_coord = `INT(180*($ystride"1")/ny)`
+    ENDIF
+
+ENDIF
+
+LET las_plotvar = ($data_var)[d=($data_num),($set_ndx_strides)]
+
+IF `($num"0|*>1") EQ 0` THEN \
+ DEFINE SYMBOL set_ndx_strides_0 =  ($set_ndx_strides)
+
+! End of $RCSfile ------------ LAS_set_strides_nonative.jnl--------------------------
+

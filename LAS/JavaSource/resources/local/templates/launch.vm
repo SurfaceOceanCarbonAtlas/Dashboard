@@ -1,0 +1,14 @@
+! Symbols from the server
+#foreach ($symbol in $symbols.keySet())
+   #if ( $symbols.get($symbol) != "" )
+      ## If it's a Ferret reserved word use single quotes.
+      #if ( $symbols.get($symbol) == "I" || $symbols.get($symbol) == "J" || $symbols.get($symbol) == "K" || $symbols.get($symbol) == "L" || $symbols.get($symbol) == "X" || $symbols.get($symbol) == "Y" || $symbols.get($symbol) == "Z" || $symbols.get($symbol) == "T" || $symbols.get($symbol) == "XBOX" || $symbols.get($symbol) == "YBOX" || $symbols.get($symbol) == "ZBOX" || $symbols.get($symbol) == "TBOX" || $symbols.get($symbol) == "AND" || $symbols.get($symbol) == "OR" || $symbols.get($symbol) == "GT" || $symbols.get($symbol) == "GE" || $symbols.get($symbol) == "LT" || $symbols.get($symbol) == "LE" || $symbols.get($symbol) == "EQ" || $symbols.get($symbol) == "NE")
+         DEFINE SYMBOL ${symbol} = '$symbols.get($symbol)'
+      #else
+         DEFINE SYMBOL ${symbol} = $symbols.get($symbol)
+      #end
+   #else ## Need the quotes cause Ferret does not like empty symbols.
+      DEFINE SYMBOL ${symbol} = "$symbols.get($symbol)"
+   #end
+#end
+GO ($operation_service_action)

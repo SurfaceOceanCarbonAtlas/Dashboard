@@ -1,0 +1,32 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! file: Trajectory_Data_Convert_File.jnl 
+! Author: ansley 
+! Date: Sep 19 2011
+!
+!
+! Trajectory_Data_Convert_File.jnl creates a listing, CDF or ASCII (based on std_list.jnl)
+! Assumes symbol ferret_format which will be one of "cdf" "csv" "asc"
+! Assumes symbol ferret_listing is the output file.
+! Assumes symbol data_dup_varname is the optional duplicate variable name to be used on output
+
+! Decode format argument
+! ACM NOTE: The slashes mess up parsing in the DEFINE SYMBOL if we do them all at once.
+! ferret_format may be asc, txt, or cdf
+
+! Set up to write info to the debug log so that FshowGO can be used
+GO LAS_initial_setup 0
+
+
+DEFINE SYMBOL frmt width=1024/norow
+
+IF ($ferret_data_format"0|csv>1|tsv>1|asc>1|*>0") THEN 
+   DEFINE SYMBOL frmt = ($frmt)/($ferret_data_format"|tsv>format=tab|csv>format=comma|asc>heading=enhanced")
+
+ENDIF
+
+CANCEL MODE INTERPOLATE  ! important when evaluating the size limits
+
+SET LIST/FILE="($result_ferret_listing_filename)"
+
+GO list_traj_data
+

@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html debug="true">
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<title>$las_config.getTitle()</title>
+	</head>
+		<stylesheet src="JavaScript/frameworks/OpenLayersExtension/OLMapWidget.css"></stylesheet>
+		<style media="all" type="text/css">
+			@import "JavaScript/ui/LASUI.css";
+		</style>
+	<body onload="this.height=document.innerHeight;">
+		<div style="display:none" class="LASPopupDIVNode" id="categories"></div>
+		<div id="main">
+			#parse ("/productserver/templates/V7UIHeader.vm")
+			<div id="nav_bg" style="width:100%;background-color:#AABCCE;overflow:hidden;padding-top:4pt;padding-bottom:3pt;">
+				<div id="nav" style="position:relative;height:100%;width:100%;">
+				#if ($request.getParameter('hideCat'))
+				#else
+					<div id="choose_dataset" class="top_link" width="100%" type="button"  onclick="showDatasetPicker()">Choose dataset&nbsp;</div>		
+					#end	
+					<div  class="top_link_disabled" id="update" onclick="if(this.className!='top_link_disabled')LAS.makeRequest();"><div style="display:inline;vertical-align:top;">Update Plot</div><input type="checkbox" id="update_chkbox" #if($request.getParameter('auto')) checked #end  onmousemove="window.status='Check to automatically update the plot.';" onmouseout="window.status='';" onclick="LAS.toggleAutoUpdate(event,this.checked)"></div>
+					<div  class="top_link_disabled" id="plotOptionsButton" onclick="showPlotOptions()">Set plot options&nbsp;</div>
+					<span width="100%" id="productButtons">
+						<div class="top_link_disabled"  ID="Animation">Animate&nbsp;</div>
+						<div class="top_link_disabled"  ID="Comparison">Compare&nbsp;</div>
+						<div class="top_link_disabled"  ID="Plot to Google Earth">Google Earth&nbsp;</div>
+						<div class="top_link_disabled"  ID="Table of values (text)">Show Values&nbsp;</div>
+						<div class="top_link_disabled"  ID="Desktop application data access scripts">Export to Desktop Application&nbsp;</div>
+						<div class="top_link_disabled"  ID="Interactive Download">Save As ...</div>
+						<div class="top_link_disabled"  ID="Correlation Plot">Correlation&nbsp;</div>
+					</span>
+					<span class="top_link_disabled" onclick="LAS.linkTo()" id="linkto">Link To ...</span>							       <span class="top_link_disabled" onclick="LAS.printPlot()" id="print">Print</span>
+				</div>
+			</div>
+			<div id="message_bar"><img id="wait" style="visibility:hidden;float:right;margin:2pt;padding:2pt;" src="JavaScript/components/mozilla_blu.gif"><div id="breadcrumb" name="breadcrumb"></div><div id="variable_container" name="variable_container" class="LASVariableContainer"></div></div>
+
+
+			<table cellpadding="0" cellspacing="0"><tbody><tr><td style="vertical-align:top;">
+				<div id="constraints">
+					<div id="ol_map_widget"  onmouseover="showDatasetPicker()"></div>
+					<div id="constraintsScroll"  class="LASConstraintsPane">
+						<div id="plotTypes"></div>
+						<div id="Date"></div>
+						<div id="Depth"></div>
+						<div id="analysisWrapper"  class="LASAnalysis" style="display:none">							
+							<a class="LASLink" value=false onclick="if(!LAS.refs.analysis.enabled){LAS.showAnalysis();this.innerHTML='Remove analysis';}else{LAS.hideAnalysis();this.innerHTML='Apply analysis';}">Apply analysis</a>
+							<div id="analysis" style="display:none;">
+								<strong>Analysis type</strong><br>
+								<select id="analysis_op" name="analysis_op">
+									<option selected="" value="">None</option>
+									<option id="ave_analysis" "value="ave">Average</option>
+									<option id="min_analysis" value="min">Minimum</option>
+									<option id="max_analysis" value="max">Maximum</option>
+									<option id="sum_analysis" value="sum">Sum</option>
+									<option id="var_analysis" value="var">Variance</option>
+								</select><br>
+								<strong>Analysis region type</strong><br>						
+								<select id="analysis_axes">
+									<option value="">None</option>
+									<option id="xy_analysis" value="xy">Area</option>
+									<option id="x_analysis" value="x">Longitude</option>
+								        <option id="y_analysis" value="y">Latitude</option>
+									<option id="z_analysis" value="z">Depth</option>
+								 	<option id="t_analysis" value="t">Time</option>
+								</select>
+							</div>
+						</div>
+						<div id="DataConstraints"></div>
+					</div>					
+				</div></td><td  style="vertical-align:top">
+				<div style="display:none;" id="wait_msg">Please wait while the plot loads or <a href="javascript:" onclick="LAS.cancelRequest()">click here to cancel</a></div>
+				<iframe   
+					                #if($las_request)
+								src='ProductServer.do?xml=$las_request.toEncodedURLString()'  
+	 	                                        #else 
+	 	                                                src="start.html"  
+	 	                                        #end  
+					id="output" name="output" frameborder=0></iframe>			
+			</td></tr></tbody></table>
+			#parse( "/productserver/templates/V7UIFooter.vm") 
+		</div>
+		<div id="plotOptions" class="LASPopupDIVNode" style="display:none;"></div>
+		<div id="downloadOptions" class="LASPopupDIVNode" style="display:none;"></div>
+		<div id="externalOptions" class="LASPopupDIVNode" style="display:none;"></div>
+	</body>
+                
+#if ($request.getParameter("debug") && $request.getParameter("debug")=="true")
+	<script type="text/javascript" language="javascript" src="JavaScript/ui/LASUI.js"></script>
+	#include("JavaScript/ui/LASUI_includes.vm")
+#else
+		<script type="text/javascript" language="javascript" src="JavaScript/ui/LASUI_compiled_components.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/ui/LASUI_compiled.js"></script>
+#end
+
+                <script type="text/javascript" language="javascript" src="JavaScript/components/gov.noaa.pmel.tmap.las.NativeMapWidget/gov.noaa.pmel.tmap.las.NativeMapWidget.nocache.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayers/OpenLayers.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/DrawSingleFeature.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/HorizontalPath.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/VerticalPath.js"></script>
+                <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/JumpPath.js"></script>
+		<script type="text/javascript" language="javascript" src="JavaScript/frameworks/json2.js"></script>
+                 <script type="text/javascript" language="javascript">
+                var LAS = new LASUI();
+                     	LAS.params = {
+#if (( $request.getParameter('openid') ) && ($request.getParameter('openid') != ""))                     	
+                                'openid' :'$request.getParameter('openid')',
+#end
+				'auth_url' : [
+
+#foreach ($auth_url in $request.getParameterValues('auth_url'))
+				"$auth_url",
+#end				],
+#if ($request.getParameter('catid') && $request.getParameter('catid')!="")
+                                'catid' :'$request.getParameter('catid')',
+#else
+                                'catid' : null,
+#end
+#if  ($request.getParameter("dsid") && $request.getParameter("dsid")!="")
+                                'dsid' : '$request.getParameter("dsid")',
+#else
+                                'dsid' : null,
+#end
+#if  ($request.getParameter("varid") && $request.getParameter("varid")!="")
+                                'varid' : '$request.getParameter("varid")',
+#else
+                                'varid' : null,
+#end
+#if ($request.getParameter('auto'))
+                                'autoupdate' : true,
+#else
+                                'autoupdate' : false,
+#end
+#if ($las_request)
+                                request : new LASRequest('$las_request.toJavaScriptSafeString()')
+#else
+                                request : null
+#end
+
+
+                }
+
+                var featureAddedCallback = LAS.onafterdraw.LASBind(LAS);
+                var featureModifiedCallback = LAS.onafterdraw.LASBind(LAS);
+                var mapMoveCallback = LAS.onafterdraw.LASBind(LAS);
+                var mapDoneCallback = LAS.initUI.LASBind(LAS);
+                
+		function showDatasetPicker() {
+                        if(document.getElementById('categories').style.display=='none') {
+                                document.getElementById('categories').style.display='';
+                                LAS.toggleUIMask('')
+                        } else {
+                                document.getElementById('categories').style.display='none';
+                                LAS.toggleUIMask('none');
+                        }
+
+                }
+                function showPlotOptions() {
+                        if(LAS.refs.options.plot.options)       {
+                                LAS.toggleUIMask('');
+                                document.getElementById('plotOptions').style.display='';
+                        }
+                }
+         </script>
+</html>
+
+
+

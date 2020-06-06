@@ -1,0 +1,73 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_check_staggered_pp.jnl
+! 
+! Author: ansley 
+! Date: 2010/09
+!
+! For multi-variable plots.
+! Two variables may be on staggered grids. Detect this and reconcile
+! the index ranges.
+!
+
+DEFINE SYMBOL xax_1 = `($data_0_var)[d=($dset0)],RETURN=xaxis`
+DEFINE SYMBOL yax_1 = `($data_0_var)[d=($dset0)],RETURN=yaxis`
+DEFINE SYMBOL xax_2 = `($data_1_var)[d=($dset1)],RETURN=xaxis`
+DEFINE SYMBOL yax_2 = `($data_1_var)[d=($dset1)],RETURN=yaxis`
+
+IF `STRCMP("($xax_1)", "($xax_2)") NE 0` THEN 
+   DEFINE SYMBOL ferret_staggered_grid_x = 0
+   LET xsiz = `($data_0_var)[d=($dset0)],RETURN=isize`
+   IF `($clon_imax) EQ (xsiz+1)` THEN 
+      DEFINE SYMBOL clon_imax `xsiz`
+      DEFINE SYMBOL ferret_staggered_grid_x = 1
+   ENDIF
+   LET xsiz = `($data_1_var)[d=($dset1)],RETURN=isize`
+   IF `($clon_imax) EQ (xsiz+1)` THEN 
+      DEFINE SYMBOL clon_imax `xsiz`
+      DEFINE SYMBOL ferret_staggered_grid_x = 1
+   ENDIF
+ENDIF
+
+IF `STRCMP("($yax_1)", "($yax_2)") NE 0` THEN 
+   DEFINE SYMBOL ferret_staggered_grid_y = 0
+   LET ysiz = `($data_0_var)[d=($dset0)],RETURN=jsize`
+   IF `($clat_jmax) EQ (ysiz+1)` THEN 
+      DEFINE SYMBOL clat_jmax `ysiz`
+      DEFINE SYMBOL ferret_staggered_grid_y = 1
+   ENDIF
+   LET ysiz = `($data_1_var)[d=($dset1)],RETURN=jsize`
+   IF `($clat_jmax) EQ (ysiz+1)` THEN 
+      DEFINE SYMBOL clat_jmax `ysiz`
+      DEFINE SYMBOL ferret_staggered_grid_y = 1
+   ENDIF
+ENDIF
+
+IF `($ferret_staggered_grid_x"0") OR ($ferret_staggered_grid_y"0")` THEN
+   DEFINE SYMBOL ferret_staggered_grid = 1
+!   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`
+!   DEFINE SYMBOL upper_left_($n_left_labels) = Variables on staggered grids
+!
+!   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+!   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+! redefine region symbols using the index ranges.
+   GO LAS_define_region_curvi_indices
+
+
+sh sym ferret*base*
+sh sym ferret*noregion*
+
+  REPEAT/RANGE=0:`($data_count)-1`/NAME=iset (\
+    DEFINE SYMBOL iset = `iset`; \
+    IF `($ferret_plot_var_($iset)_noregion"0|*>1") EQ 0` THEN EXIT/LOOP;\
+    LET endbracket = `STRRINDEX("($ferret_plot_var_($iset)_noregion)",  "]") - 1`; \
+    LET dsetloc = `STRRINDEX("($ferret_plot_var_($iset)_noregion)", "d=") + 2`; \
+    LET dset = `SUBSTRING("($ferret_plot_var_($iset)_noregion)", dsetloc, endbracket-dsetloc+1)`; \
+    DEFINE SYMBOL ferret_plot_var_($iset) ($data_($iset)_var)[d=`dset`,($region_full)]; \
+    DEFINE SYMBOL ferret_plot_base_var_($iset) ($data_($iset)_var)[d=`dset`,($region_full)] \
+  )
+
+ENDIF
+
+! ----- End of LAS_check_staggered_pp.jnl ------------------------------------------------
+

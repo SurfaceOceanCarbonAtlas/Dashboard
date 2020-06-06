@@ -1,0 +1,110 @@
+! SOCAT_mark_moorings.jnl
+! Draw the last of each mooring expocode as a symbol, so moorings will show up.
+! The -1 makes it the second-from-last point which seems to be missing less often.
+! Ideally we'd plot the last valid point in each mooring if an efficient way can be
+! found to do that
+! 3/30/2017 *acm* Make the marks larger. Optionally also draw a black mark.
+!                 Color the marks according to the last valid data in each 'trajectory'.
+! 4/2017    *acm* If the constraints choose platforms, and moorings are found, make
+*                 the mark prominent
+
+IF `($ferret_is_socat"0") EQ 0` THEN EXIT/SCRIPT
+
+SAY _________________ Start marking moorings: clock seconds:                     ($clock_secs)
+LET pre_plot = ($clock_secs)
+
+LET varnames = ..varnames
+
+LET end_of_traj = xsequence(rowsize[m=@iin])
+LET/units=degrees_east lonend = SAMPLEI (($data_lon_var), end_of_traj)
+LET/units=degrees_north latend = SAMPLEI (($data_lat_var), end_of_traj)
+LET varend = SAMPLEI (($mark_end), end_of_traj) 
+IF ($mark_end_m"0") THEN LET varend = ($mark_end)
+
+DEFINE SYMBOL have_moor = 0
+IF `IS_ELEMENT_OF_STR(varnames, "platform_type") GT 0` THEN
+   LET mooring_mask = IF STRINDEX(platform_type, "Mooring") gt 0 THEN 1
+   LET/units=degrees_east lonend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lon_var), end_of_traj)
+   LET/units=degrees_north latend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lat_var), end_of_traj)
+   DEFINE SYMBOL have_moor = `mooring_mask[M=@sum] GT 0`
+
+ELIF `IS_ELEMENT_OF_STR(varnames, "vessel_type") GT 0` THEN
+   LET mooring_mask = IF STRINDEX(vessel_type, "Mooring") gt 0 gt 0 THEN 1
+   LET/units=degrees_east lonend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lon_var), end_of_traj)
+   LET/units=degrees_north latend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lat_var), end_of_traj)
+   DEFINE SYMBOL have_moor = `mooring_mask[M=@sum] GT 0`
+
+ELIF `IS_ELEMENT_OF_STR(varnames, "platform_name") GT 0` THEN
+   LET mooring_mask = IF STRINDEX(platform_name, "Mooring") gt 0 gt 0 THEN 1
+   LET/units=degrees_east lonend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lon_var), end_of_traj)
+   LET/units=degrees_north latend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lat_var), end_of_traj)
+   DEFINE SYMBOL have_moor = `mooring_mask[M=@sum] GT 0`
+
+ELIF `IS_ELEMENT_OF_STR(varnames, "vessel_name") GT 0` THEN
+   LET mooring_mask = IF STRINDEX(vessel_name, "Mooring") gt 0 gt 0 THEN 1
+   LET/units=degrees_east lonend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lon_var), end_of_traj)
+   LET/units=degrees_north latend = XSEQUENCE(mooring_mask)* SAMPLEI (($data_lat_var), end_of_traj)
+   DEFINE SYMBOL have_moor = `mooring_mask[M=@sum] GT 0`
+
+ENDIF
+
+IF ($have_moor"0|bad>0|*>1")  THEN
+
+! This variable will be the last valid data in each trajectory.
+! See "deepest depth" Ferret examples. It is computed only for mooring data.
+!
+! ccc This method loads lots of data and is too slow to use for lots of data
+
+!    LET mask2d = XSEQUENCE(mooring_mask) + 0*z[gz=data_var_c,k=1:`longest`]
+!    LET mooring_data = mask2d* data_var_c
+!    LET kvals = k[g=mooring_data,k=1:`longest`] + 0*mooring_data
+!    LET kzero = kvals - kvals[k=1:`longest`@MAX]
+!    LET integrand = mooring_data* kzero[k=@WEQ:0]
+!    LET varend = integrand[k=1:`longest`@SUM]
+!    LET/UNITS=degrees_east loc_lon = lonend
+!    LET/UNITS=degrees_north lat_lon = latend
+
+! for lots of data use the mooring last value
+! if a color_var is defined, translating a string variable to values,
+! use it in the definition.
+
+   LET ends = rowsize[m=@iin]
+   LET mooring_end = ends* mooring_mask
+   LET nmoo = mooring_end[m=@ngd]
+   LET mends =  compressm(mooring_end)
+
+   LET/UNITS=degrees_east loc_lon =  SAMPLEI(($data_lon_var), mends[M=1:`nmoo`])
+   LET/UNITS=degrees_north loc_lat =  SAMPLEI(($data_lat_var), mends[M=1:`nmoo`])
+   LET varend =  SAMPLEI(($mark_end_m"($mark_end)"), mends[M=1:`nmoo`])
+   IF `color_var,RETURN=isready` THEN LET varend =  SAMPLEI(color_var, mends[M=1:`nmoo`])
+   
+! Now plot the mooring marks
+! see issue 1754 and comments above - as a good first step, use  /MISSING=black, so 
+! moorings with missing data show up on a gray background 
+
+   DEFINE SYMBOL qual_over = /NOLAB/NOKEY/LEVELS/THICK=3
+   IF ($ferret_palette"0|*>1") THEN DEFINE SYMBOL qual_over = \
+       ($qual_over)/PALETTE=($ferret_palette"rainbow|default>rainbow|*>*)
+   IF `($ferret_fill_levels"0|*>1") EQ 0` THEN DEFINE SYMBOL qual_over = ($qual_over)/LEVEL=($lev_opnlevs)
+   PLOT/VS/OVER/RIBBON/SYM=18/SIZ=0.10/MISSING=black($qual_over)  loc_lon, loc_lat, varend
+
+! This command makes a bigger black square at the marks.
+! Turn this on only for QC editing?
+
+! The symbol constrain_by_platform has been set if platforms were explicitly 
+! selected. If these contain moorings, mark them prominently. Do we want to add
+! a note about this?
+
+   IF ($constrain_by_platform"0|*>1") THEN
+      PLOT/VS/OVER/SYM=18/siz=0.15/NOLAB/color=black/THICK=2  loc_lon, loc_lat
+!      DEFINE SYMBOL note_num = `($note_num) + 1`
+!      DEFINE SYMBOL note_($note_num)_lab = Stationary platforms marked with a square
+   ENDIF
+
+ENDIF   ! have_moor
+
+SAY _________________ Draw end point of `mooring_mask[M=@sum]` moorings          ($clock_secs)
+SAY _________________ total time for marking moorings, seconds                             ----- `($clock_secs) - pre_plot`
+
+
+!---------------- end of SOCAT_mark_moorings.jnl -------------------------

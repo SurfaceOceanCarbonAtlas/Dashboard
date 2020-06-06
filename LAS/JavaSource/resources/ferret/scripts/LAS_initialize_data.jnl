@@ -1,0 +1,45 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_initialize_data.jnl
+! 
+! Author: ansley manke
+! 11/2011
+!  4/2013 ACM Implement the Ferret property ferret_start_memory
+! 11/2017 Remove single-quotes from around a variable title thats 
+!         quoted because its a reserved name
+!
+! The LAS_initialize_data.jnl script takes care of everything having to
+! do with initializing a datset for later use.
+! It calls the specific initialize-data script for the product.
+!
+! The products that use a specialized data initialization, such as insitu
+! data, have already defined this symbol.  If undefined, use the std one.
+
+! Allow a Ferret property start_memory to come from the configuration. If
+! an init script has a memory setting, then that will supersede the one
+! in the Ferret property.
+
+
+IF `($ferret_start_memory"0") GT 0` THEN SET MEM/SIZ=($ferret_start_memory)
+
+IF `($data_initialization_script"0|*>1") EQ 0` THEN \
+ DEFINE SYMBOL data_initialization_script LAS_initialize_data_std
+GO ($data_initialization_script) ($1)
+IF ($error_string"0|*>1") THEN 
+     IF `STRINDEX(($data_url), "_expr_") GT 0 AND STRINDEX(($data_url), "analysed_") GT 0` THEN\
+      DEFINE SYMBOL error_string = Failed setting up computation for `($data_($num)_var).long_name`. Try a smaller region.
+   MESSAGE/ERROR **ERROR ($error_STRING)
+   EXIT/PROGRAM
+ENDIF
+
+GO LAS_unquote_string data_title
+
+! And if the configuration or initialization hasn't upped the memory,
+! increase it somewhat.
+IF `($ferret_memory"25.6") LT 100` THEN SET MEM/SIZ=300
+
+! If a Ferret property ferret_add_a_note is set, define a note that will
+! be added to the annotations box. The note may contain a URL.
+
+GO LAS_note_from_property
+
+! End of ------------LAS_initialize_data.jnl--------------------------

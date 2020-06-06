@@ -1,0 +1,52 @@
+! set_quoted_annotation.jnl
+! If there is a single-quote inside an annotation, pull the string apart 
+! and replace the part of the string that is varname_ic_is_quoted with the 
+! string sent in as the symbol constraint_ic_rhs.
+! This script may be called multiple times to get more quoted strings into the
+! variable. Each iteration gets variables named with the symbol ($qn)
+
+DEFINE SYMBOl notenum = $1
+IF `($qn"0|*>1") EQ 0` THEN DEFINE SYMBOL qn = 1
+DEFINE SYMBOL qnm1 = `($qn)-1`
+
+! The symbol note_($notenum)_lab_quoted contains the variable name
+
+DEFINE SYMBOL note_($notenum)_status = `note_($notenum)_step_($qnm1),return=status`;
+DEFINE SYMBOL note_($notenum)_ready = `($note_($notenum)_status"0|AVAILABLE>1|*>0")`
+IF `($note_($notenum)_ready)  EQ 0` THEN 
+   LET note_($notenum)_lab_($qn) = "($note_($notenum)_lab)"
+ELSE
+   LET note_($notenum)_lab_($qn) =  note_($notenum)_step_($qnm1)
+   sh var note_($notenum)_step_($qnm1)
+ENDIF
+
+LET i1_($qn) = `STRINDEX(note_($notenum)_lab_($qn), "($note_($notenum)_lab_quoted)")`
+LET i2_($qn) = `STRINDEX(note_($notenum)_lab_($qn), "is_quoted")`
+
+LET namelen = STRLEN( "($note_($notenum)_lab_quoted)")
+
+! constraint number
+DEFINE SYMBOL cnum = `SUBSTRING(note_($notenum)_lab_($qn),i1_($qn)+namelen+1,i2_($qn)-namelen-i1_($qn)-2)`
+
+LET part1_($qn) = SUBSTRING(note_($notenum)_lab_($qn),1,i1_($qn)-1)
+
+LET notelen_($qn) = `STRLEN(note_($notenum)_lab_($qn))`
+
+LET part2_($qn) = SUBSTRING(note_($notenum)_lab_($qn),i2_($qn)+9,notelen_($qn)-i2_($qn)-10+3)
+LET quoted_string_($qn) = ($constraint_($cnum)_rhs)
+
+LET note_($notenum)_A_($qn) = STRCAT(part1_($qn), quoted_string_($qn))
+LET note_($notenum)_step_($qn) = STRCAT(note_($notenum)_A_($qn), part2_($qn))
+
+list note_($notenum)_step_($qn)
+
+! There may be more quoted strings in the same note. We will do it again until
+! there are no instances of is_quoted...
+
+LET still_quoted = `STRINDEX(note_($notenum)_step_($qn), "is_quoted") GT 0`
+IF `still_quoted EQ 0` THEN LET note_($mnote)_lab = note_($notenum)_step_($qn)
+
+DEFINE SYMBOL qn = `($qn)+1`
+
+! ----- End of set_quoted_annotation.jnl ------------------------------------------------
+

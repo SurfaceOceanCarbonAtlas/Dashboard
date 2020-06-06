@@ -1,0 +1,33 @@
+! cancel_temp_regions.jnl
+
+! Called by curvi_nrst_slice.jnl
+! For analysis operations on curvilienar grids we may not have definitions 
+! for region_x_* and region_y_*. These are temporarily assigned when setting
+! up slices or getting the box limits. Now remove them.
+
+
+IF ($remove_x_region"0|*>1") THEN 
+   CANCEL SYMBOL remove_x_region
+   CANCEL SYMBOL region_x_lo
+   CANCEL SYMBOL region_x_hi
+ENDIF
+IF ($remove_y_region"0|*>1") THEN 
+   CANCEL SYMBOL remove_y_region
+   CANCEL SYMBOL region_y_lo
+   CANCEL SYMBOL region_y_hi
+ENDIF
+
+! Make these Definitions from the end of curvi_nrst_slice
+IF ($region_sample"0|*>1") THEN 
+   DEFINE SYMBOL ferret_plot_var = ($expr1)sampled_var($var_num)($expr2)
+   DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+
+   IF ($expr3"0|*>1") THEN
+      DEFINE SYMBOL ferret_plot_var ($expr1)sampled_var($var_num)($expr3)sampled_var($var_num)($expr4)
+      DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr3) ($data_title) ($expr4)"
+   ENDIF
+ENDIF
+
+EXIT
+! End of file ------------cancel_temp_regions.jnl--------------------------
+

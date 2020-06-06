@@ -1,0 +1,119 @@
+! LAS_check_2d_region.jnl
+! 
+! Author: ansley
+! $Date: 2007/06/22
+! ACM 8/7/2007 - Apply expressions here.
+!              - Save symbols with information about too-small regions
+!                for use by labels_above_plot.jnl
+!              - If this is to be an overlay plot, and region is too small
+!                then overlay cant be done. Reset number of datasets to 1.
+!
+! Check whether the region is too small to make a 2D plot on this grid.
+! Call after region and dataset have been initialized for 2D plot.
+! Note should be able to do a SHADE plot
+
+
+! Change ($data_var)[d=($data_num)] to the_plot_var_noregion
+
+CANCEL SYMBOL region_small*
+
+LET/D=($data_num) the_plot_var_noregion = ($ferret_plot_var_noregion)
+
+IF ($data_analysis_expr"0|*>1") THEN
+   DEFINE SYMBOL apply_analysis_expr = ($data_analysis_expr)
+ENDIF
+
+! For curvilinear plots, check the Z and T regions
+
+IF `($do_curvi_xy"0") OR ($native_curvilinear_xy"0")` THEN 
+   IF `STRINDEX("($ferret_view)", "t") GT 0` THEN 
+      let the_plot_v = the_plot_var_noregion[x=@min,y=@min,z=@min,($region_t)]
+      LET nt = `the_plot_v,RETURN=lsize`
+      IF `nt LE 1` THEN 
+         DEFINE SYMBOL error_string = The t region is too small. It reduces to a single point. 
+         GO LAS_error_msg
+      ENDIF
+   ENDIF
+   IF `STRINDEX("($ferret_view)", "z") GT 0` THEN 
+      let the_plot_v = the_plot_var_noregion[x=@min,y=@min,t=@min,($region_z)]
+      LET nz =  `the_plot_v,return=ksize`
+      IF `nz LE 1` THEN 
+         DEFINE SYMBOL error_string = The z region is too small. It reduces to a single point. 
+         GO LAS_error_msg
+      ENDIF
+   ENDIF
+
+! Also check that the region isn't just completely degenerate in x or y
+   IF `STRINDEX("($ferret_view)", "x") GT 0 AND ($region_x_range"-1") EQ 0` THEN 
+      DEFINE SYMBOL error_string = The x region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+   IF `STRINDEX("($ferret_view)", "y") GT 0 AND ($region_y_range"-1") EQ 0` THEN 
+      DEFINE SYMBOL error_string = The y region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+
+ENDIF   	
+IF `($do_curvi_xy"0") AND ($native_curvilinear_xy"0")` THEN EXIT/SCRIPT
+IF `($do_hybrid_z"0") AND ($native_Z_plot"0")` THEN EXIT/SCRIPT
+IF `($do_curvi_xy_and_hybrid_z)` THEN EXIT/SCRIPT
+
+IF `($do_curvi_xy"0") OR ($do_hybrid_z"0") OR ($do_curvi_xy_and_hybrid_z"0")` THEN EXIT/SCRIPT
+
+! If doing a slice of a curvilinear variable then note that RETURN=shape is not
+! always correct for these variables 
+! IF `STRINDEX ("($ferret_plot_var)", "sampled_var") GT 0` THEN EXIT/SCRIPT !(dont exit, test works for some cases)
+
+LET/D=($data_num) the_plot_var = ($ferret_plot_var)
+LOAD the_plot_var
+
+DEFINE SYMBOL varshape = `the_plot_var,RETURN=shape`
+DEFINE SYMBOL viewshape =  `UPCASE("($ferret_view)")`
+
+IF `STRCMP("($varshape)", "POINT") EQ 0` THEN
+  DEFINE SYMBOL ferret_contour_style = raster
+  DEFINE SYMBOL degenerate_2d = 1
+ENDIF   ! degenerated to a point.
+
+! Requested regions that degenerate to a line.
+
+IF `STRLEN("($varshape)") EQ 1` THEN
+  DEFINE SYMBOL ferret_contour_style = raster
+  DEFINE SYMBOL degenerate_2d = 1
+ENDIF
+
+! Issue error messages if the xyz ranges are 0. Note region_t_range is not defined.
+
+IF `($degenerate_2d"0|*>1") EQ 1` THEN
+  DEFINE SYMBOL dir1 = `SUBSTRING("($ferret_view)", 1, 1)`
+  IF `($region_($dir1)_range"99") EQ 0` THEN
+      DEFINE SYMBOL error_string = The ($dir1) region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+
+  DEFINE SYMBOL dir2 = `SUBSTRING("($ferret_view)", 2, 1)`
+  IF `($region_($dir2)_range"99") EQ 0` THEN
+      DEFINE SYMBOL error_string = The ($dir2) region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+
+   IF `($viewshape"|YZ>1|*>0") AND ($varshape"|Z>1|*>0")` THEN 
+      DEFINE SYMBOL error_string = The y region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+
+   IF `($viewshape"|YT>1|*>0") AND ($varshape"|T>1|*>0")` THEN 
+      DEFINE SYMBOL error_string = The y region is too small. It reduces to a single point. 
+      GO LAS_error_msg
+      EXIT/PROGRAM
+   ENDIF
+
+ENDIF
+
+! End of file ------------LAS_check_2d_region.jnl-------------------------------
+

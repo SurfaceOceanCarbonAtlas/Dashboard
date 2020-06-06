@@ -1,0 +1,190 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Profile_2D_poly.jnl
+!
+! Creates a 2D plot with a blank 'basemap' and an overlay of points
+! drawn in the pie style from ($ferret_plot_var) defined in LAS_initialize_data_insitu.
+!
+! 10/17/17 Variables may be on the I or E direction; account for that getting @NGD or @NBD.
+! 10/17/17 Simplify: this map plot does not do color-by, so no need for any of that setup.
+!  4/ 4/18 Use the nice new PyFerret plot-shapes if running the right version of PyFerret
+
+! Set the gif filename, changing it from .gif to the name from this request
+! Set up to write info to the debug log so that FshowGO can be used
+
+GO LAS_initial_setup
+
+! Initialize the region and data.
+
+DEFINE SYMBOL data_initialization_script = feature_initialize_data_insitu
+
+! DEFINE SYMBOL ferret_label = 0
+
+SET MODE verify:always  ! allows for debugging
+
+DEFINE SYMBOL its_insitu = 1
+DEFINE SYMBOL its_profile_map = 1
+GO LAS_initialize_region 0
+
+IF ($data_0_var"0|vid>1|*>0")  THEN
+   DEFINE SYMBOL ferret_by_id = 1
+   USE "($data_0_url)"
+   LET varnames = ..varnames
+
+   DEFINE SYMBOL data_0_var = `varnames[i=1]`
+   CANCEL DATA "($data_0_url)"
+ENDIF
+DEFINE SYMBOL data_name_in = ($data_0_var)
+
+GO LAS_initialize_data 0
+
+! The chosen "plot-by" variable has no effect on this result.
+! It is only ever a set of locations on the map. Reduce possible
+! complications with data type of variable etc by substituting longitude.
+
+DEFINE SYMBOL ferret_plot_var ($data_x_var)
+DEFINE SYMBOL data_var ($data_x_var)
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Set the URL label for the first dataset.
+GO LAS_url_label 0
+
+! For the annotations
+DEFINE SYMBOL dshape = `($data_x_var),RETURN=shape`
+IF ($dshape"0|POINT>1|*>0) THEN
+   IF `($ngood_data"-10|*>1") LT 0` THEN DEFINE SYMBOL ngood_data = `($data_x_var)`
+   IF `($nbad_data"-10|*>1") LT 0` THEN DEFINE SYMBOL nbad_data = `($data_x_var)`
+ELSE
+   IF `($ngood_data"-10|*>1") LT 0` THEN DEFINE SYMBOL ngood_data = `($data_x_var)[($dshape"i")=@NGD]`
+   IF `($nbad_data"-10|*>1") LT 0` THEN DEFINE SYMBOL nbad_data = `($data_x_var)[($dshape"i")=@NBD]`
+ENDIF
+
+IF `STRINDEX("($ferret_view"0")", "x") GT 0` THEN
+
+  LET/UNITS=degrees_east x_var_data = ($data_x_var)
+  IF `($nodata"0|*>1") EQ 0` THEN
+     STAT x_var_data
+  ELSE
+     DEFINE SYMBOL stat_min ($region_x_lo)
+  ENDIF
+
+  IF ($data_y_var"0|*>1") THEN LET/UNITS=degrees_north y_var_data = ($data_y_var)
+  IF ($data_z_var"0|*>1") THEN LET z_var_data = ($data_z_var)
+  IF ($data_t_var"0|*>1") THEN LET t_var_data = ($data_t_var)
+
+ENDIF
+
+! Plot qualifiers (graticule lines etc)
+GO LAS_set_plot_qualifiers
+
+! Open the window
+GO LAS_open_window
+
+! Create the blank plot with bathymetries,
+! coastlines, etc.
+
+DEFINE SYMBOL basemap_palette = grayscale
+DEFINE SYMBOL basemap_levels = (-inf)(-10000,-1000,1000)(-1000,0,100)
+GO LAS_XY_overlay_basemap
+
+PPL SHASET PROTECT
+
+!  GO LAS_fland black
+!  GO LAS_fland navy
+!  GO LAS_fland brown_dark
+!  GO LAS_fland green_pine
+
+GO LAS_fland gray_dark
+PPL SHASET PROTECT
+
+! Define plot qualifiers for polygon overlay
+
+!CANCEL SYMBOL qualifiers 
+DEFINE SYMBOL qualifiers = ($qualifiers)/OVER/NOLAB
+
+! There is no plot variable defined - only plotting locations -
+! so do not plot the key.
+
+DEFINE SYMBOL qualifiers = ($qualifiers)/NOKEY
+
+! Just draw symbols at each location
+! If lon and lat are on the obs axis, pull out a single location
+! for each feature id.
+
+DEFINE SYMBOL lonshape = `x_var_data,return=shape`
+DEFINE SYMBOL latshape = `y_var_data,return=shape`
+DEFINE SYMBOL feature_shape = `($feature_variable),return=shape`
+
+IF ($lonshape"0|($feature_shape)>0|*>1) THEN
+   LET longest = ($rowvar)[($rind)=@max]+2
+   LET data_var_x =  EXPNDI_BY_Z_COUNTS(x_var_data, xsequence(($rowvar)),`longest`)
+   LET data_var_y =  EXPNDI_BY_Z_COUNTS(y_var_data, xsequence(($rowvar)),`longest`)
+
+   LET xpoints = data_var_x[k=1]
+   LET ypoints = data_var_y[k=1]
+ELSE
+   LET xpoints = ($data_x_var)
+   LET ypoints = ($data_y_var)
+ENDIF
+
+
+! Draw the locations as a light-blue circle with blue outline.
+IF `($program_name"0|PyFerret>1|*>0") AND ($FERRET_VERSION) GE 7.32` THEN
+  GO LAS_pp_set_feature_shapes
+  PLOT/VS/OVER/NOLAB/NOKEY/ribbon/highlight=blue/PALETTE=cyan/siz=0.15/sym=($pyshape20) xpoints, ypoints, ypoints
+ELSE
+   PLOT/OVER/NOLAB/VS/THICK=3/SYM=28/SIZ=.08/COLOR=lightblue xpoints, ypoints
+   PLOT/OVER/NOLAB/VS/SYM=28/SIZ=.12/COLOR=blue xpoints, ypoints
+ENDIF
+
+! These are expected by LAS_results
+DEFINE SYMBOL data_plotted_min = 1
+DEFINE SYMBOL data_plotted_max = 1
+
+! Add any constraint labels in the lower left, or as annotation notes.
+! (The constraints themselves are handled in the data request from ERDDAP.
+!  We do not need masking for constraints in map plots.)
+
+IF `($ferret_annotations%0|*>1%)` THEN
+
+   IF `($nmask_labels"0|*>1") EQ 0` THEN DEFINE SYMBOL nmask_labels = 1
+
+   REPEAT/RANGE=1:`($nmask_labels)`:1/NAME=m (\
+      DEFINE SYMBOL mmask = `m`;\
+      IF ($mask_title_($mmask)"0|*>1) THEN ; \
+         DEFINE SYMBOL note_num = `($note_num"0") + 1`; \
+         DEFINE SYMBOL note_($note_num)_lab = ($mask_title_($mmask)); \
+      ENDIF)
+ELSE
+
+   IF `($nmask_labels"0|*>1") EQ 0` THEN DEFINE SYMBOL nmask_labels = 1
+   DEFINE SYMBOL label_y = `-0.95*($ppl$yorg) + 0.2*(($nmask_labels)-1)`
+
+   DEFINE SYMBOL label_x = `-0.95*($ppl$xorg)`
+   DEFINE SYMBOL label_y = `-0.95*($ppl$yorg) + 0.2*(($nmask_labels)-1)`
+
+   REPEAT/RANGE=1:`($nmask_labels)`:1/NAME=m (\
+      DEFINE SYMBOL mmask = `m`;\
+      IF ($mask_title_($mmask)"0|*>1) THEN ; \
+        LABEL/NOUSER `($label_x)`, `($label_y)`, -1, 0, 0.12, ($mask_title_($mmask)) ; \
+        DEFINE SYMBOL label_y = `($label_y) - 0.2`; \
+      ENDIF)
+ENDIF
+
+! Add feature information on the top
+GO feature_labels  
+
+! If constraints are shown via constraint_0_lhs etc, define labels for those
+GO set_constraint_labels
+
+! Save the results
+
+GO LAS_results box
+
+! End of file ------------LAS_insitu_pie_xy.jnl--------------------------
+

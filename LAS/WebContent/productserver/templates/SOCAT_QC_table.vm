@@ -1,0 +1,425 @@
+## Specialized version of output.vm for OCDMS cruise plots
+## which generate a legend instead of a reference map
+
+##set ( $readonly = $las_config.getVariablePropertyValue("/lasdata/datasets/SOfCO2/variables/fCO2_rec", "socat_vars", "readonly"))
+
+##if ($las_request.getProperty("las", "output_type") == 'json')
+
+##$las_response.toJSON()
+
+##elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+##else
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<title>History of Quality Control Evaluations for $las_request.getProperty("qc","expocode")</title>
+<script language="JavaScript" src="JavaScript/components/xmldom.js"></script>
+<script language="JavaScript" src="JavaScript/components/LASRequest.js"></script>
+<script style="text/javascript" src="JavaScript/components/sorttable.js"></script>
+<link rel="stylesheet" href="JavaScript/components/css/LAS.css" type="text/css">
+<script>
+function linkify(text)
+{
+	if( !text ) return text;
+
+	text = text.replace(/((https?\:\/\/|ftp\:\/\/)|(www\.))(\S+)(\w{2,4})(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/gi,function(url){
+		nice = url;
+		if( url.match('^https?:\/\/') )
+		{
+			nice = nice.replace(/^https?:\/\//i,'')
+		}
+		else
+			url = 'http://'+url;
+
+
+		return '<a target="_blank" rel="nofollow" href="'+ url +'">'+ nice.replace(/^www./i,'') +'</a>';
+	});
+
+	return text;
+}
+function toggleConstraints () {
+	if (document.getElementById('constraints_toggle_hide').style.display=='none') {
+		document.getElementById('constraints_toggle_hide').style.display='';
+		document.getElementById('constraints_toggle').style.display='none';
+		document.getElementById('Metadata_table').className='sortable showTwominus datatable';
+	} else {
+		document.getElementById('constraints_toggle').style.display='';
+		document.getElementById('constraints_toggle_hide').style.display='none';
+		document.getElementById('Metadata_table').className='sortable hideTwominus datatable';
+	}
+}
+
+##if ($readonly == false)
+function submitQC (cruise_ID, region_name)
+{
+  Req = new LASRequest('$las_request.toJavaScriptSafeString()');
+  Req.setOperation('SOCAT_QC_input');
+  Req.setProperty('qc','cruise_ID',cruise_ID);
+  Req.setProperty('qc','region_name',region_name);
+  var URL = './ProductServer.do?xml=' + escape(Req.getXMLText());
+  var features = 'alwaysRaised=1,width=600px,height=1000px,menubar=no,location=no,status=no,resizeable=yes,scrollbars=yes';
+  window.open(URL,"inputQC", features);
+}
+##end
+
+/*
+ *
+ */
+function switchRegion(region) {
+/*
+  Req = new LASRequest('$las_request.toJavaScriptSafeString()');
+  Req.setProperty('OCDMS','table_of_cruises',region)
+  if (region == 'full') {
+    // //Req.setOperation('OCDMS_table_of_cruises_full_cruises');
+    Req.setOperation('OCDMS_table_of_cruises');
+  } else {
+    Req.setOperation('OCDMS_table_of_cruises');
+  }
+  var URL = './ProductServer.do?xml=' + escape(Req.getXMLText());
+  location.href = URL;
+*/
+}
+
+/*
+ * NOTE:  One might want to connect various columns to different searches.
+ * NOTE:  The UI only supports metadata_ID for now.
+ */
+function sendRequest(column,value) {
+  Req = new LASRequest('$las_request.toJavaScriptSafeString()');
+
+  // set the operation
+  var operation;
+  switch(column) {
+    case 1:
+      operation = 'OCDMS_cruise_summary';
+      break;
+    case 2:
+	//Req.addTextConstraint("subsampling","=","data");
+      operation = 'OCDMS_Extract_trackTV';
+      break;
+    case 3:
+      operation = 'OCDMS_data_download';
+      Req.addTextConstraint("subsampling","=","data");
+      break;
+  }
+  Req.setOperation(operation);
+
+##if ($las_request.getProperty("OCDMS", "table_of_cruises") == 'full')
+/*
+  var Select= document.getElementById('Metadata_extent');
+  var extent = Select.options[Select.selectedIndex].value;
+  if (extent == 'full') {
+    Req.setRange('x','-180.0','180.0');
+    Req.setRange('y','-90.0','90.0');
+    Req.setRange('t','01-Jan-1968','31-Dec-2008');
+  }
+*/
+##end
+
+  // set the metadata_ID 'data option'
+  Req.addTextConstraint('metadata.metadata_ID','=',value);
+  var URL = './ProductServer.do?xml=' + escape(Req.getXMLText());
+  var name = "PlotWindow";
+
+  //var features = 'alwaysRaised=1,width=800,height=600';
+  var features = '';
+  window.open(URL, name, features);
+}
+
+</script>
+
+<style type="text/css">
+
+body {
+  background-color: #CCC;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+table.hideTwominus .twominus {
+    display: none;
+}
+table.showTwominus .twominus {
+    display: table-row;
+}
+
+#container {
+  width: 100%;
+  padding: 2px;
+  background-color: #FFF;
+}
+
+#container td {
+  padding: 2px;
+}
+
+fieldset legend {
+  color: #888;
+  font-size: 14px;
+  font-family: verdana, arial, helvetica, sans-serif;
+  /* font-weight: bold; */
+}
+
+fieldset p {
+  font-size: 14px;
+  font-family: verdana, arial, helvetica, sans-serif;
+  padding: 2px;
+}
+
+fieldset p .note {
+  color: #888;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#Metadata_controlTable {
+  background-color: #ACE;
+  border: solid 2px black;
+  _padding: 4px;
+  width: 100%;
+  color: black;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 16px;
+}
+
+#Metadata_controlTable select {
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}
+
+#Metadata_controlTable .header_style {
+  font: bold 80% arial, verdana, helvetica, sans-serif;
+}
+
+#Metadata_controlTable .inline_selector {
+  padding: 0px 4px 0px 4px;
+}
+
+/* ********************************
+   The starting point for the style in this template was:
+
+   Project: CSS Table Galery
+   Title: Like Adwords
+   Author: Cleiton Francisco
+   URL: http://www.cleiton.net/
+   Country: Brazil
+   Update: 2005-12-18
+ ****************************** */
+#Metadata_table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid #3f7c5f;
+  font: normal 80%/140% arial, verdana, helvetica, sans-serif;
+  color: #000;
+  background: #fff;
+}
+#Metadata_table caption {
+  padding: 0 0.6em 0.8em;
+  font-size: 1.3em;
+  font-weight: bold;
+  text-align: left;
+  color: #000;
+  background: transparent;
+}
+#Metadata_table td, th {
+  border: 1px solid #e0e0e0;
+  padding: 0.5em;
+}
+#Metadata_table thead th {
+  border: 1px solid #e0e0e0;
+  text-align: left;
+  font-size: 1em;
+  font-weight: bold;
+  background: #c6d7cf;
+}
+#Metadata_table thead th:hover {
+  background: #a6b7af;
+  cursor: pointer;
+}
+#Metadata_table tfoot th, tfoot td {
+  border: 1px solid #e0e0e0;
+  text-align: left;
+  font-size: 1em;
+  background: #e8e8cf;
+}
+#Metadata_table tfoot th {
+  font-weight: bold;
+}
+#Metadata_table tbody td a {
+  background: transparent;
+  color: #00c;
+  text-decoration: underline;
+}
+#Metadata_table tbody td a:hover {
+  background: transparent;
+  color: #00c;
+  text-decoration: underline;
+}
+#Metadata_table tbody th a {
+  background: transparent;
+  color: #3f7c5f;
+  text-decoration: underline;
+  font-weight: bold;
+}
+#Metadata_table tbody th a:visited {
+  color: #b98b00;
+}
+#Metadata_table tbody th, tbody td {
+  vertical-align: top;
+  text-align: left;
+}
+#Metadata_table tfoot td {
+  border: 1px solid #996;
+}
+#_Metadata_table tbody tr:hover {
+  background: #ffffd9;
+}
+</style>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-33678033-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+<body>
+  <table id="container">
+    <tbody>
+      <tr>
+        <td>
+          <fieldset id="Metadata_instructions">
+            <legend>Help</legend>
+            <span>History of Quality Control Evaluations for $las_request.getProperty("qc","expocode")</span>
+          </fieldset>
+        </td>
+      </tr>
+      <tr>
+        <td>
+## Set the rowset to the last row.  Grab the return value in "last" (true or false) so it doesn't show up on the page.
+#set($last=$las_webrowset.last())
+
+## Get the number of rows returned.
+#set($size = $las_webrowset.getRow())
+
+## Go back to before the first row.  Grab the return value.
+#set($first=$las_webrowset.beforeFirst())
+
+
+<table width="1020">
+	<tr>
+		<td>
+			<a href="javascript:toggleConstraints()" id="constraints_toggle">Show all versions</a>
+			<a href="javascript:toggleConstraints()" style="display:none" id="constraints_toggle_hide">Hide previous versions</a>
+		</td>
+	</tr>
+</table>
+
+
+## If the rowset is empty, put up a message.
+#if ($size <= 0 )
+    <h3>No results found to match your query.</h3>
+#else
+## Not empty.  Write the rows.
+
+    ## Get the metadata so we have the column names and
+    ## the number of columns.
+
+    #set($metadata = $las_webrowset.getMetaData())
+    #set($cols = $metadata.getColumnCount())
+
+    <table id="Metadata_table" class="sortable hideTwominus datatable">
+        ## Set the column headers including one for the row number.
+        <thead><tr>
+##if ($readonly == false)
+             <th></th>
+##end  
+				<th title="Formal Expocode name of dataset">Expocode</th>
+				<th title="Region for which this QC flag was assigned">Region</th>
+				<th title="SOCAT QC flag assigned to dataset">Flag</th>
+				<th title="Time and Day when SOCAT QC flag assigned to dataset">Flag Timestamp</th>
+				<th title="Name of reviewer who submitted this flag">Reviewer</th>
+				<th title="Version in which flag was added to the dataset">Version<br />Flagged</th>
+				<th title="Comments added by reviewer regarding this flag">Comments</th>
+
+
+       </tr></thead>
+       ## Loop over the rows...
+       <tbody>
+       #foreach ($row in [01..$size])
+          ## Advance the row.  We do this at the top since we are currently before the first row (see beforeFirst() above).
+          #set($next=$las_webrowset.next())
+          ## Use CSS color of every other row.
+       	  #if ( ($las_webrowset.getString(6)=="1.2") || ($las_webrowset.getString(6)=="1.3") || ($las_webrowset.getString(6)=="1.4") || ($las_webrowset.getString(6)=="2.0") )
+          	<tr class="twominus">
+          #else
+          	<tr class="threeplus">
+          #end
+             ## Add the row number
+##if ($readonly == false)
+	<td align="right">
+##		#if ($las_webrowset.getString(1)=="0")
+             <button onclick="submitQC('$las_webrowset.getString(1)','$las_webrowset.getString(2)')">Add QC</button>
+##    	#end
+   	</td>
+##end
+		<td>
+			#if ( $las_webrowset.getString(1) )
+				$las_webrowset.getString(1)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(2) )
+				$las_webrowset.getString(2)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(3) )
+				$las_webrowset.getString(3)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(4) )
+				$las_webrowset.getString(4)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(5) )
+				$las_webrowset.getString(5)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(6) )
+				$las_webrowset.getString(6)
+			#end
+		</td>
+		<td>
+			#if ( $las_webrowset.getString(7) )
+				$las_webrowset.getString(7)
+			#end
+		</td>
+
+          </tr>
+       #end  ## Done with this row.
+	</tbody>
+	</table>
+#end
+	</td></tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
+
+##end
+

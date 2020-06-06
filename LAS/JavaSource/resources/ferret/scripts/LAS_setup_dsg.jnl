@@ -1,0 +1,71 @@
+! LAS_setup_dsg.jnl
+! 4/3/2017 *acm* Additions for point data types
+
+SAY _________________ START LAS_setup_dsg: clock seconds:                        ($clock_secs)
+
+
+LET nglobal_atts = ..nattrs
+IF `nglobal_atts EQ 0` THEN
+   GO LAS_error_msg Expecting Distributed Sampling Geometries file. No Global Attributes found.
+ENDIF
+
+LET global_attnames = ..attnames
+LET varnames = ..varnames
+LET nvars = ..nvars
+
+! Find longitude, latitude, and time variables
+IF `($data_lon_var"0|*>1") + ($data_lat_var"0|*>1")+ ($data_time_var"0|*>1") LT 3` THEN
+   GO feature_get_direction_vars
+   DEFINE SYMBOL data_lon_var = ($data_x_var)
+   DEFINE SYMBOL data_lat_var = ($data_y_var)
+   DEFINE SYMBOL data_time_var = ($data_t_var)
+   ! These will be redefined later.
+   CANCEL SYMBOL data_x_var, data_y_var, data_t_var, data_z_var
+ENDIF
+
+!
+! Is it a Profile or Trajectory dataset?
+! Find the featureType attribute, and find which  variables
+! are marked with the cf_role and sample_dimension attributes
+
+! Have we already found these?
+IF `( ($feature_variable"0|*>1") GT 0) AND ( ($rowvar"0|*>1") GT 0)` THEN EXIT/SCRIPT
+
+IF `IS_ELEMENT_OF_STR_N(global_attnames, "featureType") ` THEN
+    DEFINE SYMBOL feature_type = `..featureType`
+    IF ($ferret_feature_label"0|*>1") THEN DEFINE SYMBOL feature_type = ($ferret_feature_label)
+    DEFINE SYMBOL feature_type = `DNCASE("($feature_type)")`
+ENDIF
+
+! cf_role and sample_dimension are not included in DSG point datasets.
+
+IF ($feature_type"0|point>1|*>0") THEN EXIT/SCRIPT
+
+REPEAT/RANGE=1:`nvars`/name=q (\
+   DEF SYM q = `q`;\
+   DEF SYM vname = `varnames[i=($q)]`;\
+   GO dsg_find_roles;\
+   IF `STRCMP("($data_($num)_var)", "($feature_variable)") EQ 0` THEN \
+   DEFINE SYMBOL ferret_plot_title = ($feature_variable) ID;\
+   IF `( ($feature_variable"0|*>1") GT 0) AND ( ($rowvar"0|*>1") GT 0)` THEN EXIT/LOOP\
+)
+
+IF `($feature_variable"0|*>1") EQ 0` THEN
+   LET ndims = ..ndims
+   LET dimnames = ..dimnames
+   
+    REPEAT/RANGE=1:`ndims`/name=q (\
+      DEF SYM q = `q`;\
+      DEF SYM vname = (`dimnames[i=($q)]`);\
+      GO dsg_find_roles;\
+      IF `STRCMP("($data_($num)_var)", "($feature_variable)") EQ 0` THEN \
+      DEFINE SYMBOL ferret_plot_title = ($feature_variable) ID;\
+      IF `( ($feature_variable"0|*>1") GT 0) AND ( ($rowvar"0|*>1") GT 0)` THEN EXIT/LOOP; \
+      )
+
+ENDIF
+
+! End of file ------------ LAS_setup_dsg.jnl--------------------------
+
+SAY _________________ END LAS_setup_dsg: clock seconds:                          ($clock_secs)
+!

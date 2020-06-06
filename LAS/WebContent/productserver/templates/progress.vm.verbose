@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="Content-Type"
+			content="text/html; charset=ISO-8859-1">
+	    <META HTTP-EQUIV="Refresh" CONTENT="30">
+		<title>LAS Progress Report</title>
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="$feed">
+	</head>
+	<body>
+		<h3>
+			LAS is working on your request.
+		</h3>
+		<table border="1">
+			<tr>
+				<th>
+				</th>
+				<th>
+					Operation
+				</th>
+				<th>
+					Status
+				</th>
+			</tr>
+			#foreach ($job in $operations) #set($index = $velocityCount - 1)
+			<tr>
+                                <td>
+                                      #if ( $status.get($index).contains("seconds") )
+                                        <img src="JavaScript/components/mozilla_blu.gif" alt="Spinner"/>
+                                      #end
+                                </td>
+				<td>
+					$job
+				</td>
+				<td>
+                                      #if ( $status.get($index).contains("*") )
+					$status.get($index) (Each refresh adds *'s to the current step.)
+                                      #else
+					$status.get($index)
+                                      #end
+				</td>
+			</tr>
+			#end
+		</table>
+		<br>
+		You can monitor the progress of your request by doing one of the
+		following:
+		<br>
+		<ol>
+			<li>
+				Keep your browser open to this page (it will refresh automatically every 30 seconds).
+			</li>
+			## Cache must be on for closing browser window and returning to work.
+			#if ( "$cache" == "true" )
+			<li>
+				Bookmark this page.&nbsp; When you return you will either get this
+				page again or the finished product when it is ready.
+			</li>
+			<li>
+				Enter your email address to receive notification when the request is
+				finished.
+			</li>
+			<form name="progress"
+				action="$server_url?xml=$las_request.toEncodedURLString()&amp;JSESSIONID=$JSESSIONID"
+				method="POST">
+				<INPUT TYPE="SUBMIT" NAME="embutton" value="Request E-Mail Notification">
+				<INPUT TYPE="text" name="email" size="50" value="$progress.email">
+			</form>
+			#if ( "$!emails" != "" && "$!emails" != "[]" ) 
+            When this product is finished LAS will send email to these addresses: $emails.
+            #end
+			<li>
+				Subscribe to the <a href="$feed">RSS feed</a>.&nbsp; The Feed title will change
+				indicate when the request has finished.
+				<br>
+			</li>
+			#end
+		</ol>
+		<form
+			action="$server_url?xml=$las_request.toEncodedURLString()&cancel=true&JSESSIONID=$JSESSIONID"
+			method="POST">
+			<INPUT TYPE="SUBMIT" NAME="cancel" VALUE="true">
+		</form>
+	</body>
+</html>

@@ -1,0 +1,11 @@
+To build addXML:
+
+	ant addxml
+
+To run addXML:
+
+	bin/addXML.sh
+
+To read the documentation:
+
+	http://ferret.pmel.noaa.gov/LAS/documentation/installer-documentation/adding-gridded-data/

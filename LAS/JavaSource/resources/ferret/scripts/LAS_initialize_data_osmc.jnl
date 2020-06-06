@@ -1,0 +1,194 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_initialize_data_insitu.jnl
+!
+! 
+! Author: ansley 
+! Date: 2006/07/10 21:06:04 $
+!
+! The LAS_initialize_data_insitu.jnl script takes care of everything having to
+! do with initializing a datset for later use.
+!
+! LAS_initialize_data_insitu.jnl takes an argument that specifies which data
+! item [0|1|2|3|...] to create symbols for. 
+
+!ACM_note: if we use a loop in the plot routine, we are not 
+! limited to 9 data items
+! DEFINE SYMBOL num ($1"0|0|1|2|3|4|5|6|7|8|9")
+
+! acm 2/6/2007  When the variable names are keywords, and therefore are
+!               enclosed in single quotes, make uppercase versions of these
+!               to work with RETURN=dset and the SET VAR/TITLE command.
+
+DEFINE SYMBOL num ($1"0")
+
+! TODO:  It would be nice if the java code removed this dependency upon
+! TODO:  whether an operation was 'chained' or not.
+
+! Check whether the source data was part of a 'chained' operation.
+
+IF ($data_($num)_chained"0|1|*>1) THEN
+  DEFINE SYMBOL data_url \"($data_($num)_file)\"
+ELSE
+  DEFINE SYMBOL data_url \"($data_($num)_url)\"
+ENDIF
+
+! SET DATA and check for errors
+
+SET DATA ($data_url)
+
+! TODO:  Use new error features in Ferret to turn off STDERR and check
+! TODO:  for Ferret error symbols to see if the SET DATA command actually worked.
+
+IF ($fer_last_error"0|*>1") THEN
+  DEFINE SYMBOL error_status = ERROR
+  DEFINE SYMBOL error_type = DATA
+  DEFINE SYMBOL error_string = The ($data_x_var) source file -- ($data_url) did not open successfully.
+  EXIT/SCRIPT
+ENDIF
+
+! See if the dataset has been marked empty.
+
+GO LAS_test_for_empty_data_file
+
+IF ($data_file_is_empty"0") THEN 
+   LET/BAD=99 data_x_bad = 99
+   LET/BAD=99 data_y_bad = 99
+   DEFINE SYMBOL data_x_var = data_x_bad
+   DEFINE SYMBOL data_y_var = data_y_bad
+   EXIT/SCRIPT
+ENDIF
+
+
+! The x and y locations for insitu plots
+! ACM note: These are assumed to be in the same dataset, along
+!           with data_($num)_var if it exists, but we could
+!           extend to different data sets with further symbols
+
+DEFINE SYMBOL data_x_var ($data_($num)_x_var)
+DEFINE SYMBOL data_y_var ($data_($num)_y_var)
+
+! The variable at the x and y locations
+
+IF ($data_($num)_var"0|1|*>1) THEN DEFINE SYMBOL data_var ($data_($num)_var)
+!IF ($data_($num)_units"0|*>1") THEN 
+!   DEFINE SYMBOL data_units (($data_($num)_units))
+!   DEFINE SYMBOL data_units "(($data_($num)_units))"
+!   IF `STRINDEX("($data_units)", "((") GT 0` THEN \
+!     DEFINE SYMBOL data_units ($data_($num)_units)
+!ENDIF
+
+! Be sure units and title are defined.
+! If units are not defined, try to get units from the data variable.
+! If the variable in the file has no units, leave data_units symbol undefined.
+ 
+IF ($data_var"0|*>1") THEN
+!   LET anames = ($data_var).attnames
+!   IF `IS_ELEMENT_OF_STR (anames, "units") OR IS_ELEMENT_OF_STR (anames, "UNITS")` THEN
+!      DEFINE SYMBOL data_var_units `($data_var),RETURN=units`123   ! check for empty units string.
+!      IF `STRLEN("($data_var_units)" ) EQ 3` THEN
+!      CANCEL SYMBOL data_var_units
+!      ELSE
+!         DEFINE SYMBOL data_var_units `($data_var),RETURN=units`
+!         DEFINE SYMBOL data_units (`($data_var),RETURN=units`)
+!      ENDIF
+!   ENDIF
+ENDIF
+
+IF ($data_($num)_title"0|1|*>1) THEN 
+   DEFINE SYMBOL data_title ($data_($num)_title) 
+   IF ($data_units"0|*>1") THEN DEFINE SYMBOL data_title ($data_($num)_title) ($data_units)
+ENDIF
+
+DEFINE SYMBOL ferret_plot_title ($data_title)
+
+! If the database returned a name for the variable which is a reserverd Ferret 
+! keyword, then it is in the symbol enclosed in single quotes. 
+
+! If it is lowercase, some Ferret commands like RETURN= want to operate on the 
+! uppercase form. Make an uppercase version of the name.
+
+LET its_keyword = `STRINDEX ("($data_x_var)", "'") GT 0`
+IF `its_keyword` THEN
+   DEFINE SYMBOL data_x_var  `UPCASE("($data_x_var)")`
+   LET data_num = `($data_x_var) ,return=dsetnum`
+   DEFINE SYMBOL data_num = `($data_x_var) ,return=dsetnum`
+ELSE
+   LET data_num = `($data_x_var) ,return=dsetnum`
+   DEFINE SYMBOL data_num = `($data_x_var) ,return=dsetnum`
+!   SET VAR/TITLE="Eastward Velocity" 'x'[d=`data_num`]
+ENDIF
+
+! Make an uppercase version of the Y variable if it is a keyword as well.
+
+LET its_keyword = `STRINDEX ("($data_y_var)", "'") GT 0`
+IF `its_keyword` THEN
+   DEFINE SYMBOL data_y_var  `UPCASE("($data_y_var)")`
+ENDIF
+
+IF ($data_var"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var = ($data_var)
+ENDIF
+
+IF ($data_title"0|*>1") THEN \
+  SET VAR/TITLE="($data_title)" ($data_x_var)[d=`data_num`]
+
+! Mark whether there are contour levels set on first entry. 
+! Compute automatic open-ended levels.
+
+IF `data_num EQ 1` THEN
+   IF ($ferret_fill_levels"0|*>1") THEN DEFINE SYMBOL input_fill_levels = 1
+   IF ($ferret_poly_levels"0|*>1") THEN 
+      DEFINE SYMBOL ferret_fill_levels ($ferret_poly_levels)
+      DEFINE SYMBOL input_fill_levels = 1
+   ENDIF
+
+   IF `STRLEN("($ferret_view)") EQ 2 AND STRINDEX("($operation_ID)", "Plot") GT 0` THEN \
+     GO LAS_auto_levels  
+   IF `STRLEN("($ferret_view)") EQ 2 AND STRINDEX("($operation_ID)", "poly") GT 0` THEN \
+     GO LAS_auto_levels  
+
+   IF `($ferret_poly_levels"0|*>1") EQ 0` THEN \
+      IF ($ferret_fill_levels"0|*>1") THEN DEFINE SYMBOL ferret_poly_levels ($ferret_fill_levels)
+ENDIF
+
+! Apply the expression in ferret_expression. $ represents the variable.
+
+IF ($ferret_expression"0|*>1") THEN 
+   LET ev = STRINDEX("($ferret_expression)", "$")
+   IF `ev EQ 0` THEN
+      DEFINE SYMBOL error_status = ERROR
+      DEFINE SYMBOL error_type = EXPRESSION
+      DEFINE SYMBOL error_string = The expression ($ferret_expression) must contain at least one $.
+      EXIT/SCRIPT
+   ENDIF
+
+   LET en = STRLEN("($ferret_expression)")
+   LET e1 = ev - 1
+   LET e2 = ev + 1
+   IF `e1 GT 0` THEN DEFINE SYMBOL expr1 = `SUBSTRING("($ferret_expression)", 1, e1)`
+   IF `e2 LT en` THEN DEFINE SYMBOL expr2 = `SUBSTRING("($ferret_expression)", e2, en)`
+
+   DEFINE SYMBOL ferret_plot_var ($expr1)($data_var)($expr2)
+   DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr2)
+
+! This works except if the expression has spaces around the $ characters.
+! Otherwise Ferret seems to be looking for script arguments.
+
+   LET esecond = STRINDEX("($expr2)", "$") 
+   IF `esecond GT 0` THEN
+
+      LET ev = STRINDEX("($expr2)", "$")
+      LET en = STRLEN("($expr2)")
+      LET e1 = ev - 1
+      LET e2 = ev + 1
+      IF `e1 GT 0` THEN DEFINE SYMBOL expr3 = `SUBSTRING("($expr2)", 1, e1)`
+      IF `e2 LT en` THEN DEFINE SYMBOL expr4 = `SUBSTRING("($expr2)", e2, en)`
+
+      DEFINE SYMBOL ferret_plot_var ($expr1)($data_var)($expr3)($data_var)($expr4)
+      DEFINE SYMBOL ferret_plot_title ($expr1)($data_var)($expr3)($data_var)($expr4)
+   ENDIF
+ENDIF
+
+CANCEL VAR data_num
+
+

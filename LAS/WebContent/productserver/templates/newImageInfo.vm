@@ -1,0 +1,13 @@
+
+ var newImage = new Object();
+ newImage.url = "$las_response.getResult("plot_image")";
+ newImage.offX = $las_map_scale.getXOffsetFromLeft();
+ newImage.offY = $las_map_scale.getYOffsetFromBottom();
+ newImage.width = $las_map_scale.getXPlotSize();
+ newImage.height = $las_map_scale.getYPlotSize();
+ newImage.wholeImageWidth = $las_map_scale.getXImageSize();
+ newImage.wholeImageHeight =$las_map_scale.getYImageSize(); 
+ newImage.lowX = $las_map_scale.getXAxisLowerLeft();
+ newImage.highX = $las_map_scale.getXAxisUpperRight();
+ newImage.lowY = $las_map_scale.getYAxisLowerLeft();
+ newImage.highY =  $las_map_scale.getYAxisUpperRight();

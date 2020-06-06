@@ -1,0 +1,11 @@
+<script type="text/javascript" src="JavaScript/ui/LASUI.js"></script>
+<script type="text/javascript" src="JavaScript/components/xmldom.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASRequest.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetGridResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetCategoriesResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetDataConstraintsResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetViewsResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetOperationsResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/LASGetOptionsResponse.js"></script>
+<script type="text/javascript" src="JavaScript/components/querystring.js"></script>
+<script type="text/javascript" src="JavaScript/components/DateWidget.js"></script>

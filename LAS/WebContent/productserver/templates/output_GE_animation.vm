@@ -1,0 +1,3 @@
+<a href="GEServlet?xml=$las_request.toEncodedURLString()&GE=animation&FRAMES=$las_response.getResultAsFile("ferret_listing")"><h2>View on Google Earth</h2></a>
+<br>
+It may take a while to generate the KML file, please wait!

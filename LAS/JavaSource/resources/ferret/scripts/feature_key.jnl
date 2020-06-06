@@ -1,0 +1,19 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! feature_key.jnl
+!
+! 
+! Make a list of the ID number and feature ID to go back 
+! for possible subsets of this set of features.
+
+IF `($feature_max) LE ($feature_max_labels)` THEN
+
+   IF `($ferret_feature_list_xml"0|*>1") EQ 0` THEN 
+      GO LAS_insitu_write_webrowset.jnl
+
+   ENDIF
+
+ENDIF
+
+! LAS creates the key from the webrowset
+
+! End of file ------------ feature_key.jnl --------------------------

@@ -1,0 +1,27 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! file: LAS_land.jnl
+! Revision: 1.1 
+! 
+! Author: ansley $
+! Date: 2011/01/03
+!
+! LAS_land.jnl automatically adjusts the resolution
+!
+! If a custom script is available to plot land outlines, 
+! its name comes in, in the symbol ferret_land_script
+
+IF ($ferret_land_script"0|*>1") THEN
+   GO ($ferret_land_script)
+   EXIT/SCRIPT
+
+! Otherwise use land_detail or land.
+
+ELSE
+  IF `( ($region_x_range"360") LT 60) OR ( ($region_y_range) LT 30)` THEN
+     GO land_detail ($ferret_land_arg)
+  ELSE
+     GO land 
+  ENDIF
+ENDIF
+
+!  ----------------- End of LAS_land.jnl ------------------------------------

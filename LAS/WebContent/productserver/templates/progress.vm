@@ -1,0 +1,125 @@
+#if ($las_request.getProperty("las", "output_type") == 'xml')
+<?xml version="1.0" encoding="UTF-8"?><backend_response><response ID="Batch"><date>$date</date><result type="batch" ID="elapsed_time" elapsed_time="$!seconds" index="0" /></response></backend_response>
+#else
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<meta http-equiv="Content-Type"
+			content="text/html; charset=ISO-8859-1">
+	        <meta http-equiv="refresh" URL="$server_url?xml=$las_request.toEncodedURLString()&amp;JSESSIONID=$JSESSIONID">
+		<title>LAS Progress Report</title>
+		<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="$feed">
+              <style type="text/css">
+                .tableBorderDark {
+	          border: double;
+                }
+                .titleText {
+                	font-family: Arial, Helvetica, sans-serif;
+                	font-size: 18px;
+                	font-weight: bolder;
+                	letter-spacing: 0.08em;
+                	text-align: left;
+                }
+                .textInstructions {
+                	font-family: Arial, Helvetica, sans-serif;
+                	font-size: 14px;
+                	font-style: normal;
+                	font-weight: bolder;
+                	font-variant: small-caps;
+                	text-decoration: none;
+                	background-color: #FAFBF4;
+                	display: compact;
+                	letter-spacing: normal;
+                	border: thin none;
+                	list-style-position: inside;
+                	list-style-type: none;
+                	cursor: hand;
+                }
+                .textChoices {
+                	font-family: Arial, Helvetica, sans-serif;
+                	font-size: 12px;
+                	font-weight: normal;
+                }
+              </style>
+             <script type="text/javascript" language="javascript">
+
+                  var myRefresh;
+                  function stopRefresh() {
+                      window.clearTimeout(myRefresh);
+                  }
+                  function startRefresh() {
+                      if (window.setTimeout && window.location && window.location.reload)
+                      myRefresh = window.setTimeout("window.location.reload(true)", 3000);
+                  }
+               </script>
+
+	</head>
+	<body>
+      #if ( "$!emails" != "" && "$!emails" != "[]" ) 
+                <span class="textInstructions">Thank you!</span><br>
+                <span class="textChoices">When this product is finished LAS will send email to these addresses: $emails. </span><br><br><br>
+		<form
+			action="$server_url?xml=$las_request.toEncodedURLString()&cancel=true&JSESSIONID=$JSESSIONID"
+			method="POST"><span class="textInstructions">You may still cancel this request:
+			<INPUT style="background-color:#E78273;" TYPE="SUBMIT" NAME="cancel_button" VALUE="Cancel"></span>
+		</form>
+      #else      
+		<table border="0">
+			<tr>
+			</tr>
+			<tr>
+                                <td class="titleText">
+		                   <a href="https://ferret.pmel.noaa.gov/LAS/" target="_new">Live Access Server</a> has been working on your request for:
+                                </td>
+                        </tr>
+                </table><br>
+			                 <table  class="tableBorderDark"  width="50%">
+                              <tr>
+                                <td align="center">
+                                         <img src="JavaScript/components/mozilla_blu.gif" alt="Spinner"/>
+					<font color="red" size="+2">&nbsp;&nbsp;$seconds&nbsp;seconds&nbsp;&nbsp;</font>
+                                         <img src="JavaScript/components/mozilla_blu.gif" alt="Spinner"/>
+                                </td>
+                              <tr>
+                             </table>
+                <table   width="90%">
+                        <tr>
+			  <td>
+	  		    <br>
+			      ## Cache must be on for closing browser window and returning to work.
+			      #if ( "$cache" == "true" )		
+		                 <span class="textInstructions">You can wait until your request has been completed, or we can </span>	
+                          </td>
+                        </tr>
+                        <tr>
+			  <td>
+			      <span class="textInstructions">
+				notify you via email when the request has finished:
+			      </span>
+                           </td>
+                        </tr>
+                </table>
+			<form name="progress" id="progress"
+				action="$server_url?xml=$las_request.toEncodedURLString()&amp;JSESSIONID=$JSESSIONID"
+				method="POST">
+				<INPUT TYPE="text" id="email" name="email" size="50" onfocus="stopRefresh()" onblur="startRefresh()" value="Enter email address">
+				<INPUT style="background-color:#c6e3c6;" TYPE="SUBMIT" NAME="embutton" value="Request E-Mail Notification">
+
+			</form>
+
+			#end
+		<form
+			action="$server_url?xml=$las_request.toEncodedURLString()&cancel=true&JSESSIONID=$JSESSIONID"
+			method="POST"><span class="textInstructions">Cancel this request:
+			<INPUT style="background-color:#E78273;" TYPE="SUBMIT" NAME="cancel_button" VALUE="Cancel"></span>
+		</form>
+        <script language="javascript" type="text/javascript">
+	        startRefresh();
+        </script>         
+#end  
+	</body>
+</html>
+#end

@@ -1,0 +1,321 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_set_diff_labels.jnl
+! Revision: 1.1
+! 
+! $Author: ansley $
+! $Date: Feb 2007 
+!
+! Set the title and labels for a difference plot, reproducing the behavior
+! of diff plots from old LAS
+! 3/7/2007: ACM. Remove extra units labels. Make title smaller when it is 4- lines.
+! 10/10/2012 Reverse the sense of the difference; ticket 1377
+
+! Set upper-left labels, listing location normal to the plot
+! Argumnent is the view of this plot: for a 2d xy plot, XY; for a time series plot T
+!
+! Create the title (Use ascii font so any underscores in the variable or 
+! url show up. Escape character before @P2 lets us get red text.)
+!
+! If there is a long URL, put URLs at the top, and use dataset names
+! in the title
+! 
+! 10-Oct-2007 Remove extra units labels from 2nd dataset. Allow for one dataset
+! to be a URL and  the other a simple dataset name. Add upper-left label for
+! locations or times normal to the plot, previously missed if region was defined 
+! for variable 2 but not variable 1
+
+! If we want a different color than red for the second color, send it in as $2
+
+! This script issues plot commands, so it needs to be called AFTER LAS_open_window.
+
+IF $2"0|*>1" THEN 
+   DEFINE SYMBOL ipen = @P$2
+ELSE
+   DEFINE SYMBOL ipen = @P2
+ENDIF
+
+! Get the region symbols as they would be drawn on the plot.
+
+IF `($ferret_vector_1"0|*>1") OR ($ferret_vector_x1"0|*>1")` THEN 
+   DEFINE SYMBOL plt_command = VECTOR
+   DEFINE SYMBOL test_plot_1 = ($ferret_vector_x1), ($ferret_vector_y1)
+   DEFINE SYMBOL test_plot_2 = ($ferret_vector_x2), ($ferret_vector_y2)
+
+   IF ($native_curvilinear_xy"0|*>1") THEN
+      DEFINE SYMBOL test_plot_1 = ($ferret_plot_base_var_2),  ($ferret_plot_base_var_3), xcoord, ycoord
+      DEFINE SYMBOL test_plot_2 = ($ferret_plot_base_var_0),  ($ferret_plot_base_var_0), xcoord, ycoord
+   ENDIF
+ELSE
+   DEFINE SYMBOL plt_command = SHADE
+   IF `STRLEN("($ferret_view)") EQ 1` THEN DEFINE SYMBOL plt_command = PLOT
+   DEFINE SYMBOL test_plot_1 = ($ferret_var_0)
+   DEFINE SYMBOL test_plot_2 = ($ferret_var_1)
+
+   IF ($native_curvilinear_xy"0|*>1") THEN
+      DEFINE SYMBOL test_plot_1 = ($ferret_plot_base_var_0), xcoord, ycoord
+      DEFINE SYMBOL test_plot_2 = ($ferret_plot_base_var_1), xcoord, ycoord
+   ENDIF
+
+ENDIF
+
+($plt_command)/SET ($test_plot_1)
+   IF ($labnum_x"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_x))", ":")
+	 LET llen = STRLEN("($lab($labnum_x))")
+	 DEFINE SYMBOL longlab1 = `SUBSTRING("($lab($labnum_x))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_y"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_y))", ":")
+	 LET llen = STRLEN("($lab($labnum_y))")
+	 DEFINE SYMBOL latlab1 = `SUBSTRING("($lab($labnum_y))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_z"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_z))", ":")
+	 LET llen = STRLEN("($lab($labnum_z))")
+	 DEFINE SYMBOL depthlab1 = `SUBSTRING("($lab($labnum_z))", nc+1, llen-nc)`
+	 LET nc = `STRINDEX("($lab($labnum_z))", "(")`
+	 LET ncc = `STRINDEX("($lab($labnum_z))", ")")`
+	 IF `nc GT 0` THEN DEFINE SYMBOL depthunits = `SUBSTRING("($lab($labnum_z))", nc, ncc-nc+1)`
+   ENDIF
+   IF ($labnum_t"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_t))", ":")
+	 LET llen = STRLEN("($lab($labnum_t))")
+	 DEFINE SYMBOL timelab1 = `SUBSTRING("($lab($labnum_t))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_year"0|*>1") THEN DEFINE SYMBOL year_lab1 ($lab($labnum_year))
+   IF ($labnum_e"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_e))", ":")
+	 LET llen = STRLEN("($lab($labnum_e))")
+	 DEFINE SYMBOL ensnum = `SUBSTRING("($lab($labnum_e))", nc+1, llen-nc)`
+         LET varnames = ..varnames
+         IF `IS_ELEMENT_OF_STR_N(varnames, "labels") EQ 0` THEN \
+	   LET labels = STRCAT("EnsembleMember", FLOATSTR(_e[ge=($data_var)], "(I3.0)") )
+	 DEFINE SYMBOL enslab1 = `labels[e=($ensnum)]`
+   ENDIF
+   IF ($labnum_f"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_f))", ":")
+	 LET llen = STRLEN("($lab($labnum_f))")
+	 DEFINE SYMBOL forecastlab1 = `SUBSTRING("($lab($labnum_f))", nc+1, llen-nc)`
+   ENDIF
+($plt_command)/SET ($test_plot_2)
+   IF ($labnum_x"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_x))", ":")
+	 LET llen = STRLEN("($lab($labnum_x))")
+	 DEFINE SYMBOL longlab2 = `SUBSTRING("($lab($labnum_x))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_y"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_y))", ":")
+	 LET llen = STRLEN("($lab($labnum_y))")
+	 DEFINE SYMBOL latlab2 = `SUBSTRING("($lab($labnum_y))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_z"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_z))", ":")
+	 LET llen = STRLEN("($lab($labnum_z))")
+	 DEFINE SYMBOL depthlab2 = `SUBSTRING("($lab($labnum_z))", nc+1, llen-nc)`
+	 LET nc = `STRINDEX("($lab($labnum_z))", "(")`
+	 LET ncc = `STRINDEX("($lab($labnum_z))", ")")`
+	 IF `nc GT 0` THEN DEFINE SYMBOL depthunits = `SUBSTRING("($lab($labnum_z))", nc, ncc-nc+1)`
+   ENDIF
+   IF ($labnum_t"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_t))", ":")
+	 LET llen = STRLEN("($lab($labnum_t))")
+	 DEFINE SYMBOL timelab2 = `SUBSTRING("($lab($labnum_t))", nc+1, llen-nc)`
+   ENDIF
+   IF ($labnum_year"0|*>1") THEN DEFINE SYMBOL year_lab2 ($lab($labnum_year))
+   IF ($labnum_e"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_e))", ":")
+	 LET llen = STRLEN("($lab($labnum_e))")
+	 DEFINE SYMBOL enslab2 = `SUBSTRING("($lab($labnum_e))", nc+1, llen-nc)`
+	
+	 DEFINE SYMBOL ensnum = `SUBSTRING("($lab($labnum_e))", nc+1, llen-nc)`
+         LET varnames = ..varnames
+         IF `IS_ELEMENT_OF_STR_N(varnames, "labels") EQ 0` THEN \
+	   LET labels = STRCAT("EnsembleMember", FLOATSTR(_e[ge=($data_var)], "(I3.0)") )
+	 DEFINE SYMBOL enslab2 = `labels[e=($ensnum)]`
+   ENDIF
+   IF ($labnum_f"0|*>1") THEN
+	 LET nc = STRINDEX("($lab($labnum_f))", ":")
+	 LET llen = STRLEN("($lab($labnum_f))")
+	 DEFINE SYMBOL forecastlab2 = `SUBSTRING("($lab($labnum_f))", nc+1, llen-nc)`
+   ENDIF
+LET add_urls = 1
+IF `STRCMP("($data_0_dataset_name)", "($data_0_dataset_url)") EQ 0` THEN LET add_urls = 0
+
+! BUT THE URLS are also at the top of the page. Remove them from here 
+! (Under discussion)
+LET add_urls = 0
+
+IF `add_urls EQ 1` THEN
+   DEFINE SYMBOL ferret_diff_title = \
+   @AC ($ferret_title_1)) from ($data_1_dataset_name)(2) \
+   <NL> minus  ($ipen)($ferret_title_0) from ($data_0_dataset_name)(1)
+ELSE
+   DEFINE SYMBOL ferret_diff_title = \
+   @AC ($ferret_title_1)) (2) \
+   <NL> minus  ($ipen)($ferret_title_0) (1)
+ENDIF
+
+IF `STRCMP("($data_0_dataset_name)", "($data_1_dataset_name%99%)") NE 0` THEN
+   DEFINE SYMBOL dataset_title_lab = \
+    DATASETS: ($data_0_dataset_name)(1)  ($data_1_dataset_name)(2)
+   IF ($ferret_annotations"0|*>1") THEN DEFINE SYMBOL dataset_title_lab = \
+    DATASETS: ($data_1_dataset_name) minus ($data_0_dataset_name)
+ELSE
+   DEFINE SYMBOL dataset_title_lab = DATASET: ($data_0_dataset_name)
+ENDIF
+
+DEFINE SYMBOL variable_lab = \
+    Difference of ($ferret_title_1) minus ($ferret_title_0)
+IF `STRCMP("($ferret_title_0)", "($ferret_title_1)") EQ 0` THEN \
+   DEFINE SYMBOL variable_lab = Difference of ($ferret_title_0)
+
+! For data listings, a title without formatting information.
+DEFINE SYMBOL ferret_diff_list_title = ($dataset_title_lab)
+
+! For annotations, without the (1) and (2)
+IF ($ferret_annotations"0|*>1") THEN \
+  DEFINE SYMBOL ferret_diff_list_title = ($dataset_title_lab)
+
+IF `STRLEN("($ferret_diff_title)") GT 150` THEN
+
+  DEFINE SYMBOL lab_0 = ($ferret_title_0) from ($data_0_dataset_name)(1)
+  IF `STRLEN("($lab_0)") GT 80` THEN  
+    DEFINE SYMBOL lab_0 = ($ferret_title_0) \
+    <NL>  from @AC($data_0_dataset_name)(1) 
+  ENDIF
+
+  DEFINE SYMBOL lab_1 = ($ferret_title_1)) from ($data_1_dataset_name)(2)
+
+  IF `STRLEN("($lab_1)") GT 80` THEN  
+    DEFINE SYMBOL lab_1 = ($ferret_title_1) \
+    <NL>  from @AC($data_1_dataset_name)(2)
+  ENDIF
+  DEFINE SYMBOL ferret_diff_title = ($lab_1)<NL>  minus  ($ipen)($lab_0)
+  DEFINE SYMBOL title_size 0.12   ! make title text smaller...
+ENDIF
+
+! Set the upper-left labels, locations/time normal to the plot 
+
+IF `($n_left_labels"0|*>1") EQ 0` THEN DEFINE SYMBOL n_left_labels = 0
+
+DEFINE SYMBOL plotshape = $1
+
+IF `STRINDEX("($plotshape)", "X") EQ 0` THEN
+   IF ($region_0_x_lo"0|*>1") THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Longitude(1): ($longlab1) ($ipen)Longitude(2): ($longlab2)
+      DEFINE SYMBOL longitude_lab = LONGITUDE(1): ($longlab1) Longitude(2): ($longlab2)
+      IF `(STRCMP("($longlab1)", "($longlab2)") NE 0)` THEN 
+         DEFINE SYMBOL longitude_lab = LONGITUDE: ($longlab2) minus ($longlab1)
+      ELSE
+         DEFINE SYMBOL longitude_lab = LONGITUDE: ($longlab1)
+      ENDIF
+   ELIF ($region_1_x_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Longitude(2): ($longlab2)
+      DEFINE SYMBOL longitude_lab = LONGITUDE: ($longlab2)
+   ENDIF
+ENDIF
+
+IF `STRINDEX("($plotshape)", "Y") EQ 0` THEN
+   IF ($region_0_y_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Latitude(1): ($latlab1) ($ipen)Latitude(2): ($latlab2)
+      DEFINE SYMBOL latitude_lab = LATITUDE(1): ($latlab1) Latitude(2): ($latlab2)
+      IF `(STRCMP("($latlab1)", "($latlab2)") NE 0)` THEN 
+         DEFINE SYMBOL latitude_lab = LATITUDE: ($latlab2) minus ($latlab1)	
+      ELSE
+         DEFINE SYMBOL latitude_lab = LATITUDE: ($latlab1)
+      ENDIF
+   ELIF ($region_1_y_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Latitude(2): ($latlab2)
+      DEFINE SYMBOL latitude_lab = LATITUDE: ($latlab2)
+   ENDIF
+ENDIF
+
+IF `STRINDEX("($plotshape)", "Z") EQ 0` THEN   
+   IF ($region_0_z_lo"0|*>1") THEN
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = DEPTH ($depthunits)(1): ($depthlab1) ($ipen)DEPTH ($depthunits)(2): ($depthlab2)
+      DEFINE SYMBOL depth_lab = DEPTH ($depthunits)(1): ($depthlab1) DEPTH ($depthunits)(2): ($depthlab2)
+      IF `(STRCMP("($depthlab1)", "($depthlab2)") NE 0)` THEN 
+         DEFINE SYMBOL depth_lab = DEPTH ($depthunits): ($depthlab2) minus ($depthlab1)
+      ELSE
+         DEFINE SYMBOL depth_lab = DEPTH ($depthunits): ($depthlab1)
+      ENDIF
+   ELIF ($region_1_z_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = DEPTH ($depthunits)(2): ($depthlab2)
+      DEFINE SYMBOL depth_lab = DEPTH ($depthunits): ($depthlab2)
+   ENDIF
+ENDIF
+
+IF `STRINDEX("($plotshape)", "T") EQ 0` THEN   
+   IF ($region_0_t_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Time(1): ($timelab1) ($ipen)Time(2): ($timelab2)
+      DEFINE SYMBOL time_lab = Time(1): ($timelab1) Time(2): ($timelab2)
+      IF `(STRCMP("($timelab1)", "($timelab2)") NE 0)` THEN 
+         DEFINE SYMBOL time_lab = TIME: ($timelab2) minus ($timelab1)
+      ELSE
+         DEFINE SYMBOL time_lab = TIME: ($timelab2)
+      ENDIF
+   ELIF ($region_1_t_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = TIME(2): ($timelab2)
+      DEFINE SYMBOL time_lab = TIME: ($timelab2)
+   ENDIF
+ENDIF
+
+IF `STRINDEX("($plotshape)", "E") EQ 0` THEN   
+   IF ($region_0_e_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      
+      DEFINE SYMBOL upper_left_($n_left_labels) = Ensemble(1): ($enslab1) ($ipen)Ensemble(2): ($enslab2)
+      DEFINE SYMBOL ens_lab = Ensemble(1): ($enslab1) Ensemble(2): ($enslab2)
+      IF `(STRCMP("($enslab1)", "($enslab2)") NE 0)` THEN 
+         DEFINE SYMBOL ens_lab = ENSEMBLE: ($enslab2) minus ($enslab1)
+      ELSE
+         DEFINE SYMBOL ens_lab = ENSEMBLE: ($enslab2)
+      ENDIF
+   ELIF ($region_e_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Ensemble(2): ($enslab2)
+      DEFINE SYMBOL ens_lab = ENSEMBLE: ($enslab2)
+   ENDIF
+ENDIF
+
+IF `STRINDEX("($plotshape)", "F") EQ 0` THEN   
+   IF ($region_0_f_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Forecast(1): ($forcastlab1) ($ipen)Forecast(2): ($forcastlab2)
+      DEFINE SYMBOL Forecast_lab = Forecast(1): ($forcastlab1) Forecast(2): ($forcastlab2)
+      IF `(STRCMP("($forcastlab1)", "($forcastlab2)") NE 0)` THEN 
+         DEFINE SYMBOL Forecast_lab = Forecast: ($forcastlab2) minus ($forcastlab1)
+      ELSE
+         DEFINE SYMBOL Forecast_lab = Forecast: ($forcastlab2)
+      ENDIF
+   ELIF ($region_1_f_lo"0|*>1") THEN 
+      DEFINE SYMBOL n_left_labels = `($n_left_labels)+1`
+      DEFINE SYMBOL upper_left_($n_left_labels) = Forecast(2): ($forcastlab2)
+      DEFINE SYMBOL forecast_lab = Forecast: ($forcastlab2)
+   ENDIF
+ENDIF
+
+IF ($year_lab1"0|*>1") THEN
+   IF `STRCMP("($year_lab1)", "($year_lab1)") EQ 0` THEN
+      DEFINE SYMBOL year_lab = ($year_lab1)
+   ELSE
+      DEFINE SYMBOL year_lab = ($year_lab2) minus ($year_lab1)  ! shouldnt happen
+   ENDIF
+ENDIF
+
+! If there are URLs set up to write them in the upper right
+
+CANCEL SYMBOL upper_right_*
+DEFINE SYMBOL n_right_labels = 0
+
+GO LAS_url_label 0
+IF `STRCMP("($data_0_dataset_url%0%)", "($data_1_dataset_url%0%)") NE 0` THEN  GO LAS_url_label 1
+

@@ -1,0 +1,36 @@
+! LAS_check_for_pseudoname
+! 
+! Argument is a name
+
+DEFINE SYMBOL isit_pseudo = ($1)
+
+LET pseudo_names = {\
+"'i'", "'j'", "'k'", "'l'", "'x'", "'y'", "'z'", "'t'", "'xbox'", "'ybox'", "'zbox'", "'tbox'", \
+"'xboxlo'", "'yboxlo'", "'zboxlo'", "'tboxlo'", "'xboxhi'", "'yboxhi'", "'zboxhi'", "'tboxhi'",  \
+"'I'", "'J'", "'K'", "'L'", "'X'", "'Y'", "'Z'", "'T'", "'XBOX'", "'YBOX'", "'ZBOX'", "'TBOX'", \
+"'XBOXLO'", "'YBOXLO'", "'ZBOXLO'", "'TBOXLO'", "'XBOXHI'", "'YBOXHI'", "'ZBOXHI'", "'TBOXHI'"}
+
+IF `IS_ELEMENT_OF_STR("($isit_pseudo)",pseudo_names) `  THEN
+   LET slen = STRLEN("($isit_pseudo)")
+   DEFINE SYMBOL isit_pseudo_nq = `SUBSTRING("($isit_pseudo)", 2, slen-2)`
+   LET ($isit_pseudo_nq)_1 = ($isit_pseudo)
+   SET ATT/LIKE=($isit_pseudo) ($isit_pseudo_nq)_1
+   DEFINE SYMBOL isit_pseudo ($isit_pseudo_nq)_1
+   EXIT/SCRIPT
+ENDIF
+
+! Check for name not enclosed in quotes
+
+LET pseudo_names = {\
+"i", "j", "k", "l", "x", "y", "z", "t", "xbox", "ybox", "zbox", "tbox", \
+"xboxlo", "yboxlo", "zboxlo", "tboxlo", "xboxhi", "yboxhi", "zboxhi", "tboxhi",  \
+"I", "J", "K", "L", "X", "Y", "Z", "T", "XBOX", "YBOX", "ZBOX", "TBOX", \
+"XBOXLO", "YBOXLO", "ZBOXLO", "TBOXLO", "XBOXHI", "YBOXHI", "ZBOXHI", "TBOXHI"}
+
+IF `IS_ELEMENT_OF_STR("($isit_pseudo)",pseudo_names) `  THEN 
+   DEFINE SYMBOL isit_pseudo ($isit_pseudo)_1
+ELSE
+   CANCEL SYMBOL isit_pseudo
+ENDIF
+
+! End of script ---------- LAS_check_for_pseudoname.jnl----------------------------

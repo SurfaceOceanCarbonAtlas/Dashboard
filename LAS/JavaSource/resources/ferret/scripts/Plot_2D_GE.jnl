@@ -1,0 +1,133 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: rhs $
+!
+! Plot_2d.jnl decides which script to call to make a 2D plot.
+! In the "old" LAS UI a 2D plot has the same options and other
+! UI characteristics regardless of the dimension so it's easier
+! to have one script like this to drive all the others.
+! In the new UI it's likely we'll define one operation per
+! dimension.
+!
+! plot_2D_GE
+
+! ACM 7-21-2008
+! Fixes to the check on the Y region for XY plots - if the init script renames
+! a file variable, an error occurred the second time the init script was called.
+!
+! 10/4/2016 fixes so init scripts still work
+
+
+GO LAS_initial_setup
+
+IF ($ferret_view"|xt>1|*>0") THEN
+
+   !! Make a plot in XT...
+   go draw_plot_2D
+
+ELIF ($ferret_view"|xy>1|*>0") THEN
+
+   !! Make a plot in XY...
+   ! Redefine a few symbols for Google-Earth style plots
+
+   DEFINE SYMBOL ferret_margins = false !always no margins for plot on GE
+   !DEFINE SYMBOL qualifiers = ($qualifiers)/LINE/NOAXES
+   DEFINE SYMBOL qualifiers = ($qualifiers)/NOAXES
+   DEFINE SYMBOL ferret_google_plot = 1
+   !always use large size for plots on GE
+   DEFINE SYMBOL ferret_size = 0.8333
+   
+   DEFINE SYMBOL ferret_plot_key = nokey
+
+   DEFINE SYMBOL its_GE = `STRINDEX( "($operation_ID)", "_GE" ) NE 0` 
+   IF ($its_GE"0|*>1") THEN
+
+
+! For Google Earth plots, check y region:
+! check if region_y_hi > dataset_y_max; if so, reset region_y_hi to dataset_y_max 
+! check if region_y_lo < dataset_y_min; if so, reset region_y_lo to dataset_y_min 
+
+      GO LAS_initialize_region 0
+      GO LAS_initialize_dataset 0
+
+! Do not do this if the data are on a curvilinear grid - in that case keep the 
+! region information from the User Interface
+      IF `($ferret_curvi_coord_lat"0|*>1") EQ 0` THEN
+
+!  We need to have the region and data symbols so initialize these.
+!  The product script will run these again with the new y region settings.
+          IF ($ferret_init_script"0|*>1") THEN GO ($ferret_init_script) ($dset($1"0"))
+
+
+          IF ($data_0_var"0|*>1") THEN DEFINE SYMBOL data_var ($data_0_var)
+
+          LET yy = yboxhi[gy=($data_var)]
+          LET yhi = `yy[y=@max]`
+          LET yy = yboxlo[gy=($data_var)]
+          LET ylo = `yy[y=@min]`
+
+          IF `($region_y_hi) GT yhi` THEN DEFINE SYMBOL region_0_y_hi = `yhi`
+          IF `($region_y_lo) LT ylo` THEN DEFINE SYMBOL region_0_y_lo = `ylo`
+
+       ENDIF
+
+!  Google Earth as of 4/2013 really wants the longitudes to be in -180:180.
+!  If the request is global then just switch to that range.
+
+       DEFINE SYMBOL two_parter = 0
+       LET data_xax = x[gx=($data_0_var)]
+
+       LET dx = `data_xax[i=2] - data_xax[i=1]`
+       IF `($ferret_curvi_coord_lat"0|*>1") EQ 0` THEN LET dx = 2  ! just for testing
+       DEFINE SYMBOL region_0_x_range = `($region_0_x_hi) - ($region_0_x_lo)` 
+       IF `($region_0_x_range) GT 360-2*dx` THEN
+          DEFINE SYMBOL region_0_x_lo = -180
+          DEFINE SYMBOL region_0_x_hi =  180
+          
+! Otherwise try to make it go into -180:180.  
+
+       ELIF `(($region_0_x_lo) GE 180) AND (($region_0_x_hi) GT 180)` THEN
+          DEFINE SYMBOL region_0_x_lo = `($region_0_x_lo) - 360`
+          DEFINE SYMBOL region_0_x_hi = `($region_0_x_hi) - 360`
+       ELIF `(($region_0_x_lo) LT -180) AND (($region_0_x_hi) LE -180)` THEN
+          DEFINE SYMBOL region_0_x_lo = `($region_0_x_lo) + 360`
+          DEFINE SYMBOL region_0_x_hi = `($region_0_x_hi) + 360`
+       ELSE
+          DEFINE SYMBOL two_parter = 1
+       ENDIF
+       
+! Cancel the dataset initialized above; the initialization will be done
+! in xy_plot_2D, and if there is an init script, for instance, things will break.
+! Also cancel any defined variables from an init script.
+
+       IF ($ferret_init_script"0|*>1") THEN
+          CANCEL VARIABLE/ALL
+          CANCEL DATA 1
+       ENDIF
+
+       go xy_plot_2D
+   ENDIF
+
+ELIF ($ferret_view"|xz>1|*>0") THEN
+
+   !! Make a plot in XZ...
+   go draw_plot_2D
+
+ELIF ($ferret_view"|yt>1|*>0") THEN
+
+   !! Make a plot in YT...
+   go draw_plot_2D
+
+ELIF ($ferret_view"|yz>1|*>0") THEN
+
+   !! Make a plot in YZ...
+   go draw_plot_2D
+
+ELIF ($ferret_view"|zt>1|*>0") THEN
+
+   !! Make a plot in ZT...
+   go draw_plot_2D
+
+ELSE
+  say " **ERROR: Attempt to make a plot in ($ferret_view) with 2D plot script."
+ENDIF

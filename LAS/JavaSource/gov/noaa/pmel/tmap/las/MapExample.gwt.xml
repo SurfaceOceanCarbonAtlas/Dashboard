@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='mapexample'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+
+  <!-- Inherit the default GWT style sheet.  You can change       -->
+  <!-- the theme of your GWT application by uncommenting          -->
+  <!-- any one of the following lines.                            -->
+  <inherits name='com.google.gwt.user.theme.standard.Standard'/>
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+  
+  <!-- GWT Joda Time implementation. -->
+  <inherits name='org.gwttime.Time' />
+      
+  <!-- Other module inherits                                      -->
+  <inherits name="gov.noaa.pmel.tmap.las.client.map.OLMapWidget"/>
+  <inherits name='org.gwtopenmaps.openlayers.OpenLayers'/>
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='gov.noaa.pmel.tmap.las.client.map.example.MapExample'/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path="client">
+    <exclude name="**/inventory/**"/>
+    <exclude name="**/Inventory.java"/>
+  </source>
+
+  <source path='shared'/>
+
+</module>

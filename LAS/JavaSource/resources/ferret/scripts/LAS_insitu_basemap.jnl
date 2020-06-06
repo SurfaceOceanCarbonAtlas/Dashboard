@@ -1,0 +1,71 @@
+\cancel mode verify
+! LAS_insitu_basemap.jnl
+
+! 
+! $Author: ansley 
+! $Date: 2006/07/18
+
+! based on std_refmap.jnl
+! Description: draw an underlay basemap for insitu plot.
+
+! arguments:	               1    
+! Usage: GO LAS_insitu_basemap [magnify]
+!
+! For example:
+!	yes? go LAS_insitu_basemap  
+! and
+!	yes? go LAS_insitu_basemap 2
+
+! this script assumes that the viewport has already been set/window opened
+! The region symbols are assumed to include space surrounding the scattered points
+
+! NOTE:  MAGNIFY FACTOR
+! The argument magnify determines what resolution of land mask is used.
+
+DEFINE SYMBOL region_xy =  x=($region_x_lo):($region_x_hi),y=($region_y_lo):($region_y_hi)
+
+! set plot qualifiers for graticules, margins
+
+IF ($ferret_use_graticules"1|0|*>1) THEN
+  SET MODE GRATICULE:(DASH,COLOR=black)
+ENDIF
+
+! Set up for degrees-minutes-seconds labels on axes with units of degrees
+
+IF ($ferret_deg_min_sec"0|false>0|*>1") THEN GO LAS_set_deg_min_sec.jnl
+
+! For Filled land, set the palette to grey; for outline make it white. Draw
+! the shade plot. This way we get graticules and axes and margins set up.
+! For an outline plot, just call land below and we are set.
+
+IF ($ferret_land_type"1|none>0|contour>0|filled>1|default>1|*>0") THEN
+  DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=grey
+ELIF ($ferret_land_type"0|none>0|contour>1|filled>0|*>0") THEN
+  DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=white
+ENDIF
+
+show sym qualifiers
+
+! init the land mask data set
+! Do we have etopo05 available??
+! set data etopo$5"60|0>60|1>40|2>20|3>20|4>20|5>5|*>60" 
+set data etopo$5"60|0>60|1>40|2>20|3>20|4>20|5>5|*>60" ! => needs to be checked out
+! draw gray shaded continents
+! known potential bug: if X region begins at, say, 0E then magnification 3
+!	or greater results in negative modulo subscripts
+
+shade($qualifiers)/lev=(0,10000,10000)/nokey/nolab/set rose[($region_xy)]
+   IF ($xform_dms"0|*>1") THEN PPL XFOR (($xform_dms))
+   IF ($yform_dms"0|*>1") THEN PPL YFOR (($yform_dms))
+PPL SHADE
+
+! some clean up now to assist with repeated testing
+can data etopo$5"60|0>60|1>40|2>20|3>20|4>20|5>20|*>60" ! => needs to be checked out
+
+IF ($ferret_land_type"1|none>0|contour>0|filled>1|default>1|*>0") THEN
+  GO LAS_fland 
+ELIF ($ferret_land_type"0|none>0|contour>1|filled>0|*>0") THEN
+  GO LAS_land 
+ENDIF
+
+set mode/last verify

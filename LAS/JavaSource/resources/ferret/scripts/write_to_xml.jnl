@@ -1,0 +1,1 @@
+MESSAGE/QUIET/CONTINUE/OUTFILE="($result_annotations_filename)"/APPEND ($out)

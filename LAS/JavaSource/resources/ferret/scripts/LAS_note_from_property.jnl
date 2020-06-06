@@ -1,0 +1,42 @@
+! LAS_note_from_property.jnl
+! 2/2017 ACM
+!
+! Define a note in the annotations box using Ferret properties.
+! Include a url if it is specified. IF the letters url are
+! part of the note text, substitute the url for url. Otherwise,
+! if a URL is given, just use the entire note text in the link.
+!
+! Call this as part of dataset initialization. If these Ferret properties
+! are set, then the annotation is defined:
+!
+!   ferret_add_a_note   Contains text to be added to the notes in the annotation box.
+!   ferret_url_for_note Contains a url, which can be a relative url, docs/Prawler_profiles.html
+!                       If ferret_add_a_note is not defined, then ferret_url_for_note is ignored.
+!                       The url will be shown in parentheses.
+
+IF ($ferret_add_a_note"0|*>1") THEN 
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL new_note = ($ferret_add_a_note)
+
+! If a url is given, then substitute it for the letters url within the note text.
+! If the letters url do not appear in the note text, make the entire text the link.
+
+   IF ($ferret_url_for_note"0|*>1") THEN
+      LET nl = STRLEN("($ferret_add_a_note)")
+      LET iu = MAX(1, STRINDEX("($ferret_add_a_note)", "url") )
+
+      IF `iu GT 1` THEN 
+         DEFINE SYMBOL new_note1 = `SUBSTRING("($ferret_add_a_note)", 1, iu-1)`
+         DEFINE SYMBOL new_note2 = `SUBSTRING("($ferret_add_a_note)", iu+4, nl)` 
+      ELSE
+         DEFINE SYMBOL new_note2 = ($ferret_add_a_note)
+      ENDIF
+
+      DEFINE SYMBOL new_note = ($new_note1) (<a target=&quot;_blank&quot; href=($ferret_url_for_note)>($new_note2)</a>)
+   ENDIF
+
+!  set the note symbol.
+
+   DEFINE SYMBOL note_($note_num)_lab = ($new_note)
+ENDIF

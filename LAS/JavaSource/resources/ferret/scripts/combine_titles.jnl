@@ -1,0 +1,108 @@
+! combine_titles.jnl
+! where masking is done, combine labels for 2 masks on a variable 
+! into one expression, e.g.
+!
+!  Where lon < 12
+!  Where lon > 2
+!
+! become a single title,
+!
+!  Where 2 < lon < 12
+!
+! Or for text constraints, make a list:
+!
+!  Where tmonth is Jun
+!  Where tmonth is Jul
+!
+! becomes
+!
+!  Where tmonth is Jun, Jul
+
+IF `STRINDEX("($op_last)", "G") GT 0 AND STRINDEX("($op)", "L") GT 0` THEN 
+   DEFINE SYMBOL letter2 = `SUBSTRING("($op_last)", 2, 1)`
+   DEFINE SYMBOL reverse = `STRCAT("L", "($letter2)")`
+
+   DEFINE SYMBOL math_op_sym = ($reverse)
+   IF ($math_sym_convert"1|no_convert>0") THEN GO op_math_sym ($translate_math) ($reverse)
+   DEFINE SYMBOL opA = ($math_op_sym)
+   
+   DEFINE SYMBOL math_op_sym = ($op)
+   IF ($math_sym_convert"1|no_convert>0") THEN GO op_math_sym ($translate_math) ($op)
+   DEFINE SYMBOL opB = ($math_op_sym)
+   CANCEL SYMBOL mask_title_($nmask_labels)
+   DEFINE SYMBOL nmask_labels = `($nmask_labels) - 1` 
+   
+   IF ($rhsdate"0|*>1") THEN 
+      DEFINE SYMBOL mask_title_($nmask_labels) = Where ($rhs_last) ($opA) ($lhs_last) ($opB) ($rhs)
+   ELSE
+      DEFINE SYMBOL mask_title_($nmask_labels) = Where `($rhs_last),prec=3` ($opA) ($lhs_last) ($opB) `($rhs),prec=3`
+   ENDIF
+ENDIF
+IF `STRINDEX("($op_last)", "L") GT 0 AND STRINDEX("($op)", "G") GT 0` THEN 
+   DEFINE SYMBOL letter2 = `SUBSTRING("($op)", 2, 1)`
+   DEFINE SYMBOL reverse = `STRCAT("L", "($letter2)")`
+   
+   DEFINE SYMBOL math_op_sym = ($reverse)
+   IF ($math_sym_convert"1|no_convert>0") THEN GO op_math_sym ($translate_math) ($reverse)
+   DEFINE SYMBOL opA = ($math_op_sym)
+   
+   DEFINE SYMBOL math_op_sym = ($op)
+   IF ($math_sym_convert"1|no_convert>0") THEN GO op_math_sym ($translate_math) ($op_last)
+   DEFINE SYMBOL opB = ($math_op_sym)
+   CANCEL SYMBOL mask_title_($nmask_labels)
+   DEFINE SYMBOL nmask_labels = `($nmask_labels) - 1` 
+   IF ($rhsdate"0|*>1") THEN 
+      DEFINE SYMBOL  mask_title_($nmask_labels) = Where ($rhs) ($opA) ($lhs_last) ($opB) ($rhs_last)
+   ELSE
+      DEFINE SYMBOL  mask_title_($nmask_labels) = Where `($rhs),prec=3` ($opA) ($lhs_last) ($opB) `($rhs_last),prec=3`
+   ENDIF
+ENDIF
+
+! Now look for text constraints.
+! When combining names, we may want something else not a comma between them. 
+! (investigator names already have commas.  Use the word or? Cannot easily use ;)
+! The total string can be 2048 characters long. To avoid cutting off a string,
+! if it does start to get that long, just start another annotation.
+
+IF `STRINDEX("($op_last)", "IS") GT 0 AND STRINDEX("($op)", "IS") GT 0` THEN 
+   LET len1 = `STRLEN("($lhs)") + STRLEN("($math_op_sym)") + 1`
+   LET strvar = "($rhs_last%0%)"
+   LET len2 = `STRLEN(strvar)`
+
+   IF `(len1+len2) GT 2020` THEN 
+      DEFINE SYMBOL nmask_labels = `($nmask_labels) + 1` 
+   ELSE
+      LET strvar = "($rhs)"
+      LET strvar_last = "($rhs_last)"
+      IF `STRCMP(strvar_last, strvar) NE 0` THEN 
+         IF ($lhs"0|investigators>1|*>0") THEN 
+            IF `STRCMP(strvar_last, strvar) NE 0` THEN DEFINE SYMBOL rhs = ($rhs_last) : ($rhs)
+         ELSE
+            IF `STRCMP(strvar_last, strvar) NE 0` THEN DEFINE SYMBOL rhs = ($rhs_last), ($rhs)
+         ENDIF
+      ENDIF
+   ENDIF
+
+   CANCEL SYMBOL mask_title_($nmask_labels)
+   DEFINE SYMBOL nmask_labels = `($nmask_labels) - 1` 
+   DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhs)
+   IF ($($lhsq)_quoted"0") THEN DEFINE SYMBOL mask_title_($nmask_labels)_quoted = ($lhsq)
+ENDIF
+
+
+IF `STRINDEX("($op_last)", "EQ") GT 0 AND STRINDEX("($op)", "EQ") GT 0` THEN 
+
+   LET strvar = "($rhs)"
+   LET strvar_last = "($rhs_last)"
+   IF ($lhs"0|investigators>1|*>0") THEN 
+      IF `STRCMP(strvar_last, strvar) NE 0` THEN DEFINE SYMBOL rhs = ($rhs_last) : ($rhs)
+   ELSE
+      IF `STRCMP(strvar_last, strvar) NE 0` THEN DEFINE SYMBOL rhs = ($rhs_last), ($rhs)
+   ENDIF
+
+   CANCEL SYMBOL mask_title_($nmask_labels)
+   DEFINE SYMBOL nmask_labels = `($nmask_labels) - 1` 
+   DEFINE SYMBOL mask_title_($nmask_labels) = Where ($lhs) ($math_op_sym) ($rhs)
+ENDIF
+
+! ----- End of combine_titles.jnl ------------------------------------------------

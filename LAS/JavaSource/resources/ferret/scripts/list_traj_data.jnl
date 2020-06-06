@@ -1,0 +1,122 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! list_traj_data.jnl
+! Author: ansley 
+! Date: Sep 19 2011
+!      4/2013 ACM Implement the Ferret property ferret_start_memory
+!      12/2016 set list precision to 7
+!
+!
+! Called by Trajectory_Data_Convert_File.jnl 
+! Write csv data: date/time, X, Y, Z, var1, var2, ...
+
+! Cannot list out a pseudo-variable, e.g. Z. In the loop,
+! check for pseutonames. If the variable name is a pseudo-var name, 
+! write out name_1 e.g. Z_1 with all the same attributes.
+
+DEFINE SYMBOL data_initialization_script = Trajectory_initialize_data_insitu
+DEFINE SYMBOL data_initialization_script = feature_initialize_data_insitu
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+GO LAS_setup_dsg
+LET skip_names = {"($feature_variable)", "($rowvar)",  "longitude", "latitude", \
+"time", "tmonth", "day_of_year", "sample_number", "lon360"}
+
+IF ($custom_skip_listnames"0|*>1") THEN LET skip_names = {"($feature_variable)", "($rowvar)", ($custom_skip_listnames)}
+
+DEFINE SYMBOL vars_out = ($feature_variable), datetime, latitude,  longitude
+LET nlist = 4
+
+! make the list of variables to write. If lon/lat variables have been
+! expanded onto the X axis they may have been redefined and the file
+! variables included in skip_list_var.
+! Check here for pseudo-variable names such as K; replace with a Ferret-legal name.
+
+LET nvars = ..nvars
+LET varnames = ..varnames
+repeat/range=1:`nvars`/name=ivar (\
+  DEFINE SYMBOL ivar = `ivar`; \
+  DEFINE SYMBOL vname = `varnames[i=($ivar)]`; \
+  IF `STRINDEX("($skip_list_var%99%)", "($vname)") GT 0` THEN EXIT/CYCLE; \
+  GO LAS_check_for_pseudoname ($vname);\
+  IF ($isit_pseudo"0|*>1") THEN ;\
+     SET VAR/NAME=($isit_pseudo) '($vname)';\
+     DEFINE SYMBOL vname = ($isit_pseudo);\
+  ENDIF;\
+  IF `IS_ELEMENT_OF_STR_N("($vname)", skip_names) EQ 0` THEN GO reshape_list_var ($vname); \   
+  IF `IS_ELEMENT_OF_STR_N("($vname)", skip_names) EQ 0` THEN DEFINE SYMBOL vars_out = ($vars_out), ($vname); \
+  IF `IS_ELEMENT_OF_STR_N("($vname)", skip_names) EQ 0` THEN LET nlist = `nlist+1`; \
+)
+
+! expand the feature ids to the obs axis.
+GO reshape_list_var ($feature_variable)
+
+! Do we want the date string or the date coordinate?  List dates.
+IF `($ferret_timelab_res"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_timelab_res = minute
+
+DEFINE SYMBOL t_units_string = `TIME.units`
+LET nsince = `STRINDEX("($t_units_string)", "since")-1`
+IF `nsince GT 0` THEN DEFINE SYMBOl tunits = `SUBSTRING("($t_units_string)", 1, nsince)`
+
+! Make a time axis from the time coordinates and use it to compute the date strings.
+LET amin = time[i=@MIN]
+LET amax = time[i=@MAX]
+DEFINE SYMBOL is_time = 1
+GO LAS_is_range amin amax
+DEFINE AXIS/T=`ax_lo`:`ax_hi`:`del_ax`/T0="`TIME.time_origin`"/units=($tunits) haxis
+
+LET/TITLE="Time String" datetime = TAX_DATESTRING (time, t[gt=haxis], "($ferret_timelab_res%($tunits)%)")
+
+! the default is set under 1/4 of Ferret's memory allowing for LET definitions 
+LET use_size = 1000000*($ferret_memory)/4.
+LET max_size = ($MAX_LIST_SIZE"`use_size`")
+
+! Size of the data variable 
+LET size = `obsXvar,RETURN=isize`
+
+IF `size* nlist GT max_size` THEN
+   IF `($ferret_memory"25.6") LT 300` THEN SET MEM/SIZ=300
+   LET use_size = 1000000*($ferret_memory)/4.
+ENDIF
+
+
+SET LIST/PREC=7
+SET LIST/FILE="($result_ferret_listing_filename)"
+
+IF ($dataset_title_att"0|*>1") THEN 
+   LIST/NOHEAD/NOROW/FILE/CLOBBER/FORMAT=("($dataset_title_att)"/"Total Number of Records", F16.0) SIZE
+ELSE
+   LIST/NOHEAD/NOROW/FILE/APPEND/FORMAT=(Total Number of Records", F16.0) SIZE
+ENDIF
+
+DEFINE SYMBOL list_quals = APPEND
+
+IF `size* nlist LE max_size` THEN
+! 
+! ... list in one big chunk
+!
+   IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN  
+      IF ($var_history"0|*>1") THEN LIST/($list_quals)/NOHEAD/FORMAT=(A) var_hist
+      DEFINE SYMBOL list_quals = APPEND
+   ENDIF
+
+   LIST/($list_quals)/FILE/($frmt) ($vars_out)
+
+ELSE
+   LET nchunk = INT(size/ max_size)
+   IF `nchunk LT 2` THEN LET nchunk = 2
+   LET ichunk = INT(size/ nchunk) 
+   LET i1 = 1
+   LET i2 = `ichunk`
+   REPEAT/RANGE=1:`nchunk+1` ( \
+     LIST/($list_quals)/FILE/($frmt)/I=`i1`:`i2` ($vars_out); \
+     CANC MEM/ALL; \
+     DEFINE SYMBOL list_quals = APPEND/NOHEAD; \
+     LET i1 = `i2+1`; \
+     LET i2 = `i2+ichunk`; \
+     IF `i1 GT size` THEN EXIT/LOOP; \
+     IF `i2 GT size` then LET i2 = size)
+
+ENDIF
+! End of script ---------- list_csv_data.jnl----------------------------

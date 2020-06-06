@@ -1,0 +1,45 @@
+#set($table=$las_backendrequest.getDatabaseProperty("db_table"))
+#set($time=$las_backendrequest.getDatabaseProperty("time"))
+#set($lat=$las_backendrequest.getDatabaseProperty("latitude"))
+#set($lon=$las_backendrequest.getDatabaseProperty("longitude"))
+#set($depth=$las_backendrequest.getDatabaseProperty("depth"))
+#set($var = $las_backendrequest.getVariablesAsString())
+#set($time_range = $las_backendrequest.getAxisAsDRDSConstraint("t").get(0))
+#set($depth_range = $las_backendrequest.getAxisAsDRDSConstraint("z").get(0))
+#set($x_range = $las_backendrequest.getAxisAsDRDSConstraint("x"))
+#set($con = $las_backendrequest.getDRDSVariableConstraintString("$var"))
+#if ( $x_range.size() == 0 )
+#if ( $con == "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range
+#elseif ( $con != "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$con
+#elseif ( $con == "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range
+#elseif ( $con != "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$con
+#end
+#elseif ( $x_range.size() == 1 )
+#if ( $con == "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$x_range.get(0)
+#elseif ( $con != "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$con&$x_range.get(0)
+#elseif ( $con == "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$x_range.get(0)
+#elseif ( $con != "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$con&$x_range.get(0)
+#end
+#else
+#if ( $con == "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range$x_range.get(0)
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range$x_range.get(1)
+#elseif ( $con != "" && $depth_range == "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$con&$x_range.get(0)
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$con&$x_range.get(1)
+#elseif ( $con == "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$x_range.get(0)
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$x_range.get(1)
+#elseif ( $con != "" && $depth_range != "" )
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$con&$x_range.get(0)
+$table.$time,$table.$depth,$table.$lon,$table.$lat,$table.$var&$time_range&$depth_range&$con&$x_range.get(1)
+#end
+#end

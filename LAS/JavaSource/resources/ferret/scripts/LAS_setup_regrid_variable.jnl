@@ -1,0 +1,132 @@
+! LAS_setup_regrid_variable
+! The variable may not be correctly set up in the F-TDS dataset.
+! Set it up here.
+
+
+IF `STRINDEX("($data_var)", "_1_regrid") GT 0` THEN
+   LET nnx = `STRINDEX("($data_var)", "_1_regrid")`
+   DEFINE SYMBOL data_var_only = `SUBSTRING("($data_var)", 1, nnx-1)`
+ELSE
+   ! Maybe it was defined in an init script
+   IF ($ferret_init_script"0|*>1") THEN 
+      DEFINE SYMBOL definition = ($data_var).long_name
+      EXIT/SCRIPT
+   ENDIF
+ENDIF
+
+LET its_x_analysis = STRINDEX("($data_($num)_title)", "x=") 
+LET its_y_analysis = STRINDEX("($data_($num)_title)", "y=")
+!LET its_z_analysis = STRINDEX("($data_($num)_title)", "z=")
+!LET its_t_analysis = STRINDEX("($data_($num)_title)", "t=")
+! IF `its_x_analysis EQ 0 AND its_y_analysis EQ 0` THEN
+!   EXIT/SCRIPT
+! ENDIF
+
+IF `STRINDEX("($data_var)", "_1_regrid") GT 0` THEN
+   LET nnx = `STRINDEX("($data_var)", "_1_regrid")`
+   DEFINE SYMBOL data_var_only = `SUBSTRING("($data_var)", 1, nnx-1)`
+   lET nb = `STRINDEX("($data_($num)_title)", "[")`
+   LET slen = STRLEN("($data_($num)_title)")
+   LET dummy = SUBSTRING("($data_($num)_title)", nb+2, slen-nb-2)
+   DEFINE SYMBOL dtitle = `dummy`
+   DEFINE SYMBOL analysis_def = `dummy`
+
+   LET ns = STRINDEX("($dtitle)", " ")
+   IF `ns GT 0` THEN
+      LET slen = STRLEN("($dtitle)")
+      LET dummy = SUBSTRING("($dtitle)", 1, ns-1)
+      DEFINE SYMBOL dummy = `dummy`
+      DEFINE SYMBOL analysis_def = `dummy`
+
+      LET dummy = SUBSTRING("($dtitle)", ns+1, slen)
+      LET ns = STRINDEX("($dtitle)", " ")
+	 DEFINE SYMBOL dummy = `dummy`
+      IF `ns NE 0` THEN 
+	    DEFINE SYMBOL comma = ,
+	    DEFINE SYMBOL analysis_def = ($analysis_def)($comma)($dummy)
+      ELSE
+         LET dummy = SUBSTRING("($dtitle)", ns+1, slen)
+      ENDIF
+   ENDIF
+
+   DEFINE SYMBOL brkt1 = \[
+   DEFINE SYMBOL brkt2 = \]
+   LET data_var_definition = ($data_var_only)($brkt1)($analysis_def)($brkt2)
+   DEFINE SYMBOL data_var_deff = ($data_var_only)($brkt1)($analysis_def)($brkt2)
+   DEFINE SYMBOL data_var_def = `UPCASE("($data_var_deff)")`
+
+   LET its_x_analysis = STRINDEX("($analysis_def)", "x=") 
+   LET its_y_analysis = STRINDEX("($analysis_def)", "y=")
+!   LET its_z_analysis = STRINDEX("($analysis_def)", "z=") 
+!   LET its_t_analysis = STRINDEX("($analysis_def)", "t=")
+   list/nohead its_x_analysis, its_y_analysis
+   let its_analysis = 0
+
+   IF `its_x_analysis GT 0 AND its_y_analysis GT 0` THEN 
+      LET dummy = STRINDEX("($analysis_def)", "@")
+      LET its_x_analysis = `dummy`
+      LET dummy = SUBSTRING("($analysis_def)", its_x_analysis, 4)
+      DEFINE SYMBOL x_an = `dummy`
+
+      LET dummy = STRRINDEX("($analysis_def)", "@")
+      LET its_y_analysis = `dummy`
+      LET dummy = SUBSTRING("($analysis_def)", its_y_analysis, 4)
+      DEFINE SYMBOL y_an = `dummy`
+      DEFINE SYMBOL analysis_def = ($brkt1)X=($x_an),Y=($y_an)($brkt2)
+	 let its_analysis = `its_analysis + 1`
+   ELIF `its_x_analysis GT 0` THEN
+      LET dummy = STRINDEX("($analysis_def)", "@")
+      LET its_x_analysis = `dummy`
+      LET dummy = SUBSTRING("($analysis_def)", its_x_analysis, 4)
+      DEFINE SYMBOL x_an = `dummy`
+      DEFINE SYMBOL analysis_def = ($brkt1)X=($x_an)($brkt2)
+      let its_analysis = `its_analysis + 1`
+
+   ELIF `its_y_analysis GT 0` THEN 
+      LET dummy = STRRINDEX("($analysis_def)", "@")
+      LET its_y_analysis = `dummy`
+      LET dummy = SUBSTRING("($analysis_def)", its_y_analysis, 4)
+      DEFINE SYMBOL y_an = `dummy`
+      DEFINE SYMBOL analysis_def = ($brkt1)Y=($y_an)($brkt2)
+      let its_analysis = `its_analysis + 1`
+!
+!   ELIF `its_z_analysis GT 0` THEN 
+!      LET dummy = STRRINDEX("($analysis_def)", "@")
+!      LET its_z_analysis = `dummy`
+!      LET dummy = SUBSTRING("($analysis_def)", its_z_analysis, 4)
+!      DEFINE SYMBOL z_an = `dummy`
+!      DEFINE SYMBOL analysis_def = ($brkt1)Z=($z_an)($brkt2)
+!      let its_analysis = `its_analysis + 1`
+
+!   ELIF `its_t_analysis GT 0` THEN 
+!      LET dummy = STRRINDEX("($analysis_def)", "@")
+!      LET its_y_analysis = `dummy`
+!      LET dummy = SUBSTRING("($analysis_def)", its_t_analysis, 4)
+!      DEFINE SYMBOL t_an = `dummy`
+!      DEFINE SYMBOL analysis_def = ($brkt1)T=($t_an)($brkt2)
+!      let its_analysis = `its_analysis + 1`
+   ENDIF
+   
+   IF `its_analysis EQ 0` THEN CANCEL SYMBOL analysis_def
+
+   DEFINE SYMBOL data_num = `($data_var_only),RETURN=dsetnum`
+   DEFINE SYMBOL data_($num)_num = ($data_num)
+   
+   DEFINE SYMBOL up_data_var = `UPCASE("($data_var)")`
+   IF `( IS_ELEMENT_OF_STR(allvars, "($data_var)") ) OR \
+         IS_ELEMENT_OF_STR(allvars, "($up_data_var)")` THEN
+      say ($data_num)
+   ELSE
+      LET/D=($data_num) ($data_var) = ($data_var_def)
+   ENDIF
+
+ELSE
+   DEFINE SYMBOL error_string = ($data_var) is not present in source file -- ($data_url)
+   EXIT/SCRIPT
+ENDIF
+
+IF `(ITS_X_ANALYSIS + ITS_Y_ANALYSIS) GT 0` THEN\
+   DEFINE SYMBOL data_var ($data_var_only)
+
+! End of $RCSfile ------------LAS_setup_regrid_variable.jnl--------------------------
+

@@ -1,0 +1,390 @@
+body {
+	font-size: 70%;
+	font-family: Lucida Grande, Verdana, Lucida, Helvetica, Arial, sans-serif;
+}
+
+a {
+	color: Blue;
+	font-size: 80%;
+	font-family: Lucida Grande, Verdana, Lucida, Helvetica, Arial, sans-serif;
+	text-decoration: underline;
+	background-color: transparent;
+}
+
+p {
+	margin: 0 0 0.75em 0;
+	line-height: 1.5em;
+}
+
+h1 {
+	font-size: 160%;
+}
+
+h2 {
+	font-size: 150%;
+}
+
+h3 {
+	font-size: 125%;
+	border-bottom: none;
+	font-weight: bold;
+}
+
+h4 {
+	font-size: 110%;
+	border-bottom: none;
+	font-weight: bold;
+}
+
+h5 {
+	font-size: 100%;
+	border-bottom: none;
+	font-weight: bold;
+}
+
+h6 {
+	font-size: 85%;
+	border-bottom: none;
+	font-weight: bold;
+}
+
+.addvar {
+	background-color: "#ccFFcc";
+	border: "1pt solid #dddddd";
+	font-size: "150%";
+	padding: 1pt;
+}
+
+.delvar {
+	background-color: "#FF3300";
+	border: "1pt solid #dddddd";
+	padding: 1pt;
+}
+
+#breadcrumb {
+	vertical-align: middle;
+}
+
+.LASAnalysis {
+	padding: 5pt;
+	margin: 5pt;
+}
+
+.LASUIMask {
+	position: absolute;
+	top: 0pt;
+	left: 0pt;
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	background-color: black;
+	filter: alpha(opacity = 10);
+	opacity: 0.50;
+}
+
+.LASLink {
+	color: #5c731e;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.LASLink:hover {
+	color: #c30;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.LASTreeULNode {
+	margin-left: 6pt;
+	padding-left: 6pt;
+	margin-top: 0;
+	padding-top: 0;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.LASTreeLINode {
+	list-style-type: none;
+	padding: 0;
+	margin-right: 0;
+}
+
+.LASPlotCategory {
+	color: #c30;
+	line-height: 1.85em;
+	text-transform: uppercase;
+	margin-top: 20;
+	padding-top: 20;
+	list-style-type: none;
+	margin-left: 2pt;
+	padding-left: 0pt;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.LASPlotType {
+	line-height: 1.5em;
+	list-style-type: none;
+	padding: 0;
+	margin-left: 2pt;
+	margin-right: 0;
+}
+
+.LASTreeTitleNode {
+	cursor: pointer;
+	vertical-align: middle;
+}
+
+.LASTreeIMGNode {
+	cursor: pointer;
+}
+
+.LASTreeTableCell {
+	cursor: pointer;
+	text-align: left;
+	vertical-align: top;
+	padding: 0;
+	margin: 0;
+}
+
+.LASTreeTableNode {
+	cursor: pointer;
+	padding: 0;
+	margin: 0;
+}
+
+.LASMetadataDIVNode {
+	position: absolute;
+	margin: 12px;
+	padding: 8px;
+	background-color: white;
+	border-top: 1px solid #666;
+	border-left: 1px solid #666;
+	border-right: 3px solid #999;
+	border-bottom: 3px solid #999;
+	z-index: 1100;
+}
+
+.LASMetadataTableNode {
+	background-color: white;
+	border: 1pt solid #436976;
+	cell-spacing: 0;
+	cell-padding: 4;
+	z-index: 1100;
+	margin: 6px;
+}
+
+.LASCancelButton {
+	cursor: pointer;
+	position: absolute;
+	top: 0pt;
+	right: 0pt;
+	background-color: grey;
+}
+
+.LASPopupDIVNode {
+	position: absolute;
+	left: 50px;
+	top: 50px;
+	max-height: 600px;
+	max-width: 700px;
+	overflow: auto;
+	background-color: white;
+	border: 2pt solid black;
+	border-color: #5c731e;
+	padding: 8pt;
+	margin: 8pt;
+	z-index: 1050;
+	width: 600px;
+}
+
+.LASTitleTextNode {
+	font-family: arial;
+	color: white;
+	font-size: 40pt;
+	font-size-adjust: none;
+}
+
+.LASProductButton {
+	padding: 3px 4px 3px 4px;
+	font-size: .9em;
+	font-style: bold;
+	background-color: #DCDCDC;
+}
+
+.LASVariableList {
+	position: absolute;
+	z-index: 1000;
+}
+
+.LASVariableContainer {
+	padding-bottom: 2pt;
+}
+
+.leftNav {
+	border-top: 3px solid #436976;
+	border-left: 1px solid #436976;
+	border-right: 3px solid #436976;
+	border-bottom: 3px solid #436976;
+}
+
+.LASSelectNode {
+	
+}
+
+.LASOptionNode {
+	
+}
+
+.LASTextInputNode {
+	font-size: .8em;
+	font-family: sans-serif;
+	
+}
+
+.LASInfoIcon {
+	vertical-align: middle;
+}
+
+.LASRadioInputNode {
+	
+}
+
+.LASCheckboxInputNode {
+	
+}
+
+html,body {
+	height: 100%;
+}
+
+#nav {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+	height: 38px;
+	position: relative;
+	font-family: arial, verdana, sans-serif;
+}
+
+#update_chkbox {
+	margin: 0;
+	padding: 0;
+	margin-left: 2pt;
+	margin-right: 1pt;
+}
+
+.top_link_title {
+	display: block;
+	float: left;
+	color: #FFFFFC;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+	padding: 0 0 0 12px;
+	cursor: pointer;
+}
+
+.top_link_title:hover {
+	color: red;
+}
+
+.top_link_disabled {
+	display: block;
+	float: left;
+	height: 13px;
+	color: #DDDDDD;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+	padding: 2px 2px 2px 4px;
+	cursor: pointer;
+	background: #AABCCE;
+	border: groove;
+	margin-right: 2px;
+	margin-left: 2px
+}
+
+.top_link {
+	display: block;
+	float: left;
+	height: 13px;
+	color: #FFFFFF;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+	padding: 2px 2px 2px 4px;
+	cursor: pointer;
+	background: #7391A5;
+	border: groove;
+	margin-right: 2px;
+	margin-left: 2px
+}
+
+.top_link:hover {
+	color: #f5ed52;
+}
+
+.policy_link {
+	display: block;
+	color: #FFFFFC;
+	text-decoration: none;
+	font-size: medium;
+	font-weight: bold;
+	margin: 0px 2px 0px 2px;
+	cursor: pointer;
+	outline: 0px;
+}
+
+.policy_link:hover {
+	color: cyan;
+}
+
+.top_link_left {
+	display: block;
+	float: right;
+	color: #FFFFFC;
+	text-decoration: none;
+	font-size: 9px;
+	font-weight: bold;
+	padding: 2px 12px 0px 0px;
+	cursor: pointer;
+}
+
+.top_link_left:hover {
+	color: #f5ed52;
+}
+
+#main {
+	margin: 5pt;
+	padding: 5pt;
+	width: 1056px;
+	overflow: visible;
+}
+
+#header {
+	width: 1056px;
+}
+
+#output {
+	overflow: visible;
+	min-width: 800px;
+	min-height: 500px;
+}
+
+#constraints {
+	min-height: 500px;
+	width: 256px;
+	border-right: 1px solid #5c731e;
+	float: left;
+}
+
+#wait_msg {
+	text-align: left;
+}
+
+#message_bar {
+	min-height: 20pt;
+	border-bottom: 1pt solid black;
+}

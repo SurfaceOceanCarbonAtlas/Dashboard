@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map_scale>
+  <x_pixels_per_inch>63.658737</x_pixels_per_inch>
+  <y_pixels_per_inch>63.535908</y_pixels_per_inch>
+  <x_image_size>776.0</x_image_size>
+  <y_image_size>483.0</y_image_size>
+  <x_plot_size>636.26904</x_plot_size>
+  <y_plot_size>305.09943</y_plot_size>
+  <x_offset_from_left>76.39049</x_offset_from_left>
+  <y_offset_from_bottom>88.95027</y_offset_from_bottom>
+  <x_offset_from_right>63.658737</x_offset_from_right>
+  <y_offset_from_top>88.95027</y_offset_from_top>
+  <x_axis_lower_left>122.25</x_axis_lower_left>
+  <y_axis_lower_left>-35.0</y_axis_lower_left>
+  <x_axis_upper_right>288.5</x_axis_upper_right>
+  <y_axis_upper_right>45.0</y_axis_upper_right>
+</map_scale>

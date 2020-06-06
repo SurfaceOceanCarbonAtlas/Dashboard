@@ -1,0 +1,88 @@
+#!@PERL@
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+use Config;
+use lib ('../xml/perl','.', '../xml/perl/install/lib/' . $Config{version},
+         '../xml/perl/install/lib/site_perl/' . $Config{version},
+         '../xml/perl/install/lib/perl5/' . $Config{version},
+         '../xml/perl/install/lib/perl5/site_perl/' . $Config{version});
+use LWP::UserAgent;
+use URI::URL;
+use URI::Escape;
+use strict;
+use Getopt::Long;
+my (%Opts, $Separator);
+
+sub issueRequest {
+    my ($urlstr, $xml) = @_;
+    my $hdrs = new HTTP::Headers;
+    my $url = new URI::URL($urlstr);
+    my $req = new HTTP::Request('POST', $url, $hdrs);
+    $req->content_type('application/x-www-form-urlencoded');
+    $req->content($xml);
+    
+    my $ua = new LWP::UserAgent;
+    my ($resp, $loc);
+    while(1){
+	$resp = $ua->request($req);
+	$loc = $resp->header('Location');
+	last if ! $loc;
+	$url = new URI::URL($loc);
+	$req = new HTTP::Request('GET', $url, $hdrs);
+    }
+    if ($resp->is_success){
+	my $result = $resp->content;
+	print $result;
+    } else {
+	print STDERR "Request failed\n";
+	print $resp->error_as_HTML;
+	exit 1;
+    }
+
+}
+
+sub getXMLArgs {
+    my $str = "";
+    # Random number to avoid cacheing
+    $str = '<ran>' . rand() . '</ran>';
+    $str .= "<modifiers>long</modifiers>" if $Opts{l};
+    $str .= "<dataset>$ARGV[0]</dataset>" if $ARGV[0];
+    $str .= "<variable>$ARGV[1]</variable>" if $ARGV[1];
+    $str .= "<separator>$Separator</separator>";
+    $str;
+}
+
+sub genXML {
+    my $xmlHead = qq{<?xml version="1.0"?><lasRequest href="file:las.xml"><link match="/lasdata/operations/ls" /><properties><ls>};
+    my $xmlFoot = qq{</ls></properties><args></args></lasRequest>};
+    my $xml = $xmlHead . getXMLArgs . $xmlFoot;
+    return 'xml=' . uri_escape($xml);
+}
+
+sub usage {
+    print STDERR "Usage: ls.pl [-l] [-s separator] url [dataset] [variable]\n";
+    print STDERR "       -l              displays descriptive name for a dataset or variable\n";
+    print STDERR "                       and the type, units, and bounds of an axis.\n";
+    print STDERR "       -s separator    delimit fields with separator\n";
+    print STDERR "Example: ls.pl http://ferret.pmel.noaa.gov/NVODS-bin/LASserver.pl\n";
+    exit 1;
+}
+
+use Getopt::Std;
+getopts('ls:', \%Opts);
+$Separator = $Opts{s};
+die "-s argument can't contain '&','<', or '>'" if $Separator =~ /[\&\<\>]/;
+
+my $requrl = shift;
+if (!defined($requrl) || $#ARGV > 1){
+    usage;
+}
+issueRequest($requrl, genXML);
+
+
+
+

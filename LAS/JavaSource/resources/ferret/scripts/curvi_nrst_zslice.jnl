@@ -1,0 +1,28 @@
+! curvi_nrst_zslice.jnl
+
+! Define single x y point to sample at
+
+LET sample_xpts($num) = {($region_x_lo)}
+LET sample_ypts($num) = {($region_y_lo)}
+
+LET fer_plot_var($var_num) = SAMPLEXY_CURV_NRST( \
+  ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+  ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  sample_xpts($num), sample_ypts($num))
+
+DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_xlon($num)
+DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/UNITS=degrees sample_y($num)
+
+LET sample_var($var_num) = x[gx=sample_xlon($num),x=($region_x_lo)] + y[gy=sample_y($num),y=($region_y_lo)]  + \
+      z[gz=fer_plot_var($var_num)]
+      
+IF ($region_t"0|*>1") THEN LET sample_var($var_num) = x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      y[gy=sample_y($num),y=($region_y_lo)]  + \
+      t[gt=fer_plot_var($var_num),($region_t)] + z[gz=fer_plot_var($var_num)]
+
+LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+DEFINE SYMBOL needs_url 1
+! End of file ------------curvi_nrst_zslice.jnl--------------------------

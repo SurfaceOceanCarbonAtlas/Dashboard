@@ -1,0 +1,156 @@
+#!/bin/bash
+# $Id: configure,v 1.10 2002/09/14 17:45:38 sirott Exp $
+
+PATH="$PATH:/bin:/usr/bin:/usr/local/bin:/usr/sbin:/opt/bin:/opt/local/bin";
+export PATH
+search_dirs="`echo $PATH | sed '1,$s/:/ /g'`"
+
+### Get python_executable and python_subdirectory
+use_pyferret() {
+#
+# remove the return above to ask the question and allow pyFerret as an LAS engine.
+#
+#
+    echo " "
+    echo "Do you want to use PyFerret (pyferret) or the regular Ferret (ferret)? "
+    until [ 0 = 1 ]; do
+        echo " "
+        read -p " Which Ferret to use to use: ['ferret'] --> " ans
+        if [ -z "$ans" ]; then
+            ans='ferret'
+        fi
+        ferrettype=$ans
+        if [ "${ferrettype}" == "ferret" ]; then
+            return 1
+        elif [ "${ferrettype}" == "pyferret" ]; then
+            return 0;
+        else
+            echo "You must choose 'ferret' or 'pyferret' "
+        fi
+    done
+#   should not get here, but return "ferret" if it does
+    return 1
+}
+
+### Get python_executable and python_subdirectory
+get_python_vars() {
+    echo " "
+    echo " Enter the desired python executable to use for running PyFerret. "
+    echo " This may simply be 'python', but on systems with multiple versions "
+    echo " of python, you need to specify the version to use, such as 'python2.6' "
+    echo " or 'python2.7', or the full-path name to desired version of python. "
+    until [ 0 = 1 ]; do
+        echo " "
+        read -p " python executable to use: ['python'] --> " ans
+        if [ -z "$ans" ]; then
+            ans='python'
+        fi
+#       expand to the full path name, just to be safe (may not be necessary)
+        python_executable=`which "$ans"`
+#       assign python_subdirectory as 'python2.6','python2.7', 'python3.4', etc. using the 
+#       version number reported by the python executable (which validates the python executable)
+        python_subdirectory=`${ans} -c "from __future__ import print_function; import sys; print('python%d.%d' % sys.version_info[:2])"`
+        if echo "${python_subdirectory}" | grep -q '^python2\.[67]$'; then
+            pyname=${ans}
+            return 0
+        elif echo "${python_subdirectory}" | grep -q '^python3\.[4-9]$'; then
+            pyname=${ans}
+            return 0
+        elif echo "${python_subdirectory}" | grep -q '^python'; then
+            echo " ${ans} appears to be ${python_subdirectory}; only python 2.6, 2.7, 3.4 or later are supported "
+        else
+            echo " ${ans} does not appear to be a valid python executable "
+        fi
+    done
+#   should not get here - return error
+    return 1
+}
+
+
+#
+# Function to return a real, live executable
+#
+getExecutable() {
+    execloc=
+    autoexecloc="$3"
+    if [ -z "$autoexecloc" ]
+    then
+        for i in $search_dirs
+  	do
+  	    if [ -f $i/$1 -a -x $i/$1 ] 
+  	    then
+  		autoexecloc="$i/$1"
+  		break
+  	    fi
+  	done
+  	echo "Searching for $1..."
+  	if [ -z "$autoexecloc" ] 
+  	then
+  	    echo "Can't find $1"
+  	fi
+    fi
+    until [ -n "$execloc" ]
+    do
+  echo ""
+	echo -n "Location of $2 executable [$autoexecloc] "
+	read execloc
+	if [ -z "$execloc" ] 
+	then
+	    execloc="$autoexecloc"
+	fi
+	if [ ! -f "$execloc" -o ! -x "$execloc" ]
+	then
+	    echo "$execloc is not an executable file"
+	    execloc=""
+	fi
+    done
+}
+
+if [ ! -z "$1" -a "$1" != "-noui" ]
+then
+    echo "Usage: configure [-nocompare]"
+    exit 1
+fi
+
+#
+# Get perl
+#
+default_perl=""
+if [ -f "config.results" ]
+then
+    default_perl=`grep 'LasConfig{perl}' config.results | awk '{print $3}' | sed "1,1s/[\'\;]//g"`
+fi
+getExecutable perl perl $default_perl
+perlloc="$execloc"
+
+if use_pyferret; then
+
+   get_python_vars
+   export PYEXE=${python_executable}
+   pysite="${FER_DIR}/lib/${pyname}/site-packages"
+   
+   if [ -z "${PYTHONPATH}" ]; then
+       export PYTHONPATH="${pysite}"
+   else
+       if ! echo "${PYTHONPATH}" | grep -q "${pysite}"; then
+           export PYTHONPATH="${pysite}:${PYTHONPATH}"
+       fi
+   fi
+   
+   if [ -z "${LD_LIBRARY_PATH}" ]; then
+       export LD_LIBRARY_PATH="${pysite}/pyferret"
+   else
+       if ! echo "${LD_LIBRARY_PATH}" | grep -q "${pysite}/pyferret"; then
+           export LD_LIBRARY_PATH="${pysite}/pyferret:${LD_LIBRARY_PATH}"
+       fi
+   fi
+fi
+
+export FERRETTYPE=${ferrettype}
+
+
+
+echo "Starting Perl configuration script with $perlloc..."
+exec $perlloc ./configure.pl $perlloc $*
+    
+

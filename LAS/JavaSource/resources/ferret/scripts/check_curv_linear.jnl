@@ -1,0 +1,116 @@
+! 
+! check_curv_linear.jnl
+
+! After get_curv_coord_bbox has been called, 
+! check whether the grid is in fact linear in the
+! box that was found
+!
+! If the longitude or latitude is linear, then this 
+! script redefines the I,J range from curvilinear 
+! coordinate variables
+!
+! clon_imin
+! clon_imax
+! clat_jmin
+! clat_jmax
+
+\cancel mode verify
+
+LET iinc = MAX(1, INT( (($clon_imax_computed)-($clon_imin_computed))/10 ) )
+LET jinc = MAX(1, INT( (($clat_jmax)-($clat_jmin))/10 ) )
+
+! See if the longitudes are constant along lines of i
+
+LET lon_is_const = 1
+ REPEAT/RANGE=($clon_imin_computed):($clon_imax_computed):`iinc`/NAME=m (\
+    LET/QUIET lon_first = ($ferret_curvi_coord_lon)[d=($data_num),i=`m`,j=($clat_jmin)]; \
+   GO check_lon; \
+   IF `lon_is_const EQ 0` THEN EXIT/LOOP) 
+
+! This is check_lon.jnl Inner loop called by check_curv_linear.jnl
+!
+!   REPEAT/RANGE=($clat_jmin):($clat_jmax):`jinc`/NAME=n (\
+!      LET/QUIET lon_ij = ($ferret_curvi_coord_lon)[d=($data_num),i=`m`,j=`n`]; \
+!      IF `lon_ij NE lon_first` THEN LET/QUIET lon_is_const = 0;\
+!      IF `lon_is_const EQ 0` THEN EXIT/LOOP);
+
+LET lat_is_const = 1
+
+REPEAT/RANGE=($clat_jmin):($clat_jmax):`jinc`/NAME=n (\
+   LET/QUIET lat_first = ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin_computed),j=`n`]; \
+   GO check_lat; \
+   IF `lat_is_const EQ 0` THEN EXIT/LOOP)    
+
+! This is check_lat.jnl Inner loop called by check_curv_linear.jnl
+!
+!   REPEAT/RANGE=($clon_imin_computed):($clon_imax_computed):`iinc`/NAME=m (\
+!      LET lat_ij = ($ferret_curvi_coord_lat)[d=($data_num),i=`m`,j=`n`]; \
+!      IF `lat_ij NE lat_first` THEN LET lat_is_const = 0;\
+!      IF `lat_is_const EQ 0` THEN EXIT/LOOP);
+
+
+
+IF `lon_is_const EQ 1` THEN
+   LET/QUIET new_imin = 0
+   REPEAT/RANGE=($clon_imin_computed):($clon_imax_computed)/NAME=m (\
+   LET/QUIET lon_first = ($ferret_curvi_coord_lon)[d=($data_num),i=`m`,j=($clat_jmin)];\
+   IF `($region_x_lo) LE lon_first` THEN LET/QUIET new_imin = `m`;\
+   IF `new_imin NE 0` THEN EXIT/LOOP)
+   IF `new_imin LT 1` THEN LET new_imin = 1
+
+   LET/QUIET new_imax = 0
+   LET range_1 = MAX(1,`new_imin-1`)
+   REPEAT/RANGE=`range_1`:($clon_imax_computed)/NAME=m (\
+   LET/QUIET lon_first = ($ferret_curvi_coord_lon)[d=($data_num),i=`m`,j=($clat_jmin)];\
+   IF `($region_x_hi) LT lon_first` THEN LET/QUIET new_imax = `m`;\
+   IF `new_imax NE 0` THEN EXIT/LOOP)
+   IF `new_imax LT 1` THEN LET new_imax = 1
+
+   IF `new_imax EQ 0` THEN LET new_imax = `new_imin`
+   IF `new_imax EQ new_imin` THEN LET new_imax = `new_imin`
+   IF `new_imax EQ new_imin+1` THEN LET new_imax = `new_imin`
+! list/nohead new_imin,new_imax, ($ferret_curvi_coord_lon)[d=($data_num),i=`new_imin`:`new_imax`,j=($clat_jmin)]
+
+
+   DEFINE SYMBOL clon_imin_computed `new_imin`
+   DEFINE SYMBOL clon_imax_computed `new_imax`
+   IF `new_imax-new_imin LE 1` THEN 
+      DEFINE SYMBOL clon_imin `new_imin`
+      DEFINE SYMBOL clon_imax `new_imax`
+   ENDIF
+show sym cl*
+
+
+ENDIF
+
+IF  `lat_is_const EQ 1` THEN
+   LET/QUIET new_jmin = 0
+   REPEAT/RANGE=($clat_jmin):($clat_jmax)/NAME=n (\
+   LET/QUIET lat_first = ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin_computed),j=`n`];\
+   IF `($region_y_lo) LT lat_first` THEN LET/QUIET new_jmin = `n-1`;\
+   IF `new_jmin NE 0` THEN EXIT/LOOP)
+   IF `new_jmin LT 1` THEN LET new_jmin = 1
+
+   LET/QUIET new_jmax = 0
+   LET range_1 = MAX(1,`new_jmin-1`)
+   REPEAT/RANGE=`range_1`:($clat_jmax)/NAME=n (\
+   LET/QUIET lat_first = ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin_computed),j=`n`];\
+   IF `($region_y_hi) LE lat_first` THEN LET/QUIET new_jmax = `n`;\
+   IF `new_jmax NE 0` THEN EXIT/LOOP)
+   IF `new_jmax LT 1` THEN LET new_jmax = 1
+
+! list/nohead new_jmin,new_jmax, ($ferret_curvi_coord_lat)[d=($data_num),j=`new_jmin`:`new_jmax`,i=($clon_imin_computed)]
+   IF `new_jmax EQ 0` THEN LET new_jmax = `new_jmin`
+   IF `new_jmax EQ new_jmin` THEN LET new_jmax = `new_jmin`
+   IF `new_jmax EQ new_jmin+1` THEN LET new_jmax = `new_jmin`
+   
+   
+   DEFINE SYMBOL clat_jmin `new_jmin`
+   DEFINE SYMBOL clat_jmax `new_jmax`
+
+ENDIF
+show symbol cl*
+
+
+set mode/last verify
+

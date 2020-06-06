@@ -1,0 +1,44 @@
+
+! Get orthogonal-axis labels.
+
+IF `STRCMP("($ferret_view)", "xy") NE 0` THEN
+   IF `($do_curvi_xy%0|*>1%) EQ 0` THEN
+      shade/set ($data_0_var)[($region_full)]
+   ELSE
+         shade/set ($ferret_plot_var)
+   ENDIF
+ENDIF
+
+IF ($xform_dms"0|*>1") THEN PPL XFOR (($xform_dms))
+IF ($yform_dms"0|*>1") THEN PPL YFOR (($yform_dms))
+IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+IF ($labnum_dods"0|*>1") THEN go unlabel ($labnum_dods)
+
+IF `($ferret_annotations%0|*>1%) AND ($flowline_vectors"0") EQ 0` THEN \
+  PPL VECKEY/NOUSER, 2,`($ppl$ylen)+0.2`
+
+IF ($ferret_diff_var%0|*>1%) THEN 
+   IF ($labnum_z"0|*>1") THEN go unlabel ($labnum_z)
+   IF ($labnum_t"0|*>1") THEN go unlabel ($labnum_t)
+ENDIF
+
+! Remove labels from plot and set up orthogonal-axis symbols 
+! for Annotations plots.
+
+IF ($ferret_annotations"0|*>1") THEN  
+   IF `($data_count"1") EQ 2` THEN  ! non-difference vector plot.
+      IF ($labnum_x"0|*>1") THEN DEFINE SYMBOL longitude_lab ($lab($labnum_x))
+      IF ($labnum_y"0|*>1") THEN DEFINE SYMBOL latitude_lab ($lab($labnum_y))
+      IF ($labnum_z"0|*>1") THEN DEFINE SYMBOL depth_lab ($lab($labnum_z))
+      IF ($labnum_t"0|*>1") THEN DEFINE SYMBOL time_lab ($lab($labnum_t))
+   ENDIF
+   PPL XLAB
+   PPL YLAB
+   PPL TITLE
+   IF ($labnum_x"0|*>1") THEN GO unlabel ($labnum_x)
+   IF ($labnum_y"0|*>1") THEN GO unlabel ($labnum_y)
+   IF ($labnum_z"0|*>1") THEN GO unlabel ($labnum_z)
+   IF ($labnum_t"0|*>1") THEN GO unlabel ($labnum_t)
+ENDIF
+

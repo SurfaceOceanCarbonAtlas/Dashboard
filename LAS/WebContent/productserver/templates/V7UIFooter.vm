@@ -1,0 +1,16 @@
+<table>
+	<tr>
+		<td width="50%" align="left" class="bodyBlack"><font size="-1">
+			<a href="https://www.doc.gov/">US Department of Commerce</a>
+			<a href="https://www.noaa.gov/">NOAA</a> 
+			| <a href="https://www.oar.noaa.gov">OAR</a>
+       	| <a href="https://www.pmel.noaa.gov">PMEL</a> 
+			| <a href="https://www.pmel.noaa.gov/home/persons.shtml">Contacts</a> 
+			| <a href="https://www.noaa.gov/privacy.html">Privacy Policy</a> 
+			| <a href="https://www.noaa.gov/disclaimer.html">Disclaimer</a>
+			| <a href="mailto:$las_config.getInstitution().contact">mailto: $las_config.getInstitution().contact</a>
+		</td>  
+	</tr>
+</table>
+
+

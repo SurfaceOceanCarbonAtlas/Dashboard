@@ -1,0 +1,54 @@
+!remove_underscores!
+
+
+DEFINE SYMBOL Var_Lab = $1
+
+IF `STRINDEX("($Var_Lab)", "_") GT 0` THEN 
+   LET nu = `STRINDEX("($Var_Lab)", "_")`
+   let slen = STRLEN("($Var_Lab)")
+   DEFINE SYMBOL s1 = `SUBSTRING("($Var_Lab)", 1, nu-1)`
+   IF `nu+1 LT slen` THEN DEFINE SYMBOL s2 = `SUBSTRING("($Var_Lab)", nu+1, slen-nu)`
+   DEFINE SYMBOL Var_Lab = ($s1) ($s2)
+ENDIF
+CANCEL SYMBOL s1, s2
+
+IF `STRINDEX("($Var_Lab)", "_") GT 0` THEN 
+   LET nu = `STRINDEX("($Var_Lab)", "_")`
+   let slen = STRLEN("($Var_Lab)")
+   DEFINE SYMBOL s1 = `SUBSTRING("($Var_Lab)", 1, nu-1)`
+   IF `nu+1 LT slen` THEN DEFINE SYMBOL s2 = `SUBSTRING("($Var_Lab)", nu+1, slen-nu)`
+   DEFINE SYMBOL Var_Lab = ($s1) ($s2)
+ENDIF
+CANCEL SYMBOL s1, s2
+
+IF `STRINDEX("($Var_Lab)", "_") GT 0` THEN 
+   LET nu = `STRINDEX("($Var_Lab)", "_")`
+   let slen = STRLEN("($Var_Lab)")
+   DEFINE SYMBOL s1 = `SUBSTRING("($Var_Lab)", 1, nu-1)`
+   IF `nu+1 LT slen` THEN DEFINE SYMBOL s2 = `SUBSTRING("($Var_Lab)", nu+1, slen-nu)`
+   DEFINE SYMBOL Var_Lab = ($s1) ($s2)
+ENDIF
+CANCEL SYMBOL s1, s2
+
+
+IF `STRINDEX("($Var_Lab)", "_") GT 0` THEN 
+   LET nu = `STRINDEX("($Var_Lab)", "_")`
+   let slen = STRLEN("($Var_Lab)")
+   DEFINE SYMBOL s1 = `SUBSTRING("($Var_Lab)", 1, nu-1)`
+   IF `nu+1 LT slen` THEN DEFINE SYMBOL s2 = `SUBSTRING("($Var_Lab)", nu+1, slen-nu)`
+   DEFINE SYMBOL Var_Lab = ($s1) ($s2)
+ENDIF
+CANCEL SYMBOL s1, s2
+
+
+IF `STRINDEX("($Var_Lab)", "_") GT 0` THEN 
+   LET nu = `STRINDEX("($Var_Lab)", "_")`
+   let slen = STRLEN("($Var_Lab)")
+   DEFINE SYMBOL s1 = `SUBSTRING("($Var_Lab)", 1, nu-1)`
+   IF `nu+1 LT slen` THEN DEFINE SYMBOL s2 = `SUBSTRING("($Var_Lab)", nu+1, slen-nu)`
+   DEFINE SYMBOL Var_Lab = ($s1) ($s2)
+ENDIF
+CANCEL SYMBOL s1, s2
+
+!-----------------End of remove_underscores ---------------------------------
+

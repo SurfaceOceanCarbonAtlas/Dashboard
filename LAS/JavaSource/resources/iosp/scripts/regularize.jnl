@@ -1,0 +1,118 @@
+! regularize.jnl
+! For regridding variables on possibly irregular rectilinear
+! XY grids to a regular XY grid at the resolution of one of
+! the ETOPO datasets.
+
+! Regrid all the variables having XY axes to the same output 
+! grid. If the grids are sub-global define a grid that is a 
+! subset of the chosen ETOPO dataset that spans the intput grids.
+
+LET rfile_names = ..varnames[d=1]
+LET n2dvars = ..nvars[d=1]
+
+! Determine the approximate grid resolution of the input grid
+
+! Get the min and max longitudes and latitudes for variables having
+! xy grids. Check for degenerate grids, insisting on > 1 points in x 
+! and y. It looks like `var,return=shape` will not list these axis
+! directions anyway.
+
+LET nx = 0
+LET xs = 720
+LET xe = -720
+LET ny = 0
+LET ys = 90
+LET ye = -90
+
+! This so that the RETURN= will give the lon,lat values unlabeled by E or N.
+CAN MODE lon
+CAN MODE lat
+
+REPEAT/RANGE=1:`n2dvars`/NAME=nv (\
+DEF SYM nn = `nv` ;\
+DEF SYM vn = `rfile_names[i=($nn)]` ;\
+DEF SYM vshape = `($vn),RETURN=shape` ;\
+IF `STRINDEX("($vshape)", "XY") GT 0` THEN ;\ 
+LET ix = `($vn),RETURN=isize`;\
+LET jy = `($vn),RETURN=jsize`;\
+IF `ix GT 1` THEN;\
+LET nx = MAX(`nx`,`ix`) ;\
+LET xs = MIN(`xs`,`($vn),RETURN=xstart`) ;\
+LET xe = MAX(`xe`,`($vn),RETURN=xend`) ;\
+ENDIF;\
+IF `jy GT 1` THEN;\
+LET ny = MAX(`ny`,`jy`) ;\
+LET ys = MIN(`ys`,`($vn),RETURN=ystart`) ;\
+LET ye = MAX(`ye`,`($vn),RETURN=yend`) ;\
+ENDIF;\
+ENDIF)
+
+! Restore the default
+SET MODE lon
+SET MODE lat
+
+! Regrid to the grid of an etopo datset with similar resolution.
+
+IF `nx GT 1` THEN LET dx = (xe - xs)/ (nx-1)
+IF `ny GT 1` THEN LET dy = (ye - ys)/ (ny-1)
+
+! Set some defaults for possible degenerate cases
+LET deltaxy = 1.
+DEF SYM etoposet = 60
+
+! approximate the etopo grids. (Should these be OR, or AND?)
+IF `dx GT 0 AND dy GT 0` THEN
+   IF `dx GE 2 OR dy GE 2` THEN 
+      LET deltaxy = 2.
+      DEF SYM etoposet = 120
+   IF `dx LT 2 AND dy LT 2` THEN 
+      LET deltaxy = 1.
+      DEF SYM etoposet = 60
+   ENDIF
+   IF `dx LT 1 AND dy LT 1` THEN 
+      LET deltaxy = `1./3.`
+      DEF SYM etoposet = 20
+   ENDIF
+   IF `dx LT 0.2 AND dy LT 0.2` THEN 
+      LET deltaxy = `1./12.`
+      DEF SYM etoposet = 05
+   ENDIF
+   IF `dx LT 0.02 AND dy LT 0.02` THEN 
+      LET deltaxy = `1./30.`
+      DEF SYM etoposet = 02
+   ENDIF
+   IF `dx LT 0.01 AND dy LT 0.01` THEN 
+      LET deltaxy = `1./60.`
+      DEF SYM etoposet = 01
+   ENDIF
+ENDIF
+
+! Keep within -90:90
+IF `ys-deltaxy LT -90` THEN LET ys = -90+deltaxy
+IF `ye+deltaxy GT  90` THEN LET ye =  90-deltaxy
+
+! Define output grids over the same range as input grids, starting one
+! grid point before and ending one grid point after the range of the
+! input grid.
+
+SET DATA etopo($etoposet)
+LET xx = x[gx=rose]
+LET x1 = xx[x=`xs-deltaxy`]; IF `x1 LT xx[i=@MIN]` THEN LET x1 = `xx[i=@MIN]`
+LET x2 = xx[x=`xe+deltaxy`]; IF `x2 GT xx[i=@MAX]` THEN LET x2 = `xx[i=@MAX]`
+DEFINE AXIS/X=`x1`:`x2`:`deltaxy`/units=degrees_east ETOPO($etoposet)_X
+
+LET yy = y[gy=rose]
+LET y1 = yy[y=`ys-deltaxy`]; IF `y1 LT yy[j=@MIN]` THEN LET y1 = `yy[j=@MIN]`
+LET y2 = yy[y=`ye+deltaxy`]; IF `y2 GT yy[j=@MAX]` THEN LET y2 = `yy[j=@MAX]`
+DEFINE AXIS/Y=`y1`:`y2`:`deltaxy`/units=degrees_north ETOPO($etoposet)_Y
+
+CANCEL DATA etopo($etoposet)
+
+SET DATA 1
+REPEAT/RANGE=1:`n2dvars`/NAME=nv (\
+DEF SYM nn = `nv` ;\
+DEF SYM vn = `rfile_names[i=($nn)]` ;\
+DEF SYM vshape = `($vn),RETURN=shape` ;\
+IF `STRINDEX("($vshape)", "XY") GT 0` THEN ;\
+LET/D=1/TITLE="`($vn),RETURN=title`"/UNITS="`($vn),RETURN=UNITS`" \
+ ($vn)_on_reg = ($vn)[d=1,gx=ETOPO($etoposet)_X,gy=ETOPO($etoposet)_Y])

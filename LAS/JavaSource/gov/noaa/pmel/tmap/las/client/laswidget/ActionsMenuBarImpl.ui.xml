@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:style>
+		.panel {
+			background-color: ivory;
+		}
+	</ui:style>
+
+	<g:MenuBar ui:field="actionsMenuBar" focusOnHoverEnabled="false">
+		<g:MenuItem text="Actions" ui:field="actionsMenu">
+			<g:MenuBar vertical="true" ui:field="actionsSubMenuBar">
+				<g:MenuItem text="Update (this output only)" ui:field="updateItem" enabled="false" />
+				<!--  
+				<g:MenuItemSeparator />
+				<g:MenuItem text="Optional Calculations" ui:field="optionalCalcsItem" enabled="false" />
+				<g:MenuItemSeparator />
+				-->
+				<g:MenuItem text="Display Image..." ui:field="displayItem" enabled="false" />
+				<g:MenuItem text="Animate..." ui:field="animateItem" enabled="false" />
+				<g:MenuItem text="Show Values..." ui:field="showValuesItem" enabled="false" />
+				<g:MenuItem text="Save As..." ui:field="saveAsItem" enabled="false" />
+				<g:MenuItem text="Export To...">
+					<g:MenuBar vertical="true">
+						<g:MenuItem text="Google Earth..." ui:field="googleEarthItem" enabled="false" />
+						<g:MenuItem text="Other Formats..." ui:field="exportOtherItem" enabled="false"/>
+					</g:MenuBar>
+				</g:MenuItem>
+			</g:MenuBar>
+		</g:MenuItem>
+	</g:MenuBar>
+</ui:UiBinder>

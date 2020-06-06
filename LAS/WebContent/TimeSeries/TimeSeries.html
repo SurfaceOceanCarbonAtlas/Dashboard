@@ -1,0 +1,58 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Standards Mode", which gives better cross    -->
+<!-- browser compatibility to the application.     -->
+<!-- Omitting this line leaves most browsers in    -->
+<!-- "Quirks mode", emulating the bugs in older    -->
+<!-- browser versions.                             -->
+
+<html>
+  <head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>TimeSeries</title>
+    
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <script type="text/javascript" language="javascript" src="../JavaScript/components/DateWidget.js"></script>
+    <script type="text/javascript" language="javascript" src="../JavaScript/components/LASRequest.js"></script>
+    <script type="text/javascript" language="javascript" src="../JavaScript/components/xmldom.js"></script>
+    <script type="text/javascript" language="javascript" src="gov.noaa.pmel.tmap.las.TimeSeries/gov.noaa.pmel.tmap.las.TimeSeries.nocache.js"></script>
+    <link rel="stylesheet" href="TimeSeries.css" type="text/css">
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+  <body>
+    <!--#include virtual="productserver/templates/V7UIHeader.vm" -->
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+   <table>
+  <tbody>
+  <tr><td class="banner" colspan="2" align="center">LAS Time Series Collection Interface</td></tr>
+  <tr><td class="small-banner" align="right">Select a time series collection:</td><td align="right" id="timeseries_collection_listbox"></td></tr>
+  <tr><td id="map"></td><td id="variables"></td></tr>
+  <tr><td align="right" id="dates_label"></td><td id="dates"></td></tr>
+  <tr><td align="right" id="z_label"></td><td id="z"</td></tr>
+  <tr><td colspan="2" id="output"></td></tr>
+  </tbody>
+  </table>
+  <!-- #include FILE="productserver/templates/V7UIFooter.vm" -->
+  </body>
+</html>

@@ -1,0 +1,13 @@
+<application>
+	<invoker base_dir="resources/shape"
+                 executable="/home/rhs/nc2shp/bin/nc2shp"
+                 time_limit="200" template_dir="templates" 
+                 output_dir="/home/rhs/tomcat/webapps/baker/output"
+                 http_base_url = "http://strider.weathertopconsulting.com:8880/baker/output"
+                 iosp_script_dir="resources/iosp/scripts"
+                 iosp_temp_dir="/home/rhs/workspace/baker/conf/server/temp"
+                 iosp_data_dir="/home/rhs/workspace/baker/conf/server/data/dynamic"
+                 las_tfds_data_dir="/home/rhs/workspace/baker/conf/server/data"
+                 iosp_base_dir="resources/iosp"
+                 opendap_base_url = "http://strider.weathertopconsulting.com:8880/thredds/dodsC/output"/>
+</application>

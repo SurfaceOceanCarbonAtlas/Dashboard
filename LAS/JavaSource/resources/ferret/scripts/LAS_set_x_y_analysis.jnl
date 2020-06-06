@@ -1,0 +1,91 @@
+! LAS_set_x_y_analysis.jnl
+
+! If there is an X or Y analysis operation then the X or Y region has
+! Not been set. Get the X and/or Y analysis request, set up 
+! x an y region definitions, and prepare to do the request either
+! by finding the region in the rectiliear portion of the grid
+! or by first doing a curvi-to-rectilnear regridding operation.
+
+IF `($ferret_curvi_coord_lon"0|*>1") EQ 0` THEN 
+EXIT/SCRIPT
+ENDIF
+
+LET its_x_analysis = STRINDEX("($data_($num)_title)", "x=") 
+LET its_y_analysis = STRINDEX("($data_($num)_title)", "y=")
+IF `its_x_analysis EQ 0 AND its_y_analysis EQ 0` THEN
+  EXIT/SCRIPT
+ENDIF
+  
+LET its_xy_analysis = 0
+LET nnx = STRINDEX("($data_var_def)", "X=")
+IF `nnx GT 0` THEN LET its_xy_analysis = 1
+LET nny = STRINDEX("($data_var_def)", "Y=")
+IF `nny GT 0` THEN LET its_xy_analysis = 1
+
+IF `($region_($num)_x_lo"0|*>1") EQ 0` THEN 
+   IF `nnx GT 0` THEN 
+      LET nlo1 = `nnx+2`
+      LET nlo2 = `STRINDEX("($data_var_def)", ":")`
+      DEFINE SYMBOL region_($num)_x_lo `SUBSTRING("($data_var_def)", nlo1, nlo2-nlo1)`
+
+      let nhi1 = nlo2+1
+      let slen = `STRLEN("($data_var_def)")`
+      DEFINE SYMBOL var_def2 = `SUBSTRING("($data_var_def)", nhi1, slen)`
+      let nhi1 = 1
+      LET nhi2 = STRINDEX("($var_def2)", "@")
+      LET dummy  = SUBSTRING("($var_def2)", nhi1, nhi2-nhi1)
+      DEFINE SYMBOL region_($num)_x_hi = `dummy`
+      DEFINE SYMBOL region_($num)_x_range = `($region_($num)_x_hi) - ($region_($num)_x_lo)`
+      DEFINE SYMBOL xyop = X=`SUBSTRING("($var_def2)", nhi2, 4)`
+      DEFINE SYMBOL reset_regions = 1
+   ENDIF
+ENDIF
+
+IF `($region_($num)_y_lo"0|*>1") EQ 0` THEN 
+
+   IF `nny GT 0` THEN 
+      LET slen = STRLEN("($data_var_def)")
+      DEFINE SYMBOL var_def3 = `SUBSTRING("($data_var_def)", nny, slen)`
+      LET nlo1 = 3
+      LET dummy  = STRINDEX("($var_def3)", ":")
+      LET nlo2 = `dummy`
+      LET dummy  = SUBSTRING("($var_def3)", nlo1, nlo2-nlo1)
+      DEFINE SYMBOL region_($num)_y_lo `dummy`
+
+      LET nhi1 = nlo2+1
+      LET dummy = STRLEN("($var_def3)")
+      LET slen = `dummy`
+      LET dummy = SUBSTRING("($var_def3)", nhi1, slen)
+      DEFINE SYMBOL var_def4 = `dummy`
+      let nhi1 = 1
+      LET nhi2 = STRINDEX("($var_def4)", "@")
+      LET dummy  = SUBSTRING("($var_def4)", nhi1, nhi2-nhi1)
+      DEFINE SYMBOL region_($num)_y_hi = `dummy`
+      DEFINE SYMBOL region_($num)_y_range = `($region_($num)_y_hi) - ($region_($num)_y_lo)`
+      IF ($xyop"0|*>1") THEN 
+         DEFINE SYMBOL xyop = ($xyop),Y=`SUBSTRING("($var_def4)", nhi2, 4)`
+      ELSE
+         DEFINE SYMBOL xyop = ($xyop)`SUBSTRING("($var_def4)", nhi2, 4)`
+      ENDIF
+      DEFINE SYMBOL reset_regions = 1
+   ENDIF
+
+ENDIF
+
+IF `($reset_regions"0|*>1") AND \
+($constraint_($var_num)_lhs"0|Curv_to_Rect_Regridding>1|*>0") ` THEN 
+
+   GO LAS_initialize_region
+ENDIF
+
+IF ($xyop"0|*>1") THEN 
+   LET nbkt = `STRINDEX("($data_var_def)", "[")`
+   DEFINE SYMBOL data_var_def `SUBSTRING("($DATA_VAR_DEF)", 1, nbkt-1)`
+   LET data_var_definition = ($data_var_def)
+ENDIF
+DEFINE SYMBOL analysis_def = [($xyop)]
+
+CANCEL SYMBOL reset_regions
+
+! End of $RCSfile ------------LAS_set_x_y_analysis.jnl--------------------------
+

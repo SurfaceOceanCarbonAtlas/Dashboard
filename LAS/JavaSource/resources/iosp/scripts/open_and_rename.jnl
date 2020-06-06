@@ -1,0 +1,30 @@
+\cancel mode verify 
+
+! open_and_rename.jnl
+! Open a dataset, and loop through all the variables, 
+! renaming them by adding a given suffix
+!
+!                               arg 1         arg 2        arg 3        arg 4
+! usage:   GO open_and_rename dataset_name   suffix
+!
+! example:
+!  GO open_and_rename levitus_climatology _bla
+!
+!  show data
+!     currently SET data sets:
+!    1> /home/porter/tmap/ferret/linux/fer_dsets/data/levitus_climatology.cdf  (default)
+! name     title                             I         J         K         L
+! TEMP_BLA TEMPERATURE                      1:360     1:180     1:20      ...
+! SALT_BLA SALINITY                         1:360     1:180     1:20      ...
+
+
+use "$1"
+
+let varnames = ..varnames
+let nvars = `..nvars`
+repeat/range=1:`nvars`/name=m (\
+   define symbol m = `m`; \
+   let nam = varnames[i=`m`]; \
+   define symbol ivar = `varnames[i=($m)]`; \
+   define symbol newname = ($ivar)$2; \
+   set var/name="($newname)" ($ivar))

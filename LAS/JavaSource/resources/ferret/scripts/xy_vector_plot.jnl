@@ -1,0 +1,149 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! xy_vector_plot.jnl
+! 
+! $Author: ansley $
+! $Date: 2006/10/05 $
+!
+! 3/7/2007: ACM. Put code to check that the region was not too small, resulting 
+!           in degenerate plot into LAS_initialize_data.jnl rather than in the 
+!           individual plot scripts.
+! 3/29/2007 ACM Fix logic interpreting contents of ferret_interpolate_data 
+! 3/17/2008 ACM Add /FLOWLINE[/DENSITY] options and also line color and thickness
+!
+! xy_vector_plot.jnl creates an XY vector plot for use with the Back End Server
+! code that sits behind a Live Access Server (LAS). 
+!
+! NOTE:  This code handles overlays but not differencing.
+!
+! Set any Ferret modes
+!
+! NOTE:  Should we support any of the following Ferrt modes?
+! NOTE:    ASCII_FONT, CALENDAR, DEPTH_LABEL, LABELS, LATIT_LABEL, LONG_LABEL 
+
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE
+
+DEFINE SYMBOL itsa_vector_plot = 1
+
+DEFINE SYMBOL fview = `UPCASE("($ferret_view)")`
+
+! Define symbols associated with the regign and data and perform any
+! initialization needed for this dataset.
+!
+! NOTE:  Adding support for a 'base layer' variable would mean passing
+! NOTE:  some other argument.  For now, though, we always use 'data_0'
+! NOTE:  for the base layer and region.
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+DEFINE SYMBOL ferret_vector_1 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title_1 "($data_title) ($data_units)"
+DEFINE SYMBOL ferret_vector_1_noregion ($ferret_plot_var_0_noregion)
+
+GO LAS_initialize_data 1
+DEFINE SYMBOL ferret_vector_2 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title "($ferret_plot_title_1), ($data_title) ($data_units)"
+
+! If an expression was defined, note that in the title
+IF ($expr1"0|*>1") THEN DEFINE SYMBOL ferret_plot_title ($expr1) {($ferret_plot_title)} ($expr2)
+
+DEFINE SYMBOL ferret_vector_2_noregion ($ferret_plot_var_1_noregion)
+DEFINE SYMBOL variable_lab ($ferret_plot_title)
+
+! See if the vector components are on staggered grids
+GO LAS_check_staggered
+
+! Testing the length-animation script
+!GO LAS_auto_veclen_animate
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Check whether the region is too small; reduces to a single grid point.
+! (Region is a point)
+GO LAS_check_2d_region
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Trying a hack to close the gap on GE plots. Not very effective
+!IF `(($native_curvilinear_xy"0") EQ 0) AND (($its_GE"0|*>1") EQ 1)` THEN 
+!   LET delx = `xbox[gx=($ferret_plot_var),x=($region_x_lo)]`
+!
+!   IF `($region_x_range) GT (360-1.1*delx)` THEN
+!      DEFINE SYMBOL region_0_x_lo = `($region_0_x_lo) - delx`
+!      DEFINE SYMBOL region_0_x_hi = `($region_0_x_hi) + delx`
+!      DEFINE SYMBOL qualifiers = ($qualifiers)/HLIM=($region_0_x_lo):($region_0_x_hi)
+!      GO LAS_initialize_region 0
+!   ENDIF
+!ENDIF   
+
+IF `($its_GE"0|*>1") ` THEN 
+
+! This when we get transparency working. Land outlinen setup in land_overlay.jnl
+!   SET MODE LINECOLORS:7
+!   PPL COLOR,7,100,50,0  ! orange lines
+!   IF `($ferret_line_color%1|default>1|*>2%) EQ 1` THEN DEFINE SYMBOL ferret_line_color=7
+
+   IF `($ferret_line_color%1|default>1|*>2%) EQ 1` THEN DEFINE SYMBOL ferret_line_color = blue
+
+ENDIF
+
+! Use Ferret properties to set up the plot qualifiers
+GO LAS_set_plot_qualifiers
+
+! Open the window, apply size, scale options
+GO LAS_open_window
+
+! Always use /ASPECT adjusts scaling based upon the ratio of the 
+! axis scale factors (meters on the Earth to inches on the plot) and 
+! it preserves the vector magnitudes -- adjusting only the orientation. 
+
+!DEFINE SYMBOL qualifiers  = ($qualifiers)/ASPECT/NOLAB  ! but dont make a label about it.
+
+IF `($ferret_line_color%0|default>1|*>2%) LT 2` THEN DEFINE SYMBOL ferret_line_color = blue
+
+! Curvilinear plots may have more qualifiers. 
+IF ($ferret_curvi_quals"0|*>1") THEN
+  DEFINE SYMBOL qualifiers = ($qualifiers)($ferret_curvi_quals)
+ENDIF
+! Set the URL label for the first dataset.
+GO LAS_url_label 0
+
+! Draw  the plot. 
+
+IF ($native_curvilinear_xy"0|*>1") THEN 
+   IF ($ferret_plot_base_var_0"0|*>1") THEN \
+    DEFINE SYMBOL ferret_curvi_base_var = ($ferret_plot_base_var_0), ($ferret_plot_base_var_1)
+ELSE
+   IF ($ferret_vector_1"0|*>1") THEN \
+    DEFINE SYMBOL ferret_vector_variable = ($ferret_vector_1), ($ferret_vector_2)
+ENDIF
+
+GO LAS_draw_xy_vector_plot
+
+IF `($ferret_annotations"0|*>1") EQ 0` THEN \
+LABEL/NOUSER `($ppl$xlen)/2`,-0.8, 0, 0, 0.13, ($ferret_plot_title)
+
+! Overlay additional cartography data (land mask, outlines, rivers, ...)
+
+GO land_overlay
+
+GO labels_above_plot
+
+! Mark grid points. Options are no, subsample (tests if subsampling needed)
+! or all to force marking all points.
+
+IF ($ferret_mark_grid"0|no>0|all>1|subsample>1|*>0") THEN GO mark_grid
+
+! Save the results
+GO LAS_results box
+
+! End of $RCSfile -----------------------------------------------------

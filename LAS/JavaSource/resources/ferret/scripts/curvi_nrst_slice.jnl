@@ -1,0 +1,108 @@
+!\cancel mode verify
+
+! curvi_sample_slice.jnl
+! 3/07 ACM
+! 3/08 ACM limit the range of the sampling variable in z and/or t if
+!          a region is given in those directions.
+ 
+! Description: define variables for a line of constant Latitude or Longitude 
+! of a curvilinear data set.
+! This script assumes 
+! The curvilinear data set has been opened, region defined, grid has coord variables
+!    ($ferret_curvi_coord_lon), ($ferret_curvi_coord_lat)
+!
+! Note a new function SAMPLEXY_CURV_NRST returns value at ij point representing nearest xy.
+
+IF ($region_z"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_z)
+IF ($region_t"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_t)
+IF ($region_zt"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_zt)
+
+IF ($region_transform_t"0|*>1") THEN 
+   IF ($region_z"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_z)
+   IF ($region_t"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_transform_t)
+   IF ($region_zt"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_z),($region_transform_t)
+ENDIF
+
+IF `STRINDEX("($OPERATION_ID)", "Animation") GT 0` THEN 
+   DEFINE SYMBOL its_animate = 1
+   CANCEL SYMBOL region_sample
+   IF ($region_z"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_z)
+ENDIF
+
+! default value; may be redefined in this script
+LET/units="($data_($var_num)_units)" sampled_var($var_num) = ($ferret_plot_var)
+IF ($ferret_view"|zt>1|*>0") THEN LET/units="($data_($var_num)_units)" sampled_var($var_num) = ($data_var)[d=($data_num)($region_sample)]
+IF ($its_animate"0|*>1") THEN LET/units="($data_($var_num)_units)" sampled_var($var_num) = ($ferret_xyz_var)
+
+! Call CURV_RANGE to get the I,J range for the requested output rectangle
+
+GO get_curv_coord_bbox
+
+! If its an XY analysis then we just average over the box
+IF ($xyop"0|*>1") THEN 
+   DEFINE VARIABLE data_var_box = \
+     data_var_definition[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax),($region_zt)]
+   DEFINE SYMBOL ferret_p7/30/2010lot_var = data_var_box[($xyop)]
+   EXIT/SCRIPT
+ENDIF
+
+! For analysis operations on curvilienar grids we may not have definitions for region_x_* and
+! region_y_*  but there should be region_0_**
+
+IF `($region_x_lo"-999") EQ -999` THEN
+   DEFINE SYMBOL remove_x_region = 1
+   DEFINE SYMBOL region_x_lo = ($region_0_x_lo)
+   DEFINE SYMBOL region_x_hi = ($region_0_x_hi)
+ENDIF
+IF `($region_y_lo"-999") EQ -999` THEN
+   DEFINE SYMBOL remove_y_region = 1
+   DEFINE SYMBOL region_y_lo = ($region_0_y_lo)
+   DEFINE SYMBOL region_y_hi = ($region_0_y_hi)
+ENDIF
+
+! Define these - they may be redefined below.
+LET npts = 50
+IF `($region_x_hi) - ($region_x_lo) EQ 0` THEN LET npts = 1
+DEFINE AXIS/X=($region_x_lo):($region_x_hi)/NPOINTS=`npts`/MODULO/UNITS=degrees sample_xlon
+DEFINE AXIS/X=($region_x_lo):($region_x_hi)/NPOINTS=`npts`/MODULO/UNITS=degrees sample_x
+
+LET npts = 50
+IF `($region_y_hi) - ($region_y_lo) EQ 0` THEN LET npts = 1
+DEFINE AXIS/Y=($region_y_lo):($region_y_hi)/NPOINTS=`npts`/UNITS=degrees sample_ylon
+DEFINE AXIS/Y=($region_y_lo):($region_y_hi)/NPOINTS=`npts`/UNITS=degrees sample_y
+
+! Y line, or YZ, YT slice
+LET yslice = ($ferret_view"|y>1|*>0") + ($ferret_view"|yz>1|*>0") + ($ferret_view"|yt>1|*>0")
+
+IF `yslice GT 0` THEN GO curvi_nrst_yslice
+
+! X line, or XZ, XT slice
+LET xslice = ($ferret_view"|x>1|*>0") + ($ferret_view"|xz>1|*>0") + ($ferret_view"|xt>1|*>0")
+
+IF `xslice GT 0` THEN GO curvi_nrst_xslice
+
+! ZT slice
+LET ztslice = ($ferret_view"|zt>1|*>0") 
+IF `ztslice GT 0` THEN GO curvi_nrst_ztslice
+
+
+! T line
+
+LET tslice = ($ferret_view"|t>1|*>0") 
+IF `tslice GT 0` THEN GO curvi_nrst_tslice
+
+! Z line
+LET zslice = ($ferret_view"|z>1|*>0") 
+IF `zslice GT 0` THEN GO curvi_nrst_zslice
+
+
+DEFINE SYMBOL ferret_plot_var = ($expr1)sampled_var($var_num)($expr2)
+DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+
+IF ($expr3"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)sampled_var($var_num)($expr3)sampled_var($var_num)($expr4)
+   DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr3) ($data_title) ($expr4)"
+ENDIF
+
+GO cancel_temp_regions
+! End of file ------------curvi_nrst_slice.jnl--------------------------

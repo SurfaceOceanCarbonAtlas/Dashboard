@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>com.weathertopconsulting.refmap.client package</title>
+
+</head>
+<body bgcolor="white">
+
+The OLMapWidget is a a wrapper for the OpenLayers which adds widgets that
+allow a click, hold and drag, selection of latitude/longitude rectangles, latitude lines, longitude lines and points
+while displaying an overlay on the map showing the selected area.  The lines and rectangles
+allow the item to be selected and for the selection to be edited by moving the handles.  The map
+includes text widgets which display the N and S latitude, and E and W longitude of the 
+current selection and allow for user entry of values to edit the selection.  The map includes
+a reset button to zoom to the current valid data region.  
+<p>
+We use this widget a part of a tool kit that makes server requests based on the map selections.  We expect you will want to use 
+this widget as part of a client that will use the selection, but you can
+implement a listener in the class that has your OnModuleLoad and use this widget it to pan and zoom to the selection to mimic the behavior of
+other drag and zoom implementations available in the native JavaScript map.
+<p>
+
+ This software was developed by Roland Schweitzer of Weathertop Consulting, LLC 
+  (http://www.weathertopconsulting.com/) as part of work performed for
+  NOAA Contracts AB113R-04-RP-0068 and AB113R-09-CN-0182.  
+<p>
+  The NOAA licensing terms are explained below.
+<p>  
+  This software is provided by NOAA for full, free and open release.  It is
+  understood by the recipient/user that NOAA assumes no liability for any
+  errors contained in the code.  Although this software is released without
+  conditions or restrictions in its use, it is expected that appropriate
+  credit be given to its author and to the National Oceanic and Atmospheric
+  Administration should the software be included by the recipient as an
+  element in other product development. 
+ 
+<p>
+<pre>
+import com.weathertopconsulting.olmapwidget.client.map.OLMapWidget;
+public class MapExample implements EntryPoint {
+    OLMapWidget mapWidget = new OLMapWidget();
+        public void onModuleLoad() {
+
+                mapWidget.setDataExtent(-90, 90, -180, 180, 1);
+                mapWidget.setTool("xy");
+                RootPanel.get().add(mapWidget);
+        }
+}
+
+</pre>
+<h2>Package Specification</h2>
+
+ A compile time Google Web Toolkit and the GWT-OpenLayers API jars.
+
+
+<h2>Related Documentation </h2>
+<ul>
+<li><a href="">The Google code site for this widget</a>
+<li><a href="http://code.google.com/p/referencemap/" target="_blank">The code and some examples.</a>
+<li><a href="http://code.google.com/webtoolkit/">Google Web Toolkit</a>
+<li><a href="http://code.google.com/p/gwt-google-apis/">Google Web Toolkit Maps API</a>
+</ul>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<datasets>
+  <socat_v2_yearly name="SOCAT v2 annual 1x1 gridded"
+                   url="/home/data/socat/v2/SOCATv2_tracks_gridded_yearly.nc"
+                   doc="doc/SOCAT_gridded_yearly.html">
+    <properties>
+      <ferret>
+        <contour_style>raster</contour_style>
+        <timelab_res>year</timelab_res>
+        <palette>rainbow</palette>
+      </ferret>
+    </properties>
+    <variables>
+      <COUNT_NCRUISE-socat_v2_yearly name="Number of cruises" units="count" url="#COUNT_NCRUISE_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </COUNT_NCRUISE-socat_v2_yearly>
+      <COUNT_NOBS-socat_v2_yearly name="Number of obs" units="count" url="#COUNT_NOBS_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+        <properties>
+          <ferret>
+            <fill_levels>40v,0min</fill_levels>
+            <palette>lightgray_bottom</palette>
+            <contour_style>raster</contour_style>
+            <seasonal_transform>SUM</seasonal_transform>
+          </ferret>
+        </properties>
+      </COUNT_NOBS-socat_v2_yearly>
+      <FCO2_AVE_UNWTD-socat_v2_yearly name="fCO2 mean - unweighted all obs" units="uatm" url="#FCO2_AVE_UNWTD_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+      </FCO2_AVE_UNWTD-socat_v2_yearly>
+      <FCO2_AVE_WEIGHTED-socat_v2_yearly name="fCO2 mean - per cruise weighted" units="uatm" url="#FCO2_AVE_WEIGHTED_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+      </FCO2_AVE_WEIGHTED-socat_v2_yearly>
+      <FCO2_MAX_UNWTD-socat_v2_yearly name="max fCO2" units="uatm" url="#FCO2_MAX_UNWTD_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MAX</seasonal_transform>
+          </ferret>
+        </properties>
+      </FCO2_MAX_UNWTD-socat_v2_yearly>
+      <FCO2_MIN_UNWTD-socat_v2_yearly name="min fCO2" units="uatm" url="#FCO2_MIN_UNWTD_YEAR">
+        <link match="/lasdata/grids/grid-XLON-YLAT-TYEAR-socat_v2_yearly" />
+        <properties>
+          <ferret>
+            <seasonal_transform>MIN</seasonal_transform>
+          </ferret>
+        </properties>
+      </FCO2_MIN_UNWTD-socat_v2_yearly>
+    </variables>
+  </socat_v2_yearly>
+</datasets>
+<grids>
+  <grid-XLON-YLAT-TYEAR-socat_v2_yearly>
+    <link match="/lasdata/axes/XLON-x-socat_v2_yearly" />
+    <link match="/lasdata/axes/YLAT-y-socat_v2_yearly" />
+    <link match="/lasdata/axes/TYEAR-t-socat_v2_yearly" />
+  </grid-XLON-YLAT-TYEAR-socat_v2_yearly>
+</grids>
+<axes>
+  <XLON-x-socat_v2_yearly type="x" units="DEGREES_EAST">
+    <arange start="-179.5" size="360" step="1" />
+  </XLON-x-socat_v2_yearly>
+  <YLAT-y-socat_v2_yearly type="y" units="DEGREES_NORTH">
+    <arange start="-89.5" size="180" step="1" />
+  </YLAT-y-socat_v2_yearly>
+  <TYEAR-t-socat_v2_yearly type="t" units="year">
+    <arange start="1970-01-15" size="42" step="1" />
+  </TYEAR-t-socat_v2_yearly>
+</axes>

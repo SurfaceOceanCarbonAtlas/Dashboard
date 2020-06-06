@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS Output</title>
+
+<table>
+  <tr>
+      <td ALIGN=LEFT>
+         <a href="GEServlet?xml=$las_request.toEncodedURLString()&GE=placemarks">View on Google Earth</a>
+         <ul>
+         <li>It may take a while to generate the KML file for a large area.
+         <li>Each grid point will be a place mark on Google Earth.
+         <li>Clicking a place mark will pop-up the time series or depth profile plot of that grid point.
+         </ul>
+      </td>
+  </tr>
+  <tr>
+      <td>
+         <img alt="Plot Image" border="0" src="$las_response.getResult("plot_image")">
+      </td>
+  </tr>
+</table>
+</body>
+</html>
+

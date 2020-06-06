@@ -1,0 +1,1 @@
+SELECT $cruiseID,$depth,$lat,$lon,$time,$var FROM $table WHERE $missing AND  $region AND $con

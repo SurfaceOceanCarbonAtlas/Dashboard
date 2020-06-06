@@ -1,0 +1,74 @@
+! LAS_initial_setup.jnl
+!
+! Handle initial setup. Write output to the debug file so that FshowGO can be used
+! to see the tree of script calls. Reset the name .gif that plot information
+! is written to initially until the FRAME command is issued.
+!
+! IF the job is not going to produce an image, send in argument of 0,
+! then this will exit after doing the FshowGO setup.
+!
+! 10/4/2016 fixes so init scripts still work
+
+
+SET MODE VERIFY:ALWAYS
+
+! Put into the debug output what PyFerret/Ferret is running, and when.
+
+SHOW SYMBOL ferret_version, ferret_platform, program_name, current_date
+
+DEFINE SYMBOL initialize_script_arg = ($1"2")
+
+! Make sure to do the SET REDIRECT just once.
+
+IF `($initial_setup_done"0|*>1") NE 0` THEN EXIT/SCRIPT
+DEFINE SYMBOL initial_setup_done = 1
+
+! Put the output into the log file so that FshowGO will list
+! the tree of GO script calls.
+SET REDIRECT/APPEND/TEE/file="($result_debug_filename)" STDOUT,STDERR
+
+IF `($initialize_script_arg) EQ 0` THEN EXIT/SCRIPT
+
+
+IF ($program_name"0|PyFerret>1|*>0") THEN EXIT/SCRIPT
+
+! Reset the default gif filename used internally by Ferret.
+! This must be done before PPLUS is opened.  Some of the scripts use PPL
+! symbol editing, so even before any plot commands are issued, pplus is 
+! started.
+!
+! Define the gif filename (preventing collisions of file named ".gif" in multiple sessions)
+
+! When a colorbar is also made, the colorbar image overwrites the main plot in 
+! V6.8. Add characters to the GIFFILE setting here, the correct images will
+! be set when the image is saved with FRAME.
+
+! Some google earth plots scripts come in without a result image filename.
+! Just make up a name here. (A gif file with this name will be written in the 
+! temp directory.)
+IF `($result_plot_image_filename%0|*>1%) EQ 0` THEN 
+   SET GIFFILE "($operation_key)_($session_pid).gif"
+   EXIT/SCRIPT
+ENDIF
+
+DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)
+IF ($result_colorbar_filename%0|*>1%) THEN \
+DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
+
+IF `(($reset_gifname"0|*>1") EQ 0) AND ($FERRET_VERSION"0") GE 6.721` THEN 
+   IF `STRINDEX("($gifplot_name)", "gif") GT 0` THEN
+      SET GIFFILE "($gifplot_name)"
+      DEFINE SYMBOL reset_gifname = 1
+   ENDIF
+ENDIF
+
+! Do this again looking for .png
+
+IF `(($reset_gifname"0|*>1") EQ 0) AND ($FERRET_VERSION"0") GE 6.721` THEN 
+   IF `STRINDEX("($gifplot_name)", "png") GT 0` THEN
+      SET GIFFILE "($gifplot_name).gif"
+      DEFINE SYMBOL reset_gifname = 1
+   ENDIF
+ENDIF
+
+! End of file ------------ LAS_initial_setup.jnl--------------------------

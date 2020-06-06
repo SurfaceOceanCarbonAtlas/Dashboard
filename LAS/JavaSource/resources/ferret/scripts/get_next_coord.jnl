@@ -1,0 +1,47 @@
+
+
+LET space = STRINDEX(remainder, " ")
+IF `space EQ 0` THEN LET space = STRINDEX(remainder, ",")
+IF `space EQ 0` THEN
+   DEFINE SYMBOL coordstring = `remainder`
+ELSE  
+   LET coordstring = substring(remainder, 1, `space-1`)
+   DEFINE SYMBOL coordstring = `coordstring`
+ENDIF
+
+! Is it a variable (and not a dimension) of the datset?
+
+LET isvar = IS_ELEMENT_OF_STR (allvars, "($coordstring)")
+IF `isvar NE 0` THEN
+
+! Is it 2D?  IF so does it have longitude or latitude units?
+DEFINE SYMBOL cshape = `($coordstring),RETURN=shape`
+IF `STRCMP("($cshape)", "XY") EQ 0` THEN 
+   LET cunits = DNCASE("`($coordstring).units`")
+   IF `STRINDEX(cunits, "degree_e") GT 0` THEN DEFINE SYMBOL ferret_curvi_coord_lon = ($coordstring)
+   IF `STRINDEX(cunits, "degrees_e") GT 0` THEN DEFINE SYMBOL ferret_curvi_coord_lon = ($coordstring)
+   IF `STRINDEX(cunits, "degree_n") GT 0` THEN DEFINE SYMBOL ferret_curvi_coord_lat = ($coordstring)
+   IF `STRINDEX(cunits, "degrees_n") GT 0` THEN DEFINE SYMBOL ferret_curvi_coord_lat = ($coordstring)
+ENDIF
+ENDIF  ! isvar
+
+IF `space EQ 0` THEN 
+   IF ($ferret_curvi_coord_lon"0|*>1") THEN
+      LET lonstats = MINMAX(($ferret_curvi_coord_lon))
+      IF `($ferret_curv_lon_min"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_curv_lon_min = `lonstats[i=1]`
+      IF `($ferret_curv_lon_max"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_curv_lon_max = `lonstats[i=2]`
+   ENDIF
+   LET coords_done = 1
+   EXIT/SCRIPT
+ENDIF
+
+LET remainder = SUBSTRING("($remainder)", `space+1`, `STRLEN(varcoords)`)
+DEFINE SYMBOL remainder = `remainder`
+
+IF `STRLEN("($remainder)") EQ 0` THEN 
+   IF ($ferret_curvi_coord_lon"0|*>1") THEN
+      LET lonstats = MINMAX(($ferret_curvi_coord_lon))
+      IF `($ferret_curv_lon_min"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_curv_lon_min = `lonstats[i=1]`
+      IF `($ferret_curv_lon_max"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_curv_lon_max = `lonstats[i=2]`
+   ENDIF
+ENDIF

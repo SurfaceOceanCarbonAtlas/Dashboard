@@ -1,0 +1,358 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_xyzt_ijkl.jnl
+! 
+! Author: ansley 
+! Date: 2006/09/06
+!  11/14/2007 update to check the variable shape before trying to get  
+!             axis info based on regions which may come in as x=0:0
+!             when there is no x axis.
+!
+! From a dataset and region, output the corresponding x,y,z,t and i,j,k,l 
+! coordinates and indices.  If there is a modulo X axis, and the region crosses
+! the end of the axis, two sections are output, one on each side of the start 
+! or end of the axis as it is defined in the dataset.
+
+!  Assumes that region has been initialized as in LAS_initialize_region.jnl so that 
+!  symbols ($data_region), ($region_x_lo), ($region_x_hi) and so on are defined.
+
+!  Assumes a dataset is inialized, e.g. by LAS_initialize_data.jnl, so we have symbol 
+!  ($data_var) and ($ferret_plot_var) from which we can get the axes.
+
+! Symbols from the server defined
+! Operation script called, inclding: 
+!    GO LAS_initialize_region 0
+!    GO LAS_initialize_data 0
+! 
+!    GO LAS_xyzt_ijkl.jnl
+
+! Output is to a file, ($result_xyzt_ijkl_filename)
+! Currently, this script still writes output lines for all dimensions, even if they are
+! not represented in the file.  This could be eliminated if need be.
+!   "z_lo"    " "     
+!   "z_hi"    " "     
+!   "k_lo"    " "     
+!   "k_hi"    " "     
+
+! 2006/09/06 changes:
+!            Use ($ferret_plot_var) rather than ($data_var) in the call to TAX_DATESTRING 
+!            Test for modulo x axis explicitly; check for region outside branch cut only 
+!            on modulo axes
+! 2006/09/15 acm Changes so that the indices are always positive (for matlab or other non-Ferret applications)
+! 2006/11/07 acm Add comments on ENDIF and ELSE commands; fix missing ENDIF at the end of section 2 of x 
+!                region section.
+! 2007/07/03 acm Make the test for modulo x axis more robust using `var,RETURN=xmod` syngax.
+!                Also use a better test on symbol ($section) which allows for it to be 
+!                undefined, 0, 1, or 2.
+! 2007/11/14 acm If there is no x axis at all then the `LOAD var,RETURN=xmod` results in an 
+!                error. Check for the existence of an axis in the x direction first.  (trac 315)
+
+! For the present, this script does not handle curvilinear or hybrid Z data...
+
+IF ($ferret_curvi_coord_lat"0|*>1") THEN
+   DEFINE SYMBOL error_string = "Desktop Access script not available for data on a Curvilinear grid"
+   MESSAGE/ERROR **ERROR ($error_string)
+   EXIT/PROGRAM
+ENDIF
+IF `($ferret_thk_var"0|*>1")` THEN
+   DEFINE SYMBOL error_string = "Desktop Access script not available for data on a Hybrid Z grid"
+   MESSAGE/ERROR **ERROR ($error_string)
+   EXIT/PROGRAM
+ENDIF
+
+CANCEL MODE long
+CANCEL MODE lat
+
+DEFINE SYMBOL varshape = `($data_var),RETURN=shape`
+LET xmod = 0
+
+! X region
+
+IF `STRINDEX("($varshape)", "X") NE 0` THEN
+
+! Check whether X axis is modulo
+
+DEFINE SYMBOL var_xmod = "`($data_var),RETURN=xmod`"  
+IF  `STRCMP (" ", ($var_xmod)) EQ 0` THEN
+   LET xmod = 0
+   CANCEL SYMBOL FER_LAST_ERROR
+ELSE
+   LET xmod = 1
+ENDIF
+
+IF `xmod EQ 0` THEN
+   IF ($region_x_hi"0|*>1") THEN
+      DEFINE SYMBOL x_lo `x[gx=($data_var),x=($region_x_lo)]`
+      DEFINE SYMBOL i_lo `i[gx=($data_var),x=($region_x_lo)]`
+      DEFINE SYMBOL x_hi `x[gx=($data_var),x=($region_x_hi)]`
+      DEFINE SYMBOL i_hi `i[gx=($data_var),x=($region_x_hi)]`
+   ENDIF
+
+ELSE ! not xmod eq 0
+
+   IF ($region_x_hi"0|*>1") THEN
+      DEFINE SYMBOL section 0
+   
+      DEFINE SYMBOL xaxlo `xboxlo[gx=($data_var),i=1]`
+      LET ilast = `($data_var),RETURN=iend`
+      LET xx = xboxhi[gx=($data_var),i=`ilast`]
+      DEFINE SYMBOL xaxhi `xx`
+   
+      ! Part of the region extends below start of modulo X axis
+      IF `($region_x_lo) LT ($xaxlo)` THEN
+         DEFINE SYMBOL section 1
+   
+         ! Start of sec.1 is start of region
+         DEFINE SYMBOL x_lo_1 `x[gx=($data_var),x=($region_x_lo)]`
+         DEFINE SYMBOL i_lo_1 `i[gx=($data_var),x=($region_x_lo)]`
+   
+         ! Whole region is below start of x axis
+         IF `($region_x_hi) LT ($xaxlo)` THEN 
+            DEFINE SYMBOL section 1
+            DEFINE SYMBOL x_hi_1 `x[gx=($data_var),x=($region_x_hi)]`
+            DEFINE SYMBOL i_hi_1 `i[gx=($data_var),x=($region_x_hi)]`
+   
+         ELSE   !!! from region_x_hi LT xaxlo
+            DEFINE SYMBOL section 2
+   
+            ! End of sec 1 is 1 less than start of X axis
+            DEFINE SYMBOL x_hi_1 `($data_var),RETURN=xstart`
+            DEFINE SYMBOL i_hi_1 `i[gx=($data_var),x=($x_hi_1)] - 1`
+            DEFINE SYMBOL x_hi_1 `x[gx=($data_var),i=($i_hi_1)]`
+   
+            ! Start of sec 2 is 1 more than end of Sec 1
+            DEFINE SYMBOL i_lo_2 `($i_hi_1) + 1`
+            DEFINE SYMBOL x_lo_2 `x[gx=($data_var),i=($i_lo_2)]`
+   
+            IF `($region_x_hi) LE ($xaxhi)` THEN 
+   
+               ! End of Sec 2 is top of region
+               DEFINE SYMBOL x_hi_2 `x[gx=($data_var),x=($region_x_hi)]`
+               DEFINE SYMBOL i_hi_2 `i[gx=($data_var),x=($region_x_hi)]`
+   
+            ENDIF !!! region_x_hi LE xaxhi
+     
+         ENDIF   !!! region_x_hi LT xaxlo
+      
+      ELSE    !!! region_x_lo GE xaxlo 
+         DEFINE SYMBOL section 1
+   
+         ! Start of Sec 1 is start of region
+         DEFINE SYMBOL x_lo_1 `x[gx=($data_var),x=($region_x_lo)]`
+         DEFINE SYMBOL i_lo_1 `i[gx=($data_var),x=($region_x_lo)]`
+   
+         IF `($region_x_hi) LE ($xaxhi)` THEN
+            DEFINE SYMBOL x_hi_1 `x[gx=($data_var),x=($region_x_hi)]`
+            DEFINE SYMBOL i_hi_1 `i[gx=($data_var),x=($region_x_hi)]`
+         ELSE   !!! region_x_hi LE xaxhi
+            DEFINE SYMBOL section 2 
+            
+            ! End of sec 1 is end of X axis
+            DEFINE SYMBOL x_hi_1 `($data_var),RETURN=xend`
+            DEFINE SYMBOL i_hi_1 `i[gx=($data_var),x=($x_hi_1)]`
+   
+            ! Start of Sec 2 is 1 more than end of X axis
+            DEFINE SYMBOL i_lo_2 `($i_hi_1) + 1`
+            DEFINE SYMBOL x_lo_2 `x[gx=($data_var),i=($i_lo_2)]`
+   
+            ! End of Sec 2 is end of region
+            DEFINE SYMBOL x_hi_2 `x[gx=($data_var),x=($region_x_hi)]`
+            DEFINE SYMBOL i_hi_2 `i[gx=($data_var),x=($region_x_hi)]`
+   
+         ENDIF !!! region_x_hi LE xaxhi
+      ENDIF  !!! region_x_lo GE xaxlo
+   
+   ENDIF !!! region_x_hi defined
+
+   ! Make the indices positive: add npts to either section if they are negative
+   LET add_1 = 0
+   IF `($i_lo_1) LT 0` THEN LET add_1 = `($data_var),RETURN=isize`
+   IF `($i_hi_1) LT 0` THEN LET add_1 = `($data_var),RETURN=isize`
+
+   DEFINE SYMBOL i_lo_1 = `($i_lo_1) + add_1`
+   DEFINE SYMBOL i_hi_1 = `($i_hi_1) + add_1`
+
+   IF ($section"0|0|1>0|2>1|*>0")  THEN
+      LET add_2 = 0
+      IF `($i_lo_2) LT 0` THEN LET add_2 = `($data_var),RETURN=isize`
+      IF `($i_hi_2) LT 0` THEN LET add_2 = `($data_var),RETURN=isize`
+
+      DEFINE SYMBOL i_lo_2 = `($i_lo_2) + add_2`
+      DEFINE SYMBOL i_hi_2 = `($i_hi_2) + add_2`
+
+      ! Make sure theres no overlap
+      IF `($i_lo_2) EQ ($i_hi_1)` THEN DEFINE SYMBOL i_lo_2 `($i_lo_2) + 1`
+      IF `($i_hi_2) EQ ($i_lo_1)` THEN DEFINE SYMBOL i_hi_2 `($i_hi_2) - 1`
+
+   ENDIF !!! section
+
+ENDIF
+ENDIF   !!! X region
+ 
+! Y region
+
+IF `STRINDEX("($varshape)", "Y") NE 0` THEN
+IF ($region_y_hi"0|*>1") THEN
+
+   DEFINE SYMBOL y_lo `y[gy=($data_var),y=($region_y_lo)]`
+   DEFINE SYMBOL j_lo `j[gy=($data_var),y=($region_y_lo)]`
+   DEFINE SYMBOL y_hi `y[gy=($data_var),y=($region_y_hi)]`
+   DEFINE SYMBOL j_hi `j[gy=($data_var),y=($region_y_hi)]`
+
+ENDIF
+ENDIF    !!! Y region
+
+
+! Z region
+
+IF `STRINDEX("($varshape)", "Z") NE 0` THEN
+IF ($region_z_hi"0|*>1") THEN
+
+   DEFINE SYMBOL z_lo `z[gz=($data_var),z=($region_z_lo)]`
+   DEFINE SYMBOL k_lo `k[gz=($data_var),z=($region_z_lo)]`
+   DEFINE SYMBOL z_hi `z[gz=($data_var),z=($region_z_hi)]`
+   DEFINE SYMBOL k_hi `k[gz=($data_var),z=($region_z_hi)]`
+ENDIF
+ENDIF   !!! Z region
+
+! T region
+
+IF `STRINDEX("($varshape)", "T") NE 0` THEN
+   IF ($region_t_hi"0|*>1") THEN
+
+      LET tpts = t[gt=($ferret_plot_var)]
+      LET tt = `t[gt=($data_var),t="($region_t_lo)"]`
+      DEFINE SYMBOL t_lo "`TAX_DATESTRING(tt, tpts, "days")`"
+
+      LET tt = `t[gt=($data_var),t="($region_t_hi)"]`
+      DEFINE SYMBOL t_hi "`TAX_DATESTRING(tt, tpts, "days")`"
+
+      DEFINE SYMBOL l_lo `l[gt=($data_var),t="($region_t_lo)"]`
+      DEFINE SYMBOL l_hi `l[gt=($data_var),t="($region_t_hi)"]`
+
+     ! modulo years may start in year 0001, making the index
+     ! values off by a year, depending on how the dset is configured.
+
+      DEFINE SYMBOl tmodlen = 0`($data_var),RETURN=tmod`  
+      IF ($tmodlen"0|*>1") THEN 
+         LET llen = `($data_var),RETURN=lsize`
+         IF `($l_lo) GT llen` THEN 
+	    DEFINE SYMBOL l_lo `($l_lo) - llen`
+	    DEFINE SYMBOL l_hi `($l_hi) - llen`
+         ENDIF
+       ENDIF
+
+   ENDIF
+ENDIF   !!! T region
+
+! Write out as we do for the mapscale file...
+IF ($result_xyzt_ijkl_filename%1|*>0%) THEN EXIT/SCRIPT
+
+LIST/CLOBBER/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB "data region", "($data_region)"
+
+! First write the original region, which will be used when
+! Ferret gets called including index values for t and z.
+
+DEFINE SYMBOL original_x_lo " "
+DEFINE SYMBOL original_x_hi " "
+DEFINE SYMBOL original_y_lo " "
+DEFINE SYMBOL original_y_hi " "
+DEFINE SYMBOL original_z_lo " "
+DEFINE SYMBOL original_z_hi " "
+DEFINE SYMBOL original_t_lo " "
+DEFINE SYMBOL original_t_hi " "
+DEFINE SYMBOL original_k_lo " "
+DEFINE SYMBOL original_k_hi " "
+DEFINE SYMBOL original_l_lo " "
+DEFINE SYMBOL original_l_hi " "
+IF ($region_x_lo"0|*>1") THEN DEFINE SYMBOL original_x_lo ($region_x_lo)
+IF ($region_x_hi"0|*>1") THEN DEFINE SYMBOL original_x_hi ($region_x_hi)
+IF ($region_y_lo"0|*>1") THEN DEFINE SYMBOL original_y_lo ($region_y_lo)
+IF ($region_y_hi"0|*>1") THEN DEFINE SYMBOL original_y_hi ($region_y_hi)
+IF ($region_z_lo"0|*>1") THEN DEFINE SYMBOL original_z_lo ($region_z_lo)
+IF ($region_z_hi"0|*>1") THEN DEFINE SYMBOL original_z_hi ($region_z_hi)
+IF ($region_t_lo"0|*>1") THEN DEFINE SYMBOL original_t_lo ($region_t_lo)
+IF ($region_t_hi"0|*>1") THEN DEFINE SYMBOL original_t_hi ($region_t_hi)
+IF `($region_z_lo"0|*>1") AND ($k_lo"0|*>1")` THEN DEFINE SYMBOL original_k_lo ($k_lo)
+IF `($region_z_hi"0|*>1") AND ($k_hi"0|*>1")` THEN DEFINE SYMBOL original_k_hi ($k_hi)
+IF `($region_t_lo"0|*>1") AND ($l_lo"0|*>1")` THEN DEFINE SYMBOL original_l_lo ($l_lo)
+IF `($region_t_hi"0|*>1") AND ($l_hi"0|*>1")` THEN DEFINE SYMBOL original_l_hi ($l_hi)
+
+LET syms_names = {\
+     "original_x_lo", "original_x_hi",  \
+     "original_y_lo", "original_y_hi",  \
+     "original_z_lo", "original_z_hi",  \
+     "original_t_lo", "original_t_hi",  \
+     "original_k_lo", "original_k_hi",  \
+     "original_l_lo", "original_l_hi" } 
+LET syms_vals = {\
+     "($original_x_lo)", "($original_x_hi)",  \
+     "($original_y_lo)", "($original_y_hi)",  \
+     "($original_z_lo)", "($original_z_hi)",  \
+     "($original_t_lo)", "($original_t_hi)",  \
+     "($original_k_lo)", "($original_k_hi)",  \
+     "($original_l_lo)", "($original_l_hi)" }
+
+LET out_name = "original_region"
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB out_name
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals 
+LET out_name = "end original_region"
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB out_name
+
+! Write coordinates and indices for section 1. Make sure the indices are positive.
+
+IF `xmod EQ 1` THEN
+   DEFINE SYMBOL x_lo = ($x_lo_1)
+   DEFINE SYMBOL x_hi = ($x_hi_1)
+   DEFINE SYMBOL i_lo = ($i_lo_1)
+   DEFINE SYMBOL i_hi = ($i_hi_1)
+ENDIF
+
+LET syms_names = {\
+     "section", \
+     "x_lo", "x_hi", "i_lo", "i_hi", \
+     "y_lo", "y_hi", "j_lo", "j_hi", \
+     "z_lo", "z_hi", "k_lo", "k_hi", \
+     "t_lo", "t_hi", "l_lo", "l_hi"} 
+LET syms_vals = {\
+     "1",  \
+    "($x_lo)", "($x_hi)", "($i_lo)", "($i_hi)", \
+    "($y_lo)", "($y_hi)", "($j_lo)", "($j_hi)", \ 
+    "($z_lo)", "($z_hi)", "($k_lo)", "($k_hi)", \ 
+    "($t_lo)", "($t_hi)", "($l_lo)", "($l_hi)"} 
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals 
+LET out_name = "end section"
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB out_name
+
+! If there is a second section due to a modulo X axis, write its coordinates and indices.
+
+IF ($section"0|0|1>0|2>1|*>0") THEN
+   IF `xmod EQ 1` THEN
+      DEFINE SYMBOL x_lo = ($x_lo_2)
+      DEFINE SYMBOL x_hi = ($x_hi_2)
+      DEFINE SYMBOL i_lo = ($i_lo_2)
+      DEFINE SYMBOL i_hi = ($i_hi_2)
+   ENDIF
+
+   LET syms_names = {\
+     "section", \
+     "x_lo", "x_hi", "i_lo", "i_hi", \
+     "y_lo", "y_hi", "j_lo", "j_hi", \
+     "z_lo", "z_hi", "k_lo", "k_hi", \
+     "t_lo", "t_hi", "l_lo", "l_hi"} 
+   LET syms_vals = {\
+    "2",  \
+    "($x_lo)", "($x_hi)", "($i_lo)", "($i_hi)", \
+    "($y_lo)", "($y_hi)", "($j_lo)", "($j_hi)", \ 
+    "($z_lo)", "($z_hi)", "($k_lo)", "($k_hi)", \ 
+    "($t_lo)", "($t_hi)", "($l_lo)", "($l_hi)"} 
+   LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals 
+   LET out_name = "end section"
+   LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB out_name
+ENDIF
+LET out_name = "end region"
+LIST/APPEND/FILE="($result_xyzt_ijkl_filename)"/NOHEAD/NOROWLAB out_name
+
+SET MODE/LAST long
+SET MODE/LAST lat
+
+! End of $RCSfile ------------LAS_xyzt_ijkl.jnl-------------------------------

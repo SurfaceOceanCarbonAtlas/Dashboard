@@ -1,0 +1,5 @@
+<iobis_servers>
+   <!-- I think the system of serving data is unique to www.iobis.org.  -->
+   <iobis name="IOBIS" url="http://www.iobis.org/OBISWEB/ObisControllerServlet"/>
+
+</iobis_servers>

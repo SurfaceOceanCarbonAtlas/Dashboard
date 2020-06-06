@@ -1,0 +1,12 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+
+#end
+

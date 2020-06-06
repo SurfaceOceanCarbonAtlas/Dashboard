@@ -1,0 +1,655 @@
+<html>
+<<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+<title>LAS Info</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="LASInfo.css" type="text/css">
+<link rel="stylesheet" href="file:///E|/public_html/bop/LASInfo.css" type="text/css">
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<p class="section_title"><span class="top"><a href="#Index">top</a></span> <a name="Index"></a>Overview</p>
+<table width="100%" border="0" cellspacing="5" cellpadding="0">
+  <tr valign="top"><td valign="top">
+
+  <table align="left" width="140" border="0" cellspacing="5" cellpadding="0">
+    <tr valign="top">
+      <td align="center" valign="top">
+      <img height=47 width=130 border=0
+           align="top" vspace="0"
+           alt="Compare two datasets" 
+           src="../images/tabs_single_compare.gif">
+      
+      <table border=1 cellpadding=0 cellspacing=0
+             width="130" vspace="0" valign="top"
+             bgcolor="#003399" bordercolor="#003399">
+
+        <tr><td bgcolor="FFFFFF">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="4">
+                    <tr> 
+                      <td align="right"><a class="nav" href="#dataset">Datasets</a></td>
+                    </tr>
+                    <tr> 
+                      <td align="right"><a class="nav" href="#variable">Variables</a></td>
+                    </tr>
+                    <tr> 
+                      <td align="right"><a class="nav" href="#constrain">Constraints</a></td>
+                    </tr>
+                    <tr> 
+                      <td align="right"><a class="nav" href="#data">Output</a></td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <hr width="60%">
+                      </td>
+                    </tr>
+                    <tr> 
+                      <td align="right"><a class="nav" href="#history"><span class="nav">Previous 
+                        Output</span></a></td>
+                    </tr>
+                    <tr>
+                      <td align="right">
+                        <hr width="60%">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right" class="nav"><a class="nav" href="#analysis"><span class="nav">Define 
+                        Variable </span></a></td>
+                    </tr>
+                    <tr>
+                      <td align="right" class="nav">
+                        <hr width="60%">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right" class="nav">About</td>
+                    </tr>
+                    <tr>
+                      <td align="right" class="nav">
+                        <hr width="60%">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="right">LAS UI Version</td>
+                    </tr>
+                  </table>
+		          </td></tr>
+
+      </table>
+
+      </td>
+    </tr>
+</table>
+
+</td>
+    <td valign="top"> 
+      <p class="section_text">The Live Access Server (LAS) provides a web based 
+        user interface to geo-referenced data. Data of various types (gridded 
+        and in-situ) and stored in various formats are presented to the user in 
+        a single interface. The main features of LAS allow the user to </p>
+      <ul>
+        <li class="section_text"><a href="#dataset">select a dataset</a></li>
+        <li class="section_text"><a href="#variable">select one ore more variables</a></li>
+        <li class="section_text"><a href="#constrain">specify constraints</a> 
+          including output view, output products, axis ranges, SQL style queries 
+          (where applicable) as well as output product options</li>
+        <li class="section_text"><a href="#data">view graphical and textual output</a> 
+          or download data</li>
+        <li class="section_text"><a href="#history">review past plots</a></li>
+        <li><a href="#analysis" class="section_text">define new variables</a></li>
+      </ul>
+      <p class="section_text">Each of these tasks is contained on a separate page 
+        with a simple user interface that guides the user through the necessary 
+        steps.</p>
+      <p class="section_text">In addition, LAS allows you to</p>
+      <ul>
+        <li> <a href="#search"><span class="section_text">search</span></a><span class="section_text"> 
+          for datasets and variables</span></li>
+        <li class="section_text"><a href="#Interpolation">interpolate data</a>, 
+          specifying points that are not on the data grid</li>
+        <li><a href="#Comparison"><span class="section_text">perform comparisons</span></a><span class="section_text"> 
+          between two variables from different datasets</span></li>
+        <li class="section_text"><a href="#FDS">access data</a> directly through 
+          OPeNDAP (FDS) </li>
+      </ul>
+    </td>
+  </tr></table>
+
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">top</a></span> <a name="dataset"></a>Datasets 
+  page(s)</p>
+   
+<blockquote>
+  <p class="section_text">This page contains a list of all available categories 
+    or datasets on this Live Access Server. </p>
+  <p class="section_title">How to use this page:</p>
+</blockquote>
+<ul>
+  <li class="section_text">Click on a category name to bring up a list of subcategories 
+    or datasets.</li>
+  <li class="section_text">Click on a dataset name to bring up the <a href="#variable">Variables</a> 
+    page associated with that data set.</li>
+  <li class="section_text">Click on the information icon <img src="../images/icon_info.gif" width="12" height="12" align="absmiddle"> 
+    to view information about the data set.</li>
+</ul>
+<blockquote> 
+  <p class="section_item">Terms:</p>
+</blockquote>
+<dl> 
+  <dl> 
+    <dt class="term">category</dt>
+    <dd class="definition">A category is a collection of subcategories or datasets. 
+      The person setting up LAS can create whatever categories and subcategories 
+      they want to organize their data.</dd>
+    <dt class="term">dataset</dt>
+    <dd class="definition">A dataset is a collection of variables. The person 
+      setting up LAS can create whatever datasets they want, provided that variables 
+      in a dataset can always be compared with other variables in the same dataset. 
+    </dd>
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+  </dl>
+</dl>
+
+<p class="section_title"><span class="top"><a href="#Index">top</a></span> <a name="variable"></a>Variables 
+  page</p>
+<blockquote> 
+  <p class="section_text">This page contains a list of all available variables 
+    within a dataset. The chosen dataset is displayed in the gray area at the 
+    top of this page.</p>
+  <p class="section_item">How to use this page:</p>
+</blockquote>
+<ul>
+  <li class="section_text">Select one or more variables and then click on <span class="redbold">Next 
+    &gt; </span> to proceed to the <a href="#constrain">Constraints</a> page.</li>
+  <li class="section_text">You may click on the links in the gray bar at the top 
+    of this page to return to the <a href="#dataset">Datasets</a> page. 
+    <p>Typically you will select only a single variable for visualizations but 
+      some visualization types (<i>i.e.</i> property-property plots) require two. 
+      Multiple selections are appropriate for downloads and overlay plots.</p>
+  </li>
+</ul>
+<blockquote> 
+  <p class="section_item">Terms:</p>
+</blockquote>
+<dl> 
+  <dl> 
+    <dt class="term">variable</dt>
+    <dd class="definition">A variable is any named item in a dataset that may 
+      be plotted or downloaded. Some variables exist as fields in a database or 
+      a file while others may be computed on-the-fly from 'file variables'. This 
+      difference should be invisible to the user.</dd>
+  </dl>
+</dl>
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="constrain"></a>Constraints 
+  page</p>
+<blockquote> 
+  <p class="section_text">This is most feature rich page in the LAS user interface. 
+    After selection of a dataset and variable (displayed in the gray border at 
+    the top) LAS knows enough to present this page. Each of the selection tools 
+    on this page contains a list of choices that are specific to the current dataset/variable. 
+    You should not be surprised if the available products differ when you select 
+    another variable. Typically, however, many variables within a dataset will 
+    share output products, regions and axes. The products and axis ranges displayed 
+    are also dependent upon the selected view. Thus, choosing a different view 
+    will cause the page to refresh as different views have different output products 
+    and axis ranges. Most output products will also have options associated with 
+    them. These can range from named color palettes to contour line levels to 
+    gridding algorithms. The available product options will change whenever a 
+    new output product is selected.</p>
+  <p class="section_item">How to use this page:</p>
+</blockquote>
+<ul>
+  <li class="section_text">Click on a page name in the navigation bar on the left 
+    to go to that page.</li>
+  <li class="section_text">Select a view -- this will reset various options as 
+    appropriate for that view. </li>
+  <li class="section_text">Adjust any of the selectors to specify your desired 
+    output product, region and constraints.</li>
+  <li class="section_text">Use checkboxes to apply any available constraints to 
+    your data query.</li>
+  <li class="section_text">Use select menus to apply all desired product options.</li>
+  <li class="section_text">Click on <span class="redbold">Next &gt;</span> to 
+    send your request and proceed to the <a href="#data">Output</a> page.</li>
+  <p class="section_item">How to select your region of interest on the map:<br>
+  </p>
+  <blockquote> 
+    <p class="section_text">You will see one of two map interfaces in LAS -- either 
+      an &quot;interactive map&quot; or a &quot;two-click map&quot;. The &quot;interactive 
+      map&quot; is a little faster to use, but it is not compatible with all Web 
+      browsers. LAS will present you with the map that it believes will work best 
+      on your Browser, however you may override this choice by clicking the text 
+      &quot;Use the interactive map&quot; or &quot;Use the two-click map&quot;. 
+      (For instructions on controlling the initial choice of map type check the 
+      <a href="http://ferret.pmel.noaa.gov/LASdoc/serve/cache/54.html">LAS user 
+      documentation section on the map interface</a>.)</p>
+  </blockquote>
+</ul>
+<blockquote> 
+  <p class="section_item"><a name="cmap"/></a>Using the &quot;interactive map&quot;:</p>
+  <ul>
+    <li class="section_text">Click and drag in the map to select a region on the 
+      globe (1D or 2D depending on the view).</li>
+    <li class="section_text">Move handles on the map tool to reshape the region.</li>
+    <li class="section_text">Grab the center handle to reposition the region; 
+      bump against the sides to scroll the map.</li>
+    <li class="section_text">Click on &quot;Zoom In&quot; or &quot;Zoom Out&quot; 
+      to resize the underlying map. </li>
+    <li><span class="section_text">Type coordinates into the text fields to the 
+      right of the map to get precise values.</span> </li>
+  </ul>
+  <p class="section_item">Using the &quot;two-click map&quot;:</p>
+</blockquote>
+<ul>
+  <blockquote> 
+    <blockquote> 
+      <p class="section_item"></p>
+    </blockquote>
+    <p class="section_text">Click for <a href="#map">detailed instructions</a>.</p>
+  </blockquote>
+</ul>
+<blockquote> 
+  <p class="section_item">Axis values and interpolation:</p>
+  <p class="section_text">The text boxes duplicate the functionality available 
+    in the selectors, you don't need to enter anything in them. However, the text 
+    boxes allow you to enter values in between grid points on the associated axes 
+    of gridded data. By default the nearest grid location on the associated axes 
+    will be used to access the data. For gridded data, the <a href="#options">Output 
+    Options</a> page allows you to choose between nearest grid point and linear 
+    interpolation to create data at a location in between grid points. (Note: 
+    whenever a text box contains a value different from its associated selector, 
+    the value in the text box is used for <a href="#Interpolation">interpolation</a>.) 
+  </p>
+  <p class="section_item">Terms:</p>
+</blockquote>
+<dl> 
+  <dl> 
+    <dt class="term">view</dt>
+    <dd class="definition">A view is most easily understood in terms of the plot 
+      that you would like to see. If you would like a map showing a variable on 
+      longitude and latitude axes then your view is &quot;longitude-latitude&quot;. 
+      If you would instead like to see a plot showing the time history of a variable 
+      at some point in space then the view is &quot;time&quot;. Views that are 
+      one dimensional (like &quot;time&quot;) and two dimensional (like &quot;longitude-latitude&quot;) 
+      typically have graphical output products (plots) available. Views which 
+      are three or four dimensional typically have only file output products available. 
+    </dd>
+    <dt class="term">output product</dt>
+    <dd class="definition">An output product is returned to the user after all 
+      appropriate portions of the LAS request have been specified. Typical products 
+      include various plots in either .GIF or PostScript output, NetCDF files, 
+      and tables of numbers in various ASCII formats. The available product choices 
+      depend upon both the variable chosen and the view selected. Not all output 
+      products are available with all views.</dd>
+    <dt class="term">region</dt>
+    <dd class="definition">A region is a specification of longitude, latitude, 
+      depth/height and time. Some variables (<i>i.e.</i> annual averages, surface 
+      fields) may not contain all four of these axes. LAS presents the user with 
+      the appropriate user interface elements for selecting positions or ranges 
+      along the pertinent axes. Text fields next to selectors allow the user to 
+      input precise locations. Values in the text fields will always override 
+      values shown in the selectors.</dd>
+    <dt class="term">constraints</dt>
+    <dd class="definition">Some data sets support SQL style queries. In such cases 
+      this page may show additional constraints to be used to further subset the 
+      data beyond lon-lat-depth-time. The available constraints are entirely dependent 
+      upon the dataset chosen.</dd>
+    <dt class="term">product option</dt>
+    <dd class="definition">A parameter that may be set by the user to modify the 
+      default output plot or data. Typically, the LAS installer chooses reasonable 
+      default options for most variables and output products. But the end user 
+      has the power to override various options that affect graphics and occasionally 
+      algorithms.</dd>
+  </dl>
+</dl>
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="indexpage"></a>Index 
+  page</p>
+   
+<blockquote>
+  <p class="section_text">This page contains an expanded list of all available categories 
+    and/or datasets on this Live Access Server. </p>
+  <p class="section_title">How to use this page:</p>
+</blockquote>
+<ul>
+  <li class="section_text">In the "By Category" section click on a category name to navigate to that category in the LAS interface
+    or datasets.</li>
+  <li class="section_text">In the "By Dataset" section (if present) click on a dataset name to bring up the <a href="#variable">Variables</a> 
+    page associated with that data set.</li>
+  <li class="section_text">Click on the information icon <img src="../images/icon_info.gif" width="12" height="12" align="absmiddle"> 
+    to view information about the data set.</li>
+</ul>
+<blockquote> 
+  <p class="section_item">Terms:</p>
+</blockquote>
+<dl> 
+  <dl> 
+    <dt class="term">category</dt>
+    <dd class="definition">A category is a collection of subcategories or datasets. 
+      The person setting up LAS can create whatever categories and subcategories 
+      they want to organize their data.</dd>
+    <dt class="term">dataset</dt>
+    <dd class="definition">A dataset is a collection of variables. The person 
+      setting up LAS can create whatever datasets they want, provided that variables 
+      in a dataset can always be compared with other variables in the same dataset. 
+    </dd>
+    <dt>&nbsp;</dt>
+    <dt>&nbsp;</dt>
+  </dl>
+</dl>
+
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="map"></a>&quot;two-click 
+  map&quot; interface</p>
+<blockquote> 
+   
+  <p class="section_text">There are two map interfaces in LAS. An &quot;<a href="#cmap">interactive 
+    map</a>&quot; that allows users to select regions using a "rubber-band" box 
+    and a &quot;two-click map&quot; (described immediately below) that allows 
+    users to select regions by clicking on the map where they want corners of 
+    the box to be placed. The &quot;two-click map&quot; is compatible with all 
+    browsers. For more information about how to change from one map interface 
+    to the other check the <a href="http://ferret.pmel.noaa.gov/LASdoc/serve/cache/54.html">LAS 
+    user documentation section on the map interface.</a></p>
+</blockquote>
+<blockquote> 
+  <p class="section_text">This page replaces the <a href="#constrain">Constraints</a> 
+    page and presents the user with a clickable map that does not depend on java 
+    support in your browser. </p>
+  <p class="section_item"></p>
+  <p class="section_item">How to use the &quot;two-click map&quot;:</p>
+</blockquote>
+<ul>
+   <li class="section_text">Click on the map image to begin selecting a region.
+  The result of the click depends on the current map selection tool.</li>
+</ul>
+<dl> 
+  <dl> 
+    <dt class="term">cross hair</dt>
+    <dd class="definition">The result of the first click of a two-click operation.
+     Drawing a box, an x-line or a y-line requires two clicks to define the region.<br/>
+      <img src="../images/cross.gif" alt="Map with crosshair">
+    </dd>
+    <dt class="term">XY-Box</dt>
+    <dd class="definition">If the view requires an XY region to be selected, the 
+      first click draws cross hair on the map as shown above. The second click 
+      draws a box using the second click as an opposite corner of the box. For 
+      example if you click south and east of the cross hair, a box will be drawn 
+      with the second click as the "lower right" corner of the box.<br/>
+    <img src="../images/rtbox.gif" alt="Map with box using lower right corner"><br/>
+    If the second click is north and east of the cross hair, the box will be drawn
+    using the second click as the "upper left" corner of the box.<br/>
+    <img src="../images/ltbox.gif" alt="Map with box using the upper left corner"> 
+    </dd>
+    <dt class="term">X-Line</dt>
+    <dd class="definition">If the view requires an X-line to be selected, the first
+    click draws a cross hair on the map as shown above.  
+    The second click will
+    draw a a line at a fixed latitude located at the average latitude of the two clicks.
+    The line will extend from the crosshair in the direction of the click.<br/>
+    <img src="../images/rtxline.gif" alt="Map with x-line extending east."><br/>
+    <dt class="term">Y-Line</dt>
+    <dd class="definition">If the view requires a Y-line to be selected, the first
+    click draws a cross hair on the map as shown above.  
+    The second click will
+    draw a a line at a fixed longitude located at the average longitude of the two clicks.
+    The line will extend from the crosshair in the direction of the click.<br/>
+    <img src="../images/dnyline.gif" alt="Map with y-line extending south."><br/>
+    </dd>
+    <dt class="term">Point</dt>
+    <dd class="definition">If the view requires a single point to be selected, the first
+    click draws a small box on the map surrounding the point as shown below.  <b>Only one
+    click</b> is required to specify the location of the point.<br/>
+    <img src="../images/point.gif" alt="Map with a point selected."><br/>
+    </dd>
+    <dt class="term">X-Line in Comparison Mode</dt>
+    <dd class="definition">When the view requires an X-line to be selected while 
+    using comparison mode the user can select a different X-line for each
+    of the two variables being compared.  The east-west extents of both
+    lines are determined by the east-west extends of the line selected
+    for the first variable (the yellow line).  The first
+    click draws a cross hair on the map as shown above.  
+    If the Var 1 radio button is selected when the map is clicked, the second click will
+    draw a a line at a fixed latitude located at the average latitude of the two clicks.
+    The line will extend from the crosshair in the direction of the click.<br/>
+    If the Var 2 radio button is selected when the map is clicked, 
+    <b>only one click</b> is required to determine
+    the north-south location of the line (white line) for the second variable.<br/>
+    <img src="../images/rtxline_comp.gif" alt="Map with two x-lines extending east."><br/>
+    <dt class="term">Y-Line in Comparison Mode</dt>
+    <dd class="definition">When the view requires a Y-line to be selected while 
+    using comparison mode the user can select a different Y-line for each
+    of the two variables being compared.  The north-south extents of both
+    lines are determined by the north-south extends of the line selected
+    for the first variable (the yellow line).  The first
+    click draws a cross hair on the map as shown above.  
+    If the Var 1 radio button is selected when the map is clicked, the second click will
+    draw a a line at a fixed longitude located at the average longitude of the two clicks.
+    The line will extend from the crosshair in the direction of the click.<br/>
+    If the Var 2 radio button is selected when the map is clicked, 
+    <b>only one click</b> is required to determine
+    the east-west location of the line (white line) for the second variable.<br/>
+    <img src="../images/dnyline_comp.gif" alt="Map with two y-lines extending south.">
+    <br/>
+    <dt class="term">Point in Comparison mode</dt>
+    <dd class="definition">If the view requires a single point to be selected while
+    using comparison mode the user can select a different point for each of the two
+    variables being compared.  A single
+    click draws a small box on the map surrounding the point as shown below.  <b>Only one
+    click</b> is required to specify the location of the point.  If the Var 1 radio
+    button is selected when the map is clicked the location of the point 
+    for the first variable is 
+    drawn (the yellow box).  If the Var 2 radio button is selected when the 
+    map is clicked the location of the point for the second variable 
+    is drawn (the white box).<br/>
+    <img src="../images/twopoint.gif" alt="Map with two points selected."><br/>
+    </dd>
+    <dt class="term">Pan buttons 
+    <img src="../images/rt_arrow.gif" alt="right arrow">
+    <img src="../images/lt_arrow.gif" alt="left arrow">
+    <img src="../images/up_arrow.gif" alt="up arrow">
+    <img src="../images/dn_arrow.gif" alt="down arrow">
+    </dt>
+    <dd class="definition">Selecting one of the pan buttons will move the eye
+    observing the map in direction of the arrow.  The map will only pan in 
+    the direction of a modulo axis or if the map has been zoomed and there is 
+    an area of the map that is not visible in direction of the pan.<br/>
+    </dd>
+    <dt class="term">Zoom buttons 
+    <img src="../images/zoomin.gif" alt="zoom in">
+    <img src="../images/zoomout.gif" alt="zoom out">
+    </dt>
+    <dd class="definition">Selecting one of the zoom buttons zoom the map
+    in or out.  The map will not zoom out if the entire map is already being
+    displayed.
+    </dd>
+    <dt class="term">Reset button
+    <img src="../images/reset.gif" alt="reset">
+    </dt>
+    <dd class="definition">Selecting the reset button zooms the map to
+    a view appropriate for the geographic extents of the selected variable and
+    selects the entire domain for the selected variable.  If you ever get lost
+    or don't like the look of the map, try the reset button.
+    </dd>
+    <dt class="term">Help button
+    <img src="../images/help.gif" alt="help">
+    </dt>
+    <dd class="definition">Selecting the help button displays this page.
+    </dd>
+  </dl>
+</dl>
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="data"></a>Output 
+  page</p>
+<blockquote> 
+  <p class="section_text">This page displays the graphical or textual output requested 
+    from the <a href="#constrain">Constraints</a> page. </p>
+  <p class="section_item"></p>
+  <p class="section_item">How to use this page:</p>
+</blockquote>
+<ul>
+  <li class="section_text">Click on a page name in the navigation bar on the left 
+    to go to that page.</li>
+  <li class="section_text">Click on &quot;View in a new window&quot; to bring 
+    up a separate page for this output.</li>
+</ul>
+<blockquote>
+  <p class="section_item">&nbsp;</p>
+</blockquote>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="history"></a>Previous 
+  Output page</p>
+<blockquote> 
+  <p class="section_text">This page contains a list of all graphical products 
+    generated during your session with Live Access Server. The names contain dataset, 
+    variable, product and region information to help you identify old products. 
+    This list is in reverse chronological order -- newest requests at the top. 
+  </p>
+  <p class="section_item"></p>
+  <p class="section_item">How to use this page:</p>
+  <blockquote> 
+    <p class="section_item"></p>
+  </blockquote>
+</blockquote>
+<ul>
+  <li class="section_text">Click on a page name in the navigation bar on the left 
+    to go to that page.</li>
+  <li class="section_text">Click on a link to bring up a new window with your 
+    chosen output.</li>
+</ul>
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="analysis"></a>Define 
+  Variable page</p>
+<blockquote> 
+  <p class="section_text">This page looks similar to the <a href="#constrain">Constraints</a> 
+    page but allows you to define a new variable that is based on the currently 
+    selected one. Various analysis functions (average, maximum, minimum, sum and 
+    variance) may be applied to one ore more axes. This 'user' variable will be 
+    compressed along the specified axis or axes. Derived variables that can be 
+    defined in this manner might include temporal variance of SST, zonally averaged 
+    atmospheric CO2, vertically summed biomass, etc.</p>
+  <p class="section_text"><b>Note 1:</b> The axis range for all compressed axes 
+    is remembered when you define a variable. Thus, if you want to look at time 
+    series that are spatial averages you will have to define a new variable for 
+    each XY region of interest.</p>
+  <p class="section_text"><b>Note 2:</b> You cannot compress all the axes at once. 
+    LAS does not currently deal with variables that consist of a single value.</p>
+  <p class="section_item"></p>
+  <p class="section_item">How to use this page:</p>
+  <blockquote> 
+    <p class="section_item"></p>
+  </blockquote>
+</blockquote>
+<ul>
+  <li class="section_text">Select an analysis function.</li>
+  <li class="section_text">Give your new variable a memorable name.</li>
+  <li class="section_text">Choose the axes on which to apply the an<span class="section_text">alysis 
+    function.</span></li>
+  <li class="section_text">Optionally apply a mask.</li>
+  <li class="section_text">Click on <span class="redbold">Next &gt;</span> to 
+    create your variable or <span class="redbold">Cancel &gt;</span> to return 
+    to the <a href="#constrain">Constraints</a> page </li>
+</ul>
+<blockquote class="section_item">Terms:</blockquote>
+<dl> 
+  <dl> 
+    <dt class="term">user variable</dt>
+    <dd class="definition">Any variable created by the user from preexisting variables. 
+      The ability to create user variables depends upon the functionality available 
+      in the back end analysis package. The <a href="http://ferret.wrc.noaa.gov/Ferret/">Ferret</a> 
+      package is used as the default back end and has very powerful capabilities 
+      for defining variables that are functions of existing variables.</dd>
+    <dt class="term">compressed</dt>
+    <dd class="definition">An axis is compressed when a function applied to it 
+      returns a single value instead of an axis of values. A function like <font face="Courier New, Courier, mono"><b class="section_text">SUM</b></font> 
+      compresses an axis whereas a function like <font face="Courier New, Courier, mono"><b class="section_text">SIN</b></font> 
+      does not. If you start with a variable that has X, Y and T axes and apply 
+      <b>SUM</b> to both the X and Y axes you will end up with a spatially averaged 
+      time series. </dd>
+  </dl>
+</dl>
+<p class="section_title"><a href="#Index" class="top">Top</a> <a name="search"></a>Search</p>
+<blockquote> 
+  <p class="section_text">LAS has a simple search capability that lets you query 
+    the LAS database. Just type some text into the entry field in the upper right 
+    hand corner of LAS and click <img src="../images/go.gif" width="22" height="16" align="absmiddle">. 
+    You will be presented with a list of all datasets and variables that match 
+    your query string.</p>
+  <p>&nbsp;</p>
+</blockquote>
+<p class="section_title"><a href="#Index" class="top">Top</a> <a name="Index"></a>Index</p>
+<blockquote> 
+  <p class="section_text">If you click on the Index link LAS will generate an 
+    index page (like a site-map) which shows all of the datasets and variables
+    available from this LAS.  If necessary, the Index Page will present a few
+    entries at a time with navigation links at the bottom of the page to see
+    the next and previous page of links. 
+  <p>&nbsp;</p>
+</blockquote>
+<p class="section_title"><a href="#Index" class="top">Top</a> <a name="Interpolation"></a>Interpolation</p>
+<blockquote> 
+  <p class="section_text">LAS is typically set up with <a href="http://ferret.wrc.noaa.gov/Ferret/">Ferret</a> 
+    as its back end data analysis package. Ferret has the ability to interpolate 
+    gridded data from its source grid onto another destination grid. By default, 
+    LAS has this functionality turned off. If you specify a value on an axis that 
+    is not at a gridpoint Ferret will use the nearest gridpoint on that axis when 
+    generating the output product. Through the <a href="#options">Output Options</a> 
+    page the user can turn interpolation on in which case Ferret will use linear 
+    interpolation to calculate data values at precisely the location the user 
+    specified.</p>
+</blockquote>
+<p class="section_title">&nbsp;</p>
+<p class="section_title"><span class="top"><a href="#Index">Top</a></span> <a name="Comparison"></a>Comparison</p>
+<blockquote> 
+  <p class="section_text">By default, LAS starts out in &quot;single data set&quot; 
+    mode. This mode allows you to create graphical output products and download 
+    data using variables within a single dataset. Graphical output products in 
+    this mode are limited to a single variable. [The exception being property-property 
+    plots for in-situ data.] You can create multi-variable graphical products 
+    by switching to &quot;comparison&quot; mode.</p>
+  <table border="0" cellspacing="0" cellpadding="0">
+    <tr>
+      <td class="section_text">To switch to comparison mode you need to click 
+        on the &quot;compare two&quot; tab at the top of the left hand navigation 
+        box.</td>
+      <td width="130"><img src="../images/tabs_compare_compare.gif" width="130" height="47" hspace="5" align="top"></td>
+    </tr>
+  </table>
+  <p class="section_text">When you are in comparison mode you will be presented 
+    with a new left-hand navigation box which allows you to go to <a href="#dataset">Datasets</a> 
+    and <a href="#variable">Variables</a> pages for either variable 1 or variable 
+    2. The pages function in exactly the same manner as in single data set mode. 
+    The <a href="#constrain">Constraints</a> page is the only page that appears 
+    different in comparison mode. The changes occur in the region selection area 
+    where dual selectors allow you to specify separate regions for the two variables. 
+    Note that the choice of view limits which axes will have dual selectors: <i>e.g.</i> 
+    both variables will share the same latitude-longitude region for a latitude-longitude 
+    view.</p>
+  <p class="section_text">In order to difference (subtract) data on potentially 
+    different grids the back end data analysis package, <a href="http://ferret.wrc.noaa.gov/Ferret/">Ferret</a>, 
+    must regrid variable 2 onto the grid of variable 1. Thus the ordering of variables 
+    will have an effect not only on the sign but potentially also on the grid 
+    resolution of the result.</p>
+  </blockquote>
+<blockquote>
+  <p>As of version 6.x and the Armstrong version of LAS, it is not possible to 
+    compare user-defined variables. We are aware of this and will be fixing the 
+    problem in a future release.</p>
+</blockquote>
+<p class="section_title"><a href="#Index" class="top">Top</a> <a name="FDS"></a>OPeNDAP 
+  (FDS)</p>
+<blockquote> 
+  <p class="section_text">Starting with version 6.5 LAS comes bundled with the 
+    <a href="http://ferret.pmel.noaa.gov/Ferret/FDS/">Ferret Data Server</a>. 
+    FDS uses the <a href="http://opendap.org/">OPeNDAP</a> protocol to provide 
+    data sharing, subsetting and analysis services across the internet. By default, 
+    every dataset visible inside an LAS is automatically presnted in the associated 
+    FDS so that OPeNDAP enabled client software can access data directly without 
+    going through LAS. You access the FDS server by clicking on the &quot;OPeNDAP 
+    (FDS)&quot; link in the banner box at the top of the LAS interface. More information 
+    is available on the FDS and OPeNDAP web sites.</p>
+</blockquote>
+<p class="section_title">&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>

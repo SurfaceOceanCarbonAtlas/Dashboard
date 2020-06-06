@@ -1,0 +1,25 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+>
+	<ui:style>
+	 .pointer:hover {
+         cursor: pointer;
+     }
+	</ui:style>
+	    <b:Panel width="310" ui:field="panel">
+        <b:PanelHeader>
+            <b:Heading ui:field="heading" size="H3" text="Variable Name">
+                <b:Icon size="LARGE" addStyleNames="{style.pointer}" ui:field="close" type="CLOSE" pull="RIGHT"/>
+            </b:Heading>
+        </b:PanelHeader>
+        <b:PanelBody ui:field="body">
+
+        </b:PanelBody>
+        <b:PanelFooter ui:field="footer">
+            
+        </b:PanelFooter>
+    </b:Panel>
+
+</ui:UiBinder>

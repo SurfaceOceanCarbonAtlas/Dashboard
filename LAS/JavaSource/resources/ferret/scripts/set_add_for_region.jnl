@@ -1,0 +1,53 @@
+! set_add_for_region.jnl
+! For multi-var plots, if there is a region set, but the variable doesnt have
+! an axis in that direction, add 0*another variable that does.
+
+DEFINE SYMBOL iadd = $1
+
+! If no t axis, get it from another variable
+IF `($region_t"0|*>1") AND (STRINDEX("($shape($iadd))", "T") EQ 0)` THEN 
+   REPEAT/RANGE=0:`nc`/NAME=nvar (\
+       DEFINE SYMBOL nvar = `nvar`; \
+      IF `(STRINDEX("($shape($nvar))", "T") NE 0)` THEN DEFINE SYMBOL add_to_var($iadd) =\
+0*t[gt=($data_($nvar)_var)[d=($dset($nvar)),($region_full)]]; \
+      IF `(STRINDEX("($shape($nvar))", "T") NE 0)` THEN EXIT/LOOP)
+ENDIF
+
+! If they dont share other axes then we wont do this  (X and Y compared below)
+IF ($add_to_var($iadd)"0|*>1") THEN
+   IF `(STRINDEX("($shape($iadd))", "Z") NE 0)  AND (STRINDEX("($shape($nvar))", "Z") NE 0)` THEN
+      DEFINE SYMBOL axi = `($data_($iadd)_var)[d=($dset($iadd))],RETURN=zaxis`
+      DEFINE SYMBOL axn = `($data_($nvar)_var)[d=($dset($nvar))],RETURN=zaxis`
+!      IF `STRCMP("($axi)", "($axn)") NE 0` THEN CANCEL symbol add_to_var($iadd)
+   ENDIF
+ENDIF
+
+! If no z axis, get it from another variable
+IF `($region_z"0|*>1") AND (STRINDEX("($shape($iadd))", "Z") EQ 0)` THEN 
+   REPEAT/RANGE=0:`nc`/NAME=nvar (\
+      DEFINE SYMBOL nvar = `nvar`; \
+      IF `(STRINDEX("($shape($nvar))", "Z") NE 0)` THEN DEFINE SYMBOL add_to_var($iadd)= \
+0*z[gz=($data_($nvar)_var)[d=($dset($nvar)),($region_full)]]; \
+      IF `(STRINDEX("($shape($nvar))", "Z") NE 0)` THEN EXIT/LOOP)
+ENDIF
+
+! If they dont share other axes then we wont do this 
+IF ($add_to_var($iadd)"0|*>1") THEN
+   IF `(STRINDEX("($shape($iadd))", "X") NE 0)  AND (STRINDEX("($shape($nvar))", "X") NE 0)` THEN
+      DEFINE SYMBOL axi = `($data_($iadd)_var)[d=($dset($iadd))],RETURN=xaxis`
+      DEFINE SYMBOL axn = `($data_($nvar)_var)[d=($dset($nvar))],RETURN=xaxis`
+!      IF `STRCMP("($axi)", "($axn)") NE 0` THEN CANCEL symbol add_to_var($iadd)
+   ENDIF
+   IF `(STRINDEX("($shape($iadd))", "Y") NE 0)  AND (STRINDEX("($shape($nvar))", "Y") NE 0)` THEN
+      DEFINE SYMBOL axi = `($data_($iadd)_var)[d=($dset($iadd))],RETURN=yaxis`
+      DEFINE SYMBOL axn = `($data_($nvar)_var)[d=($dset($nvar))],RETURN=yaxis`
+!      IF `STRCMP("($axi)", "($axn)") NE 0` THEN CANCEL symbol add_to_var($iadd)
+   ENDIF
+   IF `(STRINDEX("($shape($iadd))", "Z") NE 0)  AND (STRINDEX("($shape($nvar))", "Z") NE 0)` THEN
+      DEFINE SYMBOL axi = `($data_($iadd)_var)[d=($dset($iadd))],RETURN=zaxis`
+      DEFINE SYMBOL axn = `($data_($nvar)_var)[d=($dset($nvar))],RETURN=zaxis`
+!      IF `STRCMP("($axi)", "($axn)") NE 0` THEN CANCEL symbol add_to_var($iadd)
+   ENDIF
+ENDIF
+
+! End of file ------------ set_add_for_region.jnl-------------------------------

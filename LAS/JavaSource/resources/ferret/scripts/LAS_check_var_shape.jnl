@@ -1,0 +1,37 @@
+! LAS_check_var_shape.jnl
+! 
+! Author: ansley
+! $Date: 2007/09/08
+!
+! Check whether the region and variable shape are compatible. For Prop-Prop plots,
+! the two variables may share the grid but one may have, say, no Z axis.
+
+! For prop-prop plot, if var has extra dimensons, replicate the variable that does not..
+ 
+ 
+! If doing a slice of a curvilinear variable then note that RETURN=shape is not
+! always correct for these variables (dont exit, test works for some cases)
+! IF `STRINDEX ("($ferret_plot_var)", "sampled_var") GT 0` THEN EXIT/SCRIPT
+
+DEFINE SYMBOL aa = $1
+DEFINE SYMBOL bb = $2
+
+LET the_plot_var = ($ferret_plot_var_($aa))
+!LOAD the_plot_var
+DEFINE SYMBOL varshape_($aa) = `the_plot_var,RETURN=shape`
+
+LET the_plot_var = ($ferret_plot_var_($bb))
+!LOAD the_plot_var
+DEFINE SYMBOL varshape_($bb) = `the_plot_var,RETURN=shape`
+
+IF `STRLEN("($varshape_($aa))") GT STRLEN("($varshape_($bb))")` THEN
+   LET v_expand = ($ferret_plot_var_($bb)) + 0*($ferret_plot_var_($aa))
+   DEFINE SYMBOL ferret_plot_var_($bb) = v_expand
+ENDIF
+
+IF `STRLEN("($varshape_($bb))") GT STRLEN("($varshape_($aa))")` THEN
+   LET v_expand = ($ferret_plot_var_($aa)) + 0*($ferret_plot_var_($bb))
+   DEFINE SYMBOL ferret_plot_var_($aa) = v_expand
+ENDIF
+
+! End of file ------------LAS_check_var_shape.jnl-------------------------------

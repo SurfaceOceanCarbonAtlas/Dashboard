@@ -1,0 +1,108 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <link rel="stylesheet" href="JavaScript/components/css/LAS.css" type="text/css">
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    
+#set($data = $las_response.getResultAsFile("netcdf"))
+
+  <script language="JavaScript" src="JavaScript/components/xmldom.js"></script>
+  <script language="JavaScript" src="JavaScript/components/LASRequest.js"></script>
+  <script language="JavaScript">
+   var outReq = {};
+   function initializeLASRequest() {
+      outReq = new LASRequest("$las_request.toJavaScriptSafeString()");
+   }
+   function gocsv() {
+       outReq.setProperty("ferret", "data_format", "csv");
+       var d0 = outReq.getProperty("data_0", "url");
+       if (typeof d0 != 'string') {
+          outReq.setProperty("data_0", "url", "$data");
+          outReq.setProperty("data", "count", "1");
+       }
+       outReq.setOperation("Trajectory_Corrrelation_File");
+       var url = "ProductServer.do?xml=" + outReq.getXMLText();
+       window.open(url, "_blank", "", false);
+    }
+    function gotsv() {
+       outReq.setProperty("ferret", "data_format", "tsv");
+       var d0 = outReq.getProperty("data_0", "url");
+       if (typeof d0 != 'string') {
+          outReq.setProperty("data_0", "url", "$data");
+          outReq.setProperty("data", "count", "1");
+       }
+       outReq.setOperation("Trajectory_Corrrelation_File");
+       var url = "ProductServer.do?xml=" + outReq.getXMLText();
+       window.open(url, "_blank", "", false);
+    }
+  </script>
+
+<title>LAS Output -- $las_config.getTitle()</title>
+
+<body  onload="initializeLASRequest()">
+
+
+
+## Write the preamble
+
+#set($preamble = $las_datatable.getPreamble())
+#foreach ( $p in $preamble)
+<strong>$p<br></strong>
+#end
+<br>
+Download these data <a href='javascript:gocsv()'>as a comma separated values (CSV) file</a> or <a href='javascript:gotsv()'>as a tab separated values (TSV) file</a></a>.
+<br>
+<br>
+##Write the rows.  
+
+    ## Get the metadata so we have the column names and
+    ## the number of columns.
+    
+    #set($metadata = $las_datatable.getHeaders())
+    #set($cols = $metadata.size())
+        
+    #set($size = $las_datatable.getData().get($metadata.get(0)).size())
+    <table border="2" cellpadding="4" class="DataTable">
+        ## Set the column headers including one for the row number.
+        <tr>
+             <th>Row</th>
+             #set($c = $cols - 1)
+             #foreach ($i in [0..$c])
+                 <th>$metadata.get($i)</th>
+             #end 
+       </tr>
+       ## Loop over the rows...
+       #set($s = $size - 1)
+       #foreach ($row in [0..$s])
+          ## Color of rows set by CSS.
+          <tr>
+             ## Add the row number
+             #set($r = $row + 1)
+             <td nowrap="nowrap" align="right">$r</td>
+             ## Loop the columns
+             #foreach ($i in [0..$c])
+                 ## Grab the column value as a string.
+                 ## If you want more control you can check the column type in the metadata and use the Velocity Formatter tool
+                 ## to format the each column value.
+                 <td nowrap="nowrap" align="right">$las_datatable.getData().get($metadata.get($i)).get($row)</td>
+             #end  ## Done with columns
+          </tr>
+
+       #end  ## Done with this row.
+    </table>
+</body>
+</html>
+#end
+

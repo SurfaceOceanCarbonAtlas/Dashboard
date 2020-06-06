@@ -1,0 +1,130 @@
+/** Add css rules here for your application. */
+.OL_MAP-middle {
+	display: block;
+    margin-left: auto;
+    margin-right: auto 
+}
+.OL_MAP-center_vertical {
+	vertical-align: middle;
+}
+.OL_MAP-CloseButton {
+	float: right;
+}
+.OL_MAP-PushButton-up,
+.OL_MAP-PushButton-up-hovering,
+.OL_MAP-PushButton-up-disabled,
+.OL_MAP-PushButton-down,
+.OL_MAP-PushButton-down-hovering,
+.OL_MAP-PushButton-down-disabled {
+  margin: 0;
+  text-decoration: none;
+  background: url("../images/hborder.png") repeat-x 0px -27px;
+}
+.OL_MAP-PushButton-up,
+.OL_MAP-PushButton-up-hovering,
+.OL_MAP-PushButton-up-disabled {
+  padding: 1px 3px 1px 3px;
+}
+.OL_MAP-PushButton-up {
+  border: 1px outset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-PushButton-up-hovering {
+  border: 1px outset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-PushButton-up-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: .5;
+  filter: alpha(opacity=40);
+  zoom: 1;
+}
+.OL_MAP-PushButton-down,
+.OL_MAP-PushButton-down-hovering,
+.OL_MAP-PushButton-down-disabled {
+  padding: 2px 2px 1px 3px;
+}
+.OL_MAP-PushButton-down {
+  border: 1px inset #666;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-PushButton-down-hovering {
+  border: 1px inset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-PushButton-down-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: 0.5;
+  filter: alpha(opacity=40);
+  zoom: 1;
+}
+
+
+
+.OL_MAP-ToggleButton-up,
+.OL_MAP-ToggleButton-up-hovering,
+.OL_MAP-ToggleButton-up-disabled,
+.OL_MAP-ToggleButton-down,
+.OL_MAP-ToggleButton-down-hovering,
+.OL_MAP-ToggleButton-down-disabled {
+  margin: 0;
+  text-decoration: none;
+  background: url("../images/hborder.png") repeat-x 0px -27px;
+}
+.OL_MAP-ToggleButton-up,
+.OL_MAP-ToggleButton-up-hovering,
+.OL_MAP-ToggleButton-up-disabled {
+  padding: 1px 3px 1px 3px;
+}
+.OL_MAP-ToggleButton-up {
+  border: 1px outset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-ToggleButton-up-hovering {
+  border: 1px outset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-ToggleButton-up-disabled {
+  border: 1px outset #ccc;
+  cursor: default;
+  opacity: .5;
+  zoom: 1;
+  filter: alpha(opacity=40);
+}
+.OL_MAP-ToggleButton-down,
+.OL_MAP-ToggleButton-down-hovering,
+.OL_MAP-ToggleButton-down-disabled {
+  padding: 2px 2px 1px 3px;
+}
+.OL_MAP-ToggleButton-down {
+  background-position: 0 -513px;
+  border: 1px inset #ccc;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-ToggleButton-down-hovering {
+  background-position: 0 -513px;
+  border: 1px inset;
+  border-color: #9cf #69e #69e #7af;
+  cursor: pointer;
+  cursor: hand;
+}
+.OL_MAP-ToggleButton-down-disabled {
+  background-position: 0 -513px;
+  border: 1px inset #ccc;
+  cursor: default;
+  opacity: .5;
+  zoom: 1;
+  filter: alpha(opacity=40);
+}

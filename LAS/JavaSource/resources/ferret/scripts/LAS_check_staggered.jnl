@@ -1,0 +1,53 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_check_staggered.jnl
+! 
+! Author: ansley 
+! Date: 2010/06 
+!
+! Vector components may be on staggered grids. Detect this and set the 
+! second component to be regridded to the grid of the first.
+!
+
+! If we are just computing auto-vector length for an animation, this is not needed.
+
+IF ($its_autolev_animate"0|*>1") THEN EXIT/SCRIPT
+
+IF ($native_curvilinear_xy"0") THEN
+   DEFINE SYMBOL xax_vec_1 = `($ferret_plot_var_0_noregion),RETURN=xaxis`
+   DEFINE SYMBOL yax_vec_1 = `($ferret_plot_var_0_noregion),RETURN=yaxis`
+   DEFINE SYMBOL xax_vec_2 = `($ferret_plot_var_1_noregion),RETURN=xaxis`
+   DEFINE SYMBOL yax_vec_2 = `($ferret_plot_var_1_noregion),RETURN=yaxis`
+ELSE
+   DEFINE SYMBOL xax_vec_1 = `($ferret_plot_base_var_0),RETURN=xaxis`
+   DEFINE SYMBOL yax_vec_1 = `($ferret_plot_base_var_0),RETURN=yaxis`
+   DEFINE SYMBOL xax_vec_2 = `($ferret_plot_base_var_1),RETURN=xaxis`
+   DEFINE SYMBOL yax_vec_2 = `($ferret_plot_base_var_1),RETURN=yaxis`
+ENDIF
+
+IF `STRCMP("($xax_vec_1)", "($xax_vec_2)") NE 0` THEN DEFINE SYMBOL ferret_staggered_grid = 1
+IF `STRCMP("($yax_vec_1)", "($yax_vec_2)") NE 0` THEN DEFINE SYMBOL ferret_staggered_grid = 1
+
+! Regrid the second component to the grid of the first. If in curvilinear
+! coordinates (will staggered grids always be in curvi??) then define 
+! the regridding on the base var, w/o curvi coordinate variables.
+!
+! Regrid to the grid of the curvilinear coordinate variables.
+
+IF `($ferret_staggered_grid"0|default>1|*>1") GT 0` THEN  
+   IF ($do_curvi_xy"0|0|1|*>1") THEN 
+      LET vec1 = ($ferret_plot_var_0_noregion)
+      LET vec1_regrid = vec1[gxy=xcoord]   ! whichever curvi coords got sent (!)
+      DEFINE SYMBOL ferret_plot_base_var_0 = vec1_regrid[($region_full)]
+      LET vec2 = ($ferret_plot_var_1_noregion)
+      LET vec2_regrid = vec2[gxy=xcoord]   ! whichever curvi coords got sent (!)
+      DEFINE SYMBOL ferret_plot_base_var_1 = vec2_regrid[($region_full)]
+   ELSE
+      LET vec2 = ($ferret_vector_2)
+      DEFINE SYMBOL ferret_vector_2 = vec2[gxy=($ferret_vector_1)]
+   ENDIF
+
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels) = Regridded from Staggered Grid
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+ENDIF

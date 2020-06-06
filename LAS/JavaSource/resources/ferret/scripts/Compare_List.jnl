@@ -1,0 +1,16 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: acm $
+!
+! Based on Compare_Plot
+! Compare_List.jnl Sets up a difference listing
+!
+
+! region 1 needs to inherit its view axes values from region 0
+
+LET ndim = STRLEN("($ferret_view)")
+REPEAT/RANGE=1:`ndim`/NAME=m (DEFINE SYMBOL idim = `SUBSTRING("($ferret_view)", m, 1)`; show sym idim; \
+  IF ($region_0_($idim)_lo"0|*>1") THEN DEFINE SYMBOL region_1_($idim)_lo ($region_0_($idim)_lo); \
+  IF ($region_0_($idim)_hi"0|*>1") THEN DEFINE SYMBOL region_1_($idim)_hi ($region_0_($idim)_hi) )
+
+GO list_data_difference

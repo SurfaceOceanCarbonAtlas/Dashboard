@@ -1,0 +1,200 @@
+! transform_curv_to_rect.jnl
+! 
+! ACM 10/2006
+!      4/2007 ACM Apply Ferret symbols for any expression that may have been defined
+!      4/2013 ACM Implement the Ferret property ferret_start_memory
+!
+set mode ver:always
+
+! incoming symbols define the regridding and where its to be centered
+!   DEFINE SYMBOL constraint_0_op = eq
+!   DEFINE SYMBOL constraint_0_lhs = Curv_to_Rect_Regridding
+
+
+! Set up to regrid from curvilinear to rectilinear using
+! symbols defined before calling this script.
+! The region and dataset have already been initialized.
+! The script expects a mapping file which defines the regridding.
+
+!  ($data_var)    - Name of variable on native curvilinear grid
+!  ($cf_map_n_file) - pre-generated curvilinear to rectlinear map
+!                   using CURV_TO_RECT_MAP external function 
+!  ($cf_map_n_var)  - curvilinear to rectlinear map variable 
+!
+! set curvilinear mapping dataset
+
+! 10-Jul-2008 ACM Define the_var_rect with the regions that are available; if there
+!             is no region_zt then dont try to use it
+
+
+IF ($ferret_curvi_coord_mapfile"0|*>1") THEN   DEFINE SYMBOL cf_map_url \"($ferret_curvi_coord_mapfile)\"
+
+IF ($ferret_curvi_coord_map($constraint_0_rhs)file"0|*>1") THEN
+   IF ($cf_map_($num)_chained"0|1|*>1) THEN
+   !  DEFINE SYMBOL cf_map_url \"($ferret_curvi_coord_map2file)\"
+     IF ($constraint_0_rhs"0|*>1) THEN DEFINE SYMBOL cf_map_url_test \"($ferret_curvi_coord_map($constraint_0_rhs)file)\"
+   ELSE
+   !  DEFINE SYMBOL cf_map_url ($ferret_curvi_coord_map2file)
+     IF ($constraint_0_rhs"0|*>1) THEN DEFINE SYMBOL cf_map_url_test \"($ferret_curvi_coord_map($constraint_0_rhs)file)\"
+   ENDIF
+   ! See if individual map files exist, else use the one named in ferret_curvi_coord_mapfile
+   LET file_exists = `TEST_OPENDAP("($cf_map_url_test)")`
+   IF `file_exists .EQ. 0` THEN DEFINE SYMBOL cf_map_url = ($cf_map_url_test)
+ENDIF
+
+
+DEFINE SYMBOL cf_map_var = ($ferret_curvi_coord_mapvar)
+USE ($cf_map_url)
+SET AXIS/MODULO/UNITS=degrees `($cf_map_var),RETURN=xaxis`
+SET AXIS/UNITS=degrees `($cf_map_var),RETURN=yaxis`
+DEFINE SYMBOL mapfile_num = `($cf_map_var),RETURN=dsetnum`
+
+
+! regrid, applying region information last
+
+! The HYCOM data needs a special function to regrid to rectilinear grid.
+DEFINE SYMBOL regrid_fcn = CURV_TO_RECT
+IF ($ferret_curvi_coord_mapfcn"0|*>1") THEN DEFINE SYMBOL regrid_fcn = ($ferret_curvi_coord_mapfcn)
+
+LET the_var_curv = ($data_var)
+
+! DEFINE SYMBOL the_var_title = "`($data_var)[d=($data_num)],RETURN=title`"
+! DEFINE SYMBOL the_var_units = "`($data_var)[d=($data_num)],RETURN=units`"
+
+LET the_var_rect = ($regrid_fcn)(($data_var_only)[d=($data_num)],($cf_map_var)[d=($mapfile_num)])
+LET the_var_rect_region = ($regrid_fcn)(($data_var_only)[d=($data_num)],($cf_map_var)[d=($mapfile_num)])
+LET the_var_rect_no_zt = ($regrid_fcn)(($data_var_only)[d=($data_num)],($cf_map_var)[d=($mapfile_num)])
+
+IF ($reg_zt"0|*>1) THEN \
+  LET the_var_rect = ($regrid_fcn)(($data_var_only)[d=($data_num),($reg_zt)],($cf_map_var)[d=($mapfile_num)])
+
+LET nx = `map[d=($mapfile_num),J=1,K=1,L=1,X=@NGD]`
+LET ny = `map[d=($mapfile_num),I=1,K=1,L=1,Y=@NGD]`
+
+DEFINE SYMBOL xlo = `($region_x_lo"($region_0_x_lo)")-360`
+DEFINE SYMBOL xhi = `($region_x_hi"($region_0_x_hi)")-360`
+
+LET mapimin = `i[gx=map,x=($xlo)] - 1`
+LET mapimax = `i[gx=map,x=($xhi)] + 1`
+IF `mapimax - mapimin GT nx` THEN LET mapimax = `nx-mapimax`
+
+LET yy = y[gy=map]
+LET ymaphi = MIN(`yy[y=@max]`,($region_y_hi"($region_0_y_hi)"))
+LET ymaplo = MAX(`yy[y=@min]`,($region_y_lo"($region_0_y_lo)"))
+
+LET mapjmin = MAX(1, j[gy=map, y=`ymaplo`] - 1)
+LET mapjmax = MIN(ny, j[gy=map, y=`ymaphi`] + 1)
+
+USE ($data_num)
+GO get_curv_coord_bbox
+
+USE ($cf_map_url)
+SET AXIS/MODULO/UNITS=degrees `($cf_map_var),RETURN=xaxis`
+SET AXIS/UNITS=degrees `($cf_map_var),RETURN=yaxis`
+DEFINE SYMBOL mapfile_num = `($cf_map_var),return=dsetnum`
+
+LET the_var_rect = ($regrid_fcn)(\
+ ($data_var)[d=($data_num),($reg_zt)], ($cf_map_var)[d=($mapfile_num),($region_xy)] )
+LET the_var_rect_no_zt = ($regrid_fcn)(\
+ ($data_var)[d=($data_num)], ($cf_map_var)[d=($mapfile_num),($region_xy)] )
+
+LET the_var_rect = ($regrid_fcn)(\
+ ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)], ($cf_map_var)[d=($mapfile_num),($region_xy)] )
+IF ($reg_zt"0|*>1) THEN LET the_var_rect = ($regrid_fcn)(\
+ ($data_var_only)[d=($data_num),($reg_zt),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)], ($cf_map_var)[d=($mapfile_num),($region_xy)] )
+LET the_var_rect_no_zt = ($regrid_fcn)(\
+ ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)], ($cf_map_var)[d=($mapfile_num),($region_xy)] )
+
+! Check that we have enough memory for the data variable and map function.
+
+LET nz = 1
+LET nt =1
+IF ($region_z"0|*>1") THEN
+   LET kk = K[gz=($data_var_only)[d=($data_num)]]
+   LET nz = kk[z=($region_z_hi)] - kk[z=($region_z_lo)] + 1
+ENDIF
+IF ($region_t"0|*>1") THEN
+   LET ll = L[gt=($data_var_only)[d=($data_num)]]
+   LET nt = ll[t="($region_t_hi)"] - ll[t="($region_t_lo)"] + 1
+ENDIF
+IF `STRINDEX("($operation_name)", "ANIMATION") NE 0` THEN LET nz = 1
+IF `STRINDEX("($operation_name)", "ANIMATION") NE 0` THEN LET nt = 1
+
+LET nmem = `nz*nt* (($clon_imax)-($clon_imin)+1 ) * ( ($clat_jmax)-($clat_jmin)+1 ) `
+
+IF ($ferret_curvi_coord_mapfcn"0|curv_to_rect_fsu>1|*>0") THEN 
+   LET nmem = `nmem + 3*(mapimax-mapimin+1)*(mapjmax-mapjmin+1)`
+ELSE 
+   LET nmem = `nmem + 12*(mapimax-mapimin+1)*(mapjmax-mapjmin+1)`
+ENDIF
+IF `($ferret_memory"25.6") LT 500` THEN SET MEM/SIZ=500
+
+DEFINE SYMBOL error_string "error allocating enough memory for curvilinear gridding"
+DEFINE SYMBOL memsize = ($FERRET_MEMORY"25.6")* 1.e6
+IF `nmem GT ($memsize)` THEN SET MEM/SIZ=`nmem/1.e6`
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+CANCEL SYMBOL error_string 
+
+! for the auto-levels scripts, we will use just the data field, subsetted but not regridded.
+DEFINE SYMBOL auto_lev_var = ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)]
+IF ($reg_zt"0|*>1") THEN DEFINE SYMBOL auto_lev_var = ($data_var_only)[d=($data_num),($reg_zt),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)]
+
+DEFINE SYMBOL auto_lev_var_no_z = ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)]
+IF ($region_z"0|*>1") THEN \ 
+  DEFINE SYMBOL auto_lev_var_no_z = ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax),($region_z)]
+DEFINE SYMBOL auto_lev_var_no_zt = ($data_var_only)[d=($data_num),I=($clon_imin):($clon_imax),J=($clat_jmin):($clat_jmax)]
+
+IF `STRCMP("($ferret_view)", "xy") EQ 0` THEN 
+   LET the_var_rect_region = the_var_rect
+   LET the_var_rect_region_no_zt = the_var_rect_no_zt
+ELSE
+   IF `STRINDEX("($ferret_view)", "x") GT 0` THEN LET the_var_rect_region = the_var_rect[($region_y)]
+   IF `STRINDEX("($ferret_view)", "y") GT 0` THEN LET the_var_rect_region = the_var_rect[($region_x)]
+ENDIF
+
+
+DEFINE SYMBOL ferret_plot_var ($expr1)the_var_rect_region($expr2)
+
+DEFINE SYMBOL ferret_list_var ($expr1)the_var_rect($expr2)
+DEFINE SYMBOL ferret_list_var_no_zt ($expr1)the_var_rect_no_zt($expr2)
+
+DEFINE SYMBOL ferret_plot_base_var ($ferret_plot_var)
+
+IF `($constraint_0_rhs"0|*>1") EQ 0` THEN
+   DEFINE SYMBOL constraint_0_rhs =`XBOX[D=($mapfile_num),GX=map,I=2],P=3`
+ENDIF
+
+DEFINE SYMBOL regrid_lab = Regridded to ($constraint_0_rhs)@IM09@AC Grid
+IF ($constraint_0_rhs"0|d>1|*>0") THEN DEFINE SYMBOL regrid_lab Regridded to Rectilinear Grid
+DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr2) ($data_units) ($regrid_lab)
+
+IF ($expr3"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)the_var_rect_region($expr3)the_var_rect_region($expr4)
+   DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr3) ($data_title) ($expr4) ($data_units) ($regrid_lab)
+ENDIF
+
+
+IF ($analysis_def"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)the_var_rect($analysis_def)($expr2)
+   
+   DEFINE SYMBOL ferret_list_var ($expr1)the_var_rect($analysis_def)($expr2)
+   DEFINE SYMBOL ferret_list_var_no_zt ($expr1)the_var_rect_no_zt($analysis_def)($expr2)
+   
+   DEFINE SYMBOL ferret_plot_base_var ($ferret_plot_var)
+   
+   DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr2) ($data_units) ($regrid_lab)
+   
+   IF ($expr3"0|*>1") THEN
+      DEFINE SYMBOL ferret_plot_var ($expr1)the_var_rect_region($analysis_def)($expr3)the_var_rect_region($analysis_def)($expr4)
+      DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr3) ($data_title) ($expr4) ($data_units) ($regrid_lab)
+   ENDIF
+ENDIF
+
+! End of $RCSfile ---------- transform_curv_to_rect.jnl----------------------------
+

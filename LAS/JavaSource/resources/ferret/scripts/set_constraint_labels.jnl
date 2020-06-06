@@ -1,0 +1,79 @@
+! set_constraint_labels.jnl
+! Make labels from the constraints. Call a second
+! script as the command line from a single REPEAT
+! statement containing all the commands could get too long.
+
+! If all labeling turned off just exit.
+IF `($ferret_label"1|0|1|*>1") EQ 0` THEN EXIT/SCRIPT
+
+! How many constraints could there be?  Should probably get 
+! this from the server...
+
+DEF SYM has_missing = 0
+
+REPEAT/RANGE=0:101:1/NAME=v ( \
+  DEFINE SYMBOL v = `v`; \
+  IF ($constraint_($v)_lhs"1|*>0") THEN EXIT/LOOP ; \
+  DEFINE SYMBOL lhs = ($constraint_($v)_lhs); \
+  DEFINE SYMBOL op = ($constraint_($v)_op); \
+  DEFINE SYMBOL rhs = ($constraint_($v)_rhs); \
+  DEFINE SYMBOL rhs_quoted = ($constraint_($v)_rhs_quoted"0"); \
+  DEFINE SYMBOL lhsq = ($constraint_($v)_lhs); \
+  IF ($rhs"NaN>1|*>0") THEN DEFINE SYMBOL rhs = valid; \
+  IF `($lhs"99|*>0") EQ 99` THEN EXIT/loop; \
+  GO make_c_lab)
+
+! A set of features may have been selected on the map. If so label them.
+! If a subset was chosen, we will replace the annotation below.
+
+IF `($nmask_labels"0") GT 0` THEN
+   REPEAT/RANGE=1:($nmask_labels)/NAME=mlab (\
+   DEFINE SYMBOL mlab = `mlab`;\
+   DEFINE SYMBOL note_num `($note_num"0") + 1`; \
+   IF ($mask_title_($mlab)"0|*>1") THEN DEFINE SYMBOL note_($note_num"0")_lab =  ($mask_title_($mlab)); \
+   IF ($mask_title_($mlab)"0|*>1") THEN LET note_($note_num"0")_lab = "($mask_title_($mlab))"; \ 
+   )
+ENDIF
+
+! Label the features that came in with ferret_cruise_list.
+
+IF `($ferret_cruise_list"0|*>1")` THEN 
+
+   IF ($feature_variable"0|*>1") THEN 
+      DEFINE SYMBOL feature_title = `($feature_variable),RETURN=title`
+   ELSE
+      DEFINE SYMBOL feature_title = ($feature_type"trajectory")
+   ENDIF
+
+   LET slen = STRLEN("($ferret_cruise_list)")
+   DEFINE SYMBOL lastletter = `SUBSTRING("($ferret_cruise_list)", slen, 1)`
+   IF `STRCMP("($lastletter)", ",") EQ 0` THEN
+      DEFINE SYMBOL note_num `($note_num"0") + 1`
+      DEFINE SYMBOL note_($note_num"0")_lab = Where ($feature_variable) = `SUBSTRING("($ferret_cruise_list)", 1, slen-1)`
+      LET note_($note_num"0")_lab = "Where ($feature_variable) = `SUBSTRING("($ferret_cruise_list)", 1, slen-1)`"
+   ELSE 
+      DEFINE SYMBOL note_num `($note_num"0") + 1`
+      DEFINE SYMBOL note_($note_num"0")_lab = Where ($feature_variable) = ($ferret_cruise_list)
+      LET note_($note_num"0")_lab = "Where ($feature_variable) = ($ferret_cruise_list)"
+   ENDIF
+
+ENDIF
+
+! If a Ferret "annotate_with" property was set, and if there is just one feature 
+! in the selection,see if that variable is in the file and make a notation.
+
+IF ($ferret_annotate_with"0|*>1") THEN
+   LET nfeature = `($rowvar),RETURN=msize`
+   IF `nfeature EQ 1` THEN 
+      DEFINE SYMBOL note_num = `($note_num"0") + 1`
+      LET notevar = "($ferret_annotate_with)"
+      LET varnames = ..varnames
+      IF `IS_ELEMENT_OF_STR_N(varnames, notevar) GT 0` THEN 
+         LET notestring = "`($ferret_annotate_with)`"
+         IF `STRINDEX(notestring, ";") GT 0` THEN LET notestring = "`STR_REPLACE(notestring, ";", ",")`"
+         DEFINE SYMBOL note_($note_num)_lab = NOTE: `notestring`
+      ENDIF
+   ENDIF
+ENDIF
+
+!-----------------End of set_constraint_labels ---------------------------------

@@ -1,0 +1,25 @@
+!  LAS_test_for_empty_data_file.jnl
+! Insitu files may have a gobal attribute called emptyResult.
+! If this exists and its value is no match then return a flag
+! data_file_is_empty
+
+DEFINE SYMBOL data_file_is_empty = 0
+
+DEFINE VARIABLE glob_atts = ..attnames
+
+IF `IS_ELEMENT_OF_STR(glob_atts,"emptyResult")` THEN 
+   DEFINE SYMBOL test_contents = `..emptyResult`
+   IF `STRINDEX("($test_contents)", "no match") GT 0` THEN \
+       DEFINE SYMBOL data_file_is_empty = 1
+ENDIF
+
+IF `IS_ELEMENT_OF_STR(glob_atts,"query_result")` THEN 
+   DEFINE SYMBOL data_file_empty_message = `..query_result`
+   IF `STRINDEX( "($data_file_empty_message)", "No data found") GT 0` THEN \
+       DEFINE SYMBOL data_file_is_empty = 1
+
+   IF `STRINDEX( "($data_file_empty_message)", "exceeds the allowed limit") GT 0` THEN \
+       DEFINE SYMBOL data_file_is_empty = 1
+ENDIF
+
+! End of file ------------LAS_test_for_empty_data_file.jnl--------------------------

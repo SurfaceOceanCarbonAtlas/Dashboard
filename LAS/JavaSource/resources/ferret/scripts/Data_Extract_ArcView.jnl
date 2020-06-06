@@ -1,0 +1,8 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: rhs $
+!
+! Extracting to a netCDF file and some text and table files have different
+! options in the UI.  Need to separate them at this level to keep the UI
+! happy.  All the Data_Extract* scripts launch the same list_data.jnl script.
+GO list_arc_ascii

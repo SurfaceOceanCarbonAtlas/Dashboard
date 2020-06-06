@@ -1,0 +1,336 @@
+\cancel mode verify
+
+! curvi_nrst_slice.jnl
+! 3/07 ACM
+! 3/08 ACM limit the range of the sampling variable in z and/or t if
+!          a region is given in those directions.
+
+! Description: define variables for a line of constant Latitude or Longitude 
+! of a curvilinear data set.
+! This script assumes 
+! The curvilinear data set has been opened, region defined, grid has coord variables
+!    ($ferret_curvi_coord_lon), ($ferret_curvi_coord_lat)
+!
+! Note a new function SAMPLEXY_CURV_NRST returns value at ij point representing nearest xy.
+
+IF ($region_z"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_z)
+IF ($region_t"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_t)
+IF ($region_zt"0|*>1") THEN DEFINE SYMBOL region_sample = ,($region_zt)
+
+! default value; may be redefined in this script
+LET sampled_var = ($ferret_plot_var)
+IF ($ferret_view"|zt>1|*>0") THEN LET sampled_var = ($data_var)[d=($data_num)($region_sample)]
+
+! Call CURV_RANGE to get the I,J range for the requested output rectangle
+
+GO get_curv_coord_bbox
+! GO check_curv_linear  ! This is done more efficiently by the init script, see HYCOM_initialize_data.jnl
+
+
+! Y line, or YZ, YT slice
+LET yslice = ($ferret_view"|y>1|*>0") + ($ferret_view"|yz>1|*>0") + ($ferret_view"|yt>1|*>0")
+IF `yslice GT 0` THEN
+
+! Define a set of x and y points to sample at (all on one value of X)
+
+   LET npts = `($ferret_curvi_coord_lon)[d=($data_num)],return=jsize` 
+   let npts = 50
+   DEFINE AXIS/Y=($region_y_lo):($region_y_hi)/NPOINTS=`npts`/UNITS=degrees sample_ylat
+   LET sample_ypts = y[gy=sample_ylat]
+   LET sample_xpts = ($region_x_lo) + 0*sample_ypts
+
+   LET fer_plot_var = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     sample_xpts, sample_ypts)
+
+   IF `(($clon_imax)-($clon_imin) EQ 0) AND (($clon_imax)-($clon_imin) EQ 0)` THEN  
+      DEFINE SYMBOL ferret_plot_var = \
+     ($expr1)($data_var)[d=($data_num),i=($clon_imin), j=($clat_jmin)($region_sample)]($expr2), \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin), j=($clat_jmin)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin), j=($clat_jmin)]
+     
+     DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+     DEFINE SYMBOL needs_url 1
+     EXIT/SCRIPT
+   ENDIF
+
+! Reshape to the grid of the sampled variable, with the sample Y latitudes
+! and the correct region of the world, so that time and location labels will
+! appear on the plot.
+
+   IF ($ferret_view"|y>1|*>0") THEN 
+      DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+      LET sample_var = y[gy=sample_ylat] + x[gx=sample_x,x=($region_x_lo)]  
+
+      IF ($region_t"0|*>1") THEN LET sample_var = y[gy=sample_ylat] + \
+         x[gx=sample_x,x=($region_x_lo)] + \
+         t[gt=fer_plot_var,($region_t)]
+
+      IF ($region_z"0|*>1") THEN LET sample_var = y[gy=sample_ylat] + \
+        x[gx=sample_x,x=($region_x_lo)] + \
+         z[gz=fer_plot_var,($region_z)]+t[gt=fer_plot_var]
+         
+      IF `($region_t"0|*>1") + ($region_z"0|*>1") EQ 2` THEN LET sample_var = y[gy=sample_ylat] + \
+         x[gx=sample_x,x=($region_x_lo)] + \
+         z[gz=fer_plot_var,($region_z)] + t[gt=fer_plot_var,($region_t)]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+
+   ELIF ($ferret_view"|yz>1|*>0") THEN 
+      DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+      LET sample_var = y[gy=sample_ylat] + x[gx=sample_x,x=($region_x_lo)] + \
+         z[gz=fer_plot_var]
+
+      IF ($region_t"0|*>1") THEN LET sample_var = y[gy=sample_ylat] + \
+         x[gx=sample_x,x=($region_x_lo)]  + \
+         z[gz=fer_plot_var]+t[gt=fer_plot_var,($region_t)]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+
+   ELIF ($ferret_view"|yt>1|*>0") THEN 
+      DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+      LET sample_var = y[gy=sample_ylat] + x[gx=sample_x,x=($region_x_lo)] + \
+         t[gt=fer_plot_var]
+
+      IF ($region_z"0|*>1") THEN LET sample_var = y[gy=sample_ylat] + \
+         x[gx=sample_x,x=($region_x_lo)]  + \
+         z[gz=fer_plot_var,($region_z)]+t[gt=fer_plot_var]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+   ENDIF
+
+ENDIF
+
+! X line, or XZ, XT slice
+LET xslice = ($ferret_view"|x>1|*>0") + ($ferret_view"|xz>1|*>0") + ($ferret_view"|xt>1|*>0")
+IF `xslice GT 0` THEN
+
+! Define a set of x and y points to sample at (all on one value of Y)
+
+   LET npts = `($ferret_curvi_coord_lat)[d=($data_num)],return=isize` 
+   let npts = 50
+   DEFINE AXIS/X=($region_x_lo):($region_x_hi)/NPOINTS=`npts`/UNITS=degrees/MODULO sample_xlon
+   LET sample_xpts = x[gx=sample_xlon]
+   LET sample_ypts = ($region_y_lo) + 0*sample_xpts
+
+   LET fer_plot_var = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     sample_xpts, sample_ypts)
+   LET sampled_var = fer_plot_var[gx=sample_xlon@asn]
+   
+
+   IF `(($clon_imax)-($clon_imin) EQ 0) AND (($clon_imax)-($clon_imin) EQ 0)` THEN  
+      CANCEL VARIABLE sampled_var 
+      DEFINE SYMBOL ferret_plot_var = \
+     ($expr1)($data_var)[d=($data_num),i=($clon_imin), j=($clat_jmin)($region_sample)]($expr2), \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin), j=($clat_jmin)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin), j=($clat_jmin)]
+     
+     DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+     DEFINE SYMBOL needs_url 1
+     EXIT/SCRIPT
+   ENDIF
+
+! Reshape to the grid of the sampled variable, with the sample Y latitudes
+! and the correct region of the world, so that time and location labels will
+! appear on the plot.
+
+   IF ($ferret_view"|x>1|*>0") THEN 
+      DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+      LET sample_var = x[gx=sample_xlon] + y[gx=sample_y,y=($region_y_lo)]  
+
+      IF ($region_t"0|*>1") THEN LET sample_var = x[gx=sample_xlon] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         t[gt=fer_plot_var,($region_t)]
+
+      IF ($region_z"0|*>1") THEN LET sample_var = x[gx=sample_xlon] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var,($region_z)]
+         
+      IF `($region_t"0|*>1") + ($region_z"0|*>1") EQ 2` THEN LET sample_var = x[gx=sample_xlon] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var,($region_z)] + t[gt=fer_plot_var,($region_t)]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+
+   ELIF ($ferret_view"|xz>1|*>0") THEN 
+      DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+      LET sample_var = x[gx=sample_xlon] + y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var]
+
+      IF ($region_t"0|*>1") THEN LET sample_var = x[gx=sample_xlon] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var]+t[gt=fer_plot_var,($region_t)]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+
+   ELIF ($ferret_view"|xt>1|*>0") THEN 
+      DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+      LET sample_var = x[gx=sample_xlon] + y[gy=sample_y,y=($region_y_lo)]  + \
+         t[gt=fer_plot_var]
+
+      IF ($region_z"0|*>1") THEN LET sample_var = x[gx=sample_xlon] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var,($region_z)]+t[gt=fer_plot_var]
+
+      LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+      DEFINE SYMBOL needs_url 1
+   ENDIF
+
+ENDIF
+
+! ZT slice
+LET ztslice = ($ferret_view"|zt>1|*>0") 
+IF `ztslice GT 0` THEN
+
+! Define the x and y point to sample at 
+
+   LET fer_plot_var = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($region_x_lo), ($region_y_lo))
+   LET sampled_var = fer_plot_var
+
+   IF `(($clon_imax)-($clon_imin) EQ 0) AND (($clon_imax)-($clon_imin) EQ 0)` THEN  
+      DEFINE SYMBOL ferret_plot_var = \
+     ($expr1)($data_var)[d=($data_num),i=($clon_imin), j=($clat_jmin)($region_sample)]($expr2)
+     
+     DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+     DEFINE SYMBOL needs_url 1
+     EXIT/SCRIPT
+   ENDIF
+
+   DEFINE SYMBOL needs_url 1
+
+! Define upper-left labels with the longitude region
+   
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels"0") = Longitude: ($region_x_lo)E
+   IF `($region_x_lo) LT 0` THEN 
+         DEFINE SYMBOL west_region_x_lo = `-1* ($region_x_lo)`
+      DEFINE SYMBOL upper_left_($n_left_labels"0") = Longitude: ($west_region_x_lo)W
+   ENDIF
+   DEFINE SYMBOL longitude_lab = ($upper_left_($n_left_labels"0"))
+
+! Define upper-left labels with the latitude region
+
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels"0") = Latitude: ($region_y_lo)N
+   IF `($region_y_lo) LT 0` THEN 
+      DEFINE SYMBOL south_region_y_lo = `-1* ($region_y_lo)`
+      DEFINE SYMBOL upper_left_($n_left_labels"0") = Latitude: ($south_region_y_lo)S
+   ENDIF
+   DEFINE SYMBOL latitude_lab = ($upper_left_($n_left_labels"0"))
+ENDIF
+
+! T line
+LET tslice = ($ferret_view"|t>1|*>0") 
+IF `tslice GT 0` THEN
+
+! Define single x y point to sample at
+
+   LET sample_xpts = {($region_x_lo)}
+   LET sample_ypts = {($region_y_lo)}
+
+   LET fer_plot_var = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     sample_xpts, sample_ypts)
+
+   IF `(($clon_imax)-($clon_imin) EQ 0) AND (($clon_imax)-($clon_imin) EQ 0)` THEN  
+      DEFINE SYMBOL ferret_plot_var = \
+     ($expr1)($data_var)[d=($data_num),i=($clon_imin), j=($clat_jmin)($region_sample)]($expr2), \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin), j=($clat_jmin)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin), j=($clat_jmin)]
+     
+     DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+     DEFINE SYMBOL needs_url 1
+     EXIT/SCRIPT
+   ENDIF
+
+   DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+   DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+
+   LET sample_var = x[gx=sample_x,x=($region_x_lo)] + y[gy=sample_y,y=($region_y_lo)]  + \
+         t[gt=fer_plot_var]
+         
+   IF ($region_z"0|*>1") THEN LET sample_var = x[gx=sample_x,x=($region_x_lo)] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         t[gt=fer_plot_var] + z[gz=fer_plot_var,($region_z)]
+
+   LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+   DEFINE SYMBOL needs_url 1
+
+ENDIF
+
+
+! Z line
+LET zslice = ($ferret_view"|z>1|*>0") 
+IF `zslice GT 0` THEN
+
+! Define single x y point to sample at
+
+   LET sample_xpts = {($region_x_lo)}
+   LET sample_ypts = {($region_y_lo)}
+
+   LET fer_plot_var = SAMPLEXY_CURV_NRST( \
+     ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+     sample_xpts, sample_ypts)
+
+   IF `(($clon_imax)-($clon_imin) EQ 0) AND (($clon_imax)-($clon_imin) EQ 0)` THEN  
+      DEFINE SYMBOL ferret_plot_var = \
+     ($expr1)($data_var)[d=($data_num),i=($clon_imin), j=($clat_jmin)($region_sample)]($expr2), \
+     ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin), j=($clat_jmin)], \
+     ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin), j=($clat_jmin)]
+     
+     DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+     DEFINE SYMBOL needs_url 1
+     EXIT/SCRIPT
+   ENDIF
+
+   DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_x
+   DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/MODULO/UNITS=degrees sample_y
+
+   LET sample_var = x[gx=sample_x,x=($region_x_lo)] + y[gy=sample_y,y=($region_y_lo)]  + \
+         z[gz=fer_plot_var]
+         
+   IF ($region_t"0|*>1") THEN LET sample_var = x[gx=sample_x,x=($region_x_lo)] + \
+         y[gy=sample_y,y=($region_y_lo)]  + \
+         t[gt=fer_plot_var,($region_t)] + z[gz=fer_plot_var]
+
+   LET sampled_var = RESHAPE(fer_plot_var, sample_var)
+
+   DEFINE SYMBOL needs_url 1
+
+ENDIF
+
+DEFINE SYMBOL ferret_plot_var = ($expr1)sampled_var($expr2)
+DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr2) ($data_units)"
+
+IF ($expr3"0|*>1") THEN
+   DEFINE SYMBOL ferret_plot_var ($expr1)sampled_var($expr3)sampled_var($expr4)
+   DEFINE SYMBOL ferret_plot_title "($expr1) ($data_title) ($expr3) ($data_title) ($expr4)"
+ENDIF
+
+! End of file ------------curvi_nrst_slice.jnl--------------------------
+

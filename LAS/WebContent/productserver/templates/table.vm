@@ -1,0 +1,55 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+<title>LAS Output</title></head>
+<body bgcolor="white">
+#set ($error=$las_response.getResult("error"))
+#if ( $error != "" )
+<h3>An error occurred creating your product.</h3>
+The information below contains the messages that were written to standard output
+and standard error.
+<hr>
+<pre>
+$error
+</pre>
+#else
+<table width="100%">
+  <tr>
+      <th>Table of Values</th>
+  </tr>
+  <tr>
+      <td width="100%">
+        <iframe src="$las_response.getResult("ferret_listing")" width="100%" height="500">
+           Missing table of values.
+        </iframe>
+      </td>
+  </tr>
+  #if ( $debug=="true" || $debug=="debug" ) 
+  <tr>
+     <th>Debug Output (including symbols from the request).</th>
+  </tr>
+  <tr>
+     <td width="100%">
+        <iframe src="$las_response.getResult("debug")" width="600">
+           Missing debug output.
+        </iframe>
+     </td>
+  </tr>
+  #end
+</table>
+#end
+</body>
+</html>
+#end

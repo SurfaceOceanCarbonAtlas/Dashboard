@@ -1,0 +1,63 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS Output -- $las_config.getTitle()</title>
+<body>
+    #set($results = $las_response.getResults())
+    #set($result = $results.get(0))
+    #set($parts = $result.getFile().split("/"))
+
+    <h1>CMIP5 Climate Analysis</h1>
+    #set($titles = $parts[8].split("Vs"))
+    <h2>Comparing $titles[0] vs $titles[1]</h2>
+    <h3>$parts[15] $parts[12] $parts[13]</h3> 
+
+    #set($region="xxx")
+    #set($ul="")
+    <ul> 
+    #foreach ($result in $results)
+        #if ( $result.getFile().endsWith("gz") )
+            #set($p = $result.getFile().split("/"))
+            #if( $region != $p[15] )
+                $ul
+                #set($region = $p[15])
+                <li><strong>$region</strong></li>
+                <ul>
+                #set($ul="</ul>")
+            #end
+                <li>
+                <a href="$result.getURL()">$p[16]</a>
+               </li>
+        #end
+    #end
+    </ul>
+    <h3>netCDF files</h3>
+    <ul>
+    #foreach ($result in $results)
+        #if ( $result.getFile().endsWith("nc") )
+            #set($p = $result.getFile().split("/"))
+            <li>
+            <a href="$result.getURL()">$p[17]</a>
+            </li>
+        #end
+    #end
+    </ul>
+</body>
+</html>
+
+#end
+

@@ -1,0 +1,21 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! $Header$
+! LAS_set_poly_scale.jnl
+
+! ACM 8/29/2007
+! Set the symbol ferret_poly_scale based on the number of observations
+! Some plots may have tens of thousands of points; for these make the
+! symbols very small.
+!
+
+IF ($ferret_poly_scale"1|*>0") THEN 
+   DEFINE SYMBOL ferret_poly_scale 0.15  ! For max number of points, can be 60,000+
+   IF `($numobs"1") LT 40000` THEN DEFINE SYMBOL ferret_poly_scale 0.2
+   IF `($numobs"1") LT 30000` THEN DEFINE SYMBOL ferret_poly_scale 0.3
+   IF `($numobs"1") LT 20000` THEN DEFINE SYMBOL ferret_poly_scale 0.4
+   IF `($numobs"1") LT 10000` THEN DEFINE SYMBOL ferret_poly_scale 0.6
+   IF `($numobs"1") LT 5000` THEN DEFINE SYMBOL ferret_poly_scale 0.8
+!   IF `($numobs"1") LT 500` THEN DEFINE SYMBOL ferret_poly_scale 1.
+ENDIF
+
+!-----------------------------------------------------------------------

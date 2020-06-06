@@ -1,0 +1,19 @@
+\        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_default_errsyms.jnl
+
+! Author: ansley
+! Date: 6/29/2007
+
+! Define default error symbols for output to XML result file 
+!  result_ferret_errmsg_filename
+
+! error_status  ! e.g. ERROR, NONE, perhaps WARN or NOTE
+! error_type    ! e.g. DATA, REGION, GRID, EXPRESSION
+! error_action  ! e.g. opening connection to data
+! error_string  ! e.g. The SST source file -- http://... did not open successfully.
+! fer_last_error ! The entire error string that Ferret would write to std error
+
+DEFINE SYMBOL error_status = ERROR
+CANCEL SYMBOL error_type 
+DEFINE SYMBOL error_action = running Ferret scripts for ($operation_ID) direction ($ferret_view)
+CANCEL SYMBOL error_string

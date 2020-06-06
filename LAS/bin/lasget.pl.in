@@ -1,0 +1,153 @@
+#!@PERL@ -w
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+use Config;
+use lib ('../xml/perl','.', '../xml/perl/install/lib/' . $Config{version},
+         '../xml/perl/install/lib/site_perl/' . $Config{version},
+         '../xml/perl/install/lib/perl5/' . $Config{version},
+         '../xml/perl/install/lib/perl5/site_perl/' . $Config{version});
+use LWP::UserAgent;
+use URI::URL;
+use URI::Escape;
+use strict;
+use Getopt::Long;
+my %Opts;
+my %Ranges = (x => '-180:180',
+	      y => '-90:90');
+my $Format = 'txt';
+my $Outfile;
+sub issueRequest {
+    my ($urlstr, $xml) = @_;
+    my $hdrs = new HTTP::Headers;
+    my $url = new URI::URL($urlstr);
+    die "Bad URL $url" if ! $url;
+    my $req = new HTTP::Request('POST', $url, $hdrs);
+    $req->content_type('application/x-www-form-urlencoded');
+    $req->content($xml);
+    
+    my $ua = new LWP::UserAgent;
+    my ($resp, $loc);
+    while(1){
+	$resp = $ua->request($req);
+	$loc = $resp->header('Location');
+	last if ! $loc;
+	$url = new URI::URL($loc);
+	$req = new HTTP::Request('GET', $url, $hdrs);
+    }
+    if ($resp->is_success){
+	my $result = $resp->content;
+	if ($result =~ /<html>/ && $result !~ /LAS SERVER OK/){
+	    print STDERR "The request failed with the following message:\n";
+	    print STDERR $result;
+	    exit 1;
+	}
+	if (defined($Outfile)){
+	    print $Outfile $result;
+	} else {
+	    print $result;
+	}
+    } else {
+	print STDERR "Request failed\n";
+	print $resp->error_as_HTML;
+	exit 1;
+    }
+}
+
+sub getXMLArgs {
+    my $str = "";
+    # Random number to avoid cacheing
+    $str = '<ran>' . rand() . '</ran>';
+    $str .= "<modifiers>long</modifiers>" if $Opts{l};
+    $str .= "<dataset>$ARGV[0]</dataset>" if $ARGV[0];
+    $str .= "<variable>$ARGV[1]</variable>" if $ARGV[1];
+    $str;
+}
+
+sub genXML {
+    my $xmlMid;
+    my $rank = 0;
+    foreach my $key (keys %Ranges){
+	my ($lo,$hi,$extra) = split(':', $Ranges{$key});
+	if ($extra){
+	    die "Invalid range:", $Ranges{$key},
+	    "\nOnly one ':' is allowed in a range";
+	}
+	next if ! defined($lo);
+	if (!$hi){
+	    $xmlMid .= qq{<point type="$key" v="$lo"/>};
+	} else {
+	    $xmlMid .= qq{<range type="$key" low="$lo" high="$hi"/>};
+	    $rank++;
+	}
+    }
+    my $xmlTail = qq{</region></args></lasRequest>};
+    my $op = 'data';
+    if ($Format =~ /ps|gif/){
+	if ($rank == 1){
+	    $op = 'line';
+	} elsif ($rank == 2){
+	    $op = 'shade';
+	} else {
+	    die "Can only plot 1 or 2d data.  Explicitly declare any ranges.\n";
+	}
+    }
+    my $xmlHead=qq{<?xml version="1.0"?><lasRequest href="file:las.xml"><link match="/lasdata/operations/$op" /><properties><ferret><format>$Format</format><size>.5</size></ferret></properties><args><link match="/lasdata/datasets/$ARGV[1]/variables/$ARGV[2]"></link><region>};
+    my $xml = $xmlHead . $xmlMid . $xmlTail;
+    return 'xml=' . uri_escape($xml);
+}
+
+sub usage {
+    print STDERR "Usage: lasget.pl [-x xrange ] [-y yrange] [-z zrange] \n";
+    print STDERR "                 [-t trange] [-f format] [-o file] \n";
+    print STDERR "                 url dataset variable\n";
+    print STDERR "       -x xrange      x range of data (-120, -120:80)\n";
+    print STDERR "       -y yrange      y range of data (0, 0:90)\n";
+    print STDERR "       -z zrange      z range of data (0, 0:20)\n";
+    print STDERR "       -t trange      time range of data (1992-Dec-10, 1992-Jan-1:1992-Dec-1)\n";
+    print STDERR "       -o file        output file. Defaults to stdout\n";
+    print STDERR "       -f format      output format asc|cdf|txt|ps|gif\n";
+    print STDERR "                          asc = 'FORTRAN formatted' text output\n";
+    print STDERR "                          cdf = NetCDF file (default)\n";
+    print STDERR "                          txt = 'Quick Inspection' text output\n";
+    print STDERR "                           ps = PostScript output\n";
+    print STDERR "                          gif = HTML page referencing a .gif image\n";
+    print STDERR "\n";
+    print STDERR "       url            URL of LAS server\n";    
+    print STDERR "       dataset        name of dataset\n";    
+    print STDERR "       variable       name of variable\n";    
+    print STDERR "\n";
+    print STDERR "       example:  lasget.pl -x -10:10 -y -30:-20 -z 0 -f txt -o salt.txt http://your.server.host.name/las-bin/LASserver.pl levitus_climatology_cdf salt\n";
+    print STDERR "\n";
+    exit 1;
+}
+
+# TODO -- arg error checking
+
+use Getopt::Std;
+getopts('x:y:z:t:o:f:', \%Opts);
+$Format = $Opts{f};
+$Format = 'cdf' if ! $Format;
+if ($Format !~ /asc|cdf|txt|ps|gif/){
+    die "Unknown format: $Format\n";
+}
+if ($Opts{o}){
+    my $file = $Opts{o};
+    open OUTFILE, ">$file" || die "Can't open output file $file\n";
+    $Outfile = \*OUTFILE;
+}
+foreach my $range (qw(x y z t)){
+    $Ranges{$range} = $Opts{$range} if $Opts{$range};
+}
+
+if ($#ARGV != 2){
+    usage;
+}
+issueRequest($ARGV[0], genXML);
+
+
+
+

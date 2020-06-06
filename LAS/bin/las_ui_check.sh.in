@@ -1,0 +1,90 @@
+#!/bin/sh
+
+# las_ui_check
+###############################################################
+#
+# A script that checks whether an LAS UI server is responding 
+# to requests, and if not, automatically reboots it and 
+# notifies the administrator(s).
+#
+# Based on gds_check written by Joe Wielgosz and Don Hooper
+#
+# If set as a cron job, this script can be temporarily 
+# disabled by creating a file with the name 
+# "block_las_check" in this directory.
+#
+###############################################################
+
+# Uses the following system commands:
+GET_URL="get_las_page.pl"
+MAIL="mail"
+RM="rm -f"
+ECHO="echo"
+CMP="cmp"
+PWD="pwd"
+
+# Default settings for filenames
+TMP_FILE=las_check_page
+SKIP_FILE=block_las_check
+LAS_CORRECT_OUTPUT=las_datasets_page
+
+LAS_DIR=@PWD@/bin
+LAS_URL=http://@SERVLET_ROOT_URL/@UIPATH@/servlets/dataset
+ADMIN_EMAIL="@ADMIN_EMAIL@"
+
+cd $LAS_DIR
+
+las_down() {
+
+        $RM las_check_page
+        $ECHO `date`: LAS UI server is down! restarting it.
+
+        $MAIL -s "LAS UI server restarted automatically" \
+            "$ADMIN_EMAIL" \
+            <<-END_OF_MSG
+        Checked $LAS_URL at `date` and got no response.
+        Restarting server at $LAS_URL.
+END_OF_MSG
+
+	cd ..
+
+        ./rebootserver.sh
+	exit;
+}
+
+las_up() {
+        $RM las_check_page
+        $ECHO `date`: LAS UI server is running
+	exit;
+}
+
+las_skip() {
+        $ECHO LAS check skipped
+        exit;
+}
+
+cd $LAS_DIR
+
+if [ -f $SKIP_FILE ] ; then
+    las_skip
+fi
+
+$LAS_DIR/$GET_URL $LAS_URL $TMP_FILE
+STATUS=$?  # save exit status for evaluation (not used by this script)
+
+if [ -s $TMP_FILE ] ; then  # we have a non-zero length output to check
+
+#
+# compare output with output from when LAS is known to be operational
+#
+ $CMP $TMP_FILE $LAS_CORRECT_OUTPUT
+ STATUS=$?
+ if [ $STATUS -eq 0 ] ; then
+     las_up
+ else
+     las_down
+ fi
+
+else # if there was a non-zero length output from lynx above; otherwise below
+	las_down
+fi

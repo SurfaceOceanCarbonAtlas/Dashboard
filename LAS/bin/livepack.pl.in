@@ -1,0 +1,740 @@
+#!@PERL@ -w
+#
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+# $Id: livepack.pl.in,v 1.4 2005/03/21 23:47:34 callahan Exp $
+use strict;
+use Config;
+use lib ('../xml/perl','.', '..', '../xml/perl/install/lib/' . $Config{version},
+         '../xml/perl/install/lib/site_perl/' . $Config{version},
+         '../xml/perl/install/lib/perl5/' . $Config{version},
+         '../xml/perl/install/lib/perl5/site_perl/' . $Config{version});
+my $VERSION = "1.0.0";
+use Getopt::Long;
+use LAS;
+use LASUI;
+use File::PathConvert qw(rel2abs splitdirs);
+use File::Copy;
+use File::Basename;
+require('LAS_config.pl');
+require('config.results');
+
+die "livepack.pl must be run from <lasxml>/server directory"
+    if ! -d '../server' && ! -d '../xml/perl';
+
+sub doCom {
+    my ($com) = @_;
+    my $results = `$com`;
+    die $results if $results;
+}
+
+package Installer;
+use File::Basename;
+use File::PathConvert qw(abs2rel rel2abs);
+use File::Copy;
+use URI::URL;
+use LWP::UserAgent;
+
+sub new {
+    my ($class,$urlName) = @_;
+    my $self = {};
+    bless $self,$class;
+    my $url = new URI::URL($urlName);
+    my $scheme = $url->scheme;
+    my $file = $url->path;
+    if ($scheme){
+	if ($scheme eq 'http'){
+	    $file = $self->downloadFile($url);
+	} elsif ($scheme eq 'file'){ # Do nada
+	} else {
+	    die "Unsupported url: $url; only http and file protocols supported";
+	}
+    }
+    die "Can't find installation file: $file" if ! -f $file;
+    $self->{file} = rel2abs($file);
+    $self->{dir} = "/tmp/liveinstall$$";
+    mkdir($self->{dir},0777) or die "Can't create temp dir:",$self->{dir};
+    return $self;
+}
+
+sub downloadFile {
+    my ($self,$url) = @_;
+    my $file = "/tmp/livepackdownload$$";
+    $self->{removeFile} = $file;
+    print "Downloading $url...\n";
+    my $req = new HTTP::Request('GET', $url);
+    my $ua = new LWP::UserAgent;
+    my ($resp, $loc);
+    $resp = $ua->request($req);
+    my $isOK = 0;
+    my $result = "";
+    if ($resp->is_success){
+	$result = $resp->content;
+	open OUTPUT, ">$file" or die "Can't open file $file";
+	print OUTPUT $result;
+	close OUTPUT;
+    } else {
+	die "Couldn't download URL: $url: ", $resp->message, "\n";
+    }
+    return $file;
+}
+
+sub install {
+    my ($self, @skipList) = @_;
+    umask(0022);
+    my $com = "cd " . $self->{dir} . " && tar xf " . $self->{file};
+    my $results = `$com`;
+    die $results if $results;
+
+#
+# Make all files readable by anyone
+    $com = "cd " . $self->{dir} . " && chmod -R a+r .";
+    $results = `$com`;
+    die $results if $results;
+    
+
+#
+# Get the package manifest
+    my $manifestFile = $self->{dir} . "/manifest.xml";
+    die "Invalid package: missing manifest.xml" if ! -r $manifestFile;
+    my $parser = new LAS::Parser($manifestFile);
+    my $manifest = new LAS::PackageManifest($parser);
+    $manifest->validateFiles($self->{dir});
+    my $isFull = ($manifest->getAttribute('isfull') eq "1");
+    if ($isFull){
+	print "Installing LAS UI and data server...\n";
+    } else {
+	print "Installing LAS UI server...\n";
+    }
+    my $cwd = rel2abs('.');
+
+# Create directories
+    my $packDirName = rel2abs("../packages/" . $manifest->getPackageDirName);
+    if (-d $packDirName){
+	die <<EOL;
+This package is already installed.
+If you want to upgrade this package you need to first uninstall this
+package (by using the --uninstall option of this program).
+EOL
+    }
+    my $packDir = rel2abs("../packages");
+    if (! -d $packDir){
+	mkdir($packDir,0777) or
+	    die "Couldn't create packages directory: $packDir";
+    }
+    mkdir($packDirName, 0777) or
+	die "Couldn't create directory: $packDirName";
+#
+# Unpack the package file in the packages directory
+#
+
+    $com = "cd " . $packDirName . " && tar xf " . $self->{file};
+    $results = `$com`;
+    die $results if $results;
+
+#
+# Only use requested datasets
+#
+    {
+	chdir($packDirName) or die "Couldn't chdir to $packDirName: $!";
+	my $xmlfile = $manifest->getAttribute('xmlfile');
+	die "Corrupted manifest: no xmlfile attribute" if ! $xmlfile;
+	die "Corrupted manifest: can't find file $xmlfile" if ! -r $xmlfile;
+	my $parser = new LAS::Parser($xmlfile);
+	my $config = new LAS::Config($parser);
+	foreach my $dataset ($config->getChildren){
+	    my $name = $dataset->getLongName;
+	    foreach my $skip (@skipList){
+		if ($name =~ /$skip/){
+		    print "Skipping dataset $name...\n";
+		    my $e = $dataset->getElement;
+		    $e->getParentNode->removeChild($e);
+		    last;
+		}
+	    }
+	}
+	if ($isFull){		# Rewrite URL if full server installation
+	    my @ops = $config->getOps;
+	    die "No operations defined" if $#ops < 0;
+	    my $opNode = $ops[0]->getElement->getParentNode;
+	    $opNode->setAttribute("url", $main::LasConfig{fullpath});
+	}
+	open OUTPUT, ">$xmlfile" or
+	    die "Couldn't open $packDirName/$xmlfile for write";
+	print OUTPUT $config->toXML;
+	close OUTPUT;
+	chdir($cwd) or die "Couldn't chdir to $cwd: $!";
+    }
+
+
+# Need to rewrite url attribute of <operations> if a full
+# (i.e. data server) install is perpetrated on this server
+    if ($isFull){
+	my $xmlfile = $manifest->getAttribute('xmlfile');
+	die "Corrupted manifest: no xmlfile attribute" if ! $xmlfile;
+	die "Corrupted manifest: can't find file $xmlfile" if ! -r $xmlfile;
+	chdir($packDirName) or die "Couldn't chdir to $packDirName: $!";
+	my $parser = new LAS::Parser($xmlfile);
+	my $config = new LAS::Config($parser);
+  	my @ops = $config->getOps;
+  	die "No operations defined" if $#ops < 0;
+  	my $opNode = $ops[0]->getElement->getParentNode;
+  	$opNode->setAttribute("url", $main::LasConfig{fullpath});
+	open OUTPUT, ">$xmlfile" or
+	    die "Couldn't open $packDirName/$xmlfile for write";
+	print OUTPUT $config->toXML;
+	close OUTPUT;
+	chdir($cwd) or die "Couldn't chdir to $cwd: $!";
+    }
+
+
+#
+# Make all files readable by anyone
+    $com = "cd " . $packDirName . " && chmod -R a+r .";
+    $results = `$com`;
+    die $results if $results;
+    
+
+#
+# Copy files for access by data server (if full package)
+#
+    if ($isFull){
+	my $datadir = rel2abs("packages");
+	if (! -d $datadir){
+	    mkdir $datadir,0777 or die "Couldn't create directory: $datadir";
+	}
+	my $dataPackDir = $datadir . "/" . $manifest->getPackageDirName;
+	if (! -d $dataPackDir){
+	    mkdir $dataPackDir,0777 or die "Couldn't create directory $dataPackDir";
+	}
+	$com = "cd " . $dataPackDir . " && tar xf " . $self->{file};
+	$results = `$com`;
+	die $results if $results;
+    }
+    
+#
+# Remove temp files
+#
+    
+    $com = "rm -rf " . $self->{dir};
+    $results = `$com`;
+    die $results if $results;
+    unlink $self->{removeFile} if $self->{removeFile};
+    
+#
+# Update packages.xml
+#
+    my $xmlfile = basename($manifest->getAttribute("url"));
+    if (-f 'packages.xml'){
+	open INPUT, 'packages.xml' or die "$!";
+	my $found = 0;
+	while(<INPUT>){
+	    if (/$packDirName/){
+		$found=1;
+	    }
+	}
+	close INPUT;
+	if (!$found){
+	    copy 'packages.xml', "/tmp/packages$$.xml" or
+		die $!;
+	    open INPUT, "/tmp/packages$$.xml" or die $!;
+	    open OUTPUT, ">packages.xml" or die $!;
+	    my $newpack = <<EOL;
+<!-- Automatically generated. Do not edit -->
+<laspackages>
+    <package base="$packDirName">
+        <config name="$xmlfile"/>\
+    </package>
+EOL
+	    while(<INPUT>){
+		s/<laspackages>\n/$newpack/;
+		print OUTPUT if $_ !~ /^\s*$/;
+	    }
+	    close INPUT;
+	    close OUTPUT;
+	    unlink("/tmp/packages$$.xml");
+	}
+    } else {
+	open OUTPUT, ">packages.xml" or die "Couldn't write to packages.xml";
+	print OUTPUT <<EOL;
+<!-- Automatically generated. Do not edit -->
+<laspackages>
+    <package base="$packDirName">
+        <config name="$xmlfile"/>
+    </package>
+</laspackages>
+EOL
+    close OUTPUT;
+    }
+
+
+#
+# Message to user
+#
+    print <<EOL;
+Installation completed successfully.
+The package will be included in your LAS server 
+the next time you run genLas.pl.
+EOL
+
+}
+
+package HTML::MyParser;
+use HTML::Parser;
+#@HTML::MyParser::ISA=qw(HTML::Parser);
+use base 'HTML::Parser';
+
+#
+# Override HTML parser methods
+# 
+sub start {
+    my($self, $tagname, $attr, $attrseq, $origtext) = @_;
+    if (lc($tagname) eq "img"){
+	if ($attr->{src}){
+	    my $src = $attr->{src};
+	    if ($src !~ /^http|^ftp/){
+		if ($src =~ /^\//){
+		    warn "Can't get image: $src :",
+		    " <img> must have relative, not full, path";
+		} else {
+		    $self->addImg($attr->{src});
+		}
+	    }
+	}
+    }
+}
+
+sub addImg {
+    my ($self, $src) = @_;
+    $self->{imgs} = [] if ! $self->{imgs};
+    push(@{$self->{imgs}}, $src);
+}
+
+sub getImages {
+    return @{$_[0]->{imgs}};
+}
+
+package main;
+use File::PathConvert qw(abs2rel rel2abs);
+# Use the user interface info in ui.xml to get
+# a LiveMap image for a variable
+sub getImage {
+    my ($ui,$var) = @_;
+    my $props = $var->getProperties('ui');
+    my $jsVarName = $var->getAttribute('js');
+    if (!($props || $jsVarName)){
+	$props = $var->getDataset->getProperties('ui');
+	$jsVarName = $var->getDataset->getAttribute('js');
+    }
+	
+    my $default;
+    if ($props){
+	my $uiprop = $props->{default};
+	my $url = new URI::URL($uiprop);
+	if ($url->scheme ne 'file' || $url->path ne 'ui.xml'){
+	    die "UI property in '$url' must refer to file:ui.xml";
+	}
+	$default = $url->frag;
+	die "'$url' missing reference to UI map" if ! $default;
+	$default =~ s/^#//;
+    }
+    $default = defined($default) ? $default : $jsVarName;
+    $default = "" if ! defined($default);
+    my $defObj = $ui->getDefaultByName($default);
+    die "Internal error: ui.xml doesn't have definition for default: $default"
+	if ! $defObj;
+    foreach my $map ($defObj->getChildren){
+	my $type = $map->getAttribute('type');
+	if ($type eq 'livemap'){
+	    my $image;
+	    foreach my $child ($map->getChildren){
+		if ($child->getName eq 'image'){
+		    my $href = $child->getAttribute('href');
+		    $href =~ s/^#//;
+		    die "<image> missing href" if ! $href;
+		    $image = $LAS::UI::Generator::Images{$href};
+		    return $image->getAttribute('url');
+		}
+	    }
+	}
+    }
+}
+
+#
+# Get all of the external entity references in a XML file
+#
+
+my %ExternHash;
+sub entHandler {
+    $ExternHash{$_[2]} = 1;
+    &XML::Parser::file_ext_ent_handler(@_);
+}
+
+sub getExternEnts {
+    my $file = shift;
+    %ExternHash = ();
+    my $parser = new XML::Parser;
+    my $junk;
+    $parser->setHandlers(ExternEnt => \&entHandler);
+    $parser->parsefile($file, ErrorContext => 3);
+    keys %ExternHash;
+}
+    
+    
+
+sub addAllHTML {
+    my @rvals = ();
+    foreach my $file (@_){
+	push(@rvals, abs2rel($file));
+	$file = "../" . $file;
+	my $parser = HTML::MyParser->new();
+	$parser->parse_file($file);
+	warn "Can't find HTML file: $file : $!" if $!;
+	push(@rvals, map {"ui/" . $_} $parser->getImages);
+    }
+    return (@rvals);
+}
+
+
+
+
+sub listDatasets {
+    my ($package) = @_;
+    my $cwd = rel2abs('.');
+    foreach my $file ($package->getFiles){
+	my $newdir = dirname($file);
+	chdir($newdir) or die "Can't chdir to $newdir: $!";
+	my $parser = new LAS::Parser($file);
+	my $config = new LAS::Config($parser);
+	foreach my $dataset ($config->getChildren){
+	    print "\t",$dataset->getLongName, "\n";
+	}
+	chdir($cwd) or die "Can't chdir to $cwd: $!";
+    }
+}
+
+#
+# List all installed packages
+#
+
+sub listPackages {
+    my ($long) = @_;
+    my $parser = new LAS::Parser('packages.xml');
+    my $root = new LAS::PackageConfig($parser);
+    foreach my $package ($root->getChildren){
+	my $base = $package->getAttribute("base");
+	print "$base\n";
+	listDatasets($package) if $long;
+    }
+}
+
+#
+# Uninstall a package
+#
+sub uninstallPackage {
+    my ($pname) = @_;
+    my $parser = new LAS::Parser('packages.xml');
+    my $root = new LAS::PackageConfig($parser);
+    my $thePackage;
+    foreach my $package ($root->getChildren){
+	my $base = $package->getAttribute("base");
+	if ($base eq $pname){
+	    $thePackage = $base;
+	    $root->removeChild($package);
+	    last;
+	}
+    }
+    die "Package $pname doesn't appear to be installed" if ! $thePackage;
+    die "Package $pname isn't a valid package name"
+	if $pname !~ /\/packages\//;
+    print "Uninstalling $pname...\n";
+    $pname =~ s/^file://;
+    my $uiloc = $pname;
+    $uiloc =~ s/\/packages\//\/ui\/packages\//;
+    my $servloc = $pname;
+    $servloc =~ s/\/packages\//\/server\/packages\//;
+    my $results = `rm -rf $pname $uiloc $servloc`;
+    die "Error removing package: $results\n" if $results;
+
+    open OUTPUT, ">/tmp/newpackage.xml$$"
+	or die "Can't open /tmp/newpackage.xml$$";
+    print OUTPUT $root->toXML;
+    close OUTPUT;
+    copy("/tmp/newpackage.xml$$", "packages.xml")
+	or die "Can't update packages.xml: $!";
+    unlink("/tmp/newpackage.xml$$");
+
+    print <<EOL;
+Package $pname uninstalled.
+You now need to rerun genLas.pl.
+EOL
+}
+
+#
+# Query an existing package file
+#
+
+sub queryPackage {
+    my $file = $ARGV[0];
+    $file = rel2abs($file);
+    my $dir = "/tmp/livequery$$";
+    die "Can't find package file: $file" if ! -r $file;
+    mkdir($dir,0777) or die "Can't create temp dir:",$dir;
+    
+    my $cwd = rel2abs('.');
+    chdir($dir) or die "Can't chdir $dir: $!";
+    doCom("tar xf $file");
+    my $parser = new LAS::Parser('manifest.xml');
+    my $manifest = new LAS::PackageManifest($parser);
+    $manifest->validateFiles($dir);
+    my $xmlfile = $manifest->getAttribute('xmlfile');
+
+    $parser = new LAS::Parser($xmlfile);
+    my $config = new LAS::Config($parser);
+    print "Datasets in $file:\n";
+    foreach my $dataset ($config->getChildren){
+	print "\t",$dataset->getLongName, "\n";
+    }
+
+    doCom("rm -rf $dir");
+    chdir($cwd);
+}
+
+#
+# Create a new package
+#
+sub createPackage {
+    my ($isFull) = @_;
+    $isFull = 0 if ! defined($isFull);
+    my ($pfile, $xmlfile) = @ARGV;
+    die "Can't find XML config file: $xmlfile" if ! -f $xmlfile;
+    die "Can't find user interface XML config file: ui.xml"
+	if ! -f 'ui.xml';
+
+# Get images/custom HTML files from UI spec
+    my %imageHash;
+    my %customHash;
+    my $uifile = 'ui.xml';
+    my $parser = new LAS::Parser($xmlfile);
+    my $config = new LAS::Config($parser);
+    
+    my $uiparser = new LAS::Parser($uifile);
+    my $ui = new LAS::UI::Generator($uiparser);
+    foreach my $dataset ($config->getChildren){
+	foreach my $var ($dataset->getChildren){
+	    my $props = {};
+	    $props = &LAS::mergeProperties($props,
+			   scalar $config->getProperties('custom'),
+			   scalar $dataset->getProperties('custom'),
+			   scalar $var->getProperties('custom'));
+	    my $customURL = $props->{url};
+	    $customHash{'ui/' . $customURL} = 1 if $customURL;
+
+	    my $imageName = getImage($ui,$var);
+	    $imageHash{$imageName} = 1;
+	}
+    }
+    my @images =  keys %imageHash;
+    my @custom = keys %customHash;
+    @custom = addAllHTML(@custom);
+
+    my @files = ($xmlfile, $uifile);
+
+# Get external entities in XML files
+    push(@files,getExternEnts($xmlfile));
+    push(@files, getExternEnts($uifile));
+#    warn "debug: ", join(',',@files);
+
+# Create manifest file
+    my $dirname = "/tmp/livepack$$";
+    my $manfile = "manifest.xml";
+    my $filename = "$dirname/$manfile";
+    my @serverFiles = ();
+
+    my $custom = "";
+    if ($LAS::Server::Config{custom_include}){
+	$custom = $LAS::Server::Config{custom_include};
+    }
+#
+# Full server packages only work for Ferret, and then only occasionally.
+# All the .tmpl, .jnl, .pl, and .pm files are snatched from the jnls
+# directory and any configured custom directory, and then we hope for 
+# the best. If non-standard external functions are defined, or non-standard 
+# .jnl files outside of the specified directories, or additional data files,
+# or if the user has hacked the shipped LAS code -- we're screwed.
+# Bugzilla 406: Also pick up .des, .spk files
+    if ($isFull){
+	push(@serverFiles, <jnls/*.jnl>);
+	push(@serverFiles, <jnls/*.tmpl>);
+        push(@serverFiles, <jnls/*.spk>);
+        push(@serverFiles, <jnls/*.des>);
+	if ($LAS::Server::Config{custom_include}){
+	    my $dir = $LAS::Server::Config{custom_include};
+	    my @dirs = splitdirs($dir);
+	    my $path = "";
+	    foreach my $dir (@dirs){
+		if ($path){
+		    $path .= "/$dir";
+		} else {
+		    $path = "$dir";
+		}
+		push(@serverFiles, <$path/*.jnl>);
+		push(@serverFiles, <$path/*.tmpl>);
+		push(@serverFiles, <$path/*.spk>);
+		push(@serverFiles, <$path/*.des>);
+		push(@serverFiles, <$path/*.pl>);
+		push(@serverFiles, <$path/*.pm>);
+	    }
+	}
+	@serverFiles = map { $_ = "server/$_"} @serverFiles;
+    }
+    my @allfiles = (@files,@images,@custom,$manfile,@serverFiles);
+
+    mkdir $dirname, 0777 or die "Can't create $dirname";
+    my $uipath = "http://" . $main::LasConfig{hostname} . $main::LasConfig{uipath};
+    my $version = $LAS::VERSION ? $LAS::VERSION : "6.5";
+    my $date = scalar localtime;
+    open OUT, ">$filename" or die "Can't write manifest file $filename";
+    print OUT <<EOL;
+<packageinfo url="$uipath/$xmlfile" lasversion="$version" version="$VERSION" date="$date" isfull="$isFull" xmlfile="$xmlfile" custom="$custom">
+EOL
+    foreach (@allfiles){
+	print OUT qq{    <file name="$_"/>\n};
+    }
+    print OUT "</packageinfo>\n";
+
+    close OUT;
+
+    my $base = rel2abs('..');
+    my $comm = qq{tar chf $pfile } . join(' ',@files) .
+               qq{ -C $base/las_servlet/web/classes } . join(' ',@images) .
+	       qq{ -C $dirname $manfile};
+    if ($#custom >= 0){
+	$comm .= qq{ -C $base } . join(' ',@custom);
+    }
+    if ($#serverFiles >= 0){
+	$comm .= qq{ -C $base } . join(' ',@serverFiles);
+    }
+#    warn $comm;
+    my $status = `$comm`;
+    if ($status){
+	die "Command '$comm' failed\n",
+	"Message: $status";
+    }
+    print "Created livepack file: $pfile\n";
+    unlink($filename) or warn "Couldn't remove $filename";
+    rmdir $dirname or warn "Couldn't remove $dirname";
+}
+
+sub execCheck {
+    my @path = split(':', $ENV{PATH});
+    foreach my $file (@_){
+	foreach my $path (@path){
+	    return if -x "$path/$file";
+	}
+	die "Can't find required executable: $file";
+    }
+}
+
+sub usage {
+    print <<EOL;
+Usage:
+    livepack.pl --install [--skip dnameexp [--skip dnameexp]]
+                          package_file [package_file] ...
+        Install a LiveAccess package from file or URL package_file.
+        --skip Don't install datasets with names matching regular expression
+               dnameexp
+
+    livepack.pl --uninstall package_name [package_name] ...
+        Uninstall the package(s) with the given name(s).
+
+    livepack.pl [--l] --list
+        List the names of all installed packages
+	--l long format (lists datasets in packages)
+
+    livepack.pl --query package_file
+        Lists all of the datasets in a package file
+
+    livepack.pl --create [--full] package_file las_config_file
+        Create a LiveAccess package in file package_file from LAS
+        configuration file config_file. 
+        --full create both a user interface server and data server
+
+livepack.pl can be used to create a package file that, when installed,
+creates a LAS user interface server on the server where the package
+is installed. All data server requests from this user interface
+are forwarded to the server on which the livepack was created.
+
+If the --full option is specified, then installation of a
+livepack will create both a user interface and a data server on
+the server where the package is installed. Note that a full
+package will only work if Ferret is used as the visualization program.
+Also note that a full package is less likely to run since educated
+guesses have to be made about what files to include in the
+package and these guesses may be wrong. Caveat emptor.
+EOL
+    exit 1;
+}
+
+my $Op = 0;
+my $Full = 0;
+my $Long = 0;
+my @Skip = ();
+&GetOptions('install' => sub {$Op = 1},
+	    'uninstall' => sub {$Op = 2},
+	    'create' => sub {$Op = 3},
+	    'list' => sub {$Op = 4},
+	    'query' => sub {$Op = 5},
+	    'full' => sub {$Full = 1},
+	    'l' => sub {$Long = 1},
+            'skip=s', \@Skip );
+
+if ($Op != 3 && $Full){
+    usage;
+}
+if ($Op != 4 && $Long){
+    usage;
+}
+execCheck(qw(tar rm cp chmod));
+if ($Op == 1){
+    usage if $#ARGV < 0;
+    foreach my $file (@ARGV){
+	my $installer = new Installer($file);
+	$installer->install(@Skip);
+    }
+    exit 0;
+}
+usage if ($#Skip >= 0);
+
+if ($Op == 2){
+    usage if $#ARGV < 0;
+    foreach my $file (@ARGV){
+	uninstallPackage($file);
+    }
+    exit 0;
+}
+
+if ($Op == 3){
+    usage if $#ARGV < 1;
+    createPackage($Full);
+    exit 0;
+}
+
+if ($Op == 4){
+    usage if $#ARGV >= 0;
+    listPackages($Long);
+    exit 0;
+}
+
+if ($Op == 5){
+    usage if $#ARGV != 0;
+    queryPackage;
+    exit 0;
+}
+
+usage;
+

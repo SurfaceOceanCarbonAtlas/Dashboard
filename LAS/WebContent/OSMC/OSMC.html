@@ -1,0 +1,486 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<title>OSMC.html</title>
+		<style>
+.list_items {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+.list_items li {
+	margin: 3px;
+	padding: 0.4em;
+	font-size: .8em;
+	height: 12px;
+}
+</style>
+		<link type="text/css"
+			href="css/ui-lightness/jquery-ui-1.8.13.custom.css" rel="stylesheet" />
+		<script type="text/javascript" src="js/jquery-1.5.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.8.13.custom.min.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+		<script type="text/javascript">
+$(function() {
+     var query_base = "SELECT Location FROM 980103 ";
+     var table = 980103;
+     var country_query = "";
+	// Accordion
+	$("#accordion").accordion( {
+		header : "h3",
+		autoHeight: false,
+		collapsible: true
+	});
+
+	// Check boxes and drag selection listeners to keep the info box up-to-date ...
+	// for countries
+	$('#countries')
+			.find(":checkbox")
+			.change(
+					function() {
+						var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>Countries Selected: </strong>";
+						var count = 0;
+						$("#countries li").each(function(idx) {
+							if ($(this).find(":checkbox").attr('checked')) {
+								if (count > 0) {
+                                    title += ", ";
+                                }
+                                count++;
+                                title += jQuery.trim($(this).text());
+							}
+						});
+						if ( count == 0) {
+						    title += "All";
+						}
+						title += "</p>";
+						$("#countries-highlight").html(title);
+                        setLayers();
+					});
+	$("#countries")
+			.selectable(
+					{
+						selected : function(event, ui) {
+							var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>Countries Selected: </strong>";
+							var count = 0;
+							$(ui.unselected).find(":checkbox").attr('checked',true);
+							$("#countries li").each(function(idx) {
+								if ($(this).find(":checkbox").attr('checked')) {
+								   if (count > 0) {
+                                       title += ", ";
+                                   }
+                                   count++;
+                                   title += jQuery.trim($(this).text());
+								}
+							});
+							
+							if ( count == 0 ) {
+							    title += "All";
+							}
+							title += "</p>";
+							$("#countries-highlight").html(title);
+							setLayers();
+						},
+						unselected : function(event, ui) {
+							var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>Countries Selected: </strong>";		
+							var count = 0;
+							$(ui.unselected).find(":checkbox").attr('checked', false);
+							$("#countries li").each(function(idx) {
+								if ($(this).find(":checkbox").attr('checked')) {
+									if (count > 0) {
+                                        title += ", ";
+                                    }
+                                    count++;
+                                    title += jQuery.trim($(this).text());
+								}
+							});
+							
+							if ( count == 0 ) {
+							    title += "All";
+							}
+							title += "</p>";
+							$("#countries-highlight").html(title);
+							setLayers();
+						}
+					});
+
+	// for platforms
+
+	$('#platforms')
+			.find(":checkbox")
+			.change(
+					function() {
+						var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>Platforms Selected: </strong>";
+						var count = 0;
+						$("#platforms li").each(function(idx) {
+							if ($(this).find(":checkbox").attr('checked')) {
+								if (count > 0) {
+                                    title += ", ";
+                                }
+                                count++;
+                                title += jQuery.trim($(this).text());
+							}
+						});
+						if ( count == 0 ) {
+						    title += "All";
+				        }
+				        title += "</p>";
+						$("#platforms-highlight").html(title);
+						setLayers();
+					});
+	$("#platforms")
+			.selectable(
+					{
+						selected : function(event, ui) {
+							$(ui.selected).find(":checkbox").attr('checked', true);
+							var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>platforms Selected: </strong>";
+							var count = 0;
+							$("#platforms li").each(function(idx) {
+								if ($(this).find(":checkbox").attr('checked')) {
+									if (count > 0) {
+                                        title += ", ";
+                                    }
+                                    count++;
+                                    title += jQuery.trim($(this).text());
+								}
+							});
+							title += "</p>";
+							if ( count == 0 ) {
+							    title += "All";
+							}
+							title += "</p>";
+							$("#platforms-highlight").html(title);
+							setLayers();
+						},
+						unselected : function(event, ui) {
+							var title = "<p><span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: .3em;\"></span><strong>Platforms Selected: </strong>";
+							$(ui.unselected).find(":checkbox").attr('checked', false);
+							var count = 0;
+							$("#platforms li").each(function(idx) {
+								if ($(this).find(":checkbox").attr('checked')) {
+									if (count > 0) {
+                                        title += ", ";
+                                    }
+                                    count++;
+                                    title += jQuery.trim($(this).text());
+								}
+							});
+							title += "</p>";
+							$("#platforms-highlight").html(title);
+							setLayers();
+						}
+					});
+function setLayers() {
+    for( var l = 0; l < layers.length; l++ ) {
+        layers[l].setMap(null);
+    }
+    layers.length = 0;
+    var platform_ids = new Array();
+    var i = 0;
+    $("#platforms li").each(function(platform_idx) {
+    if ( $(this).find(":checkbox").attr('checked')) {
+        platform_ids[i] = jQuery.trim($(this).attr('id'));
+        i++;
+    }
+    });
+    var country_ids = new Array();
+    var j = 0;
+    $("#countries li").each(function(country_idx) {
+        if ( $(this).find(":checkbox").attr('checked')) {
+            country_ids[j] = jQuery.trim($(this).attr('id'));
+            j++
+        }
+    });
+    if ( platform_ids.length > 0 && country_ids.length > 0 ) {
+        for( var i = 0; i < country_ids.length; i++ ) {
+            for (var j = 0; j < platform_ids.length; j++ ) {
+                var query = query_base + " WHERE " + "Country='"+country_ids[i]+"' AND Platform_type='"+platform_ids[j]+"'";
+                var layer = new google.maps.FusionTablesLayer(table);
+                layer.setQuery(query);
+                layer.setMap(map);
+                layers.push(layer);
+            }
+        }
+    } else if ( platform_ids.length > 0 && country_ids.length <= 0 ) {
+        for (var j = 0; j < platform_ids.length; j++ ) {
+            var query = query_base + " WHERE " + "Platform_type='"+platform_ids[j]+"'";
+            var layer = new google.maps.FusionTablesLayer(table);
+            layer.setQuery(query);
+            layer.setMap(map);
+            layers.push(layer);
+        }        
+    } else if ( platform_ids.length <= 0 && country_ids.length > 0 ) {
+        for( var c = 0; c < country_ids.length; c++ ) {
+            var query = query_base + " WHERE " + "Country='"+country_ids[c]+"'";
+            var layer = new google.maps.FusionTablesLayer(table);
+            layer.setQuery(query);
+            layer.setMap(map);
+            layers.push(layer);
+        }
+    } else {
+         var layer = new google.maps.FusionTablesLayer(table);
+         layer.setQuery(query_base);
+         layer.setMap(map);
+         layers.push(layer);
+    }
+}			
+					
+var myLatlng = new google.maps.LatLng(0, 0);
+var myOptions = {
+  zoom: 2,
+  center: myLatlng,
+  mapTypeId: google.maps.MapTypeId.SATELLITE
+}
+ 
+var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);			
+var layers = new Array();
+var layer = new google.maps.FusionTablesLayer(table);
+layer.setQuery(query_base);
+layer.setMap(map);
+layers.push(layer);
+					
+});
+
+
+
+
+</script>
+		<meta http-equiv="keywords"
+			content="Ocean Data, Ocean Monitoring, Bouys, Ships, Observations">
+		<meta http-equiv="description"
+			content="This is an interface in the Observing System Monitoring Center data collection with an interactive map.">
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+		<!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+
+	</head>
+
+	<body>
+		<img src="images/jcomm.jpg" alt="Observing System Monitoring Center" />
+
+		<table>
+			<tr>
+				<td colspan="2">
+					
+					<div class="ui-widget">
+						<div id="platforms-highlight"
+							class="ui-state-highlight ui-corner-all"
+							style="margin-top: 5px; padding: 0 .2em; font-size: .65em;">
+							<p>
+								<span class="ui-icon ui-icon-info"
+									style="float: left; margin-right: .3em;"></span>
+								<strong>Platforms Selected: </strong>All
+							</p>
+						</div>
+					</div>
+					
+					<div class="ui-widget">
+						<div id="countries-highlight"
+							class="ui-state-highlight ui-corner-all"
+							style="margin-top: 5px; padding: 0 .2em; font-size: .65em;">
+							<p>
+								<span class="ui-icon ui-icon-info"
+									style="float: left; margin-right: .3em;"></span>
+								<strong>Countries Selected: </strong>All
+							</p>
+						</div>
+					</div>
+					
+				</td>
+			</tr>
+			<tr>
+				<td width="330px" height="512px">
+					<div id="accordion">
+
+						<h3>
+							<a href="#">Platform</a>
+						</h3>
+						<div>
+							<ol id="platforms" class="list_items">
+								<li id="DRIFTING BUOYS">
+									<input type="checkbox" id="DRIFTING BUOYS-CB" />
+									Drifting Buoys
+								</li>
+								<li id="ICE BUOYS">
+									<input type="checkbox" id="ICE BUOYS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Ice Buoys
+								</li>
+								<li id="HURRICANE DRIFTERS">
+									<input type="checkbox" id="HURRICANE DRIFTERS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Hurricane Drifters
+								</li>
+								<li id="MOORED BUOYS">
+									<input type="checkbox" id="MOORED BUOYS-CB" />
+									Moored Buoys
+								</li>
+								<li id="CLIMATE REFERENCE MOORED BUOYS">
+									<input type="checkbox" id="CLIMATE REFERENCE MOORED BUOYS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Climate Reference Stations
+								</li>
+								<li id="TROPICAL MOORED BUOYS">
+									<input type="checkbox" id="TROPICAL MOORED BUOYS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Tropical Moored Buoys
+								</li>
+								<li id="TSUNAMI WARNING STATIONS">
+									<input type="checkbox" id="TSUNAMI WARNING STATIONS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Tsunami (DART) Buoys
+								</li>
+								<li id="WEATHER BUOYS">
+									<input type="checkbox" id="WEATHER BUOYS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Weather Buoys
+								</li>
+								<li id="SHORE AND BOTTOM STATIONS">
+									<input type="checkbox" id="SHORE AND BOTTOM STATIONS-CB" />
+									Shore and Bottom Stations
+								</li>
+								<li id="C-MAN WEATHER STATIONS">
+									<input type="checkbox" id="C-MAN WEATHER STATIONS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;CMAN Stations
+								</li>
+								<li id="PROFILING FLOATS AND GLIDERS (GENERIC)">
+									<input type="checkbox"
+										id="PROFILING FLOATS AND GLIDERS (GENERIC)-CB" />
+									Argo Profiling Floats
+								</li>
+								<li id="XBT">
+									<input type="checkbox" id="XBT-CB" />
+									XBTs
+								</li>
+								<li id="SHIPS (GENERIC)">
+									<input type="checkbox" id="SHIPS (GENERIC)-CB" />
+									All Ships
+								</li>
+								<li id="VOLUNTEER OBSERVING SHIPS">
+									<input type="checkbox" id="VOLUNTEER OBSERVING SHIPS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;VOS Ships
+								</li>
+								<li id="VOSCLIM">
+									<input type="checkbox" id="MOORED BUOYS-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;VOSclim Ships
+								</li>
+								<li id="UNDERWAY CARBON SHIPS">
+									<input type="checkbox" id="VOSCLIM-CB" />
+									&nbsp;&nbsp;&nbsp;&nbsp;Underway Carbon Ships
+								</li>
+								<li id="TIDE GAUGE STATIONS">
+									<input type="checkbox" id="TIDE GAUGE STATIONS-CB" />
+									Tide Gauge Stations
+								</li>
+								<li id="GLIDERS">
+									<input type="checkbox" id="GLIDERS-CB" />
+									Gliders
+								</li>
+								<li id="AUTONOMOUS PINNIPEDS">
+									<input type="checkbox" id="AUTONOMOUS PINNIPEDS-CB" />
+									Pinnipeds
+								</li>
+								<li id="UNKNOWN">
+									<input type="checkbox" id="UNKNOWN-CB" />
+									Unknown Platforms
+								</li>
+							</ol>
+						</div>
+						<div>
+							<h3>
+								<a href="#">Country</a>
+							</h3>
+							<div>
+								<ol id="countries" class="list_items">
+									<li id="AUSTRALIA">
+										<input type="checkbox" id="AUSTRALIA-CB" />
+										Australia
+									</li>
+									<li id="BRAZIL">
+										<input type="checkbox" id="BRAZIL-CB" />
+										Brazil
+									</li>
+									<li id="CANADA">
+										<input type="checkbox" id="CANADA-CB" />
+										Canada
+									</li>
+									<li id="CHINA">
+										<input type="checkbox" id="CHINA-CB" />
+										China
+									</li>
+									<li id="EUROPEAN UNION">
+										<input type="checkbox" id="EUROPEAN UNION-CB" />
+										European Union
+									</li>
+									<li id="FRANCE">
+										<input type="checkbox" id="FRANCE-CB" />
+										France
+									</li>
+									<li id="GERMANY">
+										<input type="checkbox" id="GERMANY-CB" />
+										Germany
+									</li>
+									<li id="INDIA">
+										<input type="checkbox" id="INDIA-CB" />
+										India
+									</li>
+									<li id="IRELAND">
+										<input type="checkbox" id="IRELAND-CB" />
+										Ireland
+									</li>
+									<li id="JAPAN">
+										<input type="checkbox" id="JAPAN-CB" />
+										Japan
+									</li>
+									<li id="KOREA, REPUBLIC OF">
+										<input type="checkbox" id="KOREA, REPUBLIC OF-CB" />
+										South Korea
+									</li>
+									<li id="SPAIN">
+										<input type="checkbox" id="SPAIN-CB" />
+										Spain
+									</li>
+									<li id="NETHERLANDS">
+										<input type="checkbox" id="NETHERLANDS-CB" />
+										Netherlands
+									</li>
+									<li id="NEW ZEALAND">
+										<input type="checkbox" id="NEW ZEALAND-CB" />
+										New Zealand
+									</li>
+									<li id="NORWAY">
+										<input type="checkbox" id="NORWAY-CB" />
+										Norway
+									</li>
+									<li id="SOUTH AFRICA">
+										<input type="checkbox" id="SOUTH AFRICA-CB" />
+										South Africa
+									</li>
+									<li id="UKRAINE">
+										<input type="checkbox" id="UKRAINE-CB" />
+										Ukraine
+									</li>
+									<li id="UNITED KINGDOM">
+										<input type="checkbox" id="UNITED KINGDOM-CB" />
+										United Kingdom
+									</li>
+									<li id="UNITED STATES">
+										<input type="checkbox" id="UNITED STATES-CB" />
+										United States
+									</li>
+								</ol>
+							</div>
+						</div>
+						<div>
+							<h3>
+								<a href="#">Third</a>
+							</h3>
+							<div>
+								Nam dui erat, auctor a, dignissim quis.
+							</div>
+						</div>
+					</div>
+				</td>
+				<td style="vertical-align:top;">
+					<div style="vertical-align:top; width:1024px; height:512px; border: 2px solid" id="map_canvas"></div>
+				</td>
+			</tr>
+		</table>
+</html>

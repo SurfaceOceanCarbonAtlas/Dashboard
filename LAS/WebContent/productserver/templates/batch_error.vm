@@ -1,0 +1,40 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.brief().toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+<title>LAS Output</title></head>
+<body bgcolor="white">
+<h3>An error occurred the last time LAS tried to create this product.</h3>
+<h3>$las_response.getResult("las_message")</h3>
+<hr>
+<a href="ProductServer.do?xml=$las_request.toEncodedURLString()">The URL of this product.</a>
+<hr>
+#if ( $debug=="true" || $debug=="debug" )
+#if ( $las_response.getResult("debug") != "" )
+<a href="$las_response.getResult("debug")">More details about this error.</a>
+#end
+<hr>
+<pre>
+$las_response.getResult("exception_message")
+</pre>
+#else
+#if ( $las_response.getResult("debug") != "" )
+<a href="$las_response.getResult("debug")">More details about this error.</a>
+#end
+#end
+</body>
+</html>
+
+#end
+

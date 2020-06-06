@@ -1,0 +1,358 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS v7.1 UI tutorial</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<BR><BR>
+<p align="center">
+<img height="100px" src="images/LASlogo.gif" align="center"">
+</p>
+
+<p>&nbsp; </p>
+<p align="center"><font size="+3" face="Arial, Helvetica, sans-serif">Introduction 
+  to the LAS version 7.1 User Interface</font></p>
+<p align="center">&nbsp;</p>
+<p align="left"><font size="+1" face="Arial, Helvetica, sans-serif"><strong>Table 
+  of Contents:</strong></font></p>
+<ul>
+  <li><a href="#intro"><font size="+1" face="Arial, Helvetica, sans-serif">Introduction 
+    to the Live Access Server (LAS)</font></a></li>
+
+  <li><a href="#intro_UI"><font size="+1" face="Arial, Helvetica, sans-serif">Introduction 
+    and Overview to v7.1 User Interface</font></a></li>
+  <li><font size="+1" face="Arial, Helvetica, sans-serif">
+  <a href="#products">Getting Images and Data from LAS</a> </font> 
+    <ul>
+      <li><font size="+1" face="Arial, Helvetica, sans-serif"><a href="#selectDataset">Specifying 
+        Variable and Dataset</a></font></li>
+      <li><font size="+1" face="Arial, Helvetica, sans-serif"><a href="#selectRegion">Specifying the Location and Date</a></font></li>  
+    </ul>
+  </li>
+  <li><font size="+1" face="Arial, Helvetica, sans-serif"><a href="#customizing">Customizing what you get from LAS</a></font></li>
+  <li><font size="+1" face="Arial, Helvetica, sans-serif">
+  <a href="#compare">Comparing fields in LAS</a></font></li>
+  <li><font size="+1" face="Arial, Helvetica, sans-serif"><a href="#animations">Animations (movies)</a></font></li>
+  <li><font size="+1" face="Arial, Helvetica, sans-serif">
+  <a href="#googleEarth">Using Google Earth&reg;</a></font></li>
+	
+  <li><font size="+1" face="Arial, Helvetica, sans-serif"><a href="#data_options">Viewing and Saving Data</a></font></li>
+	<li><font size="+1" face="Arial, Helvetica, sans-serif">
+	<a href="#needV6">LAS V6 &quot;Classic&quot; Interface</a></font></li>
+</ul>
+<hr>
+<p><a name="intro"><font size="+2" face="Arial, Helvetica, sans-serif"><strong><em>Introduction 
+  to LAS</em></strong></font></a></p>
+<p><font face="Arial, Helvetica, sans-serif">Welcome to the the Live Access Server 
+  (LAS). LAS is a highly configurable web server designed to provide flexible 
+  access to geo-referenced scientific data. It can present distributed data sets 
+  as a unified virtual data base through the use of <a href="http://www.opendap.org" target="_blank">OPeNDAP</a> 
+  networking. <a href="http://www.ferret.noaa.gov" target="_parent">Ferret</a> 
+  is the default visualization application used by LAS, though other applications 
+  (Matlab, IDL, GrADS, ...) can also be used.</font></p>
+<p><font face="Arial, Helvetica, sans-serif">LAS enables the web user to:</font></p>
+<ul>
+  <li><font face="Arial, Helvetica, sans-serif">Visualize data with on-the-fly 
+    graphics</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Request custom subsets of variables 
+    in a choice of file formats</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Access background reference material 
+    about the data (metadata)</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Compare (difference) variables 
+    from distributed locations</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Use Google Earth&reg; to visualize data</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Easily create animations</font></li>
+</ul>
+<p><font face="Arial, Helvetica, sans-serif">LAS enables the data provider to:</font></p>
+<ul>
+  <li><font face="Arial, Helvetica, sans-serif">Unify access to multiple types 
+    of data in a single interface</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Create thematic data servers from 
+    distributed data sources</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Offer derived products on the 
+    fly</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Remedy metadata inadequacies (poorly 
+    self-describing data)</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Offer unique products (e.g. visualization 
+    styles specialized for the data)</font></li>
+  <li><font face="Arial, Helvetica, sans-serif">Provide data access to gridded 
+    as well as in-situ datasets</font>
+    <ul>
+      <li><font face="Arial, Helvetica, sans-serif">For examples of LAS serving 
+        in-situ data, please see the <a href="http://osmc.noaa.gov/Monitor/OSMC/OSMC.html" target="_blank">Observing System Monitoring Center</a>, or the <a href="http://ferret.pmel.noaa.gov/OCDMS/index.htm" target="_blank">Ocean 
+        Carbon Data Management System</a> </font></li>
+    </ul>
+  </li>
+</ul>
+<p align="left"><font face="Arial, Helvetica, sans-serif"> Further details about LAS may be found in the <a href="http://ferret.pmel.noaa.gov/LAS/documentation">LAS documentation</a> and the current
+  <a href="http://ferret.pmel.noaa.gov/LAS/documentation/release-notes-for-las-v7_1">LAS release notes</a>.
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+
+<hr>
+
+<p align="left"><font size="+2" face="Arial, Helvetica, sans-serif"><strong><em><a name="intro_UI"></a>Introduction and Overview</em></strong></font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">Here is the LAS V7.1 User Interface. This HELP document uses the NVODS server, which may be found at</font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">
+<a href="http://ferret.pmel.noaa.gov/NVODS/">http://ferret.pmel.noaa.gov/NVODS/</a> (National 
+    Virtual Oceanographic Data System)</font></p>
+
+<p align="left">&nbsp;</p>
+<p align="left"><img src="./images/lasV7_1_tutorial_ui_layout.gif" border=2 width="800" height="500"></p>
+<br>
+
+
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+<hr>
+
+<p><font size="+2" face="Arial, Helvetica, sans-serif"><strong><a name="finding"></a>Finding your way around</strong></font></p>
+<p><font face="Arial, Helvetica, sans-serif">
+The buttons across the top bar are for opening menus, requesting a new plot, or requesting products such as animations. When a menu is open you will often see this small icon <img src="./images/lasV7_1_tutorial_info_icon.gif" align="bottom"/> next to an item.  Click on this icon for information. When it is next to a dataset in a dataset menu, this will bring up further information about the dataset. In an options menu, clicking the info icon brings up an explanation of the option.</strong></font></p>
+<p><font face="Arial, Helvetica, sans-serif">
+The reference map in the upper left has its own controls along the top. In the LAS interface, hover the 
+mouse over each for a short description, and click the ? for more help with these controls.
+The longitude and latitude widgets below the map may be used to enter the X and Y region desired. </font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_reference_map.gif" border=2 ></p>
+
+<br>
+
+<p><font size="+2" face="Arial, Helvetica, sans-serif"><strong><a name="products"></a>Getting 
+  images and data from LAS</strong></font></p>
+
+
+<p><font face="Arial, Helvetica, sans-serif">Example: Create a 2D xy color plot 
+  of Sea Surface Temperature from the coads climatology dataset.</font></strong></p>
+<p><font face="Arial, Helvetica, sans-serif"><a name="selectDataset"></a>Select the Coads climatology dataset: Click on the &quot;Choose Dataset&quot; button:</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_choose_dataset_button.gif" border=2></p>
+<br>
+
+<p align="left"><font face="Arial, Helvetica, sans-serif">The Dataset 
+  selection tree will open. Many LAS installations use a tree of dataset categories. Click on &quot;by Dataset Name&quot;<br><p>
+<p align="left"><img src="./images/lasV7_1_tutorial_select_dataset_category.gif" border=2 width="600"></p>
+<br>
+  and then click &quot;Coads monthly climatology&quot; and 
+  &quot;Air temperature&quot;:</strong></font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_select_coads.gif" border=2 width="600"></p>
+
+<br>
+<p align="left"><font face="Arial, Helvetica, sans-serif"><a name="selectRegion"></a>LAS 
+  will use your choice of data and variable and create a Latitude-Longitude map by default:</font></p>
+<p>&nbsp;</p>
+<p align="left"><img src="./images/lasV7_1_tutorial_coads_opened.gif" border=2 width="800" height="500"></p>
+
+<br>
+<p align="left"><font face="Arial, Helvetica, sans-serif">Using the zoom 
+  and pan reference map, you may refine the latitude and longitude displayed by the reference map; and using the selection tool the user can change the region selected. Then that region will be used when you update the plot or ask for data.
+  <p align="left"><font face="Arial, Helvetica, sans-serif">
+  Longitude-latitude images are also interactive. This means that you can click and drag to 
+  zoom into a particular region on the image itself. Use the browser's &quot;Back&quot; button to return to earlier plots.
+  <p align="left"><font face="Arial, Helvetica, sans-serif">
+  You are now free to begin interacting with LAS. For example, clicking 
+  &quot;Time Series&quot; on the left side of 
+  the interface will result in this image:</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_coads_opened_TimeSeries_selected.gif" border=2 width="800" height="500"></p>
+<br>
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+<hr>
+<p><font size="+2" face="Arial, Helvetica, sans-serif"><strong><em><a name="customizing"></a>Customizing 
+  what you get from LAS</em></strong></font></p>
+<p><font face="Arial, Helvetica, sans-serif"><strong>Example: How to modify the 
+  default values LAS uses to create an image. </strong></font></p>
+<p><font face="Arial, Helvetica, sans-serif">In this example, we will change the 
+  specified color pallete for our AIRT plot, as well as eliminate the graticule 
+  lines. First, to change the output size of the plot, click the &quot;Set plot 
+  options&quot; button from the menu toolbar.</font></p>
+<p><font face="Arial, Helvetica, sans-serif">This will open up a menu from which 
+  you may change several options for plot creation. In the below - we have 
+  turned off the graticules option as well as selecting a different pallete:</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_show_plot_options.gif" border=2 ></p>
+<br>
+<p><font face="Arial, Helvetica, sans-serif">After making the changes, and clicking 
+  on the &quot;OK&quot; button, the &quot;Update plot&quot; button will have 
+  changed color in the upper menu bar, like so:</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_update_plot_button_highlighted.gif" border=2></p>
+<br>
+
+<p><font face="Arial, Helvetica, sans-serif">When the &quot;Update Plot&quot; 
+  button is yellow like above, it means that the current image is out of sync 
+  with something in the User Interface. In this example, it is because the plot 
+  options have changed, but it could also happen if a different variable was selected, 
+  or a different time range was chosen, etc.</font></p>
+  Alternatively, if the select box in the &quot;Update plot&quot; button is selected, 
+  then the plot will update immediately when a new selection is made. 
+<p><font face="Arial, Helvetica, sans-serif"> In our example, after changing the 
+  plot options, clicking the &quot;Update Plot&quot; button results in the below 
+  plot. Notice that the graticule lines are no longer covering the image, and 
+  the palette is slightly different.</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_after_changing_plot_options.gif" border=2 width="800" height="500"></font></p>
+<br>
+<p><font face="Arial, Helvetica, sans-serif">There are many other options 
+  that you can play with, and it's important to note that these options can 
+  be &quot;view&quot; specific or possibly even dataset specific.</font></p>
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+
+<hr>
+<p><a name="compare"><font size="+2" face="Arial, Helvetica, sans-serif"><strong><em>Comparing 
+  fields with LAS</em></strong></font></a></p>
+<p><font face="Arial, Helvetica, sans-serif">In the LAS v7.1 UI, we utilize the 
+  &quot;Compare&quot; button to compare data from different times or locations in a single variable, two variables in the same dataset, or variables in different datasets.
+<p><font face="Arial, Helvetica, sans-serif">Clicking on the &quot;Compare&quot; 
+  button will open a new window which will contain the LAS vizGal tool:</font></p>
+<p><img src="./images/lasV7_1_tutorial_original_vizgal.gif" border=2 width="800" height="500" ></p>
+<br>
+<p><font face="Arial, Helvetica, sans-serif">Any plot within vizGal may be clicked, bringing it up in full-size view.</font></p>
+
+<p><font face="Arial, Helvetica, sans-serif">By default, all four plots are of 
+  the originaly selected date and time, but can be changed by making a selection in the Date 
+  menu on each plot:</font></p>
+<p><img src="./images/lasV7_1_tutorial_vizgal_change_date.gif" border=2 width="800" height="500"></p>
+<br>
+<p><font face="Arial, Helvetica, sans-serif">In addition, it is now easier then 
+  ever to see anomalies with the dataset using vizGal. Clicking the &quot;Difference 
+  Mode&quot; button will allow you to easily see 
+  how the values from the upper left panel differ from those in the other three 
+  panels:</font></p>
+<p><img src="./images/lasV7_1_tutorial_vizgal_difference_mode.gif" border=2 width="800" height="500"></p>
+<br>
+
+
+<p><font face="Arial, Helvetica, sans-serif">Note the &quot;Gallery Settings&quot; 
+options on the far left. These may be used to change the plot options for all of 
+the plots, change to another dataset and variable, or change the view. The map may 
+be used to select sub-regions.  The + in the far upper left-hand corner of this 
+page closes (and toggles to reopen) the Gallery Setttings menus, leaving more space 
+on the page for the four plot panels.
+<p><font face="Arial, Helvetica, sans-serif">In the example below we choose a longitude 
+line plot, use the &quot;Plot Options&quot; to choose thicker blue lines, and turn on
+&quot;Difference Mode&quot; to draw the difference from the upper left plot at each of 
+three other times.
+<p><img src="./images/lasV7_1_tutorial_vizgal_gallery_settings.gif" border=2 width="800" height="500"></p>
+<br>
+<p><font face="Arial, Helvetica, sans-serif">Each frame also has its own 
+&quot;settings&quot; button. This opens an options box, which may be dragged to another 
+location on the page.
+
+<p><img src="./images/lasV7_1_tutorial_vizgal_settings.gif" border=2 width="800" height="500"></p>
+<br>
+
+<br>Here there are options to change the plot options (plot style, color palette), 
+change the variable, or even choose another dataset and variable, for
+comparison with the plots in other panels, either side-by-side or in Difference Mode.
+
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+<hr>
+<p><a name="animations"></a><strong><font size="+2" face="Arial, Helvetica, sans-serif"><em>Animations 
+  from LAS</em></font></strong></p>
+<p><font face="Arial, Helvetica, sans-serif">From the v7.1 UI, it is also quite 
+  easy for you to view data as an animation or movie. Clicking the &quot;Animation&quot; 
+  button will bring up a dialog for you to specify the desired length of 
+  the animation:</font></p>
+<p><font face="Arial, Helvetica, sans-serif"><img src="./images/lasV7_1_tutorial_submit_animation.gif" border=2 width="800" height="500" width="800" height="500"></font></p>
+<p>&nbsp;</p>
+<p><font face="Arial, Helvetica, sans-serif">Once the Time range is selected, 
+  and the &quot;Submit&quot; button pressed, each frame of the download will begin 
+  loading, and will animate as loaded:</font></p>
+<p><font face="Arial, Helvetica, sans-serif"><img src="./images/lasV7_1_tutorial_animation.gif" border=2 width="800" height="500" width="800" height="500"></font></p>
+<p>&nbsp;</p>
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+
+<hr>
+
+<p><font size="+2" face="Arial, Helvetica, sans-serif"><a name="googleEarth"><strong><em>Viewing 
+  data on Google Earth</em></strong></a></font></p>
+<p><font face="Arial, Helvetica, sans-serif">LAS users can also view their data 
+  on Google Earth by clicking on the &quot;Google Earth&quot; button. This will 
+  bring up the current image inside of Google Earth:</font></p>
+<p><img src="./images/lasV7_1_tutorial_google_earth.gif" border=2></p>
+<p><font face="Arial, Helvetica, sans-serif"><strong>NOTE:</strong> The dots on 
+  the above plot represent &quot;placemarks&quot; in the actual data. Clicking 
+  on a placemark will bring up a timeseries or a vertical profile of the data 
+  at that point.</font></p>
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+
+<p><font size="+2" face="Arial, Helvetica, sans-serif"><a name="data_options"><strong><em>Viewing and Saving data</em></strong></a></font></p>
+
+<p align="left"><font face="Arial, Helvetica, sans-serif">
+Two buttons let you view data values or download data. &quot;Show Values&quot; 
+creates a formatted listing of the currently selected variable, including 
+a header describing the dataset, variable and subset in space and time. After 
+choosing some data, click on &quot;Show Values&quot;,</font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">To see the following listing:</font></p>
+
+<p align="left"><img src="./images/lasV7_1_tutorial_show_values_output.gif" width="800">
+<p align="left"><font face="Arial, Helvetica, sans-serif">
+To save data in a file in NetCDF, ASCII or arcGrid format, use the &quot;Save As&quot; 
+button. This brings up a dialog to select the format of the file to be written, 
+and the range to save in the dimensions not chosen on the main page. In this 
+example, ranges of Time and Depth may be chosen.</font></p>
+
+<p align="left"><img src="./images/lasV7_1_tutorial_save_controls.gif" border=2 width="800">
+<p align="left"><font face="Arial, Helvetica, sans-serif">The result will be a file to download.</font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">The remaining button at the 
+top of the User Interface is &quot;Export to Desktop Application&quot;. This button 
+shows you a page showing the OPeNDAP URL for the data selected and how it can 
+be opened with Ferret, GrADS, and Matlab to point to the current variable and region 
+in space and time. 
+</font></p><table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+
+<hr>
+
+<p>&nbsp;</p>
+<p align="left"><font size="+2" face="Arial, Helvetica, sans-serif"><strong><em><a name="needV6"></a>The Classic LAS UI</em></strong></font></p>
+</font></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">At the option of the LAS installer, the 
+V6 LAS User Interface may be made available. If this option has been installed, then you may bring 
+up the classic interface by clicking the &quot;Use Classic LAS&quot; link on the 
+  right side of the v7.1 UI banner.</font></p>
+<p align="left"><img src="./images/lasV7_1_tutorial_use_classic_las_banner.gif" border=2 width="800"></p>
+<p align="left"><font face="Arial, Helvetica, sans-serif">This link will take 
+  you to the V6 UI so that you may request vector plots and some more complex
+  comparisons.</font></li>
+</ul>
+<table width="19%" height="39" border="0" cellpadding="0" cellspacing="0">
+  <tr> 
+    <td width="49%"><div align="left"><font face="Arial, Helvetica, sans-serif"><a href="./las_v7_1_ui_introduction.html">Back to TOP</a></font></div></td>
+  </tr>
+</table>
+<hr>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,31 @@
+    select
+        AA.id ID,
+        round((AA.ob_date - to_date('01-jan-1970','dd-mon-yyyy')) * (24*60*60)) CTIME,
+        AA.latitude Latitude,
+        AA.longitude Longitude,
+        BB.Cnt Cnt
+    from
+        osmc_observation AA,
+        ( select
+              A.id ID,
+              trunc(A.ob_date) OB_DAY,
+              max(A.rowid) ROW_,
+              Count(*) Cnt
+          from
+              osmc_observation A,
+              osmc_platform B
+          where
+              A.id=B.id
+              and B.type = 'DRIFTING BUOY'
+              and A.ob_date between
+                  to_date('07-01-2005','mm-dd-yyyy')
+                  and to_date('07-31-2005 23:59:59','mm-dd-yyyy hh24:mi:ss')
+          group by
+              A.id,
+              trunc(A.ob_date)
+         ) BB
+    where
+        BB.id = AA.id
+        and BB.row_ = AA.rowid
+    order by 1, 2
+    );

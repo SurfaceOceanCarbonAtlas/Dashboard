@@ -1,0 +1,162 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_ensemble_tplot.jnl
+! 
+! Author: ansley 
+! Date: 12/2013
+!
+! Draw a set of time series plots, one for each ensemble member in the region.
+
+! Set up parameters for defining the viewports and making the plots.
+
+DEFINE SYMBOL stack_plot = 0
+IF `($stack_plot"0|0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_line_color = multi
+
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE IneERPOLATE
+
+DEFINE SYMBOL fview = `UPCASE("($ferret_view)")`
+
+CANCEL MODE logo
+
+! Define symbols associated with the regign and data and perform any
+! initialization needed for this dataset.
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Check whether the region is too small to make a 2D plot on this grid.
+GO LAS_check_2d_region
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Here is variable 0 and its title
+
+DEFINE SYMBOL ferret_var_0 = ($ferret_plot_var)
+DEFINE SYMBOL ferret_title_0 = ($ferret_plot_title"($data_var)")
+
+
+LET mlo = ($region_e_lo)
+LET mhi = ($region_e_hi)
+LET num_ens = `mhi-mlo+1`
+
+
+! If its a degenerate plot in E, make a nominal plot and a message and exit
+
+IF `mlo EQ mhi` THEN 
+   
+   CANCEL SYMBOL n_left_labels
+   CANCEL SYMBOL n_right_labels
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0")+1`
+   DEFINE SYMBOL upper_left_($n_left_labels"0") = @CR[The requested E region is smaller than 1 grid cell]
+   DEFINE SYMBOL region_small_($n_left_labels"0") = yes
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+   ! Make a nominal plot and put the -no-valid-region label on  it.
+   GO margins 2 2 2 2
+   PLOT/I=1:2/NOLAB/NOAX/VLIM=10:11 i
+   GO labels_above_plot
+   
+! Save the results
+   GO LAS_results box
+
+   EXIT/SCRIPT
+ENDIF
+
+
+! Use Ferret properties to set up the plot qualifiers
+DEFINE SYMBOL line_drawn = 1
+GO LAS_set_plot_qualifiers
+
+! symbols and/or line
+GO set_linesym
+
+set mode linecolors:14
+
+ppl color,7,100,65,51   ! orange
+ppl color,8,0,55,0      ! dark green
+ppl color,9,60,0,100    ! purple
+ppl color,10,100,70,100 ! magenta
+ppl color,11,80,70,60   ! tan
+ppl color,12,100,88,0   ! yellow
+PPL COLOR,13,70,70,70     ! gray
+PPL COLOR,14,100,100,100  ! white
+
+
+IF ($ferret_use_graticules"1|none>0|*>1) THEN
+  DEFINE SYMBOL graticuleColor = black
+  IF ($ferret_use_graticules"1|default>1|gray>1|*>0) THEN
+     DEFINE SYMBOL graticuleColor = 13
+  ELIF ($ferret_use_graticules"0|white>1|*>0) THEN
+     DEFINE SYMBOL graticuleColor = 14
+  ELIF ($ferret_use_graticules"0|black>1|*>0) THEN
+     DEFINE SYMBOL graticuleColor = 1
+  ENDIF
+  SET MODE GRATICULE:(DASH,COLOR=($graticuleColor))
+ENDIF
+
+! Open the window, apply size, scale options
+! Must do this AFTER setting up the line colors.
+
+DEFINE SYMBOL ferret_view = t
+
+GO LAS_open_window
+DEFINE SYMBOL ferret_view = ($fview)
+
+LET plot_var_e = ($ferret_plot_var)
+DEFINE SYMBOL plot_arg = plot_var_e[M=`mlo`]
+
+
+REPEAT/RANGE=`mlo+1`:`mhi`/NAME=q ( DEF SYM c_count = `q`;\
+  DEFINE SYMBOL plot_arg = ($plot_arg), plot_var_e[m=($c_count)])
+
+PLOT($qualifiers)/NOKEY/SET ($plot_arg)
+   GO reset_labels    
+PPL PLOT
+
+! Set up for plot key
+
+! Make an invisible xy plot. The legline script doesnt work well with z and t plots.
+
+DEFINE VIEWPORT/x=0:1/y=0:1/axes overview
+
+SET VIEW overview
+PLOT/NOYADJUST/NOLAB/NOAX/I=1:2/VLIM=100:102 i
+
+LET titlesiz = 0.09
+
+
+LET titlesiz = 0.09
+
+LET x1 = 0.5
+LET xkey = {`x1` , `x1` , `x1` , `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`,     0, 0}
+
+LET ykey = {0.7, 0.5, 0.3, 0.7, 0.5, 0.3, 0.1, 0.1}
+!IF `($data_count) EQ 2` THEN LET ykey = \
+!           {-0.7,  -0.9,  -1.05,            -0.65,             -0.85,             -1.05, -1.25, -1.25}
+
+REPEAT/RANGE=`mlo`:`mhi`/NAME=q  (; \
+   DEFINE SYMBOL q = `q`;  \
+   LET xpos = xkey[i=($q)]; LET ypos = ykey[i=($q)]; \
+   GO LAS_legend_line \
+   `xpos-0.2` 0.3 `ypos` `q + 6*($thicknum)` `titlesiz` "  `labels[m=($q)]`" ($legend_qual);\   
+)
+
+! Save the results
+GO LAS_results line
+
+
+
+!  ----------------- End of LAS_ensemble_tplot ------------------------------------
+

@@ -1,0 +1,4 @@
+#set ($expocode=$las_backendrequest.getProperty("qc","expocode"))
+SELECT DISTINCT(r.region_id), r.region_name from Regions r 
+left join QCEvents qc on qc.region_id=r.region_id
+where qc.expocode = "${expocode}"

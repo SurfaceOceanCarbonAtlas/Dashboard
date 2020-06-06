@@ -1,0 +1,20 @@
+<backend>
+	<cache size="15000" bytes="1024Mb" file="@JAKARTA_HOME@/webapps/@APPNAME@/output/cache.obj"/>
+	<servers>
+		<service name="ferret" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASFerretBackend" method="getProduct"/>
+		<service name="climate_analysis" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASClimateAnalysisBackend" method="getProduct"/>
+		<service name="shape" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASShapeFileBackend" method="getProduct"/>
+		<service name="database" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASDatabaseBackend" method="getProduct"/>
+		<service name="drds" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASDRDSBackend" method="getProduct"/>
+		<service name="dapper" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASDapperBackend" method="getProduct"/>
+		<service name="obis" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASObisBackend" method="getProduct"/>
+		<service name="tabledap" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASTabledapBackend" method="getProduct"/>
+		<service name="iobis" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASIobisBackend" method="getProduct"/>
+		<service name="kml" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASKMLBackend" method="mapScaleToKML"/>
+		<service name="fregrid" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASFregridBackend" method="getProduct"/>
+		<service name="tabledap" url="http://@SERVLET_ROOT_URL@/@APPNAME@/services/LASTabledapBackend" method="getProduct"/>
+                <service name="local" method="getTHREDDS" url="local"/>
+	</servers>
+        <smtp host="localhost"/>
+        <ftds base_url="http://@SERVLET_ROOT_URL@/thredds/dodsC/las" data_dir="@TDS_DATA@"/>
+</backend>

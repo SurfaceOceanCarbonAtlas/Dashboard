@@ -1,0 +1,237 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! list_data_difference.jnl
+! 
+! Author: ansley 
+! Date: 2007/08/13
+!
+! list_data_difference.jnl creates a listing, CDF or ASCII of the difference of 
+! two variables.
+! Assumes symbol ferret_format which will be one of "cdf" "txt" "tsv" "csv" "asc"
+! Assumes symbol ferret_listing is the output file.
+! Assumes symbol data_dup_varname is the optional duplicate variable name to be ! used on output. Otherwise the variable is named DIFFERENCE
+
+CANCEL SYMBOL frmt 
+DEFINE SYMBOL frmt ($frmt)/($ferret_format%format=cdf|txt>heading|cdf>format=cdf|asc>width=1024|%)
+
+IF ($ferret_format%0|asc>1|*>0) THEN
+  DEFINE SYMBOL frmt ($frmt)/format=(5G12.5)
+  
+  IF ($ferret_data_format"0|tsv>1|csv>1|asc>1|*>0") THEN DEFINE SYMBOL frmt ($frmt) = ($frmt)/($ferret_data_format"|tsv>format=tab|csv>format=comma|asc>heading=enhanced")
+
+ENDIF
+
+CANCEL MODE INTERPOLATE  ! important when evaluating the size limits
+
+SET LIST/FILE="($result_ferret_listing_filename)"
+
+GO LAS_initialize_region 0
+
+GO LAS_initialize_data 0
+! Here is variable 0 and its title
+
+DEFINE SYMBOL ferret_var_0 = ($ferret_plot_var)
+DEFINE SYMBOL ferret_title_0 = ($ferret_plot_title"($data_var)")
+
+! Set up a history attribute for the variable, and a text variable with
+! the same information for ascii and text output.
+
+SET DATA/SAVE
+SET DATA ($data_num)
+LET attlist = ($data_var).attnames
+CANCEL SYMBOL data_var_history
+IF `IS_ELEMENT_OF_STR(attlist, "history") GT 0` THEN \
+   DEFINE SYMBOL data_var_history = ($data_var) `($data_var).history `
+
+DEFINE SYMBOL var_history  "($data_var_history)($data_var_transform)"
+
+SET DATA/RESTORE
+
+! Initialize next dataset. 
+
+! Apply any expression only to the first variable not to this one.
+CANCEL SYMBOL ferret_expression 
+
+GO LAS_initialize_region 1
+
+GO LAS_initialize_data  1 
+
+! Check for errors 
+
+IF ($error_status"0|*>1") THEN
+   MESSAGE/ERROR **ERROR ($error_string)
+   EXIT/PROGRAM
+ENDIF
+
+! Here is variable 1 and its title
+
+DEFINE SYMBOL ferret_var_1 = ($ferret_plot_var)
+DEFINE SYMBOL ferret_title_1 = ($ferret_plot_title"($data_var)")
+
+
+! Define the lsit variable 
+
+DEFINE SYMBOL ferret_diff_var = ($ferret_var_0) - ($ferret_var_1)
+IF `($data_dup_varname%0|*>1%) EQ 0` THEN DEFINE SYMBOL data_dup_varname ($data_0_var)_($data_1_var)
+
+! Add to the history attribute for the variable, and a text variable with
+! the same information for ascii and text output.
+
+SET DATA/SAVE
+SET DATA ($data_num)
+LET attlist = ($data_var).attnames
+IF `IS_ELEMENT_OF_STR(attlist, "history") GT 0` THEN \
+   DEFINE SYMBOL data_var_history = ($data_var_history) minus ($data_var) `($data_var).history `
+
+DEFINE SYMBOL var_history  "History: ($data_var_history)"
+LET var_hist = "($var_history)"
+
+SET DATA/RESTORE
+
+! TODO: assuming the variables are on the same or on conformable grids??
+
+! Set the title, and the labels for the upper left listing the locations
+! and time in directions normal to the plot, and in the upper right listing
+! urls if dataset are opendap. Only some of these will be used here.
+
+DEFINE SYMBOL fview = `UPCASE("($ferret_view)")`
+GO LAS_set_diff_labels ($fview)
+
+! For requests that encompass 360 deg of longitude Ferret returns N points if
+! the range boundaries lie exactly on grid cell boundaries and N+1 points 
+! otherwise.  Folks requesting data downloads don't want to have their their
+! first data point (sometimes) repeated so we test for that here and switch 
+! to index space.
+
+DEFINE SYMBOL user_istart `($ferret_var_0),return=istart`
+DEFINE SYMBOL user_iend `($ferret_var_0),return=iend`
+CANCEL REGION/X
+DEFINE SYMBOL data_isize `($ferret_var_0),return=isize`
+IF `($user_iend) - ($user_istart) + 1 - ($data_isize) GT 0` THEN
+ DEFINE SYMBOL new_iend `($user_iend) - 1`
+ELSE 
+ DEFINE SYMBOL new_iend `($user_iend)`
+ENDIF
+SET REGION/I=($user_istart):($new_iend)
+
+! Now get the start, stop and size information
+DEFINE SYMBOL isize `($ferret_var_0),return=isize`
+DEFINE SYMBOL jmin `($ferret_var_0),return=jstart`
+DEFINE SYMBOL jmax `($ferret_var_0),return=jend`
+DEFINE SYMBOL jsize `($ferret_var_0),return=jsize`
+DEFINE SYMBOL kmin `($ferret_var_0),return=kstart`
+DEFINE SYMBOL kmax `($ferret_var_0),return=kend`
+DEFINE SYMBOL ksize `($ferret_var_0),return=ksize`
+DEFINE SYMBOL lmin `($ferret_var_0),return=lstart`
+DEFINE SYMBOL lmax `($ferret_var_0),return=lend`
+DEFINE SYMBOL lsize `($ferret_var_0),return=lsize`
+
+! RETURN=*start returns 0 if the axis is an undefined axis
+! This messes messes up the repeat loop below if the data is chunked.
+! A few more lines of code to handle this.
+
+if `($jmin) lt 1` then DEFINE SYMBOL jmin 1
+if `($jmax) lt 1` then DEFINE SYMBOL jmax 1
+if `($kmin) lt 1` then DEFINE SYMBOL kmin 1
+if `($kmax) lt 1` then DEFINE SYMBOL kmax 1
+if `($lmin) lt 1` then DEFINE SYMBOL lmin 1
+if `($lmax) lt 1` then DEFINE SYMBOL lmax 1
+CANCEL REGION/X
+
+! the default is set under 1/4 of Ferret's memory allowing for LET definitions 
+LET max_size = ($MAX_LIST_SIZE"1000000")  ! use this for debugging, too
+
+! Size of the data variable 
+LET size = ($isize)*($jsize)*($ksize)*($lsize)
+
+! default chunk sizes
+LET jchunk = ($jsize) ! dflt size = full span
+LET kchunk = ($ksize)
+LET lchunk = INT(max_size/size * ($lsize))
+
+! if mode interpolate is desired
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE 
+
+IF `size LE max_size` THEN
+
+   ! ... list in one big chunk
+   !     This special case is not strictly necessary -- the logic for listing
+   !     large files also works for small ... but with some overhead
+
+   ! if a duplicate variable name is assigned for netcdf listings, change the name before listing 
+
+   IF `($data_dup_varname%0|*>1%) GT 0` THEN
+      LET ($data_dup_varname) = ($ferret_diff_var)
+      SET VAR/TITLE="($ferret_diff_title)" ($data_dup_varname)
+      DEFINE ATTRIBUTE/OUTPUT ($data_dup_varname).history = "($data_var_history)"
+
+      IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN
+         IF ($var_history"0|*>1") THEN LIST/APPEND/NOHEAD/FORMAT=(A)/FILE="($result_ferret_listing_filename)" var_hist
+      ENDIF
+
+      LIST/APPEND/FILE/($frmt) ($data_dup_varname)
+
+   ELSE
+
+      IF `($ferret_format"0|asc>1|*>0") + ($ferret_format"0|txt>1|*>0") GT 0` THEN  
+         IF ($var_history"0|*>1") THEN LIST/APPEND/NOHEAD/FORMAT=(A)/FILE="($result_ferret_listing_filename)" var_hist
+      ENDIF
+
+      LIST/APPEND/FILE/($frmt) ($ferret_diff_var)
+
+   ENDIF
+
+ELSE
+   DEF REGION/DEFAULT SAVE
+   CAN REGION
+
+   ! determine how to break the listing into small chunks
+   ! chunk along L axis. If still too big then along K axis, too. If still ...
+   IF `lchunk EQ 0` THEN
+     LET lchunk = 1
+     LET kchunk =  INT(max_size/(size/($lsize)) * ($ksize))
+     IF `kchunk EQ 0` THEN
+       LET kchunk = 1
+       LET jchunk =  INT(max_size/(size/(($lsize)*($ksize))) * ($jsize) )
+       IF `jchunk EQ 0` THEN
+         LET jchunk = 1
+         ! always list a full span in I ... possibly exceeding max_size
+       ENDIF
+     ENDIF
+   ENDIF
+   LET jtop = MIN(j+jchunk-1, ($jmax) )
+   LET ktop = MIN(k+kchunk-1, ($kmax) )
+   LET ltop = MIN(l+lchunk-1, ($lmax) )
+
+   IF ($ferret_format"0|cdf>1|*>0") THEN
+     ! if a duplicate variable name is assigned for netcdf listings, change the name before listing
+     
+!!      IF `($data_dup_varname%0|*>1%) EQ 0` THEN DEFINE SYMBOL data_dup_varname ($data_var)
+      IF `($data_dup_varname%0|*>1%) GT 0` THEN
+        LET ($data_dup_varname) = ($ferret_diff_var)
+        SET VAR/TITLE="($ferret_diff_title)" ($data_dup_varname)
+
+     ! ... netCDF output in chunks
+        REPEAT/L=($lmin):($lmax):`lchunk` REPEAT/K=($kmin):($kmax):`kchunk` REPEAT/J=($jmin):($jmax):`jchunk` (LIST/APPEND/FILE/($frmt)/J=`j`:`jtop`/K=`k`:`ktop`/L=`l`:`ltop`/JLIMITS=($jmin):($jmax)/KLIMITS=($kmin):($kmax)/LLIMITS=($lmin):($lmax) ($data_dup_varname); CANC MEM/ALL)
+     ELSE
+     ! ... netCDF output in chunks
+
+        REPEAT/L=($lmin):($lmax):`lchunk` REPEAT/K=($kmin):($kmax):`kchunk` REPEAT/J=($jmin):($jmax):`jchunk` (LIST/APPEND/FILE/($frmt)/J=`j`:`jtop`/K=`k`:`ktop`/L=`l`:`ltop`/JLIMITS=($jmin):($jmax)/KLIMITS=($kmin):($kmax)/LLIMITS=($lmin):($lmax) ($ferret_diff_var); CANC MEM/ALL)
+     ENDIF
+
+   ELSE
+
+   ! ... ASCII output
+   ! ... Note that large ASCII output as-is is highly imperfect because header
+   !     information gets embedded into the data
+   !     Proper solution of this problem requires us to know which is the #2
+   !     axis of the output (e.g. in an XYZT output the Y axis is #2 by dflt)
+   !     and forbid chunking along either axis of this plane -- 
+
+     IF ($var_history"0|*>1") THEN LIST/APPEND/NOHEAD/FILE="($result_ferret_listing_filename)" var_hist
+
+     REPEAT/L=($lmin):($lmax):`lchunk` REPEAT/K=($kmin):($kmax):`kchunk` REPEAT/J=($jmin):($jmax):`jchunk` (LIST/APPEND/FILE/($frmt)/J=`j`:`jtop`/K=`k`:`ktop`/L=`l`:`ltop` ($ferret_diff_var); CANC MEM/ALL)
+   ENDIF
+   set region save
+
+ENDIF
+

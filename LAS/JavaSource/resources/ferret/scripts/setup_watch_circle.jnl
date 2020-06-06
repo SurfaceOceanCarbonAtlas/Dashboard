@@ -1,0 +1,272 @@
+! setup_watch_circle.jnl 
+! ACM 11/2015
+!
+! 10/2017 Writing a note when data selection results in no data
+!         Here, if we already make such a note, xx var is all-missing,
+!         set a symbol to skip the new annotation.
+!
+! Draw the underlying axes of a property-property plot
+! where the variables are buoy longitude and latitude. 
+! The range will be a circle drawn around the deployment lon,lat
+! large enough to show the excursions of the bouy from that point.
+
+! variable p is the prop_var (independent axis) masked for any subset chosen and
+!  with XSEQUENCE applied to put it on an x axis
+! variable q is the data_var (dependent axis) masked for any subset chosen and
+!  with XSEQUENCE applied to put it on an x axis
+
+! Define two viewports filling the window and do the axes in one, the 
+! plot in the other. If the annotations are being done separately,
+! draw in the viewports defined in set_full_margins.jnl
+
+LET name0 = UPCASE("($DATA_0_VAR)")
+LET name1 = UPCASE("($DATA_1_VAR)")
+LET its_watch_circle = `STRINDEX(name0, "BUOY_LONGITUDE") GT 0 AND\
+ STRINDEX(name1,  "BUOY_LATITUDE") GT 0`
+
+IF `its_watch_circle EQ 0` THEN EXIT/SCRIPT
+
+! If the watch-circle radius is available as an attribute on the buoy longitude,
+! we will use that. Otherwise compute the radius.
+
+LET attlist = station.attnames
+IF `IS_ELEMENT_OF_STR(attlist,"watch_circle_deg" ) GT 0` THEN DEFINE SYMBOl wc_rad = `station.watch_circle_deg`
+
+! Are there deployment lon/lat variables?
+
+DEFINE SYMBOL deploy_lon = 0
+DEFINE SYMBOL deploy_lat = 0
+
+LET all_varnames = ..varnames
+LET nvars = ..nvars
+REPEAT/I=1:`nvars` (DEFINE SYMBOL ivar = `all_varnames`;\
+ LET all_attnames = ($ivar).attnames;\
+ IF `IS_ELEMENT_OF_STR_N(all_attnames, "units") EQ 0` THEN EXIT/CYCLE;\
+ IF `IS_ELEMENT_OF_STR_N(all_attnames, "long_name") EQ 0` THEN EXIT/CYCLE;\
+ IF `STRCMP(($ivar).units, "degrees_east") NE 0` THEN EXIT/CYCLE;\ 
+ LET vtitle = UPCASE(($ivar).long_name);\
+ list/norow/nohead vtitle;\
+ IF `STRINDEX(vtitle, "DEPLOYMENT") NE 0` THEN DEFINE SYMBOL deploy_lon = ($ivar);\ 
+ IF ($deploy_lon"0|*>1") THEN EXIT/LOOP;\
+)
+
+REPEAT/I=1:`nvars` (DEFINE SYMBOL ivar = `all_varnames`;\
+ LET all_attnames = ($ivar).attnames;\
+ IF `IS_ELEMENT_OF_STR_N(all_attnames, "units") EQ 0` THEN EXIT/CYCLE;\
+ IF `IS_ELEMENT_OF_STR_N(all_attnames, "long_name") EQ 0` THEN EXIT/CYCLE;\
+ IF `STRCMP(($ivar).units, "degrees_north") NE 0` THEN EXIT/CYCLE;\ 
+ LET vtitle = UPCASE(($ivar).long_name);\
+ list/norow/nohead vtitle;\
+ IF `STRINDEX(vtitle, "DEPLOYMENT") NE 0` THEN DEFINE SYMBOL deploy_lat = ($ivar);\ 
+  IF ($deploy_lat"0|*>1") THEN EXIT/LOOP;\
+)
+
+LET its_watch_circle = `($deploy_lat"0|*>1") AND  ($deploy_lon"0|*>1")`
+IF `its_watch_circle EQ 0` THEN EXIT/SCRIPT
+
+!LET its_watch_circle = `(($constr_lon_max"0|*>1") EQ 0) AND (($constr_lon_max"0|*>1") EQ 0)` 
+!IF `its_watch_circle EQ 0` THEN EXIT/SCRIPT
+
+! May turn off axis labeling later
+PPL TICS .6,.125,.6,.125
+PPL axlabp,-1,-1
+
+DEFINE SYMBOL xvar = constraints_mask*xvar
+DEFINE SYMBOL yvar = constraints_mask*yvar
+LET p = ($xvar) ! longitude
+LET q = ($yvar) ! latitude
+
+DEFINE SYMBOL connect_dots = 1
+DEFINE SYMBOL do_rsquare = 0
+
+CANCEL SYMBOL set_window_quals
+
+! size for the label that says a variable is all-missing
+DEFINE SYMBOL miss_lab_siz = 0.14
+
+! Do not label axes with the words LONGITUDE, LATITUDE
+DEFINE SYMBOL ax_label_x = ppl xlab
+DEFINE SYMBOL ax_label_y = ppl ylab
+
+
+DEFINE VIEWPORT/XLIM=0:1/YLIM=0:1 vfull1
+DEFINE VIEWPORT/XLIM=0:1/YLIM=0:1 vfull2
+
+DEFINE SYMBOL view1 = vfull1
+DEFINE SYMBOL view2 = vfull2
+IF ($ferret_annotations"0|*>1") THEN
+   DEFINE SYMBOL view1 = full_view
+   DEFINE SYMBOL view2 = full_view2
+ENDIF
+
+SET VIEW ($view1)
+
+! If this symbol is set during this script, then
+! the script will make a blank plot and exit.
+CANCEL SYMBOL put_label
+
+! For the line connecting points in each feature, color it grey.
+PPL COLOR,6,60,60,60 ! grey
+
+
+let pq = p*q
+let pqmask = pq-pq
+let p_var = p + pqmask
+let q_var = q + pqmask
+
+! Define axes for both variables using the range in the data
+
+!---------
+LET amin = p_var[i=@MIN]
+LET amax = p_var[i=@MAX]
+LET bmin = q_var[i=@MIN]
+LET bmax = q_var[i=@MAX]
+
+
+LET locx = ($deploy_lon)[i=1]
+LET locy = ($deploy_lat)[i=1]
+
+! Compute radius of circle: max excursion from the deployment location.
+! The plot range is the max of this size and the watch circle radius
+
+LET radii = ((p_var - locx)^2 + (q_var - locy)^2)^0.5
+LET wc_rad_compute = radii[i=@max]
+LET wc_rad = wc_rad_compute
+LET axis_add =  wc_rad_compute
+
+IF ($wc_rad"0|0|*>1) THEN LET wc_rad = ($wc_rad)
+LET axis_add = MAX(($wc_rad"0"), wc_rad_compute)
+
+LEt ax_lo = ($deploy_lon) - axis_add*1.05
+LEt ax_hi = ($deploy_lon) + axis_add*1.05
+
+DEFINE AXIS/x=`ax_lo,prec=9`:`ax_hi,prec=9`/npoints=20/units="($lon_units%degrees_east%)" haxis
+IF `axis_add LT 0.06` THEN  DEFINE SYMBOL special_label_x = dms
+DEFINE SYMBOL have_haxis = 1
+
+LET region_x_range = `ax_hi - ax_lo`
+DEFINE SYMBOL region_x_range = `region_x_range,prec=9` ! reset this so LAS_fland.jnl chooses the right resolution
+
+LET dep_var = x[gx=haxis]
+CANCEL SYMBOL data_1_units
+CANCEL SYMBOL ferret_title_0  ! dont need a horizontal axis label
+
+!  latitude
+
+LEt ax_lo = ($deploy_lat) - axis_add*1.05
+LEt ax_hi = ($deploy_lat) + axis_add*1.05
+
+DEFINE AXIS/y=`ax_lo,prec=9`:`ax_hi,prec=9`/npoints=20/units="($lat_units%degrees_north%)" vaxis
+IF `axis_add LT 0.06` THEN  DEFINE SYMBOL special_label_y = dms
+DEFINE SYMBOL have_haxis = 1
+
+LET region_y_range = `ax_hi - ax_lo`
+DEFINE SYMBOL region_y_range = `region_y_range,prec=9` ! reset this so LAS_fland.jnl chooses the right resolution
+
+LET indep_var = y[gy=vaxis]
+CANCEL SYMBOL data_1_units
+CANCEL SYMBOL ferret_title_0  ! dont need a horizontal axis label
+
+DEFINE SYMBOL axes_already_defined = 1
+
+
+DEFINE SYMBOL win_asp = /ASPECT=1
+DEFINE SYMBOL set_window_quals = /SIZE=($ferret_size"0.5")($win_asp)
+GO LAS_open_window
+
+LET bvar = dep_var + indep_var
+LET allmiss = IF bvar THEN (`bvar,RETURN=bad`)
+CANCEL MODE nodata_lab
+IF `($special_label_x"0|*>1") OR ($special_label_y"0|*>1") OR\
+  ($ax_label_x"0|*>1") OR ($ax_label_y"0|*>1")` THEN
+   SHADE/NOKEY/PAL=white($pqual)/SET/title=" " allmiss
+   ($ax_label_x)
+   ($ax_label_y)
+   ($ax_label_resize)
+   ($thumb_alab_size)
+   IF `($lab1"0|*>1")` THEN go unlabel 1
+   PPL SHADE
+   SET VIEW full_view2
+ENDIF
+
+SHADE/NOKEY/PAL=white($pqual)/NOAX/title=" "/SET allmiss
+   ($thumb_alab_size)
+   ($ax_label_resize)
+IF ($lab1"0|*>1") THEN
+   IF `(STRINDEX("($lab1)", "YEAR") GT 0)` THEN 
+      IF `STRINDEX("($note_($note_num%0%)_lab%0%)", "YEAR") EQ 0` THEN
+         DEFINE SYMBOL note_num = `($note_num"0") + 1`
+         DEFINE SYMBOL note_($note_num)_lab = ($lab1)
+         IF ($ferret_thumb"0|0|*>1") THEN label/nouser `-0.2*($ppl$xorg)`,`-0.95*($ppl$yorg)`,-1,0,($txl_lab_size),($lab1)
+      ENDIF
+   ENDIF
+   GO unlabel 1
+ENDIF
+PPL SHADE
+
+! Plot center of the circle and the circle itself
+
+PLOT/VS/OVER/NOLAB/THICK=3/sym=21/SIZ=0.2/color=lightblue locx, locy
+PLOT/VS/OVER/NOLAB/THICK=3/sym=27/SIZ=0.18/color=black locx, locy
+PLOT/VS/OVER/NOLAB/LINE/k=1:628/COLOR=6/pal=rnb locx + wc_rad*cos(k/100), locy + wc_rad*sin(k/100)
+
+! If put_label was defined, something caused one or both variables to be all BAD.
+IF ($put_label"0|*>1") THEN 
+
+! add labels if a whole variable is all-bad
+! p is masked XVAR
+
+   DEFINE SYMBOL ax_lo = `xvar[i=@MIN]`
+   DEFINE SYMBOL ax_hi = `xvar[i=@MAX]`
+
+   LET ylab_bad = ($ppl$ylen) - 1
+   IF `($ax_lo"0|bad>1|*>0") OR ($ax_hi"0|bad>1|*>0")` THEN 
+      IF ($ferret_thumb"0|0|*>1") THEN  
+         LABEL/NOUSER 0.2, `ylab_bad-0.2`, -1, 0, ($miss_lab_siz), @AS($ferret_title_0)<NL> is all-missing
+         LET ylab_bad = `ylab_bad-3*($miss_lab_siz)`
+	 DEFINE SYMBOL no_novalid_lab = 1
+      ELSE
+         LABEL/NOUSER 0.2, `ylab_bad-0.2`, -1, 0, ($miss_lab_siz), @AS($ferret_title_0) is all-missing
+         LET ylab_bad = `ylab_bad-2*($miss_lab_siz)`
+	 DEFINE SYMBOL no_novalid_lab = 1
+      ENDIF
+      DEFINE SYMBOL bad_pp_var = 1
+   ENDIF
+
+! q is masked YVAR
+
+   DEFINE SYMBOL ax_lo = `yvar[i=@MIN]`
+   DEFINE SYMBOL ax_hi = `yvar[i=@MAX]`
+   IF `($ax_lo"0|bad>1|*>0") OR ($ax_hi"0|bad>1|*>0")` THEN 
+   
+      IF ($ferret_thumb"0|0|*>1") THEN  
+         LABEL/NOUSER 0.2, `ylab_bad-0.2`, -1, 0, ($miss_lab_siz), @AS($ferret_title_1)<NL> is all-missing
+         LET ylab_bad = `ylab_bad-3*($miss_lab_siz)`
+	 DEFINE SYMBOL no_novalid_lab = 1
+      ELSE
+         LABEL/NOUSER 0.2, `ylab_bad-0.2`, -1, 0, ($miss_lab_siz), @AS($ferret_title_1) is all-missing
+         LET ylab_bad = `ylab_bad-2*($miss_lab_siz)`
+	 DEFINE SYMBOL no_novalid_lab = 1
+      ENDIF
+      DEFINE SYMBOL bad_pp_var = 1
+   ENDIF
+
+   IF `($bad_pp_var"0") EQ 0` THEN 
+      LABEL/NOUSER 0.2, `ylab_bad-($miss_lab_siz)`, -1, 0, 0.12, @ASConstraints result in no valid data
+      DEFINE SYMBOL no_novalid_lab = 1
+   ENDIF
+
+   DEFINE SYMBOL data_0_var = allmiss  ! for LAS_results
+   EXIT/SCRIPT
+ENDIF
+
+
+SET MODE/LAST nodata_lab
+
+!!  See testing comment at top
+DEFINE SYMBOL xvar = constraints_mask*xvar
+DEFINE SYMBOL yvar = constraints_mask*yvar
+LET p = ($xvar) 
+LET q = ($yvar)
+
+! End of file setup_watch_circle.jnl--------------------------

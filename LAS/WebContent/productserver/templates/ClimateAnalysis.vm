@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Standards Mode", which gives better cross    -->
+<!-- browser compatibility to the application.     -->
+<!-- Omitting this line leaves most browsers in    -->
+<!-- "Quirks mode", emulating the bugs in older    -->
+<!-- browser versions.                             -->
+
+<html>
+  <head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta content="tave_spectrum" name="Analysis Time Averaged Spectrum" id="analysis-tave_spectrum" />
+    <meta content="cdb_zonal" name="CDB Zonal" id="analysis-cdb_zonal" />
+    
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>LAS CMIP5 Climate Analysis</title>
+    
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <!--  strider.weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xSi6Ygk863vw1oXTT1cyritDYiIOhSs8NJgobGDysmECbXI_Ld9bweUlA"
+      type="text/javascript"></script>
+    -->
+    <!--  weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xTCqQI3Sj7hqI6Uh8C-ytlVpmJc8xS3dXHdpRVUOyawacVodlU95YCvWg"
+      type="text/javascript"></script>
+    -->
+    <!-- localhost
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRutBJbRgJeVagWzAByU3KazihaXg"
+      type="text/javascript"></script>
+       -->
+    <script type="text/javascript" language="javascript" src="../../JavaScript/components/gov.noaa.pmel.tmap.las.ClimateAnalysis/gov.noaa.pmel.tmap.las.ClimateAnalysis.nocache.js"></script>
+    <link rel="stylesheet" href="../../JavaScript/components/css/OLMapWidget.css" type="text/css">
+    <link rel="stylesheet" href="../../JavaScript/components/css/LAS.css" type="text/css">
+    <link rel="stylesheet" href="../../JavaScript/ui/LASUI.css" type="text/css"/>
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+  <body style="margin-left:15px;margin-right:15px">
+  #parse ("productserver/templates/V7UIHeader.vm")
+  <h1>CMIP5 Climate Analysis</h1>
+  <p>Using this page you can create comparison graphs between two CMIP5 data sets for various climate analysis algorithms.</p>
+  <div id="DatasetSelection" class="highlightSelection">
+  <h3>Step 1: Select the data sets to be compared:</h3>
+  <p>You have currently selected: 
+  <ul>
+  <li><div style="margin-left=20px" id="CurrentDataset"></div></li>
+  </ul>
+  <p>which will be compared to:
+  <ul>
+  <li>
+  <div style="padding-left=20px" id="SecondDataset"></div></p>
+  </li>
+  </ul>
+  <p>Select another CMIP5 Data Set from the list below to compare with the current selection.</p>
+  <div class="selection" id="DatasetWidget"></div>
+  </div>
+  <div id="AnalysisSelection">
+  <h3>Step 2: Select the Plot Type.</h3>
+  <div id="AnalysisType"></div>
+  </div>
+  <div id="RegionSelection">
+  <h3 id="regionTitle">Step 3: Select the Variables and/or Regions.</h3>
+  <div id="Regions"></div>
+  </div>
+  <div id="DateSelection">
+  <div id="timeTitle"></div>
+  <table padding="8px" border="1">
+  <tr><th>Year range for the first data set.</th><th>Year range for the second data set.</th></tr>
+  <tr><td><div id="DateRange"></div></td><td><div id="DateRange2"></div></td></tr>
+  </table>
+  </div>
+  <div id="SubmitSelection">
+  <center><div id="Submit"></div></center>
+  </div>
+  #parse("productserver/templates/V7UIFooter.vm")
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>			
+  </body>
+</html>

@@ -1,0 +1,9 @@
+<module>
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.i18n.I18N" />
+    <inherits name="com.google.gwt.json.JSON" />
+	<source path="client/map" />
+	<source path="client/openlayers" />
+	<inherits name='org.gwtopenmaps.openlayers.OpenLayers' />
+	<stylesheet src="../css/OLMapWidget.css" />
+</module>

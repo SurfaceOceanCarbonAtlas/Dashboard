@@ -1,0 +1,82 @@
+! list_csv_define_var.jnl
+! Run this from a loop in list_csv_data.jnl
+
+! Initialize data and define 1-d list of variable to write out
+! Save the original variable name and use it in the listing.
+
+! 1/21/20 issue 1770 
+! If a variable was already renamed in an init script then
+! workaround was incorrect when handling naming here.
+! 4/20 Make sure we don't try to access variables in dataset 
+!      via ..varnames before the dataset has been initialized.
+
+DEFINE SYMBOL var_num = $1
+GO LAS_initialize_region ($var_num)
+
+DEFINE SYMBOL data_($var_num)_var_orig ($data_($var_num)_var)
+
+! Is a variable repeated in the list?  If so then ($data_($var_num)_var)_csv is already 
+! set up so we can skip writing it
+
+IF  `($data_($var_num)_var)_csv,RETURN=isready` THEN
+   DEFINE SYMBOL csv_skip_($var_num) = 1
+   EXIT/SCRIPT
+ENDIF
+
+! Second instance of an init-script variable 
+IF  `($data_($var_num)_var)_csv_($session_PID),RETURN=isready` THEN
+   DEFINE SYMBOL csv_skip_($var_num) = 1
+   EXIT/SCRIPT
+ENDIF
+
+
+GO LAS_initialize_data ($var_num)
+LET varnames = ..varnames
+
+! If a variable has already been renamed in an init script 
+! then we need to work around that.
+
+LET renamed_($var_num) = 0
+IF ($ferret_init_script"0|*>1") THEN
+
+   LET renamed_($var_num) = `IS_ELEMENT_OF_STR_N(varnames, "($data_($var_num)_var)") GT 0 AND \
+     IS_ELEMENT_OF_STR_N(varnames, "($data_($var_num)_var)_in") GT 0`
+   IF `renamed_($var_num) EQ 0` THEN LET renamed_($var_num) =  `IS_ELEMENT_OF_STR_N(varnames, "($data_($var_num)_var)") EQ 0`
+
+ENDIF
+
+IF `renamed_($var_num)` THEN
+
+   IF `($data_($var_num)_var)_csv_($session_PID),RETURN=isready` THEN 
+      DEFINE SYMBOL ferret_plot_var_($var_num) = skip_var_($var_num)
+      EXIT/script
+   ENDIF
+
+   DEFINE SYMBOL data_($var_num)_var_orig = ($data_($num)_var)_
+   LET/title="`($data_($num)_var),return=title`"/units="`($data_($num)_var),RETURN=units`" \
+       ($data_($var_num)_var)_csv_($session_PID) = ($data_($num)_var)[($region_full)]
+   DEFINE SYMBOL data_($var_num)_var =  ($data_($var_num)_var)_csv_($session_PID)
+   DEFINE SYMBOL ferret_plot_var = ($data_($var_num)_var)
+ELSE
+
+   IF `(($data_($var_num)_var)_csv),RETURN=isready` THEN 
+      DEFINE SYMBOL ferret_plot_var_($var_num) = skip_var_($var_num)
+      EXIT/script
+   ENDIF
+
+   SET VAR/NAME=($data_($var_num)_var)_csv ($data_($var_num)_var)
+   DEFINE SYMBOL data_($var_num)_var = ($data_($var_num)_var)_csv
+   DEFINE SYMBOL ferret_plot_var = ($data_($var_num)_var)
+   GO LAS_initialize_data ($var_num)
+
+ENDIF
+
+DEFINE SYMBOL ferret_plot_var_($var_num) =($ferret_plot_var)
+LET ferret_list_var_($var_num) = XSEQUENCE(($ferret_plot_var))
+DEFINE SYMBOL ferret_list_var_($var_num) = ferret_list_var_($var_num)
+DEFINE SYMBOL size_($var_num)= `($ferret_list_var_($var_num)),return=isize`
+IF `($var_num) GT 0` THEN if `($size_($var_num)) NE ($size_0)` THEN MESSAGE/ERROR ERROR: Variables different sizes
+IF `($var_num) GT 0` THEN if `($size_($var_num)) NE ($size_0)` THEN exit/program 
+
+! End of script ---------- list_csv_define_var.jnl----------------------------
+

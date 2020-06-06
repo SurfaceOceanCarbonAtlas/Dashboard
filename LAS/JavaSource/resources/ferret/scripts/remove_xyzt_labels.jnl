@@ -1,0 +1,9 @@
+! remove_xyzt_labels.jnl
+! Remove automatically-generated labels.
+
+IF ($labnum_x"0|*>1") THEN go unlabel ($labnum_x)
+IF ($labnum_y"0|*>1") THEN go unlabel ($labnum_y)
+IF ($labnum_z"0|*>1") THEN go unlabel ($labnum_z)
+IF ($labnum_t"0|*>1") THEN go unlabel ($labnum_t)
+
+!  ----------------- End of remove_xyzt_labels.jnl ------------------------------------

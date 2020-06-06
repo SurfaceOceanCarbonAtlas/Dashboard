@@ -1,0 +1,68 @@
+@charset "utf-8";
+/* HTML tags */
+
+
+fieldset legend {
+  color: #888;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  /* font-weight: bold; */
+}
+
+fieldset p {
+  font-size: 14px;
+  padding: 2px;
+}
+
+fieldset p .note {
+  color: #888;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Elements identified by ID */
+
+#PW_Table {
+  background-color: #FFF;
+  border-spacing: 4px;
+  color: black;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+#PW_controlTable {
+  background-color: #ACE;
+  border: solid 2px black;
+  padding: 4px;
+  width: 100%;
+}
+
+#PW_Table .PW_banner {
+  color: #579;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+#PW_Table .PW_optionTable {
+  background-color: #ACE;
+  border-spacing: 0;
+  padding: 6px;
+}
+
+/* Elements identified by 'class' */
+
+.PW_imageCell {
+  padding: 2px;
+  text-align: center;
+}
+
+.PW_imageCell img{
+  border: none;
+}
+
+.PW_imageCell table {
+  background-color: #ACE;
+}
+

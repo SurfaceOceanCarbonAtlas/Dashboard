@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+#parse ("/productserver/templates/revision.vm")
+<html debug="true">
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<title>Cache Manager: $las_config.getTitle()</title>
+		
+		<style media="all" type="text/css">
+			@import "JavaScript/ui/LASUI.css";
+			@import "css/UX/metallic/metallicGrn.css";
+		</style>
+	</head>
+
+<body onload="init()">
+		#parse ("/productserver/templates/V7UIHeader.vm")
+<h3>The cache is currently set to hold at most $max_files files.  Currently there are $numfiles files stored in the cache.</h3>
+<h3>The cache is limited to $max_bytes bytes.  Currently there are $size bytes stored in the cache.</h3>
+            <form name="cacheForm"
+				action="CacheManager.do"
+				method="POST">
+				<INPUT type="SUBMIT" name="cleanbutton" value="Clean the cache">
+				<INPUT type="hidden" name="clean" property="clean" value="true">
+            </form>
+<h3>These files are currently in the cache:</h3>
+#foreach ($ds in $datasets.keySet())
+    #set ($files = $datasets.get($ds))
+    <h4>$ds</h4>
+    <ol>
+        #foreach ($file in $files)
+             <li>$file</li>
+        #end
+    </ol>
+   #set ($keys = $dataset_keys.get($ds))
+       #set($keylist="")
+       #foreach ($key in $keys)
+           #set($keylist="$keylist&$key")
+       #end
+       <form name="cacheForm"
+				action="CacheManager.do"
+				method="POST">
+				<INPUT type="SUBMIT" name="cleands" value="Clean these files">
+                <INPUT type="hidden" name="key" property="key" value="$keylist.substring(1)">
+       </form>
+#end
+
+
+#parse( "/productserver/templates/V7UIFooter.vm") 
+</body>
+</html>

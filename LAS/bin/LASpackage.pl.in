@@ -1,0 +1,239 @@
+#!@PERL@ -w
+#
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+# $Id: LASpackage.pl.in,v 1.1 2004/05/10 23:13:30 callahan Exp $
+#
+# Server code for returning various information about this
+# server including livepack packages.
+#
+
+use strict;
+use lib qw(. .. ../xml/perl);
+use CGI qw/:push/;
+use CGI::Carp qw(fatalsToBrowser set_message);
+use LAS;
+use LASUI;
+use File::Basename;
+use File::PathConvert qw(abs2rel rel2abs splitdirs);
+require('LAS_config.pl');
+require('config.results');
+
+
+my $VERSION = "1.0.0";
+my $LAS_VERSION = $LAS::VERSION ? $LAS::VERSION : "6.3.0";
+
+
+BEGIN {
+    set_message("Error from LASinfo.pl:  ");
+}
+	
+############################################################
+# Start of main program
+#
+
+my %ExternHash;
+my $OldHandler;
+
+my $query = new CGI;
+$| = 1;
+
+my $request = $query->param('request');
+
+$request = "help" if ! $request;
+if ($request eq 'package' || $request eq 'pac') {
+  &getPackage($query);
+} else {
+  &helpPage($query);
+}
+
+#
+# End of main program
+############################################################
+
+############################################################
+# Print out table of navigation links
+#
+sub printNavBar {
+  my ($query) = @_;
+  print "<TABLE align=center border=0 cellpadding=0 cellspacing=10><TR>\n";
+  print "<TD align=center><A HREF=\"" . $query->url . "\">help</A></TD>\n";
+  print "<TD align=center><A HREF=\"" . $query->url . "?request=package\">package</A></TD>\n";
+  print "</TR></TABLE>\n";
+}
+
+############################################################
+# Print out error message
+#
+sub helpPage {
+  my ($query) = @_;
+  print $query->header;
+  print $query->start_html('LASpackage');
+  &printNavBar($query);
+  print <<EOF;
+<P>
+By clicking on the links above you can request information about the LAS
+site hosted by this server.<P>
+<UL>
+  <TABLE border=0>
+    <TR><TD><B>help </B></TD><TD>&nbsp;</TD>
+        <TD>This page.</TD></TR>
+    <TR><TD><B>package </B></TD><TD>&nbsp;</TD>
+        <TD> A 'livepack' package appropriate for setting up a sister server.</TD></TR>
+  </TABLE>
+</UL>
+EOF
+  print $query->end_html;
+
+}
+
+############################################################
+# Create and return a livepack tar file containing server
+# configuration information.
+#
+sub getPackage {
+  my ($query) = @_;
+  if ( $query->param('version') ) {
+    $LAS_VERSION = $query->param('version');
+  }
+  if ( $LAS_VERSION < 5.2 ) {
+    &getXML($query);
+  } else {
+    &createPackage($query);
+  }
+}
+
+############################################################
+# Create a new package
+#
+sub getXML {
+  my ($query) = @_;
+
+  my $configFile = "../ui/config.xml";
+  my $parser = new LAS::Parser($configFile);
+  my $uiInfo = new LAS::UI($parser);
+  $LAS::UI::Base = $uiInfo->getAttribute('base');
+  my @urls = $uiInfo->getURLs;
+  my @xmlFiles = ();
+  foreach my $url (@urls){
+    my $fname = $url;
+    if ($fname =~ /^file:/ && $fname !~ /packages/) {
+      $fname =~ s/^file://;
+      my $basename = basename($fname);
+      push(@xmlFiles,$basename);
+    }
+  }
+
+
+  if ($#xmlFiles < 0) {
+    printErrorDie($query,'No local files were found in config.xml');
+  }
+
+# Generate a file name
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(); 
+  $year = sprintf("%02d", $year % 100);  
+  $mon += 1;
+  my $uiPath = $main::LasConfig{uipath};
+  $uiPath =~ s/\///;
+  my $pfile = "xml_" . $uiPath . "_" . $year . $mon . $mday . ".tar";
+  my $output_path = "http://" . $main::LasConfig{hostname} . 
+                    $main::LasConfig{output_alias} . "/" . $pfile;
+
+  # Create a new file if there isn't one with today's time stamp.
+  if (! -f $pfile) {
+    my @files = ();
+    foreach my $xmlFile (@xmlFiles) {
+      printErrorDie($query,"Can't find XML config file: $xmlFile\n") if ! -f $xmlFile;
+      # Get starting XML file and external entities in XML files
+      push(@files,$xmlFile);
+      push(@files,getExternEnts($xmlFile));
+    }
+    my $comm = qq{tar chf output/$pfile } . join(' ',@files);
+    my $status = `$comm`;
+    if ($status) {
+      printErrorDie($query, "Command '$comm' failed\n" . "Message: $status");
+    }
+  }
+
+  print $query->redirect($output_path);
+}
+
+############################################################
+# Create a new package
+#
+sub createPackage {
+  my ($query) = @_;
+
+  my $xmlFile = "las.xml";
+
+if ($LAS_VERSION < 6.0) {
+  my $configFile = "../ui/config.xml";
+  my $parser = new LAS::Parser($configFile);
+  my $uiInfo = new LAS::UI($parser);
+  $LAS::UI::Base = $uiInfo->getAttribute('base');
+  my @urls = $uiInfo->getURLs;
+  my @xmlFiles = ();
+  foreach my $url (@urls){
+    my $fname = $url;
+    if ($fname =~ /^file:/ && $fname !~ /packages/) {
+      $fname =~ s/^file://;
+      my $basename = basename($fname);
+      push(@xmlFiles,$basename);
+    }
+  }
+
+
+  if ($#xmlFiles < 0) {
+    printErrorDie($query,'No local files were found in config.xml');
+  } elsif ($#xmlFiles > 0) {
+    printErrorDie($query,'More than one top level .xml file found in config.xml');
+  }
+  $xmlFile = pop(@xmlFiles);
+}
+
+# Generate a file name
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(); 
+  $year = sprintf("%02d", $year % 100);  
+  $mon += 1;
+  my $uiPath = $main::LasConfig{uipath};
+  $uiPath =~ s/\///;
+  my $pfile = "package_" . $uiPath . "_" . $year . $mon . $mday . ".tar";
+  my $output_path = "http://" . $main::LasConfig{hostname} . 
+                    $main::LasConfig{output_alias} . "/" . $pfile;
+
+  # Create a new file if there isn't one with today's time stamp.
+  if (! -f $pfile) {
+    my $comm = qq{./livepack.pl --create --full output/$pfile $xmlFile};
+    my $status = `$comm`;
+    if ($status !~ /Created livepack file/) {
+      printErrorDie($query, "Command '$comm' failed\n" . "Message: $status");
+    }
+  }
+
+  print $query->redirect($output_path);
+}
+
+############################################################
+# Get all of the external entity references in a XML file
+#
+
+sub entHandler {
+    $ExternHash{$_[2]} = 1;
+    &$OldHandler(@_);
+}
+
+
+sub getExternEnts {
+    my $file = shift;
+    %ExternHash = ();
+    my $parser = new XML::Parser;
+    my $junk;
+    ($junk, $OldHandler) = $parser->setHandlers(ExternEnt => \&entHandler);
+    $parser->parsefile($file, ErrorContext => 3);
+    keys %ExternHash;
+}
+

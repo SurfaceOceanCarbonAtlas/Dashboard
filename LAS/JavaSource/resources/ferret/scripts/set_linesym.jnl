@@ -1,0 +1,68 @@
+! set_linesym.jnl
+! set plot type: line, symbols, or both.  If there are up to 120 
+! points use line-and-symbol.Use STAT to get # of points, and count 
+! both bad andgood -- avoids inconsistencies if there are a few 
+! missing points in one series and not in another.
+
+LET plotvar  = ($ferret_plot_var)
+LET filledvar = missing(plotvar,0)
+
+! We could get this out of a STAT command, but @NGD and @NBD need less computation.
+! For data sampled from a curvilinear datset, the STAT is way more efficient
+
+IF ($do_curvi_xy"0|*>1") THEN 
+   stat plotvar
+   let ngood = ($stat_ngood)
+   let nbad =  ($stat_nbad)
+ELSE
+   DEFINE SYMBOL  VARSHAPE `plotvar,RETURN=shape`
+   CANCEL SYMBOL comma
+   IF `STRINDEX("($varshape)", "X") NE 0` THEN
+      DEFINE SYMBOL getgood = i=@ngd
+      DEFINE SYMBOL getbad = i=@nbd
+      DEFINE SYMBOL comma = ,
+   ENDIF
+   IF `STRINDEX("($varshape)", "Y") NE 0` THEN
+      DEFINE SYMBOL getgood = ($getgood)($comma)j=@ngd
+      DEFINE SYMBOL getbad = ($getbad)($comma)j=@nbd
+      DEFINE SYMBOL comma = ,
+   ENDIF
+   IF `STRINDEX("($varshape)", "Z") NE 0` THEN
+      DEFINE SYMBOL getgood = ($getgood)($comma)k=@ngd
+      DEFINE SYMBOL getbad = ($getbad)($comma)k=@nbd
+      DEFINE SYMBOL comma = ,
+   ENDIF
+   IF `STRINDEX("($varshape)", "T") NE 0` THEN
+      DEFINE SYMBOL getgood = ($getgood)($comma)l=@ngd
+      DEFINE SYMBOL getbad = ($getbad)($comma)l=@nbd
+      DEFINE SYMBOL comma = ,
+   ENDIF
+   IF `STRINDEX("($varshape)", "E") NE 0` THEN
+      DEFINE SYMBOL getgood = ($getgood)($comma)m=@ngd
+      DEFINE SYMBOL getbad = ($getbad)($comma)m=@nbd
+      DEFINE SYMBOL comma = ,
+   ENDIF
+   IF `STRINDEX("($varshape)", "F") NE 0` THEN
+      DEFINE SYMBOL getgood = ($getgood)($comma)n=@ngd
+      DEFINE SYMBOL getbad = ($getbad)($comma)n=@nbd
+   ENDIF
+   
+   let ngood = plotvar[($getgood)]
+   let nbad =  plotvar[($getbad)]
+
+ENDIF ! curvilinear or not
+
+LET npoints = ngood + nbad
+list npoints
+LET nminpts = 120
+IF ($itsa_multi_lineplot"0|*>1") THEN LET nminpts = 15
+
+IF `npoints LT nminpts AND ($plotsymbol"0|*>1")` THEN
+   DEFINE SYMBOL qualifiers = ($qualifiers)($ferret_line_or_sym%/LINE/SYM=($plotsymbol)|default>/LINE/SYM=($plotsymbol)|line>/LINE|both>/LINE/SYM=($plotsymbol)|sym>/SYM=($plotsymbol)%)
+   DEFINE SYMBOL legend_qual = ($legend_qual)($ferret_line_or_sym%/LINE/SYM=($plotsymbol)|default>/LINE/SYM=($plotsymbol)|line>/LINE|both>/LINE/SYM=($plotsymbol)|sym>/SYM=($plotsymbol)%)
+ELSE 
+   DEFINE SYMBOL qualifiers = ($qualifiers)($ferret_line_or_sym%/LINE|default>/LINE|line>/LINE|both>/LINE/SYM=($plotsymbol)|sym>/SYM=($plotsymbol)%)
+   DEFINE SYMBOL legend_qual = ($legend_qual)($ferret_line_or_sym%/LINE|default>/LINE|line>/LINE|both>/LINE/SYM=($plotsymbol)|sym>/SYM=($plotsymbol)%)
+ENDIF
+
+! --------------- End of set_linesym  ---------------------------

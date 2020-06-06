@@ -1,0 +1,5 @@
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+!! Attempt to define a variable from the result of the analysis script
+DEFINE VARIABLE/D=1 ($data_0_analysis_label) = ($ferret_plot_var)
+GO LAS_xyzt_ijkl

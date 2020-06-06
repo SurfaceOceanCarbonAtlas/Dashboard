@@ -1,0 +1,32 @@
+! reset_after_trend.jnl
+! After a 1D plot that has a trend line, set things so that zooming 
+! will work correctly.
+!
+! Reset to the viewport of the first trend line for 2-panel trendline plots
+! and redraw the variable line. This lets zooming work correctly.
+
+IF `($ferret_trend_line"0|1|2|0") EQ 1` THEN
+!   SET VIEW trend_view
+   PLOT($qualifiers)/NOKEY/SET/TITLE=" " ($plot_arg)
+   IF `STRCMP("($xaxis_min%none|*>ok%)", "none") EQ 0` THEN DEFINE SYMBOL xaxis_min = ($v1)
+   IF `STRCMP("($xaxis_max%none|*>ok%)", "none") EQ 0` THEN DEFINE SYMBOL xaxis_max = ($v2)
+   IF ($fview"0|Z>1|*>0") THEN CANCEL SYMBOL ax_horiz  !data direction
+
+ENDIF
+IF `($ferret_trend_line"0|1|2|0") EQ 2` THEN
+   IF ($dep_dir"0|Y>1|*>0") THEN 
+      DEFINE VIEW/axes/x=0.1:0.9/y=0.55:0.8 trend_up 
+      DEFINE VIEW/axes/x=0.1:0.9/y=0.2:0.45 trend_dn
+      SET VIEW trend_up
+      PLOT($qualifiers)/NOKEY/SET/TITLE=" " ($plot_arg)
+   ELSE
+      SET VIEW left
+      PLOT($qualifiers)/NOKEY/SET/TITLE=" " ($plot_arg)
+      IF `STRCMP("($xaxis_min%none|*>ok%)", "none") EQ 0` THEN DEFINE SYMBOL xaxis_min = ($v1)
+      IF `STRCMP("($xaxis_max%none|*>ok%)", "none") EQ 0` THEN DEFINE SYMBOL xaxis_max = ($v2)
+      CANCEL SYMBOL ax_horiz  !data direction
+   ENDIF
+
+ENDIF
+
+! --------------- End of reset_after_trend.jnl  ---------------------------

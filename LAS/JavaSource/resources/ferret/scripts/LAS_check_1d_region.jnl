@@ -1,0 +1,70 @@
+! LAS_check_1d_region.jnl
+! 
+! Author: ansley
+! $Date: 2007/06/22
+!
+! Check whether the region is too small= and reduces to a single grid point.
+! Call after region and dataset have been initialized for 1D plot.
+
+! Do this only if this is not a native curvlinear or hybrid z plot.
+
+IF `($do_curvi_xy"0") AND ($native_curvilinear_xy"0")` THEN EXIT/SCRIPT
+IF `($do_hybrid_z"0") AND ($native_Z_plot"0")` THEN EXIT/SCRIPT
+IF `($do_curvi_xy_and_hybrid_z)` THEN EXIT/SCRIPT
+
+! IF `($do_curvi_xy"0") OR ($do_hybrid_z"0") OR ($do_curvi_xy_and_hybrid_z)` THEN EXIT/SCRIPT
+
+! See if there is an axis in this direction (may happen for a var in a multi-line plot)
+DEFINE SYMBOL ax1d = `($data_var),RETURN=($ferret_view)axis`
+
+IF `STRCMP("($ax1d)", "NORMAL") EQ 0` THEN
+   DEFINE SYMBOL has_no_line = 1
+   DEFINE SYMBOL error_status = ERROR
+   DEFINE SYMBOL error_type = REGION
+   DEFINE SYMBOL error_action = Checking grid and region  
+   DEFINE SYMBOL error_string = No ($ferret_view) axis for variable ($data_name)
+   GO LAS_error_msg 
+   EXIT/PROGRAM
+ENDIF
+
+! Or there may be a 1-point axis
+
+CANCEL SYMBOL error*
+
+DEFINE SYMBOL index_dir = ($ferret_view%N|x>I|y>J|z>K|t>L|*>N%)
+IF `STRCMP("($index_dir)", "N") EQ 0` THEN EXIT/SCRIPT
+
+LET tsiz = `($data_var),return=($index_dir)size`
+
+IF `tsiz LE 1` THEN
+   DEFINE SYMBOL has_no_line = 1
+   DEFINE SYMBOL error_status = ERROR
+   DEFINE SYMBOL error_type = REGION
+   DEFINE SYMBOL error_action = Checking grid and region  
+   DEFINE SYMBOL error_string = No ($ferret_view) axis for variable ($data_name)
+   GO LAS_error_msg 
+   EXIT/PROGRAM
+ENDIF
+
+! Or the region may reduce to a single point.
+! If doing a slice of a curvilinear variable then note that RETURN=shape is not
+! always correct for these variables (dont exit, test works for some cases)
+! IF `STRINDEX ("($ferret_plot_var)", "sampled_var") GT 0` THEN EXIT/SCRIPT
+
+LET the_plot_var = ($ferret_plot_var)
+LOAD the_plot_var
+DEFINE SYMBOL varshape = `the_plot_var,RETURN=shape`
+DEFINE SYMBOL viewshape =  `UPCASE("($ferret_view)")`
+IF `STRCMP("($varshape)", "POINT") EQ 0` THEN
+   DEFINE SYMBOL error_status = ERROR
+   DEFINE SYMBOL error_type = REGION
+   DEFINE SYMBOL error_action = Checking grid and region  
+   DEFINE SYMBOL error_string = The ($viewshape) region is too small. It reduces to a single point.<NL>\
+   Variable ($data_name) 
+
+   GO LAS_error_msg 
+  EXIT/PROGRAM
+ENDIF
+
+! End of file ------------LAS_check_1d_region.jnl-------------------------------
+

@@ -1,0 +1,44 @@
+<module>
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.i18n.I18N" />
+	<inherits name="com.google.gwt.json.JSON" />
+
+
+	<!-- Inherit the default GWT style sheet. You can change -->
+	<!-- the theme of your GWT application by uncommenting -->
+	<!-- any one of the following lines. -->
+	<!-- <inherits name='com.google.gwt.user.theme.clean.Clean' /> -->
+ 	<inherits name='com.google.gwt.user.theme.standard.Standard' /> 
+	<!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+	<!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
+
+	<!-- Other module inherits -->
+    <!--  The OpenLayers module contains a script reference. At some point we
+	      should repackage it and remove the reference, but for now, surpress the 
+	      warning. -->
+    <set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
+	<inherits name='org.gwtopenmaps.openlayers.OpenLayers' />
+
+
+	<inherits name="com.google.gwt.xml.XML" />
+	<!-- GWT Joda Time implementation. -->
+	<inherits name='org.gwttime.Time' />
+	<!-- <inherits name="com.google.gwt.place.Place" /> -->
+	<inherits name="com.google.gwt.activity.Activity" />
+
+	<!-- Specify the app entry point class. -->
+	<entry-point class="gov.noaa.pmel.tmap.las.client.InteractiveDownloadData" />
+	<replace-with class="gov.noaa.pmel.tmap.las.client.ClientFactoryImpl">
+		<when-type-is class="gov.noaa.pmel.tmap.las.client.ClientFactory" />
+	</replace-with>
+	<!-- Specify the paths for translatable code -->
+        <source path="client">
+           <exclude name="**/inventory/**"/>
+           <exclude name="**/Inventory.java"/>
+        </source>
+
+
+	<!-- Specify the application specific style sheet. -->
+	<stylesheet src="../css/LAS.css" />
+</module>

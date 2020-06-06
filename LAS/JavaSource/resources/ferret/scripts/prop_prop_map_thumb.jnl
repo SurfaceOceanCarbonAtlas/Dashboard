@@ -1,0 +1,91 @@
+
+CANCEL MODE nodata_lab
+GO set_full_margins
+
+DEFINE SYMBOL ferret_thumb_qc2 = 1  ! Dont use finest-resolution map underlay.
+
+LET/UNITS="`longitude,RETURN=units`"/TITLE="`longitude,RETURN=title`" lon = longitude
+LET/UNITS="`latitude,RETURN=units`"/TITLE="`latitude,RETURN=title`" lat = latitude
+
+LET amin = `min(lon[i=@MIN]-5, 180)`
+LET amax = `max(lon[i=@MAX]+5, -180)`
+
+GO LAS_is_range amin amax 
+
+LET xax_lo = ($ppl$range_low)
+LET xax_hi = ($ppl$range_high)
+LET xax_del = ($ppl$range_inc)
+
+LET varnames = ..varnames
+IF `IS_ELEMENT_OF_STR(varnames, "lon360") GT 0` THEN
+   
+   LET amin = `min(lon[i=@MIN]-5, 360)`
+   LET amax = `max(lon[i=@MAX]+5, 0)`
+   
+   GO LAS_is_range amin amax 
+
+   LET ax_lo360 = ($ppl$range_low)
+   LET ax_hi360 = ($ppl$range_high)
+   LET xax360_del = ($ppl$range_inc)
+
+   IF `(ax_hi360 - ax_lo360) LT (xax_hi-xax_lo)` THEN
+      LET/UNITS="`longitude,RETURN=units`"/TITLE="`longitude,RETURN=title`" lon = lon360
+      LET xax_lo = ax_lo360
+      LET xax_hi = ax_hi360
+      LET xax_del = xax360_del
+   ENDIF
+
+ENDIF
+
+IF `ABS(xax_hi - xax_lo) LT 1` THEN DEFINE SYMBOL dm_labels = dm
+IF `ABS(xax_hi - xax_lo) LT 0.06` THEN DEFINE SYMBOL dm_labels = dms
+DEFINE AXIS/x=`xax_lo`:`xax_hi`:`del_ax`/units="($lon_units%degrees_east%)" haxis
+
+LET amin = `max(lat[i=@MIN]-5, -90)`
+LET amax = `min(lat[i=@MAX]+5,  90)`
+GO LAS_is_range amin amax
+
+LET yax_lo = ($ppl$range_low)
+LET yax_hi = ($ppl$range_high)
+LET del_ax = ($ppl$range_inc)
+
+DEFINE SYMBOL connect_dots = 1
+DEFINE AXIS/y=`yax_lo`:`yax_hi`:`del_ax`/units=deg vaxis
+
+LET dep_var = x[gx=haxis]
+LET indep_var = y[gy=vaxis]
+LET bvar = dep_var + indep_var
+LET allmiss = IF bvar THEN (`bvar,RETURN=bad`)
+
+SHADE/NOKEY/PAL=white/title=" "/SET allmiss
+   ppl xlab
+   ppl ylab
+PPL SHADE
+
+DEFINE SYMBOL region_x_lo = `xax_lo`
+DEFINE SYMBOL region_x_hi = `xax_hi`
+DEFINE SYMBOL region_x_range = `xax_hi - xax_lo`
+DEFINE SYMBOL region_y_lo = `yax_lo`
+DEFINE SYMBOL region_y_hi = `yax_hi`
+DEFINE SYMBOL region_y_range = `yax_hi - yax_lo`
+DEFINE SYMBOL land_palette = gray_light
+
+GO LAS_fland ($land_palette)
+
+! If it's a mooring or single point, make it more prominent.
+
+DEFINE SYMBOL symquals = /SIZE=0.12/THICK=1
+
+STAT lon
+LET lonconst = `($stat_std) LT 0.1`
+STAT lat 
+LET latconst = `($stat_std) LT 0.1`
+IF `lonconst + latconst EQ 2` THEN DEFINE SYMBOL symquals = /SIZE=0.3/THICK=3
+
+IF ($zvar"0|*>1") THEN 
+   RIBBON/VS/OVER/NOLAB/KEY=HORIZ,CONT,CENT/SYM=17($symquals)/\
+PALETTE=($ferret_palette"red")/LEVELS=($ferret_fill_levels"v") lon, lat, ($zvar)
+ELSE
+   PLOT/VS/OVER/NOLAB/NOKEY/SYM=17($symquals)/COLOR=($lonlatcolor"red") lon, lat
+ENDIF
+

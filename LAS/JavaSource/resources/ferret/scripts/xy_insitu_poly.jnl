@@ -1,0 +1,135 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  xy_poly.jnl
+! 
+! $Author: ansley 
+! $Date: 2006/07/18
+!
+! XY_poly.jnl creates an XY polygon plot for insitu data, for use with the 
+! Back End Server code that sits behind a Live Access Server (LAS). 
+!
+! Plots data locations xpts, ypts, with an optional variable at those
+! locations whose values color the points.
+
+! Define symbols associated with the regign and data and perform any
+! initialization needed for this dataset.
+
+! 2/5/2007 ACM additions to handle modulo replication of the X variable.
+
+DEFINE SYMBOL data_initialization_script = LAS_initialize_data_insitu
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+set mem/siz=300
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Set up upper-left labels with the region info
+GO LAS_pp_set_region_labels
+
+GO LAS_url_label 0
+
+! Open the window, apply size, scale options
+GO LAS_open_window
+
+GO LAS_set_plot_qualifiers
+
+! Make a basemap plot similar to refmap.
+! Graticule and axis settings are applied in this step.
+
+DEFINE SYMBOL basemap_palette = grayscale
+
+DEFINE SYMBOL basemap_levels = (-inf)(-20000,-1000,500)(-1000,0,100)
+
+IF ($ferret_bathymetry_style"1|grayscale>1|*>0") THEN 
+   PPL COLOR,7,55,55,55     ! gray
+ENDIF
+
+IF ($ferret_bathymetry_style"0|white>1|*>0") THEN DEFINE SYMBOL basemap_palette = white
+IF ($ferret_bathymetry_style"0|blue>1|*>0") THEN 
+   DEFINE SYMBOL basemap_palette = osmc_bluescale
+   DEFINE SYMBOL basemap_levels = (-20000)(-10000,0,10000)
+ENDIF
+
+GO LAS_XY_overlay_basemap
+
+
+! Define plot qualifiers for polygon overlay  (these should go into LAS_set_plot_qualifiers?)
+
+DEFINE SYMBOL qualifiers = ($qualifiers)/OVER/NOLAB
+
+
+IF ($ferret_poly_levels"0|*>1") THEN 
+  DEFINE SYMBOL qualifiers = ($qualifiers)/LEVELS=($ferret_poly_levels)
+ENDIF
+
+! Color key for the variable values. If no variable only locations, plot no
+! key. Otherwise controlled by ferret_plot_key, or key turned on by default.
+
+IF ($ferret_plot_var"1|*>0") THEN DEFINE SYMBOL ferret_plot_key "0"
+
+IF ($ferret_plot_key"1|0|1|nokey>0|key>1|default>1|*>1") THEN
+   DEFINE SYMBOL qualifiers = ($qualifiers)/KEY
+ELSE
+   DEFINE SYMBOL qualifiers = ($qualifiers)/NOKEY
+ENDIF
+
+! If there is no variable, only locations, and if a palette is not 
+! defined by ferret_palette, use black.
+
+IF ($ferret_plot_var"0|*>1") THEN
+   DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=($ferret_palette"default|*>*)
+ELSE
+   DEFINE SYMBOL qualifiers = ($qualifiers)/PALETTE=($ferret_palette"black|default>black|*>*)
+ENDIF
+
+DEFINE SYMBOL poly_command poly($qualifiers)
+IF `($ferret_annotations%0|*>1%) EQ 0` THEN \
+ LABEL/NOUSER `($ppl$xlen)/2`, `-1*($ppl$yorg)/2`, 0, 0, 0.14, ($ferret_plot_title)
+
+! Make the polygon overlay plot
+
+IF ($ferret_plot_var"0|*>1") THEN
+   GO polymark ($poly_command)/SET ($data_x_var) ($data_y_var) ($ferret_plot_var) ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   IF ($ferret_annotations%0|*>1%) THEN GO key_at_top
+   PPL POLYGON/OVER
+ELSE
+   GO polymark ($poly_command)/SET ($data_x_var) ($data_y_var) " " ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   IF ($ferret_annotations%0|*>1%) THEN GO key_at_top
+   PPL POLYGON/OVER
+ENDIF
+
+! What if the x locations are a modulo-360 distance outside the region?
+! Define a new variable with the data plus or minus 360.
+
+LET data_x = ($data_x_var)
+LET data_xmin = data_x[x=@min,y=@min,z=@min,t=@min]
+LET data_xmax = data_x[x=@max,y=@max,z=@max,t=@max]
+IF `data_xmax LT ($region_x_lo)` THEN
+   DEFINE SYMBOL data_x_var_xmod = ($data_x_var)+360
+
+   IF ($ferret_plot_var"0|*>1") THEN
+      GO polymark ($poly_command) ($data_x_var_xmod) ($data_y_var) ($ferret_plot_var) ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   ELSE
+      GO polymark ($poly_command) ($data_x_var_xmod) ($data_y_var) " " ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   ENDIF
+ENDIF
+
+IF `data_xmin GT ($region_x_hi)` THEN
+   DEFINE SYMBOL data_x_var_xmod = ($data_x_var)-360
+
+   IF ($ferret_plot_var"0|*>1") THEN
+      GO polymark ($poly_command) ($data_x_var_xmod) ($data_y_var) ($ferret_plot_var) ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   ELSE
+      GO polymark ($poly_command) ($data_x_var_xmod) ($data_y_var) " " ($ferret_poly_shape"triangle|delta|square|diamond|pentagon|hexagon|circle|star|plus|ex|*>triangle") ($ferret_poly_scale)
+   ENDIF
+ENDIF
+
+! Save the results
+
+GO LAS_results box
+

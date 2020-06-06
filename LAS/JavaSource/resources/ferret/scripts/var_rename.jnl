@@ -1,0 +1,14 @@
+
+ DEFINE SYMBOL ivar = `ivar`
+ IF `($data_($ivar)_var"0|*>1") EQ 0` THEN 
+    DEFINE SYMBOL exit_rename = 1
+    EXIT/script
+ ENDIF
+ DEFINE SYMBOL vname = ($data_($ivar)_var)
+ DEFINE SYMBOL vnameNQ = ($data_($ivar)_var)
+ GO LAS_unquote_string vnameNQ
+ IF `($($vnameNQ)_done"0|*>1") EQ 0` THEN SET VAR/NAME=($vnameNQ)_ ($vname)
+ DEFINE SYMBOL data_($ivar)_var_in = ($vname)
+ DEFINE SYMBOL data_($ivar)_var = ($vnameNQ)_
+ DEFINE SYMBOL ($vnameNQ)_done = 1
+

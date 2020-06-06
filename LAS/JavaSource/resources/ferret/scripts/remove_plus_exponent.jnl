@@ -1,0 +1,22 @@
+! Remove_plus_exponent
+! if levels symbols have exponents with + in them, then that + is
+! lost in the animation sequence and Ferret chokes on levels symbols
+! containing a blank.  
+
+
+! should be       (-inf)(6000.,8.2000E+04,4000)(8.2000E+04,1.1000E+05,16000)(inf)
+! Java sends this (-inf)(6000.,8.2000E 04,4000)(8.2000E 04,1.1000E 05,16000)(inf) 
+! This works      (-inf)(6000.,8.2000E04,4000)(8.2000E04,1.1000E05,16000)(inf) 
+
+! so send the third format back
+
+DEFINE SYMBOL name = ($1)
+DEFINE SYMBOL expon_symbol = ($2)
+
+LET loc = `STRINDEX("($expon_symbol)", "+")`
+LET slen = `STRLEN("($expon_symbol)")`
+DEFINE SYMBOL s1 = `SUBSTRING ("($expon_symbol)", 1, loc-1)`
+DEFINE SYMBOL s2 = `SUBSTRING ("($expon_symbol)", loc+1, slen)`
+DEFINE SYMBOL ($name) = ($s1)($s2)
+
+

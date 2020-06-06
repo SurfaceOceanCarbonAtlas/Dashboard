@@ -1,0 +1,40 @@
+/* 
+ * DateWidget_proto.css
+ *
+ * First attempt at creating a style sheet for the an 'unobrtusive' version of the DateWidget.
+ */
+
+/* basic elements */
+
+html { }
+
+body { }
+
+p { }
+
+table {
+  border: thick black solid;
+}
+
+tr { }
+
+td {
+  border: thin black solid;
+}
+
+/* classes */
+
+/* Doesn't seem to be working for me.
+tr.flash {
+  background-color: '#faa';
+}
+*/
+/*
+.classname
+*/
+
+/* specific IDs */
+
+/*
+#id
+*/

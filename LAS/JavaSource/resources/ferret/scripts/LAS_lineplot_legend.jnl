@@ -1,0 +1,54 @@
+! LAS_lineplot_legend.jnl
+! Make a legend at the bottom of the page.
+! Argument is the number of lines to draw
+! Label them with ferret_title_0, ferret_title_1, ...
+
+! arguments 
+!  1   count: number of lines to draw
+!  2   palette: Optional, use colors from this palette. 
+!               Must be a by-levels palette.
+
+let legend_count = ($1"1")
+IF ($2"0|*>1") THEN 
+   DEFINE SYMBOL use_palette = ($2)
+ENDIF
+
+! Make an invisible xy plot. The legline script doesnt work well with z and t plots.
+
+
+
+DEFINE VIEWPORT/x=0:1/y=0:1/axes overview
+SET VIEW overview
+PLOT/NOYADJUST/NOLAB/NOAX/I=1:2/VLIM=100:102 i
+
+LET titlesiz = 0.09
+
+! The start (x,y) position for each line drawn on the key
+
+LET x1 = 1.
+LET xkey = {`x1`,  `x1`, `x1`, `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`, `0.6*($ppl$xlen)`,  0,  0}
+LET ykey = { 0.7,  0.5,   0.3,               0.7,               0.5,               0.3, 0.1, 0.1}
+
+IF ($use_palette"0|*>1") THEN
+
+REPEAT/range=1:`legend_count`/NAME=m (; \
+   DEFINE SYMBOL m = `m`;  \
+   DEFINE SYMBOL lnum = `m-1` ; \
+   LET xpos = xkey[i=($m)]; LET ypos = ykey[i=($m)]; \
+   GO LAS_legend_line \
+   `xpos-0.2` 0.3 `ypos` `-1*($m)` `titlesiz` "($ferret_title_($lnum)%($lnum)%)" "($legend_qual)" ($use_palette);\   
+   )
+
+ELSE
+REPEAT/range=1:`legend_count`/NAME=m (; \
+   DEFINE SYMBOL m = `m`;  \
+   DEFINE SYMBOL lnum = `m-1` ; \
+   LET xpos = xkey[i=($m)]; LET ypos = ykey[i=($m)]; \
+   GO LAS_legend_line \
+   `xpos-0.2` 0.3 `ypos` `m + ($nlinecolors)*($thicknum)` `titlesiz` "($ferret_title_($lnum)%($lnum)%)" ($legend_qual);\   
+   )
+ENDIF
+
+
+! End of file ------------ LAS_lineplot_legend.jnl--------------------------
+

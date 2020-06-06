@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.0">
+   <NetworkLink>
+      <GroundOverlay>
+         <description>Overlay LAS plots on Google Earth</description>
+         <name>LAS Plot</name>
+         <LookAt>
+               <longitude>$longitude_center</longitude>
+               <latitude>$latitude_center</latitude>
+               <range>3035000.36838438907</range>
+               <tilt>0</tilt>
+               <heading>0</heading>
+         </LookAt>
+         <visibility>1</visibility>
+         <Icon>
+            <href>$plot_image_URL</href>
+         </Icon>
+         <LatLonBox id="lasLatLonBox">
+             <north>$map_scale.getYAxisUpperRight()</north>
+             <south>$map_scale.getYAxisLowerLeft()</south>
+             <east>$map_scale.getXAxisUpperRight()</east>
+             <west>$map_scale.getXAxisLowerLeft()</west>
+             <rotation>0</rotation>
+         </LatLonBox>
+      </GroundOverlay>
+   </NetworkLink>
+</kml>

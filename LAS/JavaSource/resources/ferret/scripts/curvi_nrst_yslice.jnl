@@ -1,0 +1,159 @@
+! curvi_nrst_yslice.jnl
+!
+! Define a set of x and y points to sample at (all on one value of X)
+
+LET npts = `($ferret_curvi_coord_lon)[d=($data_num)],return=jsize` 
+LET npts = 50
+DEFINE AXIS/Y=($region_0_y_lo):($region_0_y_hi)/NPOINTS=`npts`/UNITS=degrees sample_ylat($num)
+
+LET sample_ypts($num) = y[gy=sample_ylat($num)]
+LET sample_xpts($num) = ($region_x_lo) + 0*sample_ypts($num)
+
+LET fer_plot_var($var_num) = SAMPLEXY_CURV_NRST( \
+  ($data_var)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)($region_sample)], \
+  ($ferret_curvi_coord_lon)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  ($ferret_curvi_coord_lat)[d=($data_num),i=($clon_imin):($clon_imax), j=($clat_jmin):($clat_jmax)], \
+  sample_xpts($num), sample_ypts($num))
+
+! Reshape to the grid of the sampled variable, with the sample Y latitudes
+! and the correct region of the world, so that time and location labels will
+! appear on the plot.
+
+IF ($ferret_view"|y>1|*>0") THEN 
+   DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_xlon($num)
+   LET sample_var($var_num) = y[gy=sample_ylat($num)] + x[gx=sample_xlon($num),x=($region_x_lo)]  
+
+   IF ($region_t"0|*>1") THEN LET sample_var($var_num) = y[gy=sample_ylat($num)] + \
+      x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      t[gt=fer_plot_var($var_num),($region_t)]
+
+   IF ($region_z"0|*>1") THEN LET sample_var($var_num) = y[gy=sample_ylat($num)] + \
+     x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      z[gz=fer_plot_var($var_num),($region_z)]+t[gt=fer_plot_var($var_num)]
+      
+   IF `($region_t"0|*>1") + ($region_z"0|*>1") EQ 2` THEN LET sample_var($var_num) = y[gy=sample_ylat($num)] + \
+      x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      z[gz=fer_plot_var($var_num),($region_z)] + t[gt=fer_plot_var($var_num),($region_t)]
+
+   LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+   DEFINE SYMBOL needs_url 1
+   GO cancel_temp_regions
+   EXIT/SCRIPT
+
+ELIF ($ferret_view"|yz>1|*>0") THEN 
+
+   IF `($num) eq 0` THEN
+      IF `($region_x_lo"0|*>1")` THEN DEFINE SYMBOL alt_x_lab = LONGITUDE: ($region_x_lo)E
+      IF `($region_t_lo"0|*>1")` THEN DEFINE SYMBOL alt_t_lab = TIME: ($region_t_lo)
+   ELSE
+      IF `($alt_x_lab"0|*>1") NE 0` THEN 
+         IF `($region_x_lo"0|*>1")` THEN DEFINE SYMBOL alt2 = LONGITUDE: ($region_x_lo)E
+	 IF `STRCMP("($alt2)", "($alt_x_lab)") NE 0` THEN 
+            DEFINE SYMBOL alt_x_lab = ($alt_x_lab) minus ($region_x_lo)E
+	 ELSE
+	    CANCEL SYMBOL alt_x_lab
+	 ENDIF
+      ENDIF
+      IF `($alt_t_lab"0|*>1") NE 0` THEN 
+         DEFINE SYMBOL alt2 = TIME: ($region_t_lo)
+	 IF `STRCMP("($alt2)", "($alt_t_lab)") NE 0` THEN 
+            DEFINE SYMBOL alt_t_lab = ($alt_t_lab) minus ($region_t_lo)
+	 ELSE
+	    CANCEL SYMBOL alt_t_lab
+	 ENDIF
+      ENDIF
+   ENDIF
+
+   DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_xlon($num)
+   LET sample_var($var_num) = y[gy=sample_ylat($num)] + x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      z[gz=fer_plot_var($var_num)]
+
+   IF ($region_t"0|*>1") THEN LET sample_var($var_num) = y[gy=sample_ylat($num)] + \
+      x[gx=sample_xlon($num),x=($region_x_lo)]  + \
+      z[gz=fer_plot_var($var_num)]+t[gt=fer_plot_var($var_num),($region_t)]
+
+   LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+   DEFINE SYMBOL needs_url 1
+   GO cancel_temp_regions
+   EXIT/SCRIPT
+
+ELIF ($ferret_view"|yt>1|*>0") THEN 
+
+   IF `($num) eq 0` THEN
+      IF `($region_x_lo"0|*>1")` THEN DEFINE SYMBOL alt_x_lab = LONGITUDE: ($region_x_lo)E
+      IF `($region_z_lo"0|*>1")` THEN DEFINE SYMBOL alt_z_lab = DEPTH: ($region_z_lo)
+   ELSE
+      IF `($alt_x_lab"0|*>1") NE 0` THEN 
+         IF `($region_x_lo"0|*>1")` THEN DEFINE SYMBOL alt2 = LONGITUDE: ($region_x_lo)E
+	 IF `STRCMP("($alt2)", "($alt_x_lab)") NE 0` THEN
+            DEFINE SYMBOL alt_x_lab = ($alt_x_lab) minus ($region_x_lo)E
+	 ELSE
+	    CANCEL SYMBOL alt_x_lab
+	 ENDIF
+      ENDIF
+      IF `($alt_z_lab"0|*>1") NE 0` THEN 
+         DEFINE SYMBOL alt2 = TIME: ($region_t_lo)
+	 IF `STRCMP("($alt2)", "($alt_z_lab)") NE 0` THEN \
+            DEFINE SYMBOL alt_z_lab = ($alt_z_lab) minus ($region_z_lo)
+	 ELSE
+	    CANCEL SYMBOL alt_z_lab
+	 ENDIF
+      ENDIF
+   ENDIF
+
+   DEFINE AXIS/X=($region_x_lo):`($region_x_lo)+1`:1/MODULO/UNITS=degrees sample_xlon($num)
+   LET sample_var($var_num) = y[gy=sample_ylat($num)] + x[gx=sample_xlon($num),x=($region_x_lo)] + \
+      t[gt=fer_plot_var($var_num)]
+
+   IF ($region_z"0|*>1") THEN LET sample_var($var_num) = y[gy=sample_ylat($num)] + \
+      x[gx=sample_xlon($num),x=($region_x_lo)]  + \
+      z[gz=fer_plot_var($var_num),($region_z)]+t[gt=fer_plot_var($var_num)]
+
+   LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+   DEFINE SYMBOL needs_url 1
+   GO cancel_temp_regions
+   EXIT/SCRIPT
+
+
+ELIF ($ferret_view"|z>1|*>0") THEN 
+
+   DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/UNITS=degrees sample_y
+   LET sample_var($var_num) = x[gx=sample_xlon($num)] + y[gy=sample_y,y=($region_y_lo)]  + \
+      z[gz=fer_plot_var($var_num)]
+
+   IF ($region_t"0|*>1") THEN LET sample_var($var_num) = x[gx=sample_xlon($num)] + \
+      y[gy=sample_y,y=($region_y_lo)]  + \
+      z[gz=fer_plot_var($var_num)]+t[gt=fer_plot_var($var_num),($region_t)]
+
+   LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+   DEFINE SYMBOL needs_url 1
+   GO cancel_temp_regions
+   EXIT/SCRIPT
+
+ELIF ($ferret_view"|t>1|*>0") THEN 
+   DEFINE AXIS/Y=($region_y_lo):`($region_y_lo)+1`:1/UNITS=degrees sample_y
+
+   LET sample_var($var_num) = x[gx=sample_xlon($num)] + y[gy=sample_y,y=($region_y_lo)]  + \
+      t[gt=fer_plot_var($var_num)]
+
+   IF ($region_z"0|*>1") THEN LET sample_var($var_num) = x[gx=sample_xlon($num)] + \
+      y[gy=sample_y,y=($region_y_lo)]  + \
+      z[gz=fer_plot_var($var_num),($region_z)]+t[gt=fer_plot_var($var_num)]
+
+   LET dummy_sample($var_num) = RESHAPE(fer_plot_var($var_num), sample_var0)
+   LET/units="($data_($var_num)_units)" sampled_var($var_num) = dummy_sample($var_num)($analysis_def)
+
+   DEFINE SYMBOL needs_url 1
+   GO cancel_temp_regions
+   EXIT/SCRIPT
+
+ENDIF
+! End of file ------------curvi_nrst_yslice.jnl--------------------------

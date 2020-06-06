@@ -1,0 +1,20 @@
+! setup_GE_2part.jnl
+!
+! More setup for Google Earth in -180:180. The Plot_2D_GE
+! script has already handled the change if it's simple. If it
+! needs to be a 2-part plot, with some on the left and some
+! on the right, set that up here.
+
+DEFINE SYMBOL qualifiers = ($qualifiers)/hlim=-180:180
+DEFINE SYMBOL ferret_plot_var_part2 = ($data_var)[d=1,($region_yzt),x=`($region_x_lo)-360`:`($region_x_hi)-360`]
+
+! For native curvi, we already overlay plot with xcoords-360
+IF ($native_curvilinear_xy"0|*>1") THEN 
+
+   DEFINE SYMBOL ferret_plot_var_part2 = plot_var, xcoord+360, ycoord
+
+! The SHADE commands dont work well when we're drawing in the full-globe /hlim=-180:180
+   CANCEL SYMBOL shade_qualifiers
+   CANCEL SYMBOL shade_underlay
+ENDIF
+

@@ -1,0 +1,146 @@
+  <menus>
+    <menu type="views" name="Views_StdSurface_XY">
+      <ifitem view="xy" values="xy">Longitude-Latitude map (xy)</ifitem>
+    </menu>
+    <menu type="ops" name="TrajectoryProfile_operations_XY">
+      <item values="Trajectory_interactive_plot,gif">map</item>
+      <item values="Profile_Plot_2D_zoom,gif">map</item>
+      <item values="SPPV,gif">map</item>
+      <item values="PropPropThumbTable,gif">map</item>
+      <item values="TrajectoryTable,gif">file</item>
+      <item values="Trajectory_Interactive_Download,gif">map</item>
+      <item values="trajectory_show_values,gif">map</item>
+    </menu>
+  </menus>
+  <maps>
+    <map type="options" name="TrajectoryProfile_ColorOptions">
+      <ifoptions op="Trajectory_interactive_plot" href="#TrajectoryProfile_Options"/>
+    </map>
+    <map type="ops" name="TrajectoryProfile_Operations">
+      <ifmenu view="xy" href="#TrajectoryProfile_operations_XY"/>
+      <constraint type="variable"/>
+    </map>
+    <map type="views" name="TrajectoryProfile_Views">
+      <menu href="#Views_StdSurface_XY"/>
+    </map>
+  </maps>
+  <options>
+    <optiondef name="TrajectoryProfile_palette">
+      <option>
+        <help>Set the color palette for the plot. </help>
+        <title>Palette</title>
+        <menu type="options" name="TrajectoryProfile_palette">
+
+        <item values="viridis">CM viridis (blue to green) -- default</item>
+        <item values="plasma">CM plasma (lighter purple to yellow)</item>
+        <item values="inferno">CM inferno (purple to orange to yellow)</item>
+        <item values="magma">CM magma (purple to yellow)</item>
+
+
+        <item values="ocean_temp">Ocean temperature (consistent by-value)</item>
+
+        <item values="land_sea">topo: land and sea</item>
+        <item values="dark_land_sea">topo: land and sea, dark </item>
+        <item values="land_sea_values">topo: (consistent by value)</item>
+        <item values="etop_values">topo: etopo land and sea (consistent by value)</item>
+        <item values="ocean_blue">topo: blue bathymetry</item>
+        <item values="terrestrial">topo: land only</item>
+        <item values="dark_terrestrial">topo: land only, dark</item>
+
+
+        <item values="rainbow">Rainbow</item>
+        <item values="rnb2">Rainbow alternative</item>
+        <item values="light_rainbow">Rainbow pastel</item>
+        <item values="rainbow_by_levels">Rainbow (repeating by-level)</item>
+        <item values="light_bottom">Rainbow light bottom</item>
+
+        <item values="cmocean_algae">CMocean algae (light to dark greens)</item>
+        <item values="cmocean_amp">CMocean amp (light to dark browns)</item>
+        <item values="cmocean_balance">CMocean balance (centered blue and brown)</item>
+        <item values="cmocean_curl">CMocean curl (centered green and brown)</item>
+        <item values="cmocean_deep">CMocean deep (yellow to blue)</item>
+        <item values="cmocean_delta">CMocean delta (centered green and blue)</item>
+        <item values="cmocean_dense">CMocean dense (blues and purples)</item>
+        <item values="cmocean_gray">CMocean gray (dark to light grays)</item>
+        <item values="cmocean_haline">CMocean haline (blue to green)</item>
+        <item values="cmocean_ice">CMocean ice (dark to light blue)</item>
+        <item values="cmocean_matter">CMocean matter (yellow to brown)</item>
+        <item values="cmocean_oxy">CMocean oxy (red/ gray/ yellow)</item>
+        <item values="cmocean_phase">CMocean phase (smoothly varying)</item>
+        <item values="cmocean_solar">CMocean solar (brown to yellow)</item>
+        <item values="cmocean_speed">CMocean speed (yellow to green)  </item>
+        <item values="cmocean_tempo">CMocean tempo (light to dark green)</item>
+        <item values="cmocean_thermal">CMocean thermal (purple to yellow)</item>
+        <item values="cmocean_turbid">CMocean turbid (yellow to brown)</item>
+
+        <item values="light_centered">centered anomaly</item>
+        <item values="white_centered">centered w/white at center</item>
+
+        <item values="no_blue_centered">centered no-blue</item>
+        <item values="no_green_centered">centered no-green</item>
+        <item values="no_red_centered">centered no-red</item>
+
+        <item values="bluescale">scale of blues</item>
+        <item values="bluescale">scale of blues reversed</item>
+        <item values="redscale">scale of reds</item>
+        <item values="redscale">scale of blues reversed</item>
+        <item values="greenscale">scale of greens</item>
+        <item values="greenscale">scale of greens reversed</item>
+        <item values="grayscale">scale of grays</item>
+        <item values="grayscale">scale of grays reversed</item>
+        </menu>
+      </option>
+    </optiondef>
+    <optiondef name="full_data">
+      <option>
+        <help>
+Force LAS to use the full resultion of the data set instead of choosing.
+Choices are:
+&lt;ul>&lt;li>&lt;b>Default&lt;/b> -- let LAS decide whether to use the decimated data or the full resolution
+&lt;li>&lt;b>Yes&lt;/b> -- Force LAS to use the full resolution data set for all map plots
+&lt;li>&lt;b>No&lt;/b> -- same as default
+&lt;/ul>
+
+        </help>
+        <title>Use full resolution data set.</title>
+        <menu type="options" name="full_data">
+          <item values="default">Default</item>
+          <item values="yes">Yes</item>
+          <item values="no">No</item>
+        </menu>
+      </option>
+    </optiondef>
+
+    <optiondef name="bathymetry_style">
+      <option>
+        <help>
+Choose a plain white background or grayscale bathymetry for the map plots. 
+
+Choices are:
+&lt;ul>&lt;li>&lt;b>Default&lt;/b> -- grayscale ocean bathymetry
+&lt;li>&lt;b>grayscale&lt;/b> -- same as default
+&lt;li>&lt;b>blue&lt;/b> -- color the ocean blue
+&lt;li>&lt;b>white&lt;/b> -- color the ocean white
+&lt;/ul>
+
+        </help>
+        <title>Bathymetry style</title>
+        <menu type="options" name="bathymetry_style">
+          <item values="default">default</item>
+          <item values="grayscale">grayscale</item>
+          <item values="white">white</item>
+          <item values="blue">blue</item>
+        </menu>
+      </option>
+    </optiondef>
+
+    <optiondef name="TrajectoryProfile_Options" inherit="#TrajectoryProfile_palette,#size,#fill_levels,#deg_min_sec,#set_aspect,#use_graticules,#full_data,#bathymetry_style"/>
+  </options>
+  <defaults>
+    <default name="trajectoryprofile">
+      <map href="#TrajectoryProfile_Operations"/>
+      <map href="#TrajectoryProfile_Views"/>
+      <map href="#DefaultLivemap"/>
+      <map href="#TrajectoryProfile_ColorOptions"/>
+    </default>
+  </defaults>

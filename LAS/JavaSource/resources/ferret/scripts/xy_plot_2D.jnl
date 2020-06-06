@@ -1,0 +1,180 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! $RCSfile: xy_plot_2D.jnl,v $
+! $Revision: 1.12 $
+! 
+! $Author: ansley $
+! $Date: 2006/08/11 16:45:54 $
+! 2006/07/19 Fix test of ($ferret_contour_levels"0|*>1")
+! 3/7/2007: ACM. Put code to check that the region was not too small, resulting 
+!           in degenerate plot into LAS_initialize_data.jnl rather than in the 
+!           individual plot scripts.
+! 3/29/2007 ACM Fix logic interpreting contents of ferret_interpolate_data 
+! 7/15/2007 ACM Add lines to remove labels when a degenerate 2D plot is made 
+!               This happens when the region chosen is smaller than a grid cell.
+! 3/2008 ACM Use SHADE/TRIM for shade underlays of FILL plots (Ferret v6.1)
+! 3/2008 ACM For native curvilinear plots use MODULO qualifier only on SHADE plots
+!10/2018 ACM For native curvilinear plots use MODULO qualifier on SHADE and FILL plots
+!            No need for plus360 or minus360 overlays
+! ACM 11/18 (Ferret v7.44) use new OVER/AXES behavior to draw axis and 
+!                          graticule lines on top of everything else
+
+! XY_plot.jnl creates an XY plot for use with the Back End Server
+! code that sits behind a Live Access Server (LAS). 
+!
+! NOTE:  This code handles overlays but not differencing.
+!
+! TODO:  We should support user choice of the 'base layer' variable.
+! TODO:  From the Ferret script writers' perspective it would be nice
+! TODO:  if this were handled in the UI so that ($data_0_...) always
+! TODO:  referred to the base layer.
+
+! Set any Ferret modes
+!
+! NOTE:  Should we support any of the following Ferrt modes?
+! NOTE:    ASCII_FONT, CALENDAR, DEPTH_LABEL, LABELS, LATIT_LABEL, LONG_LABEL 
+
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE
+
+DEFINE SYMBOL fview = `UPCASE("($ferret_view)")`
+
+! Define symbols associated with the regign and data and perform any
+! initialization needed for this dataset.
+!
+! NOTE:  Adding support for a 'base layer' variable would mean passing
+! NOTE:  some other argument.  For now, though, we always use 'data_0'
+! NOTE:  for the base layer and region.
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Check whether the region is too small to make a 2D plot on this grid.
+GO LAS_check_2d_region
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Here is variable 0 and its title
+
+DEFINE SYMBOL ferret_var_0 = ($ferret_plot_var)
+DEFINE SYMBOL ferret_title_0 = ($ferret_plot_title"($data_var)")
+
+! Use Ferret properties to set up the plot qualifiers
+GO LAS_set_plot_qualifiers
+
+IF ($ferret_koppen_var_2"0|*>1") THEN
+   GO xy_koppen_plots
+   LET pvar = a
+   DEFINE SYMBOL have_pvar = 1
+   GO LAS_results
+   EXIT/SCRIPT
+ENDIF
+
+! Curvilinear plots may have more qualifiers. 
+
+IF ($native_curvilinear_xy"0|*>1") THEN
+  DEFINE SYMBOL qualifiers = ($qualifiers)($ferret_curvi_quals)
+
+   IF `($ferret_curvi_quals"0|*>1") AND ($ferret_lon_modulo"1|1|0|yes>1|no>0|*>0")` THEN  \
+     DEFINE SYMBOL qualifiers = ($qualifiers)/MODULO
+
+ENDIF
+
+! More setup for Google Earth in -180:180. The Plot_2D_GE
+! script has already handled the change if possible. If it
+! needs to be a 2-part plot, with some on the left and some
+! on the right, set that up here.
+
+IF `($its_GE"0|*>1") AND ($two_parter"0|*>1")` THEN GO setup_GE_2part.jnl
+
+
+! Open the window, apply size, scale and WMS view options
+GO LAS_open_window
+
+! Set the URL label for the first dataset.
+GO LAS_url_label 0
+
+IF `($plot_type"0|CONTOUR>0|*>1") AND ($degenerate_2d"0|*>1") EQ 0` THEN
+IF ($ferret_annotations"0|*>1") THEN
+   CANCEL VIEW
+   SET VIEW full_view
+ENDIF
+ENDIF
+
+! Draw the plot and we are done
+
+IF `($data_count"0") EQ 1` THEN
+   DEFINE SYMBOL split_title = ($ferret_plot_title)
+   GO LAS_split_title
+   DEFINE SYMBOL ferret_plot_title = ($split_title)
+
+   IF ($shade_underlay"0") THEN 
+
+      SHADE($qualifiers)($shade_qualifiers)/TITLE="($ferret_plot_title)"/SET ($ferret_var_0)
+	 GO reset_labels
+      PPL SHADE
+
+      IF ($two_parter"0|*>1") THEN SHADE($qualifiers)($shade_qualifiers)/OVER/NOLAB($do_axes) ($ferret_plot_var_part2)
+      IF `($LEV_NUM"0") GT 245/2` THEN PPL SHASET RESET
+
+      ($plot_type)/NOKEY($qualifiers)/OVER($do_axes)/NOLAB ($ferret_var_0)
+      IF ($two_parter"0|*>1") THEN ($plot_type)($qualifiers)/OVER($do_axes)/NOLAB ($ferret_plot_var_part2)
+
+   ELSE
+   
+      ($plot_type)($qualifiers)/TITLE="($ferret_plot_title)"/SET ($ferret_var_0)
+         GO reset_labels
+         PPL ($plot_type)
+             
+      IF ($two_parter"0|*>1") THEN ($plot_type)($qualifiers)/OVER/NOLAB ($ferret_plot_var_part2)
+
+   ENDIF
+
+! One of the results is the data min and max. Save those here.
+   DEFINE SYMBOL data_plotted_min = ($ppl$zmin)
+   DEFINE SYMBOL data_plotted_max = ($ppl$zmax)
+
+   IF ($contour_over"0|*>1") THEN
+      IF ($ferret_curvi_quals"0|*>1") THEN
+         CONTOUR/OVER($ferret_curvi_quals)/COLOR=black/NOLAB($levsym) ($ferret_var_0)
+      ELSE
+         CONTOUR/OVER/COLOR=black/NOLAB($levsym) ($ferret_var_0)
+      ENDIF
+   ENDIF
+   
+! One of the results is the data min and max. Save those here.
+   DEFINE SYMBOL data_plotted_min = ($ppl$zmin)
+   DEFINE SYMBOL data_plotted_max = ($ppl$zmax)
+
+ENDIF
+
+! Add labels at the top for the location of overlaid lines
+! and for URLs if they exist  
+
+GO labels_above_plot
+
+! Overlay additional cartography data (land mask, outlines, rivers, ...)
+! If the region degenerated to a point or line, don't try.
+
+IF `($degenerate_2d"0|*>1") EQ 0` THEN GO land_overlay
+
+! Mark grid points. Options are no, subsample (tests if subsampling needed)
+! or all to force marking all points.
+
+IF ($ferret_mark_grid"0|no>0|all>1|subsample>1|*>0") THEN GO mark_grid
+
+! Save the results
+
+GO LAS_results box
+
+! End of file ----------------- xy_plot_2D.jnl ------------------------------------
+

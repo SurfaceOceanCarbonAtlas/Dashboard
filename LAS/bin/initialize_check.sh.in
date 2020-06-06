@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# initialize_check 
+###############################################################
+#
+# A script that prepares the files needed to initialize
+# the automatic UI server check script.
+#
+# Based on gds_check written by Joe Wielgosz and Don Hooper
+#
+###############################################################
+
+# Uses the following system commands:
+GET_URL="get_las_page.pl"
+MAIL="mail"
+RM="rm -f"
+ECHO="echo"
+CMP="cmp"
+PWD="pwd"
+
+# Default settings for filenames
+LAS_CORRECT_OUTPUT=las_datasets_page
+
+LAS_DIR=@PWD@/bin
+LAS_URL=http://@SERVLET_ROOT_URL@UIPATH@/servlets/dataset
+
+$LAS_DIR/$GET_URL $LAS_URL $LAS_DIR/$LAS_CORRECT_OUTPUT
+
+if [ -s $LAS_DIR/$LAS_CORRECT_OUTPUT ] ; then  # we have a non-zero length output to check
+
+	$ECHO "Initialization complete."
+
+else # if there was a non-zero length output from lynx above; otherwise below
+	$ECHO "Initialization failed."
+fi

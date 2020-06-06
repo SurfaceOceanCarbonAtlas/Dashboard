@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         version="2.4" 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee   http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  <display-name>Live Access Server</display-name>
+  <discription>Live Access Server (LAS) is a general purpose web application for the display and analysis of climate data.</discription>
+  <session-config>
+    <session-timeout>180</session-timeout>
+  </session-config>
+  <listener>
+    <description>LAS Session Listener for Confluence/Tributary Server (Sister Servers) Variable Clean-up</description>
+    <listener-class>gov.noaa.pmel.tmap.las.session.LASSessionListener</listener-class>
+  </listener>
+  <listener>
+    <description>LAS Context Listener which will read the context parameters below and initialize LAS with the configuration files specified.</description>
+    <listener-class>            
+      gov.noaa.pmel.tmap.las.product.server.LASServletContextListener      
+    </listener-class>
+  </listener>
+  <context-param>
+    <param-name>version</param-name>
+    <param-value>8.4</param-value>
+  </context-param>
+  <context-param>
+    <param-name>configFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/las.xml</param-value>
+  </context-param>
+  <context-param>
+    <param-name>v7OperationsFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/operationsV7.xml</param-value>
+  </context-param>
+  <context-param>
+    <param-name>lasUIFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/ui.xml</param-value>
+  </context-param>
+  <context-param>
+    <param-name>serverConfigFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/productserver.xml</param-value>
+  </context-param>
+  <context-param>
+    <param-name>lasServersFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/las_servers.xml</param-value>
+  </context-param>
+  <context-param>
+    <param-name>lasServersStaticFileName</param-name>
+    <param-value>@JAKARTA_HOME@/content/@APPNAME@/conf/server/las_servers_static.xml</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>velocity</servlet-name>
+    <servlet-class>         
+      gov.noaa.pmel.tmap.las.view.LASVelocityViewServlet
+    </servlet-class>
+    <init-param>
+      <param-name>org.apache.velocity.toolbox</param-name>
+      <param-value>/WEB-INF/toolbox.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>org.apache.velocity.properties</param-name>
+      <param-value>/WEB-INF/velocity.properties</param-value>
+    </init-param>
+    <load-on-startup>10</load-on-startup>
+  </servlet>
+  <!-- Map *.vm files to Velocity -->
+  <servlet-mapping>
+    <servlet-name>velocity</servlet-name>
+    <url-pattern>*.vm</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>RPCServlet</servlet-name>
+    <servlet-class>gov.noaa.pmel.tmap.las.server.RPCServiceImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RPCServlet</servlet-name>
+    <url-pattern>/rpc</url-pattern>
+  </servlet-mapping>
+  <!--  Apply an input filter every LAS request.   -->
+  <filter>
+    <filter-name>RequestInputFilter</filter-name>
+    <filter-class>gov.noaa.pmel.tmap.las.filter.RequestInputFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>RequestInputFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Add attribute user_name to authenticated sessions for SOCAT QC -->
+    <!-- Comment out the following to remove login (bock)
+    -->
+    <filter>
+      <filter-name>AddUsernameFilter</filter-name>
+      <filter-class>gov.noaa.pmel.tmap.las.filter.AddUsernameFilter</filter-class>
+    </filter>
+    <filter-mapping>
+      <filter-name>AddUsernameFilter</filter-name>
+      <url-pattern>*.do</url-pattern>
+      <url-pattern>*.vm</url-pattern>
+    </filter-mapping>
+
+<!-- End of LAS input filters -->
+  <!-- Unless there is an illegal parameter, LAS will pass the request along the filter chain to this filter which will handle every other request.         
+       This struts filter does not forward to this is the end of the filter chain.        Static content will not be served unless it's location is specified in the struts.xml
+       
+         <constant name="struts.action.excludePattern" value="/las-spring/output/*.*" />           
+  -->
+  <filter>
+    <filter-name>struts2</filter-name>
+    <filter-class>             
+      org.apache.struts2.dispatcher.filter.StrutsPrepareAndExecuteFilter 	    
+    </filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>struts2</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <mime-mapping>
+    <extension>wsdl</extension>
+    <mime-type>text/xml</mime-type>
+  </mime-mapping>
+  <mime-mapping>
+    <extension>xsd</extension>
+    <mime-type>text/xml</mime-type>
+  </mime-mapping>
+  <!-- ++++++++++ Setup security restrictions ++++++++++ -->
+  <!--      This set up can be used in conjunction with any https access
+            you have configured for TDS.  If you want to use your own          
+            LAS specific https access set up, mimic these configuration changes
+            and configure in your own users and roles in the tomcat config.     
+  -->
+  <!-- This allows "remote configuration":     
+      /thredds/debug gives access to various debug and status info.
+      ThreddsDefault servlet aliases /thredds/root/ to "{tomcat_home}/webapps/thredds/"
+      ThreddsDefault servlet aliases /thredds/dataDir/path to "dirLocation/" where path is mapped to dirLocation through a       
+      datasetRoot or datasetScan element in the catalog. 
+  -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>sensitive read access</web-resource-name>
+      <url-pattern>/ReInit.do</url-pattern>
+      <url-pattern>/admin.do</url-pattern>
+      <url-pattern>/CacheManager.do</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>tdsConfig</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  <!-- ThreddsDefault servlet aliases /thredds/content/ to "{tomcat_home}/content/thredds/"   -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>sensitive read and write access</web-resource-name>
+      <url-pattern>/content/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>tdsConfig</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>cataloggen configuration</web-resource-name>
+      <url-pattern>/cataloggen/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>tdsConfig</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  <!-- default restricted access uses DIGEST, but not HTTPS -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>restricted access datasets</web-resource-name>
+      <url-pattern>/restrictedAccess/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>restrictedDatasetUser</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
+  <!-- for SOCAT QC -->
+  <!-- Comment out the following to remove login (bock)
+  -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>SOCATFlags database</web-resource-name>
+      <url-pattern>*.do</url-pattern>
+      <url-pattern>*.vm</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>socatreviewer</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <!-- can only have one login-config for extire context. -->
+  <!--
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>THREDDS Data Server</realm-name>
+  </login-config>
+  -->
+
+  <!-- for SOCAT QC -->
+  <!-- Comment out the following to remove login (bock)
+  -->
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>socatreviewer</realm-name>
+      <form-login-config>
+        <form-login-page>/socatlogin.html</form-login-page>
+        <form-error-page>/socatloginerror.html</form-error-page>
+      </form-login-config>
+  </login-config>
+
+  <!-- Define security roles. -->
+  <security-role>
+    <description>The configuration role allows users to configure the THREDDS server.</description>
+    <role-name>tdsConfig</role-name>
+  </security-role>
+
+  <security-role>
+    <description>User who can access restricted datasets.</description>
+    <role-name>restrictedDatasetUser</role-name>
+  </security-role>
+
+  <security-role>
+    <description>SOCAT reviewer who can add flag events to SOCATFlags.</description>
+    <role-name>socatreviewer</role-name>
+  </security-role>
+
+</web-app>

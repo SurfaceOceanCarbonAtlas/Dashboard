@@ -1,0 +1,255 @@
+! LAS_set_strides.jnl
+! ACM
+
+! From the region and the grid we can define striding. Compute strides 
+! based first on Ferret memory and THEN IF it is a graphics product, on 
+! pixel size. 
+! ACM 8/312/2007 Do not issue the SET AXIS/STRIDE= command IF the stride is 1
+!                This partially works around TRAC #224.
+! ACM 3/2008  IF the transform-to-1-season per year has been set THEN do not 
+!             stride in t
+! ACM 4/2008  For descriptor data or for data whose axes are replaced cant
+!             do native strides. In these cases set up index strides with
+!             a call to LAS_set_strides_nonative
+! 10-Jul-2008 ACM  Fixes for Google Earth placemark strides
+
+! TODO: When there's going to be a transformation or something, THEN these 
+! calculations may not be sufficient. Might be better done by the transform script.
+
+! IF the operation is writing a netCDF file, that is done in chunks. Do not use strides
+
+IF `(STRINDEX( "($operation_ID)", "Data_Extract" ) NE 0) AND \
+    (STRINDEX( "($result_ferret_listing_type)", "netcdf" ) NE 0)` THEN EXIT/SCRIPT
+
+! See LAS_set_strides_curvilinear for first cut on dealing with strides and curvi data.
+! IF it is a native curvilinear plot THEN LAS_set_strides_curvilinear has been called.
+!!IF ($ferret_curvi_coord_lat"0|0|*>1") THEN EXIT/SCRIPT
+
+! Hybrid Z not dealt with here...
+
+IF ($do_hybrid_z"0|0|1|*>1") THEN  EXIT/SCRIPT 
+
+! ---------------------------------------------------------------------
+! Determine striding based on the memory allocation
+
+LET memsize = 0.25* ($FERRET_MEMORY"6.4")* 1.e6
+LET memsize = 100000 ! limit the number of points plotted.
+
+! Cannot do native striding IF this is a descriptor dataset.
+
+DEFINE SYMBOL no_native = 0
+IF ($data_var_only"0|*>1") THEN 
+   DEFINE SYMBOL check_for_des =  `($data_var_only)[d=($data_num)],RETURN=dsetpath`
+ELSE
+   DEFINE SYMBOL check_for_des =  `($data_var)[d=($data_num)],RETURN=dsetpath`
+ENDIF
+
+IF `STRINDEX("($check_for_des)", ".des") GT 0 OR ($no_native_strides_xy"0|*>1")` THEN 
+   EXIT/SCRIPT
+ENDIF
+
+! IF multiple variables add the sizes.
+DEFINE SYMBOL nvars = ($data_count)
+
+LET las_plotvar = ($ferret_plot_var) 
+DEFINE SYMBOL var_size = ($var_size"0") + `las_plotvar,RETURN=size`
+
+LET ndims = 0
+IF ($native_curvilinear_xy"0|*>1") THEN
+   LET xsiz = ($clon_imax) - ($clon_imin) + 1
+   LET ysiz = ($clat_jmax) - ($clat_jmin) + 1
+
+   LET ii = i[gx=($data_var)[d=($data_num)]]
+   LET ixmax = ii[i=@MAX]
+
+   LET jj = j[gy=($data_var)[d=($data_num)]]
+   LET jymax = jj[j=@MAX]
+
+   LET ndims = 2
+ELSE
+   LET xsiz = `las_plotvar,RETURN=isize`
+   IF `xsiz GT 1` THEN LET ndims = `ndims + 1`
+   LET ysiz = `las_plotvar,RETURN=jsize`
+   IF `ysiz GT 1` THEN LET ndims = `ndims + 1`
+ENDIF
+
+LET zsiz = `las_plotvar,RETURN=ksize`
+IF `zsiz GT 1` THEN LET ndims = `ndims + 1`
+LET tsiz = `las_plotvar,RETURN=lsize`
+IF `tsiz GT 1` THEN LET ndims = `ndims + 1`
+
+LET varsiz = `xsiz* ysiz* zsiz* tsiz`
+DEFINE SYMBOL stride_for_mem = `INT( 1 + varsiz/memsize )`
+
+IF `($stride_for_mem) LE 1` THEN EXIT/SCRIPT
+
+LET xstride = 1
+LET ystride = 1
+LET zstride = 1
+LET tstride = 1
+
+LET logx = INT(0.5+ LOG(xsiz) )
+LET logy = INT(0.5+ LOG(ysiz) )
+LET logxy = INT(0.5+ LOG(xsiz*ysiz) )
+LET logt = INT(0.5+ LOG(tsiz) )
+LET logz = INT(0.5+ LOG(zsiz) )
+
+LET logx = INT(LOG(xsiz) )
+LET logy = INT(LOG(ysiz) )
+LET logxy = INT(LOG(xsiz*ysiz) )
+LET logt = INT(LOG(tsiz) )
+LET logz = INT(LOG(zsiz) )
+
+LET stride_each = `INT(0.5+ ($stride_for_mem)^(1./ndims) )`
+list logx, logy, logxy, logt, logz
+
+IF `(logt GE logxy) AND (logz LT logxy)` THEN
+   LET nc = `ndims`
+   IF `zsiz GT 1` THEN 
+      LET zstride = `INT(0.5+ MAX(2, stride_each/4) )`
+      LET nc = `nc - 1`
+   ENDIF
+   LET stride_xyt = `INT(0.5+  (($stride_for_mem)/zstride)^(1./nc) )`
+   LET xstride = INT( 0.5+ stride_xyt^0.5 )
+   LET ystride = xstride
+   let tstride = stride_xyt
+ELIF `(logt GE logx) AND(logt GE logy) AND (logz LT logxy)` THEN
+   LET nc = `ndims`
+   IF `zsiz GT 1` THEN 
+      LET zstride = `INT(0.5+ MAX(2, stride_each/4) )`
+      LET nc = `nc - 1`
+   ENDIF
+   LET stride_xyt = `INT(0.5+  (($stride_for_mem)/zstride)^(1./nc) )`
+   LET xstride = INT( 0.5+ stride_xyt^0.5 )
+   LET ystride = xstride
+   let tstride = stride_xyt
+ELIF `(logx eq logt) and (logy eq logt) and (logx gt logz) and (logy gt logz)` THEN
+   LET nc = `ndims`
+   IF `zsiz GT 1` THEN
+      LET zstride = `INT(0.5+ MAX(2, stride_each/4) )`
+      LET nc = `nc-1`
+   ENDIF
+   IF `zstride LT 1` THEN let zstride = 1
+   IF `tsiz GT 1` THEN 
+      LET tstride = `INT(0.5+ MAX(2, stride_each/4) )`
+      LET nc = `nc-1`
+   ENDIF
+   LET stride_xy = `INT(0.5+  (($stride_for_mem)/(zstride*tstride))^(1./nc) )`
+   LET xstride = stride_xy
+   LET ystride = stride_xy
+ELSE
+   LET xstride = stride_each
+   LET ystride = stride_each
+   LET zstride = stride_each
+   LET tstride = stride_each
+ENDIF
+
+LIST xstride, ystride,zstride,tstride
+! Adjust so that the product of the strides gets close to ($stride_for_mem)
+REPEAT/RANGE=1:5 (\
+      LET teststride = `($stride_for_mem)/(xstride* ystride* zstride* tstride)`; \
+      IF `teststride GT 1` THEN LET xstride = `xstride+1`; \
+      IF `teststride GT 1` THEN LET ystride = `ystride+1`; \
+      IF `teststride GT 1` THEN LET tstride = `tstride+1`; \
+      LET teststride = `($stride_for_mem)/(xstride* ystride* zstride* tstride)`; \
+      IF `teststride GT 1` THEN LET tstride = `tstride+1`; \
+      LET teststride = `($stride_for_mem)/(xstride* ystride* zstride* tstride)`; \
+      IF `teststride GT 1` THEN LET tstride = `tstride+1`; \
+      IF `teststride LE 1` THEN EXIT/LOOP \
+   )
+LIST xstride, ystride,zstride,tstride
+
+IF `xsiz LE 6` THEN LET xstride = 1
+IF `ysiz LE 6` THEN LET ystride = 1
+IF `zsiz LE 6` THEN LET zstride = 1
+IF `tsiz LE 6` THEN LET ystride = 1
+LIST ($stride_for_mem)
+LIST ($stride_for_mem)/(xstride* ystride* zstride* tstride)
+
+DEFINE SYMBOL xstride = `xstride`
+DEFINE SYMBOL ystride = `ystride`
+DEFINE SYMBOL zstride = `zstride`
+DEFINE SYMBOL tstride = `tstride`
+
+DEFINE SYMBOL add_to_title = Points subsampled
+IF `($region_x_range"0|*>1") GT 0` THEN
+      DEFINE SYMBOL modax = "`las_plotvar, RETURN=xmod`"
+      GO check_modulo_factor x 
+      SET AXIS/STRIDE=($xstride) `($data_var),RETURN=xaxis`
+
+      IF ($do_curvi_xy"0|0|1|*>1") THEN
+         DEFINE SYMBOL clon_imin = `MAX(1, INT(($clon_imin)/($xstride)) )`
+         DEFINE SYMBOL clon_imax = `MIN (ixmax, INT(($clon_imax)/($xstride)) )`
+	 IF `(($clon_imin) + ($clon_imax)*($xstride)) GT ixmax` THEN \
+	    IF `($clon_imax)-($xstride) GT 0` THEN DEFINE SYMBOL clon_imax = `($clon_imax)-($xstride)`
+      ENDIF
+
+      LET x_strided_var = las_plotvar
+!      IF `STRCMP(($modax), " ") NE 0` THEN SET AXIS/MODULO `($data_var),RETURN=xaxis`
+      IF `($xstride) GT 1` THEN DEFINE SYMBOL add_to_title = ($add_to_title) by ($xstride) in X
+ENDIF
+
+IF `($region_y_range"0|*>1") GT 0` THEN 
+      SET AXIS/STRIDE=($ystride) `($data_var),RETURN=yaxis`
+      LET y_strided_var = las_plotvar
+
+      IF ($do_curvi_xy"0|0|1|*>1") THEN
+         DEFINE SYMBOL clat_jmin = `MAX(1, INT(($clat_jmin)/($ystride)) )`
+         DEFINE SYMBOL clat_jmax = `MIN(jymax, INT(($clat_jmax)/($ystride)) )`
+	 IF `(($clat_jmin) + ($clat_jmax)*($ystride)) GT jymax` THEN \
+	    IF `($clat_jmax)-($ystride) GT 0` THEN DEFINE SYMBOL clat_jmax = `($clat_jmax)-($ystride)`
+      ENDIF
+      IF `($ystride) GT 1` THEN DEFINE SYMBOL add_to_title = ($add_to_title) by ($ystride) in Y
+ENDIF
+      
+IF `($region_z_range"0|*>1") GT 0` THEN
+      IF `($zstride) GT 1` THEN
+         SET AXIS/STRIDE=($zstride) `($data_var),RETURN=zaxis`
+         LET z_strided_var = las_plotvar
+         DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($zstride) in Z
+      ENDIF
+ENDIF
+
+IF `($region_t"0|*>1") GT 0` THEN 
+      DEFINE SYMBOL modax = "`($data_var),RETURN=tmod`"      
+      IF `($tstride) GT 1` THEN
+         SET AXIS/STRIDE=($tstride) `($data_var),RETURN=taxis`
+         LET t_strided_var = las_plotvar
+         DEFINE SYMBOL add_to_title = ($add_to_title) by ($tstride) in T
+      ENDIF
+ENDIF
+
+! If long/lat index ranges were redefined, then we need to redefine 
+! ferret_plot variables. See curvilinear strides script
+
+IF `($do_curvi_xy"0|0|1|*>1") AND (($xstride"0")+($ystride"0") GT 0)` THEN
+   LET var0_noregion = ($ferret_plot_var_0_noregion)
+   CANCEL SYMBOL comma
+   IF ($region_zt"0|*>1) THEN DEFINE SYMBOL comma = ,
+   DEFINE SYMBOL ferret_plot_var_0 = var0_noregion[($region_zt)($comma)i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+   LET var1_noregion = ($ferret_plot_var_1_noregion)
+   CANCEL SYMBOL comma
+   IF ($region_zt"0|*>1) THEN DEFINE SYMBOL comma = ,
+   DEFINE SYMBOL ferret_plot_var_1 = var1_noregion[($region_zt)($comma)i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+
+   IF ($ferret_plot_var_2"0|*>1") THEN 
+      DEFINE SYMBOL ferret_plot_var_2 = var2_noregion[($region_zt)($comma)i=($clon_imin):($clon_imax),j=($clat_jmin):($clat_jmax)]
+      LET var2_noregion = ($ferret_plot_var_2_noregion)
+      LET/TITLE="($ferret_title_2)" zvar = XSEQUENCE(($ferret_plot_var_2))
+   ENDIF
+ENDIF
+
+! If there was any striding, set the label to be plotted.
+IF `($add_to_title"0|Points subsampled>1|*>0")` THEN CANCEL SYMBOL add_to_title
+IF ($add_to_title"0|*>1") THEN
+   DEFINE SYMBOL n_left_labels = `($n_left_labels"0") + 1`    
+   DEFINE SYMBOL upper_left_($n_left_labels) = ($add_to_title)
+
+   DEFINE SYMBOL note_num = `($note_num"0") + 1`
+   DEFINE SYMBOL note_($note_num)_lab = ($upper_left_($n_left_labels))
+
+ENDIF
+
+! End of $RCSfile ------------LAS_set_strides_prop.jnl--------------------------
+

@@ -1,0 +1,167 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_initialize_data_pt_insitu.jnl
+!
+! 
+! Author: ansley 
+! Date: 7/17/2007 $
+!
+! The LAS_initialize_data_pt_insitu.jnl script takes care of everything having to
+! do with initializing a datset for later use in a property-time insitu plot
+!
+! LAS_initialize_data_insitu.jnl takes an argument that specifies which data
+! item [0|1|2|3|...] to create symbols for. 
+
+!ACM_note: if we use a loop in the plot routine, we are not 
+! limited to 9 data items
+! DEFINE SYMBOL num ($1"0|0|1|2|3|4|5|6|7|8|9")
+
+DEFINE SYMBOL num ($1"0")
+
+! TODO:  It would be nice if the java code removed this dependency upon
+! TODO:  whether an operation was 'chained' or not.
+
+! Check whether the source data was part of a 'chained' operation.
+
+IF ($data_($num)_chained"0|1|*>1) THEN
+  DEFINE SYMBOL data_url \"($data_($num)_file)\"
+ELSE
+  DEFINE SYMBOL data_url \"($data_($num)_url)\"
+ENDIF
+
+! The t locations for insitu plots and the property value
+! ACM note: These are assumed to be in the same dataset, along
+!           with data_($num)_var if it exists, but we could
+!           extend to different data sets with further symbols
+
+! DEFINE SYMBOL data_t_var ($database_access_($num)_time)
+DEFINE SYMBOL data_t_var ($data_($num)_t_var)
+DEFINE SYMBOL data_p_var ($data_($num)_var)
+
+! The variable at the t locations
+IF ($data_($num)_title"0|1|*>1) THEN 
+   DEFINE SYMBOL data_title ($data_($num)_title)
+   DEFINE SYMBOL ferret_plot_title "($data_title) (($data_($num)_units))"
+ENDIF
+
+IF ($data_($num)_units"0|*>1") THEN 
+   DEFINE SYMBOL data_units (($data_($num)_units))
+   IF `STRINDEX("($data_units)", "((") GT 0` THEN \
+     DEFINE SYMBOL data_units ($data_($num)_units)
+ENDIF
+
+! LET sloc =`STRINDEX ("($data_units)", "degree_c")`
+! IF `sloc GT 0` THEN  ! change e.g. degree_c to Deg C else Ferret labels as degrees longitude!
+!    DEFINE SYMBOL data_units Deg C
+! ENDIF
+
+IF ($database_access_($num)_time_units"0|1|*>1") THEN 
+   DEFINE SYMBOL data_time_units  ($database_access_($num)_time_units)
+      LET sloc = `STRINDEX ("($database_access_($num)_time_units)", "since")`
+   IF `sloc GT 0` THEN
+      DEFINE SYMBOL data_time_units `SUBSTRING ("($database_access_($num)_time_units)", 0, sloc-1)`
+      LET slen = `STRLEN ("($database_access_($num)_time_units)")`
+      DEFINE SYMBOL data_time_origin `SUBSTRING ("($database_access_($num)_time_units)", sloc+5, slen - (sloc+4))`
+      sh sym data_time_units
+      sh sym data_time_origin
+
+      ! TODO: HERE IS A REAL HACK! Do a better job converting the form of the date.
+      IF `STRCMP("($data_time_origin)", "1970-01-01 00:00:00") EQ 0` THEN \
+         DEFINE SYMBOL data_time_origin 1-Jan-1970:00:00:00
+
+   ENDIF
+ENDIF
+
+! TODO:  Use new error features in Ferret to turn off STDERR and check
+! TODO:  for Ferret error symbols to see if the SET DATA command actually worked.
+
+! SET DATA and check for errors
+
+SET DATA ($data_url)
+
+! Set up striding on the x axis.
+! This might be set up differently. We should check that the data is on 
+! the x axis, and maybe this could be an option the user would set.
+
+DEFINE SYMBOL p_npts = `($data_p_var),RETURN=size`
+DEFINE SYMBOL pstride = `INT(($p_npts)/10000)+1`
+SET AXIS/STRIDE=($pstride) `($data_p_var),return=xaxis`
+
+IF ($fer_last_error"0|*>1") THEN
+  DEFINE SYMBOL error_status = ERROR
+  DEFINE SYMBOL error_type = DATA
+  DEFINE SYMBOL error_string = The ($data_p_var) source file -- ($data_url) did not open successfully.
+  EXIT/SCRIPT
+ENDIF
+
+LET data_num = `($data_p_var),RETURN=dsetnum`
+
+IF ($data_title"0|*>1") THEN \
+  SET VAR/TITLE="($data_title) ($data_units)" ($data_p_var)[d=`data_num`]
+
+IF ($data_units"0|*>1") THEN SET VAR/UNITS="($data_units)" ($data_p_var)[d=`data_num`]
+
+IF ($data_time_units"0|*>1") THEN SET VAR/UNITS=($data_time_units) ($data_t_var)[d=`data_num`]
+
+! Put the units in parentheses, as it will appear on the plots
+IF ($data_units"0|*>1") THEN DEFINE SYMBOL data_units (($data_units))
+IF `STRINDEX("($data_units)", "((") GT 0` THEN \
+     DEFINE SYMBOL data_units ($data_($num)_units)
+
+! Mark whether there are contour levels set on first entry. 
+! Compute automatic open-ended levels.
+
+IF `data_num EQ 1` THEN
+   IF ($ferret_fill_levels"0|*>1") THEN DEFINE SYMBOL input_fill_levels = 1
+   IF ($ferret_poly_levels"0|*>1") THEN 
+      DEFINE SYMBOL ferret_fill_levels ($ferret_poly_levels)
+      DEFINE SYMBOL input_fill_levels = 1
+   ENDIF
+
+   IF `STRLEN("($ferret_view)") EQ 2 AND STRINDEX("($operation_ID)", "Plot") GT 0` THEN \
+     GO LAS_auto_levels  
+   IF `STRLEN("($ferret_view)") EQ 2 AND STRINDEX("($operation_ID)", "poly") GT 0` THEN \
+     GO LAS_auto_levels  
+
+   IF `($ferret_poly_levels"0|*>1") EQ 0` THEN \
+      IF ($ferret_fill_levels"0|*>1") THEN DEFINE SYMBOL ferret_poly_levels ($ferret_fill_levels)
+ENDIF
+
+! Apply the expression in ferret_expression. $ represents the variable.
+
+IF ($ferret_expression"0|*>1") THEN 
+   LET ev = STRINDEX("($ferret_expression)", "$")
+   IF `ev EQ 0` THEN
+      DEFINE SYMBOL error_status = ERROR
+      DEFINE SYMBOL error_type = EXPRESSION
+      DEFINE SYMBOL error_string = The expression ($ferret_expression) must contain at least one $.
+      EXIT/SCRIPT
+   ENDIF
+
+   LET en = STRLEN("($ferret_expression)")
+   LET e1 = ev - 1
+   LET e2 = ev + 1
+   IF `e1 GT 0` THEN DEFINE SYMBOL expr1 = `SUBSTRING("($ferret_expression)", 1, e1)`
+   IF `e2 LT en` THEN DEFINE SYMBOL expr2 = `SUBSTRING("($ferret_expression)", e2, en)`
+
+   DEFINE SYMBOL ferret_plot_var ($expr1)($data_p_var)($expr2)
+   DEFINE SYMBOL ferret_plot_title ($expr1) ($data_title) ($expr2)
+
+! This works except if the expression has spaces around the $ characters.
+! Otherwise Ferret seems to be looking for script arguments.
+
+   LET esecond = STRINDEX("($expr2)", "$") 
+   IF `esecond GT 0` THEN
+
+      LET ev = STRINDEX("($expr2)", "$")
+      LET en = STRLEN("($expr2)")
+      LET e1 = ev - 1
+      LET e2 = ev + 1
+      IF `e1 GT 0` THEN DEFINE SYMBOL expr3 = `SUBSTRING("($expr2)", 1, e1)`
+      IF `e2 LT en` THEN DEFINE SYMBOL expr4 = `SUBSTRING("($expr2)", e2, en)`
+
+      DEFINE SYMBOL ferret_plot_var ($expr1)($data_p_var)($expr3)($data_p_var)($expr4)
+      DEFINE SYMBOL ferret_plot_title ($expr1)($data_p_var)($expr3)($data_p_var)($expr4)
+   ENDIF
+ENDIF
+
+CANCEL VAR data_num

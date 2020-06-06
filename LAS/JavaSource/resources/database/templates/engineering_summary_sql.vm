@@ -1,0 +1,4 @@
+#set($table=$las_backendrequest.getDatabaseProperty("db_table"))
+#set($region=$las_backendrequest.getRegionAsConstraint())
+#set($missing=$las_backendrequest.getMissingConstraint())
+SELECT GPS_lock_time,date_time,latitude,load_max,load_mean,load_min,load_std_dev,longitude FROM IPSV314 WHERE ($missing) AND $region 

@@ -1,0 +1,85 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! file: labels_above_plot.jnl
+! 
+! Author: ansley 
+! Date: July 18, 2007
+! ACM 8/7/2007 - use symbols region_small* rather than looking for 
+!                certain text within the labels for a more robust
+!                means of setting up for the region-too-small label.
+! 7/2010    ACM updates for V7.2 multi-variable plots. Loop over labels.
+
+! Add labels at the top for the location of overlaid lines,
+! transformations, and for URLs if they exist  
+
+! 4/2011
+! If a special marker location has been sent in (nuclear reactor location) 
+! plot a marker. The value of the location should be x,y
+
+!DEFINE SYMBOL ferret_xy_location_mark = 141.03291,37.422974
+
+IF ($ferret_xy_location_mark"0|*>1") THEN
+   LET xylocn = STRLEN("($ferret_xy_location_mark)")
+   LET xylocc = STRINDEX("($ferret_xy_location_mark)", ",")
+   DEFINE SYMBOL xyloccx = `SUBSTRING("($ferret_xy_location_mark)", 1, xylocc-1)`
+   DEFINE SYMBOL xyloccy = `SUBSTRING("($ferret_xy_location_mark)", xylocc+1, xylocn-xylocc)`
+   GO polymark POLY/OVER/LINE/color=red/PAL=yellow/NOLAB {($xyloccx)}, {($xyloccy)}, {($xyloccx)}, star, 1.2
+   GO polymark POLY/OVER/LINE/color=black/NOLAB {($xyloccx)}, {($xyloccy)}, {($xyloccx)}, star, 1.6
+
+ENDIF
+
+LET labdel = 0.2
+LET labsiz = 0.1
+
+IF ($ferret_annotations%0|*>1%) THEN EXIT/SCRIPT
+
+sh sym n_left_labels
+sh sym n_right_labels
+DEFINE SYMBOL num_labels = `MAX(($n_left_labels"0"), ($n_right_labels"0"))`
+
+! Put the location labels in the upper left.
+! If the script LAS_check_2d_region has set a label notifying us that
+!  the requested retion was too small, make that label larger.
+
+IF `($n_left_labels"0") GT 2` THEN
+!   LET labsiz = 0.08
+   LET labdel = 0.15
+ENDIF
+
+IF ($n_left_labels"0|*>1") THEN
+
+   LET labyloc = `($ppl$ylen) + labdel*($n_left_labels"1") + ($extra_y_space"0")`
+
+   REPEAT/RANGE=1:($n_left_labels)/NAME=m (DEFINE SYMBOL m = `m` ;\
+      LABEL/NOUSER 0, `labyloc`, -1, 0, `labsiz`, @AS($upper_left_($m)) ;\
+      LET labyloc = `labyloc - labdel` ;\
+      LET labsiz = 0.1 ;\
+      IF ($region_small_($m)"0|*>1") THEN LET labsiz = 0.12 ;\
+      IF ($region_small_($m)"0|*>1") THEN LET labyloc = `($ppl$ylen) + (($num_labels)+2)* labdel` ;\
+    )
+ENDIF
+
+! Put any URL labels in the upper right
+! Put any dataset labels in the upper right
+
+IF ($n_right_labels"0|0|*>1") THEN
+   LET labxloc = `($ppl$xlen)`
+   IF ($long_right_label"0|0|*>1") THEN   LET labxloc = `($ppl$xlen) + ($ppl$xorg) - 0.5`
+
+   LET labyloc = `($ppl$ylen) + labdel*($n_left_labels"1") `  ! start with loc of left-side labels
+   IF ($long_right_label"0|0|*>1") THEN 
+      LET labyloc = MAX(`($ppl$ylen) + labdel*(1+nlines)`, `($ppl$ylen) + labdel*($n_left_labels"1") `)
+   ELSE
+      LET labyloc = `labyloc + labdel*($n_right_labels)`
+   ENDIF
+   LET labyloc = `labyloc + ($extra_y_space"0")`
+   IF ($its_prop_prop_plot"0") THEN LET labyloc = MAX(`labyloc`, `($ppl$ylen) + 0.7`)
+
+
+   REPEAT/RANGE=1:($n_right_labels)/NAME=m (DEFINE SYMBOL m = `m` ;\
+      LABEL/NOUSER `labxloc`, `labyloc`, 1, 0.0, `labsiz`, @AS($upper_right_($m)) ;\
+      LET labyloc = `labyloc - labdel` ;\
+   )
+ENDIF 
+
+! End of $RCSfile ---------- labels_above_plot.jnl----------------------------
+

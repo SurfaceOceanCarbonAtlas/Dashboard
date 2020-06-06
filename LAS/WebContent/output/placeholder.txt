@@ -1,0 +1,2 @@
+Keep me or remove me from the deployed location, it doesn't matter.
+But keep me in $LAS_HOME so the war file includes me.

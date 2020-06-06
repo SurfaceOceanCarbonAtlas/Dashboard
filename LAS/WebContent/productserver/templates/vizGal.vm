@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+#set($op="Plot_2D_XY_zoom")
+#set($optionid="Options_2D_image_contour_xy_7")
+#if($las_request.getOperation().equals("Plot_2D_XY_SlideSorter"))
+    #set($op="Plot_2D_XY_zoom")
+    #set($vid=$las_request.variableIDs.get(0))
+#end
+#set($dsid=$las_request.datasetIDs.get(0))
+#if($las_request.getOperation().equals("Plot_2D_XY_SlideSorter_Vector"))
+    #set($op="Plot_vector")
+    #set($vid=$las_config.getVectorVariable($dsid, $las_request.variableIDs).getID())
+#end
+#if ($las_request.getOperation().equals("Plot_2D_SlideSorter"))
+    #set($op="Plot_2D_zoom")
+     #set($vid=$las_request.variableIDs.get(0))
+ #end
+ #if ($las_request.getOperation().equals("Plot_1D_SlideSorter"))
+    #set($op="Plot_1D_zoom")
+     #set($vid=$las_request.variableIDs.get(0))
+ #end
+  #if ($las_request.getOperation().equals("Plot_1D_SlideSorter_Vector"))
+    #set($op="Plot_vector")
+     #set($vid=$las_config.getVectorVariable($dsid, $las_request.variableIDs).getID())
+ #end
+ 
+ #set($optionid=$las_config.getOptionID($op))
+ 
+ #set($region="")
+ #if ($las_request.getXlo() != "" && $las_request.getXlo() != "null")
+    #set($region=$region+"&xlo="+$las_request.getXlo())
+ #end
+ #if ($las_request.getXhi() != "" && $las_request.getXhi() != "null")
+    #set($region=$region+"&xhi="+$las_request.getXhi())
+ #end
+  #if ($las_request.getYlo() != "" && $las_request.getYlo() != "null")
+    #set($region=$region+"&ylo="+$las_request.getYlo())
+ #end
+ #if ($las_request.getYhi() != "" && $las_request.getYhi() != "null")
+    #set($region=$region+"&yhi="+$las_request.getYhi())
+ #end
+ #if ($las_request.getZlo() != "" && $las_request.getZlo() != "null")
+    #set($region=$region+"&zlo="+$las_request.getZlo())
+ #end
+ #if ($las_request.getZhi() != "" && $las_request.getZhi() != "null")
+    #set($region=$region+"&zhi="+$las_request.getZhi())
+ #end
+ #if ($las_request.getTlo() != "" && $las_request.getTlo() != "null")
+    #set($region=$region+"&tlo="+$las_request.getTlo())
+ #end
+ #if ($las_request.getThi() != "" && $las_request.getThi() != "null")
+    #set($region=$region+"&thi="+$las_request.getThi())
+ #end
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+
+<title>LAS Output -- $las_config.getTitle()</title>
+<META http-equiv="refresh" content="0;URL=VizGal.vm?dsid=$dsid&vid=$vid&opid=$op&optionid=$optionid&view=$las_request.getProperty("ferret","view")$region"> 
+</head>
+<body>
+</body>
+</html>
+

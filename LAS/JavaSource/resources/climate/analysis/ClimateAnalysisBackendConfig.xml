@@ -1,0 +1,100 @@
+<application>
+	<invoker base_dir="resources/climate/analysis"
+                 interpreter = "/usr/bin/python"
+                 executable="/home/rhs/GFDL/analysis/threddsFeed/bin/domcatalog.py"
+                 time_limit="3600" template_dir="templates" 
+                 output_dir="/home/rhs/tomcat/webapps/baker/output"
+                 http_base_url = "http://gazelle.weathertopconsulting.com:8282/baker/output"
+                 iosp_script_dir="resources/iosp/scripts"
+                 iosp_temp_dir="/home/rhs/tomcat/content/baker/conf/server/temp"
+                 iosp_data_dir="/home/rhs/tomcat/content/baker/conf/server/data/dynamic"
+                 las_tfds_data_dir="/home/rhs/tomcat/content/baker/conf/server/data"
+                 iosp_base_dir="resources/iosp"
+                 opendap_base_url = "http://gazelle.weathertopconsulting.com:8282/thredds/dodsC/output">
+        <arg>domcatalog.py</arg>
+    </invoker>
+	<cacher dataset="true" dataset_queue_size="10000" dataset_size="40"
+		subset="true" subset_queue_size="10000" meta="true"
+		meta_queue_size="10000" />
+        <messages>
+           <message type="startsWith" level="error">
+              <key>/usr/bin/python: can't</key>
+              <text>
+                A Python error occurred.
+              </text>
+           </message>
+           <message type="startsWith" level="error">
+              <key>Traceback</key>
+              <text>
+                A Python error occurred.
+              </text>
+           </message>
+    </messages>
+    <environment>
+        <variable>
+            <name>FER_DIR</name>
+             <value>.</value>
+             <value>/usr/local/ferret</value>
+        </variable>
+        <variable>
+            <name>FER_DESCR</name>
+             <value>.</value>
+             <value>/usr/local/ferret_data/descr</value>
+             <value>des</value>
+        </variable>
+        <variable>
+            <name>FER_DATA</name>
+             <value>.</value>
+             <value>./data</value>
+             <value>/data/ncep</value>
+             <value>/usr/local/ferret/contrib</value>
+             <value>/usr/local/ferret/examples</value>
+             <value>/usr/local/ferret/go</value>
+             <value>/usr/local/ferret_data/data</value>
+        </variable>
+        <variable>
+            <name>FER_GRIDS</name>
+             <value>.</value>
+             <value>/usr/local/ferret_data/grids</value>
+        </variable>
+        <variable>
+            <name>FER_PALETTE</name>
+             <value>.</value>
+             <value>/usr/local/ferret/ppl</value>
+             <value>jnls</value>
+             <value>jnls/insitu</value>
+             <value>jnls/section</value>
+             <value>scripts</value>
+        </variable>
+        <variable>
+            <name>FER_GO</name>
+             <value>.</value>
+             <value>/usr/local/ferret/contrib</value>
+             <value>/usr/local/ferret/examples</value>
+             <value>/usr/local/ferret/go</value>
+             <value>jnls</value>
+             <value>jnls/insitu</value>
+             <value>jnls/section</value>
+             <value>scripts</value>
+        </variable>
+        <!-- ferret 7.2 and later -->
+        <variable>
+            <name>FER_FONTS</name>
+             <value>/usr/local/ferret/ppl/fonts</value>
+        </variable>
+        <!-- before ferret 7.2 -->
+        <variable>
+            <name>PLOTFONTS</name>
+             <value>/usr/local/ferret/ppl/fonts</value>
+        </variable>
+        <variable>
+            <name>FER_EXTERNAL_FUNCTIONS</name>
+             <value>.</value>
+             <value>/usr/local/ferret/ext_func/libs</value>
+        </variable>
+        <variable>
+            <name>DODS_CONF</name>
+             <value>/home/rhs/tomcat/content/baker/conf/server/dods/.dodsrc</value>
+        </variable>
+    </environment>
+</application>

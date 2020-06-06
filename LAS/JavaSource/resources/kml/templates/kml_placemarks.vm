@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.1">
+  <Document>  
+    <Folder>
+    <LookAt>    
+      <longitude>$gridLon</longitude>    
+      <latitude>$gridLat</latitude>    
+      <altitude>0</altitude>    
+      <range>5000000</range>    
+      <tilt>0</tilt>    
+      <heading>0</heading>    
+      <altitudeMode>relativeToGround</altitudeMode>  
+    </LookAt>
+    <description> strided $xstride_coord degrees in x and $ystride_coord degrees in y</description>
+    <name> Placemarks </name>
+#foreach ($placemark in $allPlacemarks)
+    $placemark.toString()
+#end
+    </Folder>
+  </Document>
+</kml>

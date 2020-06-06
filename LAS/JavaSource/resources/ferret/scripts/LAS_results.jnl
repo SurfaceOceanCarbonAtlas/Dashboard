@@ -1,0 +1,450 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_results.jnl
+!
+! $Author: ansley $
+! $Date: 2006/07/13 18:08:18 $
+! 3/30/2007 ACM When writing the map_scale.xml file, first list the urls separately;
+!       long URLs can make the Ferret command too long.
+! 2/11/2008 ACM Add DATA_MIN, DATA_MAX and DATA_EXISTS to the map scale file for 2D plots. 
+! 5/2010    ACM Add axis direction symbols for 1D plots: axis_vert or axis_horiz give the 
+!       indep axis, use D for the dep axis.
+!
+! 5/2010    ACM Write time range in formatted time strings if a time axis.
+! 4/2012    ACM Testing removal of the URL and variables from the map-scale file.
+! 4/2014    ACM Add time units, origin and calendar to map scale file
+! 10/2017   Add an annotation on the plot when data selection results in no data
+! 10/2017   fixes for map-scale file, monthly time axis such as monthly_navy_winds
+! 11/2017   add report map resolution to the log if this was a map plot
+! 10/2018   changing animation product to make all the frames in one PyFerret session
+!  5/2020   Define time_map_var to access time units etc without loading so much data.
+! .......................................................................................
+!
+! LAS_results.jnl creates the result files. 
+!
+! The argument is the refmap type "box", "xline", "yline", or "point"
+
+cancel region 
+
+! If its a difference plot, use dataset 1 e.g. for the coordnames getting axis directions
+set data 1
+
+IF ($have_las_plotvar"0") THEN 
+   LET the_plot_var = las_plotvar  ! from LAS_auto_levels
+ELSE
+   IF ($native_curvilinear_xy"0|0|*>1") THEN 
+      LET the_plot_var = plot_var
+   ELIF ($do_hybrid_z"0|0|*>1") THEN
+      LET the_plot_var = ($ferret_plot_base_var_noregion)
+   ELIF ($native_Z_plot"0|0|*>1") THEN
+      LET the_plot_var = ($ferret_var_0)
+   ELIF ($ferret_plot_var"0|0|*>1") THEN
+      LET the_plot_var = ($ferret_plot_var)
+      IF ($ferret_plot_var"0|sampled_var>1|*>0) THEN LET the_plot_var = ($ferret_plot_var)
+   ELSE
+      IF ($basemap_url"0|0|*>1") THEN
+         USE ($basemap_url)
+         LET the_plot_var = ($basemap_var)
+	 DEFINE SYMBOL plotvar_is_basemap = 1
+      ENDIF
+   ENDIF
+ENDIF
+
+! Annotate if the selection resulted in no data  ngood_data is defined for insitu datasets
+
+IF `($ngood_data"-1|*>1") NE -1` THEN
+   IF `($ngood_data) EQ 0` THEN annotate/norm/x=0.02/y=0.92/halign=-1/siz=0.1 "No Valid Data in the selection"
+ELSE
+   IF `($ferret_annotations"0|*>1") AND ($plotvar_is_basemap"0|*>1") EQ 0 AND ($no_novalid_lab"0|*>1") NE 1` THEN
+      stat the_plot_var
+      IF `($stat_ngood"0|0|*>1") EQ 0` THEN \
+       annotate/norm/x=0.02/y=0.92/halign=-1/siz=0.1 "No Valid Data in the selection"
+  ENDIF
+ENDIF
+
+SAY _________________ Saving the image: clock seconds:                            ($clock_secs)
+LET pre_plot = ($clock_secs)
+
+
+! Write the image file
+!
+! Result "plot_image" is the the image file result_plot_image_filename
+
+! For Google Earth plots, use transparency for white background if the 
+! ferret version has that option available.
+
+IF `($its_GE"0|*>1")` THEN DEFINE SYMBOL trans = /TRANS
+
+IF ($program_name"0|PyFerret>1|*>0") THEN 
+   IF ($result_plot_image_filename%0|*>1%) THEN FRAME($trans)/FILE="($result_plot_image_filename)"
+!   IF ($result_plot_pdf_filename%0|*>1%) THEN FRAME($trans)/FILE="($result_plot_pdf_filename)"
+!   IF ($result_plot_ps_filename%0|*>1%) THEN FRAME($trans)/FILE="($result_plot_ps_filename)"
+!   IF ($result_plot_svg_filename%0|*>1%) THEN FRAME($trans)/FILE="($result_plot_svg_filename)"
+ELSE
+   IF ($result_plot_image_filename%0|*>1%) THEN FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+ENDIF
+
+SAY _________________ END Saving the image: clock seconds:                              ($clock_secs)
+SAY _________________ total time Saving the image, seconds                                  ----- `($clock_secs) - pre_plot`
+
+
+! When we are making all the images for an animation in one go, that's it. 
+! We do not need a map-scale file, we aren't doing annotations.  
+
+IF ($is_animation_frame"0|0|*>1") THEN EXIT/SCRIPT
+
+
+! Result map_scale_file is output map scale file
+! Write the output immediately after drawing the plot; it uses symbols 
+! that are set when making the plot. If a colorbar is made, do that after the
+! map_scale file is written.
+ 
+! X region for plot does not apply to the abstract axis for 
+! the variables SYMS_NAMES, SYMS_VALS, so cancel region
+! assume we are running Ferret v5.81 + with /NOROWLAB qualifier on LIST command
+
+
+! First list the urls and variable names; the URLs can be so long they make the
+! commands too long for the Ferret command-line buffer. 
+
+! Always write the map_scale file.
+
+! If an insitu waterfall plot made a "blankvar" plot underlying the color plot,
+! re-draw that to use in making the reference map. It has the correct time/space
+! size and units.
+
+IF ($insitu_blankvar"0|*>1) THEN SHADE/PAL=white/NOLAB/NOKEY/LEV=(0,1,1) ($insitu_blankvar)
+
+!Do not write out the url and variable name output. This info is not saved
+!when map_scale.xml is generated anyway. (See ferret ticket 1933)
+
+   IF `($xstride"0|*>1) EQ 0` THEN DEFINE SYMBOL xstride = 1 
+   IF `($ystride"0|*>1) EQ 0` THEN DEFINE SYMBOL ystride = 1
+
+   LET syms_names = {\
+     "PPL$XMIN", "PPL$XMAX", \
+      "PPL$YMIN", "PPL$YMAX",\
+      "PPL$XPIXEL", "PPL$YPIXEL",\
+      "PPL$WIDTH", "PPL$HEIGHT",\
+      "PPL$XORG","PPL$YORG",\
+      "PPL$XLEN","PPL$YLEN",\
+      "XAXIS_MIN","XAXIS_MAX",\
+      "YAXIS_MIN","YAXIS_MAX",\
+      "VP_TOP_MARGIN","VP_RT_MARGIN",\
+      "XSTRIDE","YSTRIDE"}
+
+! When animating a Z profile, drawing the first plot: 
+! The symbols XAXIS_MIN and XAXIS_MAX may not be defined.
+! Set them here using the data min and max.
+
+   DEFINE SYMBOL has_xaxis_sym = ($XAXIS_MIN"0|*>1")
+   IF `($has_xaxis_sym) EQ 0` THEN
+      PPL %RANGE ($PPL$XMIN1) ($PPL$XMAX1) 10
+      DEFINE SYMBOL xaxis_min = ($ppl$range_low) 
+      DEFINE SYMBOL xaxis_max = ($ppl$range_high)
+   ENDIF
+
+! For curvilinear grids, region_0_x_lo and region_0_x_hi may
+! have been changed to another modulo longitude branch. If so
+! then the x axis min and max need to be reset.
+      
+   DEFINE SYMBOL xaxlo = ($XAXIS_MIN)
+   DEFINE SYMBOL xaxhi = ($XAXIS_MAX)
+
+   IF ($region_0_x_lo_orig"0|*>1") THEN
+      IF `($region_0_x_lo_orig) - ($XAXIS_MIN) LT (-350)` THEN 
+         DEFINE SYMBOL xaxlo = `($XAXIS_MIN) - 360`
+         DEFINE SYMBOL xaxhi = `($XAXIS_MAX) - 360`
+      ELIF `($region_0_x_lo_orig) - ($XAXIS_MIN) GT   350 ` THEN 
+         DEFINE SYMBOL xaxlo = `($XAXIS_MIN) + 360`
+         DEFINE SYMBOL xaxhi = `($XAXIS_MAX) + 360`
+      ENDIF
+   ENDIF
+
+   DEFINE SYMBOL taxis_dir = 0
+
+   LET syms_vals = {\
+      "($PPL$XMIN)", "($PPL$XMAX)", \
+      "($PPL$YMIN)", "($PPL$YMAX)", \
+      "($PPL$XPIXEL)", "($PPL$YPIXEL)",\
+      "($PPL$WIDTH)", "($PPL$HEIGHT)",\
+      "($PPL$XORG)", "($PPL$YORG)",\
+      "($PPL$XLEN)", "($PPL$YLEN)",\
+      "($xaxlo)", "($xaxhi)",\
+      "($YAXIS_MIN)", "($YAXIS_MAX)",\
+      "($VP_TOP_MARGIN)","($VP_RT_MARGIN)",\
+      "($xstride)","($ystride)"}
+
+   IF `($XAXIS_MIN"0|*>1) EQ 0 OR ($YAXIS_MIN"0|*>1) EQ 0 ` THEN LET syms_vals = {\
+      "($PPL$XMIN)", "($PPL$XMAX)", \
+      "($PPL$YMIN)", "($PPL$YMAX)", \
+      "($PPL$XPIXEL)", "($PPL$YPIXEL)",\
+      "($PPL$WIDTH)", "($PPL$HEIGHT)",\
+      "($PPL$XORG)", "($PPL$YORG)",\
+      "($PPL$XLEN)", "($PPL$YLEN)",\
+      "($PPL$XMIN1)", "($PPL$XMAX1)", \
+      "($PPL$YMIN1)", "($PPL$YMAX1)", \
+      "($VP_TOP_MARGIN)","($VP_RT_MARGIN)",\
+      "($xstride)","($ystride)"}
+
+! assume we are running Ferret v5.81 or higher with /NOROWLAB qualifier on LIST command
+   LIST/CLOBBER/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+
+! If symbols for formatted time-axis ends have been defined, write those.
+! These are used by correlation plots.
+! If a plot axis is a time axis, write its formatted-date ends. Line plots
+! have symbols such as ppl$xmin1, 2D plots will have xaxis_min etc.
+
+   IF ($HAXIS_tstart"0|*>1") THEN
+      LET syms_names = {"HAXIS_TSTART", "HAXIS_TEND"}
+      LET syms_vals = {"($HAXIS_TSTART)", "($HAXIS_TEND)"}
+      IF ($haxis_taxname"0|*>1") THEN 
+         LET tt= t[GT=($haxis_taxname)]
+
+	 let tblo = tboxlo[gt=tt]
+	 let tbhi = tboxlo[gt=tt]
+	 LET tbl = MAX(tblo[L=1],($xaxis_min%($ppl$xmin1)%) )
+         LET t1 = tboxlo[gt=tt,t=`tbl`]
+	 LET tbh = MIN(tbhi[L=@max],($xaxis_max%($ppl$xmax1)%) )
+         LET t2 =  tboxhi[gt=tt,t=`tbh`]
+
+         DEFINE SYMBOL haxis_tunits = `tt,RETURN=tunits`
+         DEFINE SYMBOL haxis_torigin = `tt,RETURN=t0`
+         DEFINE SYMBOL haxis_tcalendar = `tt,RETURN=calendar`
+         LET syms_names = {"HAXIS_TSTART", "HAXIS_TEND", "HAXIS_TUNITS", "HAXIS_TORIGIN", "HAXIS_TCALENDAR"}
+         LET syms_vals = {"($HAXIS_TSTART)", "($HAXIS_TEND)", "($HAXIS_TUNITS)", "($HAXIS_TORIGIN)", "($HAXIS_TCALENDAR)"}
+      ENDIF
+      LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+   ELSE
+      IF ($ax_horiz"0|T>1|*>0") THEN
+         SET DATA 1
+	 LET time_map_var = ($data_0_var)[($region_full)]
+	 IF ($insitu_blankvar"0|*>1) THEN LET time_map_var = ($insitu_blankvar)
+         LET tt= t[GT=time_map_var]
+
+! See Ferret ticket 2483
+! With Ferret v7.02 11/2016, the xaxis_min, xaxis_max correctly represent the start and end
+! points of the plotted axis which PPLUS may haave extended beyond the time axis coordinates. 
+! (Previously these contained the time-axis coordinates). Even if the values in XAXIS_MIN 
+! and XAXIS_MAX may lie outside the coordinate range of the time axis, the function 
+! TAX_DATESTRING returns the correct dates using the time units and origin from the axis.
+
+	 LET min_ax = ($xaxis_min%($ppl$xmin1)%)
+	 LET max_ax = ($xaxis_max%($ppl$xmax1)%)
+
+         DEFINE SYMBOL haxis_tstart = `TAX_DATESTRING(min_ax, tt, "seconds")`
+         DEFINE SYMBOL haxis_tend = `TAX_DATESTRING(max_ax, tt, "seconds")`
+
+         DEFINE SYMBOL haxis_tunits = `time_map_var,RETURN=tunits`
+         DEFINE SYMBOL haxis_torigin = `time_map_var,RETURN=t0`
+         DEFINE SYMBOL haxis_tcalendar = `time_map_var,RETURN=calendar`
+
+         LET syms_names = {"HAXIS_TSTART", "HAXIS_TEND", "HAXIS_TUNITS", "HAXIS_TORIGIN", "HAXIS_TCALENDAR"}
+         LET syms_vals = {"($HAXIS_TSTART)", "($HAXIS_TEND)", "($HAXIS_TUNITS)", "($HAXIS_TORIGIN)", "($HAXIS_TCALENDAR)"}
+         LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+      ENDIF
+   ENDIF
+
+
+   IF ($VAXIS_tstart"0|*>1") THEN
+      LET syms_names = {"VAXIS_TSTART", "VAXIS_TEND"}
+      LET syms_vals = {"($VAXIS_TSTART)", "($VAXIS_TEND)"}
+      IF ($vaxis_taxname"0|*>1") THEN 
+         LET tt= t[GT=($vaxis_taxname)]
+
+	 let tblo = tboxlo[gt=tt]
+	 let tbhi = tboxlo[gt=tt]
+	 LET tbl = MAX(tblo[L=1],($yaxis_min%($ppl$ymin1)%) )
+         LET t1 = tboxlo[gt=tt,t=`tbl`]
+	 LET tbh = MIN(tbhi[L=@max],($yaxis_max%($ppl$ymax1)%) )
+         LET t2 =  tboxhi[gt=tt,t=`tbh`]
+
+         DEFINE SYMBOL vaxis_tunits = `tt,RETURN=tunits`
+         DEFINE SYMBOL vaxis_torigin = `tt,RETURN=t0`
+         DEFINE SYMBOL vaxis_tcalendar = `tt,RETURN=calendar`
+         LET syms_names = {"VAXIS_TSTART", "VAXIS_TEND", "VAXIS_TUNITS", "VAXIS_TORIGIN", "VAXIS_TCALENDAR"}
+         LET syms_vals = {"($VAXIS_TSTART)", "($VAXIS_TEND)", "($VAXIS_TUNITS)", "($VAXIS_TORIGIN)", "($VAXIS_TCALENDAR)"}
+      ENDIF
+      LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+   ELSE
+      IF ($ax_vert"0|T>1|*>0") THEN
+         SET DATA 1
+         LET tt= t[GT=($data_0_var),d=($dset0%1%)]
+
+	 let tblo = tboxlo[gt=tt]
+	 let tbhi = tboxlo[gt=tt]
+	 LET tbl = MAX(tblo[L=1],($yaxis_min%($ppl$ymin1)%) )
+         LET t1 = tboxlo[gt=tt,t=`tbl`]
+	 LET tbh = MIN(tbhi[L=@max],($yaxis_max%($ppl$ymax1)%) )
+         LET t2 =  tboxhi[gt=tt,t=`tbh`]
+
+	 DEFINE SYMBOL vaxis_tstart = `TAX_DATESTRING(t1, tt, "seconds")`
+         DEFINE SYMBOL vaxis_tend = `TAX_DATESTRING(t2, tt, "seconds")`
+         LET time_map_var = ($data_0_var)[($region_full)]
+	 DEFINE SYMBOL vaxis_tunits = `time_map_var,RETURN=tunits`
+         DEFINE SYMBOL vaxis_torigin = `time_map_var,RETURN=t0`
+         DEFINE SYMBOL vaxis_tcalendar = `time_map_var,RETURN=calendar`
+         LET syms_names = {"VAXIS_TSTART", "VAXIS_TEND", "VAXIS_TUNITS", "VAXIS_TORIGIN", "VAXIS_TCALENDAR"}
+         LET syms_vals = {"($VAXIS_TSTART)", "($VAXIS_TEND)", "($VAXIS_TUNITS)", "($VAXIS_TORIGIN)", "($VAXIS_TCALENDAR)"}
+         LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+      ENDIF
+   ENDIF
+
+! Assume we are running Ferret v6.07+ or higher with symbols AX_HORIZ and AX_VERT 
+! defined for 2D plots. Write to the XML the horizontal and vertical axis and any
+! attribute positive=
+! TODO: Question - do we want a line for a possible positive= attribute to always
+!       be written or only when that attribute exists??
+
+! This section assumes there is a variable "the_plot_var" which is
+! defined by standard LAS scripts but not for all customized interfaces.
+! If things have really gone wrong and there is no ferret_plot_var, just 
+! use this dummy variable so as to be able to finish the script.
+
+   LET dummyvar = x[i=1:5] + y[i=1:5]
+
+   IF `($ferret_plot_var"0|*>1") EQ 0` THEN DEFINE SYMBOL ferret_plot_var = dummyvar
+
+   IF `($ax_horiz"0|*>1") OR ($ax_vert"0|*>1")`  THEN 
+      LET syms_names = {"AX_HORIZ", "AX_HORIZ_POSTV", "AX_VERT", "AX_VERT_POSTV", \
+      "DATA_EXISTS", "DATA_MIN", "DATA_MAX"}
+
+! Find the axis directions
+
+      IF `($native_curvilinear_xy"0") EQ 0` THEN 
+
+      IF `($ferret_version) GE 6.98` THEN LET coordnames = ..coordnames
+      IF ($ax_horiz"0|*>1") THEN
+         DEFINE SYMBOL the_axis =  `the_plot_var,RETURN=($ax_horiz)axis`
+
+! Remove striding so we can get the attributes of axes
+         IF `STRINDEX("($the_axis)", "(") GT 0` THEN 
+            IF `($($ax_horiz)stride"0") GT 1` THEN 
+               CANCEL AXIS/STRIDE `($ax_horiz)_strided_var,RETURN=($ax_horiz)axis`
+               DEFINE SYMBOL the_axis =  `($data_var),RETURN=($ax_horiz)axis`
+            ENDIF
+         ENDIF
+
+         IF `($ferret_version) GE 6.98` THEN 
+	    IF `IS_ELEMENT_OF_STR_N(coordnames, "($the_axis)") GT 0`  THEN
+	       DEFINE SYMBOL the_axis = (($the_axis))
+	       LET attlist = ($the_axis).attnames
+	       IF `IS_ELEMENT_OF_STR_N(attlist, "positive") GT 0` THEN \
+	       DEFINE SYMBOL AX_HORIZ_POSTV = `($the_axis).positive`
+	    ENDIF
+	 ENDIF
+      ELSE
+         DEFINE SYMBOL ax_horiz = D
+      ENDIF
+
+      IF ($ax_vert"0|*>1") THEN
+      IF `($ax_vert_postv"0|*>1") NE 1` THEN   ! AX_VERT_POSTV already defined for waterfall plot?
+         DEFINE SYMBOL the_axis =  `the_plot_var,RETURN=($ax_vert)axis`
+
+         IF `STRINDEX("($the_axis)", "(") GT 0` THEN 
+            IF `($($ax_vert)stride"0") GT 1` THEN 
+               CANCEL AXIS/STRIDE `($ax_vert)_strided_var,RETURN=($ax_vert)axis`
+               DEFINE SYMBOL the_axis =  `($data_var),RETURN=($ax_vert)axis`
+            ENDIF
+         ENDIF
+
+         IF `($ferret_version) GE 6.98` THEN 
+	    IF `IS_ELEMENT_OF_STR_N(coordnames, "($the_axis)") GT 0`  THEN
+	       DEFINE SYMBOL the_axis = (($the_axis))
+	       LET attlist = ($the_axis).attnames
+	       IF `IS_ELEMENT_OF_STR_N(attlist, "positive") GT 0` THEN \
+	       DEFINE SYMBOL AX_VERT_POSTV = `($the_axis).positive`
+	    ENDIF
+	 ENDIF
+      ENDIF  ! AX_VERT_POSTV already defined
+      ELSE
+         DEFINE SYMBOL ax_vert = D
+      ENDIF
+      
+      ENDIF  ! not curvilinear
+
+      IF ($ax_horiz"0|*>1") THEN DEFINE SYMBOL ax_horiz = `DNCASE("($ax_horiz)")`
+      IF ($ax_vert"0|*>1") THEN DEFINE SYMBOL ax_vert = `DNCASE("($ax_vert)")`
+
+! Find the data min, max.  If all data was bad, send blank strings to the output.
+
+      LET pplus_default_zmin = 1.E38  ! PPLUS initializes zmin = 1.E38 and zmax = -1.E38
+
+      IF `($data_plotted_min"1.E38") EQ pplus_default_zmin` THEN 
+         DEFINE SYMBOL DATA_EXISTS = 0
+         CANCEL SYMBOL DATA_MIN
+         CANCEL SYMBOL DATA_MAX
+      ELSE
+         DEFINE SYMBOL DATA_EXISTS = 1
+         DEFINE SYMBOL DATA_MIN = ($data_plotted_min)
+         DEFINE SYMBOL DATA_MAX = ($data_plotted_max)
+         IF ($data_max"0|bad>1|1.E+34>1|*>0") THEN 
+            CANCEL SYMBOL data_min
+            CANCEL SYMBOL data_max
+            DEFINE SYMBOL DATA_EXISTS = 0
+         ENDIF
+         IF ($data_min"0|bad>1|1.E+34>1|*>0") THEN 
+            CANCEL SYMBOL data_min
+            CANCEL SYMBOL data_max
+            DEFINE SYMBOL DATA_EXISTS = 0
+         ENDIF
+      ENDIF
+
+      IF ($its_prop_prop_plot"0|*>1") THEN
+          DEFINE SYMBOL ax_horiz = ($data_0_id)
+          DEFINE SYMBOL ax_vert = ($data_1_id)
+          CANCEL SYMBOL DATA_MAX
+          CANCEL SYMBOL DATA_MIN
+          DEFINE SYMBOL DATA_EXISTS = 1
+          IF ($all_missing"0|*>1") THEN DEFINE SYMBOL DATA_EXISTS = 0
+      ENDIF
+
+      LET syms_vals = {"($AX_HORIZ)", "($AX_HORIZ_POSTV)", "($AX_VERT)", "($AX_VERT_POSTV)",\
+       "($DATA_EXISTS)", "($DATA_MIN)", "($DATA_MAX)"}
+      
+      
+      LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+   ENDIF  ! ax_horiz ax_vert defined
+
+! If it was a color plot write the string needed to put into a /LEVELS qualifier,
+! to duplicate the color levels from this plot.
+
+   IF ($LEV_NUM"0|*>1") THEN
+      LET syms_names = "LEVELS_STRING"
+      IF ($LEV_OPNLEVS"0|*>1") THEN 
+         LET syms_vals = "($LEV_OPNLEVS)"
+      ELIF `(($LEV_MIN"0|*>1") + ($LEV_MAX"0|*>1") + ($LEV_DEL"0|*>1")) EQ 3` THEN
+         IF `STRCMP("($LEV_DEL%1%)", "none") EQ 0` THEN DEFINE SYMBOL lev_del = 1
+         LET syms_vals = "(($LEV_MIN),($LEV_MAX),($LEV_DEL))"
+      ELSE
+         LET syms_vals = "($LEV_TEXT%v%)"
+      ENDIF
+      LIST/APPEND/FILE="($result_map_scale_filename)"/NOHEAD/NOROWLAB syms_names, syms_vals
+   ENDIF
+
+
+! Done with map scale file
+
+IF ($ferret_annotations%0|*>1%) THEN GO LAS_annotations_xml
+
+! Result "colorbar" is the legend of the plot_image...only for Google Earth
+IF ($result_colorbar_filename%0|*>1%) THEN GO colorbar
+
+! Result ref_map is a ref map. Save to result_ref_map_filename
+
+IF  ($ferret_use_ref_map%0|false>0|*>1%) THEN 
+  CAN VIEW
+  SET VIEW full
+  GO std_refmap ($region_0_x_lo) ($region_0_x_hi) ($region_0_y_lo) ($region_0_y_hi) $1%box% ($ref_magnify%0%) ($ref_xcompress%0%) ($ref_ycompress%0%)
+  FRAME/FORMAT=gif/FILE="($result_ref_map_filename)"
+
+ENDIF
+
+! If this was a map plot, report on the topo resolution used
+IF ($fland_area"0|*>1") THEN
+   SAY _________________Map plot:  Region and topo file used:
+   SAY _________________Map plot:    XY region      ($region_xy)
+   SAY _________________Map plot:    $fland_area    ($fland_area)
+   SAY _________________Map plot:    topo file      ($topo_url)
+ENDIF
+! End of file ------------LAS_results.jnl--------------------------
+

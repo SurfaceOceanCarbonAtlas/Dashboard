@@ -1,0 +1,198 @@
+\cancel mode verify
+
+! dapper_stack_line.jnl
+! stack line plots of a variable at each location; as delimited by 
+! gaps in the TIME variable
+! acm 7/2007
+
+! TODO: The aspect ratio and potentially the size of the plot could
+!       be adjusted depending on the number of locations to be plotted.
+!       For now if there are more than 12 I just plot the first 12 and 
+!       add a note
+! TODO: This is a good candidate for striding, BUT watch out, as striding
+!       would cause us to lose the missing-data value in the TIME variable
+!       as the marker between the time series at different locations. If
+!       striding is done, we would still need to watch for and deal with 
+!       those missing values where they exist, but use delta-time < 0 as
+!       where a new series starts.
+
+LET max_lines = 12
+
+! The script donesnt really use any region info but this doesnt hurt.
+
+DEFINE SYMBOL data_initialization_script = LAS_initialize_data_dapper
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Open the window, apply size, scale options
+DEFINE SYMBOL ferret_set_aspect = 0
+GO LAS_open_window
+
+LET lons = ($data_x_var)
+LET lats = ($data_y_var)
+
+LET npts = `lons,RETURN=isize`
+
+! Get the location in the file of the different time series at various locations.
+
+! Define a variable which is 1 every time the logitude,latitudes change else missing.
+! There is a missing value in the TIME variable at the end of each section
+
+LET latlonchange = IF MISSING(TIME, -10000) LT 0 then 1
+
+! Set up to count and mark the start and end of each section
+
+LET istart = 1
+LET nsection = 0
+DEFINE SYMBOL start_index = {1
+DEFINE SYMBOL end_index = {
+
+! Loop does not go over all of npts, it is a very large upper bound.
+! Get and save the location of missing-vaues in the TIME variable
+! Save the start and end of each section, and number of sections.
+
+REPEAT/RANGE=1:`npts`/NAME=m (\
+  LET ifind = latlonchange[i=`istart`:`npts`@loc:1] ;\
+  LET iend = MISSING(ifind, `npts`) ;\
+  LET istart = `iend+1` ;\
+  LET nsection = `nsection + 1` ;\ 
+  IF `iend NE npts` THEN DEFINE SYMBOL start_index = ($start_index), `istart` ;\
+  IF `iend NE npts` THEN DEFINE SYMBOL end_index = ($end_index)`iend-1`,  ;\
+  IF `iend EQ npts` THEN DEFINE SYMBOL end_index = ($end_index)`iend-1`  ;\
+  LIST/nohead nsection, istart, iend ;\
+  IF `iend GE npts` THEN EXIT/LOOP )
+
+DEFINE SYMBOL start_index = ($start_index)}
+DEFINE SYMBOL end_index = ($end_index)}
+
+LET indx1 = ($start_index)
+LET indx2 = ($end_index)
+
+! If there are too many plots for a page, do something...
+
+IF `nsection GT max_lines` THEN
+  DEFINE SYMBOL toomany = Too many LON,LAT locations, `nsection` found. Cutting off plot at `max_lines` locations.
+  LET nsection = `max_lines`
+ENDIF
+
+! Get the y axis range to use; %range returns the
+! plot range that Ferret would automatically use.
+
+PPL %RANGE `($data_var)[x=@min,y=@min,z=@min,t=@min]`, `($data_var)[x=@max,y=@max,z=@max,t=@max]`, 2
+   LET ylo = ($PPL$RANGE_LOW)
+   LET yhi = ($PPL$RANGE_HIGH)
+   LET ydel = ($PPL$RANGE_INC)
+
+! Define the time axis.
+DEFINE AXIS/T/T0="`TIME.time_origin`"/units=seconds tax = TIME[i=`indx1[i=1]`:`indx2[i=1]-1`]/1000
+
+! Set up to label longitudes and latitudes with the direction.
+
+DEFINE SYMBOL lunits = UPCASE("`($data_x_var),RETURN=units`")
+IF `STRINDEX(($lunits), "EAST") GT 0` THEN
+   DEFINE SYMBOL lonlab = E
+   DEFINE SYMBOL neglonlab = W
+ELSE
+   DEFINE SYMBOL lonlab = W
+   DEFINE SYMBOL neglonlab = E
+ENDIF
+DEFINE SYMBOL lunits = UPCASE("`($data_y_var),RETURN=units`")
+IF `STRINDEX(($lunits), "NORTH") GT 0` THEN
+   DEFINE SYMBOL latlab = N
+   DEFINE SYMBOL neglatlab = S
+ELSE
+   DEFINE SYMBOL latlab = S
+   DEFINE SYMBOL neglatlab = N
+ENDIF
+
+
+! Set up parameters for defining the viewports and making the plots.
+
+CANCEL VIEW
+
+LET y2 = 0.9
+LET del = 0.8/`nsection`
+LET y1 = `y2 - del` + 0.02
+
+! This viewport will be used to draw the time axis at the bottom 
+! and to make the labels along the sides.
+
+DEFINE VIEW/AXES/XLIM=0.1:0.95/YLIM=0.095:0.9 tv
+
+! Define viewports for all the stacked plots.
+! The line_* viewports are used to plot each line.
+
+REPEAT/RANGE=1:`nsection`/NAME=m (DEF VIEW/AXES/XLIM=0.1:0.95/YLIM=`y1`:`y2` line_`m` ;\
+                          LET y1 = `y1 - del`; \
+                          LET y2 = `y2 - del`)
+
+! Draw the time axis by plotting a variable having no data in the vertical range.
+! Label the vertical stacks of axes in the middle.
+
+set view tv
+LET tt = t[gt=tax]
+LET all_zero =  0*tt
+PLOT/NOY/AX=0,1,0,0/NOLAB/VLIM=100:200 all_zero 
+
+LABEL/NOUSER `($ppl$xlen)/2`,-0.6, 0, 0, 0.14 ($ferret_plot_title)
+LABEL/NOUSER -0.6, `($ppl$ylen)/2`, 0, 90, 0.12 @AC(`($data_var),return=units`)
+
+! Draw a plot for each series, labelling just above and to the left with the lon,lat.
+
+! Make the plot for each series:
+! Define the time axis from the TIME variable
+! Assign the data to that axis and plot.
+! Label on the right with the loction labeled with lon,lat
+
+REPEAT/RANGE=1:`nsection`/NAME=m (  SET VIEW line_`m` ;\
+   LET i1 = indx1[i=`m`] ;\
+   LET i2 = indx2[i=`m`] ;\
+   LET plot_sec = TSEQUENCE( ($data_var)[i=`i1`:`i2`] ) ;\
+   LET plot_tvar = plot_sec[gt=tax@ASN] ;\
+     PLOT/SET_UP/NOY/AXES=0,0,1,1/NOLAB plot_tvar ;\
+     PPL YLAB " "; PPL YAXIS,`ylo`,`yhi`,`ydel` ;\
+     PPL PLOT ;\
+     ;\
+     LET ilon = lons[i=`i1`] ;\
+     DEFINE SYMBOL ewlab = ($lonlab) ;\
+     IF `ilon LT 0` THEN LET ewlab = ($neglonlab) ;\
+     IF `ilon LT 0` THEN LET ilon = `-1.* ilon` ;\
+    ;\
+     let ilat = lats[i=`i2`] ;\
+     DEFINE SYMBOL nslab = ($latlab) ;\
+     IF `ilat LT 0` THEN LET nslab = ($neglatlab) ;\
+     IF `ilat LT 0` THEN LET ilat = `-1.* ilat` ;\
+    ;\
+     LET lonlatlab = "(`ilon`($ewlab), `ilat`($nslab))" ;\
+     LABEL/NOUSER `($ppl$xlen)-0.1`, `($ppl$ylen)-0.1`, 1, 0, 0.12, "`lonlatlab`" ;\
+  ) 
+
+! Overall header at the very top
+SET VIEW full
+PLOT/NOY/AX=0,0,0,0/NOLAB/VLIM=100:200 all_zero 
+
+IF `($ferret_las_version"0|*>1") EQ 0` THEN \
+   DEFINE SYMBOL ferret_las_version = 8.
+IF ($program_name"0|PyFerret>1|*>0") THEN
+    LABEL/NOUSER `($ppl$xlen)/2`, `($ppl$ylen)+1.2`, 0, 0, 0.12, "LAS ($ferret_las_version)/PyFerret ($FERRET_VERSION)   NOAA/PMEL"
+ELSE
+    LABEL/NOUSER `($ppl$xlen)/2`, `($ppl$ylen)+1.2`, 0, 0, 0.12, "LAS ($ferret_las_version)/Ferret ($FERRET_VERSION)     NOAA/PMEL"
+ENDIF
+
+! Add the Dataset name and URL
+LABEL/NOUSER 0, `($ppl$ylen)+1.`, -1, 0, 0.10, @AC($data_dataset_name)
+LABEL/NOUSER 0, `($ppl$ylen)+0.8`, -1, 0, 0.10, @AC($data_dataset_url)
+
+IF ($toomany"0|*>1") THEN LABEL/NOUSER  0,`($ppl$ylen)+0.5`, -1, 0, 0.12, @P2"($toomany)" 
+
+
+go LAS_results
+SET MODE/LAST verify

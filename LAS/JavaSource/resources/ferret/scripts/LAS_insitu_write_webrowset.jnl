@@ -1,0 +1,45 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_insitu_write_webrowset.jnl
+!
+!
+! Make a LIST/QUIET of the ID number and Cruise ID to go back 
+! for possible subsets of this set of cruises.
+
+CANCEL MODE VERIFY
+IF ($debug_mode"0|*>1") THEN  LET seconds_1 = ($CLOCK_SECS)
+
+IF `($result_icon_webrowset_filename"0|*>1") EQ 0` THEN
+  EXIT/SCRIPT
+ENDIF
+
+! Write all the counter numbers and the cruise IDs in the webrowset format.
+! For SOCAT 3, cruise_id cruise_name are identical to cruise_expocode
+
+IF ($feature_variable"0|*>1") THEN 
+
+   let imask = i[gx=xmask_axis]
+
+   let webrow_mask = XSEQUENCE(feature_mask)* imask
+
+! What do we want here? write_webrow with imask would put out the full key,
+! or write_webrow_icon with webrow_mask would make a subset key, listing names and numbers 1, 3, 5, ...
+
+! If writing the whole key, we can use write_webrow:
+
+   LOAD write_webrow_gwt(XSEQUENCE(($feature_variable)), XSEQUENCE(($feature_variable)), XSEQUENCE(imask), "($result_icon_webrowset_filename)")
+
+ENDIF
+
+SET MODE/LAST verify
+
+IF ($debug_mode"0|*>1") THEN
+   DEFINE SYMBOL secs = `(($clock_secs) - seconds_1),PREC=5`
+   LABEL/NOUSER `xloc_db`,`yloc_db`, 1, 0, 0.12,Webrowset xml ($secs)
+   LET yloc_db = `yloc_db - 0.16`
+   SAY ----- debug mode Webrowset xml ($secs) -----
+ENDIF
+
+
+!!!!
+
+! End of file ------------ LAS_insitu_write_webrowset.jnl --------------------------

@@ -1,0 +1,59 @@
+! LAS_setup_strides_GE
+
+! Set maxpix for Google Earth plots
+
+IF `STRINDEX( "($operation_ID)", "GE" ) EQ 0` THEN EXIT/SCRIPT
+
+!for plot
+LET maxpix = 200  ! default
+IF ($ferret_stride_quality_factor"0|1.0>1|*>0") THEN LET maxpix = 200  ! draft(fast)
+IF ($ferret_stride_quality_factor"0|0.5>1|*>0") THEN LET maxpix = 500  ! medium
+IF ($ferret_stride_quality_factor"0|0.0>1|*>0") THEN LET maxpix = 700  ! best(slow)
+
+!limit number of points (for place mark operation)
+IF `STRINDEX( "($operation_ID)", "Grid" ) NE 0` THEN
+
+  !xycoord: stride value for placemarks, i.e., 1 placemark per xycoord degrees
+  LET xycoord = 30  ! default
+
+  IF ($ferret_stride_quality_factor"0|1.0>1|*>0") THEN LET xycoord = 30 ! draft(fast)
+  IF ($ferret_stride_quality_factor"0|0.5>1|*>0") THEN LET xycoord = 6  ! medium
+  IF ($ferret_stride_quality_factor"0|0.0>1|*>0") THEN LET xycoord = 2  ! best(slow)
+
+   DEFINE SYMBOL range_GE = `MAX( ($region_x_range), ($region_y_range) )`
+   IF `($range_GE) LT 120` THEN LET xycoord= `xycoord/2`
+   IF `($range_GE) LT 10` THEN LET xycoord= `xycoord/2`
+   IF `INT(xycoord/($range_GE)) LT 2` THEN LET xycoord= `xycoord/2`
+   IF `xycoord GT 1` THEN let xycoord= `MAX(1,INT(xycoord))`
+   
+ENDIF
+
+! End of $RCSfile ------------LAS_setup_strides_GE.jnl--------------------------
+
+!   let xydel = xycoord
+!   let npts = xsiz
+!   let xrange = range_GE
+!   let delxdeg = xydel
+!   let delxdat = xbox[gx=var,x=region_0_x_lo]
+!   let delydat = ybox[gy=var,y=region_0_y_lo]
+!   let delxydat = max(delxdat,delydat)  !??
+!   
+!   let delxy = MAX(delxdat ,INT(range_GE/xydel))
+!   
+!   IF (delxdat GT INT(region_x_range/xydel)) then
+!      let del_i = 1
+!   ELSE
+!      let i1 = I[gx=var,x=region_0_x_lo]
+!      let i2 = I[gx=var,x=`region_0_x_lo + delxy`]
+!      LET del_i = i2 - i1
+!      IF `del_i LT 0` THEN LET del_i = 1
+!   ENDIF
+!   
+!   IF (delxdat GT INT(region_y_range/xydel)) then
+!      let del_j = 1
+!   ELSE
+!      let j1 = J[gy=var,y=region_0_y_lo]
+!      let j2 = J[gy=var,y=`region_0_y_lo + delxy`]
+!      LET del_j = j2 - j1
+!      IF `del_j LT 0` THEN LET del_j = 1
+!   ENDIF

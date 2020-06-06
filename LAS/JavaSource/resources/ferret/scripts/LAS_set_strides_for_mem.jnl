@@ -1,0 +1,40 @@
+!LAS_set_strides_for_mem.jnl
+! Called by LAS_set_strides.jnl
+
+
+IF `($stride_for_mem"0") GT 1` THEN
+   IF `($region_x_range"0|*>1") GT 0` THEN
+      IF `($no_native_strides_xy"0|*>1") NE 1` THEN 
+         DEFINE SYMBOL modax = "`las_plotvar, RETURN=xmod`"
+         SET AXIS/STRIDE=($stride_for_mem) `las_plotvar,RETURN=xaxis`
+	 LET x_strided_var = las_plotvar
+         IF `STRCMP(($modax), " ") NE 0` THEN SET AXIS/MODULO `las_plotvar,RETURN=xaxis`
+         DEFINE SYMBOL add_to_title = Stride ($stride_for_mem) in X
+      ENDIF
+   ENDIF
+   IF `($region_y_range"0|*>1") GT 0 AND ($no_native_strides_xy"0|*>1") NE 1` THEN 
+      SET AXIS/STRIDE=($stride_for_mem) `las_plotvar,RETURN=yaxis`
+      LET y_strided_var = las_plotvar
+      DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in Y
+   ENDIF
+   IF `($region_z_range"0|*>1") GT 0` THEN 
+      SET AXIS/STRIDE=($stride_for_mem) `las_plotvar,RETURN=zaxis`
+      LET z_strided_var = las_plotvar
+      DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in Z
+   ENDIF
+   
+   IF `STRINDEX( "($operation_ID)", "Animation" ) EQ 0` THEN
+      IF `($region_t"0|*>1") GT 0` THEN 
+         DEFINE SYMBOL modax = "`las_plotvar, RETURN=tmod`"
+         SET AXIS/STRIDE=($stride_for_mem) `las_plotvar,RETURN=taxis`
+	 LET t_strided_var = las_plotvar
+         IF `STRCMP(($modax), " ") NE 0` THEN SET AXIS/MODULO `las_plotvar,RETURN=taxis`
+         DEFINE SYMBOL add_to_title = ($add_to_title) Stride ($stride_for_mem) in T
+      ENDIF
+   ENDIF
+   SET VAR/TITLE="($ferret_plot_title) ($add_to_title)" ($ferret_plot_var) 
+
+ENDIF
+
+! End of $RCSfile ------------LAS_set_strides_for_mem.jnl--------------------------
+

@@ -1,0 +1,75 @@
+! collect_unts_vars.jnl
+! Line plots with multiple variables possibly different units
+!
+! Build up plot_vars_n symbols, with sets of variables
+! that have common units.
+!12/11/2017 Fixes for datast configs with vars in different urls
+!
+! Argument
+!   1 = Collect the unique units strings, and a list of which 
+!       variables has each units string.
+
+! set up to reverse the vertical axis if all the variables in
+! a group have positive=down attributes
+
+LET n_ustrings = 0
+DEFINE SYMBOL inunits_0 = `UPCASE("($units_0)")`
+DEFINE SYMBOL group_label_0 = ($units_0)
+
+DEFINE SYMBOL has_0 = 0
+DEFINE SYMBOL var_grp0 = 0;\
+DEFINE SYMBOL plot_vars_0 = ($ferret_plot_var_0)
+LET num_found = 1
+LET nunique = 1
+
+! which variables match the units ($units_0)
+
+DEFINE SYMBOL unique_0 = ($inunits_0)
+
+LET attnames = ($data_0_var)[d=($data_0_num)].attnames
+LET has_positive = IS_ELEMENT_OF_STR_N(attnames, "positive")
+LET pos = ($data_0_var).positive
+IF `has_positive GT 0` THEN
+   IF ($pos"0|down>1|*>0") THEN DEFINE SYMBOL plot_pos_down_0 = 1
+ENDIF
+
+REPEAT/RANGE=2:($data_count)/name=c (\
+   DEFINE SYMBOL c = `c`;\
+   DEFINE SYMBOL cm = `c-1`;\
+   DEFINE SYMBOL in_units = ($units_($cm));\
+   DEFINE SYMBOL inunits_up `UPCASE("($in_units)")`;\
+   IF `STRCMP("($inunits_up)", "($unique_0)") EQ 0` THEN ;\
+     DEFINE SYMBOL has_0 = ($has_0)($cm);\
+     DEFINE SYMBOL var_grp($cm) = 0;\
+     DEFINE SYMBOL plot_vars_0 =  ($plot_vars_0), ($ferret_plot_var_($cm));\
+     LET num_found = `num_found + 1`;\ 
+     LET attnames = ($data_($cm)_var)[d=($data_($cm)_num)].attnames;\
+     IF `has_positive GT 0` THEN;\
+       IF ($pos"0|down>1|*>0") THEN DEFINE SYMBOL plot_pos_down_0 = `($plot_pos_down_0"0") + 1`;\
+     ENDIF;\
+   ENDIF)
+   IF `($plot_pos_down_0"0") LT num_found` THEN 
+      CANCEL SYMBOL plot_pos_down_0
+   ELSE
+      DEFINE SYMBOL plot_pos_down_0 = 1
+   ENDIF
+
+IF `num_found LT ($data_count)` THEN 
+   
+! Find the next unique units string, inunits_1 and which variables 
+! match the units inunits_1, etc.
+
+let strings_unique_0 = {"($unique_0)"}
+
+   REPEAT/RANGE=0:($data_count)/name=c (\
+   DEFINE SYMBOL c = `c`;\
+   GO collect_units_vars_sub ($c);\
+   IF ($no_more_unique"0|*>1) THEN EXIT/LOOP;\
+   IF `num_found GE ($data_count)` THEN EXIT/LOOP)
+
+ENDIF  ! Find further unique units
+
+DEFINE SYMBOL nunit_grp = `nunique`
+LET strings_unique = strings_unique_`($nunit_grp)-1`
+
+!  ----------------- End of collect_units_vars.jnl ------------------------------------

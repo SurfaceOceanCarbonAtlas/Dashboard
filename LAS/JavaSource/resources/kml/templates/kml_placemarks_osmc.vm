@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://earth.google.com/kml/2.2">
+  <Document>
+  	<Style id="style1_roll_over_labels_Earthwatch_highlight">
+  		<IconStyle>
+  			<scale>1.2</scale>
+  			<Icon>
+  				<href>http://maps.google.com/mapfiles/kml/pal4/icon29.png</href>
+  			</Icon>
+  			<hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+  		</IconStyle>
+  		<LabelStyle>
+  			<scale>1.1</scale>
+  		</LabelStyle>
+  		
+  	</Style>
+  	<Style id="style1_roll_over_labels_Earthwatch_normal">
+  		<IconStyle>
+  			<scale>1.1</scale>
+  			<Icon>
+  				<href>http://maps.google.com/mapfiles/kml/pal4/icon29.png</href>
+  			</Icon>
+  			<hotSpot x="0.5" y="0.5" xunits="fraction" yunits="fraction"/>
+  		</IconStyle>
+  		<LabelStyle>
+  			<scale>0</scale>
+  		</LabelStyle>
+  	</Style>	
+  	<StyleMap id="style1_roll_over_labels_Earthwatch">
+  		<Pair>
+  			<key>normal</key>
+  			<styleUrl>#style1_roll_over_labels_Earthwatch_normal</styleUrl>
+  		</Pair>
+  		<Pair>
+  			<key>highlight</key>
+  			<styleUrl>#style1_roll_over_labels_Earthwatch_highlight</styleUrl>
+  		</Pair>
+	</StyleMap>
+	
+    <Folder>
+    <LookAt>    
+      <longitude>$gridLon</longitude>    
+      <latitude>$gridLat</latitude>    
+      <altitude>0</altitude>    
+      <range>5000000</range>    
+      <tilt>0</tilt>    
+      <heading>0</heading>    
+      <altitudeMode>relativeToGround</altitudeMode>  
+    </LookAt>
+    <description>place marks for insitu data</description>
+    <name> Placemarks </name>
+#foreach ($placemark in $allPlacemarks)
+    $placemark.toString()
+#end
+    </Folder>
+  </Document>
+</kml>

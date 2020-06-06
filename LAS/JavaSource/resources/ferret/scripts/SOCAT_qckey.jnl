@@ -1,0 +1,83 @@
+! SOCAT_qckey
+! Label the key with A,B,C,D,F,N,U,S,X
+
+! --------
+LET n_key_levs = 11
+
+IF ($horizontal_key"0|*>1") THEN
+
+LET vht = (($ppl$ylen) + ($ppl$yorg)) * 1.15
+IF ($vp_height"0|*>1") THEN LET vht = ($vp_height)
+
+LET rem = vht - (($ppl$ylen) + ($ppl$yorg))
+LET ymaxx = 0.20*($ppl$ylen)
+LET key_hi = MIN (`($ppl$yorg) + ($ppl$ylen) + ymaxx`,`vht-0.051*rem`)
+
+LET key_lo = (($ppl$yorg) + ($ppl$ylen) + 0.20*MIN (rem,ymaxx))
+LET key_lo = (($ppl$ylen) + 0.20*MIN (rem,ymaxx))
+LET key_inc = `0.1 * (key_hi - key_lo)`
+
+LET key_hi = `key_lo + 8.0*key_inc`
+LET key_hi = `key_lo + 2.0*key_inc + 0.02`
+
+let keylen = `x2-x1`
+let keydel = keylen/`n_key_levs`
+let keystart = x1 - ($ppl$xorg) + keydel/2
+
+! key_hi-0.07-1,0,.05,l
+
+define symbol qclettersize = 0.09
+define symbol qcwordsize = 0.09
+IF `($win_aspect"1") GT 0.9` THEN DEFINE SYMBOL qcwordsize = 0.08
+
+IF `($win_aspect"1") LT 0.8` THEN
+   LABEL/NOUSER `keydel*0+keystart`,`key_hi`,0,0,($qclettersize),A
+
+   LABEL/NOUSER `keydel*1+keystart`,`key_hi`,0,0,($qclettersize),B
+
+   LABEL/NOUSER `keydel*2+keystart`,`key_hi`,0,0,($qclettersize),C
+
+   LABEL/NOUSER `keydel*3+keystart`,`key_hi`,0,0,($qclettersize),D
+
+   LABEL/NOUSER `keydel*4+keystart`,`key_hi`,0,0,($qcwordsize),E
+
+   LABEL/NOUSER `keydel*5+keystart`,`key_hi`,0,0,($qclettersize),F
+
+   LABEL/NOUSER `keydel*6+keystart`,`key_hi`,0,0,($qcwordsize),New
+
+   LABEL/NOUSER `keydel*7+keystart`,`key_hi`,0,0,($qcwordsize),Conflicting
+
+   LABEL/NOUSER `keydel*8+keystart`,`key_hi`,0,0,($qcwordsize),Updated
+
+   LABEL/NOUSER `keydel*9+keystart`,`key_hi`,0,0,($qcwordsize),Suspended
+
+   LABEL/NOUSER `keydel*10+keystart`,`key_hi`,0,0,($qcwordsize),Excluded
+
+ELSE
+
+LET key_hi = `key_hi - 1.2*($qclettersize)`
+   LABEL/NOUSER `keydel*0+keystart`,`key_hi`,0,0,($qclettersize),A
+
+   LABEL/NOUSER `keydel*1+keystart`,`key_hi`,0,0,($qclettersize),B
+
+   LABEL/NOUSER `keydel*2+keystart`,`key_hi`,0,0,($qclettersize),C
+
+   LABEL/NOUSER `keydel*3+keystart`,`key_hi`,0,0,($qclettersize),D
+
+   LABEL/NOUSER `keydel*4+keystart`,`key_hi`,0,0,($qclettersize),E
+
+   LABEL/NOUSER `keydel*5+keystart`,`key_hi`,0,0,($qclettersize),F
+
+   LABEL/NOUSER `keydel*6+keystart`,`key_hi`,0,0,($qclettersize),N
+
+   LABEL/NOUSER `keydel*7+keystart`,`key_hi`,0,0,($qclettersize),Q
+
+   LABEL/NOUSER `keydel*8+keystart`,`key_hi`,0,0,($qclettersize),U
+
+   LABEL/NOUSER `keydel*9+keystart`,`key_hi`,0,0,($qclettersize),S
+
+   LABEL/NOUSER `keydel*10+keystart`,`key_hi`,0,0,($qclettersize),X
+ENDIF
+
+! ----- End of SOCAT_qckey.jnl ------------------------------------------------
+

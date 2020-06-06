@@ -1,0 +1,17 @@
+#set($table=$las_backendrequest.getDatabaseProperty("db_table"))
+#set($time=$las_backendrequest.getDatabaseProperty("time"))
+#set($lat=$las_backendrequest.getDatabaseProperty("latitude"))
+#set($lon=$las_backendrequest.getDatabaseProperty("longitude"))
+#set($depth=$las_backendrequest.getDatabaseProperty("depth"))
+#set($cruiseID=$las_backendrequest.getDatabaseProperty("cruiseID"))
+## Or you can get the individual values of the min and max X,Y,Z and T with
+## $las_backendrequest.getXlo(), etc.
+#set($region=$las_backendrequest.getRegionAsConstraint())
+#set($missing=$las_backendrequest.getMissingConstraint())
+#set($var = $las_backendrequest.getVariablesAsString())
+#set($con = $las_backendrequest.getConstraintString("AND"))
+#if ( $con != "")
+SELECT * FROM $table WHERE $missing AND  $region AND $con
+#else
+SELECT * FROM $table WHERE $missing AND  $region
+#end

@@ -1,0 +1,79 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- LAS SERVER OK -->
+<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+<title>LAS Output -- $las_config.getTitle()</title>
+##
+
+
+## Set the rowset to the last row.  Grab the return value in "last" (true or false) so it doesn't show up on the page.
+#set($last=$las_webrowset.last())
+
+## Get the number of rows returned.
+#set($size = $las_webrowset.getRow())
+
+## Go back to before the first row.  Grab the return value.
+#set($first=$las_webrowset.beforeFirst())
+
+## If the rowset is empty, put up a message.
+#if ($size <= 0 )
+    <h3>No results found to match your query.</h3>
+#else
+## Not empty.  Write the rows.
+    ## Set up an alternator tool to color every other row.
+    #set($color = $alternator.auto('#F3E7C9','#FFFFFF'))
+
+    ## Get the metadata so we have the column names and
+    ## the number of columns.
+    
+    #set($metadata = $las_webrowset.getMetaData())
+    #set($cols = $metadata.getColumnCount())
+    
+    Number of results $size<br>
+    
+    <table border="2" cellpadding="4">
+        ## Set the column headers including one for the row number.
+        <tr>
+             <th>Row</th>
+             #foreach ($i in [1..$cols])
+                 <th>$metadata.getColumnName($i)</th>
+             #end 
+       </tr>
+       ## Loop over the rows...
+       
+       #foreach ($row in [01..$size])
+          ## Advance the row.  We do this at the top since we are currently before the first row (see beforeFirst() above).
+          #set($next=$las_webrowset.next())
+          ## Use the alternator to change the color of every other row.
+          <tr bgcolor="$color">
+             ## Add the row number
+             <td align="right">$row</td>
+             ## Loop the columns
+             #foreach ($i in [1..$cols])
+                 ## Grab the column value as a string.
+                 ## If you want more control you can check the column type in the metadata and use the Velocity Formatter tool
+                 ## to format the each column value.
+                 <td align="right">$las_webrowset.getString($i)</td>
+             #end  ## Done with columns
+          </tr>
+
+       #end  ## Done with this row.
+    </table>
+#end
+</body>
+</html>
+#end
+

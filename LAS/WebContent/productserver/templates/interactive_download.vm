@@ -1,0 +1,485 @@
+#if ($las_request.getProperty("las", "output_type") == 'json')
+
+$las_response.toJSON()
+
+#elseif ($las_request.getProperty("las", "output_type") == 'xml')
+
+$las_response.toString()
+
+#else
+<!doctype html>
+<html>
+	<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+
+  <script language="JavaScript" src="JavaScript/components/xmldom.js"></script>
+  <script language="JavaScript" src="JavaScript/components/LASRequest.js"></script>
+  <script language="JavaScript" src="JavaScript/components/LASResponse.js"></script>
+  <script language="JavaScript" src="JavaScript/components/LASGrid.js"></script>
+  <script language="JavaScript" src="JavaScript/components/DateWidget.js"></script>
+  <script language="JavaScript" src="JavaScript/components/MenuWidget.js"></script>
+  <script language="JavaScript" src="JavaScript/components/sarissa.js"></script>
+  <script language="JavaScript" src="JavaScript/components/json.js"></script>
+
+<SCRIPT language="javascript">
+  #set($dsID = $las_request.datasetIDs.get(0))
+  #set($varID = $las_request.variableIDs.get(0))
+  #set($grid = $las_config.getGrid($dsID,$varID))
+  #set($grid_JSON = $grid.toJSON().toString())
+  #set($serverURL=$las_config.getBaseServerURL());
+
+  var gridJSON = '$grid_JSON';
+  //parse the gridJSON object
+  var Grid;
+  var JSONObject;
+  try{
+      var JSONObject = gridJSON.parseJSON();
+  }catch(e){
+      alert('Error parsing gridJSON as JSON.');
+  }
+  try{
+      Grid = new LASGrid(JSONObject);
+  }catch(e){
+      alert(e);
+  }
+
+  var baseURL = "$serverURL";                        //base server URL
+  var dsId   = "$dsID";                              //initial dataset ID
+  var varId  = "$varID";                             //initial variable ID
+  var initReq;
+  var initView;
+  var initXLo;
+  var initXHi;
+  var initYLo;
+  var initYHi;
+
+  var dataTLo;
+  var dataTHi;
+  var dataHasT;
+  var tDisplayType;
+  var tRenderFmt;
+  var tUnits;
+  var tDelta;
+
+  var reqTLo; 
+  var reqTHi;
+
+  var dataZLo;
+  var dataZHi;
+  var dataHasZ;
+
+  var reqZLo;
+  var reqZHi;
+
+  var dataFormat = 0; //0:netCDF,1:ascii,2:csv:3,arcgrid:4,shapeFile (not used)
+
+  var newReq;
+
+  var initReq_xml = "$las_request.toJavaScriptSafeString()"; //initial LAS request
+  initReq = new LASRequest(initReq_xml);
+  initView = initReq.getProperty('ferret','view');
+  initXLo = initReq.getRangeLo('x');
+  initXHi = initReq.getRangeHi('x');
+  if(initXHi==null){initXHi=initXLo;}
+  initYLo = initReq.getRangeLo('y');
+  initYHi = initReq.getRangeHi('y');
+  if(initYHi==null){initYHi=initYLo}
+
+  reqTLo = initReq.getRangeLo('t');
+  reqTHi = initReq.getRangeHi('t');
+  reqZLo = initReq.getRangeLo('z');
+  reqZHi = initReq.getRangeHi('z');
+
+  // Only show the z and/or t control if those axes have not be transformed away...
+  var showt = true;
+  var showz = true;  
+
+//console.debug("initReq.getAnalysis(0)=");
+//console.debug(initReq.getAnalysis(0));
+  if(initReq.getAnalysis(0)) {
+	for(var a=0;a < initReq.getAnalysis(0).axis.length;a++) {
+	    if ( initReq.getAnalysis(0).axis[a].type == "t" ) showt = false;
+	    if ( initReq.getAnalysis(0).axis[a].type == "z" ) showz = false;
+	    if(initReq.getAnalysis(0).axis[a].lo) { 
+		var eval1 = "(req"+initReq.getAnalysis(0).axis[a].type.toUpperCase()+"Lo='"+initReq.getAnalysis(0).axis[a].lo+"')";
+		//console.debug(eval1);
+		eval(eval1);
+	    }
+	    if(initReq.getAnalysis(0).axis[a].hi) {
+		var eval2 = "(req"+initReq.getAnalysis(0).axis[a].type.toUpperCase()+"Hi='"+initReq.getAnalysis(0).axis[a].hi+"')";
+		//console.debug(eval2);
+                eval(eval2);
+            }
+	}
+  }
+
+  if(Grid.hasAxis('t') && showt ){
+      dataHasT = true;
+      //console.debug("dataHasT");
+      //console.debug(dataHasT);      
+      dataTLo = Grid.getLo('t');                      //low end of time grid
+      //console.debug("dataTLo");
+      //console.debug(dataTLo);      
+      dataTHi = Grid.getHi('t');                      //high end of time grid
+      //console.debug("dataTHi");
+      //console.debug(dataTHi);      
+      tDisplayType = Grid.getDisplayType('t');
+      //console.debug("tDisplayType:");
+      //console.debug(tDisplayType);
+      tRenderFmt = Grid.getRenderFormat('t');
+      //console.debug("tRenderFmt:");
+      //console.debug(tRenderFmt);
+      tUnits = Grid.getUnits('t');                   //units of time grid
+      //console.debug("tUnits:");
+      //console.debug(tUnits);
+      tDelta = Grid.getDelta('t');
+      //console.debug("tDelta:");
+      //console.debug(tDelta);
+  }
+
+  if(Grid.hasAxis('z') && showz){
+      dataHasZ = true;
+      dataZLo = Grid.getLo('z');                     
+      dataZHi = Grid.getHi('z');                      
+  }
+
+  function launch(){
+    genFormatMenu();  
+    if(dataHasT){genDateWidget();}
+    if(dataHasZ){genDepthWidget();}
+  }
+
+  function genFormatMenu(){
+    //data format
+    fmt = "";
+    fmt += " <SELECT NAME='download_format' onChange='setDataFormat(this.selectedIndex)'> ";
+    fmt += " <OPTION SELECTED VALUE=0>NetCDF ";
+    fmt += " <OPTION VALUE=1>ASCII ";
+    fmt += " <OPTION VALUE=2>CSV ";
+    fmt += " <OPTION VALUE=3>arcGrid ";
+    fmt += " </SELECT><br><br>";
+    document.getElementById("format").innerHTML = fmt;
+  }
+
+  function genUI(){
+
+    //selected region
+    var UIString = "<b><h2>Download Data</h2></b>";  
+    UIString += "<table cellpadding='5'><tr><td valign=top><b>Selected Region</b></td>";
+    UIString += "<td>Longitude range: [" + initXLo+", "+initXHi+"]<br> ";
+    UIString += "Latitude range: [" + initYLo+", "+initYHi+"]<br></td></tr><br>";
+    
+    //data format menu
+    UIString +="<tr><td valign=top><b>Select Format</b></td><td><div id='format'></div></td></tr>";
+
+    //date widget
+    if(dataHasT){
+      UIString +="<tr><td valign=top><b>Select Time</b></td><td valign=top><div id='dateWidget'></div></td></tr>";
+    }
+
+    //depth widget
+    if(dataHasZ){
+      UIString += "<tr><td valign=top><b>Select Depth</b></td><td><div id='depthWidget'></div></td></tr>";
+    }
+
+    UIString += "</table>";
+
+    //ok and reset button
+    UIString += "<br><INPUT TYPE='button' name='download_submit' Value='OK' onClick='submit()'> ";
+
+    document.write(UIString);
+  }
+  
+  //create and send the LAS request to download data
+  function submit(){
+    newReq = updateLASRequest();
+    sendLASRequest(newReq);
+  }
+
+  //set format of download data
+  function setDataFormat(index){
+    dataFormat = index;
+    //reset date and depth widget
+    getWidgetState(); 
+    if ( index == 4) {
+      document.getElementById('DateWidgetRange').style.visibility="hidden";
+      document.getElementById('DepthWidgetStart').style.visibility="hidden";
+      if (document.getElementById('DepthWidgetEnd')) {
+         document.getElementById('DepthWidgetEnd').style.visibility="hidden";
+      }
+    } else {
+      if(dataHasT){genDateWidget();}
+      if(dataHasZ){genDepthWidget();}
+    }
+  }
+
+  function getWidgetState(){
+    //get user selected date range
+    if(dataHasT){
+      if(tDisplayType == 'widget'){
+        reqTLo = DW.getDate1();
+        reqTHi = DW.getDate2();
+      }else if(tDisplayType == 'menu'){
+        reqTLo = MW1.getValue();
+        reqTHi = MW2.getValue();
+      }
+    }
+
+    //get user selected depth range
+    if(dataHasZ){
+      reqZLo = dpMW1.getValue();
+      reqZHi = dpMW2.getValue();
+    }
+  }
+
+  //create the LAS request
+  function updateLASRequest(){
+    var req = new LASRequest(initReq_xml);
+
+    //set user selected date range
+    if(dataHasT){
+      if(tDisplayType == 'widget'){
+        if(dataFormat == 3){//arcGrid
+          req.setRange('t', DW.getDate1_Ferret(), DW.getDate1_Ferret());
+        }else{
+          req.setRange('t', DW.getDate1_Ferret(), DW.getDate2_Ferret());
+        }
+        reqTLo = DW.getDate1();
+        reqTHi = DW.getDate2();
+      }else if(tDisplayType == 'menu'){
+        if(dataFormat == 3){//arcGrid
+          req.setRange('t', MW1.getValue(), MW1.getValue());
+        }else{
+          req.setRange('t', MW1.getValue(), MW2.getValue());
+        }
+        reqTLo = MW1.getValue();
+        reqTHi = MW2.getValue();
+      }
+    }
+
+    //set user selected depth range
+    if(dataHasZ){
+      if(dataFormat == 3){//arcGri
+        req.setRange('z', dpMW1.getValue(), dpMW1.getValue());
+      }else{
+        req.setRange('z', dpMW1.getValue(), dpMW2.getValue());
+      }
+      reqZLo = dpMW1.getValue();
+      reqZHi = dpMW2.getValue();
+    }
+
+    //set view
+    if(dataHasT){
+      if(dataHasZ){
+        req.setProperty('ferret', 'view', 'xyzt');
+      }else{
+        req.setProperty('ferret', 'view', 'xyt');
+      }
+    }else{
+      if(dataHasZ){
+        req.setProperty('ferret', 'view', 'xyz');
+      }else{
+        req.setProperty('ferret', 'view', 'xy');
+      }
+    }
+
+    //arcGrid: only for xy map
+    if(dataFormat == 3 || dataFormat == 4){req.setProperty('ferret', 'view', 'xy');}
+
+    //set output format for ascii, 'tsv' for tab seperated
+    if(dataFormat == 1){
+      req.setProperty('ferret','data_format','tsv');
+    } else if(dataFormat == 2) {
+      req.setProperty('ferret','data_format','csv');
+    }
+
+    //set operation
+    if(dataFormat == 0) {
+      req.setOperation('Data_Extract_netCDF');
+    }else if(dataFormat == 1){
+      req.setOperation('Data_Extract_File');
+    }else if(dataFormat == 2){
+      req.setOperation('Data_Extract_File');
+    }else if(dataFormat == 3){
+      req.setOperation('Data_Extract_ArcView');
+    }else if(dataFormat == 4){
+      req.setOperation('Shape_File');
+    }
+
+    return req;
+  }
+
+  //open a new window with the request as URL
+  function sendLASRequest(lasReq){
+    var prefix =  baseURL + '/ProductServer.do?xml=';
+    var url = prefix+escape(lasReq.getXMLText());
+    //document.location = url;
+    var OpenWindow=window.open(url, "newwindow", "height=450, width=650,toolbar=1,menubar=1,scrollbars=1,status=1");
+    //OpenWindow.document.close();
+  }
+
+  //generate the depth widget
+  function genDepthWidget(){
+    var dpWidget = document.getElementById("depthWidget");
+
+    var dpw = "<div id='DepthWidgetStart' ></div><br>";
+    if(dataFormat != 3){dpw += "<div id='DepthWidgetEnd' ></div><br>";}
+    dpWidget.innerHTML = dpw;
+
+    menu = Grid.getMenu('z');
+
+    dpMW1 = new MenuWidget(menu);
+    dpMW1.render('DepthWidgetStart');
+    if(reqZLo != null){
+      dpMW1.setValue(reqZLo);
+    }else{
+      dpMW1.setValue(dataZLo);
+    }
+
+    if(dataFormat != 3){
+      dpMW2 = new MenuWidget(menu);
+      dpMW2.render('DepthWidgetEnd');
+      if(reqZHi != null){
+        dpMW2.setValue(reqZHi);
+      }else{
+        if(reqZLo != null){
+          dpMW2.setValue(reqZLo);
+        }else{
+          dpMW2.setValue(dataZHi);
+        }
+      }
+    }
+  }
+
+  //generate the date widget
+  function genDateWidget(){
+    var dtWidget = document.getElementById("dateWidget");
+    
+    var dtw="";
+    if(tDisplayType == 'widget'){
+      dtw += "<br><div id='DateWidgetRange' ></div><br>";
+    }else if(tDisplayType == 'menu'){
+      var dtw = "<div id='DateWidgetStart' ></div>";
+      if(dataFormat != 3){//for arcGrid, no need of end date
+        dtw += "<div id='DateWidgetEnd' ></div><br>";
+      }
+    }
+    dtWidget.innerHTML = dtw;
+ 
+    if(tDisplayType == 'menu'){
+      menu = Grid.getMenu('t');
+      if(menu != null){
+        MW1 = new MenuWidget(menu);
+        MW1.render('DateWidgetStart');
+        if(reqTLo != null){
+            MW1.setValue(reqTLo);
+        }else{
+            MW1.setValueByIndex(0);
+        }
+        if(dataFormat != 3){
+            MW2 = new MenuWidget(menu);
+            MW2.render('DateWidgetEnd');
+            if(reqTHi != null) {
+                MW2.setValue(reqTHi);
+            }else{
+                if(reqTLo != null){
+                  MW2.setValue(reqTLo);
+                }else{
+                  MW2.setValueByIndex(menu.length-1);
+                }
+            }
+        }
+      }
+    }else if(tDisplayType == 'widget'){
+        if(tRenderFmt == 'YMDT'){
+            if(tUnits == 'hour'){
+                DW = new DateWidget(dataTLo, dataTHi, 60*tDelta);
+            }
+            if(tUnits == 'minute'){
+                DW = new DateWidget(dataTLo, dataTHi, tDelta);
+            }
+        }else{
+            DW = new DateWidget(dataTLo, dataTHi);
+        }
+
+        if(tRenderFmt == '' && tUnits == "month"){
+            if(dataFormat == 3){//arcGrid
+              DW.render('DateWidgetRange', 'M');
+            }else{
+              DW.render('DateWidgetRange', 'M', 'M');
+            }
+        }else{
+            if(dataFormat == 3){//arcGrid
+              DW.render('DateWidgetRange', tRenderFmt);
+            }else{
+              DW.render('DateWidgetRange', tRenderFmt, tRenderFmt);
+            }
+        }
+
+        if(reqTLo != null){
+            DW.setValue(reqTLo, 1);
+        }else{
+            DW.setValue(dataTLo, 1);
+        }
+
+        if(dataFormat != 3){
+          if(reqTHi != null && reqTHi != ""){
+            DW.setValue(reqTHi, 2);
+          }else{
+            if(reqTLo != null){
+              DW.setValue(reqTLo, 2);
+            }else{
+              DW.setValue(dataTHi, 2);
+            }
+          }
+        }
+    }
+  } 
+</SCRIPT>	
+ #set($initXLo=$las_request.getXlo())
+ #if ($initXLo == "null")
+    #set($initXLo="")
+ #end
+ #set($initXHi=$las_request.getXhi())
+ #if ($initXHi == "null")
+    #set($initXHi=$initXLo)
+ #end
+ #set($initYLo=$las_request.getYlo())
+ #if ($initYLo == "null")
+    #set($initYLo="")
+ #end
+ #set($initYHi=$las_request.getYhi())
+ #if ($initYHi == "null")
+    #set($initYHi=$initYLo)
+ #end
+ #set ($lasxmldoc=$las_request.toEncodedJavaScriptSafeURLString())
+## TODO: Use velocity to get the rest of the vars JS had access too and feed to GWT page as parameters	
+<META http-equiv="refresh" content="0;URL=InteractiveDownloadData.html?dsID=$dsID&varID=$varID&initXLo=$initXLo&initXHi=$initXHi&initYLo=$initYLo&initYHi=$initYHi&lasxmldoc=$lasxmldoc"> 
+<!-- add &gwt.codesvr=127.0.0.1:9997 for GWt Development Mode--> 
+	</head>
+
+	<!--                                           -->
+	<!-- The body can have arbitrary html, or      -->
+	<!-- we leave the body empty because we want   -->
+	<!-- to create a completely dynamic ui         -->
+	<!--                                           -->
+##	<body>
+##
+##		<!-- OPTIONAL: include this if you want history support -->
+##		<iframe id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
+##
+##	</body>
+##</html>
+<!-- BODY BGCOLOR="#FFFFFF" onLoad="launch()">
+  <SCRIPT language="javascript">
+    genUI();
+  </SCRIPT>
+ </BODY -->
+<BODY>
+</BODY>
+</html>
+#end

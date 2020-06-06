@@ -1,0 +1,371 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<!--
+
+  @(#)package.html	1.60 98/01/27
+
+This software was developed by the Thermal Modeling and Analysis
+Project(TMAP) of the National Oceanographic and Atmospheric
+Administration's (NOAA) Pacific Marine Environmental Lab(PMEL),
+hereafter referred to as NOAA/PMEL/TMAP.
+
+Access and use of this software shall impose the following
+obligations and understandings on the user. The user is granted the
+right, without any fee or cost, to use, copy, modify, alter, enhance
+and distribute this software, and any derivative works thereof, and
+its supporting documentation for any purpose whatsoever, provided
+that this entire notice appears in all copies of the software,
+derivative works and supporting documentation.  Further, the user
+agrees to credit NOAA/PMEL/TMAP in any publications that result from
+the use of this software or in any product that includes this
+software. The names LiveMap, Live Access Server, TMAP, NOAA and/or
+PMEL, however, may not be used in any advertising or publicity to
+endorse or promote any products or commercial entity unless specific
+written permission is obtained from NOAA/PMEL/TMAP. The user also
+understands that NOAA/PMEL/TMAP is not obligated to provide the user
+with any support, consulting, training or assistance of any kind with
+regard to the use, operation and performance of this software nor to
+provide the user with any updates, revisions, new versions or "bug
+fixes".
+
+THIS SOFTWARE IS PROVIDED BY NOAA/PMEL/TMAP "AS IS" AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL NOAA/PMEL/TMAP BE LIABLE FOR ANY SPECIAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE ACCESS, USE OR PERFORMANCE OF THIS SOFTWARE.
+
+-->
+</head>
+<body bgcolor="white">
+This is the pure Java implementation of the TMAP Live Access Server.  There are three major components to this implementation of LAS, <a href="#LPS">the Product Server</a>, <a href="#LBES">a
+collection of backend services</a> and the <a href="#LUIS">user interface server</a>.<br>
+<br>
+<a name="LPS"><span style="font-weight: bold;">The Product Server</span><br>
+<br>
+The LAS Product Server (LPS) is implemented as a Struts-based Web
+application server (though care has been taken to keep the logic that
+deals with LAS configuration files and the request and response
+messages separate from the framework). The LPS typically does
+work on behalf of an LAS User Interface (LUI) server, a servlet-based
+Web application server responsible for presenting HTML pages to a
+browser from which the user interacts with an LAS site. When the
+user has completed the selections necessary to create an LAS Product,
+the LUI redirects the browser to an LPS URL. The query string of
+this URL contains one essential parameter (a text parameter named "xml"
+which is a string representation of the UI Request XML [some outdated
+documentation about these messages is available here:
+http://www.ferret.noaa.gov/Ferret/LAS/Documentation/manual/reqapi.html).
+The user interface model we use is for the LPS URL to be opened in a
+new "output" window of the user's browser. This window
+accumulates LPS URLs in its history and interacts with the LPS to give
+the user feedback from long-running product requests, gives the user
+the ability to cancel long-running product requests and has the
+potential to make subsequent requests directly to the LPS. The
+remainder of this document will deal exclusively to what happens after
+the request has been received by the LPS.<br>
+<br>
+<span style="font-weight: bold;">The Life-cycle of a Request</span><br>
+<br>
+The life-cycle of a LAS UI Request from its arrival at the LPS is as
+follows. Using the UI Request and the LAS configuration, the LPS
+(a Struts Action class called ProductServerAction) creates a
+ProductRequest object. Using the newly constructed ProductRequest
+object along with the LAS configuration (which has been processed when
+the servlet initialized to merge the hierarchy of &lt;property&gt;
+definitions), the LPS specific configuration (information about the
+cache and the known backend services), the incoming HTTP Request
+object, the Structs action mapping (this is unnecessary and will be
+eliminated to separate the "Runner" thread from the Struts framework)
+and a reference to the centrally maintained cache object, the LPS
+constructs a ProductServerRunner object (which is a sub-class of Java
+Thread). The Thread is started and the LPS joins this thread and
+waits for it complete. If it completes the request or encounters
+an error within the &lt;ui_timeout&gt; it returns the product or error
+to the client. If the Thread has not finished before the
+specified &lt;ui_timeout&gt; this Thread object is stored as an
+attribute in the Struts ActionServlet context and the LPS returns a
+progress page to the client (with information about how many times the
+progress page has refreshed since the request started and which step in
+the compound operation is currently being performed). After a 5
+second delay, the browser client refreshes by sending the exact same
+request to the LPS. The LPS takes the UI Request and finds the
+Thread in its context that is processing this request. It joins
+that Thread and again waits for the &lt;ui_timeout&gt; to expire or the
+request to complete repeating the cycle of sending the progress page
+and refreshing the browser with the same request. Eventually, the
+ProductServerRunner will complete or the Backend Service will encounter
+the &lt;product_timeout&gt; and return a timeout error.<br>
+<br>
+In the event that no &lt;ui_timeout&gt; is set in the incoming request
+(such as with a "batch" request from a command line client) the LPS
+will wait forever for the ProdcutServerRunner thread to complete
+without returning a progress page.<br>
+<br>
+<span style="font-weight: bold;">How the LPS Uses the LAS Configuration</span><br>
+<br>
+The complexity of the operations and the mechanics of the data access
+necessary to make a product are hidden from the LUI by abstractions
+contained in XML configuration documents. For example, the
+configuration will contain details such as the units, time, geographic
+extents a particular data variable. The fact that these data
+reside on a remote OPeNDAP server or in a database table is hidden from
+the LUI. Likewise, the fact that creating the particular graphic
+product request might require the LPS to request that information be
+extracted from a database table and an intermediate netCDF file be
+created and then request a plot be made from this file is also hidden
+from the LUI.<br>
+<br>
+Therefore, it is a large part of the job of the LPS to unwind these
+hidden complexities into the specific steps needed to create the
+product. It is not however, the job of the LPS to create the
+intermediate and final products needed to fulfill the request.
+Instead, the LPS will call upon one or more Backend Services to build
+the products necessary to complete a request. We have implemented
+a collection of Backend Services which we deploy in the LAS Backend
+Server (LBES). The LBES is nothing more than the Apache
+AxisServlet with a collection of LAS specific services deployed to the
+AxisServlet via the Axis WSDL.<br>
+<br>
+In order to make the translation from the abstract references to data
+and operations included in the UI request to specific data access
+mechanisms and backend services, the LPS translates the UI request into
+an internal data structure called a ProductRequest. This
+translation highlights one of the first and most important design
+philosophies of the LPS architecture, the use of Plain Ordinary Java
+Objects (POJOs) to hold the application specific data.<br>
+<br>
+<span style="font-weight: bold;">The ProductRequest POJO[<a href="#pojo">2</a>]
+(a marriage between the UI Request and the LAS Configuration)</span><br>
+<br>
+The constructor for the ProductRequest object takes as input the JDOM
+Document representing the LAS Configuration information and the JDOM
+Document representing UI Request XML. (Actually, all of the XML
+in the LPS and LBES are internally represented by sub-classes of
+LASDocument which is in turn a sub-class of JDOM Docment.) The
+ProductRequest object is independent of the Web application framework
+that is used to deploy the application. This means the JUnit
+testing can be used to exercise all of the code that creates and
+manipulates the ProductReqeust object and most importantly the
+underlying Web application framework can be changed without affecting a
+single line of the ProductReqeust object's code. The biggest
+collection of information in the ProductRequest object is an
+ArrayList&lt;LASBackendRequest&gt; which contains the XML documents
+that will used to invoke each backend service (some preliminary
+information about the LASBackendRequest XML document can be found here:
+http://tmap.pmel.noaa.gov/~rhs/JPS/LBES.html). When this XML is
+constructed all of the abstractions which point to data definitions in
+the LAS configuration are resolved into actual data access information
+either in form of file names or network resources (such as OPeNDAP
+URLs). Additionally, all of the property definitions which are
+contained in the LAS configuration XML are included in the XML that
+defines the data access for each LAS variable include in the
+request. Finally, this XML also contains concrete file names
+which will be the containers for the results this operation is expected
+to produce (plot images, map scale information, debug output and so
+on). The construction of the ProductRequest object is also
+responsible for creating the connections between compound operations
+where the results from one operation are used as input into subsequent
+operations. <br>
+The ProductActionRunner (the POJO that invokes the backend services)<br>
+<br>
+When the ProductRequest object has been constructed, it is in turn used
+to construct the ProductServerRunner, the Thread sub-class that will be
+run to create the product. The ProductServerRunner Thread runs
+and sequentially invokes the services necessary to create the requested
+product and collates the responses.<br>
+Cache Mangement<br>
+<br>
+All of the cache management occurs at the LPS before any backend
+services are invoked. The first check for a cache hit is based on
+the cached key generated from the UI Request. If there is a
+response file in the cache that matches this key, that response file is
+examined to make sure all of the individual results are still in the
+cache. If so, then the LPS returns this response
+immediately. If not it begins the process of invoking the
+individual services needed to produce the final product. Each
+individual sub-operation and its response are also cached so based on
+cache keys generated from the Backend Request XML for each
+sub-operation.<br>
+<br>
+Individual backend service implementations are also welcome to manage a
+cache independently of the LPS, but are not required to do so.<br>
+<br>
+<span style="font-weight: bold;">The Backend Services (and how they are
+invoked and controlled)</span><br>
+<br>
+The second important design philosophy has to do with the fact that the
+actions of the Backend Services that ultimately fulfill the product
+requests can be controlled by the LAS configuration. For the two
+services that we have implemented so far, this behavior is achieved by
+assigning a script template to each LAS operation.<br>
+<br>
+For example, in the implementation of the Ferret backend service an
+operation that will perform a plot in a 2D plane is defined with this
+XML:<br>
+<br>
+&lt;operation name="2D Plot" ID="Plot_2D" template="output"
+script="Plot_2D"&gt;<br>
+
+&lt;service&gt;ferret&lt;/service&gt;<br>
+ &lt;args&gt;<br>
+<br>
+
+&lt;!-- This can now be improved with min/max info<br>
+<br>
+
+to be used by the UI to enforce selections. --&gt;<br>
+
+&lt;arg type="variable" index="1" /&gt;<br>
+
+&lt;arg type="region" index="1" /&gt;<br>
+ &lt;/args&gt;<br>
+ &lt;response
+ID="PlotResp" type="HTML" index="1"&gt;<br>
+
+&lt;result type="image" ID="image1" /&gt;<br>
+
+&lt;result type="image" ID="ref_map" /&gt;<br>
+
+&lt;result type="map_scale" ID="map_scale" /&gt;<br>
+
+&lt;result type="debug" ID="debug" /&gt;<br>
+
+&lt;result type="cancel" ID="cancel" /&gt;<br>
+ &lt;/response&gt;<br>
+ &lt;/operation&gt;<br>
+<br>
+The ProductServerRunner takes the ProductRequest and begins invoking
+the service for each LASBackendRequest. The SOAP call to the
+service is invoked and the LASBackendReqeust is passed to the backend
+service as a single String argument. The "script" attribute
+of this operation definition is a reference to a particular text file
+in the resource path of the backend service. When the backend
+service (named in the &lt;service&gt; element of the operation
+definition) receives this request, it will process this template as
+part of fulfilling the request (see below).<br>
+<br>
+<a name="LBES"><span style="font-weight: bold;">The Backend Services</span><br>
+<br>
+At this point, we are ready to hop across the network to the backend
+services that are needed to create the product. Each of the
+backend services that we have implemented has the same basic
+structure. The service is a simple class which exposes a single
+method to the SOAP clients and this method accepts the
+LASBackendRequest XML string as its only argument. This request
+object is used to construct a Tool[1] class (which extends a generic
+Tool class). The Tool class must implement a run method which
+processes the request. If the Tool needs to interface with a
+legacy application such as Ferret a generic Task class is available
+which contains all of the infrastructure needed to run the external
+Unix application (methods for constructing the Runtime class to
+interface with the operating system, methods to pick up the output
+streams (which is critical since process can block with buffer
+overflows if this is not done correctly) and a generic methods to
+search the output streams for error conditions). I have used this
+Task class to run Ferret and to run Perl scripts.<br>
+<br>
+When the service runs the aforementioned "script" file is what controls
+the actions of the legacy application or database query. This
+file is first processed as a Velocity template with the
+LASBackendRequest object in its context. All of the LAS
+configuration properties (that apply to this request or to the data
+variables referenced by this request) and names of input and output
+data files are available from the LASBackendRequest object and can
+thereby be translated into Ferret symbols or placed into SQL requests
+to customize the action for this particular request.<br>
+<br>
+The backend service processes the request (runs the ferret or queries
+the db based on the "script") and constructs and LASBackendResponse
+object that will be returned to the LPS. This is a very simple
+XML construct that contains the names and IDs of the output files
+produced. (If the backend service is a remote service it must
+return a network URL instead of a file path in the response XML).<br>
+<br>
+<span style="font-weight: bold;">Canceling a Request</span><br>
+<br>
+The backend service must also be prepared to handle a request to cancel
+a running request. If the LPS sends exactly the same request
+again (except containing a single &lt;cancel/&gt; element below the
+root element) the backend service should stop processing the
+request. Since getting access to the thread processing the
+backend request in the AxisServlet is complicated, we have implemented
+this action using the file system to signal that the request has been
+canceled. When the cancel request arrives the backend service
+creates an empty "cancel" file (defined in the operation XML) and
+immediately returns an error response indicating that the job has been
+canceled (even though the thread running the backend service may or may
+not have stopped processing the request at that moment).
+This means that the LPS can halt the ProductServerRunner that is
+processing the job and signal the user that the job has been
+canceled. Meanwhile, the original thread that is processing the
+job on the backend should be checking periodically (after completing
+various steps along the way in the Tool and Task classes) for the
+existence of the "cancel" file. If it finds the file it can stop
+processing and it has no further responsibilities and does not need to
+return any information to the LPS since the request that caused the
+cancel file to be created has already taken care of signaling the LPS
+and user that the job has been canceled.<br>
+<br>
+<span style="font-weight: bold;">Error Processing</span><br>
+<br>
+If the backend service encounters an error processing the request it
+constructs a special LASBackendResponse with the error information
+included and the LPS will detect the error and forward to the generic
+error response (shown in the diagram below).<br>
+Processing the Response<br>
+<br>
+We are now ready to return to the LSP. The LASBackendResponse is
+shipped back the ProductServerRunner (as a string) and the
+ProductServerRunner invokes the next service in the chain or signals
+the ProductServerAction that it is finished. The final task of
+the ProductActionServer is to process the response it receives.
+In any case, it removes the ProductActionRunner object from the Servlet
+context (at that moment subsequent requests for the same product will
+either get their request fulfilled from cache or will cause the product
+to be regenerated). If the response contains an error the action
+is forwarded to the error template which displays the error to the
+user. Otherwise, if the cache is turned on the LASBackendResponse
+file is added to the cache and the action is forwarded to the output
+template.<br>
+<br>
+This last bit of work is the final part of the design philosophy in the
+new architecture. Every operation can have a template assigned to
+it which tells the LPS how to display the results. The template
+has access to the LASBackendResponse object and from this object it can
+extract any or all of the results that are defined in the response (be
+they debug text, plot output, ASCII data files and so on). It
+also has access to the LASUIRequest that was used to create this
+product so that it can make decisions about what to display, fill in
+titles and other information based on the values of properties that are
+defined for this request.<br>
+<br>
+Finally, to allow the LPS to cause the browser to invoke external
+applications (such as Excel with CSV files) or to allow LPS URLs to
+used as the src attribute in &lt;img&gt; HTML tags, the LPS operations
+XML allows for operations to be defined with a single streaming
+result. E.g.<br>
+<br>
+&lt;result type="image" ID="plot_image" stream="true"
+mime_type="image/jpg"/&gt;<br>
+<br>
+If the LPS processes a request for an operation that asks for the
+output to be streamed, it sets the mime type of the response, picks up
+the bytes of the output and streams them back to the client then
+signals the Struts action servlet that is finished by forwarding to a
+null action.<br>
+<br>
+<a name="LUIS"><span style="font-weight: bold;">The User Interface Server</span><br></a>
+<br>
+[<a name="tool">1</a>] The Tool class and the Task class were stolen
+directly from Anagram and the implementations of Anagram used by
+TMAP. These classes were designed and written by Joe Wielgosz,
+Richard Rogers, Yonghua Wie.<br>
+<br>
+[<a name="pojo">2</a>] A POJO is a Plain Old Java Object as opposed to
+an Enterprise JavaBean or some other elaborate and specific object type.
+</body>
+</html>

@@ -1,0 +1,39 @@
+! LAS_autolev_regridded_from_curv.jnl
+! compute auto-levels for animations when the variable
+! is on a curvilinear grid.
+
+IF `($do_curvi_xy"0|*>1") EQ 0` THEN EXIT/SCRIPT
+
+LET xsize = ($clon_imax) - ($clon_imin)
+LET ysize = ($clat_jmax) - ($clat_jmin)
+IF `xsize GT max_size` THEN 
+   DEFINE SYMBOL xstride = `INT(xsize/10)`
+   DEFINE SYMBOL clon_imin = `INT(($clon_imin)/($xstride))`
+   DEFINE SYMBOL clon_imax = `INT(($clon_imax)/($xstride))`
+   IF `($clon_imin) LT 1` THEN DEFINE SYMBOL clon_imin = 1
+   IF `($clon_imax) LT 1` THEN DEFINE SYMBOL clon_imax = 1
+
+ENDIF
+IF `ysize GT max_size` THEN 
+   DEFINE SYMBOL ystride = `INT(ysize/10)`
+   DEFINE SYMBOL clat_jmin = `INT(($clat_jmin)/($ystride))`
+   DEFINE SYMBOL clat_jmax = `INT(($clat_jmax)/($ystride))`
+   IF `($clat_jmin) LT 1` THEN DEFINE SYMBOL clat_jmin = 1
+   IF `($clat_jmax) LT 1` THEN DEFINE SYMBOL clat_jmax = 1
+ENDIF
+
+IF ($region_zt"0|*>1") THEN
+   LET pvar = ($data_var)[d=($data_num),i=($clon_imin):($clon_imax),\
+      j=($clat_jmin):($clat_jmax),($region_zt)]
+ELSE
+   LET pvar = ($data_var)[d=($data_num),i=($clon_imin):($clon_imax),\
+      j=($clat_jmin):($clat_jmax)]
+ENDIF
+
+! Redefine the region symbols with this new set of index ranges.
+GO LAS_define_region_curvi_indices
+
+! Now will go on and apply native strides.
+
+! End of file ------------LAS_autolev_curvi.jnl--------------------------
+

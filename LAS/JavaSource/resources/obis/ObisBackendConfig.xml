@@ -1,0 +1,38 @@
+<obis_servers>
+   <!-- There is likely to be a lot of overlap in the data these serve.
+        This have not all been tested, but are likely to work. -->
+
+   <!-- darwin2 providers from http://bigdig.ecoforge.net/wiki/SchemaResources#SchemaID5 .
+        Although listed as darwin2 providers, individual resources may use darwin2 variant schemas
+        or the obis schema.
+        Note that other providers use the same namespace but a different schema. -->
+   <obis name="Burke Museum" url="http://biology.burke.washington.edu:80/digir/burke/DiGIR.php"/>
+   <obis name="Yale University Peabody Museum" url="http://research.yale.edu:80/~ypm4/digir/www/DiGIR.php"/>
+   <obis name="Australian Antarctic Data Centre" url="http://aadc-maps.aad.gov.au/digir/digir.php"/>
+   <obis name="Canadian Biodiversity Information Facility" url="http://www.cbif.gc.ca/digir/www/DiGIR.php"/>
+   <obis name="National Herbarium of New South Wales" url="http://plantnet.rbgsyd.nsw.gov.au/digir/DiGIR.php"/>
+   <obis name="National Institute of Water and Atmospheric Research Ltd, NZ" url="http://webmap.niwa.co.nz/digir/DiGiR.php"/>
+
+   <!-- darwin2 providers from    http://bigdig.ecoforge.net/wiki/SchemaResources#SchemaID18. -->
+   <obis name="Bird Studies Canada" url="http://www.bsc-eoc.org/digir/www/digir.php"/>
+   <obis name="Canadian Museum of Nature" url="http://digir.chin.gc.ca/digir/DiGIR.php"/>
+   <obis name="The Danish Biodiversity Information Facility" url="http://192.38.112.87:8079/DigirProvider/"/>
+   <obis name="Ecological Monitoring and Assessment Network, Canada" url="http://digir.eman-rese.ca/www/DiGIR.php"/>
+   <obis name="Global Boidiversity Information Facility, Spain" url="http://taray.csic.es:6000/digir/DiGIR.php"/>
+   <obis name="The Swedish Museum of Natural History (NRM)" url="http://www.gbif.se:8888/digir/DiGIR.php"/>
+   <obis name="National Science Museum, Japan" url="http://gbif.science-net.kahaku.go.jp:8080/digir/DiGIR.php"/>
+   <obis name="NatureServe" url="http://services.natureserve.org/digir/DiGIR.php"/>
+
+   <!-- obis providers (a superset of darwin2) 
+        from http://bigdig.ecoforge.net/wiki/SchemaResources#SR_21 -->
+   <obis name="IOBIS" url="http://iobis.marine.rutgers.edu/digir2/DiGIR.php"/>
+   <!-- <obis name="CSIRO OBIS" url="http://www.obis.org.au/digir/DiGIR.php"/> not valid -->
+   <!-- <obis name="ANSP" url="http://janthina.acnatsci.org/digir/DiGIR.php"/> not valid -->
+   <obis name="Hexacoral" url="http://pluto.kgs.ku.edu/digir/DiGIR.php"/>
+   <obis name="Flanders Marine Institute" url="http://www.vliz.be/digir/DiGIR.php"/>
+   <obis name="Pacific Basin Information Node" url="http://166.122.60.46:8080/digir/DiGIR.php"/>
+   <obis name="Indian Ocean Node of OBIS," url="http://digir.indobis.org/digir/DiGIR.php"/>
+   <obis name="UAF School of Fisheries and Ocean Sciences" url="http://ak.aoos.org:9000/digir/DiGIR.php"/>
+   <obis name="French Research Institute for Exploitation of the Sea" url="http://www.ifremer.fr/digir/DiGIR.php"/>
+
+</obis_servers>

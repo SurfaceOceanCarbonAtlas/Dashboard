@@ -1,0 +1,31 @@
+! op_math_sym.jnl
+
+
+! Set a symbol corresponding to the math symbol for an
+! operation e.g. LT is > EQ is = .  Take eq from the Cartegraphic
+! font, as the math one has the lines close together and they
+! run together when part of a small label.
+
+DEFINE SYMBOL math_op_sym = ($2)
+IF `($1"0|0|1|*>1") EQ 0` THEN 
+
+IF ($2"0|LT>1|*>0") THEN DEFINE SYMBOL math_op_sym = <
+IF ($2"0|LE>1|*>0") THEN DEFINE SYMBOL math_op_sym = <=
+IF ($2"0|GT>1|*>0") THEN DEFINE SYMBOL math_op_sym = >
+IF ($2"0|GE>1|*>0") THEN DEFINE SYMBOL math_op_sym = <=
+IF ($2"0|EQ>1|*>0") THEN DEFINE SYMBOL math_op_sym = =
+IF ($2"0|NE>1|*>0") THEN DEFINE SYMBOL math_op_sym = NE
+IF ($2"0|IS>1|*>0") THEN DEFINE SYMBOL math_op_sym = is
+
+ELSE
+
+IF ($2"0|LT>1|*>0") THEN DEFINE SYMBOL math_op_sym = @MA40@SR
+IF ($2"0|LE>1|*>0") THEN DEFINE SYMBOL math_op_sym = @MA42@SR
+IF ($2"0|GT>1|*>0") THEN DEFINE SYMBOL math_op_sym = @MA41@SR
+IF ($2"0|GE>1|*>0") THEN DEFINE SYMBOL math_op_sym = @MA43@SR
+IF ($2"0|EQ>1|*>0") THEN DEFINE SYMBOL math_op_sym = @CA17@SR  ! The one from MA font is too close together
+IF ($2"0|NE>1|*>0") THEN DEFINE SYMBOL math_op_sym = @MA36@SR
+IF ($2"0|IS>1|*>0") THEN DEFINE SYMBOL math_op_sym = is
+
+ENDIF
+!-----------------End of op_math_sym 

@@ -1,0 +1,19 @@
+
+#set ($expocode=$las_backendrequest.getProperty("qc","expocode"))
+###set ( $readonly = $las_backendrequest.getProperty("socat_vars", "readonly"))
+
+
+select q.expocode as "Expocode", r.region_name as "Region", qc_flag as "Flag", FROM_UNIXTIME(q.qc_time) as "Flag Timestamp", v.realname as "Reviewer", ROUND(q.socat_version,1) as "Version", q.qc_comment as "Comments"
+FROM
+
+QCEvents q
+LEFT JOIN Regions r
+ON
+q.region_id = r.region_id
+LEFT JOIN Reviewers v
+ON
+q.reviewer_id = v.reviewer_id
+where expocode="${expocode}"
+and q.qc_flag <> 'R'
+order by q.qc_time
+		

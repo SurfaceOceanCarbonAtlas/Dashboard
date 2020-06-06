@@ -1,0 +1,126 @@
+#!@PERL@ -w
+#
+# Copyright (c) 2001 TMAP, NOAA
+# ALL RIGHTS RESERVED
+#
+# Please read the full copyright notice in the file COPYRIGHT
+# included with this code distribution
+
+# $Id: configizmo.pl.in,v 1.1 2004/05/10 23:13:29 callahan Exp $
+#
+# Server code for returning various information about this
+# server including livepack packages.
+#
+
+use strict;
+use lib qw(. .. ../xml/perl);
+use CGI qw/:push/;
+use CGI::Carp qw(fatalsToBrowser set_message);
+use LAS;
+use LASUI;
+use File::Basename;
+use File::PathConvert qw(abs2rel rel2abs splitdirs);
+require('LAS_config.pl');
+require('config.results');
+
+
+my $VERSION = "1.0.0";
+
+BEGIN {
+    sub handle_errors {
+	my $msg = shift;
+	print <<EOF;
+	<html><head><title>LAS Error</title></head><body bgcolor="white">
+        <h3>Configurator gizmo error</h3>
+	<pre><b>$msg</b></pre>
+	</body></html>
+EOF
+
+	&LAS::Server::Error::doError($msg);
+    }
+    set_message(\&handle_errors);
+}
+
+sub getData {
+    my ($query) = @_;
+    print $query->header;
+    print <<EOF;
+<html>
+<head>
+<title>LAS configuration gizmo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#FFFFFF">
+<h3>LAS configuration gizmo (prototype)</h3>
+<form method="post" action="configizmo.pl">
+  <table>
+    <tr><td align="right">File name or URL of COARDS dataset:</td>
+    <td><input type="text" name="url" size="80"></td>
+    </tr>
+    <tr>
+      <td align="right">MySQL username:</td><td><input type="text" name="dbuser"></td>
+    </tr>
+    <tr>
+      <td align="right">MySQL password:</td><td><input type="password" name="dbuser"></td>
+    </tr>
+    </table>
+    <input type="hidden" name="op" value="doit">
+    <input type="submit" value="Add dataset">
+</form>
+<p>&nbsp;</p>
+</body>
+</html>
+EOF
+}
+
+sub doit {
+    my ($query) = @_;
+    my $url = $query->param('url');
+    die "Missing url parameter" if ! $url;
+    my ($dbuser,$dbpass) = ($query->param('dbuser'), $query->param('dbpass'));
+
+    my @checkem = qw(las.xml ../las_servlet/src/las.properties);
+    foreach my $file (@checkem){
+	die "$file is not writeable by CGI process" if ! -w $file;
+    }
+    my $comm = qq{(../xml/perl/addXml.pl las.xml las.xml $url && ../xml/perl/genLas.pl -u "$dbuser" -p "$dbpass" -h localhost las.xml) 2>&1};
+    open FOO,"$comm|" or die "Can't open addXml.pl";
+
+
+    print $query->header;
+    print <<EOF;
+<html>
+<head>
+<title>LAS configuration gizmo results</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF">
+<h3>LAS configuration gizmo results</h3>
+<pre>
+EOF
+    while (<FOO>){
+	print;
+    }
+    print <<EOF1;
+</body>
+</html>
+EOF1
+    close FOO;
+}
+
+my $query = new CGI;
+$| = 1;
+
+my $op = $query->param('op');
+
+$op = "getdata" if ! $op;
+
+if ($op eq 'getdata'){
+    getData($query);
+} elsif ($op eq 'doit'){
+    doit($query);
+} else {
+    die "Unknown op: $op";
+}
+

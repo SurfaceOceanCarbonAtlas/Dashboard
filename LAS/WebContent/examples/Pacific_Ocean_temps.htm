@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<h<head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+ <title>Pacific Ocean Temperatures Example</title>
+<!-- 
+ * Imported libaries:
+ *
+ * xmldom.js              Parses the LASRequest XML.  Used by LASRequest.js.
+ * LASRequest.js          Provides an API for accessing/modifying LASRequest elements.
+ * DateWidget.js          Creates and populates a date Widget (group of Selectors).
+ * 
+ * NOTE:  This example has to go up one directory '../' to find 'JavaScript/components/'
+ * NOTE:  because this example is found in WebContent/examples/.  
+ * NOTE:  Any pages you include directly in the WebContent/ directory won't need '../'.
+-->
+  <script type="text/javascript" src="../JavaScript/components/xmldom.js"></script>
+  <script type="text/javascript" src="../JavaScript/components/LASRequest.js"></script>
+  <script type="text/javascript" src="../JavaScript/components/DateWidget.js"></script>
+
+  <script type="text/javascript">
+
+/**
+ * Initialize the LASRequest and DateWidget objects when the page is loaded.
+ *
+ * A note on products.
+ * 
+ * You'll need to look at $LAS_HOME/conf/server/ui.xml to see how products are named.
+ * Each line will contain something like these:
+ * 
+ * 	<item values="Plot_2D_XY,shade,2">Color plot</item>
+ * 
+ * The two values are the 'operation' and the 'format' and need to be specified
+ * as arguments to Req.setOperation().
+ * 
+ */
+function initialize() {
+  // Initialize the LASRequest
+  Req = new LASRequest('');
+  Req.removeVariables();
+  Req.addVariable('NOAA_NCEP_EMC_CMB_Ocean_Analysis_ml','IRI-otemp2027');
+  Req.setOperation('Plot_2D_XY','shade');
+  Req.setProperty('ferret','view','xy');
+  Req.setProperty('ferret','set_aspect','default');
+  Req.setProperty('ferret','fill_levels','(0,34,2)');
+  Req.setRange('x',122.25,288.75);
+  Req.setRange('y',-35,45);
+  Req.setRange('z',5);
+  Req.setRange('t','01-Jan-1980');
+
+  // Initialize the DateWidget
+  // Then render it in the identified table cell with only Month and Year Selectors showing.
+  DW = new DateWidget('1980-01-15','2006-01-15');
+  DW.render('DateWidgetCell','MY');
+
+  // Add a counter to the document object
+  document.first_time = 1;
+}
+
+/**
+ * Submit the LASRequest to the LAS ProductServer.
+ *
+ * Normally, products are returned inside an HTML page.
+ * By adding '&stream=true@stream_ID=plot_image' to the URL we can request
+ * that the image bytes be streamed directly back to the client.
+ *
+ * NOTE:  As above, we need to go up one directory '../' to find 'ProductServer.do'.
+ */
+function submitXML() {
+  updateLASRequest();
+  var URL = '../ProductServer.do?xml=' + escape(Req.getXMLText()) + '&stream=true&stream_ID=plot_image'; 
+  var Image = document.getElementById('LAS_img');
+  Image.src = URL;
+  if (document.first_time) {
+    alert('Please be patient.  The data is being fetched from another server and it may take a few seconds to generate the plot.');
+    document.first_time = 0;
+  }
+  
+}
+
+/**
+ * Use any user selected parameters to update the LASRequest.
+ */
+function updateLASRequest() {
+  Req.setRange('t',DW.getDate1_Ferret());
+}
+
+/**
+ * Creates an alert box containing the LASRequest XML.
+ */
+function alertXML() {
+  updateLASRequest();
+  alert(Req.getXMLText());
+}
+
+  </script>
+</head>
+
+<body onload="initialize()">
+
+  <p align="center">
+    <b><i><font size="6">Explore Pacific Ocean Temperatures!</font></i></b>
+  </p>
+
+  <form name="inputForm">
+
+    <div align="center">
+      <table>
+        <tbody>
+          <tr>
+            <td valign="top">
+              <font size="+1">Select a date:</font>
+            </td>
+            <td id="DateWidgetCell" valign="top"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div align="center">
+      <input name="xml" type="hidden">
+      <input value="See the request." onclick="alertXML()" type="button"> &nbsp;
+      <input value="See the plot!" onclick="submitXML()" type="button">
+    </div>
+
+  </form>
+
+  <div align="center">
+    <table border="5">
+      <tbody>
+        <tr>
+          <td>
+            <img id="LAS_img" alt="Temperature plot will appear here."></img>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+Please see the <a target="_blank" href="http://ferret.pmel.noaa.gov/LAS/documentation/developer-documentation/javascript-components-v2.x/">javascript component documentation</a>
+for more information on using the LAS components for creating simple user interfaces.
+  </p>
+
+</body>
+</html>
+

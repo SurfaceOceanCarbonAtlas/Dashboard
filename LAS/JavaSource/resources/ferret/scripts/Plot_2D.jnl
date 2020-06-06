@@ -1,0 +1,17 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! $Author: rhs $
+! 11/11  ACM consolidate scripts. XY plots needs unique product script; 
+!            the other 2D directions can all run from a single script
+!
+! Plot_2d.jnl decides which script to call to make a 2D plot. 
+!
+! Set the gif filename, changing it from .gif to the name from this request
+! Set up to write info to the debug log so that FshowGO can be used
+GO LAS_initial_setup
+
+!! Make a 2d plot...
+   go draw_plot_2D
+
+
+! End of file ------------ Plot_2D.jnl--------------------------

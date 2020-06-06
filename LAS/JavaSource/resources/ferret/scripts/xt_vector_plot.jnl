@@ -1,0 +1,71 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! file: xt_vector_plot.jnl 
+! 
+! Author: ansley 
+! Date: 2010/06/29
+!
+! xt_vector_plot.jnl creates an XT vector plot for use with the Back End Server
+! code that sits behind a Live Access Server (LAS). 
+
+! Calls LAS_vector_stickplot_t to plot the variable as stacked vector stick 
+! plots at each time.
+
+! Set any Ferret modes
+
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE
+
+DEFINE SYMBOL itsa_vector_plot = 1
+
+! Define symbols associated with the region and data and perform any
+! initialization needed for this dataset.
+
+DEFINE SYMBOL var_num = 0
+GO LAS_initialize_region ($var_num)
+GO LAS_initialize_data ($var_num)
+DEFINE SYMBOL ferret_vector_1 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title_1 "($data_title) ($data_units)"
+
+DEFINE SYMBOL var_num = 1
+GO LAS_initialize_data ($var_num)
+DEFINE SYMBOL ferret_vector_2 ($ferret_plot_var)
+DEFINE SYMBOL ferret_plot_title "($ferret_plot_title_1), ($data_title) ($data_units)"
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Check whether the region is too small; reduces to a single grid point.
+! (Region is a point)
+GO LAS_check_2d_region
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Use Ferret properties to set up the plot qualifiers
+! By default do not draw graticules, but user may turn them on.
+
+IF ($ferret_use_graticules"1|default>1|*>0) THEN DEFINE SYMBOL ferret_use_graticules = none
+
+GO LAS_set_plot_qualifiers
+DEFINE SYMBOL qualifiers = ($qualifiers)/NOLAB
+
+! Open the window, apply size, scale options
+GO LAS_open_window
+
+! Set the URL label for the first dataset.
+GO LAS_url_label 0
+
+
+GO LAS_vector_stickplot_t
+
+! Save the results
+GO LAS_results box
+
+!  ----------------- End of xt_vector_plot.jnl ------------------------------------
+

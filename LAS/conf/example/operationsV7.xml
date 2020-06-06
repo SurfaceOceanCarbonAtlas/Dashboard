@@ -1,0 +1,2858 @@
+<?xml version="1.0"?>
+<operations>
+<!-- Point Data operations -->
+  <!-- This is the default XY plot. -->
+  <operation name="Point Location value Plot" ID="Point_location_value_plot" output_template="zoom" default="true" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Timeseries_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="In-situ location and value plot" ID="Plot_insitu_XY_locations_and_values" output_template="zoom" service_action="Plot_insitu_XY_locations_and_values">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <optiondef IDREF="Timeseries_Options"/>
+    <region>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+<!-- Time series (station) data operations -->
+  <!-- This is the default XY plot. -->
+  <operation name="Timeseries Location Plot" ID="Timeseries_interactive_plot" output_template="zoom" default="true" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Timeseries_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Timeseries Plot" ID="Time_Series_Location_Plot" output_template="output" service_action="Profile_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <optiondef IDREF="Timeseries_Options"/>
+    <region>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+  <operation name="Multi-station Timeseries Plot" ID="Timeseries_station_plot" output_template="zoom" default="true" category="visualization" minvars="1" maxvars="100000">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Timeseries_station_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Timeseries Plot" ID="Timeseries_station_plot" output_template="output" service_action="Timeseries_station_plot">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <optiondef IDREF="Options_1D_7"/>
+    <region>
+      <intervals name="xyt" type="Line Plots" title="Time Series"/>
+    </region>
+  </operation>
+<!-- End of Time series (station) data operations -->
+  <!-- Profile specific operations. -->
+  <operation name="Profile Plot" ID="Profile_interactive_plot" output_template="zoom" default="true" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Profile Map" ID="Profile_2D_poly" output_template="output" service_action="Profile_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <optiondef IDREF="Trajectory_Options"/>
+    <region>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+  <operation ID="Profile_Plot_2D_zoom" default="true" name="Color plot" output_template="zoom" service_action="Plot_2D" order="0101" category="visualization" isZoomable="true">
+      <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" ID="Profile_Plot_2D" service_action="Plot_2D_Profile" order="0101" category="visualization">
+    <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    </operation>
+     <region>
+      <intervals name="xzt" type="Depth Profiles" title="Longitude-Depth"/>
+      <intervals name="yzt" type="Depth Profiles" title="Latitude-Depth"/>
+      <intervals name="zt" type="Hovmoller Plots" title="Latitude-Depth"/>
+    </region>
+    <grid_types>
+      <grid_type name="profile"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_7"/>
+  </operation>
+  <!-- End of Profile specific operations -->
+
+  <!-- SOCAT-specific operations -->
+    <operation name="Table of QC" ID="SOCAT_QC_table" output_template="SOCAT_QC_table" service_action="SOCAT_QC_table">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug"/>
+        <result type="webrowset" ID="webrowset" file_suffix=".xml"/>
+         <result type="cancel" ID="cancel" />
+      </response>
+      <service>database</service>
+    </operation>
+    <operation name="SOCAT QC Input Form" ID="SOCAT_QC_input" output_template="SOCAT_QC_input" service_action="SOCAT_QC_input">
+                <response ID="DBExtractResponse">
+                        <result type="debug" ID="db_debug" file_suffix=".txt" />
+                        <result type="cancel" ID="cancel" />
+                        <result type="webrowset" ID="webrowset" file_suffix=".xml" />
+                </response>
+                <service>database</service>
+    </operation>
+    <operation name="SOCAT QC Input Results" ID="SOCAT_QC_submit" output_template="SOCAT_QC_setup" >
+		<response ID="DBExtractResponse">
+			<result type="debug" ID="db_debug" file_suffix=".txt" />
+			<result type="cancel" ID="cancel" />
+		</response>
+		<service>template</service>
+    </operation>
+  <!-- End of SOCAT-specific operations -->
+
+  <operation name="Climate Analysis" ID="Climate_Analysis" private="true" service_action="" default="true" category="climate_analysis" output_template="Climate_Analysis">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="xy"/>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation name="Climate Analysis" ID="Climate_Analysis_Plot" private="true" service_action="" default="true" category="file" output_template="climate_analysis_plots">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>climate_analysis</service>
+    <region>
+      <intervals name="xy"/>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <!-- BEGIN trajectory operations -->
+  <operation name="ASCII file" ID="Trajectory_Data_Extract_TSV" output_template="netcdf" service_action="Trajectory_Data_Extract_netCDF" order="0500" category="file">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation name="ASCII file" chained="true" ID="Trajectory_Data_Extract_File" output_template="ascii" service_action="Trajectory_Data_Convert_File" order="0500" category="file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <service>ferret</service>
+      <response ID="Data_Extract_netCDF_Response">
+        <result type="ascii" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".tsv"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="x"/>
+        <intervals name="y"/>
+        <intervals name="z"/>
+        <intervals name="t"/>
+        <intervals name="e"/>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="xe"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="ye"/>
+        <intervals name="zt"/>
+        <intervals name="ze"/>
+        <intervals name="te"/>
+        <intervals name="xyz"/>
+        <intervals name="xyt"/>
+        <intervals name="xye"/>
+        <intervals name="xzt"/>
+        <intervals name="xze"/>
+        <intervals name="xte"/>
+        <intervals name="yzt"/>
+        <intervals name="yze"/>
+        <intervals name="yte"/>
+        <intervals name="zte"/>
+        <intervals name="xyzt"/>
+        <intervals name="xyze"/>
+        <intervals name="xyte"/>
+        <intervals name="xzte"/>
+        <intervals name="yzte"/>
+        <intervals name="xyzte"/>
+        <degenerate/>
+      </region>
+      <grid_types>
+        <grid_type name="trajectory"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+  </operation>
+  <operation name="ASCII file" ID="Trajectory_Data_Extract_CSV" output_template="netcdf" service_action="Trajectory_Data_Extract_netCDF" order="0500" category="file">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation name="ASCII file" chained="true" ID="Trajectory_Data_Extract_File" output_template="ascii" service_action="Trajectory_Data_Convert_File" order="0500" category="file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <service>ferret</service>
+      <response ID="Data_Extract_netCDF_Response">
+        <result type="ascii" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".csv"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="x"/>
+        <intervals name="y"/>
+        <intervals name="z"/>
+        <intervals name="t"/>
+        <intervals name="e"/>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="xe"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="ye"/>
+        <intervals name="zt"/>
+        <intervals name="ze"/>
+        <intervals name="te"/>
+        <intervals name="xyz"/>
+        <intervals name="xyt"/>
+        <intervals name="xye"/>
+        <intervals name="xzt"/>
+        <intervals name="xze"/>
+        <intervals name="xte"/>
+        <intervals name="yzt"/>
+        <intervals name="yze"/>
+        <intervals name="yte"/>
+        <intervals name="zte"/>
+        <intervals name="xyzt"/>
+        <intervals name="xyze"/>
+        <intervals name="xyte"/>
+        <intervals name="xzte"/>
+        <intervals name="yzte"/>
+        <intervals name="xyzte"/>
+        <degenerate/>
+      </region>
+      <grid_types>
+        <grid_type name="trajectory"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+  </operation>
+  <operation name="NetCDF file" ID="Trajectory_Data_Extract_netCDF" output_template="netcdf" service_action="Trajectory_Data_Extract_netCDF" order="0500" category="file">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="webrowset" ID="webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation name="NetCDF file" ID="Trajectory_Data_Extract_netCDF" output_template="netcdf" service_action="Data_Download" order="0500" category="file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <!-- A bit of a kludge... No service is really needed, but the ProductServer 
+				is not expecting the template service in the second operation of a compound 
+				operation... -->
+      <service>ferret</service>
+      <response ID="Data_Extract_netCDF_Response">
+        <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="x"/>
+        <intervals name="y"/>
+        <intervals name="z"/>
+        <intervals name="t"/>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="zt"/>
+        <intervals name="xyz"/>
+        <intervals name="xyt"/>
+        <intervals name="xzt"/>
+        <intervals name="yzt"/>
+        <intervals name="xyzt"/>
+        <degenerate/>
+      </region>
+      <grid_types>
+        <grid_type name="trajectory"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+  </operation>
+  <operation ID="Trajectory_Interactive_Download" default="true" minvars="1" maxvars="100000" name="Interactive Download" output_template="trajectory_interactive_download" service_action="" order="0300" category="table">
+    <service>template</service>
+    <response ID="Data_Download_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- This is the default XY plot. -->
+  <operation name="Trajectory Plot" ID="Trajectory_interactive_plot" output_template="zoom" default="true" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Trajectory Map" ID="Trajectory_2D_poly" output_template="output" service_action="Trajectory_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <optiondef IDREF="Trajectory_Options"/>
+    <region>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+  <!--  This will be the "Show Values" operaton on the main interface. It will potentially make a huge mess, but it might be useful in many cases. -->
+   <operation name="Trajectory Values Table" ID="trajectory_show_values" output_template="datatable" default="true" category="table">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation  chained="true" name="Show Values Table" ID="trajectory_table_compound" service_action="Trajectory_corr_File" private="false" output_template="datatable">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+    <response ID="FileResp" type="HTML" index="1">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="DataTable" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>ferret</service> 
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+    </operation>
+     <region>
+      <intervals name="xyt"/>
+      <intervals name="xt"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+    </region>
+  </operation>
+
+  
+  
+  <!-- Private operation only invoked by correlation viewer when it knows 
+		the plot can be made from the existing netCDF file. -->
+  <operation name="Trajectory Correlation Plot" ID="Trajectory_correlation_plot" service_action="Trajectory_correlation" private="true" output_template="zoom">
+    <args>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="icon_webrowset" ID="icon_webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <operation name="Trajectory Correlation Table" ID="Trajectory_correlation_table" service_action="Trajectory_corr_File" private="true" output_template="datatable">
+    <args>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <response ID="FileResp" type="HTML" index="1">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="DataTable" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <operation name="Trajectory Correlation Table" ID="Trajectory_Corrrelation_File" service_action="Trajectory_corr_File" private="true" output_template="netcdf">
+    <args>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <response ID="FileResp" type="HTML" index="1">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="ferret_listing" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- END Trajectory_interactive_plot -->
+  <!--  Special prop-prop plot for making the thumbnails so we can get a smaller netCDF file at the start. -->
+    <operation name="Correlation Plot" ID="Trajectory_thumbnail_extract_and_plot" default="true" category="file" output_template="zoom">
+    <backend_service>
+      <exclude>ferret,propprop</exclude>
+    </backend_service>
+    <operation name="Database Extraction" ID="DBExtract" service_action="Trajectory_correlation_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret,prop_hist</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="Trajectory Correlation Plot" ID="Trajectgory_thumbnails" service_action="Trajectory_correlation">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+        <result type="icon_webrowset" ID="icon_webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- This is the property-property operation for trajectory in-situ data. 
+		It gets called from the Correlation view defined below. -->
+  <operation name="Correlation Plot" ID="Trajectory_correlation_extract_and_plot" default="true" category="file" output_template="zoom">
+    <backend_service>
+      <exclude>ferret,propprop</exclude>
+    </backend_service>
+    <operation name="Database Extraction" ID="DBExtract" service_action="Trajectory_correlation_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret,prop_hist</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="Trajectory Correlation Plot" ID="Trajectgory_correlation" service_action="Trajectory_correlation">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+        <result type="icon_webrowset" ID="icon_webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- End of trajectory operations -->
+  <!-- BEGIN ERDDAP trajectory operations -->
+  <operation name="ASCII file" ID="ERDDAP_Trajectory_Data_Extract_File" output_template="netcdf" service_action="ERDDAP_Trajectory_Data_Extract_netCDF" order="0500" category="file">
+    <operation name="ERDDAP Extraction" ID="ERDDAPExtract" output_template="ascii" service_action="ERDDAP_Trajectory_interactive_plot">
+      <response ID="ERDDAPExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation name="ASCII file" chained="true" ID="ERDDAP_Trajectory_Data_Extract_File" output_template="ascii" service_action="ERDDAP_Trajectory_Data_Convert_File" order="0500" category="file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="ERDDAPExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <service>ferret</service>
+      <response ID="ERDDAP_Data_Extract_netCDF_Response">
+        <result type="ascii" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="x"/>
+        <intervals name="y"/>
+        <intervals name="z"/>
+        <intervals name="t"/>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="zt"/>
+        <intervals name="xyz"/>
+        <intervals name="xyt"/>
+        <intervals name="xzt"/>
+        <intervals name="yzt"/>
+        <intervals name="xyzt"/>
+        <degenerate/>
+      </region>
+      <grid_types>
+        <grid_type name="trajectory"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+  </operation>
+  <operation name="NetCDF file" ID="ERDDAP_Trajectory_Data_Extract_netCDF" output_template="netcdf" service_action="ERDDAP_Trajectory_Data_Extract_netCDF" order="0500" category="file">
+    <operation name="ERDDAP Extraction" ID="ERDDAPExtract" output_template="ascii" service_action="ERDDAP_Trajectory_interactive_plot">
+      <response ID="ERDDAPExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="webrowset" ID="icon_webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation name="NetCDF file" ID="ERDDAP_Trajectory_Data_Extract_netCDF" output_template="netcdf" service_action="Data_Download" order="0500" category="file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="ERDDAPExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <!-- A bit of a kludge... No service is really needed, but the ProductServer 
+				is not expecting the template service in the second operation of a compound 
+				operation... -->
+      <service>ferret</service>
+      <response ID="ERDDAP_Data_Extract_netCDF_Response">
+        <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="x"/>
+        <intervals name="y"/>
+        <intervals name="z"/>
+        <intervals name="t"/>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="zt"/>
+        <intervals name="xyz"/>
+        <intervals name="xyt"/>
+        <intervals name="xzt"/>
+        <intervals name="yzt"/>
+        <intervals name="xyzt"/>
+        <degenerate/>
+      </region>
+      <grid_types>
+        <grid_type name="trajectory"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+  </operation>
+  <operation ID="ERDDAP_Trajectory_Interactive_Download" default="true" minvars="1" maxvars="100000" name="Interactive Download" output_template="ERDDAP_trajectory_interactive_download" service_action="" order="0300" category="table">
+    <service>template</service>
+    <response ID="ERDDAP_Data_Download_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- This is the default XY plot for a ERRDAP trajectory. -->
+  <operation name="Trajectory Plot" ID="ERDDAP_Trajectory_interactive_plot" output_template="zoom" default="true" category="visualization">
+    <operation name="Database Extraction" ID="ERDDAPExtract" output_template="" service_action="ERDDAP_Trajectory_interactive_plot">
+      <response ID="ERDDAPExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Trajectory Map" ID="ERDDAP_Trajectory_2D_poly" output_template="output" service_action="Trajectory_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="ERDDAPExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" file_suffix=".ps"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xy" type="Maps" title="Latitude-Longitude"/>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+  <!-- END ERDDAP Trajectory_interactive_plot -->
+  <!-- This is the property-property operation for trajectory in-situ data. 
+		It gets called from the Correlation view defined below. -->
+  <operation name="Correlation Plot" ID="Trajectory_correlation_plot" default="true" category="file" output_template="zoom">
+    <backend_service>
+      <exclude>ferret,propprop</exclude>
+    </backend_service>
+    <operation name="Database Extraction" ID="DBExtract" service_action="Trajectory_correlation_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret,prop_hist</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="Trajectory Correlation Plot" ID="Trajectgory_correlation" service_action="Trajectory_correlation">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- End of ERDDAP trajectory operations -->
+  <!-- BEGIN netCDF data source Trajectory operations -->
+  <operation name="ASCII file" ID="ERDDAP_Trajectory_Data_Extract_File" output_template="ascii" service_action="ERDDAP_Trajectory_Data_Convert_File" order="0500" category="file">
+    <args>
+      <arg chained="true" type="variable" index="1" operation="netCDFExtract" result="netcdf" file_suffix=".nc"/>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <service>ferret</service>
+    <response ID="ERDDAP_Data_Extract_netCDF_Response">
+      <result type="ascii" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation name="NetCDF file" default="true" ID="ERDDAP_Trajectory_Data_Extract_netCDF" output_template="netcdf" service_action="Data_Download" order="0500" category="file">
+    <args>
+      <arg chained="true" type="variable" index="1" operation="ERDDAPExtract" result="netcdf" file_suffix=".nc"/>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <!-- A bit of a kludge... No service is really needed, but the ProductServer 
+			is not expecting the template service in the second operation of a compound 
+			operation... -->
+    <service>ferret</service>
+    <response ID="netCDF_Data_Extract_netCDF_Response">
+      <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation ID="netCDF_Trajectory_Interactive_Download" default="true" minvars="1" maxvars="100000" name="Interactive Download" output_template="ERDDAP_trajectory_interactive_download" service_action="" order="0300" category="table">
+    <service>template</service>
+    <response ID="ERDDAP_Data_Download_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- This is the default XY plot for a ERRDAP trajectory. -->
+  <operation name="Trajectory Plot" ID="ERDDAP_Trajectory_interactive_plot" output_template="zoom" default="true" category="visualization">
+    <args>
+      <arg chained="true" type="variable" index="1" operation="ERDDAPExtract" result="netcdf" file_suffix=".nc"/>
+      <arg type="region" index="1" ID="in-situ-Region"/>
+    </args>
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" file_suffix=".ps"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="js_total" ID="js_total" file_suffix=".js"/>
+      <result type="map_data" ID="map_data" file_suffix=".txt"/>
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xy" type="Maps" title="Latitude-Longitude"/>
+      <intervals name="xyt" type="Maps" title="Latitude-Longitude"/>
+    </region>
+  </operation>
+  <!-- END ERDDAP Trajectory_interactive_plot -->
+  <!-- This is the property-property operation for trajectory in-situ data. 
+		It gets called from the Correlation view defined below. -->
+  <operation name="Correlation Plot" ID="Trajectory_correlation_plot" default="true" category="file" output_template="zoom">
+    <backend_service>
+      <exclude>ferret,propprop</exclude>
+    </backend_service>
+    <operation chained="true" name="Trajectory Correlation Plot" ID="Trajectgory_correlation" service_action="Trajectory_correlation">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- This is a correlation plot chain specific to the Trajectory data where 
+		the netCDF file is made once and used over and over for plots. -->
+  <operation name="Correlation Plot" ID="SPPV" service_action="" default="true" category="correlation" output_template="SPPV_setup">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+    <!-- This is the column editor that will edit woce flags and such
+		it uses netCDF that has already been made. -->
+  <operation name="Column Editor" ID="EditColumn_setup" service_action="" default="true" category="correlation" output_template="EditColumn_setup">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- Table of Property Property Thumbnails -->
+  <operation name="Table of Property-Property Thumbnails" ID="PropPropThumbTable" service_action="" default="true" category="thumbnails" output_template="PPT_setup">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!--  Trajctory Table	 USE target="_self" to have the table replace the main interface.  -->
+  <operation name="Trajectory Table" ID="TrajectoryTable" service_action="" default="true" category="trajectory_table" output_template="TrajectoryTable">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+  </operation>
+  <!-- End of netCDF only trajectory operations -->
+  <operation name="Correlation Plot" ID="Correlation" service_action="" default="true" category="correlation" output_template="Correlation_setup">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation ID="Plot_2D_XY_zoom" default="true" name="Color plot" output_template="zoom" service_action="Plot_2D_XY" order="0001" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy" type="Maps" title="Latitude-Longitude"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_7"/>
+  </operation>
+  <operation name="V7 User Interface" ID="V7UI" output_template="V7UI" service_action="V7UI" private="true">
+    <service>template</service>
+  </operation>
+  <operation name="Desktop application data access scripts" ID="Gen_Scripts" output_template="scripts" minvars="1" maxvars="100000" service_action="Convert_to_Index" order="0600" category="file">
+    <service>ferret</service>
+    <response ID="ConvertResp">
+      <result type="index" ID="index" file_suffix=".xml"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+      <grid_type name="scattered"/>
+    </grid_types>
+    <optiondef IDREF="Options_gen_script"/>
+  </operation>
+  <operation ID="Overlay_Plot_2D" default="false" name="Overlay plot" output_template="output" service_action="Overlay_Plot_2D" order="0200" private="true" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale"/>
+      <result type="debug" ID="debug"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_7"/>
+  </operation>
+  <operation name="Difference plot" ID="Compare_Plot" output_template="output" service_action="Compare_Plot" order="0201" regrid_prn="true" private="true" category="visualization" isZoomable="true" minvars="2" maxvars="2">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy" type="Maps" title="Latitude-Longitude Difference"/>
+      <intervals name="xz" type="Depth Profile" title="Longitude-Depth Difference"/>
+      <intervals name="xt" type="Hovmoller Plots" title="Longitude Time Difference"/>
+      <intervals name="yz" type="Depth Profile" title="Latitude-Depth Difference"/>
+      <intervals name="yt" type="Hovmoller Plots" title="Latitude-Time Difference"/>
+      <intervals name="zt" type="Hovmoller Plots" title="Depth-Time Difference"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Compare"/>
+  </operation>
+  <operation name="Adjacent plots (GIF only)" ID="SidebySide_Plot_2D" output_template="side_by_side" service_action="SideBySide" order="0202" category="visualization" isZoomable="true">
+    <operation name="2D Plot" ID="Side1" output_template="output" service_action="Side1">
+      <service>ferret</service>
+      <response ID="PlotResp"><result type="image" ID="plot_image1" streamable="true" mime_type="image/png" file_suffix=".png"/><!-- <result type="ps" ID="plot_postscript1" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+				--&gt;
+				<result type="image" ID="ref_map1" file_suffix=".png"/>
+				<result type="map_scale" ID="map_scale1" file_suffix=".xml"/>
+				<result type="debug" ID="debug1" file_suffix=".txt"/>
+				<result type="cancel" ID="cancel1" file_suffix=".txt"/>
+			</response>
+    </operation>
+    <operation name="2D Plot" ID="Side2" output_template="output" service_action="Side2">
+      <service>ferret</service>
+      <response ID="PlotResp">
+        <result type="image" ID="plot_image2" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript2" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map2" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale2" file_suffix=".xml"/>
+        <result type="debug" ID="debug2" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel2" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="xy"/>
+        <intervals name="xz"/>
+        <intervals name="xt"/>
+        <intervals name="yz"/>
+        <intervals name="yt"/>
+        <intervals name="zt"/>
+      </region>
+      <grid_types>
+        <grid_type name="regular"/>
+      </grid_types>
+      <optiondef IDREF="Options_side"/>
+    </operation>
+  </operation>
+  <operation name="Comparison" ID="Plot_1D_SlideSorter" output_template="vizGal" service_action="" order="0801" category="comparison">
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation name="Comparison" ID="Plot_1D_SlideSorter_Vector" output_template="vizGal" service_action="" order="0801" category="comparison">
+    <service>template</service>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+    </region>
+    <grid_types>
+      <grid_type name="vector"/>
+    </grid_types>
+  </operation>
+  <operation ID="Plot_1D" default="true" name="Line plot" minvars="1" maxvars="12" output_template="output" service_action="Plot_1D" order="0102" category="visualization" isZoomable="false">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <!-- <intervals name="x" /> <intervals name="y" /> <intervals name="z" 
+				/> -->
+      <intervals name="t" type="Line Plots" title="Time Series"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_7"/>
+  </operation>
+  <operation ID="Plot_1D_zoom" default="true" name="Line plot" minvars="1" maxvars="12" type="Line Plots" output_template="zoom" service_action="Plot_1D" order="0102" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x" type="Line Plots" title="Longitude"/>
+      <intervals name="y" type="Line Plots" title="Latitude"/>
+      <intervals name="z" type="Line Plots" title="Depth"/>
+      <!--<intervals name="t" /> -->
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_7"/>
+  </operation>
+  <!-- default means it goes on the left nav panel, private means it only gets returned if requested as part of specific "UI Default". -->
+    <operation ID="Plot_1D_t_e" private="true" default="true" name="Line plot" minvars="1" maxvars="12" output_template="output" service_action="Plot_1D" order="0101" category="visualization" isZoomable="false">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <!-- <intervals name="x" /> <intervals name="y" /> <intervals name="z" 
+				/> -->
+      <intervals name="t" type="Line Plots" title="Time Series"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_E_7"/>
+  </operation>
+  <operation ID="Plot_1D_e" private ="true" default="true" name="Line plot" minvars="1" maxvars="12" type="Line Plots" output_template="zoom" service_action="Plot_1D" order="0103" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+      <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+      <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x" type="Line Plots" title="Longitude"/>
+      <intervals name="y" type="Line Plots" title="Latitude"/>
+      <intervals name="z" type="Line Plots" title="Depth"/>
+      <intervals name="e" type="Line Plots" title="Realizations"/>
+      <!--<intervals name="t" /> -->
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_E_7"/>
+  </operation>
+  <operation name="Comparison" ID="Plot_2D_XY_SlideSorter" output_template="vizGal" service_action="" category="comparison">
+    <service>template</service>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation name="Comparison" ID="Plot_2D_XY_SlideSorter_Vector" output_template="vizGal" service_action="" category="comparison">
+    <service>template</service>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="vector"/>
+    </grid_types>
+  </operation>
+  <operation name="Color plot" ID="Plot_2D_XY" output_template="output" service_action="Plot_2D_XY" order="0100" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_7"/>
+  </operation>
+  <!-- Operations for xy map - just a map, no dataset or variable other than 
+		topo -->
+  <operation name="xy map" ID="xy_map" output_template="output" service_action="xy_map" private="true" order="9999" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				/> -->
+      <result type="image" ID="ref_map"/>
+      <result type="map_scale" ID="map_scale"/>
+      <result type="debug" ID="debug"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_7"/>
+  </operation>
+  <!-- Animation on browser (fast response) [public] -->
+  <!-- animate XY plots -->
+  <operation ID="Animation_2D_XY" default="true" name="Animation" output_template="output_animation" service_action="Data_Extract_Frames" order="9999" category="animation">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_animation_xy"/>
+  </operation>
+  <!-- animate XY vector plots -->
+  <operation ID="Animation_2D_XY_vector" default="true" name="Animation" output_template="output_animation" service_action="Data_Extract_Frames" order="9999" category="animation">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xyt"/>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="vector"/>
+    </grid_types>
+    <optiondef IDREF="Options_Vector"/>
+  </operation>
+  <!-- used for extracting time frames only -->
+  <operation ID="Animation_Frames_XY" default="true" name="AnimationFrames" output_template="output_frames" service_action="Data_Extract_Frames" order="9999" category="animation">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xyt"/>
+      <intervals name="xy"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xz"/>
+      <intervals name="yz"/>
+      <intervals name="xt"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_animation_xy"/>
+  </operation>
+  <!-- animate XZ or YZ plots -->
+  <operation name="Animation" ID="Animation_2D" output_template="output_animation" service_action="Data_Extract_Frames" order="9999" category="animation">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xz"/>
+      <intervals name="yz"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_animation"/>
+  </operation>
+  <!-- animate X, Y, or Z plots -->
+  <operation name="Animation" ID="Animation_1D" output_template="output_animation" service_action="Data_Extract_Frames" order="9999" category="animation">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xt"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_Animation"/>
+  </operation>
+  <!-- Operations for Google Earth -->
+  <!-- BEGIN: dynamic overlay on Google Earth -->
+  <!-- for non-vector plots [public] -->
+    <!-- for non-vector plots [public] -->
+  <operation ID="Plot_GE_Overlay_Traj" default="true" name="Plot to Google Earth" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE_overlay" service_action="Plot_2D_GE" category="virtual_globe">
+    <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Trajectory Map" ID="Trajectory_2D_poly" output_template="output_GE_overlay" service_action="Trajectory_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="trajectory"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_GE"/>
+  </operation>
+  <operation ID="Plot_GE_Overlay" default="true" name="Plot to Google Earth" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE_overlay" service_action="Plot_2D_GE" category="virtual_globe">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_GE"/>
+  </operation>
+  <operation name="Plot to Google Earth" ID="Vector_GE_Overlay" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE_overlay" service_action="Plot_vector_GE" default="true" category="virtual_globe">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="vector"/>
+    </grid_types>
+    <optiondef IDREF="Options_GE_Vector_7"/>
+  </operation>
+  <!-- END: dynamic overlay on Google Earth -->
+  <!-- Begin: static overlay -->
+  <!-- overlay kml for non-vector plots [private]; it is used by the dynamic 
+		overlay -->
+  <operation name="Plot to Google Earth (static)" ID="Plot_GE_Traj_kml" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE" private="true" category="virtual_globe">
+    <!-- Extract and plot... -->
+     <operation name="Database Extraction" ID="DBExtract" output_template="" service_action="Trajectory_interactive_plot">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>tabledap</service>
+    </operation>
+    <operation chained="true" name="Trajectory Map" ID="Trajectory_2D_poly" output_template="output_GE_overlay" service_action="Trajectory_2D_poly">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="svg" ID="plot_svg" file_suffix=".svg"/>
+        <result type="ps" ID="plot_ps" file_suffix=".ps"/>
+        <result type="pdf" ID="plot_pdf" file_suffix=".pdf"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="js_total" ID="js_total" file_suffix=".js"/>
+        <result type="map_data" ID="map_data" file_suffix=".txt"/>
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel"/>
+        <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <operation chained="true" name="Make KML File" ID="kml" service_action="kml_overlay">
+      <args>
+        <arg chained="true" type="image" operation="Trajectory_2D_poly" result="plot_image"/>
+        <arg chained="true" type="image" operation="Trajectory_2D_poly" result="colorbar"/>
+        <arg chained="true" type="map_scale" operation="Trajectory_2D_poly" result="map_scale"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="kml" ID="kml" streamable="true" mime_type="application/vnd.google-earth.kml+xml" file_suffix=".kml"/>
+        <result type="kmz" ID="kmz" streamable="true" mime_type="application/vnd.google-earth.kmz" file_suffix=".kmz"/>
+      </response>
+      <service>kml</service>
+    </operation>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_GE"/>
+  </operation>
+  <operation name="Plot to Google Earth (static)" ID="Plot_GE_kml" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE" private="true" category="virtual_globe">
+    <operation name="Plot_2D_GE" ID="Plot_for_GE" service_action="Plot_2D_GE">
+      <response ID="PlotResp">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="image" ID="colorbar" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <operation chained="true" name="Make KML File" ID="kml" service_action="kml_overlay">
+      <args>
+        <arg chained="true" type="image" operation="Plot_for_GE" result="plot_image"/>
+        <arg chained="true" type="image" operation="Plot_for_GE" result="colorbar"/>
+        <arg chained="true" type="map_scale" operation="Plot_for_GE" result="map_scale"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="kml" ID="kml" streamable="true" mime_type="application/vnd.google-earth.kml+xml" file_suffix=".kml"/>
+        <result type="kmz" ID="kmz" streamable="true" mime_type="application/vnd.google-earth.kmz" file_suffix=".kmz"/>
+      </response>
+      <service>kml</service>
+    </operation>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_GE"/>
+  </operation>
+  <!-- overlay kml for vector plots [private]; it is used by the dynamic overlay -->
+  <operation name="Plot to Google Earth (static)" ID="Vector_GE_kml" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE" private="true" category="virtual_globe">
+    <operation name="Plot_vector_GE" ID="Vector_for_GE" service_action="Plot_vector_GE">
+      <response ID="PlotResp">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <operation chained="true" name="Make KML File" ID="kml" service_action="kml_overlay_vector">
+      <args>
+        <arg chained="true" type="image" operation="Vector_for_GE" result="plot_image"/>
+        <arg chained="true" type="map_scale" operation="Vector_for_GE" result="map_scale"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="kml" ID="kml" streamable="true" mime_type="application/vnd.google-earth.kml+xml" file_suffix=".kml"/>
+        <result type="kmz" ID="kmz" streamable="true" mime_type="application/vnd.google-earth.kmz" file_suffix=".kmz"/>
+      </response>
+      <service>kml</service>
+    </operation>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Vector_GE_7"/>
+  </operation>
+  <!-- END: static overlay -->
+  <!-- BEGIN: grid points on Google Earth [public] -->
+  <!-- place mark kml for grid points -->
+  <operation name="Time Series/Vertical Profiles from Google Earth" ID="Grid_GE_kml" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE" category="virtual_globe">
+    <operation name="Data_Extract_Grid" ID="Grid_for_GE" service_action="Data_Extract_Grid">
+      <response ID="Data_Extract_Grid_Response">
+        <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+        <result type="text" ID="las_request_info" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+        <result type="debug" ID="debug"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <operation chained="true" name="Make KML File" ID="kml" service_action="kml_placemarks">
+      <args>
+        <arg chained="true" type="text" operation="Grid_for_GE" result="ferret_listing"/>
+        <arg chained="true" type="text" operation="Grid_for_GE" result="las_request_info"/>
+      </args>
+      <response ID="KMLResp" type="HTML" index="1">
+        <result type="kml" ID="kml" streamable="true" mime_type="application/vnd.google-earth.kml+xml" file_suffix=".kml"/>
+        <result type="kmz" ID="kmz" streamable="true" mime_type="application/vnd.google-earth.kmz" file_suffix=".kmz"/>
+      </response>
+      <service>kml</service>
+    </operation>
+    <region>
+      <intervals name="xyt"/>
+      <intervals name="xyz"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <!-- END: grid on Google Earth -->
+  <!-- Google Earth: 1D plot [private] -->
+  <operation name="1D Plot" ID="Plot_1D_GE" output_template="output_response" service_action="Plot_1D" private="true" order="0704" category="visualization">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_7"/>
+  </operation>
+  <!-- Google Earth: extract grid locations used by placemarks KML [private] -->
+  <operation name="Grid locations" ID="Data_Extract_Grid" output_template="output_response" service_action="Data_Extract_Grid" private="true" order="9999" category="virtual_globe">
+    <service>ferret</service>
+    <response ID="Data_Extract_Grid_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+      <result type="debug" ID="debug"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <!-- Google Earth: animation kml for xyt view [private] -->
+  <operation name="Google Earth Animation" ID="Google_Earth_Animation" output_template="output_GE_animation" service_action="Data_Extract_Frames" private="true" order="9999" category="virtual_globe">
+    <service>ferret</service>
+    <response ID="Data_Extract_Frames_Response">
+      <result type="xml" ID="ferret_listing" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+      <result type="debug" ID="debug"/>
+    </response>
+    <region>
+      <intervals name="xyt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <!-- End of operations for Google Earth -->
+  <!-- Operation for WMS -->
+  <operation name="2D Plot for WMS" ID="Plot_2D_WMS" output_template="output_wms" service_action="Plot_2D_WMS" private="true" order="9999">
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation name="2D Color Key for WMS" ID="Plot_2D_ColorKey" output_template="output_colorkey" service_action="Plot_2D_WMS" private="true">
+    <response ID="PlotResp">
+      <result type="image" ID="colorbar" streamable="true" mime_type="image/png"/>
+    </response>
+    <service>ferret</service>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_xy_7"/>
+  </operation>
+  <!-- End of operation for WMS -->
+  <operation name="Comparison" ID="Plot_2D_SlideSorter" output_template="vizGal" service_action="" category="comparison">
+    <service>template</service>
+    <region>
+      <!-- xy has its own operation -->
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation default="true" name="Color plot" ID="Plot_2D" output_template="output" service_action="Plot_2D" order="0101" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <visualization_types>
+      <type name="Hovmoller Plots"/>
+      <type name="Line Plots"/>
+    </visualization_types>
+    <region>
+      <!--<intervals name="xy" /> -->
+      <!-- These zoom <intervals name="xz" /> <intervals name="yz" /> -->
+      <intervals name="xt" type="Hovmoller Plots" title="Longitude-Time"/>
+      <intervals name="yt" type="Hovmoller Plots" title="Latitude-Time"/>
+      <intervals name="zt" type="Hovmoller Plots" title="Depth-Time"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_7"/>
+  </operation>
+  <operation ID="Plot_2D_zoom" default="true" name="Color plot" output_template="zoom" service_action="Plot_2D" order="0101" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xz" type="Depth Profiles" title="Longitude-Depth"/>
+      <intervals name="yz" type="Depth Profiles" title="Latitude-Depth"/>
+      <intervals name="ze" type="Depth Proviles" title="Ensemble-Depth"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_2D_image_contour_7"/>
+  </operation>
+  <operation name="Vector plot" ID="Plot_vector" default="true" output_template="zoom" service_action="Plot_vector" order="0103" private="false" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy" type="Maps" title="Latitude-Longitude"/>
+      <intervals name="xz" type="Depth Profiles" title="Longitude-Depth"/>
+      <intervals name="xt" type="Hovmoller Plots" title="Longitude-Time"/>
+      <intervals name="yz" type="Depth Profiles" title="Latitude-Depth"/>
+      <intervals name="yt" type="Hovmoller Plots" title="Latitude-Time"/>
+      <intervals name="zt" type="Hovmoller Plots" title="Depth-Time"/>
+    </region>
+    <grid_types>
+      <grid_type name="vector"/>
+    </grid_types>
+    <optiondef IDREF="Options_Vector_7"/>
+  </operation>
+  <operation name="Vector comparison" ID="Compare_Vectors" minvars="2" maxvars="2" output_template="zoom" service_action="Compare_Vectors" order="0103" private="false" category="visualization" isZoomable="true">
+    <service>ferret</service>
+    <response ID="PlotResp">
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+				file_suffix=".ps"/> -->
+      <result type="image" ID="ref_map" file_suffix=".png"/>
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy" type="Scatter Plots" title="Vector Comparison Map"/>
+      <intervals name="xz" type="Scatter Plots" title="Longitude-Depth Vector Comparison"/>
+      <intervals name="xt" type="Scatter Plots" title="Longitude-Time Vector Comparison"/>
+      <intervals name="yz" type="Scatter Plots" title="Latitude-Depth Vector Comparison"/>
+      <intervals name="yt" type="Scatter Plots" title="Latitude-Time Vector Comparison"/>
+      <intervals name="zt" type="Scatter Plots" title="Depth-Time Vector Comparison"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Vector_7"/>
+  </operation>
+  <!-- Data extract operations for difference of two variables. -->
+  <operation ID="Compare_Data_Extract" default="true" name="Table of difference values (text)" regrid_prn="true" output_template="table" service_action="Compare_Data_Extract" private="true" order="0300" category="table">
+    <service>ferret</service>
+    <response ID="Data_Extract_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation name="NetCDF difference file" ID="Compare_Data_netCDF" output_template="netcdf" regrid_prn="true" service_action="Compare_Data_Extract_netCDF" order="0500" private="true" category="file">
+    <service>ferret</service>
+    <response ID="Data_Extract_netCDF_Response">
+      <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation ID="Compare_Data_Extract_File" default="true" name="ASCII difference file" output_template="ascii" regrid_prn="true" service_action="Compare_Data_Extract_File" order="0400" private="true" category="file">
+    <service>ferret</service>
+    <response ID="Data_Extract_File_Response">
+      <result type="ascii" ID="ferret_listing" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="zt"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xzt"/>
+      <intervals name="yzt"/>
+      <intervals name="xyzt"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data_file"/>
+  </operation>
+  <!-- End of Data Extract operations for differences. -->
+  <!-- Begin: interactive download -->
+  <operation ID="Interactive_Download" default="true" minvars="1" maxvars="100000" name="Interactive Download" output_template="interactive_download" service_action="Data_Download" order="0300" category="table">
+    <service>ferret</service>
+    <response ID="Data_Download_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <!-- End: interactive download -->
+  <operation ID="Data_Extract" default="true" name="Table of values (text)" output_template="table" service_action="Data_Extract" order="0300" category="table" minvars="1" maxvars="9999">
+    <service>ferret</service>
+    <response ID="Data_Extract_Response">
+      <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation name="NetCDF file" ID="Data_Extract_netCDF" output_template="netcdf" service_action="Data_Extract_netCDF" order="0500" category="file">
+    <service>ferret</service>
+    <response ID="Data_Extract_netCDF_Response">
+      <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation ID="Data_Extract_File" default="true" name="ASCII file" output_template="ascii" service_action="Data_Extract_File" order="0400" category="file">
+    <service>ferret</service>
+    <response ID="Data_Extract_File_Response">
+      <result type="ascii" ID="ferret_listing" streamable="true" mime_type="ascii/text" file_suffix=".txt"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="x"/>
+      <intervals name="y"/>
+      <intervals name="z"/>
+      <intervals name="t"/>
+      <intervals name="e"/>
+      <intervals name="xy"/>
+      <intervals name="xz"/>
+      <intervals name="xt"/>
+      <intervals name="xe"/>
+      <intervals name="yz"/>
+      <intervals name="yt"/>
+      <intervals name="ye"/>
+      <intervals name="zt"/>
+      <intervals name="ze"/>
+      <intervals name="te"/>
+      <intervals name="xyz"/>
+      <intervals name="xyt"/>
+      <intervals name="xye"/>
+      <intervals name="xzt"/>
+      <intervals name="xze"/>
+      <intervals name="xte"/>
+      <intervals name="yzt"/>
+      <intervals name="yze"/>
+      <intervals name="yte"/>
+      <intervals name="zte"/>
+      <intervals name="xyzt"/>
+      <intervals name="xyze"/>
+      <intervals name="xyte"/>
+      <intervals name="xzte"/>
+      <intervals name="yzte"/>
+      <intervals name="xyzte"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data_file"/>
+  </operation>
+  <operation name="ArcView gridded" ID="Data_Extract_ArcView" output_template="arcview" service_action="Data_Extract_ArcView" order="0800" category="file">
+    <service>ferret</service>
+    <response ID="Data_Extract_File_Response">
+      <result type="arc" ID="ferret_listing" file_suffix=".asc"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+    </response>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <optiondef IDREF="Options_Data"/>
+  </operation>
+  <operation name="Database Extraction" ID="DBExtract" output_template="dbnetcdf" service_action="sql" order="0501" category="file">
+    <response ID="DBExtractResponse">
+      <result type="debug" ID="db_debug" file_suffix=".txt"/>
+      <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+    </response>
+    <service>database</service>
+  </operation>
+  <operation name="Table of values (text)" ID="DBExtractRowset" output_template="webrowset" service_action="sql" order="0501" category="table">
+    <response ID="DBExtractRowsetResponse">
+      <result type="debug" ID="db_debug" file_suffix=".txt"/>
+      <result type="webrowset" ID="webrowset" file_suffix=".xml"/>
+    </response>
+    <service>database</service>
+  </operation>
+  <operation name="Location Plot" ID="Insitu_extract_location_plot" minvars="1" maxvars="1" default="true" output_template="zoom" order="0104" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="sql">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      </response>
+      <service>database</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="In-situ location plot" ID="Plot_insitu_XY_locations" output_template="zoom" service_action="Plot_insitu_XY_locations">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="map_scale" ID="map_scale"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="xy" type="Maps" title="Location Plot"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <operation name="Location and Value Plot" ID="Insitu_extract_location_value_plot" output_template="zoom" order="0105" default="true" category="visualization">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="sql">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      </response>
+      <service>database</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="In-situ location and value plot" ID="Plot_insitu_XY_locations_and_values" output_template="zoom" service_action="Plot_insitu_XY_locations_and_values">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="xy" type="Maps" title="Location and Value"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <operation name="DRDS Extraction" output_template="netcdf" ID="DRDSExtract" service_action="drds" order="0502" category="file">
+    <response ID="DBExtractResponse">
+      <result type="debug" ID="db_debug" file_suffix=".txt"/>
+      <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <properties>
+      <property_group type="backend_request">
+        <property>
+          <name>exclude</name>
+          <value>ferret</value>
+        </property>
+      </property_group>
+    </properties>
+    <service>drds</service>
+  </operation>
+  <operation name="Extract DRDS Data and Plot Location and Value" ID="DRDS_extract_location_value_plot" output_template="zoom" order="0106" category="visualization">
+    <operation name="Database Extraction" ID="DRDSExtract" service_action="drds">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+      <service>drds</service>
+    </operation>
+    <operation chained="true" name="DRDS location and value plot" ID="Plot_DRDS_XY_locations_and_values" output_template="zoom" service_action="Plot_insitu_XY_locations_and_values" order="0107">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DRDSExtract" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <visualization_types>
+      <type name="Maps"/>
+    </visualization_types>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="xy" type="Maps" title="Location Plot"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <operation ID="DRDS_extract_location_plot" default="true" name="Extract DRDS Data and Plot Location" output_template="zoom" order="0108" category="visualization">
+    <operation name="Database Extraction" ID="DRDSExtract" service_action="drds">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+      <service>drds</service>
+    </operation>
+    <operation chained="true" name="DRDS location plot" ID="Plot_DRDS_XY_locations" output_template="zoom" service_action="Plot_insitu_XY_locations">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DRDSExtract" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="xy" type="Maps" title="Location Plot"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <operation name="Extract DRDS data and property_depth plot" default="true" ID="DRDS_Property_Depth" output_template="output" category="visualization">
+    <operation name="Database Extraction" ID="DRDSExtract" service_action="drds">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+      <service>drds</service>
+    </operation>
+    <operation chained="true" name="DRDS property_depth plot" ID="Plot_DRDS_Property_Depth" output_template="output" service_action="Plot_insitu_pz">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DRDSExtract" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps"/> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="z" type="Line Plot" title="Depth Profile"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <!-- End of DRDS Operations -->
+  <!-- Beginning of Dapper Operations -->
+  <operation name="Dapper Extraction" output_template="netcdf" ID="DapperExtract" service_action="dapper" order="0503">
+    <response ID="DBExtractResponse" category="file">
+      <result type="debug" ID="db_debug" file_suffix=".txt"/>
+      <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <properties>
+      <property_group type="backend_request">
+        <property>
+          <name>exclude</name>
+          <value>ferret</value>
+        </property>
+      </property_group>
+    </properties>
+    <service>dapper</service>
+  </operation>
+  <operation name="Extract Dapper Data and Plot Location" ID="Dapper_extract_location_plot" output_template="output" minvars="1" maxvars="1" default="true" order="0110" category="visualization">
+    <operation name="Database Extraction" ID="DapperExtract" service_action="dapper">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+      <service>dapper</service>
+    </operation>
+    <operation chained="true" name="Dapper location plot" ID="Plot_Dapper_XY_locations" output_template="zoom" service_action="Plot_insitu_XY_locations" category="visualization">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DapperExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps" /> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="map_scale" ID="map_scale"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="xy" type="Maps" title="Location Plot"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <operation name="Extract Dapper Data and Time Series Plot" minvars="1" maxvars="999" ID="Dapper_extract_time_series_plot" output_template="output" order="0140" category="visualization" default="true">
+    <operation name="Database Extraction" ID="DapperExtract" service_action="dapper">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+      <service>dapper</service>
+    </operation>
+    <operation chained="true" name="Dapper time series plot" ID="Plot_Dapper_Time_Series" output_template="output" service_action="dapper_stack_line" category="visualization">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DapperExtract" result="netcdf" file_suffix=".nc"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <!-- <result type="ps" ID="plot_postscript" streamable="true" mime_type="application/postscript" 
+					file_suffix=".ps" /> -->
+        <result type="image" ID="ref_map" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="cancel" ID="cancel" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <!-- Not sure about this since the plot is planar in XY but the extract 
+				doesn't have to be. -->
+      <intervals name="t" type="Line Plot" title="Time Series"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+    <optiondef IDREF="Options_1D_7"/>
+  </operation>
+  <operation name="Process Template" ID="Template" output_template="direct_output" private="true" order="9999">
+    <service>template</service>
+  </operation>
+  <operation name="THREDDS Catalog" ID="THREDDS" output_template="thredds" service_action="getTHREDDS" private="true" order="9999">
+    <service>local</service>
+    <response ID="THREDDSCatalog">
+      <result type="xml" ID="thredds" streamable="true" mime_type="text/xml" file_suffix=".xml"/>
+    </response>
+  </operation>
+  <!-- Create a Metadata operation to replace the metadata action managed 
+		by the old UI. -->
+  <!-- This one shows only summeary and contact information with the variables 
+		and their ranges. -->
+  <operation name="Metadata" ID="Metadata" output_template="metadata" service_action="" private="true">
+    <service>template</service>
+  </operation>
+  <!-- This one show all of the above with the OPeNDAP access URLs. -->
+  <operation name="MetadataURLs" ID="MetadataURLs" output_template="metadata_opendap" service_action="" private="true">
+    <service>template</service>
+  </operation>
+  <operation name="Regrid" ID="Fregrid" service_action="launch" output_template="fregrid">
+    <response ID="FregridResponse">
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      <result type="cancel" ID="cancel" file_suffix=".txt"/>
+    </response>
+    <properties>
+      <property_group type="backend_request">
+        <property>
+          <name>exclude</name>
+          <value>ferret</value>
+        </property>
+      </property_group>
+    </properties>
+    <service>fregrid</service>
+  </operation>
+  <!-- placemarks for OSMC -->
+  <operation name="OSMC placemarks" ID="OSMC_placemarks" mime_type="application/vnd.google-earth.kml+xml" output_template="output_GE" category="virtual_globe">
+    <operation name="Database Extraction" ID="DBExtract_new" service_action="osmc_new_query">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      </response>
+      <service>database</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="OSMC_Data_Extract_Grid" ID="OSMC_Grid_for_GE" service_action="Data_Extract_Grid_OSMC">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract_new" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="OSMC_Data_Extract_Grid_Response">
+        <result type="text" ID="ferret_listing" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+        <result type="text" ID="las_request_info" streamable="true" mime_type="text/plain" file_suffix=".txt"/>
+        <result type="debug" ID="insitu_grid_debug" file_suffix=".txt"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <operation chained="true" name="Make KML File" ID="kml" service_action="kml_placemarks_osmc">
+      <args>
+        <arg chained="true" type="text" operation="OSMC_Grid_for_GE" result="ferret_listing"/>
+        <arg chained="true" type="text" operation="OSMC_Grid_for_GE" result="las_request_info"/>
+      </args>
+      <response ID="KMLResp" type="HTML" index="1">
+        <result type="kml" ID="kml" streamable="true" mime_type="application/vnd.google-earth.kml+xml" file_suffix=".kml"/>
+        <result type="kmz" ID="kmz" streamable="true" mime_type="application/vnd.google-earth.kmz" file_suffix=".kmz"/>
+      </response>
+      <service>kml</service>
+    </operation>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+  </operation>
+  <!--end: placemarks for OSMC -->
+  <operation ID="Shape_File" output_template="output_shape_file" category="file" name="Shape File Output">
+    <operation name="NetCDF file" ID="Data_Extract_netCDF" output_template="netcdf" service_action="Data_Extract_netCDF" order="0500" category="file">
+      <service>ferret</service>
+      <response ID="Data_Extract_netCDF_Response">
+        <result type="netcdf" ID="ferret_listing" file_suffix=".nc"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+      </response>
+      <region>
+        <intervals name="xy"/>
+      </region>
+      <grid_types>
+        <grid_type name="regular"/>
+      </grid_types>
+      <optiondef IDREF="Options_Data"/>
+    </operation>
+    <operation chained="true" name="Make Shape File" ID="Make_Shape_file" service_action="shape_file">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="Data_Extract_netCDF" result="ferret_listing" file_suffix=".nc"/>
+      </args>
+      <response ID="Shape_File_Resp" type="HTML" index="1">
+        <result type="dir" ID="dir" streamable="false" file_suffix=".dir"/>
+        <result type="dbf" ID="dbf" streamable="false" file_suffix=".dbf"/>
+        <result type="shp" ID="shp" streamable="false" file_suffix=".shp"/>
+        <result type="shx" ID="shx" streamable="false" file_suffix=".shx"/>
+        <result type="zip" ID="zip" streamable="false" file_suffix=".zip"/>
+      </response>
+      <service>shape</service>
+    </operation>
+    <region>
+      <intervals name="xy"/>
+    </region>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+  </operation>
+  <operation default="false" category="visualization" name="Property Property Plot" ID="prop_prop_plot" service_action="prop_prop_plot" output_template="zoom" minvars="2" maxvars="3">
+    <response ID="PlotResp" type="HTML" index="1">
+      <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+      <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+      <result type="debug" ID="debug" file_suffix=".txt"/>
+      <result type="xml" ID="webrowset" file_suffix=".xml"/>
+      <result type="cancel" ID="cancel"/>
+    </response>
+    <region>
+      <intervals name="xy" abstract="true" type="Scatter Plots" title="Property-Property"/>
+      <degenerate/>
+    </region>
+    <axis_labels>
+      <label name="on horizontal axis"/>
+      <label name="on vertical axis"/>
+      <label name="on color scale"/>
+    </axis_labels>
+    <grid_types>
+      <grid_type name="regular"/>
+    </grid_types>
+    <service>ferret</service>
+  </operation>
+  <operation default="true" category="visualization" name="Property Property Plot" ID="prop_prop_plot_insitu" output_template="zoom" minvars="2" maxvars="3">
+    <operation name="Database Extraction" ID="DBExtract" output_template="ascii" service_action="prop_prop_sql">
+      <response ID="DBExtractResponse">
+        <result type="debug" ID="db_debug" file_suffix=".txt"/>
+        <result type="netCDF" ID="netcdf" file_suffix=".nc"/>
+      </response>
+      <service>database</service>
+      <properties>
+        <property_group type="backend_request">
+          <property>
+            <name>exclude</name>
+            <value>ferret</value>
+          </property>
+        </property_group>
+      </properties>
+    </operation>
+    <operation chained="true" name="Property Property Plot" ID="prop_prop_plot_insitu" output_template="zoom" service_action="prop_prop_plot">
+      <args>
+        <arg chained="true" type="variable" index="1" operation="DBExtract" result="netcdf"/>
+        <arg type="region" index="1" ID="in-situ-Region"/>
+      </args>
+      <response ID="PlotResp" type="HTML" index="1">
+        <result type="image" ID="plot_image" streamable="true" mime_type="image/png" file_suffix=".png"/>
+        <result type="debug" ID="debug" file_suffix=".txt"/>
+        <result type="map_scale" ID="map_scale" file_suffix=".xml"/>
+        <result type="cancel" ID="cancel"/>
+      </response>
+      <service>ferret</service>
+    </operation>
+    <region>
+      <intervals name="xy" abstract="true" type="Scatter Plots" title="Property-Property"/>
+      <degenerate/>
+    </region>
+    <grid_types>
+      <grid_type name="scattered"/>
+    </grid_types>
+    <service>ferret</service>
+  </operation>
+</operations>

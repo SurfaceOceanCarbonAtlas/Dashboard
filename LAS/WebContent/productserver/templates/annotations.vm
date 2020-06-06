@@ -1,0 +1,67 @@
+  <div style="background-color:#FFF;padding:4px">
+<style>
+.title {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+color: #000000;
+font-weight: normal;
+text-align:left;
+}
+.url {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+color: #000000;
+text-align:left;
+}
+.footer {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+color: #000000;
+text-align:right;
+}
+.regular {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+color: #000000;
+text-align:left;
+}
+</style>
+     <table width="100%">
+      
+    	#foreach ( $title in $las_annotations.getDatasetTitles() )
+           <tr  width="100%">
+    		<td class="title">
+    		$title
+    		#foreach ( $id in $las_annotations.getDatasetIDs() )
+    		    <a href="$base_server_url/getMetadata.do?dsid=$id" target="_blank"><img src="$base_server_url/JavaScript/components/images/info.png"/></a>
+    		#end
+    		</td>
+           </tr>
+	    #end
+    	#foreach ( $title in $las_annotations.getVariableTitles() )
+           <tr width="100%">
+    		<td class="title">VARIABLE: $title</td>
+           <tr>
+	    #end
+    	#foreach ( $axis in $las_annotations.getOrthogonalAxes() )
+           <tr width="100%">
+    		<td class="regular">$axis</td>
+           </tr>
+	    #end
+    	#foreach ( $url in $las_annotations.getDatasetURLs() )
+           <tr width="100%">
+    		<td width="100%"class="url" >$url</td>
+           </tr>
+	    #end
+           <tr width="100%">
+             <td class="regular">
+       	     <ul>
+	    #foreach ($note in $las_annotations.getNotes() )
+	        <li>$note</li>
+    	    #end
+       	    </ul>
+           </td>
+          </tr>
+          <tr width="100%">
+             <td class="regular">
+                 $las_annotations.getHeader()
+             </td>
+          </tr>
+   </table>
+  </div>

@@ -1,0 +1,108 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LAS_initialize_feature_id.jnl
+!
+! Define variables and symbols based on feature (trajecotory or profile)
+! identification variables
+!
+! FEATURES      - unique identifier for each cruise
+! FEATURE_COUNTS - number of points per trajectory  Now use symbol rowvar
+
+IF ($nodata"0|*>1") THEN EXIT/SCRIPT
+IF `($ferret_memory"25.6") LT 200` THEN SET MEM/siz=200
+
+! Create the 'feature_evnt' variable which increments for each new trajectory.
+
+! NOTE:  The calculation of individual cruises only works if the 
+! NOTE:  intermediate netCDF files is ordered by cruise_ID.  Make sure that
+! NOTE:  the SQL query ends with:  'ORDER BY cruise_ID'.
+
+DEFINE SYMBOL feature_max_labels = 200
+DEFINE SYMBOL numobs `($ferret_plot_var),return = isize`
+
+LET featurevar = ($rowvar)
+LET nfeatures = `featurevar,RETURN=($rind)size`
+
+!If undefined, set up the feature_numbers variable
+DEFINE AXIS/X=1:`nfeatures`:1 xfeature_axis
+
+IF `($have_feature_nums"0|*>1") EQ 0` THEN LET feature_numbers = x[gx=xfeature_axis]
+
+! rind is direction of rowsize, defined in feature_initialize
+LET longest = featurevar[($rind)=@max]+2
+
+LET data_var_c =  EXPNDI_BY_Z_COUNTS(longitude, xsequence(featurevar),`longest`)
+LET id_by_c =  EXPNDI_ID_BY_Z_COUNTS(xsequence(featurevar),`longest`)
+
+! If dsg file then these symbols are set up.
+IF `($data_($num)_var"0|($feature_variable)>1|*>0") AND ($rowvar"0|*>1")` THEN 
+   LET data_var_id = EXPND_BY_LEN(feature_numbers,($rowvar), `($rowvar)[M=@sum]`)
+   IF ($feature_type"0|*>1") THEN SET VAR/TITLE="($feature_type) ID" data_var_id
+   DEFINE SYMBOL data_var = data_var_id
+   EXIT/SCRIPT
+ENDIF
+
+IF `($its_prop_prop_plot"0|*>1") EQ 0` THEN
+   LET data_var_id = EXPND_BY_LEN(feature_numbers,XSEQUENCE(featurevar), `featurevar[M=@sum]`)
+   IF ($feature_type"0|*>1") THEN SET VAR/TITLE="($feature_type) ID" data_var_id
+   DEFINE SYMBOL data_var = data_var_id
+  
+   EXIT/SCRIPT
+ENDIF
+
+! If  a subset of cruise ids is given then only plot those on a Prop/Prop 
+! plot, but using the symbols and colors as determined by the whole dataset.
+! If given, traj_list is a list of numbers.
+
+   IF ($ferret_traj_list"0|*>1") THEN
+      LET subset_ids = {($ferret_traj_list)}
+      LET n_subset = `subset_ids,RETURN=isize`
+
+! Define a mask to use on the entire list of values: plot or not to plot
+! the polygons on the prop-prop plot.
+     
+      LET subm_ids = IF ELEMENT_INDEX(traj_numbers,subset_ids) THEN 1
+      IF `($subset_mask"0|*>1") EQ 0` THEN LET subset_mask = subm_ids + 0*x[x=1:`ntrajs`]  ! put it on a non-abstract axis. 
+
+! apply mask as data_var_c* subset_mask
+
+      LET n_subset = `subset_mask[I=@NGD]`
+      DEFINE SYMBOL cruises_shown = `n_subset`
+      DEFINE SYMBOL prof_traj_shown = `n_subset`
+   ELSE
+
+! There may be a subset already defined from ferret_cruise_list
+
+      IF `($subset_mask"0|*>1") EQ 0` THEN LET subset_mask = 1 + 0*i[i=1:`nfeatures`]
+      
+      LET n_subset = `subset_mask[I=@NGD]`
+      DEFINE SYMBOL cruises_shown = `n_subset`
+      DEFINE SYMBOL prof_traj_shown = `n_subset`
+   ENDIF
+
+! Make time symbols w/o the trailing 00:00:00
+
+IF ($region_0_t_lo"0|*>1") THEN
+   DEFINE SYMBOL t_lab_lo = ($region_0_t_lo)
+   LET iz = STRINDEX("($region_0_t_lo)", " 00:00:00")
+   IF `iz GT 0` THEN 
+      DEFINE SYMBOL t_lab_lo = `SUBSTRING("($region_0_t_lo)", 1, iz-1)`
+   ELSE
+      LET iz = STRINDEX("($region_0_t_lo)", ":00:00")
+      IF `iz GT 0` THEN DEFINE SYMBOL t_lab_lo = `SUBSTRING("($region_0_t_lo)", 1, iz-1)`
+   ENDIF
+ENDIF 
+
+IF `STRCMP("($region_0_t_lo)", "($region_0_t_hi)") EQ 0` THEN  EXIT/SCRIPT
+
+IF ($region_0_t_hi"0|*>1") THEN
+   DEFINE SYMBOL t_lab_hi = ($region_0_t_hi)
+   LET iz = STRINDEX("($region_0_t_hi)", " 00:00:00")
+   IF `iz GT 0` THEN 
+      DEFINE SYMBOL t_lab_hi = `SUBSTRING("($region_0_t_hi)", 1, iz-1)`
+   ELSE
+      LET iz = STRINDEX("($region_0_t_hi)", ":00:00")
+      IF `iz GT 0` THEN DEFINE SYMBOL t_lab_hi = `SUBSTRING("($region_0_t_hi)", 1, iz-1)`
+   ENDIF
+ENDIF
+
+!---------------- end of LAS_initialize_feature_id.jnl -------------------------

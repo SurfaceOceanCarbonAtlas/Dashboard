@@ -1,0 +1,150 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! line_plot_1D.jnl,v $
+! 
+! Author: ansley 
+! Date: 2006/07/11 22:40:08 
+! 3/7/2007: ACM. Put code to check that the region was not too small, resulting 
+!           in degenerate plot into LAS_initialize_data.jnl rather than in the 
+!           individual plot scripts.
+! 3/29/2007 ACM Fix logic interpreting contents of ferret_interpolate_data 
+! 7/2010    ACM updates for V7.2 multi-variable plots
+!11/2011    ACM Consolidate line plots into one script.
+!12/11/2017 Fixes for datast configs with vars in different urls
+!
+! line_plot_1D.jnl creates a line plot for use with the Back End Server
+! code that sits behind a Live Access Server (LAS). 
+!
+
+SET MODE verify:always  ! allows for debugging
+
+! Set any Ferret modes
+!
+IF ($ferret_interpolate_data%0|false>0|true>1|1|0|*>1%) THEN SET MODE INTERPOLATE
+
+DEFINE SYMBOL fview = `UPCASE("($ferret_view)")`
+
+! Define symbols associated with the region and data and perform any
+! initialization needed for this dataset.
+
+GO LAS_initialize_region 0
+GO LAS_initialize_data 0
+DEFINE SYMBOL ferret_plot_var_0 = ($ferret_plot_var)
+
+! Check for errors (They often occur during dataset initialization.)
+
+IF ($error_status"0|*>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Check whether the region is too small; reduces to a single grid point.
+! (Region is a point)
+GO LAS_check_1d_region
+
+! Check for errors 
+IF ($error_status"0|ERROR>1") THEN
+  MESSAGE/ERROR **ERROR ($error_string)
+  EXIT/PROGRAM
+ENDIF
+
+! Here is variable 0 title
+DEFINE SYMBOL ferret_title_0 = ($ferret_plot_title"($data_var)")
+LET title_len = STRLEN("($ferret_title_0)")
+
+! Initialize further variables
+! Ignore line color if this is a multi-var plot.
+! Also ignore any request for trend-line plots.
+
+IF `($data_count) GT 1` THEN 
+
+   REPEAT/RANGE=1:`($data_count)-1`/NAME=q (\
+     DEFINE SYMBOL q = `q`;\
+     GO LAS_initialize_region ($q);\
+     GO LAS_initialize_data  ($q);\
+    DEFINE SYMBOL ferret_plot_var_($q) = ($ferret_plot_var);\
+    )
+
+   DEFINE SYMBOL itsa_multi_lineplot = 1
+   DEFINE SYMBOL do_legend = 1
+   CANCEL SYMBOL ferret_trend_line
+ENDIF
+
+! Use Ferret properties to set up the plot qualifiers
+GO LAS_set_plot_qualifiers
+
+! symbols and/or line
+GO set_linesym
+
+! Open the window, apply size, scale options
+GO LAS_open_window
+
+! Set the plot argument. If there are multiple variables, plot them
+! all at once to get Ferret auto-scaling of the dependent axis.
+
+DEFINE SYMBOL plot_arg = ($ferret_plot_var)
+DEFINE SYMBOL plot_title = ($ferret_plot_title)
+
+! Apply any expression only to the first variable not to subsequent ones
+CANCEL SYMBOL ferret_expression 
+
+! Draw the plot
+
+IF `($data_count"0") GT 1` THEN
+
+   IF ($ferret_view"0|z>1|*>0") THEN 
+      GO LAS_draw_multi_line_z_plot
+   ELSE
+      GO LAS_draw_multi_line_plot
+   ENDIF
+   GO LAS_url_label `($data_count)-1`
+
+ELSE
+
+   DEFINE SYMBOL split_title = ($ferret_title_0)
+   GO LAS_split_title
+   DEFINE SYMBOL ferret_title_0 = ($split_title)
+   
+   IF ($ferret_trend_line"0|*>1") THEN  
+
+      GO trend_line
+
+   ELSE
+
+      PLOT($qualifiers)/NOKEY/SET/TITLE="($ferret_title_0)" ($plot_arg)
+
+         IF ($ferret_dep_axis_scale"0|*>1") THEN 
+	    IF ($ferret_view"0|z>1|*>0") THEN 
+               PPL XAXIS ($ferret_dep_axis_scale)
+	    ELSE
+	       PPL YAXIS ($ferret_dep_axis_scale)
+            ENDIF
+         ENDIF
+	 IF ($ferret_view"0|e>1|*>0") THEN PPL axlint,0,  ! custom e-axis labels
+
+         GO reset_labels
+      PPL PLOT
+
+   ENDIF
+   GO LAS_url_label 0
+
+ENDIF
+
+! Add labels at the top for the location of overlaid lines
+! and for URLs if they exist  
+
+GO labels_above_plot
+
+
+! Set up so zooming works on plots with trend lines.
+IF ($ferret_trend_line"0|1|2>1") THEN GO reset_after_trend
+
+! Save the results
+
+DEFINE SYMBOL result_type = ($ferret_view)line
+IF `STRINDEX("($ferret_view)", "t") GT 0 OR STRINDEX("($ferret_view)", "z") GT 0` THEN\
+  DEFINE SYMBOL result_type = point
+GO LAS_results ($result_type)
+
+
+! End of file ------------ line_plot_1D.jnl--------------------------
+

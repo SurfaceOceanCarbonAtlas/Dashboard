@@ -1,0 +1,117 @@
+! feature_lon_lat_time_depth.jnl
+
+! Use file attributes to find which variables correspond to
+! longitude, latitude, time in a Trajectory file
+
+GO feature_get_direction_vars
+
+IF ($data_x_var"0|*>1") THEN DEFINE SYMBOL original_longi_var = ($data_x_var)
+IF ($data_y_var"0|*>1") THEN DEFINE SYMBOL original_lati_var  = ($data_y_var)
+IF ($data_z_var"0|*>1") THEN DEFINE SYMBOL original_vert_var  = ($data_z_var)
+IF ($data_t_var"0|*>1") THEN DEFINE SYMBOL original_time_var  = ($data_t_var)
+
+! Are longitude and latitude on the E axis of the dsg file? (profile data)
+! Expand them, making sure the result is on the obs axis not abstract axis.
+! List them in skip_list_var so they dont get listed in file outputs.
+
+sh sym its_trajectory_map
+sh sym its_profile_map
+sh sym data_x_var,data_y_var, data_t_var
+IF ($its_profile_map"0|*>1") then exit/script
+
+
+LET rowsum = ($rowvar)[m=@sum]
+
+DEFINE SYMBOL vshape = `($data_x_var),RETURN=shape`
+IF `($vshape"0|E>1|POINT>1|*>0)` THEN
+   DEFINE SYMBOL ($data_x_var)_name = ($data_x_var)
+   SET VAR/NAME=($data_x_var)_M ($data_x_var)
+   LET ($($data_x_var)_name)_x = EXPND_BY_LEN(($data_x_var)_M, ($rowvar), rowsum)
+   LET/units="`($data_x_var)_M,return=units`"/TITLE="`($data_x_var)_M,RETURN=title`" \
+    ($($data_x_var)_name) = ($($data_x_var)_name)_x[gx=obsXvar@ASN]
+   DEFINE SYMBOL skip_list_var = ($skip_list_var) ($data_x_var)_M
+ENDIF
+
+DEFINE SYMBOL vshape = `($data_y_var),RETURN=shape`
+IF `($vshape"0|E>1|POINT>1|*>0)` THEN
+   DEFINE SYMBOL ($data_y_var)_name = ($data_y_var)
+   SET VAR/NAME=($data_y_var)_M ($data_y_var)
+   LET ($($data_y_var)_name)_y = EXPND_BY_LEN(($data_y_var)_M, ($rowvar), rowsum)
+   LET/units="`($data_y_var)_M,return=units`"/TITLE="`($data_y_var)_M,RETURN=title`" \
+    ($($data_y_var)_name) = ($($data_y_var)_name)_y[gx=obsXvar@ASN]
+   DEFINE SYMBOL skip_list_var = ($skip_list_var) ($data_y_var)_M
+ENDIF
+
+DEFINE SYMBOL vshape = `($data_t_var),RETURN=shape`
+IF `($vshape"0|E>1|POINT>1|*>0)` THEN
+   DEFINE SYMBOL ($data_t_var)_name = ($data_t_var)
+   SET VAR/NAME=($data_t_var)_M ($data_t_var)
+   LET ($($data_t_var)_name)_y = EXPND_BY_LEN(($data_t_var)_M, ($rowvar), rowsum)
+   LET/units="`($data_t_var)_M,return=units`"/TITLE="`($data_t_var)_M,RETURN=title`" \
+    ($($data_t_var)_name) = ($($data_t_var)_name)_y[gx=obsXvar@ASN]
+   DEFINE ATTRIBUTE ($($data_t_var)_name).time_origin = "`($data_t_var)_M.time_origin`"
+   DEFINE SYMBOL skip_list_var = ($skip_list_var) ($data_t_var)_M
+ENDIF
+
+! If the data was expanded above, we need to redefine these variables,
+! used in synthesizing feature names when there is no name in the datset
+
+IF `($feature_name_list"0|*>1") AND ($skip_list_var"0|*>1")` THEN
+
+   LET xlon_for_name = XSEQUENCE(IF ($data_x_var)_M GE 0 THEN ($data_x_var)_M ELSE ($data_x_var)_M+360 )
+   LET xlat_for_name = XSEQUENCE(($data_y_var)_M)
+   LET xtim_for_name = XSEQUENCE(($data_t_var)_M)
+	 
+ENDIF
+
+IF `($data_x_var%0|*>1%) + ($data_y_var%0|*>1%) LT 2` THEN
+   MESSAGE/ERROR **ERROR Dataset must contain a Lon variable and a Lat variable
+   EXIT/PROGRAM
+ENDIF
+
+IF `($its_trajectory_map"0|*>1") OR ($its_profile_map"0|*>1")` THEN
+   IF ($rowvar"0|*>1") THEN DEFINE SYMBOL rowvar = rowsize
+
+   DEFINE SYMBOL vshape = `($data_x_var),RETURN=shape`
+   IF `($vshape"0|E>1|POINT>1|*>0) AND  (STRCMP("($data_x_var)", "($feature_variable)") NE 0)` THEN
+
+! Expand feature variable into obs axis
+      LET/TITLE="($ferret_title_0)" data_x_var_expand = EXPND_BY_LEN(($data_x_var), ($rowvar), rowsum)
+      DEFINE SYMBOL data_x_var = data_x_var_expand
+
+   ENDIF
+
+   DEFINE SYMBOL vshape = `($data_y_var),RETURN=shape`
+   IF `($vshape"0|E>1|POINT>1|*>0) AND  (STRCMP("($data_y_var)", "($feature_variable)") NE 0)` THEN
+
+! Expand feature variable into obs axis
+      LET/TITLE="($ferret_title_0)" data_y_var_expand = EXPND_BY_LEN(($data_y_var), ($rowvar), rowsum)
+      DEFINE SYMBOL data_y_var = data_y_var_expand
+
+   ENDIF
+
+   IF ($data_z_var"0|*>1") THEN
+   DEFINE SYMBOL vshape = `($data_z_var),RETURN=shape`
+   IF `($vshape"0|E>1|POINT>1|*>0) AND  (STRCMP("($data_z_var)", "($feature_variable)") NE 0)` THEN
+
+! Expand feature variable into obs axis
+      LET/TITLE="($ferret_title_0)" data_z_var_expand = EXPND_BY_LEN(($data_z_var), ($rowvar), rowsum)
+      DEFINE SYMBOL data_z_var = data_z_var_expand
+
+   ENDIF
+   ENDIF  ! IF ($data_z_var)
+
+   IF ($data_t_var"0|*>1") THEN
+   DEFINE SYMBOL vshape = `($data_t_var),RETURN=shape`
+   IF `($vshape"0|E>1|POINT>1|*>0) AND  (STRCMP("($data_t_var)", "($feature_variable)") NE 0)` THEN
+
+! Expand feature variable into obs axis
+      LET/TITLE="($ferret_title_0)" data_t_var_expand = EXPND_BY_LEN(($data_t_var), ($rowvar), rowsum)
+      DEFINE SYMBOL data_t_var = data_t_var_expand
+
+   ENDIF
+   ENDIF  ! IF ($data_t_var)
+
+ENDIF
+
+!---------------- end of feature_lon_lat_time_depth.jnl -------------------------

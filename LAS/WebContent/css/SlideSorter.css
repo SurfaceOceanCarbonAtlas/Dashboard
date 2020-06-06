@@ -1,0 +1,88 @@
+@charset "utf-8";
+/* CSS Document */
+body {
+  background-color: #CCC;
+}
+
+/*
+ * # Signifies elements identified by 'id' 
+ */
+
+/* Overall table */
+
+#LSS_Table {
+  background-color: #FFF;
+  border-spacing: 4px;
+  color: black;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+#LSS_Table .LSS_banner {
+  color: #579;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Options row */
+
+#LSS_Table .LSS_optionTable {
+  background-color: #ACE;
+  border-spacing: 0;
+  padding: 6px;
+}
+
+#Apply {
+  border-top: solid 2px #EDD;
+  border-left: solid 2px #EDD;
+  border-bottom: solid 2px #EAA;
+  border-right: solid 2px #EAA;
+  font-size: 14px;
+  font-weight: normal;
+  padding: 0px 4px 2px 4px;
+}
+
+/* Control row */
+
+#LSS_controlTable {
+  background-color: #ACE;
+  border: solid 2px black;
+  padding: 4px;
+  width: 100%;
+}
+
+#LSS_G1Title {
+  color: #D33;
+  font-weight: bold;
+}
+
+#LSS_G1Bold {
+  color: #000;
+  font-weight: bold;
+}
+
+/* Images row */
+
+#LSS_imagesTable {
+  padding: 0px;
+}
+
+/*
+ * . Signifies elements identified by 'class'
+ */
+
+.LSS_imageCell {
+  padding: 2px;
+  text-align: center;
+}
+
+.LSS_imageCell img{
+  border: none;
+}
+
+.LSS_imageCell table {
+  background-color: #ACE;
+}
+

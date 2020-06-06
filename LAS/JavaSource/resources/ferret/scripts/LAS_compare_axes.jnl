@@ -1,0 +1,29 @@
+
+! Compare the grids of two variables in the specified direction. They must be the same.
+
+DEFINE SYMBOL var1 = $1
+DEFINE SYMBOL var2 = $2
+
+LET ndim = STRLEN("($3)")
+DEFINE SYMBOL dim1 = `SUBSTRING("($3)", 1,1)`
+
+
+DEFINE SYMBOL ax1 = `($var1),RETURN=($dim1)axis`
+DEFINE SYMBOL ax2 = `($var2),RETURN=($dim1)axis`
+IF `STRCMP("($ax1)", "($ax2)") NE 0` THEN 
+   DEFINE SYMBOL error_status = ERROR
+   DEFINE SYMBOL error_type = GRID
+   EXIT/SCRIPT
+ENDIF
+
+IF `ndim GT 1` THEN 
+   DEFINE SYMBOL dim2 = `SUBSTRING("($3)", 2,1)`
+
+   DEFINE SYMBOL ax1 = `($var1),RETURN=($dim1)axis`
+   DEFINE SYMBOL ax2 = `($var2),RETURN=($dim1)axis`
+   IF `STRCMP("($ax1)", "($ax2)") NE 0` THEN 
+      DEFINE SYMBOL error_status = ERROR
+      DEFINE SYMBOL error_type = GRID
+      EXIT/SCRIPT
+   ENDIF
+ENDIF

@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Standards Mode", which gives better cross    -->
+<!-- browser compatibility to the application.     -->
+<!-- Omitting this line leaves most browsers in    -->
+<!-- "Quirks mode", emulating the bugs in older    -->
+<!-- browser versions.                             -->
+
+<html>
+  <head>
+    <!-- Let IE know to use the IE9 standard browser and document modes -->
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>LAS Correlation Viewer (Beta)</title>
+    
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <!--  strider.weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xSi6Ygk863vw1oXTT1cyritDYiIOhSs8NJgobGDysmECbXI_Ld9bweUlA"
+      type="text/javascript"></script>
+    -->
+    <!--  weathertopconsulting.com 
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xTCqQI3Sj7hqI6Uh8C-ytlVpmJc8xS3dXHdpRVUOyawacVodlU95YCvWg"
+      type="text/javascript"></script>
+    -->
+    <!-- localhost
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAQd8QHM5bG96kv_FdbP2d_xT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRutBJbRgJeVagWzAByU3KazihaXg"
+      type="text/javascript"></script>
+       -->
+    <script type="text/javascript" language="javascript" src="JavaScript/components/DateWidget.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/components/LASRequest.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/components/xmldom.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayers/OpenLayers.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/DrawSingleFeature.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/HorizontalPath.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/VerticalPath.js"></script>
+    <script type="text/javascript" language="javascript" src="JavaScript/frameworks/OpenLayersExtensions/JumpPath.js"></script>
+    
+    <script type="text/javascript" language="javascript" src="JavaScript/components/gov.noaa.pmel.tmap.las.SPPV/gov.noaa.pmel.tmap.las.SPPV.nocache.js"></script>
+    <link rel="stylesheet" href="JavaScript/components/css/OLMapWidget.css" type="text/css">
+    <link rel="stylesheet" href="JavaScript/components/css/LAS.css" type="text/css">
+    <link rel="stylesheet" href="JavaScript/ui/LASUI.css" type="text/css"/>
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+  <body>
+  #parse ("productserver/templates/CVHeader.vm")
+  <table class="allBorder" >
+  <tr>
+  <td style="vertical-align:top;" id="leftPadding">
+     <div style="padding:10px" id="icons"></div>
+  </td>
+  <td class="regularBackground" width="409px" style="vertical-align:top;word-wrap:pre;" id="leftControls">
+    <div style="padding:0px 10px 10px 10px"  class="regularBackground" id="button_panel"></div>
+    <div style="padding:10px" id="space_time_constraints"></div>
+    <div style="padding:0px 10px 10px 10px" class="regularBackground noBottomBorder" id="data_selection"></div>
+    <div style="padding:0px 10px 10px 10px" class="regularBackground noTopBottomBorder" id="data_constraints"></div>
+  </td>
+  <td style="vertical-align:top;" id="correlationOutputs">
+     <div style="padding:10px" id="correlation"></div>
+  </td>
+  </tr>
+ </table>
+ #parse("productserver/templates/V7UIFooter.vm")
+    <!-- OPTIONAL: include this if you want history support -->
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>			
+  </body>
+</html>
