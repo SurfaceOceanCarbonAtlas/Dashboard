@@ -7,7 +7,7 @@ can mode upcase
 use SOCAT_tracks_gridded_monthly.nc
 set mem/siz=70
 
-define symbol outfile = SOCAT_tracks_gridded_decades.nc
+define symbol outfile = SOCAT_tracks_gridded_decadal.nc
 sp rm -f outfile
 
 

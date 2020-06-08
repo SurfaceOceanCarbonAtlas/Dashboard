@@ -16,7 +16,7 @@ GO add_global_attribute SOCAT_qrtrdeg_gridded_coast_monthly.nc
 
 use coast_mask_quarter_noland.nc
 
-use SOCAT_tracks_gridded_monthly_quarterdeg_count_ncruise.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_count_ncruise.nc
 let/units="`count_ncruise,return=units`"/title="`count_ncruise,return=title`" coast_count_ncruise = count_ncruise* coast_mask[d=1]
 
 ! Set up loop to save as compressed data 200 timesteps at a time
@@ -42,7 +42,10 @@ cancel var coast_count_ncruise
 use ($outfile)
 show data 2
 show data 3
-show grid coast_count_ncruise; say check time axes; pause
+show grid coast_count_ncruise
+say "*************************"
+say "**** check time axes ****"
+say "*************************"
 can data 3
 
 DEFINE SYMBOL var = fco2
@@ -68,7 +71,7 @@ let L2 = `L2+del`;\
 IF `L2 GT Ln` THEN LET L2 = `Ln`)
 
 can data 2
-use SOCAT_tracks_gridded_monthly_quarterdeg_lon_offset_unwtd.nc"
+use SOCAT_tracks_gridded_monthly_quarterdeg_lon_offset_unwtd.nc
 let/units="`lon_offset_unwtd,return=units`"/title="`lon_offset_unwtd,return=title`" coast_lon_offset_unwtd = lon_offset_unwtd* coast_mask[d=1]
 
 let L1 = 1

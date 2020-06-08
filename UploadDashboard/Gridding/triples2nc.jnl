@@ -43,7 +43,7 @@ let date = day1970 + time/24
 set variable/units="Days since 1970-01-01" date
 
 define axis/t=`date[i=@min],prec=10`:`date[i=@max],prec=10`:1/t0=01-JAN-1970/units=days tax 
-sh axis tax; pause
+sh axis tax
 
 sh dat 
 sh var
