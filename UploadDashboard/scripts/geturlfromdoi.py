@@ -87,8 +87,8 @@ def getUrlFromDoi(mydoi, mydoiurldict):
             except KeyError:
                 time.sleep(1)
                 suburl = readUrlFromDoi(subdoi)
-                if suburl:
-                    mydoiurldict[subdoi] = suburl
+                # record it even if it failed so it won't try it again
+                mydoiurldict[subdoi] = suburl
             if suburl and suburl not in urllist:
                 urllist.append(suburl)
         for suburl in urllist:
