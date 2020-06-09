@@ -18,10 +18,10 @@ ACCESSXML_URL = re.compile(r'https://www\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.x
 TESTDATA_URL = re.compile(r'https://test\.nodc\.noaa\.gov/ocads/data/([0-9]+)\.xml$', re.IGNORECASE)
 
 
-def getUrlFromDoi(mydoi):
+def readUrlFromDoi(mydoi):
     # type: (str) -> (str,None)
     """
-        Gets the endpoint URL for the given DOI.  If the endpoint URL matches one of the OCADS URLs
+        Reads the endpoint URL for the given DOI.  If the endpoint URL matches one of the OCADS URLs
         with a accession ID, checks if the standard https://accession.nod.noaa/gov/<accessionID>
         landing page URL (if not that URL already), redirects to the same page.  If so, returns this
         standard landing page URL; otherwise, returns the endpoint URL.
@@ -62,6 +62,90 @@ def getUrlFromDoi(mydoi):
     return endurl
 
 
+def getUrlFromDoi(mydoi, mydoiurldict):
+    # type: (str, dict) -> str
+    """
+        Return the endpoint URL(s) for the given DOI(s).  The given dictionary for DOIs to URLs is first
+        searched.  If not found, the endpoint URL is obtained using readUrlFromDoi(str).  If a URL is
+        found, it is added to the dictionary with the DOI as the key.
+
+        :param mydoi: DOI to get the URL; can be multiple DOIs with space-semicolon-space separators
+        :param mydoiurldict: dictionary containing DOI:URL for DOIs already searched
+
+        :return: URL corresponding to the DOI, or None if the DOI is invalid.  If multiple DOIs are given,
+                 the URLs are returned in the same order with space-semicolon-space separators
+    """
+    myurl = None
+    try:
+        myurl = mydoiurldict[mydoi]
+    except KeyError:
+        # Possibility of multiple DOIs
+        urllist = []
+        for subdoi in mydoi.split(' ; '):
+            try:
+                suburl = mydoiurldict[subdoi]
+            except KeyError:
+                time.sleep(1)
+                suburl = readUrlFromDoi(subdoi)
+                if suburl:
+                    mydoiurldict[subdoi] = suburl
+            if suburl and suburl not in urllist:
+                urllist.append(suburl)
+        for suburl in urllist:
+            if not myurl:
+                myurl = suburl
+            else:
+                myurl += ' ; ' + suburl
+        if myurl:
+            mydoiurldict[mydoi] = myurl
+    return myurl
+
+
+def readDoiUrlFromPropFile(mypropfilename):
+    # type: (str) -> tuple[str,str]
+    """
+         Read the properties file with the given name and extract the DOI and URL from the file
+
+        :param mypropfilename: name (path optional) of the file to read
+
+        :return: (doi, url) where either or both could be None if not found
+
+        :raise ValueError: if more than property line matches the DOI or URL property being searched
+    """
+    ORIGDATADOI = "origdatadoi="
+    SOURCEDOI = "sourcedoi="
+    SOURCEURL = "sourceurl="
+
+    mydoi = None
+    myurl = None
+    propfile = open(mypropfilename)
+    try:
+        for propline in propfile:
+            propline = propline.strip()
+            if propline.startswith(ORIGDATADOI):
+                doival = propline[len(ORIGDATADOI):]
+                if doival:
+                    if mydoi:
+                        raise ValueError("More than one original-data DOI for " + propfilename)
+                    mydoi = doival
+            elif propline.startswith(SOURCEDOI):
+                doival = propline[len(SOURCEDOI):]
+                if doival:
+                    if mydoi:
+                        raise ValueError("More than one original-data DOI for " + propfilename)
+                    mydoi = doival
+            elif propline.startswith(SOURCEURL):
+                urlval = propline[len(SOURCEURL):]
+                if urlval:
+                    if myurl:
+                        raise ValueError("More than one original-data URL for " + propfilename)
+                    myurl = urlval
+
+    finally:
+        propfile.close()
+    return mydoi, myurl
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print('', file=sys.stderr)
@@ -80,72 +164,23 @@ if __name__ == "__main__":
         sys.exit(1)
     propnamesfilename = sys.argv[1]
 
-    ORIGDATADOI = "origdatadoi="
-    SOURCEDOI = "sourcedoi="
-    SOURCEURL = "sourceurl="
-
     doiurls = {}
     propnamesfile = open(propnamesfilename)
     try:
         for propfilename in propnamesfile:
-            propfilename = propfilename.strip()
-            propfile = open(propfilename)
             try:
-                for propline in propfile:
-                    propline = propline.strip()
-
-                    doi = None
+                (doi, url) = readDoiUrlFromPropFile(propfilename.strip())
+            except ValueError as ex:
+                print(ex, file=sys.stderr)
+                continue
+            if doi and not url:
+                try:
+                    url = getUrlFromDoi(doi, doiurls)
+                except Exception:
                     url = None
-                    if propline.startswith(ORIGDATADOI):
-                        doival = propline[len(ORIGDATADOI):]
-                        if doival:
-                            if doi:
-                                print("More than one original-data DOI for " + propfilename)
-                                continue
-                            doi = doival
-                    elif propline.startswith(SOURCEDOI):
-                        doival = propline[len(SOURCEDOI):]
-                        if doival:
-                            if doi:
-                                print("More than one original-data DOI for " + propfilename)
-                                continue
-                            doi = doival
-                    elif propline.startswith(SOURCEURL):
-                        urlval = propline[len(SOURCEURL):]
-                        if urlval:
-                            if url:
-                                print("More than one original-data URL for " + propfilename)
-                                continue
-                            url = urlval
-
-                    if doi and not url:
-                        try:
-                            url = doiurls[doi]
-                        except KeyError:
-                            # Possibility of multiple DOIs
-                            urllist = []
-                            for mydoi in doi.split(' ; '):
-                                try:
-                                    myurl = doiurls[mydoi]
-                                except KeyError:
-                                    time.sleep(1)
-                                    myurl = getUrlFromDoi(mydoi)
-                                    if myurl:
-                                        doiurls[mydoi] = myurl
-                                if myurl and myurl not in urllist:
-                                    urllist.append(myurl)
-                            for myurl in urllist:
-                                if not url:
-                                    url = myurl
-                                else:
-                                    url += ' ; ' + myurl
-                            if url:
-                                doiurls[doi] = url
-                        if url:
-                            print(propfilename + '\t' + url + '\t' + doi)
-                        else:
-                            print("No URL found for DOI " + doi + " given in " + propfilename, file=sys.stderr)
-            finally:
-                propfile.close()
+                if url:
+                    print(propfilename + '\t' + url + '\t' + doi)
+                else:
+                    print("No URL found for DOI " + doi + " given in " + propfilename, file=sys.stderr)
     finally:
         propnamesfile.close()
