@@ -168,8 +168,9 @@ if __name__ == "__main__":
     propnamesfile = open(propnamesfilename)
     try:
         for propfilename in propnamesfile:
+            propfilename = propfilename.strip()
             try:
-                (doi, url) = readDoiUrlFromPropFile(propfilename.strip())
+                (doi, url) = readDoiUrlFromPropFile(propfilename)
             except ValueError as ex:
                 print(ex, file=sys.stderr)
                 continue
