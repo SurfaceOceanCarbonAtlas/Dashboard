@@ -1,9 +1,8 @@
 #! /bin/sh
-export UPLOAD_DASHBOARD_SERVER_NAME="SOCATv2020"
+export UPLOAD_DASHBOARD_SERVER_NAME="SocatUploadDashboard"
 export CATALINA_BASE="${HOME}/Tomcat"
-export CATALINA_HOME="${CATALINA_BASE}"
-export DASHBOARD_WEBINF="${CATALINA_HOME}/webapps/SocatUploadDashboard/WEB-INF"
-export DASHBOARDAPPS_JAR="${CATALINA_HOME}/content/SocatUploadDashboard/scripts/SocatDashboardApps.jar"
+export DASHBOARD_WEBINF="${CATALINA_BASE}/webapps/SocatUploadDashboard/WEB-INF"
+export DASHBOARDAPPS_JAR="${CATALINA_BASE}/content/SocatUploadDashboard/scripts/SocatDashboardApps.jar"
 
 if [ ! -r "${DASHBOARDAPPS_JAR}" ]; then
     echo ""
