@@ -183,5 +183,10 @@ if __name__ == "__main__":
                     print(propfilename + '\t' + url + '\t' + doi)
                 else:
                     print("No URL found for DOI " + doi + " given in " + propfilename, file=sys.stderr)
+            elif doi and url:
+                print("URL " + url + " already given for DOI " + doi + " in " + propfilename, file=sys.stderr)
+            else:
+                print("No DOI given in " + propfilename, file=sys.stderr)
     finally:
         propnamesfile.close()
+
