@@ -1,5 +1,5 @@
 #! /bin/csh
-set cruisedir="${HOME}/Tomcat/content/SOCATv2020/CruiseFiles"
+set cruisedir="${HOME}/Tomcat/content/SocatUploadDashboard/CruiseFiles"
 if ( $# != 1 ) then
     echo ""
     echo "   Usage: $0 expocodes_file"

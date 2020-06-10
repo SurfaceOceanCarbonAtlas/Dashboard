@@ -1,6 +1,6 @@
 #! /bin/csh
 set currvers = "2020.0"
-set dsgsdir = "/home/data/socat/v2020/DsgNcFiles"
+set dsgsdir = "${HOME}/Tomcat/content/SocatUploadDashboard/DsgNcFiles"
 if ( $# != 2 ) then
     echo ""
     echo "Usage: $0 expocodes_file ignore_prev"
