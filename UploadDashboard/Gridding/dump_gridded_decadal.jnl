@@ -1,0 +1,65 @@
+! dump_gridded_decadal.jnl
+!
+! Creates a spreadsheet-like dump of the contents of SOCAT_tracks_gridded_decadal.nc as SOCAT_tracks_gridded_decadal.txt
+! Uses ncdump to dump the metadata preamble - goes to stdout
+! Then lists the axes - goes to stdout
+! Then lists the first point to get the header - goes to stdout
+! Then lists the actual data - goes to SOCAT_tracks_gridded_decadal.txt
+!
+! Edit the information printed to stdout and then append the actual data printout
+!
+
+CANCEL MODE VERIFY
+SET MEMORY/SIZE=4G
+CANCEL MODE UPCASE
+SET MODE DATE_FORMAT ISO
+
+SPAWN ncdump -h SOCAT_tracks_gridded_decadal.nc
+
+SAY
+
+USE SOCAT_tracks_gridded_decadal.nc
+SET GRID fco2_ave_weighted_decade
+SHOW GRID
+
+LET /TITLE="T-Axis Date" tax_date = TAX_DATESTRING(_T[g=fco2_ave_weighted_decade], fco2_ave_weighted_decade, "day")
+LOAD /PERM tax_date, count_ncruise_decade
+
+SAY
+SAY ******************************************************************************
+SAY **** NOTE: rows containing no data (cruise count is zero) are not printed ****
+SAY ******************************************************************************
+SAY
+
+LIST /QUIET /PREC=0 /WIDTH=5000 /HEAD /NOROWLAB /I=1 /J=1 /L=1 \
+    tax_date, _Y, _X, count_ncruise_decade, \
+    fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
+    sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
+    salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade
+
+SAY
+SAY Missing values are represented as "...."
+SAY
+
+SPAWN rm -f SOCAT_tracks_gridded_decadal.txt
+SET LIST /FILE=SOCAT_tracks_gridded_decadal.txt
+REPEAT /L=1:`count_ncruise_decade,RETURN=LEND` ( \
+    IF `count_ncruise_decade[X=@MAX,Y=@MAX]` THEN \
+        SAY L = `_L` ;\
+        REPEAT /J=1:`count_ncruise_decade,RETURN=JEND` ( \
+            IF `count_ncruise_decade[X=@MAX]` THEN \
+                SAY J = `_J` ;\
+                LOAD fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
+                     sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
+                     salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade ;\
+                REPEAT /I=1:`count_ncruise_decade,RETURN=IEND` ( \
+                    IF `count_ncruise_decade` THEN \
+                        LIST /QUIET /FILE /APPEND /PREC=6 /WIDTH=5000 /NOHEAD /NOROWLAB \
+                            tax_date, _Y, _X, count_ncruise_decade, \
+                            fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
+                            sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
+                            salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade \
+                ) \
+        ) \
+)
+
