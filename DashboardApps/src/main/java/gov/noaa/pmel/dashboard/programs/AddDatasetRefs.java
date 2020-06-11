@@ -132,7 +132,7 @@ public class AddDatasetRefs {
     /**
      * Creates and returns maps of expocodes to URLs and expocodes to DOIs in the specified file.
      * If multiple entries for an expocode are present, the URLs or DOIs are concatenated with
-     * semicolons.  Ignored blank lines and lines that start with a #
+     * space-semicolon-space.  Ignored blank lines and lines that start with a #
      *
      * @param refsFilename
      *         name of the file containing the expocode / URL / DOI data
