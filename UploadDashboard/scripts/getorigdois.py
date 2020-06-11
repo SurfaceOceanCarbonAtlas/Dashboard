@@ -44,14 +44,14 @@ def getExpocodeFromValue(myvalue):
 
 
 # skip any "DOIs" that do not match (start with) usual DOI pattern
-DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[A-Z0-9/_.-]+')
+DOI_REGEX = re.compile(r'[0-9]+\.[0-9]+/[a-z0-9/_.-]+')
 
 
 def getDOIFromValue(myvalue):
     # type: (str) -> (str, None)
     """
         Determines if the given value represents a DOI. Prior to examination, the value is converted
-        to uppercase, and whitespace is removed from each end.  If the DOI is in the form of a hyperlink
+        to lowercase, and whitespace is removed from each end.  If the DOI is in the form of a hyperlink
         to https://doi.org/, this prefix is removed to give the "bare" DOI value.
 
         :param myvalue: value to check
@@ -59,8 +59,8 @@ def getDOIFromValue(myvalue):
         :return: the "bare" DOI value if the value resembles a DOI,
                  or None if the value does not resemble a DOI
     """
-    mydoi = myvalue.strip().upper()
-    if mydoi.startswith('HTTPS://DOI.ORG/'):
+    mydoi = myvalue.strip().lower()
+    if mydoi.startswith('https://doi.org/'):
         mydoi = mydoi[16:]
     if not DOI_REGEX.match(mydoi):
         mydoi = None
