@@ -189,4 +189,3 @@ if __name__ == "__main__":
                 print("No DOI given in " + propfilename, file=sys.stderr)
     finally:
         propnamesfile.close()
-

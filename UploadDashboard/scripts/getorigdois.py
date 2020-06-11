@@ -79,14 +79,14 @@ class LinkedObject(object):
     """
 
     def __init__(self, fullname, attrs, prevobj):
-        # type: (str, object, LinkedObject) -> None
+        # type: (str, object, [LinkedObject,None]) -> None
         """
             Create with the given values for fullname, attrs, and prevobj.  The value attribute is
             assigned as an empty string.  The nextobj and parent attributes are assigned as None.
 
             :param fullname: value for the fullname attribute
             :param attrs: value for the attrs attribute
-            :param prevobj: value for the prevobj attribute, either None or another LinedObject
+            :param prevobj: value for the prevobj attribute, either None or another LinkedObject
         """
         self.fullname = fullname
         self.attrs = attrs
