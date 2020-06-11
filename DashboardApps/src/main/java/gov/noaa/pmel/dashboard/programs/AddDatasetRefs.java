@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
  */
 public class AddDatasetRefs {
 
-    private static final Pattern DOI_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+/[A-Z0-9/_.-]+");
+    private static final Pattern DOI_PATTERN = Pattern.compile("[0-9]+\\.[0-9]+/[0-9a-zA-Z/_.-]+");
 
     private final DataFileHandler dataHandler;
 
@@ -74,6 +74,8 @@ public class AddDatasetRefs {
                 String doi = origDoi.trim();
                 if ( !doi.isEmpty() ) {
                     cruise.setSourceDOI(doi);
+                    // Because the DOI changed, make sure the URL gets updated as well
+                    cruise.setSourceURL(null);
                     cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
                     msg = "updated the original-data DOI for " + upperExpo + " to " + doi + " and marking as archived";
                 }
@@ -99,6 +101,8 @@ public class AddDatasetRefs {
                 String doi = enhancedDoi.trim();
                 if ( !doi.isEmpty() ) {
                     cruise.setEnhancedDOI(doi);
+                    // Because the DOI changed, make sure the URL gets updated as well
+                    cruise.setEnhancedURL(null);
                     if ( msg != null )
                         msg += "\n";
                     else
@@ -174,7 +178,7 @@ public class AddDatasetRefs {
                     }
 
                     if ( refs.length > 2 ) {
-                        String doi = refs[2].trim().toUpperCase();
+                        String doi = refs[2].trim();
                         if ( !doi.isEmpty() ) {
                             if ( !DOI_PATTERN.matcher(doi).matches() )
                                 throw new IllegalArgumentException(dataline + ": invalid DOI");
