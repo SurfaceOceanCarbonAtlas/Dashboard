@@ -1,0 +1,57 @@
+! print_gridded_coastal.jnl
+!
+LET linear_ncruise = XSEQUENCE(coast_count_ncruise[L=($lidx)]) 
+LET mask = IF linear_ncruise THEN 1 
+LOAD mask
+DEFINE SYMBOL num_good = `mask[X=@NGD]`
+
+LET my_coast_time = _T[L=($lidx)] + 0.0 * _X + 0.0 * _Y 
+LET /TITLE="Time" /UNIT="days since 1900-01-01" valid_coast_time = COMPRESSI_BY(XSEQUENCE(my_coast_time), mask)
+SAVE /FILE=my_coast_time.nc /CLOBBER my_coast_time
+SAVE /I=1:($num_good) /FILE=valid_coast_time.nc /CLOBBER valid_coast_time
+CANCEL VAR valid_coast_time, my_coast_time
+
+LET my_coast_lat = _Y + 0.0 * _X + 0.0 * _T[L=($lidx)]
+LET /TITLE="Latitude" /UNIT="degrees_north" valid_coast_lat = COMPRESSI_BY(XSEQUENCE(my_coast_lat), mask)
+SAVE /I=1:($num_good) /FILE=valid_coast_lat.nc /CLOBBER valid_coast_lat
+CANCEL VAR valid_coast_lat, my_coast_lat
+
+LET my_coast_lon = _X + 0.0 * _Y + 0.0 * _T[T=($lidx)]
+LET /TITLE="Longitude" /UNIT="degrees_east" valid_coast_lon = COMPRESSI_BY(XSEQUENCE(my_coast_lon), mask)
+SAVE /I=1:($num_good) /FILE=valid_coast_lon.nc /CLOBBER valid_coast_lon
+CANCEL VAR valid_coast_lon, my_coast_lon
+
+REPEAT /RANGE=1:`vararray,RETURN=ISIZE` /NAME=idx (\
+   DEFINE SYMBOL varidx = `idx` ;\
+   DEFINE SYMBOL varname = `vararray[I=($varidx)]` ;\
+   LET /TITLE="`($varname),RETURN=TITLE`" /UNIT="`($varname),RETURN=UNIT`" valid_($varname) = COMPRESSI_BY(XSEQUENCE(($varname)[L=($lidx)]), mask) ;\
+   SAVE /I=1:($num_good) /FILE=valid_($varname).nc /CLOBBER valid_($varname) ;\
+   CANCEL VAR valid_($varname) ;\
+   CANCEL SYMBOL varname ;\
+   CANCEL SYMBOL varidx \
+)
+
+CANCEL SYMBOL num_good
+CANCEL VAR mask
+CANCEL VAR linear_ncruise
+CANCEL MEMORY /ALL
+
+USE my_coast_time.nc
+
+DEFINE DATA /AGGREGATE /U /HIDE valid_data = dataset_array
+
+LET valid_tax_date = TAX_DATESTRING(valid_coast_time, my_coast_time[d=my_coast_time], "day")
+
+LIST /ORDER=TYX /QUIET /FILE=SOCAT_qrtrdeg_gridded_coast_monthly.txt /APPEND /FORMAT=comma /PREC=6 /WIDTH=5000 /NOHEAD /NOROWLAB \
+    valid_tax_date, valid_coast_lat, valid_coast_lon, valid_coast_count_ncruise, \
+    valid_coast_fco2_count_nobs, valid_coast_fco2_ave_unwtd, valid_coast_fco2_ave_weighted, valid_coast_fco2_max_unwtd, valid_coast_fco2_min_unwtd, \
+        valid_coast_fco2_std_unwtd, valid_coast_fco2_std_weighted, \
+    valid_coast_sst_count_nobs, valid_coast_sst_ave_unwtd, valid_coast_sst_ave_weighted, valid_coast_sst_max_unwtd, valid_coast_sst_min_unwtd, \
+        valid_coast_sst_std_unwtd, valid_coast_sst_std_weighted, \
+    valid_coast_salinity_count_nobs, valid_coast_salinity_ave_unwtd, valid_coast_salinity_ave_weighted, valid_coast_salinity_max_unwtd, valid_coast_salinity_min_unwtd, \
+        valid_coast_salinity_std_unwtd, valid_coast_salinity_std_weighted, \
+    valid_coast_lat_offset_unwtd, valid_coast_lon_offset_unwtd
+
+CANCEL DATA valid_data
+CANCEL DATA my_coast_time
+

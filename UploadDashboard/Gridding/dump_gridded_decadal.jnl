@@ -6,7 +6,10 @@
 ! Then lists the first point to get the header - goes to stdout
 ! Then lists the actual data - goes to SOCAT_tracks_gridded_decadal.txt
 !
-! Edit the information printed to stdout and then append the actual data printout
+! Edit the information printed to stdout.
+! Remove the '----' lines from SOCAT_tracks_gridded_decadal.txt and add spaces after the commas using 
+!    grep -v -- ---- SOCAT_tracks_gridded_decadal.txt | sed -e 's/,/, /g' > (outputfilename)
+! Concatenate the two edited files to create the CSV file.
 !
 
 CANCEL MODE VERIFY
@@ -19,47 +22,119 @@ SPAWN ncdump -h SOCAT_tracks_gridded_decadal.nc
 SAY
 
 USE SOCAT_tracks_gridded_decadal.nc
-SET GRID fco2_ave_weighted_decade
+SET GRID count_ncruise_decade
 SHOW GRID
-
-LET /TITLE="T-Axis Date" tax_date = TAX_DATESTRING(_T[g=fco2_ave_weighted_decade], fco2_ave_weighted_decade, "day")
-LOAD /PERM tax_date, count_ncruise_decade
 
 SAY
 SAY ******************************************************************************
 SAY **** NOTE: rows containing no data (cruise count is zero) are not printed ****
 SAY ******************************************************************************
 SAY
+SAY Column  1: DATE is ISO Date representing the decade midpoint (axis TDECADE)
+SAY Column  2: LAT is Latitude (axis YLAT)
+SAY Column  3: LON is Longitude (axis XLON)
+SAY
 
 LIST /QUIET /PREC=0 /WIDTH=5000 /HEAD /NOROWLAB /I=1 /J=1 /L=1 \
-    tax_date, _Y, _X, count_ncruise_decade, \
+    _T, _Y, _X, count_ncruise_decade, \
     fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
     sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
     salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade
 
 SAY
-SAY Missing values are represented as "...."
+SAY Missing values are represented as -1.E+34
 SAY
 
-SPAWN rm -f SOCAT_tracks_gridded_decadal.txt
-SET LIST /FILE=SOCAT_tracks_gridded_decadal.txt
-REPEAT /L=1:`count_ncruise_decade,RETURN=LEND` ( \
-    IF `count_ncruise_decade[X=@MAX,Y=@MAX]` THEN \
-        SAY L = `_L` ;\
-        REPEAT /J=1:`count_ncruise_decade,RETURN=JEND` ( \
-            IF `count_ncruise_decade[X=@MAX]` THEN \
-                SAY J = `_J` ;\
-                LOAD fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
-                     sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
-                     salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade ;\
-                REPEAT /I=1:`count_ncruise_decade,RETURN=IEND` ( \
-                    IF `count_ncruise_decade` THEN \
-                        LIST /QUIET /FILE /APPEND /PREC=6 /WIDTH=5000 /NOHEAD /NOROWLAB \
-                            tax_date, _Y, _X, count_ncruise_decade, \
-                            fco2_count_nobs_decade, fco2_ave_weighted_decade, fco2_ave_unwtd_decade, fco2_min_unwtd_decade, fco2_max_unwtd_decade, \
-                            sst_count_nobs_decade, sst_ave_weighted_decade, sst_ave_unwtd_decade, sst_min_unwtd_decade, sst_max_unwtd_decade, \
-                            salinity_count_nobs_decade, salinity_ave_weighted_decade, salinity_ave_unwtd_decade, salinity_min_unwtd_decade, salinity_max_unwtd_decade \
-                ) \
-        ) \
+SET MODE VERIFY
+
+LET linear_ncruise = XSEQUENCE(count_ncruise_decade)
+LET mask = IF linear_ncruise THEN 1
+LOAD mask
+DEFINE SYMBOL num_good = `mask[X=@NGD]`
+
+LET my_time_decade = _T + 0.0 * _X + 0.0 * _Y
+SAVE /FILE=my_time_decade.nc /CLOBBER my_time_decade
+
+LET /TITLE="Time" /UNIT="days since 1900-01-01" valid_time_decade = COMPRESSI_BY(XSEQUENCE(my_time_decade), mask)
+SAVE /I=1:($num_good) /FILE=valid_time_decade.nc /CLOBBER valid_time_decade
+CANCEL VAR valid_time_decade, my_time_decade
+
+LET my_lat_decade = _Y + 0.0 * _X + 0.0 * _T
+LET /TITLE="Latitude" /UNIT="degrees_north" valid_lat_decade = COMPRESSI_BY(XSEQUENCE(my_lat_decade), mask)
+SAVE /I=1:($num_good) /FILE=valid_lat_decade.nc /CLOBBER valid_lat_decade
+CANCEL VAR valid_lat_decade, my_lat_decade
+
+LET my_lon_decade = _X + 0.0 * _Y + 0.0 * _T
+LET /TITLE="Longitude" /UNIT="degrees_east" valid_lon_decade = COMPRESSI_BY(XSEQUENCE(my_lon_decade), mask)
+SAVE /I=1:($num_good) /FILE=valid_lon_decade.nc /CLOBBER valid_lon_decade
+CANCEL VAR valid_lon_decade, my_lon_decade
+
+LET vararray = { \
+    "count_ncruise_decade", \
+    "fco2_count_nobs_decade", \
+    "fco2_ave_weighted_decade", \
+    "fco2_ave_unwtd_decade", \
+    "fco2_min_unwtd_decade", \
+    "fco2_max_unwtd_decade", \
+    "sst_count_nobs_decade", \
+    "sst_ave_weighted_decade", \
+    "sst_ave_unwtd_decade", \
+    "sst_min_unwtd_decade", \
+    "sst_max_unwtd_decade", \
+    "salinity_count_nobs_decade", \
+    "salinity_ave_weighted_decade", \
+    "salinity_ave_unwtd_decade", \
+    "salinity_min_unwtd_decade", \
+    "salinity_max_unwtd_decade" \
+}
+
+REPEAT /RANGE=1:16 /NAME=idx (\
+   DEFINE SYMBOL varidx = `idx` ;\
+   DEFINE SYMBOL varname = `vararray[I=($varidx)]` ;\
+   LET /TITLE="`($varname),RETURN=TITLE`" /UNIT="`($varname),RETURN=UNIT`" valid_($varname) = COMPRESSI_BY(XSEQUENCE(($varname)), mask) ;\
+   SAVE /I=1:($num_good) /FILE=valid_($varname).nc /CLOBBER valid_($varname) ;\
+   CANCEL VAR valid_($varname) ;\
+   CANCEL SYMBOL varname ;\
+   CANCEL SYMBOL varidx \
 )
+
+SET GRID abstract
+CANCEL DATA /ALL
+CANCEL SYMBOL /ALL
+CANCEL VAR /ALL
+CANCEL MEMORY /ALL
+
+USE my_time_decade.nc
+
+LET dataset_array = { \
+    "valid_time_decade.nc", \
+    "valid_lat_decade.nc",  \
+    "valid_lon_decade.nc", \
+    "valid_count_ncruise_decade.nc", \
+    "valid_fco2_count_nobs_decade.nc", \
+    "valid_fco2_ave_weighted_decade.nc", \
+    "valid_fco2_ave_unwtd_decade.nc", \
+    "valid_fco2_min_unwtd_decade.nc", \
+    "valid_fco2_max_unwtd_decade.nc", \
+    "valid_sst_count_nobs_decade.nc", \
+    "valid_sst_ave_weighted_decade.nc", \
+    "valid_sst_ave_unwtd_decade.nc", \
+    "valid_sst_min_unwtd_decade.nc", \
+    "valid_sst_max_unwtd_decade.nc", \
+    "valid_salinity_count_nobs_decade.nc", \
+    "valid_salinity_ave_weighted_decade.nc", \
+    "valid_salinity_ave_unwtd_decade.nc", \
+    "valid_salinity_min_unwtd_decade.nc", \
+    "valid_salinity_max_unwtd_decade.nc" \
+}
+
+DEFINE DATA /AGGREGATE /U valid_data = dataset_array
+
+LET valid_tax_date = TAX_DATESTRING(valid_time_decade, my_time_decade[d=1], "day")
+
+LIST /ORDER=TYX /QUIET /FILE=SOCAT_tracks_gridded_decadal.txt /CLOBBER /FORMAT=comma /PREC=6 /WIDTH=5000 /NOHEAD /NOROWLAB \
+    valid_tax_date, valid_lat_decade, valid_lon_decade, valid_count_ncruise_decade, \
+    valid_fco2_count_nobs_decade, valid_fco2_ave_weighted_decade, valid_fco2_ave_unwtd_decade, valid_fco2_min_unwtd_decade, valid_fco2_max_unwtd_decade, \
+    valid_sst_count_nobs_decade, valid_sst_ave_weighted_decade, valid_sst_ave_unwtd_decade, valid_sst_min_unwtd_decade, valid_sst_max_unwtd_decade, \
+    valid_salinity_count_nobs_decade, valid_salinity_ave_weighted_decade, valid_salinity_ave_unwtd_decade, valid_salinity_min_unwtd_decade, valid_salinity_max_unwtd_decade
 
