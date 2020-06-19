@@ -11,7 +11,7 @@ import java.util.HashSet;
  */
 public class Person implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -6584211193508187602L;
+    private static final long serialVersionUID = -7541265229091626959L;
 
     private String lastName;
     private String firstName;
@@ -184,6 +184,118 @@ public class Person implements Duplicable, Serializable, IsSerializable {
             }
         }
         return refName;
+    }
+
+    /**
+     * Generates initial(s) for the first name.  Normally this is the first character of the first name
+     * followed by a period, but it can contain multiple letters in the case of hyphenated or
+     * multiple names
+     *
+     * @return the initial(s) of the first name; never null but could be empty
+     */
+    public String firstInitial() {
+        if ( firstName.isEmpty() )
+            return "";
+        String initial = null;
+        for (String spacePiece : firstName.split("\\s+")) {
+            String part = null;
+            for (String hyphenPiece : spacePiece.split("-")) {
+                if ( !hyphenPiece.isEmpty() ) {
+                    if ( part == null )
+                        part = hyphenPiece.substring(0, 1).toUpperCase() + ".";
+                    else
+                        part += "-" + hyphenPiece.substring(0, 1).toUpperCase() + ".";
+                }
+            }
+            if ( (part != null) && !part.isEmpty() ) {
+                if ( initial == null )
+                    initial = part;
+                else
+                    initial += " " + part;
+            }
+        }
+        if ( initial == null )
+            initial = "";
+
+        return initial;
+    }
+
+    /**
+     * Creates a "clean" name for comparisons.  Currently this is done by removing punctuation,
+     * replacing any amount of whitespace with a single space character, and trimming.
+     *
+     * @param name
+     *         name to clean
+     *
+     * @return cleaned name
+     */
+    private String cleanName(String name) {
+        return name.toUpperCase()
+                   .replaceAll("\\p{Punct}+", "")
+                   .replaceAll("\\s+", " ")
+                   .trim();
+    }
+
+    public boolean matchesName(String name) {
+        // null and empty names never match
+        if ( (name == null) || lastName.isEmpty() )
+            return false;
+        // strip out punctuation and clean up spaces to simplify matching
+        String cmpName = cleanName(name);
+        // "Unknown"-type names never match
+        if ( cmpName.isEmpty() )
+            return false;
+        String cmpUnknown = cleanName("Unknown");
+        // note that the startsWith check assumes punctuation was removed
+        if ( cmpName.equals(cmpUnknown) || cmpName.startsWith(cmpUnknown + " ") )
+            return false;
+        // check if just the last name - probably the most common case
+        String cmpLast = cleanName(lastName);
+        if ( cmpName.equals(cmpLast) )
+            return true;
+        String firstInit = firstInitial();
+        // checks for names starting with the last name
+        // note that the startsWith check assumes punctuation was removed
+        if ( cmpName.startsWith(cmpLast + " ") && !firstName.isEmpty() ) {
+            // Last, First M.
+            if ( !middle.isEmpty() ) {
+                if ( cmpName.equals(cleanName(lastName + ", " + firstName + " " + middle)) )
+                    return true;
+            }
+            // Last, First
+            if ( cmpName.equals(cleanName(lastName + ", " + firstName)) )
+                return true;
+            // Last, F.
+            if ( cmpName.equals(cleanName(lastName + ", " + firstInit)) )
+                return true;
+            // Last, F.M.
+            if ( !middle.isEmpty() ) {
+                if ( cmpName.equals(cleanName(lastName + ", " + firstInit + middle)) )
+                    return true;
+                if ( cmpName.equals(cleanName(lastName + ", " + firstInit + " " + middle)) )
+                    return true;
+            }
+        }
+        // check for names start with the first name or first initial
+        if ( !firstName.isEmpty() ) {
+            // First M. Last
+            if ( !middle.isEmpty() ) {
+                if ( cmpName.equals(cleanName(firstName + " " + middle + " " + lastName)) )
+                    return true;
+            }
+            // First Last
+            if ( cmpName.equals(cleanName(firstName + " " + lastName)) )
+                return true;
+            // F. Last
+            if ( cmpName.equals(cleanName(firstInit + " " + lastName)) )
+                return true;
+            // F. M. Last
+            if ( !middle.isEmpty() ) {
+                if ( cmpName.equals(cleanName(firstInit + " " + middle + " " + lastName)) )
+                    return true;
+            }
+        }
+        return false;
     }
 
     @Override

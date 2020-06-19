@@ -3,7 +3,6 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.BioData;
 import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
@@ -25,7 +24,6 @@ public class BioDataTest {
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final MultiNames EMPTY_NAMESET = new MultiNames();
-    private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "Krill_Count";
     private static final String FULL_NAME = "Krill Count";
@@ -36,7 +34,7 @@ public class BioDataTest {
     private static final MethodType MEASURE_METHOD = MethodType.MEASURED_INSITU;
     private static final String METHOD_DESCRIPTION = "Directly measured";
     private static final String METHOD_REFERENCE = "a very old reference";
-    private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
+    private static final String RESEARCHER_NAME = "Smith, John D.Z.";
     private static final MultiNames ANALYZER_NAMES = new MultiNames("Video Analyzer");
 
     private static final String BIOLOGICAL_SUBJECT = "Krill";
@@ -50,7 +48,7 @@ public class BioDataTest {
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
         assertEquals(BIOLOGICAL_SUBJECT, var.getBiologicalSubject());
         assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -82,7 +80,7 @@ public class BioDataTest {
         assertEquals(SPECIES_ID, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
         assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -115,7 +113,7 @@ public class BioDataTest {
         assertEquals(EMPTY_STRING, var.getSpeciesId());
         assertEquals(EMPTY_STRING, var.getBiologicalSubject());
         assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -171,7 +169,7 @@ public class BioDataTest {
 
         BioData biovar = new BioData(var);
         assertEquals(EMPTY_NAMESET, biovar.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, biovar.getResearcher());
+        assertEquals(EMPTY_STRING, biovar.getResearcherName());
         assertEquals(EMPTY_STRING, biovar.getMethodReference());
         assertEquals(EMPTY_STRING, biovar.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, biovar.getMeasureMethod());
@@ -187,12 +185,12 @@ public class BioDataTest {
         datavar.setMeasureMethod(MEASURE_METHOD);
         datavar.setMethodDescription(METHOD_DESCRIPTION);
         datavar.setMethodReference(METHOD_REFERENCE);
-        datavar.setResearcher(RESEARCHER);
+        datavar.setResearcherName(RESEARCHER_NAME);
         datavar.setInstrumentNames(ANALYZER_NAMES);
 
         biovar = new BioData(datavar);
         assertEquals(ANALYZER_NAMES, biovar.getInstrumentNames());
-        assertEquals(RESEARCHER, biovar.getResearcher());
+        assertEquals(RESEARCHER_NAME, biovar.getResearcherName());
         assertEquals(METHOD_REFERENCE, biovar.getMethodReference());
         assertEquals(METHOD_DESCRIPTION, biovar.getMethodDescription());
         assertEquals(MEASURE_METHOD, biovar.getMeasureMethod());
@@ -223,7 +221,7 @@ public class BioDataTest {
         var.setMeasureMethod(MEASURE_METHOD);
         var.setMethodDescription(METHOD_DESCRIPTION);
         var.setMethodReference(METHOD_REFERENCE);
-        var.setResearcher(RESEARCHER);
+        var.setResearcherName(RESEARCHER_NAME);
         var.setInstrumentNames(ANALYZER_NAMES);
 
         var.setBiologicalSubject(BIOLOGICAL_SUBJECT);
@@ -302,10 +300,10 @@ public class BioDataTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setResearcher(RESEARCHER);
+        first.setResearcherName(RESEARCHER_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setResearcher(RESEARCHER);
+        second.setResearcherName(RESEARCHER_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

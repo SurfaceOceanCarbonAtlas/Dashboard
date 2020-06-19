@@ -282,7 +282,8 @@ public class OcadsWriter extends DocumentHandler {
             if ( var instanceof GenData )
                 addGenDataVarAddnFields(ancestor, (GenData) var);
             if ( var instanceof InstData )
-                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstData) var, instruments));
+                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstData) var,
+                        mdata.getInvestigators(), instruments));
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -432,13 +433,15 @@ public class OcadsWriter extends DocumentHandler {
      *         add under this element
      * @param var
      *         use the information given in this data variable
+     * @param investigators
+     *         investigators associated with this dataset
      * @param instruments
      *         list of instruments used in this dataset
      *
      * @return set of instrument names used in the description
      */
     private HashSet<String> addInstDataVarAddnFields(Element ancestor, InstData var,
-            ArrayList<Instrument> instruments) {
+            ArrayList<Investigator> investigators, ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
 
         setElementText(ancestor, VARIABLE_OBS_TYPE_ELEMENT_NAME, var.getObserveType());
@@ -542,11 +545,20 @@ public class OcadsWriter extends DocumentHandler {
             }
         }
         setElementText(ancestor, VARIABLE_REPLICATE_ELEMENT_NAME, var.getReplication());
-        Person pi = var.getResearcher();
-        String fullname = pi.getFirstName() + " " + pi.getMiddle();
-        fullname = fullname.trim() + " " + pi.getLastName();
-        setElementText(ancestor, VARIABLE_RESEARCHER_NAME_ELEMENT_NAME, fullname);
-        setElementText(ancestor, VARIABLE_RESEARCHER_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+        String name = var.getResearcherName();
+        Person pi = null;
+        for (Investigator inv : investigators) {
+            if ( inv.matchesName(name) ) {
+                pi = inv;
+                break;
+            }
+        }
+        if ( pi != null ) {
+            String fullname = pi.getFirstName() + " " + pi.getMiddle();
+            fullname = fullname.trim() + " " + pi.getLastName();
+            setElementText(ancestor, VARIABLE_RESEARCHER_NAME_ELEMENT_NAME, fullname);
+            setElementText(ancestor, VARIABLE_RESEARCHER_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+        }
 
         if ( var instanceof AquGasConc ) {
             switch ( var.getMeasureMethod() ) {

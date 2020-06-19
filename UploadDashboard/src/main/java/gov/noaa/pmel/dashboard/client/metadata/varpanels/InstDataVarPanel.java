@@ -13,7 +13,6 @@ import gov.noaa.pmel.dashboard.client.metadata.LabeledListBox;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextArea;
 import gov.noaa.pmel.dashboard.client.metadata.LabeledTextBox;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 
@@ -134,7 +133,7 @@ public class InstDataVarPanel extends GenDataVarPanel {
         durationValue.setText(instvar.getDuration());
         analysisTempValue.setText(instvar.getAnalysisTemperature());
         replicationValue.setText(instvar.getReplication());
-        researcherValue.setText(instvar.getResearcher().getReferenceName());
+        researcherValue.setText(instvar.getResearcherName());
         instrumentsValue.setText(instvar.getInstrumentNames().asOneString());
 
         sampleLocValue.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -220,17 +219,7 @@ public class InstDataVarPanel extends GenDataVarPanel {
         researcherValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                String[] nameParts = researcherValue.getText().split(",", 2);
-                Person pi = new Person();
-                if ( !"Unknown".equals(nameParts[0]) )
-                    pi.setLastName(nameParts[0]);
-                if ( nameParts.length > 1 ) {
-                    nameParts = nameParts[1].split(" ", 2);
-                    pi.setFirstName(nameParts[0]);
-                    if ( nameParts.length > 1 )
-                        pi.setMiddle(nameParts[1]);
-                }
-                instvar.setResearcher(pi);
+                instvar.setResearcherName(researcherValue.getText());
                 markInvalids(null);
             }
         });
@@ -262,7 +251,7 @@ public class InstDataVarPanel extends GenDataVarPanel {
         durationValue.markInvalid(invalids.contains("duration"));
         analysisTempValue.markInvalid(invalids.contains("analysisTemperature"));
         replicationValue.markInvalid(invalids.contains("replication"));
-        researcherValue.markInvalid(invalids.contains("researcher"));
+        researcherValue.markInvalid(invalids.contains("researcherName"));
         instrumentsValue.markInvalid(invalids.contains("instrumentNames"));
 
         // Finish marking labels and the tab for this panel

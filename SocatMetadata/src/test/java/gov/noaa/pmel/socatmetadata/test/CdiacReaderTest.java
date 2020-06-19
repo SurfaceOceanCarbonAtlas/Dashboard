@@ -17,7 +17,6 @@ import gov.noaa.pmel.socatmetadata.shared.instrument.SalinitySensor;
 import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
 import gov.noaa.pmel.socatmetadata.shared.instrument.TemperatureSensor;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
@@ -456,7 +455,7 @@ public class CdiacReaderTest {
             assertEquals("CO2 Sensor", strSet.pop());
             assertEquals("Equilibrator", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof GasConc);
             GasConc gasConc = (GasConc) instDataVar;
@@ -509,7 +508,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("CO2 Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof GasConc);
             GasConc gasConc = (GasConc) instDataVar;
@@ -560,7 +559,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("CO2 Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof GasConc);
             GasConc gasConc = (GasConc) instDataVar;
@@ -601,7 +600,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("Equilibrator Pressure Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof AirPressure);
             AirPressure pressure = (AirPressure) instDataVar;
@@ -638,7 +637,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("Atmospheric Pressure Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof AirPressure);
             AirPressure pressure = (AirPressure) instDataVar;
@@ -673,7 +672,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("Equilibrator Temperature Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof Temperature);
         }
@@ -706,7 +705,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("Water Temperature Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof Temperature);
         }
@@ -740,7 +739,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("Salinity Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertFalse(instDataVar instanceof Temperature);
             assertFalse(instDataVar instanceof AirPressure);
@@ -784,7 +783,7 @@ public class CdiacReaderTest {
             assertEquals("CO2 Sensor", strSet.pop());
             assertEquals("Equilibrator", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof GasConc);
             GasConc gasConc = (GasConc) instDataVar;
@@ -838,7 +837,7 @@ public class CdiacReaderTest {
             MultiNames strSet = instDataVar.getInstrumentNames();
             assertEquals("CO2 Sensor", strSet.pop());
             assertNull(strSet.pop());
-            assertEquals(instDataVar.toString(), new Person(), instDataVar.getResearcher());
+            assertEquals(instDataVar.toString(), "", instDataVar.getResearcherName());
 
             assertTrue(instDataVar instanceof GasConc);
             GasConc gasConc = (GasConc) instDataVar;

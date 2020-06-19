@@ -5,6 +5,7 @@ import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
 import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
 import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 
 import java.io.Serializable;
@@ -60,21 +61,47 @@ public class SocatMetadata implements Duplicable, Serializable, IsSerializable {
             invalid.add("coverage." + name);
         }
         for (int k = 0; k < instruments.size(); k++) {
-            HashSet<String> invalidNames;
             for (String name : instruments.get(k).invalidFieldNames()) {
                 invalid.add("instruments[" + k + "]." + name);
             }
         }
         for (int k = 0; k < variables.size(); k++) {
-            for (String name : variables.get(k).invalidFieldNames()) {
+            Variable vari = variables.get(k);
+            for (String name : vari.invalidFieldNames()) {
                 invalid.add("variables[" + k + "]." + name);
+            }
+            if ( vari instanceof InstData ) {
+                InstData instVar = (InstData) vari;
+                String name = instVar.getResearcherName();
+                if ( !name.isEmpty() ) {
+                    boolean found = false;
+                    for (Investigator pi : investigators) {
+                        found = pi.matchesName(name);
+                        if ( found )
+                            break;
+                    }
+                    if ( !found )
+                        invalid.add("variables[" + k + "].researcherName");
+                    for (String instName : instVar.getInstrumentNames()) {
+                        found = false;
+                        for (Instrument instrument : instruments) {
+                            if ( instName.equalsIgnoreCase(instrument.getName()) ||
+                                    instName.equalsIgnoreCase(instrument.getId()) ) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if ( !found ) {
+                            invalid.add("variables[" + k + "].instrumentNames");
+                            break;
+                        }
+                    }
+                }
             }
         }
         for (String name : miscInfo.invalidFieldNames()) {
             invalid.add("miscInfo." + name);
         }
-
-        // TODO: verify researcher and instrument names in variables match some entry in investigators and instruments
 
         return invalid;
     }

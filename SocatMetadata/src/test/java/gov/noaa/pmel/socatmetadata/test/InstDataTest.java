@@ -3,7 +3,6 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
 import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
@@ -27,7 +26,6 @@ public class InstDataTest {
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
     private static final MultiNames EMPTY_NAMESET = new MultiNames();
-    private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
@@ -52,7 +50,7 @@ public class InstDataTest {
     private static final String DURATION = "Immediate measurements";
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
-    private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
+    private static final String RESEARCHER_NAME = "Smith, John D.Z.";
     private static final MultiNames INSTRUMENT_NAMES = new MultiNames("Ship's SST sensor");
 
     @Test
@@ -497,12 +495,9 @@ public class InstDataTest {
     @Test
     public void testGetSetResearcher() {
         InstData var = new InstData();
-        assertEquals(EMPTY_PERSON, var.getResearcher());
-        var.setResearcher(RESEARCHER);
-        Person researcher = var.getResearcher();
-        assertEquals(RESEARCHER, researcher);
-        assertNotSame(RESEARCHER, researcher);
-        assertNotSame(researcher, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
+        var.setResearcherName(RESEARCHER_NAME);
+        assertEquals(RESEARCHER_NAME, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getDuration());
@@ -522,8 +517,8 @@ public class InstDataTest {
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
-        var.setResearcher(null);
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        var.setResearcherName(null);
+        assertEquals(EMPTY_STRING, var.getResearcherName());
     }
 
     @Test
@@ -535,7 +530,7 @@ public class InstDataTest {
         assertEquals(INSTRUMENT_NAMES, names);
         assertNotSame(INSTRUMENT_NAMES, names);
         assertNotSame(names, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getDuration());
@@ -575,7 +570,7 @@ public class InstDataTest {
 
         InstData instDataVar = new InstData(var);
         assertEquals(EMPTY_NAMESET, instDataVar.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, instDataVar.getResearcher());
+        assertEquals(EMPTY_STRING, instDataVar.getResearcherName());
         assertEquals(EMPTY_STRING, instDataVar.getReplication());
         assertEquals(EMPTY_STRING, instDataVar.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, instDataVar.getDuration());
@@ -651,7 +646,7 @@ public class InstDataTest {
         var.setStorageMethod(STORAGE_METHOD);
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
-        var.setResearcher(RESEARCHER);
+        var.setResearcherName(RESEARCHER_NAME);
         var.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(var, dup);
 
@@ -661,7 +656,6 @@ public class InstDataTest {
         assertNotSame(var.getAccuracy(), dup.getAccuracy());
         assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
-        assertNotSame(var.getResearcher(), dup.getResearcher());
         assertNotSame(var.getInstrumentNames(), dup.getInstrumentNames());
     }
 
@@ -808,10 +802,10 @@ public class InstDataTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setResearcher(RESEARCHER);
+        first.setResearcherName(RESEARCHER_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setResearcher(RESEARCHER);
+        second.setResearcherName(RESEARCHER_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

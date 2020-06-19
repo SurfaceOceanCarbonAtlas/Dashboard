@@ -3,7 +3,6 @@ package gov.noaa.pmel.socatmetadata.test;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
 import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
 import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
@@ -23,7 +22,6 @@ public class AquGasConcTest {
     private static final NumericString EMPTY_NUMSTR = new NumericString();
     private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final MultiNames EMPTY_NAMESET = new MultiNames();
-    private static final Person EMPTY_PERSON = new Person();
 
     private static final String COL_NAME = "xCO2water";
     private static final String FULL_NAME = "Mole fraction CO2 in surface sea water";
@@ -46,7 +44,7 @@ public class AquGasConcTest {
     private static final String STORAGE_METHOD = "Does not apply";
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
-    private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
+    private static final String RESEARCHER_NAME = "Smith, John D.Z.";
     private static final MultiNames INSTRUMENT_NAMES = new MultiNames("Equilibrator, Equilibrator LICOR");
 
     private static final String REPORT_TERMPERATURE = "SST";
@@ -63,7 +61,7 @@ public class AquGasConcTest {
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
         assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -97,7 +95,7 @@ public class AquGasConcTest {
         assertEquals(EMPTY_STRING, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
         assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -185,7 +183,7 @@ public class AquGasConcTest {
         var.setStorageMethod(STORAGE_METHOD);
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
-        var.setResearcher(RESEARCHER);
+        var.setResearcherName(RESEARCHER_NAME);
         var.setInstrumentNames(INSTRUMENT_NAMES);
 
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
@@ -201,7 +199,6 @@ public class AquGasConcTest {
         assertNotSame(var.getAccuracy(), dup.getAccuracy());
         assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
-        assertNotSame(var.getResearcher(), dup.getResearcher());
         assertNotSame(var.getInstrumentNames(), dup.getInstrumentNames());
     }
 
@@ -334,10 +331,10 @@ public class AquGasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setResearcher(RESEARCHER);
+        first.setResearcherName(RESEARCHER_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setResearcher(RESEARCHER);
+        second.setResearcherName(RESEARCHER_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

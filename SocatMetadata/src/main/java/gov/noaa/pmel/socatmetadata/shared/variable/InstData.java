@@ -3,7 +3,6 @@ package gov.noaa.pmel.socatmetadata.shared.variable;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import gov.noaa.pmel.socatmetadata.shared.core.Duplicable;
 import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
-import gov.noaa.pmel.socatmetadata.shared.person.Person;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -13,7 +12,7 @@ import java.util.HashSet;
  */
 public class InstData extends GenData implements Duplicable, Serializable, IsSerializable {
 
-    private static final long serialVersionUID = -4128682981000861807L;
+    private static final long serialVersionUID = -5832756187890065884L;
 
     private String observeType;
     private MethodType measureMethod;
@@ -26,7 +25,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
     private String duration;
     private String analysisTemperature;
     private String replication;
-    private Person researcher;
+    private String researcherName;
     private MultiNames instrumentNames;
 
     /**
@@ -45,7 +44,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
         duration = "";
         analysisTemperature = "";
         replication = "";
-        researcher = new Person();
+        researcherName = "";
         instrumentNames = new MultiNames();
     }
 
@@ -67,7 +66,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
             duration = other.duration;
             analysisTemperature = other.analysisTemperature;
             replication = other.replication;
-            researcher = (Person) (other.researcher.duplicate(null));
+            researcherName = other.researcherName;
             instrumentNames = new MultiNames(other.instrumentNames);
         }
         else {
@@ -82,7 +81,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
             duration = "";
             analysisTemperature = "";
             replication = "";
-            researcher = new Person();
+            researcherName = "";
             instrumentNames = new MultiNames();
         }
     }
@@ -286,20 +285,20 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
     }
 
     /**
-     * @return reference to the investigator responsible for obtaining this variable;
-     *         never null but may not be a valid investigator reference
+     * @return name of the investigator responsible for obtaining this variable;
+     *         never null but may be empty.
      */
-    public Person getResearcher() {
-        return (Person) (researcher.duplicate(null));
+    public String getResearcherName() {
+        return researcherName;
     }
 
     /**
-     * @param researcher
-     *         assign as the reference to the investigator responsible for obtaining this variable;
-     *         if null, an invalid reference (a Person with all-empty fields) is assigned
+     * @param researcherName
+     *         assign as the name of the investigator responsible for obtaining this variable;
+     *         if null, an empty name is assigned.
      */
-    public void setResearcher(Person researcher) {
-        this.researcher = (researcher != null) ? (Person) (researcher.duplicate(null)) : new Person();
+    public void setResearcherName(String researcherName) {
+        this.researcherName = (researcherName != null) ? researcherName.trim() : "";
     }
 
     /**
@@ -337,7 +336,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
         var.duration = duration;
         var.analysisTemperature = analysisTemperature;
         var.replication = replication;
-        var.researcher = (Person) (researcher.duplicate(null));
+        var.researcherName = researcherName;
         var.instrumentNames = new MultiNames(instrumentNames);
         return var;
     }
@@ -357,7 +356,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
         result = result * prime + duration.hashCode();
         result = result * prime + analysisTemperature.hashCode();
         result = result * prime + replication.hashCode();
-        result = result * prime + researcher.hashCode();
+        result = result * prime + researcherName.hashCode();
         result = result * prime + instrumentNames.hashCode();
         return result;
     }
@@ -397,7 +396,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
             return false;
         if ( !replication.equals(instDataVar.replication) )
             return false;
-        if ( !researcher.equals(instDataVar.researcher) )
+        if ( !researcherName.equals(instDataVar.researcherName) )
             return false;
         if ( !instrumentNames.equals(instDataVar.instrumentNames) )
             return false;
@@ -420,7 +419,7 @@ public class InstData extends GenData implements Duplicable, Serializable, IsSer
                 ", duration='" + duration + "'" +
                 ", analysisTemperature='" + analysisTemperature + "'" +
                 ", replication='" + replication + "'" +
-                ", researcher=" + researcher +
+                ", researcher=" + researcherName +
                 ", instrumentNames=" + instrumentNames +
                 " }";
     }
