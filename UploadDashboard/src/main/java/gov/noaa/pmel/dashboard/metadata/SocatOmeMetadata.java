@@ -28,17 +28,48 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Implementation of OmeMetadataInterface that uses an SDIMetadata object
+ * Implementation of OmeMetadataInterface that uses an SocatMetadata object
  * as its foundation.  Intended to be the working class for OME metadata,
  * with other metadata formats being converted to or produced from
- * SDIMetadata objects.
+ * SocatMetadata objects.
  */
 public class SocatOmeMetadata implements OmeMetadataInterface {
 
     private SocatMetadata mdata;
 
-    public SocatOmeMetadata() {
-        mdata = new SocatMetadata();
+    /**
+     * Create using a copy of the given SocatMetadata
+     *
+     * @param metadata
+     *         foundation metadata object to use
+     */
+    public SocatOmeMetadata(SocatMetadata metadata) {
+        mdata = (SocatMetadata) metadata.duplicate(null);
+    }
+
+    /**
+     * Create from the SocatMetadata saved in the given metadata file.
+     *
+     * @param datasetId
+     *         dataset ID associated with this metadata
+     * @param mdataFile
+     *         metadata file to read
+     *
+     * @throws IllegalArgumentException
+     *         if the given dataset ID does not match that specified in the metadata file, or
+     *         if the contents of the metadata file does not contain SocatMetadata information
+     * @throws FileNotFoundException
+     *         if the metadata file does not exist
+     */
+    public SocatOmeMetadata(String datasetId, File mdataFile) throws IllegalArgumentException, FileNotFoundException {
+        this.read(datasetId, mdataFile);
+    }
+
+    /**
+     * @return a copy of the current foundation metadata object in this instance
+     */
+    public SocatMetadata getSocatMetadata() {
+        return (SocatMetadata) mdata.duplicate(null);
     }
 
     @Override

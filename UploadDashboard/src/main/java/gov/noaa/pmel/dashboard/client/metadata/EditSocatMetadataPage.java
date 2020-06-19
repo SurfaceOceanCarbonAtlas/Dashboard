@@ -176,13 +176,15 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
      * Display the EditSocatMetadataPage in the RootLayoutPanel for the given dataset.
      * Adds this page to the page history.
      *
-     * @param datasetList
-     *         ask about editing the metadata for the first dataset in this list
+     * @param dataset
+     *         edit the metadata for this dataset
+     * @param username
+     *         name of logged-in user (to verify edit access)
      */
-    public static void showPage(DashboardDatasetList datasetList) {
+    public static void showPage(DashboardDataset dataset, String username) {
         if ( singleton == null )
             singleton = new EditSocatMetadataPage();
-        singleton.updateDataset(datasetList);
+        singleton.updateDataset(dataset, username);
         UploadDashboard.updateCurrentPage(singleton);
         History.newItem(PagesEnum.EDIT_SOCAT_METADATA.name(), false);
     }
@@ -204,16 +206,18 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
     /**
      * Updates this page with the username and the first dataset in the given dataset list.
      *
-     * @param datasetList
-     *         ask about editing the metadata for the first dataset in this list
+     * @param dataset
+     *         edit the metadata for this dataset
+     * @param username
+     *         name of logged-in user (to verify edit access)
      */
-    private void updateDataset(DashboardDatasetList datasetList) {
+    private void updateDataset(DashboardDataset dataset, String username) {
         // Update the current username
-        setUsername(datasetList.getUsername());
+        setUsername(username);
         userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
-        // Update the cruise associated with this page
-        dataset = datasetList.values().iterator().next();
+        // Update the dataset associated with this page
+        this.dataset = dataset;
 
         // Update the HTML intro naming the cruise
         String expo = SafeHtmlUtils.htmlEscape(dataset.getDatasetId());
@@ -232,6 +236,9 @@ public class EditSocatMetadataPage extends CompositeWithUsername {
             public void onFailure(Throwable ex) {
                 UploadDashboard.showAutoCursor();
                 UploadDashboard.showFailureMessage(RETRIEVE_METADATA_FAIL_MSG + expo, ex);
+                DashboardDatasetList datasetList = new DashboardDatasetList();
+                datasetList.setUsername(getUsername());
+                datasetList.put(dataset.getDatasetId(), dataset);
                 SelectSocatMetadataPage.showPage(datasetList);
             }
         });

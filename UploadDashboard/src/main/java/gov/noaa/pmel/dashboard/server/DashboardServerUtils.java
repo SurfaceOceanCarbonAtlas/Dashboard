@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag.Severity;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -439,6 +440,59 @@ public class DashboardServerUtils {
     }
 
     /**
+     * Extracts the ship code from the given dataset ID.  This is usually the first four characters
+     * of the dataset ID as uppercase characters.
+     *
+     * @param datasetID
+     *         dataset ID to use
+     *
+     * @return the ship code
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is null, too short, too long, or contains invalid characters
+     */
+    public static String getShipCodeFromDatasetID(String datasetID) throws IllegalArgumentException {
+        String upperId = checkDatasetID(datasetID);
+        // Currently, "QUIMA" is the only one not using a four-character ship code
+        if ( Character.isDigit(upperId.charAt(4)) )
+            return upperId.substring(0, 4);
+        else
+            return upperId.substring(0, 5);
+    }
+
+    /**
+     * Extract the date stamp from the given dataset ID.  This is usually the yyyyMMdd given
+     * as the fifth through twelfth characters (digits) in the dataset ID.
+     *
+     * @param datasetID
+     *         dataset ID to use
+     *
+     * @return the date stamp
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is null, too short, too long, or contains invalid characters
+     */
+    public static Datestamp getDatestampFromDatasetID(String datasetID) throws IllegalArgumentException {
+        String upperId = checkDatasetID(datasetID);
+        int idx;
+        // Currently, "QUIMA" is the only one not using a four-character ship code
+        if ( Character.isDigit(upperId.charAt(4)) )
+            idx = 5;
+        else
+            idx = 6;
+        Datestamp stamp;
+        try {
+            int year = Integer.parseInt(upperId.substring(idx, idx + 4));
+            int month = Integer.parseInt(upperId.substring(idx + 4, idx + 6));
+            int day = Integer.parseInt(upperId.substring(idx + 6, idx + 8));
+            stamp = new Datestamp(year, month, day, 0, 0, 0);
+        } catch ( NumberFormatException ex ) {
+            throw new IllegalArgumentException("Non-numeric year, month, or day in the dataset ID");
+        }
+        return stamp;
+    }
+
+        /**
      * "Cleans" a username for use by substituting characters that are problematic (such as space characters). Also
      * converts all alphabetic characters to lowercase. An empty string is returned if username is null.
      *

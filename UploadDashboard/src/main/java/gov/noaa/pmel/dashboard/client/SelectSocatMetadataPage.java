@@ -439,10 +439,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
      * Show the pages for viewing and editing the SocatMetadata for the current dataset.
      */
     private void showMetadataForDataset() {
-        DashboardDatasetList datasetList = new DashboardDatasetList();
-        datasetList.setUsername(getUsername());
-        datasetList.put(cruise.getDatasetId(), cruise);
-        EditSocatMetadataPage.showPage(datasetList);
+        EditSocatMetadataPage.showPage(cruise, getUsername());
     }
 
 }

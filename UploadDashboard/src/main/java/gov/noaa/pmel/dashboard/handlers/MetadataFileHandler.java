@@ -1,10 +1,8 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.metadata.CdiacOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.metadata.SocatOmeMetadata;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.RowNumSet;
@@ -12,6 +10,10 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
+import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.tmatesoft.svn.core.SVNException;
 
@@ -32,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * Handles storage and retrieval of metadata files.
@@ -40,14 +43,20 @@ import java.util.Properties;
  */
 public class MetadataFileHandler extends VersionedFileHandler {
 
+    private static final String STD_METADATA_SUFFIX = "_SocatMetadata.xml";
     private static final String INFOFILE_SUFFIX = ".properties";
     private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
     private static final String METADATA_OWNER_ID = "metadataowner";
     private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
     private static final String METADATA_VERSION_ID = "metadataversion";
-
-    private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
     private static final String FLAG_MSGS_FILENAME = "WOCE_flags.tsv";
+    private static final SimpleDateFormat DATETIME_FORMATTER;
+
+    static {
+        DATETIME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        DATETIME_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
 
     /**
      * Handles storage and retrieval of metadata files under the given metadata files directory.
@@ -65,6 +74,26 @@ public class MetadataFileHandler extends VersionedFileHandler {
     public MetadataFileHandler(String metadataFilesDirName, String svnUsername, String svnPassword)
             throws IllegalArgumentException {
         super(metadataFilesDirName, svnUsername, svnPassword);
+    }
+
+    /**
+     * Generates the virtual file for the SocatMetadata metadata file associated with this dataset.
+     *
+     * @param datasetId
+     *         ID of the dataset associated with this metadata document
+     *
+     * @return virtual file for the SocatMetadata metadata file
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid
+     */
+    public File getSocatMetadataFile(String datasetId) throws IllegalArgumentException {
+        // Check and standardize the dataset
+        String stdId = DashboardServerUtils.checkDatasetID(datasetId);
+        // Generate the full path filename for this metadata file
+        File grandParentDir = new File(filesDir, stdId.substring(0, 4));
+        File parentDir = new File(grandParentDir, stdId);
+        return new File(parentDir, stdId + STD_METADATA_SUFFIX);
     }
 
     /**
@@ -90,8 +119,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         // Generate the full path filename for this metadata file
         File grandParentDir = new File(filesDir, stdId.substring(0, 4));
         File parentDir = new File(grandParentDir, stdId);
-        File metadataFile = new File(parentDir, basename);
-        return metadataFile;
+        return new File(parentDir, basename);
     }
 
     /**
@@ -117,11 +145,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
         File[] metafiles = parentDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                if ( name.endsWith(INFOFILE_SUFFIX) )
-                    return true;
-                return false;
+                return name.endsWith(INFOFILE_SUFFIX);
             }
         });
+        if ( metafiles == null )
+            return metadataList;
         // Record the metadata file for each metadata info file (may be empty)
         for (File mfile : metafiles) {
             String basename = mfile.getName().substring(0,
@@ -157,12 +185,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
         DashboardMetadata oldMetadata = getMetadataInfo(datasetId, metaname);
         if ( oldMetadata == null )
             return;
+
         DashboardConfigStore configStore;
         try {
             configStore = DashboardConfigStore.get(false);
         } catch ( IOException ex ) {
             throw new IllegalArgumentException("Unexpected error obtaining the dashboard configuration");
         }
+
         String oldOwner = oldMetadata.getOwner();
         if ( !configStore.userManagesOver(username, oldOwner) )
             throw new IllegalArgumentException("Not permitted to update metadata document " +
@@ -346,7 +376,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
                     "\n    " + ex.getMessage());
         }
         String origName = (new File(link.getPath())).getName();
-        if ( (origName == null) || origName.trim().isEmpty() )
+        if ( origName.trim().isEmpty() )
             throw new IllegalArgumentException("Invalid link document: " + urlString +
                     "\n    Not a file (empty name)");
         if ( origName.equalsIgnoreCase("index.html") || origName.equalsIgnoreCase("index.htm") )
@@ -429,8 +459,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
                     numRead = src.read(buff);
                 }
             } finally {
-                if ( dest != null )
-                    dest.close();
+                dest.close();
             }
         } catch ( IOException ex ) {
             throw new IllegalArgumentException("Problems copying the metadata document " + origName +
@@ -525,7 +554,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         value = metaProps.getProperty(METADATA_OWNER_ID);
         metadata.setOwner(value);
         value = metaProps.getProperty(METADATA_CONFLICTED_ID);
-        metadata.setConflicted(Boolean.valueOf(value));
+        metadata.setConflicted(Boolean.parseBoolean(value));
         value = metaProps.getProperty(METADATA_VERSION_ID);
         metadata.setVersion(value);
 
@@ -667,7 +696,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
         if ( piOmeMData != null ) {
             piOmeMData.changeDatasetID(newId);
-            saveOmeToFile(omeMData, "Change dataset for PI OME XML document from " + oldId + " to " + newId);
+            saveOmeToFile(piOmeMData, "Change dataset for PI OME XML document from " + oldId + " to " + newId);
             // The PI_OME.pdf file will have been moved (as a normal metadata document)
             // but the dataset ID it contains needs to be updated, so regenerate it.
             try {
@@ -919,6 +948,194 @@ public class MetadataFileHandler extends VersionedFileHandler {
      */
     public void deleteWoceFlagMsgsFile(String username, String datasetId) throws IllegalArgumentException {
         deleteMetadata(username, datasetId, FLAG_MSGS_FILENAME);
+    }
+
+    /**
+     * Save the given SocatMetadata as the standard metadata file for the dataset.
+     *
+     * @param username
+     *         name of user requesting to save the metadata
+     * @param datasetId
+     *         ID of the dataset associated with this metadata
+     * @param metadata
+     *         metadata to save
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid or does not match that given in the metadata,
+     *         if the user is not permitted to overwrite the standard metadata file, or
+     *         if there are problems writing the metadata to file
+     */
+    public void saveSocatMetadata(String username, String datasetId, SocatMetadata metadata)
+            throws IllegalArgumentException {
+        String mdataId = metadata.getMiscInfo().getDatasetId();
+        if ( !mdataId.equals(datasetId) )
+            throw new IllegalArgumentException("The dataset ID given in the metadata (" + mdataId +
+                    ") does not match the ID of the dataset to associate with this metadata (" + datasetId + ")");
+
+        // Get the full path name for the standard metadata file for this dataset
+        File metadataFile = getSocatMetadataFile(datasetId);
+
+        // Make sure the parent directory exists
+        File parentDir = metadataFile.getParentFile();
+        if ( !parentDir.exists() ) {
+            if ( !parentDir.mkdirs() )
+                throw new IllegalArgumentException("Problems creating the parent directory for " +
+                        metadataFile.getPath());
+        }
+
+        // Check if this will overwrite existing metadata
+        String message;
+        if ( metadataFile.exists() ) {
+            verifyOkayToDelete(username, datasetId, metadataFile.getName());
+            message = "Updated SocatMetadata document for dataset " + datasetId + " and owner " + username;
+        }
+        else {
+            message = "Added SocatMetadata document for dataset " + datasetId + " and owner " + username;
+        }
+
+        // Get the current SOCAT upload version number
+        DashboardConfigStore configStore;
+        try {
+            configStore = DashboardConfigStore.get(false);
+        } catch ( IOException ex ) {
+            throw new IllegalArgumentException("Unexpected error obtaining the dashboard configuration");
+        }
+        String version = configStore.getUploadVersion();
+
+        // Use the current time for the timestamp
+        String timestamp = DATETIME_FORMATTER.format(new Date());
+
+        // Create the metadata properties for the SocatMetadata file
+        DashboardOmeMetadata omeinfo = new DashboardOmeMetadata(new SocatOmeMetadata(metadata),
+                metadataFile.getName(), timestamp, username, version);
+
+        // Save the SocatMetadata as the XML file
+        omeinfo.saveOmeToFile(metadataFile);
+        // Save the properties file for this XML file
+        saveMetadataInfo(omeinfo, message, true);
+    }
+
+    /**
+     * Modify fields in the given metadata so they are appropriate for the given dataset ID
+     *
+     * @param datasetId
+     *         dataset ID to use
+     * @param metadata
+     *         metadata to update
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID is invalid
+     */
+    private static void setSocatMetadataDatasetId(String datasetId, SocatMetadata metadata)
+            throws IllegalArgumentException {
+        MiscInfo miscInfo = metadata.getMiscInfo();
+        miscInfo.setDatasetId(datasetId);
+        metadata.setMiscInfo(miscInfo);
+        Platform platform = metadata.getPlatform();
+        platform.setPlatformId(DashboardServerUtils.getShipCodeFromDatasetID(datasetId));
+        metadata.setPlatform(platform);
+        Coverage coverage = metadata.getCoverage();
+        coverage.setStartDatestamp(DashboardServerUtils.getDatestampFromDatasetID(datasetId));
+        metadata.setCoverage(coverage);
+    }
+
+    /**
+     * Read the standard metadata for a dataset from file, and update appropriate fields from the dataset data.
+     * If the standard metadata file does not exist, new standard metadata is created.
+     * In either case, the appropriate metadata values are updated from the dataset data.
+     *
+     * @param datasetId
+     *         get the standard metadata for the dataset with this ID
+     *
+     * @return the standard metadata for the indicated dataset
+     */
+    public SocatMetadata getSocatMetadata(String datasetId) {
+        File metadataFile = getSocatMetadataFile(datasetId);
+        SocatMetadata metadata;
+        try {
+            SocatOmeMetadata omeMetadata = new SocatOmeMetadata(datasetId, metadataFile);
+            metadata = omeMetadata.getSocatMetadata();
+        } catch ( Exception ex ) {
+            metadata = new SocatMetadata();
+            setSocatMetadataDatasetId(datasetId, metadata);
+        }
+
+        DashboardConfigStore configStore;
+        try {
+            configStore = DashboardConfigStore.get(false);
+        } catch ( IOException ex ) {
+            throw new IllegalArgumentException("Unexpected error obtaining the dashboard configuration");
+        }
+        configStore.getDataFileHandler().updateSocatMetadataFromData(metadata);
+
+        return metadata;
+    }
+
+    /**
+     * Read the standard metadata for one dataset, appropriately modifies it for use by another dataset,
+     * and saves it as the standard dataset for the other dataset.
+     *
+     * @param username
+     *         name of the user requesting the copy
+     * @param toId
+     *         save the modified standard metadata for this dataset
+     * @param fromId
+     *         read the standard metadata for this dataset
+     *
+     * @throws IllegalArgumentException
+     *         if either dataset ID is invalid,
+     *         if there are problems reading the standard metdata for fromId,
+     *         if the user is not permitted to overwrite the standard metadata for this dataset, or
+     *         if there are problems writing the standard metadata for toId
+     */
+    public void copySocatMetadata(String username, String toId, String fromId) {
+        // Get the standard metadata for fromId
+        SocatMetadata metadata = getSocatMetadata(fromId);
+        // Modify fields associated with the dataset ID
+        setSocatMetadataDatasetId(toId, metadata);
+        // Update the appropriate metadata fields from the data
+        DashboardConfigStore configStore;
+        try {
+            configStore = DashboardConfigStore.get(false);
+        } catch ( IOException ex ) {
+            throw new IllegalArgumentException("Unexpected error obtaining the dashboard configuration");
+        }
+        configStore.getDataFileHandler().updateSocatMetadataFromData(metadata);
+        // Save as the standard metadata for toId
+        saveSocatMetadata(username, toId, metadata);
+    }
+
+    /**
+     * Return the list of dataset IDs which have standard metadata which can be modified by the specified user.
+     *
+     * @param username
+     *         name of the user
+     *
+     * @return list of dataset IDs; never null but could be empty
+     */
+    public ArrayList<String> getDatasetIdsWithSocatMetadata(String username) {
+        File[] socatMetadataFiles = filesDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(STD_METADATA_SUFFIX);
+            }
+        });
+        if ( socatMetadataFiles == null )
+            return new ArrayList<String>(0);
+        ArrayList<String> datasetIds = new ArrayList<String>(socatMetadataFiles.length);
+        for (File mdataFile : socatMetadataFiles) {
+            String filename = mdataFile.getName();
+            String id = filename.substring(0, filename.indexOf(STD_METADATA_SUFFIX));
+            // Only return the IDs of the metadata modifiable by the user
+            try {
+                verifyOkayToDelete(username, id, filename);
+                // allowed, so add this entry
+                datasetIds.add(id);
+            } catch ( Exception ex ) {
+                // not allowed, so ignore this entry
+            }
+        }
+        return datasetIds;
     }
 
 }

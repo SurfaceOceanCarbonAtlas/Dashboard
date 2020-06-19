@@ -21,9 +21,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
-import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
-import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +39,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -704175344499761491L;
+    private static final long serialVersionUID = -6379445797395821598L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -579,8 +577,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        // TODO: implement
-        throw new IllegalArgumentException("Not yet implemented");
+        return configStore.getMetadataFileHandler().getDatasetIdsWithSocatMetadata(pageUsername);
     }
 
     @Override
@@ -589,8 +586,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        // TODO: implement
-        throw new IllegalArgumentException("Not yet implemented");
+        configStore.getMetadataFileHandler().copySocatMetadata(pageUsername, toId, fromId);
     }
 
     @Override
@@ -599,17 +595,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        // TODO: actually implement - this is an incorrect stub just to return something
-        SocatMetadata metadata = new SocatMetadata();
-        MiscInfo miscInfo = new MiscInfo();
-        miscInfo.setDatasetId(datasetId);
-        metadata.setMiscInfo(miscInfo);
-        if ( datasetId.length() >= 4 ) {
-            Platform platform = new Platform();
-            platform.setPlatformId(datasetId.substring(0, 4));
-            metadata.setPlatform(platform);
-        }
-        return metadata;
+        return configStore.getMetadataFileHandler().getSocatMetadata(datasetId);
     }
 
     @Override
@@ -619,8 +605,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");
 
-        // TODO: implement
-        throw new IllegalArgumentException("Not yet implemented");
+        configStore.getMetadataFileHandler().saveSocatMetadata(pageUsername, datasetId, metadata);
     }
 
     @Override

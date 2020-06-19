@@ -17,6 +17,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -1385,6 +1386,21 @@ public class DataFileHandler extends VersionedFileHandler {
         saveDatasetInfoToFile(dset, "Update dataset dashboard status for " + expocode +
                 "from '" + oldStatus.statusString() + "' to '" + newStatus.statusString() + "'");
         return true;
+    }
+
+    /**
+     * Update the appropriate fields in the given standard metadata from valid data in the
+     * dataset associated with this metadata.
+     *
+     * @param metadata
+     *         standard metadata to check.
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID in the metadata is invalid, or
+     *         if there is an error reading the dataset data
+     */
+    public void updateSocatMetadataFromData(SocatMetadata metadata) throws IllegalArgumentException {
+        // TODO: implement
     }
 
     /**
