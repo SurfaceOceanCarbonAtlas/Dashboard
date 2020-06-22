@@ -1,8 +1,0 @@
-
-       #if($las_response.getError() != "")
-           <h3>$las_response.getError()</h3>
-       #else
-           <h3>$las_response.getResult("las_message")</h3>
-       #end
-       <hr>
-       <h2>$!las_response.getResult("exception_message")</h2>

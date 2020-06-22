@@ -1,4 +1,0 @@
-! Check the eol on this line...
-set mode verify:always
-go "$1"
-
