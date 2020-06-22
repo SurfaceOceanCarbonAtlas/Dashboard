@@ -681,7 +681,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         }
         if ( piOmeMData != null ) {
             piOmeMData.changeDatasetID(newId);
-            saveOmeToFile(omeMData, "Change dataset for PI OME XML document from " +
+            saveOmeToFile(piOmeMData, "Change dataset for PI OME XML document from " +
                     oldId + " to " + newId);
             // The PI_OME.pdf file will have been moved (as a normal metadata document)
             // but the dataset ID it contains needs to be updated, so regenerate it.

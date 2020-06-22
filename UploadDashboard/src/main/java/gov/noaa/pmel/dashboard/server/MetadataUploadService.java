@@ -191,9 +191,14 @@ public class MetadataUploadService extends HttpServlet {
                     try {
                         dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
                     } catch ( IllegalArgumentException ex ) {
-                        // Problem with this OME metadata - delete it
-                        metadataHandler.deleteMetadata(username, id, metadata.getFilename());
-                        // And just throw the exception again
+                        // Problem with this PI_OME metadata - delete it
+                        try {
+                            metadataHandler.deleteMetadata(username, id, DashboardUtils.PI_OME_FILENAME);
+                            metadataHandler.deleteMetadata(username, id, DashboardUtils.PI_OME_PDF_FILENAME);
+                        } catch ( Exception e ) {
+                            // Ignore any problems deleting the invalid files
+                        }
+                        // And just throw the original exception again
                         throw ex;
                     }
                 }
@@ -308,9 +313,8 @@ public class MetadataUploadService extends HttpServlet {
         // "Add" this OME metadata file by assigning the OME timestamp, and get the dataset information
         DashboardDataset dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
 
-        DatasetQCStatus autoSuggestedQC;
         try {
-            autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
+            DatasetQCStatus autoSuggestedQC = omedata.suggestedDatasetStatus(dataset);
             DatasetQCStatus status = dataset.getSubmitStatus();
             if ( !autoSuggestedQC.getAutoSuggested().equals(status.getAutoSuggested()) ) {
                 status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
@@ -325,7 +329,6 @@ public class MetadataUploadService extends HttpServlet {
              * a dataset QC flag is faulty; whatever the reason, do not make a recommendation,
              * but keep this OME metadata (so squash this exception).
              */
-            ;
         }
         return dataset;
     }
