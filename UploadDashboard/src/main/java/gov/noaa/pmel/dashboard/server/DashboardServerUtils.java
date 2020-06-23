@@ -477,9 +477,9 @@ public class DashboardServerUtils {
         int idx;
         // Currently, "QUIMA" is the only one not using a four-character ship code
         if ( Character.isDigit(upperId.charAt(4)) )
-            idx = 5;
+            idx = 4;
         else
-            idx = 6;
+            idx = 5;
         Datestamp stamp;
         try {
             int year = Integer.parseInt(upperId.substring(idx, idx + 4));

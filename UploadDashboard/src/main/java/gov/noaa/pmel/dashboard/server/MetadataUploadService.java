@@ -192,8 +192,8 @@ public class MetadataUploadService extends HttpServlet {
                     } catch ( IllegalArgumentException ex ) {
                         // Problem with this PI_OME metadata - delete it
                         try {
-                            metadataHandler.deleteMetadata(username, id, DashboardUtils.PI_OME_FILENAME);
-                            metadataHandler.deleteMetadata(username, id, DashboardUtils.PI_OME_PDF_FILENAME);
+                            metadataHandler.deleteMetadata(username, id, DashboardServerUtils.PI_OME_FILENAME);
+                            metadataHandler.deleteMetadata(username, id, DashboardServerUtils.PI_OME_PDF_FILENAME);
                         } catch ( Exception e ) {
                             // Ignore any problems deleting the invalid files
                         }
