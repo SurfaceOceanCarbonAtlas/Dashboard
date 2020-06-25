@@ -9,8 +9,8 @@ set mem/siz=300
 def sym offst = 101000
 def sym newbadint = 32766
 def sym newbad = `($newbadint)+($offst)`
-def sym finalyear = 2019
-def sym firstmissday = 03-DEC
+def sym finalyear = 2020
+def sym firstmissday = 23-JUN
 
 ! Rewrite the whole set.  This only takes a couple minutes.
 
