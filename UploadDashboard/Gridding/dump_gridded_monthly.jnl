@@ -1,0 +1,140 @@
+! dump_gridded_monthly.jnl
+!
+! Creates a spreadsheet-like dump of the contents of SOCAT_tracks_gridded_monthly.nc as SOCAT_tracks_gridded_monthly.txt
+! Uses ncdump to dump the metadata preamble - goes to stdout
+! Then lists the axes - goes to stdout
+! Then lists the first point to get the header - goes to stdout
+! Then lists the actual data - goes to SOCAT_tracks_gridded_monthly.txt
+!
+! Edit the information printed to stdout.
+! Remove the '----' lines from SOCAT_tracks_gridded_monthly.txt and add spaces after the commas using 
+!    grep -v -- ---- SOCAT_tracks_gridded_monthly.txt | sed -e 's/,/, /g' > (outputfilename)
+! Concatenate the two edited files to create the CSV file.
+!
+
+CANCEL MODE VERIFY
+SET MEMORY/SIZE=4G
+CANCEL MODE UPCASE
+SET MODE DATE_FORMAT ISO
+
+SPAWN ncdump -h SOCAT_tracks_gridded_monthly.nc
+
+SAY
+
+USE SOCAT_tracks_gridded_monthly.nc
+SET GRID count_ncruise
+SHOW GRID
+
+SAY
+SAY ******************************************************************************
+SAY **** NOTE: rows containing no data (cruise count is zero) are not printed ****
+SAY ******************************************************************************
+SAY
+SAY Column  1: DATE is ISO Date representing the month midpoint (axis TMNTH)
+SAY Column  2: LAT is Latitude (axis YLAT)
+SAY Column  3: LON is Longitude (axis XLON)
+SAY
+
+LIST /QUIET /PREC=0 /WIDTH=5000 /HEAD /NOROWLAB /I=1 /J=1 /L=1 \
+    _T, _Y, _X, count_ncruise, \
+    fco2_count_nobs, fco2_ave_weighted, fco2_ave_unwtd, fco2_min_unwtd, fco2_max_unwtd, \
+    sst_count_nobs, sst_ave_weighted, sst_ave_unwtd, sst_min_unwtd, sst_max_unwtd, \
+    salinity_count_nobs, salinity_ave_weighted, salinity_ave_unwtd, salinity_min_unwtd, salinity_max_unwtd
+
+SAY
+SAY Missing values are represented as -1.E+34
+SAY
+
+SET MODE VERIFY
+
+LET linear_ncruise = XSEQUENCE(count_ncruise)
+LET mask = IF linear_ncruise THEN 1
+LOAD mask
+DEFINE SYMBOL num_good = `mask[X=@NGD]`
+
+LET my_time_month = _T + 0.0 * _X + 0.0 * _Y
+SAVE /FILE=my_time_month.nc /CLOBBER my_time_month
+
+LET /TITLE="Time" /UNIT="days since 1900-01-01" valid_time_month = COMPRESSI_BY(XSEQUENCE(my_time_month), mask)
+SAVE /I=1:($num_good) /FILE=valid_time_month.nc /CLOBBER valid_time_month
+CANCEL VAR valid_time_month, my_time_month
+
+LET my_lat_month = _Y + 0.0 * _X + 0.0 * _T
+LET /TITLE="Latitude" /UNIT="degrees_north" valid_lat_month = COMPRESSI_BY(XSEQUENCE(my_lat_month), mask)
+SAVE /I=1:($num_good) /FILE=valid_lat_month.nc /CLOBBER valid_lat_month
+CANCEL VAR valid_lat_month, my_lat_month
+
+LET my_lon_month = _X + 0.0 * _Y + 0.0 * _T
+LET /TITLE="Longitude" /UNIT="degrees_east" valid_lon_month = COMPRESSI_BY(XSEQUENCE(my_lon_month), mask)
+SAVE /I=1:($num_good) /FILE=valid_lon_month.nc /CLOBBER valid_lon_month
+CANCEL VAR valid_lon_month, my_lon_month
+
+LET vararray = { \
+    "count_ncruise", \
+    "fco2_count_nobs", \
+    "fco2_ave_weighted", \
+    "fco2_ave_unwtd", \
+    "fco2_min_unwtd", \
+    "fco2_max_unwtd", \
+    "sst_count_nobs", \
+    "sst_ave_weighted", \
+    "sst_ave_unwtd", \
+    "sst_min_unwtd", \
+    "sst_max_unwtd", \
+    "salinity_count_nobs", \
+    "salinity_ave_weighted", \
+    "salinity_ave_unwtd", \
+    "salinity_min_unwtd", \
+    "salinity_max_unwtd" \
+}
+
+REPEAT /RANGE=1:16 /NAME=idx (\
+   DEFINE SYMBOL varidx = `idx` ;\
+   DEFINE SYMBOL varname = `vararray[I=($varidx)]` ;\
+   LET /TITLE="`($varname),RETURN=TITLE`" /UNIT="`($varname),RETURN=UNIT`" valid_($varname)_month = COMPRESSI_BY(XSEQUENCE(($varname)), mask) ;\
+   SAVE /I=1:($num_good) /FILE=valid_($varname)_month.nc /CLOBBER valid_($varname)_month ;\
+   CANCEL VAR valid_($varname)_month ;\
+   CANCEL SYMBOL varname ;\
+   CANCEL SYMBOL varidx \
+)
+
+SET GRID abstract
+CANCEL DATA /ALL
+CANCEL SYMBOL /ALL
+CANCEL VAR /ALL
+CANCEL MEMORY /ALL
+
+USE my_time_month.nc
+
+LET dataset_array = { \
+    "valid_time_month.nc", \
+    "valid_lat_month.nc",  \
+    "valid_lon_month.nc", \
+    "valid_count_ncruise_month.nc", \
+    "valid_fco2_count_nobs_month.nc", \
+    "valid_fco2_ave_weighted_month.nc", \
+    "valid_fco2_ave_unwtd_month.nc", \
+    "valid_fco2_min_unwtd_month.nc", \
+    "valid_fco2_max_unwtd_month.nc", \
+    "valid_sst_count_nobs_month.nc", \
+    "valid_sst_ave_weighted_month.nc", \
+    "valid_sst_ave_unwtd_month.nc", \
+    "valid_sst_min_unwtd_month.nc", \
+    "valid_sst_max_unwtd_month.nc", \
+    "valid_salinity_count_nobs_month.nc", \
+    "valid_salinity_ave_weighted_month.nc", \
+    "valid_salinity_ave_unwtd_month.nc", \
+    "valid_salinity_min_unwtd_month.nc", \
+    "valid_salinity_max_unwtd_month.nc" \
+}
+
+DEFINE DATA /AGGREGATE /U valid_data = dataset_array
+
+LET valid_tax_date = TAX_DATESTRING(valid_time_month, my_time_month[d=1], "day")
+
+LIST /ORDER=TYX /QUIET /FILE=SOCAT_tracks_gridded_monthly.txt /CLOBBER /FORMAT=comma /PREC=6 /WIDTH=5000 /NOHEAD /NOROWLAB \
+    valid_tax_date, valid_lat_month, valid_lon_month, valid_count_ncruise_month, \
+    valid_fco2_count_nobs_month, valid_fco2_ave_weighted_month, valid_fco2_ave_unwtd_month, valid_fco2_min_unwtd_month, valid_fco2_max_unwtd_month, \
+    valid_sst_count_nobs_month, valid_sst_ave_weighted_month, valid_sst_ave_unwtd_month, valid_sst_min_unwtd_month, valid_sst_max_unwtd_month, \
+    valid_salinity_count_nobs_month, valid_salinity_ave_weighted_month, valid_salinity_ave_unwtd_month, valid_salinity_min_unwtd_month, valid_salinity_max_unwtd_month
+

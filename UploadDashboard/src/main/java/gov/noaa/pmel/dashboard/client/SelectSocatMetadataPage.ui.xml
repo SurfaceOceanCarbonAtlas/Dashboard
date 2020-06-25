@@ -1,0 +1,45 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:style src="FullWidth.css"/>
+
+    <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.titlepanel}">
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
+            </g:FlowPanel>
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
+            <g:CaptionPanel addStyleNames="{style.metadatacaptionpanel}" ui:field="sourceCaption">
+                <g:FlowPanel>
+                    <g:FlowPanel addStyleNames="{style.metadatapanel}">
+                        <g:RadioButton addStyleNames="{style.metadataradiobutton}" name="metadataRadioGroup" ui:field="existingRadio"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel addStyleNames="{style.metadatapanel}">
+                        <g:RadioButton addStyleNames="{style.metadataradiobutton}" name="metadataRadioGroup" ui:field="copyRadio"/>
+                        <g:ListBox addStyleNames="{style.metadatalistbox}" ui:field="metadataListBox"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel addStyleNames="{style.metadatapanel}">
+                        <g:RadioButton addStyleNames="{style.metadataradiobutton}" name="metadataRadioGroup" ui:field="uploadRadio"/>
+                        <g:FormPanel addStyleNames="{style.metadatauploadpanel}" ui:field="uploadForm">
+                            <g:FlowPanel addStyleNames="{style.metadatauploadpanel}">
+                                <g:FileUpload name="metadataupload" addStyleNames="{style.metadatauploadfile}" ui:field="xmlUpload"/>
+                                <g:Hidden name="timestamp" ui:field="timestampToken"/>
+                                <g:Hidden name="datasetids" ui:field="datasetIdsToken"/>
+                                <g:Hidden name="ometoken" ui:field="omeToken"/>
+                            </g:FlowPanel>
+                        </g:FormPanel>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:CaptionPanel>
+            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="editButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:ScrollPanel>
+
+</ui:UiBinder>

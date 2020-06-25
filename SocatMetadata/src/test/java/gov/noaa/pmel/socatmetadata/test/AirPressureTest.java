@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -71,7 +71,7 @@ public class AirPressureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((InstData) pressure).setAccuracy(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setAccuracy with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -105,7 +105,7 @@ public class AirPressureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
+            ((InstData) pressure).setPrecision(new NumericString("0.01", KILOPASCALS_UNIT));
             fail("call to casted setPrecision with kPa unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -114,9 +114,9 @@ public class AirPressureTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         AirPressure pressure = new AirPressure();
-        AirPressure dup = pressure.clone();
+        AirPressure dup = (AirPressure) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -127,7 +127,7 @@ public class AirPressureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.clone();
+        dup = (AirPressure) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());

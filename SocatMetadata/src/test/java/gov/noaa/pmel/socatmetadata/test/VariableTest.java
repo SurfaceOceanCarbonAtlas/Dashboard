@@ -1,10 +1,11 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.Variable;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -19,19 +20,19 @@ public class VariableTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
-    private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
 
     private static final String COL_NAME = "SST_C";
     private static final String FULL_NAME = "Sea surface temperature";
-    private static final String VAR_UNIT = "degrees Celsius";
+    private static final String VAR_UNIT = "deg C";
     private static final String MISSING_VALUE = "-999";
     private static final String FLAG_COL_NAME = "WOCE SST";
-    private static final NumericString ACCURACY = new NumericString("0.01", "deg C");
-    private static final NumericString PRECISION = new NumericString("0.001", "deg C");
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some sort of information",
-            "Another bit of information"
-    ));
+    private static final NumericString ACCURACY = new NumericString("0.01", VAR_UNIT);
+    private static final NumericString PRECISION = new NumericString("0.001", VAR_UNIT);
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some sort of information\n" +
+                    "Another bit of information"
+    );
 
     @Test
     public void testGetSetColName() {
@@ -89,7 +90,7 @@ public class VariableTest {
 
     @Test
     public void testGetSetFlagColName() {
-        Variable var = new Variable();
+        GenData var = new GenData();
         assertEquals(EMPTY_STRING, var.getFlagColName());
         var.setFlagColName(FLAG_COL_NAME);
         assertEquals(FLAG_COL_NAME, var.getFlagColName());
@@ -105,8 +106,13 @@ public class VariableTest {
 
     @Test
     public void testGetSetAccuracy() {
-        Variable var = new Variable();
+        GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        var.setAccuracy(ACCURACY);
+        assertEquals(new NumericString(ACCURACY.getValueString(), ""), var.getAccuracy());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        var.setVarUnit(VAR_UNIT);
+        assertEquals(ACCURACY, var.getAccuracy());
         var.setAccuracy(ACCURACY);
         NumericString numstr = var.getAccuracy();
         assertEquals(ACCURACY, numstr);
@@ -114,13 +120,12 @@ public class VariableTest {
         assertNotSame(numstr, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAccuracy(null);
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         var.setAccuracy(EMPTY_NUMSTR);
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         try {
             var.setAccuracy(new NumericString("0.0", VAR_UNIT));
             fail("calling setAccuracy with a zero string succeeded");
@@ -137,23 +142,27 @@ public class VariableTest {
 
     @Test
     public void testGetSetPrecision() {
-        Variable var = new Variable();
+        GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        var.setPrecision(PRECISION);
+        assertEquals(new NumericString(PRECISION.getValueString(), ""), var.getPrecision());
+        assertEquals(EMPTY_STRING, var.getVarUnit());
+        var.setVarUnit(VAR_UNIT);
+        assertEquals(PRECISION, var.getPrecision());
         var.setPrecision(PRECISION);
         NumericString numstr = var.getPrecision();
         assertEquals(PRECISION, numstr);
         assertNotSame(PRECISION, numstr);
         assertNotSame(numstr, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
+        assertEquals(new NumericString("", VAR_UNIT), var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
-        assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setPrecision(null);
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(new NumericString("", VAR_UNIT), var.getPrecision());
         var.setPrecision(EMPTY_NUMSTR);
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
+        assertEquals(new NumericString("", VAR_UNIT), var.getPrecision());
         try {
             var.setPrecision(new NumericString("0.0", VAR_UNIT));
             fail("calling setPrecision with a zero string succeeded");
@@ -171,35 +180,20 @@ public class VariableTest {
     @Test
     public void testGetSetAddnInfo() {
         Variable var = new Variable();
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         var.setAddnInfo(ADDN_INFO);
-        ArrayList<String> addnInfo = var.getAddnInfo();
+        MultiString addnInfo = var.getAddnInfo();
         assertEquals(ADDN_INFO, addnInfo);
         assertNotSame(ADDN_INFO, addnInfo);
         assertNotSame(addnInfo, var.getAddnInfo());
-        assertEquals(EMPTY_NUMSTR, var.getPrecision());
-        assertEquals(EMPTY_NUMSTR, var.getAccuracy());
-        assertEquals(EMPTY_STRING, var.getFlagColName());
         assertEquals(EMPTY_STRING, var.getMissVal());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         assertEquals(EMPTY_STRING, var.getFullName());
         assertEquals(EMPTY_STRING, var.getColName());
         var.setAddnInfo(null);
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        var.setAddnInfo(new HashSet<String>());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
-        try {
-            var.setAddnInfo(Arrays.asList("something", null, "else"));
-            fail("calling setAddnInfo with a null string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            var.setAddnInfo(Arrays.asList("something", "\n", "else"));
-            fail("calling setAddnInfo with a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
+        var.setAddnInfo(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
     }
 
     @Test
@@ -213,9 +207,9 @@ public class VariableTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Variable var = new Variable();
-        Variable dup = var.clone();
+        Variable dup = (Variable) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -223,17 +217,12 @@ public class VariableTest {
         var.setFullName(FULL_NAME);
         var.setVarUnit(VAR_UNIT);
         var.setMissVal(MISSING_VALUE);
-        var.setFlagColName(FLAG_COL_NAME);
-        var.setAccuracy(ACCURACY);
-        var.setPrecision(PRECISION);
         var.setAddnInfo(ADDN_INFO);
         assertNotEquals(var, dup);
 
-        dup = var.clone();
+        dup = (Variable) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
-        assertNotSame(var.getAccuracy(), dup.getAccuracy());
-        assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
     }
 
@@ -272,27 +261,6 @@ public class VariableTest {
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
         second.setMissVal(MISSING_VALUE);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setFlagColName(FLAG_COL_NAME);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setFlagColName(FLAG_COL_NAME);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setAccuracy(ACCURACY);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setAccuracy(ACCURACY);
-        assertEquals(first.hashCode(), second.hashCode());
-        assertTrue(first.equals(second));
-
-        first.setPrecision(PRECISION);
-        assertNotEquals(first.hashCode(), second.hashCode());
-        assertFalse(first.equals(second));
-        second.setPrecision(PRECISION);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

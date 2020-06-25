@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.handlers;
 
 import org.tmatesoft.svn.core.SVNDepth;
@@ -18,7 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Abstract file handler for dealing with subversion version control of the files contained within the directory.
+ * Abstract file handler for dealing with subversion version control
+ * of the files contained within the directory.
  *
  * @author Karl Smith
  */
@@ -30,10 +28,10 @@ public class VersionedFileHandler {
     private static final long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
 
     File filesDir;
-    private SVNClientManager svnManager;
-    private ArrayDeque<File[]> filesToCommit;
-    private ArrayDeque<File> parentToUpdate;
-    private ArrayDeque<String> commitMessage;
+    private final SVNClientManager svnManager;
+    private final ArrayDeque<File[]> filesToCommit;
+    private final ArrayDeque<File> parentToUpdate;
+    private final ArrayDeque<String> commitMessage;
 
     /**
      * Handles version control for files under the given working copy directory.

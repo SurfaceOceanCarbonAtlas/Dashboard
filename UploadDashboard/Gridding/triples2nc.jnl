@@ -1,0 +1,70 @@
+! triples2nc
+!
+! Convert the ASCII file of SOCAT "triples" data from QC Flags A-D, WOCE-flag 2
+! into a netCDF file
+!
+! the format of the data that this script is designed to handle is 
+! data_id	latitude	longitude	datetime	expocode	fCO2rec	SST	salinity
+! 1	49.827970	-2.815118	2018-08-14 18:55:03	069920180814	477.196384	16.083	34.953
+! 2	49.827570	-2.815443	2018-08-14 18:55:13	069920180814	476.790538	16.079	34.951
+! ....
+! 
+
+define symbol infile = SOCAT_ABCD_data_for_gridding.tsv
+define symbol outfile = SOCAT_ABCD_data_for_gridding.nc
+
+! Get the number of obs directly
+
+let num = {spawn:'wc -l ($infile)'}
+define symbol wc = `num`
+let len = `strindex ("($wc)", "($infile)")` - 1
+
+define symbol nobs = `substring("($wc)", 1, len)`
+
+! minus 1 for header line
+define symbol nobs =`($nobs)-1`
+
+set memory/size=600   ! Need > 400 to load all the data at once from ascii
+can mode upcase
+
+define axis/x=1:($nobs):1 xobs
+define grid/x=xobs gobs
+cancel data/all
+
+! now set Ferret up to read the data for real
+columns/skip=1/grid=gobs/\
+var="data_id,lat,lon,day,time,cruise_id,fco2_rec,sst,salinity"/\
+type="numeric,latitude,longitude,eurodate,time,text,numeric,numeric,numeric"/delim="\t,\b,\," ($infile)
+
+! determine the day number with the proper offset
+let offset1970 = DAYS1900(1970,1,1)
+let day1970 = day - offset1970
+let date = day1970 + time/24
+set variable/units="Days since 1970-01-01" date
+
+define axis/t=`date[i=@min],prec=10`:`date[i=@max],prec=10`:1/t0=01-JAN-1970/units=days tax 
+sh axis tax
+
+sh dat 
+sh var
+
+! compute a cruise sequence number using @EVNT (takes 7 seconds)
+
+let mask = cruise_id ne cruise_id[i=@shf:-1]
+let mask_missing = IGNORE0(mask)
+let/title="Cruise no." cruise_no = mask_missing[i=@evnt:1]
+
+show data
+
+go add_global_attribute ($outfile)
+
+set var/outtype=float/units="degrees_north" lat
+set var/outtype=float/units="degrees_east" lon
+set var/outtype=float/units="uatm" fco2_rec
+set var/bad=-999/outtype=float/units="degrees C" sst
+set var/bad=-999/outtype=float/units="PSU" salinity
+
+sp date
+save/append/file="($outfile)" lat,lon,date,data_id,cruise_id,cruise_no,fco2_rec,sst,salinity
+sp date
+

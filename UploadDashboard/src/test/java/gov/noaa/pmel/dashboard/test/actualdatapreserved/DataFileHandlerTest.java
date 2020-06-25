@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.actualdatapreserved;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -33,7 +30,7 @@ public class DataFileHandlerTest {
      */
     @Test
     public void testAssignDatasetDataFromInput() throws IOException {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DataFileHandler dataHandler = DashboardConfigStore.get(false).getDataFileHandler();
         StringReader cruiseReader = new StringReader(CSV_DATA);

@@ -1,0 +1,112 @@
+! year_stats.jnl
+!
+! Use the script stats_var instead, same script for 1-degree
+! and quarter-degree gridding.
+!
+! Compute and append to file gridded data for a variable: 
+! count all of observations in each XYT cell,
+! mean weighted by cruise, 
+! unweighted mean, 
+! min, 
+! max, 
+! variance, 
+! unweighted std
+
+! A symbol ($var) has been set with the variable to use.
+! Symbol titlename has been set with text to use in the title, e.g. fCO2
+! Symbol vname has been set with text to use in creating variable names, e.g. lowercase fco2
+
+! Get the units from the units of ($var). 
+
+LET var = ($var)
+
+! Count all of observations in each XYT cell
+DEFINE SYMBOL title = Number of ($vname) obs
+IF `STRINDEX("($vname)", "fco2") EQ 0` THEN DEFINE SYMBOL title = Number of valid ($vname) obs
+
+LET/UNITS="count"/TITLE="($title)" \
+  ($vname)_count_nobs = SCAT2GRID_NBIN_XYT(LON,LAT,DATE,var,X[GX=xlon],Y[GY=ylat],T[GT=tmnth])
+SET VAR/OUTTYPE=float ($vname)_count_nobs
+
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_count_nobs
+
+! Was there even any data? If not can write all-missing to the following variables. 
+! fco2_rec always has full data, the set is all points where it exists. 
+
+DEFINE SYMBOL any_data = `($vname)_count_nobs[x=@sum,y=@sum,l=@sum]`
+
+! Mean by cruise of var, with some data in each XYT cell
+LET var = ($var)
+
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) mean - per cruise weighted" \
+ ($vname)_ave_weighted = TRACKS2GRID_MASK_AVE_XYT(VAR,LON,LAT,DATE,CRUISE_NO,X[GX=xlon],Y[GY=ylat],T[GT=tmnth],maskvar)
+
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) mean - per cruise weighted" \
+ ($vname)_ave_weighted = 1./0 + 0*($vname)_count_nobs
+  
+SET VAR/OUTTYPE=float ($vname)_ave_weighted
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_ave_weighted
+
+
+! Mean ($var), all observations in each XYT cell
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) mean - unweighted all obs" \
+  ($vname)_ave_unwtd = SCAT2GRID_BIN_XYT(LON,LAT,DATE,($var),X[GX=xlon],Y[GY=ylat],T[GT=tmnth])
+  
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) mean - unweighted all obs" \
+  ($vname)_ave_unwtd =  1./0 + 0*($vname)_count_nobs
+  
+SET VAR/OUTTYPE=float ($vname)_ave_unwtd
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_ave_unwtd
+
+! Min and max var.  These are computed from one function with min at k=1, max at k=2.
+! Use the Z=1:1@ave to remove the Z axis from the grid of the variable on output.
+LET minmax = SCAT2GRID_MINMAX_XYT(lon, lat, date, ($var), x[gx=xlon], y[gy=ylat], t[gt=tmnth])
+
+IF `($any_data) GT 0` THEN LOAD minmax
+
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) min" ($vname)_min_unwtd = minmax[z=1:1@ave]
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) min" ($vname)_min_unwtd = 1./0 + 0*($vname)_count_nobs
+  
+SET VAR/OUTTYPE=float ($vname)_min_unwtd
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_min_unwtd
+
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) max" ($vname)_max_unwtd = minmax[z=2:2@ave]
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) max" ($vname)_max_unwtd = 1./0 + 0*($vname)_count_nobs
+
+SET VAR/OUTTYPE=float ($vname)_max_unwtd
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_max_unwtd
+
+
+! Variance by cruise of ($var), with some data in each XYT cell
+LET fvar = ($var)
+
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) std dev - per cruise weighted" \
+ ($vname)_std_weighted = TRACKS2GRID_STD_XYT(fvar,lon,lat,\
+ date,cruise_no,x[gx=xlon],y[gy=ylat],t[gt=tmnth])
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) std dev - per cruise weighted" \
+ ($vname)_std_weighted = 1./0 + 0*($vname)_count_nobs 
+
+SET VAR/OUTTYPE=float ($vname)_std_weighted
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_std_weighted
+
+! unweighted std dev var
+LET/UNITS="`($var),return=units`"/TITLE="($titlename) std dev - unweighted all obs" \
+  ($vname)_std_unwtd = SCAT2GRID_STD_XYT(lon, lat, date, ($var), x[gx=xlon], y[gy=ylat], t[gt=tmnth])
+IF `($any_data) EQ 0` THEN \
+  LET/UNITS="`($var),return=units`"/TITLE="($titlename) std dev - unweighted all obs" \
+  ($vname)_std_unwtd = 1./0 + 0*($vname)_count_nobs  
+
+SET VAR/OUTTYPE=float ($vname)_std_unwtd
+SAVE/APPEND/FILE="($gridded_outfile)" ($vname)_std_unwtd
+sh axis tmnth
+sh sym var, any_data
+
+
+say/outfile=gridding_months.txt/append  ....
+show axis/outfile=gridding_months.txt/append tmnth
+say/outfile=gridding_months.txt/append ($var) any_data is ($any_data)

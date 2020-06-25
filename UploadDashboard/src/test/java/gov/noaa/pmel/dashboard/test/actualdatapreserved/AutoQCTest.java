@@ -4,10 +4,10 @@ import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.junit.Test;
 
 import java.io.File;
@@ -26,7 +26,7 @@ public class AutoQCTest {
      */
     @Test
     public void testSuggestDatasetQCFlag() throws Exception {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         DataFileHandler dataHandler = confStore.getDataFileHandler();
@@ -48,7 +48,7 @@ public class AutoQCTest {
 
         for (String expocode : TEST_EXPOCODES) {
             DashboardDataset dset = dataHandler.getDatasetFromInfoFile(expocode);
-            File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardUtils.PI_OME_FILENAME);
+            File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardServerUtils.PI_OME_FILENAME);
             FileReader cdiacReader = new FileReader(cdiacFile);
             SocatMetadata mdata = OmeUtils.createSdiMetadataFromCdiacOme(cdiacReader,
                     dset.getUserColNames(), dset.getDataColTypes());
@@ -56,12 +56,13 @@ public class AutoQCTest {
             DatasetQCStatus.Status auto = status.getAutoSuggested();
             String comment = status.getComments().get(0);
             String info = expocode + ": " + auto.toString() + " " + comment;
-            if ( ! expAutoStatus.equals(auto) ) {
+            if ( !expAutoStatus.equals(auto) ) {
                 fail(info);
             }
             if ( comment.length() >= expFullLen ) {
                 assertEquals(info, expCommentStart, comment.substring(0, expStartLen));
-                assertEquals(info, expCommentMiddle, comment.substring(expStartLen + 1, expStartLen + expMiddleLen + 1));
+                assertEquals(info, expCommentMiddle,
+                        comment.substring(expStartLen + 1, expStartLen + expMiddleLen + 1));
                 assertEquals(info, expCommentEnd, comment.substring(expStartLen + expMiddleLen + 2));
             }
             else {

@@ -446,7 +446,7 @@ public class DatabaseRequestHandler {
                     // Ignore missing region IDs
                     if ( regionID.length() < 1 )
                         continue;
-                    if ( DashboardUtils.REGION_ID_GLOBAL.equals(regionID) &&
+                    if ( DashboardServerUtils.REGION_ID_GLOBAL.equals(regionID) &&
                             (flag.isNewAwaitingQC() || flag.isUpdatedAwaitingQC()) ) {
                         lastUpdateTime = time;
                     }
@@ -465,7 +465,7 @@ public class DatabaseRequestHandler {
         }
 
         // Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
-        QCEvent globalEvent = regionFlags.get(DashboardUtils.REGION_ID_GLOBAL);
+        QCEvent globalEvent = regionFlags.get(DashboardServerUtils.REGION_ID_GLOBAL);
         DatasetQCStatus globalFlag;
         long globalTime;
         if ( globalEvent == null ) {
@@ -485,7 +485,7 @@ public class DatabaseRequestHandler {
         DatasetQCStatus latestFlag = null;
         for (Entry<String,QCEvent> regionEntry : regionFlags.entrySet()) {
             // Just compare non-global entries
-            if ( DashboardUtils.REGION_ID_GLOBAL.equals(regionEntry.getKey()) )
+            if ( DashboardServerUtils.REGION_ID_GLOBAL.equals(regionEntry.getKey()) )
                 continue;
             // Ignore regional flags assigned (more than 1 s) before the last update
             QCEvent qcEvent = regionEntry.getValue();
@@ -538,7 +538,7 @@ public class DatabaseRequestHandler {
             // Get all the QC events for this data set, ordered so the latest are last
             PreparedStatement getPrepStmt = catConn.prepareStatement(
                     "SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME +
-                            "` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.REGION_ID_GLOBAL +
+                            "` WHERE `expocode` = ? AND `region_id` = '" + DashboardServerUtils.REGION_ID_GLOBAL +
                             "' AND ( `qc_flag` LIKE '" + DatasetQCStatus.FLAG_NEW_AWAITING_QC +
                             "%' OR `qc_flag` LIKE '" + DatasetQCStatus.FLAG_UPDATED_AWAITING_QC + "%' );");
             getPrepStmt.setString(1, expocode);
@@ -949,9 +949,9 @@ public class DatabaseRequestHandler {
             addQcPrepStmt.setString(4, version);
             addQcPrepStmt.setString(11, version);
             addQcPrepStmt.setString(18, version);
-            addQcPrepStmt.setString(5, DashboardUtils.REGION_ID_GLOBAL);
-            addQcPrepStmt.setString(12, DashboardUtils.REGION_ID_GLOBAL);
-            addQcPrepStmt.setString(19, DashboardUtils.REGION_ID_GLOBAL);
+            addQcPrepStmt.setString(5, DashboardServerUtils.REGION_ID_GLOBAL);
+            addQcPrepStmt.setString(12, DashboardServerUtils.REGION_ID_GLOBAL);
+            addQcPrepStmt.setString(19, DashboardServerUtils.REGION_ID_GLOBAL);
             addQcPrepStmt.setInt(6, reviewerId);
             addQcPrepStmt.setInt(13, reviewerId);
             addQcPrepStmt.setInt(20, reviewerId);

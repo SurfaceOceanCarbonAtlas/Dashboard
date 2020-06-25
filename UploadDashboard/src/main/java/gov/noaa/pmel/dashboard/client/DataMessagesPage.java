@@ -108,7 +108,7 @@ public class DataMessagesPage extends CompositeWithUsername {
      * @param datasetId
      *         ID of the dataset to use
      */
-    static void showPage(String username, String datasetId) {
+    public static void showPage(String username, String datasetId) {
         UploadDashboard.showWaitCursor();
         service.getDataMessages(username, datasetId, new AsyncCallback<ADCMessageList>() {
             @Override
@@ -139,7 +139,7 @@ public class DataMessagesPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

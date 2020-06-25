@@ -6,6 +6,7 @@ import gov.noaa.pmel.dashboard.handlers.SpellingHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 
 import java.io.File;
@@ -24,7 +25,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = 6113847974011933801L;
+    private static final long serialVersionUID = -8109401858249468927L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -39,7 +40,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         DATE_STAMPER.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    private OmeMetadataInterface omeMData;
+    private final OmeMetadataInterface omeMData;
 
     /**
      * Create from the contents of the OME metadata file specified.
@@ -166,7 +167,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         // Set the platform type - could be missing
         String platformType = omeMData.getPlatformType();
         if ( (platformType == null) || platformType.trim().isEmpty() )
-            platformType = DashboardServerUtils.guessPlatformType(this.datasetId, platformName);
+            platformType = DashboardUtils.guessPlatformType(this.datasetId, platformName);
         scMData.setPlatformType(platformType);
 
         scMData.setWestmostLongitude(omeMData.getWesternLongitude());
@@ -238,6 +239,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
+     * @param westmostLongitude
+     *         set as the westernmost longitude; if null or invalid, an empty string is assigned
+     */
+    public void setWestmostLongitude(Double westmostLongitude) {
+        if ( (westmostLongitude == null) || westmostLongitude.isNaN() || westmostLongitude.isInfinite() ||
+                (westmostLongitude < -720.0) || (westmostLongitude > 720.0) )
+            omeMData.setWesternLongitude(null);
+        else
+            omeMData.setWesternLongitude(westmostLongitude);
+    }
+
+    /**
      * @return the easternmost longitude, in the range (-180,180]
      *
      * @throws IllegalArgumentException
@@ -248,6 +261,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         if ( (value == null) || value.isNaN() || value.isInfinite() || (value <= -180.0) || (value > 180.0) )
             throw new IllegalArgumentException("Invalid eastmost longitude: " + value);
         return value;
+    }
+
+    /**
+     * @param eastmostLongitude
+     *         set as the easternmost longitude; if null or invalid, an empty string is assigned
+     */
+    public void setEastmostLongitude(Double eastmostLongitude) {
+        if ( (eastmostLongitude == null) || eastmostLongitude.isNaN() || eastmostLongitude.isInfinite() ||
+                (eastmostLongitude < -720.0) || (eastmostLongitude > 720.0) )
+            omeMData.setEasternLongitude(null);
+        else
+            omeMData.setEasternLongitude(eastmostLongitude);
     }
 
     /**
@@ -264,6 +289,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
+     * @param southmostLatitude
+     *         set as the southernmost latitude; if null or invalid, an empty string is assigned
+     */
+    public void setSouthmostLatitude(Double southmostLatitude) {
+        if ( (southmostLatitude == null) || southmostLatitude.isNaN() || southmostLatitude.isInfinite() ||
+                (southmostLatitude < -90.0) || (southmostLatitude > 90.0) )
+            omeMData.setSouthernLatitude(null);
+        else
+            omeMData.setSouthernLatitude(southmostLatitude);
+    }
+
+    /**
      * @return the northernmost latitude
      *
      * @throws IllegalArgumentException
@@ -274,6 +311,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         if ( (value == null) || value.isNaN() || value.isInfinite() || (value < -90.0) || (value > 90.0) )
             throw new IllegalArgumentException("Invalid northmost latitude: " + value);
         return value;
+    }
+
+    /**
+     * @param northmostLatitude
+     *         set as the northernmost latitude; if null or invalid, an empty string is assigned
+     */
+    public void setNorthmostLatitude(Double northmostLatitude) {
+        if ( (northmostLatitude == null) || northmostLatitude.isNaN() || northmostLatitude.isInfinite() ||
+                (northmostLatitude < -90.0) || (northmostLatitude > 90.0) )
+            omeMData.setNorthernLatitude(null);
+        else
+            omeMData.setNorthernLatitude(northmostLatitude);
     }
 
     /**
@@ -291,6 +340,19 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
+     * @param beginTime
+     *         set as the beginning (earliest) data time, in units of "seconds since 01-JAN-1970 00:00:00 UTC"
+     */
+    public void setDataBeginTime(Double beginTime) {
+        if ( (beginTime == null) || beginTime.isNaN() || beginTime.isInfinite() ||
+                DashboardUtils.closeTo(beginTime, DashboardUtils.FP_MISSING_VALUE,
+                        DashboardUtils.MAX_ABSOLUTE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+            omeMData.setDataStartTime(null);
+        else
+            omeMData.setDataStartTime(beginTime);
+    }
+
+    /**
      * @return the UTC date, as a String in "yyyy-MM-dd" format, of the latest data measurement
      *
      * @throws IllegalArgumentException
@@ -302,6 +364,19 @@ public class DashboardOmeMetadata extends DashboardMetadata {
             throw new IllegalArgumentException("Invalid data end time: " + value);
         Date endTime = new Date(Math.round(value * 1000.0));
         return DATE_STAMPER.format(endTime);
+    }
+
+    /**
+     * @param endTime
+     *         set as the ending (latest) data time, in units of "seconds since 01-JAN-1970 00:00:00 UTC"
+     */
+    public void setDataEndTime(Double endTime) {
+        if ( (endTime == null) || endTime.isNaN() || endTime.isInfinite() ||
+                DashboardUtils.closeTo(endTime, DashboardUtils.FP_MISSING_VALUE,
+                        DashboardUtils.MAX_ABSOLUTE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+            omeMData.setDataEndTime(null);
+        else
+            omeMData.setDataEndTime(endTime);
     }
 
     /**
@@ -326,7 +401,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @param platformName
-     *     the platform name to assign for this dataset
+     *         the platform name to assign for this dataset
      */
     public void setPlatformName(String platformName) {
         omeMData.setPlatformName(platformName);
@@ -344,7 +419,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
     /**
      * @param platformType
-     *     the platform type to assign for this dataset
+     *         the platform type to assign for this dataset
      */
     public void setPlatformType(String platformType) {
         omeMData.setPlatformType(platformType);
@@ -412,13 +487,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
     }
 
     /**
-     * @return the http reference for the source dataset; never null but may be empty
+     * @return the landing page(s) for the PI-provided dataset; never null but may be empty
      */
     public String getDatasetLink() {
-        String dataSetLink = omeMData.getDatasetLink();
-        if ( dataSetLink == null )
-            dataSetLink = "";
-        return dataSetLink;
+        String datasetLink = omeMData.getDatasetLink();
+        if ( datasetLink == null )
+            datasetLink = "";
+        return datasetLink;
     }
 
     /**

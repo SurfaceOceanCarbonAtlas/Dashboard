@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.dsg;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -618,14 +615,18 @@ public class DsgMetadata {
             }
             else {
                 // return the longitude limits to [-180,180]
-                while ( eastLon < -180.0 )
+                while ( eastLon < -180.0 ) {
                     eastLon += 360.0;
-                while ( eastLon > 180.0 )
+                }
+                while ( eastLon > 180.0 ) {
                     eastLon -= 360.0;
-                while ( westLon < -180.0 )
+                }
+                while ( westLon < -180.0 ) {
                     westLon += 360.0;
-                while ( westLon > 180.0 )
+                }
+                while ( westLon > 180.0 ) {
                     westLon -= 360.0;
+                }
             }
         }
         setBeginTime(beginTime);

@@ -1,0 +1,277 @@
+\can mode verify
+
+set mem/siz=100
+
+cancel var/all
+cancel data/all
+
+
+define symbol infile = $1%SOCAT_tracks_gridded_monthly.nc%
+
+use "($infile)"
+define symbol report = report_`FCO2_COUNT_NOBS,return=dset`.txt
+
+SAY --- Making report file with statistics on the variables in ($infile)
+SAY --- 
+
+set redirect/clobber/file=report_dummy.txt
+
+say/clobber/outfile="($report)" statistics for ($infile)
+say/append/outfile="($report)" file history  `..history`
+
+say/append/outfile="($report)" file notation `..SOCAT_Notes`
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat COUNT_NCRUISE 
+say/append/outfile="($report)" COUNT_NCRUISE min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" COUNT_NCRUISE good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- COUNT_NCRUISE cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- COUNT_NCRUISE must be all valid. Reports ($STAT_NBAD) missing
+
+let npos = if count_ncruise gt 0 then 1
+stat npos
+
+say/append/outfile="($report)" COUNT_NCRUISE GT 0 good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_COUNT_NOBS 
+say/append/outfile="($report)" FCO2_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- FCO2_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_AVE_WEIGHTED
+say/append/outfile="($report)" FCO2_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_AVE_WEIGHTED must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_AVE_WEIGHTED values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_AVE_UNWTD
+say/append/outfile="($report)" FCO2_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_AVE_UNWTD must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_AVE_UNWTD values > 1000?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_MIN_UNWTD
+say/append/outfile="($report)" FCO2_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_MIN_UNWTD must be nonnegative
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_MIN_UNWTD values > 1000
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_MAX_UNWTD
+say/append/outfile="($report)" FCO2_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_MAX_UNWTD must be positive
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- FCO2_MAX_UNWTD values > 1000?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of FCO2_MAX_UNWTD=($STAT_MIN) less than min of FCO2_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of FCO2_MAX_UNWTD=($STAT_MAX) less than max of FCO2_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_STD_WEIGHTED
+say/append/outfile="($report)" FCO2_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat FCO2_STD_UNWTD
+say/append/outfile="($report)" FCO2_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" FCO2_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- FCO2_STD_UNWTD must be nonnegative
+
+! ---------------------
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_COUNT_NOBS 
+say/append/outfile="($report)" SST_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SST_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- SST_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_AVE_WEIGHTED
+say/append/outfile="($report)" SST_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- SST_AVE_WEIGHTED values > 1000?
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SST_AVE_WEIGHTED values > 900?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_AVE_UNWTD
+say/append/outfile="($report)" SST_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- SST_AVE_UNWTD values > 1000?
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SST_AVE_UNWTD values > 900?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_MIN_UNWTD
+say/append/outfile="($report)" SST_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- SST_MIN_UNWTD values > 1000?
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SST_MIN_UNWTD values > 900?
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_MAX_UNWTD
+say/append/outfile="($report)" SST_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) GT 1000` THEN say/append/outfile="($report)" --------- SST_MAX_UNWTD values > 1000?
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SST_MAX_UNWTD values > 900?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of SST_MAX_UNWTD=($STAT_MIN) less than min of SST_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of SST_MAX_UNWTD=($STAT_MAX) less than max of SST_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_STD_WEIGHTED
+say/append/outfile="($report)" SST_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SST_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SST_STD_UNWTD
+say/append/outfile="($report)" SST_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SST_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SST_STD_UNWTD must be nonnegative
+
+! ---------------------
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_COUNT_NOBS 
+say/append/outfile="($report)" SALINITY_COUNT_NOBS min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_COUNT_NOBS good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SALINITY_COUNT_NOBS cannot be less than 0
+if `($STAT_NBAD) GT 0` THEN say/append/outfile="($report)" --------- SALINITY_COUNT_NOBS must be all valid. Reports ($STAT_NBAD) missing
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_AVE_WEIGHTED
+say/append/outfile="($report)" SALINITY_AVE_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_AVE_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SALINITY_AVE_WEIGHTED values > 900?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_AVE_UNWTD
+say/append/outfile="($report)" SALINITY_AVE_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_AVE_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SALINITY_AVE_UNWTD values > 900?
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_MIN_UNWTD
+say/append/outfile="($report)" SALINITY_MIN_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_MIN_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SALINITY_MIN_UNWTD values > 1000
+define symbol min_min = ($STAT_MIN)
+define symbol max_min = ($STAT_MAX)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_MAX_UNWTD
+say/append/outfile="($report)" SALINITY_MAX_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_MAX_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MAX) GT 900` THEN say/append/outfile="($report)" --------- SALINITY_MAX_UNWTD values > 900?
+if `($STAT_MIN) LT ($min_min)` THEN say/append/outfile="($report)"  --------- min of SALINITY_MAX_UNWTD=($STAT_MIN) less than min of SALINITY_MIN_UNWTD=($min_min)
+if `($STAT_MAX) LT ($max_min)` THEN say/append/outfile="($report)"  --------- max of SALINITY_MAX_UNWTD=($STAT_MAX) less than max of SALINITY_MIN_UNWTD=($min_max)
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_STD_WEIGHTED
+say/append/outfile="($report)" SALINITY_STD_WEIGHTED min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_STD_WEIGHTED good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SALINITY_STD_WEIGHTED must be nonnegative
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat SALINITY_STD_UNWTD
+say/append/outfile="($report)" SALINITY_STD_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" SALINITY_STD_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `($STAT_MIN) LT 0` THEN say/append/outfile="($report)" --------- SALINITY_STD_UNWTD must be nonnegative
+
+! ---------------------
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat LAT_OFFSET_UNWTD
+say/append/outfile="($report)" LAT_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" LAT_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `ABS(($STAT_MIN)) GT 1` THEN say/append/outfile="($report)" --------- Min LAT_OFFSET_UNWTD must be > -1
+if `ABS(($STAT_MAX)) GT 1` THEN say/append/outfile="($report)" --------- Max LAT_OFFSET_UNWTD must be < 1
+
+
+say/append/outfile="($report)" .
+say/append/outfile="($report)" .
+
+stat LON_OFFSET_UNWTD
+say/append/outfile="($report)" LON_OFFSET_UNWTD min  ($STAT_MIN) max ($STAT_MAX)  std ($STAT_STD)
+say/append/outfile="($report)" LON_OFFSET_UNWTD good ($STAT_NGOOD) bad ($STAT_NBAD)  pct `100*($STAT_NGOOD)/(($STAT_NGOOD)+($STAT_NBAD)),prec=5`
+if `ABS(($STAT_MIN)) GT 1` THEN say/append/outfile="($report)" --------- Min LON_OFFSET_UNWTD must be > -1
+if `ABS(($STAT_MAX)) GT 1` THEN say/append/outfile="($report)" --------- Max LON_OFFSET_UNWTD must be < 1
+
+
+cancel redirect
+
+sp cat ($report)
+sp rm report_dummy.txt
+
+set mode/last verify
+

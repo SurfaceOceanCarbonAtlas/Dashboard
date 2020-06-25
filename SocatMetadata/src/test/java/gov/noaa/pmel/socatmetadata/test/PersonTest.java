@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -49,7 +49,7 @@ public class PersonTest {
     }
 
     @Test
-    public void testGetSetMiddleInitials() {
+    public void testGetSetMiddle() {
         Person person = new Person();
         assertEquals(EMPTY_STRING, person.getMiddle());
         person.setMiddle(INITIALS);
@@ -111,6 +111,25 @@ public class PersonTest {
     }
 
     @Test
+    public void testGetReferenceName() {
+        final String UNKNOWN = "Unknown";
+        Person person = new Person();
+        assertEquals(UNKNOWN, person.getReferenceName());
+        person.setLastName(LAST_NAME);
+        assertEquals(LAST_NAME, person.getReferenceName());
+        person.setFirstName(FIRST_NAME);
+        assertEquals(LAST_NAME + ", " + FIRST_NAME, person.getReferenceName());
+        person.setMiddle(INITIALS);
+        assertEquals(LAST_NAME + ", " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
+        person.setLastName(null);
+        assertEquals(UNKNOWN + " " + FIRST_NAME + " " + INITIALS, person.getReferenceName());
+        person.setFirstName(null);
+        assertEquals(UNKNOWN, person.getReferenceName());
+        person.setLastName(LAST_NAME);
+        assertEquals(LAST_NAME, person.getReferenceName());
+    }
+
+    @Test
     public void testPerson() {
         Person person = new Person(null, null, null, null, null, null);
         assertEquals(new Person(), person);
@@ -139,9 +158,9 @@ public class PersonTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Person person = new Person();
-        Person dup = person.clone();
+        Person dup = (Person) (person.duplicate(null));
         assertEquals(person, dup);
         assertNotSame(person, dup);
 
@@ -153,7 +172,7 @@ public class PersonTest {
         person.setOrganization(ORGANIZATION);
         assertNotEquals(person, dup);
 
-        dup = person.clone();
+        dup = (Person) (person.duplicate(null));
         assertEquals(person, dup);
         assertNotSame(person, dup);
     }

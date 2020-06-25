@@ -155,55 +155,44 @@ body {
     margin-left: 0.5em;
 }
 
+.metadatacaptionpanel {
+    display: block;
+    margin: 1em;
+}
+
+.metadatalistbox {
+    display: inline;
+    width: 16em;
+    margin-left: 1em;
+}
+
+.metadatapanel {
+    display: block;
+    margin-top: 0.25em;
+    margin-bottom: 0.5em;
+}
+
+.metadataradiobutton {
+    display: inline;
+    margin-left: 0.25em;
+}
+
+.metadatauploadfile {
+    display: inline;
+    width: 50%;
+    font-size: 100%;
+}
+
+.metadatauploadpanel {
+    display: inline;
+    margin-left: 0.5em;
+}
+
 .morehelpanchor {
     display: block;
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     margin-left: 3em;
-}
-
-.omeoptionpanel {
-    display: block;
-    border-style: solid;
-    border-width: 1px;
-    padding: 0.25em;
-    margin-top: 1em;
-    margin-bottom: 0em;
-    margin-left: 1em;
-    margin-right: 1em;
-}
-
-.omecruiselabel {
-    display: block;
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    margin-left: 0.5em;
-    marging-right: 1em;
-}
-
-.omeoptionradio {
-    display: block;
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    margin-left: 1em;
-    margin-right: 1em;
-}
-
-.omeoptionradiopiece {
-    display: inline;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    margin-left: 0em;
-    margin-right: 0.5em;
-}
-
-.omeoptiontext {
-    display: inline;
-    width: 16em;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    margin-left: 0.5em;
-    margin-right: 0em;
 }
 
 .optionsborderpanel {
@@ -367,7 +356,7 @@ body {
 }
 
 .uploadfile {
-    display: block;
+    display: inline;
     width: 90%;
     font-size: 100%;
     margin: 2em;

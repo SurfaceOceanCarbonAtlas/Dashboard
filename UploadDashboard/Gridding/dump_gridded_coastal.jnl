@@ -1,0 +1,117 @@
+! dump_gridded_coastal.jnl
+!
+! Creates a spreadsheet-like dump of the contents of SOCAT_qrtrdeg_gridded_coast_monthly.nc as SOCAT_qrtrdeg_gridded_coast_monthly.txt
+! Uses ncdump to dump the metadata preamble - goes to stdout
+! Then lists the axes - goes to stdout
+! Then lists the first point to get the header - goes to stdout
+! Then lists the actual data - goes to SOCAT_qrtrdeg_gridded_coast_monthly.txt
+!
+! Edit the information printed to stdout.
+! Remove the '----' lines from SOCAT_qrtrdeg_gridded_coast_monthly.txt and add spaces after the commas using 
+!    grep -v -- ---- SOCAT_qrtrdeg_gridded_coast_monthly.txt | sed -e 's/,/, /g' > (outputfilename)
+! Concatenate the two edited files to create the CSV file.
+!
+
+CANCEL MODE VERIFY
+SET MEMORY/SIZE=12G
+CANCEL MODE UPCASE
+SET MODE DATE_FORMAT ISO
+
+SPAWN ncdump -h SOCAT_qrtrdeg_gridded_coast_monthly.nc
+
+SAY
+
+USE SOCAT_qrtrdeg_gridded_coast_monthly.nc
+SET GRID coast_count_ncruise
+SHOW GRID
+
+SAY
+SAY ******************************************************************************
+SAY **** NOTE: rows containing no data (cruise count is zero) are not printed ****
+SAY ******************************************************************************
+SAY
+SAY Column  1: DATE is ISO Date representing the month midpoint (axis TMNTH)
+SAY Column  2: LAT is Latitude (axis YLAT)
+SAY Column  3: LON is Longitude (axis XLON)
+SAY
+
+LIST /QUIET /PREC=0 /WIDTH=5000 /HEAD /NOROWLAB /I=1 /J=1 /L=1 \
+    _T, _Y, _X, coast_count_ncruise, \
+    coast_fco2_count_nobs, coast_fco2_ave_unwtd, coast_fco2_ave_weighted, coast_fco2_max_unwtd, coast_fco2_min_unwtd, \
+        coast_fco2_std_unwtd, coast_fco2_std_weighted, \
+    coast_sst_count_nobs, coast_sst_ave_unwtd, coast_sst_ave_weighted, coast_sst_max_unwtd, coast_sst_min_unwtd, \
+        coast_sst_std_unwtd, coast_sst_std_weighted, \
+    coast_salinity_count_nobs, coast_salinity_ave_unwtd, coast_salinity_ave_weighted, coast_salinity_max_unwtd, coast_salinity_min_unwtd, \
+        coast_salinity_std_unwtd, coast_salinity_std_weighted, \
+    coast_lat_offset_unwtd, coast_lon_offset_unwtd
+
+SAY
+SAY Missing values are represented as -1.E+34
+SAY
+
+SET MODE VERIFY
+
+LET vararray = { \
+    "coast_count_ncruise", \
+    "coast_fco2_count_nobs", \
+    "coast_fco2_ave_unwtd", \
+    "coast_fco2_ave_weighted", \
+    "coast_fco2_max_unwtd", \
+    "coast_fco2_min_unwtd", \
+    "coast_fco2_std_unwtd", \
+    "coast_fco2_std_weighted", \
+    "coast_sst_count_nobs", \
+    "coast_sst_ave_unwtd", \
+    "coast_sst_ave_weighted", \
+    "coast_sst_max_unwtd", \
+    "coast_sst_min_unwtd", \
+    "coast_sst_std_unwtd", \
+    "coast_sst_std_weighted", \
+    "coast_salinity_count_nobs", \
+    "coast_salinity_ave_unwtd", \
+    "coast_salinity_ave_weighted", \
+    "coast_salinity_max_unwtd", \
+    "coast_salinity_min_unwtd", \
+    "coast_salinity_std_unwtd", \
+    "coast_salinity_std_weighted", \
+    "coast_lat_offset_unwtd", \
+    "coast_lon_offset_unwtd" \
+}
+
+LET dataset_array = { \
+    "valid_coast_time.nc", \
+    "valid_coast_lat.nc",  \
+    "valid_coast_lon.nc", \
+    "valid_coast_count_ncruise.nc", \
+    "valid_coast_fco2_count_nobs.nc", \
+    "valid_coast_fco2_ave_unwtd.nc", \
+    "valid_coast_fco2_ave_weighted.nc", \
+    "valid_coast_fco2_max_unwtd.nc", \
+    "valid_coast_fco2_min_unwtd.nc", \
+    "valid_coast_fco2_std_unwtd.nc", \
+    "valid_coast_fco2_std_weighted.nc", \
+    "valid_coast_sst_count_nobs.nc", \
+    "valid_coast_sst_ave_unwtd.nc", \
+    "valid_coast_sst_ave_weighted.nc", \
+    "valid_coast_sst_max_unwtd.nc", \
+    "valid_coast_sst_min_unwtd.nc", \
+    "valid_coast_sst_std_unwtd.nc", \
+    "valid_coast_sst_std_weighted.nc", \
+    "valid_coast_salinity_count_nobs.nc", \
+    "valid_coast_salinity_ave_unwtd.nc", \
+    "valid_coast_salinity_ave_weighted.nc", \
+    "valid_coast_salinity_max_unwtd.nc", \
+    "valid_coast_salinity_min_unwtd.nc", \
+    "valid_coast_salinity_std_unwtd.nc", \
+    "valid_coast_salinity_std_weighted.nc", \
+    "valid_coast_lat_offset_unwtd.nc", \
+    "valid_coast_lon_offset_unwtd.nc" \
+}
+
+SPAWN rm -f SOCAT_qrtrdeg_gridded_coast_monthly.txt 
+REPEAT /RANGE=1:`coast_count_ncruise,RETURN=LSIZE` /NAME=odx ( \
+    DEFINE SYMBOL lidx = `odx` ;\
+    IF `coast_count_ncruise[X=@MAX,Y=@MAX,L=($lidx)]` THEN \
+       GO print_gridded_coastal.jnl \
+)
+

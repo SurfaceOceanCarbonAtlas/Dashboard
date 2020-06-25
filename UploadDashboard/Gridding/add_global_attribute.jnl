@@ -1,0 +1,15 @@
+! add_global_attribute.jnl
+! Write a global "SOCAT_Notes" attribute, starting a new
+! file and containing the text here.
+
+SET DATA/SAVE
+can mode upcase
+
+define symbol writefile = ($1)
+
+let SOCAT_Notes = "SOCAT gridded v2020 ($current_date)" 
+
+save/clobber/asglobal/file="($writefile)" SOCAT_Notes
+sp ncdump -h ($writefile)
+
+SET DATA/RESTORE

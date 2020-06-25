@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test;
 
 import gov.noaa.pmel.dashboard.datatype.DashDataType;
@@ -36,7 +33,7 @@ public class RegenerateDsgsTest {
     public void testRegenerateDsgFiles() throws IllegalArgumentException, IOException {
         final String expocode = "PAT520151021";
 
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;

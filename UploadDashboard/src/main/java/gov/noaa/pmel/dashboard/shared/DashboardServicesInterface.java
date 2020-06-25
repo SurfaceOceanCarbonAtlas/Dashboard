@@ -1,10 +1,8 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -262,6 +260,68 @@ public interface DashboardServicesInterface extends RemoteService {
      */
     boolean buildPreviewImages(String username, String datasetId, String timetag, boolean firstCall)
             throws IllegalArgumentException;
+
+    /**
+     * Requests the IDs of datasets which have associated SocatMetadata objects
+     *
+     * @param username
+     *         name of the current user - for validation
+     *
+     * @return list of dataset IDs
+     *
+     * @throws IllegalArgumentException
+     *         if authentication failed
+     */
+    ArrayList<String> getAllDatasetIdsForMetadata(String username) throws IllegalArgumentException;
+
+    /**
+     * Copy the SocatMetadata, with appropriate adjustments, from one dataset to another.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param toId
+     *         copy the SocatMetadata to the dataset with this ID
+     * @param fromId
+     *         copy the SocatMetadata from the dataset with this ID
+     *
+     * @throws IllegalArgumentException
+     *         if authentication failed, or
+     *         if there was a problem copying the SocatMetadata
+     */
+    void copySocatMetadata(String username, String toId, String fromId) throws IllegalArgumentException;
+
+    /**
+     * Return the SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         return the SocatMetadata for the dataset with this ID
+     *
+     * @return the SocatMetadata for the dataset
+     *
+     * @throws IllegalArgumentException
+     *         if authentication fails, or
+     *         if unable to read the SocatMetadata for the dataset.
+     */
+    SocatMetadata getSocatMetadata(String username, String datasetId) throws IllegalArgumentException;
+
+    /**
+     * Save the given SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         save the given SocatMetadata for the dataset with this ID
+     * @param metadata
+     *         SocatMetadata to save
+     *
+     * @throws IllegalArgumentException
+     *         if authentication fails,
+     *         if the SocatMetadata does not correspond to the indicated dataset, or
+     *         if unable to save the SocatMetadata for the dataset.
+     */
+    void saveSocatMetadata(String username, String datasetId, SocatMetadata metadata) throws IllegalArgumentException;
 
     /**
      * Submits datasets named in the given listing for QC.

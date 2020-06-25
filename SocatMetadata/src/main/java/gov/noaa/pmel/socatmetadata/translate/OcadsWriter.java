@@ -1,28 +1,31 @@
 package gov.noaa.pmel.socatmetadata.translate;
 
-import gov.noaa.pmel.socatmetadata.Coverage;
-import gov.noaa.pmel.socatmetadata.MiscInfo;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
-import gov.noaa.pmel.socatmetadata.instrument.Analyzer;
-import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.socatmetadata.instrument.Equilibrator;
-import gov.noaa.pmel.socatmetadata.instrument.GasSensor;
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
-import gov.noaa.pmel.socatmetadata.instrument.PressureSensor;
-import gov.noaa.pmel.socatmetadata.instrument.Sampler;
-import gov.noaa.pmel.socatmetadata.instrument.TemperatureSensor;
-import gov.noaa.pmel.socatmetadata.person.Investigator;
-import gov.noaa.pmel.socatmetadata.person.Person;
-import gov.noaa.pmel.socatmetadata.person.Submitter;
-import gov.noaa.pmel.socatmetadata.platform.Platform;
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.AirPressure;
-import gov.noaa.pmel.socatmetadata.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.variable.DataVar;
-import gov.noaa.pmel.socatmetadata.variable.GasConc;
-import gov.noaa.pmel.socatmetadata.variable.MethodType;
-import gov.noaa.pmel.socatmetadata.variable.Variable;
+import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
+import gov.noaa.pmel.socatmetadata.shared.instrument.GasSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.instrument.PressureSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
+import gov.noaa.pmel.socatmetadata.shared.instrument.TemperatureSensor;
+import gov.noaa.pmel.socatmetadata.shared.person.Investigator;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.person.Submitter;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.GenData;
+import gov.noaa.pmel.socatmetadata.shared.variable.InstData;
+import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -175,7 +178,7 @@ public class OcadsWriter extends DocumentHandler {
     private static final String STANDARD_GAS_CONCENTRATION_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "concentration";
     private static final String STANDARD_GAS_UNCERTAINTY_ELEMENT_NAME = STANDARD_GAS_ELEMENT_NAME + SEP + "uncertainty";
 
-    private Writer xmlWriter;
+    private final Writer xmlWriter;
 
     /**
      * Creates a new document containing only the root element for OCADS XML content.
@@ -213,10 +216,10 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, ACCESS_ID_ELEMENT_NAME, info.getAccessId());
         ArrayList<Datestamp> history = info.getHistory();
         if ( history.size() > 0 )
-            setElementText(null, SUBMISSION_DATE_ELEMENT_NAME, history.get(0).stampString());
+            setElementText(null, SUBMISSION_DATE_ELEMENT_NAME, history.get(0).dateString());
         for (int k = 1; k < history.size(); k++) {
             Element elem = addListElement(null, UPDATE_DATE_ELEMENT_NAME);
-            elem.setText(history.get(k).stampString());
+            elem.setText(history.get(k).dateString());
         }
 
         addInvestigatorFields(null, mdata.getSubmitter());
@@ -230,16 +233,16 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(null, PURPOSE_ELEMENT_NAME, info.getPurpose());
 
         Coverage coverage = mdata.getCoverage();
-        Datestamp stamp = DocumentHandler.getDatestamp(coverage.getEarliestDataTime());
+        Datestamp stamp = coverage.getEarliestDataDate();
         try {
-            setElementText(null, DATA_START_DATE_ELEMENT_NAME, stamp.stampString());
-        } catch ( IllegalStateException ex ) {
+            setElementText(null, DATA_START_DATE_ELEMENT_NAME, stamp.dateString());
+        } catch ( IllegalArgumentException ex ) {
             // Invalid Datestamp - leave unassigned
         }
-        stamp = DocumentHandler.getDatestamp(coverage.getLatestDataTime());
+        stamp = coverage.getLatestDataDate();
         try {
-            setElementText(null, DATA_END_DATE_ELEMENT_NAME, stamp.stampString());
-        } catch ( IllegalStateException ex ) {
+            setElementText(null, DATA_END_DATE_ELEMENT_NAME, stamp.dateString());
+        } catch ( IllegalArgumentException ex ) {
             // Invalid Datestamp - leave unassigned
         }
         setElementText(null, WESTERNMOST_LONGITUDE_ELEMENT_NAME, coverage.getWesternLongitude().getValueString());
@@ -269,21 +272,18 @@ public class OcadsWriter extends DocumentHandler {
 
         setElementText(null, CITATION_ELEMENT_NAME, info.getCitation());
 
-        StringBuilder strBldr = new StringBuilder();
-        for (String ref : info.getReferences()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append(ref);
-        }
-        setElementText(null, REFERENCE_ELEMENT_NAME, strBldr.toString());
+        setElementText(null, REFERENCE_ELEMENT_NAME, info.getReferences().asOneString());
 
         ArrayList<Instrument> instruments = mdata.getInstruments();
         HashSet<String> usedInstrumentNames = new HashSet<String>();
         for (Variable var : mdata.getVariables()) {
             Element ancestor = addListElement(null, VARIABLE_ELEMENT_NAME);
             addVariableFields(ancestor, var);
-            if ( var instanceof DataVar )
-                usedInstrumentNames.addAll(addDataVariableAddnFields(ancestor, (DataVar) var, instruments));
+            if ( var instanceof GenData )
+                addGenDataVarAddnFields(ancestor, (GenData) var);
+            if ( var instanceof InstData )
+                usedInstrumentNames.addAll(addInstDataVarAddnFields(ancestor, (InstData) var,
+                        mdata.getInvestigators(), instruments));
             if ( var instanceof AirPressure )
                 addAirPressureAddnFields(ancestor, (AirPressure) var);
             if ( var instanceof GasConc )
@@ -293,30 +293,22 @@ public class OcadsWriter extends DocumentHandler {
         }
 
         // Additional information
-        strBldr = new StringBuilder();
+        MultiString addnInfo = new MultiString();
         // Describe any instruments not included elsewhere
         for (Instrument inst : instruments) {
             if ( !usedInstrumentNames.contains(inst.getName()) ) {
-                if ( strBldr.length() > 0 )
-                    strBldr.append("\n");
-                strBldr.append(getInstrumentDescription(inst));
+                addnInfo.append(getInstrumentDescription(inst));
             }
         }
         // Include the ports-of-call
         for (String port : info.getPortsOfCall()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append("Port of Call: ");
-            strBldr.append(port);
-
+            addnInfo.append("Port of Call: " + port);
         }
         // And any additional information in the SocatMetadata
         for (String addn : info.getAddnInfo()) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append(addn);
+            addnInfo.append(addn);
         }
-        setElementText(null, ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+        setElementText(null, ADDN_INFO_ELEMENT_NAME, addnInfo.asOneString());
 
         setElementText(null, WEBSITE_ELEMENT_NAME, info.getWebsite());
         setElementText(null, DOWNLOAD_URL_ELEMENT_NAME, info.getDownloadUrl());
@@ -346,40 +338,35 @@ public class OcadsWriter extends DocumentHandler {
         }
         String strVal = pi.getFirstName() + " " + pi.getMiddle();
         strVal = strVal.trim() + " " + pi.getLastName();
-        setElementText(ancestor, issubmitter ? SUBMITTER_NAME_ELEMENT_NAME : INVESTIGATOR_NAME_ELEMENT_NAME,
-                strVal);
-        setElementText(ancestor, issubmitter ? SUBMITTER_ORG_ELEMENT_NAME : INVESTIGATOR_ORG_ELEMENT_NAME,
-                pi.getOrganization());
-        ArrayList<String> strList = pi.getStreets();
-        if ( strList.size() > 0 )
-            setElementText(ancestor,
-                    issubmitter ? SUBMITTER_FIRST_STREET_ELEMENT_NAME : INVESTIGATOR_FIRST_STREET_ELEMENT_NAME,
-                    strList.get(0));
-        if ( strList.size() > 1 ) {
-            strVal = strList.get(1);
-            for (int k = 2; k < strList.size(); k++) {
-                strVal += "\n" + strList.get(k);
-            }
-            setElementText(ancestor,
-                    issubmitter ? SUBMITTER_SECOND_STREET_ELEMENT_NAME : INVESTIGATOR_SECOND_STREET_ELEMENT_NAME,
-                    strVal);
+        setElementText(ancestor, issubmitter ? SUBMITTER_NAME_ELEMENT_NAME :
+                INVESTIGATOR_NAME_ELEMENT_NAME, strVal);
+        setElementText(ancestor, issubmitter ? SUBMITTER_ORG_ELEMENT_NAME :
+                INVESTIGATOR_ORG_ELEMENT_NAME, pi.getOrganization());
+        MultiString streets = pi.getStreets();
+        if ( !streets.isEmpty() ) {
+            strVal = streets.pop();
+            setElementText(ancestor, issubmitter ? SUBMITTER_FIRST_STREET_ELEMENT_NAME :
+                    INVESTIGATOR_FIRST_STREET_ELEMENT_NAME, strVal);
         }
-        setElementText(ancestor, issubmitter ? SUBMITTER_CITY_ELEMENT_NAME : INVESTIGATOR_CITY_ELEMENT_NAME,
-                pi.getCity());
-        setElementText(ancestor, issubmitter ? SUBMITTER_REGION_ELEMENT_NAME : INVESTIGATOR_REGION_ELEMENT_NAME,
-                pi.getRegion());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ZIP_ELEMENT_NAME : INVESTIGATOR_ZIP_ELEMENT_NAME,
-                pi.getZipCode());
-        setElementText(ancestor, issubmitter ? SUBMITTER_COUNTRY_ELEMENT_NAME : INVESTIGATOR_COUNTRY_ELEMENT_NAME,
-                pi.getCountry());
-        setElementText(ancestor, issubmitter ? SUBMITTER_EMAIL_ELEMENT_NAME : INVESTIGATOR_EMAIL_ELEMENT_NAME,
-                pi.getEmail());
-        setElementText(ancestor, issubmitter ? SUBMITTER_PHONE_ELEMENT_NAME : INVESTIGATOR_PHONE_ELEMENT_NAME,
-                pi.getPhone());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ID_ELEMENT_NAME : INVESTIGATOR_ID_ELEMENT_NAME,
-                pi.getId());
-        setElementText(ancestor, issubmitter ? SUBMITTER_ID_TYPE_ELEMENT_NAME : INVESTIGATOR_ID_TYPE_ELEMENT_NAME,
-                pi.getIdType());
+        if ( !streets.isEmpty() )
+            setElementText(ancestor, issubmitter ? SUBMITTER_SECOND_STREET_ELEMENT_NAME :
+                    INVESTIGATOR_SECOND_STREET_ELEMENT_NAME, streets.asOneString());
+        setElementText(ancestor, issubmitter ? SUBMITTER_CITY_ELEMENT_NAME :
+                INVESTIGATOR_CITY_ELEMENT_NAME, pi.getCity());
+        setElementText(ancestor, issubmitter ? SUBMITTER_REGION_ELEMENT_NAME :
+                INVESTIGATOR_REGION_ELEMENT_NAME, pi.getRegion());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ZIP_ELEMENT_NAME :
+                INVESTIGATOR_ZIP_ELEMENT_NAME, pi.getZipCode());
+        setElementText(ancestor, issubmitter ? SUBMITTER_COUNTRY_ELEMENT_NAME :
+                INVESTIGATOR_COUNTRY_ELEMENT_NAME, pi.getCountry());
+        setElementText(ancestor, issubmitter ? SUBMITTER_EMAIL_ELEMENT_NAME :
+                INVESTIGATOR_EMAIL_ELEMENT_NAME, pi.getEmail());
+        setElementText(ancestor, issubmitter ? SUBMITTER_PHONE_ELEMENT_NAME :
+                INVESTIGATOR_PHONE_ELEMENT_NAME, pi.getPhone());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_ELEMENT_NAME :
+                INVESTIGATOR_ID_ELEMENT_NAME, pi.getId());
+        setElementText(ancestor, issubmitter ? SUBMITTER_ID_TYPE_ELEMENT_NAME :
+                INVESTIGATOR_ID_TYPE_ELEMENT_NAME, pi.getIdType());
     }
 
     /**
@@ -394,24 +381,13 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_COLUMN_NAME_ELEMENT_NAME, var.getColName());
         setElementText(ancestor, VARIABLE_FULL_NAME_ELEMENT_NAME, var.getFullName());
         setElementText(ancestor, VARIABLE_UNIT_ELEMENT_NAME, var.getVarUnit());
-        setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
-        String strVal = var.getFlagColName();
-        if ( !strVal.isEmpty() )
-            setElementText(ancestor, VARIABLE_FLAG_ELEMENT_NAME, "Given in column: " + strVal);
 
         StringBuilder strBldr = new StringBuilder();
-        strVal = var.getMissVal();
+        String strVal = var.getMissVal();
         if ( !strVal.isEmpty() ) {
             if ( strBldr.length() > 0 )
                 strBldr.append("\n");
             strBldr.append("Missing Value: ");
-            strBldr.append(strVal);
-        }
-        strVal = var.getPrecision().asOneString();
-        if ( !strVal.isEmpty() ) {
-            if ( strBldr.length() > 0 )
-                strBldr.append("\n");
-            strBldr.append("Resolution/Precision: ");
             strBldr.append(strVal);
         }
         for (String addn : var.getAddnInfo()) {
@@ -423,19 +399,49 @@ public class OcadsWriter extends DocumentHandler {
     }
 
     /**
-     * Add the OCADS XML for the additional fields found in DataVar
+     * Add the OCADS XML for the additional fields found in GenData
      *
      * @param ancestor
      *         add under this element
      * @param var
      *         use the information given in this data variable
+     */
+    private void addGenDataVarAddnFields(Element ancestor, GenData var) {
+        setElementText(ancestor, VARIABLE_UNCERTAINTY_ELEMENT_NAME, var.getAccuracy().asOneString());
+        String strVal = var.getFlagColName();
+        if ( !strVal.isEmpty() )
+            setElementText(ancestor, VARIABLE_FLAG_ELEMENT_NAME, "Given in column: " + strVal);
+
+        strVal = var.getPrecision().asOneString();
+        if ( !strVal.isEmpty() ) {
+            StringBuilder strBldr = new StringBuilder();
+            strBldr.append("Resolution/Precision: ");
+            strBldr.append(strVal);
+            String addnInfo = getElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME);
+            if ( !addnInfo.isEmpty() ) {
+                strBldr.append("\n");
+                strBldr.append(addnInfo);
+            }
+            setElementText(ancestor, VARIABLE_ADDN_INFO_ELEMENT_NAME, strBldr.toString());
+        }
+    }
+
+    /**
+     * Add the OCADS XML for the additional fields found in InstData
+     *
+     * @param ancestor
+     *         add under this element
+     * @param var
+     *         use the information given in this data variable
+     * @param investigators
+     *         investigators associated with this dataset
      * @param instruments
      *         list of instruments used in this dataset
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addDataVariableAddnFields(Element ancestor, DataVar var,
-            ArrayList<Instrument> instruments) {
+    private HashSet<String> addInstDataVarAddnFields(Element ancestor, InstData var,
+            ArrayList<Investigator> investigators, ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
 
         setElementText(ancestor, VARIABLE_OBS_TYPE_ELEMENT_NAME, var.getObserveType());
@@ -469,7 +475,7 @@ public class OcadsWriter extends DocumentHandler {
         setElementText(ancestor, VARIABLE_MANIPULATION_METHOD_ELEMENT_NAME, var.getManipulationDescription());
         setElementText(ancestor, VARIABLE_DURATION_ELEMENT_NAME, var.getDuration());
 
-        HashSet<String> strSet = var.getInstrumentNames();
+        MultiNames strSet = var.getInstrumentNames();
         if ( !strSet.isEmpty() ) {
             for (Instrument inst : instruments) {
                 if ( !strSet.contains(inst.getName()) )
@@ -539,11 +545,20 @@ public class OcadsWriter extends DocumentHandler {
             }
         }
         setElementText(ancestor, VARIABLE_REPLICATE_ELEMENT_NAME, var.getReplication());
-        Person pi = var.getResearcher();
-        String fullname = pi.getFirstName() + " " + pi.getMiddle();
-        fullname = fullname.trim() + " " + pi.getLastName();
-        setElementText(ancestor, VARIABLE_RESEARCHER_NAME_ELEMENT_NAME, fullname);
-        setElementText(ancestor, VARIABLE_RESEARCHER_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+        String name = var.getResearcherName();
+        Person pi = null;
+        for (Investigator inv : investigators) {
+            if ( inv.matchesName(name) ) {
+                pi = inv;
+                break;
+            }
+        }
+        if ( pi != null ) {
+            String fullname = pi.getFirstName() + " " + pi.getMiddle();
+            fullname = fullname.trim() + " " + pi.getLastName();
+            setElementText(ancestor, VARIABLE_RESEARCHER_NAME_ELEMENT_NAME, fullname);
+            setElementText(ancestor, VARIABLE_RESEARCHER_ORGANIZATION_ELEMENT_NAME, pi.getOrganization());
+        }
 
         if ( var instanceof AquGasConc ) {
             switch ( var.getMeasureMethod() ) {
@@ -655,7 +670,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addSamplerElements(Element ancestor, DataVar var, Sampler inst,
+    private HashSet<String> addSamplerElements(Element ancestor, InstData var, Sampler inst,
             ArrayList<Instrument> instruments) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
@@ -687,7 +702,7 @@ public class OcadsWriter extends DocumentHandler {
                 setElementText(ancestor, EQUILIBRATOR_VENTED_ELEMENT_NAME, equil.getVenting());
                 setElementText(ancestor, EQUILIBRATOR_WATER_FLOW_RATE_ELEMENT_NAME, equil.getWaterFlowRate());
                 setElementText(ancestor, EQUILIBRATOR_GAS_FLOW_RATE_ELEMENT_NAME, equil.getGasFlowRate());
-                HashSet<String> attachInstNames = inst.getInstrumentNames();
+                MultiNames attachInstNames = inst.getInstrumentNames();
                 if ( !attachInstNames.isEmpty() ) {
                     for (Instrument attachInst : instruments) {
                         if ( attachInstNames.contains(attachInst.getName()) ) {
@@ -747,7 +762,7 @@ public class OcadsWriter extends DocumentHandler {
      *
      * @return set of instrument names used in the description
      */
-    private HashSet<String> addAnalyzerElements(Element ancestor, DataVar var, Analyzer inst) {
+    private HashSet<String> addAnalyzerElements(Element ancestor, InstData var, Analyzer inst) {
         HashSet<String> usedInstNames = new HashSet<String>();
         usedInstNames.add(inst.getName());
 

@@ -1,12 +1,11 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -87,13 +86,27 @@ public class NumericStringTest {
         assertEquals(new NumericString(), numstr);
         numstr = new NumericString("\t", "\n");
         assertEquals(new NumericString(), numstr);
+
         numstr = new NumericString(POSVAL_STR, UNIT_STR);
         assertEquals(POSVAL_STR, numstr.getValueString());
         assertEquals(UNIT_STR, numstr.getUnitString());
+
         NumericString other = new NumericString(null, null);
         other.setValueString(POSVAL_STR);
         other.setUnitString(UNIT_STR);
         assertEquals(numstr, other);
+
+        numstr = new NumericString();
+        other = new NumericString(numstr);
+        assertEquals(numstr, other);
+
+        numstr.setValueString(NEGVAL_STR);
+        numstr.setUnitString(UNIT_STR);
+        assertNotEquals(numstr, other);
+
+        other = new NumericString(numstr);
+        assertEquals(numstr, other);
+        assertTrue(other.isNegative());
     }
 
     @Test
@@ -164,23 +177,6 @@ public class NumericStringTest {
         assertEquals(UNIT_STR, numstr.asOneString());
         numstr.setUnitString("\t");
         assertEquals(EMPTY_STR, numstr.getValueString());
-    }
-
-    @Test
-    public void testClone() {
-        NumericString numstr = new NumericString();
-        NumericString dup = numstr.clone();
-        assertEquals(numstr, dup);
-        assertNotSame(numstr, dup);
-
-        numstr.setValueString(NEGVAL_STR);
-        numstr.setUnitString(UNIT_STR);
-        assertNotEquals(numstr, dup);
-
-        dup = numstr.clone();
-        assertEquals(numstr, dup);
-        assertNotSame(numstr, dup);
-        assertTrue(dup.isNegative());
     }
 
     @Test

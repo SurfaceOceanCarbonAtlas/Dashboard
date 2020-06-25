@@ -1,0 +1,43 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:style src="../FullWidth.css"/>
+    <ui:style field="mstyle" src="EditSocatMetadata.css"/>
+
+    <g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.titlepanel}">
+                <g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton"/>
+                <g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel"/>
+                <g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel"/>
+                <g:Label addStyleNames="{style.titlereset}"/>
+            </g:FlowPanel>
+            <g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml"/>
+            <g:DockLayoutPanel unit="EM" addStyleNames="{mstyle.dockpanel}">
+                <g:west size="10">
+                    <g:FlowPanel addStyleNames="{mstyle.sidepanel}">
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="submitterButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="investigatorsButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="platformButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="coverageButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="instrumentsButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="variablesButton"/>
+                        <g:Button addStyleNames="{mstyle.sidebutton}" ui:field="miscInfoButton"/>
+                    </g:FlowPanel>
+                </g:west>
+                <g:center>
+                    <g:ResizeLayoutPanel>
+                        <g:DeckLayoutPanel addStyleNames="{mstyle.mainpanel}" ui:field="mainPanel"/>
+                    </g:ResizeLayoutPanel>
+                </g:center>
+            </g:DockLayoutPanel>
+            <g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="saveButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton"/>
+                <g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:ScrollPanel>
+
+</ui:UiBinder>

@@ -3,6 +3,7 @@ package gov.noaa.pmel.dashboard.test.qc;
 import gov.noaa.pmel.dashboard.qc.DataLocation;
 import gov.noaa.pmel.dashboard.qc.DataQCEvent;
 import gov.noaa.pmel.dashboard.qc.QCEvent;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import org.junit.Test;
 
@@ -67,7 +68,7 @@ public class DataQCEventTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());
@@ -92,7 +93,7 @@ public class DataQCEventTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
-        assertEquals(DashboardUtils.REGION_ID_GLOBAL, myflag.getRegionId());
+        assertEquals(DashboardServerUtils.REGION_ID_GLOBAL, myflag.getRegionId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getDatasetId());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagValue());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getFlagName());

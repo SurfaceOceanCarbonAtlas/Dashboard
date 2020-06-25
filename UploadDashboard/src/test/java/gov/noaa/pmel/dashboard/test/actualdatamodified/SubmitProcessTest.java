@@ -41,7 +41,7 @@ public class SubmitProcessTest {
      */
     @Test
     public void testSubmitProcess() {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         // Get the default dashboard configuration
         DashboardConfigStore configStore = null;
@@ -119,7 +119,7 @@ public class SubmitProcessTest {
                 };
                 try {
                     metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                            DashboardUtils.OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                            DashboardServerUtils.OME_FILENAME, TIMESTAMP, version, inputStream, true);
                 } finally {
                     reader.close();
                 }
@@ -134,7 +134,7 @@ public class SubmitProcessTest {
                 };
                 try {
                     metadata = metaFileHandler.saveMetadataInputStream(EXPOCODE, USERNAME,
-                            DashboardUtils.PI_OME_FILENAME, TIMESTAMP, version, inputStream, true);
+                            DashboardServerUtils.PI_OME_FILENAME, TIMESTAMP, version, inputStream, true);
                 } finally {
                     reader.close();
                 }
@@ -191,7 +191,7 @@ public class SubmitProcessTest {
             qc.setFlagValue(flag.flagString());
             qc.setFlagDate(new Date());
             qc.setVersion(version);
-            qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+            qc.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
             qc.setComment(comment);
             qc.setDatasetId(EXPOCODE);
             dbHandler.addDatasetQCEvents(Collections.singletonList(qc));
@@ -254,7 +254,7 @@ public class SubmitProcessTest {
 
     static {
         if ( !DATA_COLUMN_TYPES.get(2).setSelectedUnit("dd-mm-yyyy") )
-            throw new RuntimeException("Failed to assign the DATE unit ofr DATA_COLUMN_TYPES");
+            throw new RuntimeException("Failed to assign the DATE unit for DATA_COLUMN_TYPES");
     }
 
     private static final String[] TSV_DATA_STRINGS = new String[] {

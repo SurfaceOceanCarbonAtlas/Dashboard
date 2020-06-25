@@ -1,12 +1,13 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.GasConc;
-import gov.noaa.pmel.socatmetadata.variable.MethodType;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.variable.GasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -20,9 +21,8 @@ public class GasConcTest {
 
     private static final String EMPTY_STRING = "";
     private static final NumericString EMPTY_NUMSTR = new NumericString();
-    private static final ArrayList<String> EMPTY_ARRAYLIST = new ArrayList<String>();
-    private static final HashSet<String> EMPTY_HASHSET = new HashSet<String>();
-    private static final Person EMPTY_PERSON = new Person();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
 
     private static final String COL_NAME = "xCO2_atm";
     private static final String FULL_NAME = "Mole fraction CO2 in sea level atmosphere";
@@ -31,10 +31,10 @@ public class GasConcTest {
     private static final String FLAG_COL_NAME = "WOCE xCO2_atm";
     private static final NumericString ACCURACY = new NumericString("0.01", "umol/mol");
     private static final NumericString PRECISION = new NumericString("0.001", "umol/mol");
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some sort of information",
-            "Another bit of information"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some sort of information\n" +
+                    "Another bit of information"
+    );
 
     private static final String OBSERVE_TYPE = "Surface Underway";
     private static final MethodType MEASURE_METHOD = MethodType.MEASURED_INSITU;
@@ -45,11 +45,8 @@ public class GasConcTest {
     private static final String STORAGE_METHOD = "Does not apply";
     private static final String MEASURE_TEMPERATURE = "20 deg C";
     private static final String REPLICATION_INFO = "Duplicate sampling was performed";
-    private static final Person RESEARCHER = new Person("Smith", "John", "D.Z.", "PI-23423", "PIRecords", "NOAA/PMEL");
-    private static final ArrayList<String> INSTRUMENT_NAMES = new ArrayList<String>(Arrays.asList(
-            "Equilibrator",
-            "Equilibrator LICOR"
-    ));
+    private static final String RESEARCHER_NAME = "Smith, John D.Z.";
+    private static final MultiNames INSTRUMENT_NAMES = new MultiNames("Equilibrator, Equilibrator LICOR");
 
     private static final String DRYING_METHOD = "Gas stream passes through a thermoelectric condenser (~5 &#176;C) and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).";
     private static final String WATER_VAPOR_CORRECTION = "Another standard data reduction method";
@@ -60,8 +57,8 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getDryingMethod());
         var.setDryingMethod(DRYING_METHOD);
         assertEquals(DRYING_METHOD, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -71,7 +68,7 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -92,8 +89,8 @@ public class GasConcTest {
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertEquals(WATER_VAPOR_CORRECTION, var.getWaterVaporCorrection());
         assertEquals(EMPTY_STRING, var.getDryingMethod());
-        assertEquals(EMPTY_HASHSET, var.getInstrumentNames());
-        assertEquals(EMPTY_PERSON, var.getResearcher());
+        assertEquals(EMPTY_NAMESET, var.getInstrumentNames());
+        assertEquals(EMPTY_STRING, var.getResearcherName());
         assertEquals(EMPTY_STRING, var.getReplication());
         assertEquals(EMPTY_STRING, var.getAnalysisTemperature());
         assertEquals(EMPTY_STRING, var.getStorageMethod());
@@ -103,7 +100,7 @@ public class GasConcTest {
         assertEquals(EMPTY_STRING, var.getMethodDescription());
         assertEquals(MethodType.UNSPECIFIED, var.getMeasureMethod());
         assertEquals(EMPTY_STRING, var.getObserveType());
-        assertEquals(EMPTY_ARRAYLIST, var.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, var.getAddnInfo());
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getFlagColName());
@@ -143,20 +140,20 @@ public class GasConcTest {
         assertEquals(new HashSet<String>(Arrays.asList("instrumentNames")), var.invalidFieldNames());
 
         var.setInstrumentNames(INSTRUMENT_NAMES);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
         var.setInstrumentNames(null);
 
         var.setMeasureMethod(MethodType.COMPUTED);
         assertEquals(new HashSet<String>(Arrays.asList("methodDescription")), var.invalidFieldNames());
 
         var.setMethodDescription(METHOD_DESCRIPTION);
-        assertEquals(EMPTY_HASHSET, var.invalidFieldNames());
+        assertEquals(new HashSet<String>(), var.invalidFieldNames());
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         GasConc var = new GasConc();
-        GasConc dup = var.clone();
+        GasConc dup = (GasConc) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
 
@@ -178,20 +175,19 @@ public class GasConcTest {
         var.setStorageMethod(STORAGE_METHOD);
         var.setAnalysisTemperature(MEASURE_TEMPERATURE);
         var.setReplication(REPLICATION_INFO);
-        var.setResearcher(RESEARCHER);
+        var.setResearcherName(RESEARCHER_NAME);
         var.setInstrumentNames(INSTRUMENT_NAMES);
 
         var.setDryingMethod(DRYING_METHOD);
         var.setWaterVaporCorrection(WATER_VAPOR_CORRECTION);
         assertNotEquals(var, dup);
 
-        dup = var.clone();
+        dup = (GasConc) (var.duplicate(null));
         assertEquals(var, dup);
         assertNotSame(var, dup);
         assertNotSame(var.getAccuracy(), dup.getAccuracy());
         assertNotSame(var.getPrecision(), dup.getPrecision());
         assertNotSame(var.getAddnInfo(), dup.getAddnInfo());
-        assertNotSame(var.getResearcher(), dup.getResearcher());
         assertNotSame(var.getInstrumentNames(), dup.getInstrumentNames());
     }
 
@@ -324,10 +320,10 @@ public class GasConcTest {
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 
-        first.setResearcher(RESEARCHER);
+        first.setResearcherName(RESEARCHER_NAME);
         assertNotEquals(first.hashCode(), second.hashCode());
         assertFalse(first.equals(second));
-        second.setResearcher(RESEARCHER);
+        second.setResearcherName(RESEARCHER_NAME);
         assertEquals(first.hashCode(), second.hashCode());
         assertTrue(first.equals(second));
 

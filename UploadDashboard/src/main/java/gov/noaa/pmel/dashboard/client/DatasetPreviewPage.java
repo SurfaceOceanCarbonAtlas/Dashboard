@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
@@ -309,7 +306,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
      * Display the preview page in the RootLayoutPanel with data plots for the first cruise in the given cruiseList.
      * Adds this page to the page history.
      */
-    static void showPage(DashboardDatasetList cruiseList) {
+    public static void showPage(DashboardDatasetList cruiseList) {
         if ( singleton == null )
             singleton = new DatasetPreviewPage();
         singleton.imageExtension = cruiseList.getImageExtension();
@@ -322,7 +319,7 @@ public class DatasetPreviewPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

@@ -3,6 +3,7 @@ package gov.noaa.pmel.dashboard.test.server;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.TreeSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Unit tests for methods in {@link DashboardServerUtils}
@@ -19,17 +21,42 @@ import static org.junit.Assert.assertTrue;
 public class DashboardServerUtilsTest {
 
     /**
-     * Test method for {@link DashboardServerUtils#guessPlatformType(String, String)}.
+     * Test method for {@link DashboardServerUtils#getShipCodeFromDatasetID(String)} and
+     * {@link DashboardServerUtils#getDatestampFromDatasetID(String)}
      */
     @Test
-    public void testGuessPlatformType() {
-        assertEquals("Ship", DashboardServerUtils.guessPlatformType("ABCD", ""));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("ABCD", "Mooring"));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("ABCD", "Buoy"));
-        assertEquals("Drifting Buoy", DashboardServerUtils.guessPlatformType("ABCD", "Drifting Buoy"));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("3164", ""));
-        assertEquals("Mooring", DashboardServerUtils.guessPlatformType("91FS", ""));
-        assertEquals("Drifting Buoy", DashboardServerUtils.guessPlatformType("91DB", ""));
+    public void testGetShipCodeDateFromDatasetID() {
+        final String normal = "abcd20200215";
+        final String normexpo = "ABCD";
+        final String longer = "aBcDe20200215";
+        final String longexpo = "ABCDE";
+        final String hyphenated = "316420200215-2";
+        final String hyphenexpo = "3164";
+        final String toolong = "ABCDEF20200215-42";
+        Datestamp expectdate = new Datestamp(2020, 2, 15, 0, 0, 0);
+
+        assertEquals(normexpo, DashboardServerUtils.getShipCodeFromDatasetID(normal));
+        assertEquals(expectdate, DashboardServerUtils.getDatestampFromDatasetID(normal));
+        assertEquals(longexpo, DashboardServerUtils.getShipCodeFromDatasetID(longer));
+        assertEquals(expectdate, DashboardServerUtils.getDatestampFromDatasetID(longer));
+        assertEquals(hyphenexpo, DashboardServerUtils.getShipCodeFromDatasetID(hyphenated));
+        assertEquals(expectdate, DashboardServerUtils.getDatestampFromDatasetID(hyphenated));
+        boolean complained = false;
+        try {
+            DashboardServerUtils.getShipCodeFromDatasetID(toolong);
+        } catch ( IllegalArgumentException ex ) {
+            complained = true;
+        }
+        if ( !complained )
+            fail("getShipCodeFromDatasetID with " + toolong + " did not throw an exception");
+        complained = false;
+        try {
+            DashboardServerUtils.getDatestampFromDatasetID(toolong);
+        } catch ( IllegalArgumentException ex ) {
+            complained = true;
+        }
+        if ( !complained )
+            fail("getDatestampFromDatasetID with " + toolong + " did not throw an exception");
     }
 
     /**

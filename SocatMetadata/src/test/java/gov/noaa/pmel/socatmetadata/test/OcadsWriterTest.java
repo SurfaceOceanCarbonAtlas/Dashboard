@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.Coverage;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.core.Coverage;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
 import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;
@@ -143,31 +143,31 @@ public class OcadsWriterTest {
                 docHandler.getElementText(null, "citation"));
 
         assertEquals("DOE (1994). Handbook of methods for the analysis of the various\n" +
-                        "parameters of the carbon dioxide system in sea water; version\n" +
-                        "2. DOE.\n" +
+                        "        parameters of the carbon dioxide system in sea water; version\n" +
+                        "        2. DOE.\n" +
                         "Feely, R. A., R. Wanninkhof, H. B. Milburn, C. E. Cosca, M. Stapp and\n" +
-                        "P. P. Murphy (1998) A new automated underway system for making\n" +
-                        "high precision pCO2 measurements onboard research ships.\n" +
-                        "Analytica Chim. Acta 377: 185-191.\n" +
+                        "        P. P. Murphy (1998) A new automated underway system for making\n" +
+                        "        high precision pCO2 measurements onboard research ships.\n" +
+                        "        Analytica Chim. Acta 377: 185-191.\n" +
                         "Ho, D. T., R. Wanninkhof, J. Masters, R. A. Feely and C. E. Cosca\n" +
-                        "(1997). Measurement of underway fCO2 in the Eastern\n" +
-                        "Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER,\n" +
-                        "NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.\n" +
+                        "        (1997). Measurement of underway fCO2 in the Eastern\n" +
+                        "        Equatorial Pacific on NOAA ships BALDRIGE and DISCOVERER,\n" +
+                        "        NOAA data report ERL AOML-30, 52 pp., NTIS Springfield.\n" +
                         "Pierrot, D., C. Neill, K. Sullivan, R. Castle, R. Wanninkhof, H.\n" +
-                        "Luger, T. Johannessen, A. Olsen, R. A. Feely, and C. E.\n" +
-                        "Cosca (2009), Recommendations for autonomous underway pCO2\n" +
-                        "measuring systems and data-reduction routines.  Deep Sea\n" +
-                        "Research II, 56: 512-522.\n" +
-                        "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in\n" +
-                        "surface water using continuous and discrete sampling methods.\n" +
-                        "Mar. Chem. 44(2-4): 189-205.\n" +
+                        "        Luger, T. Johannessen, A. Olsen, R. A. Feely, and C. E.\n" +
+                        "        Cosca (2009), Recommendations for autonomous underway pCO2\n" +
+                        "        measuring systems and data-reduction routines.  Deep Sea\n" +
+                        "        Research II, 56: 512-522.\n" +
+                        "Wanninkhof, R. and K. Thoning (1993) Measurement of fugacity of CO2 in \n" +
+                        "        surface water using continuous and discrete sampling methods.\n" +
+                        "        Mar. Chem. 44(2-4): 189-205.\n" +
                         "Weiss, R. F. (1970) The solubility of nitrogen, oxygen and argon in\n" +
-                        "water and seawater. Deep-Sea Research 17: 721-735.\n" +
+                        "        water and seawater. Deep-Sea Research 17: 721-735.\n" +
                         "Weiss, R. F. (1974) Carbon dioxide in water and seawater: the\n" +
-                        "solubility of a non-ideal gas.  Mar. Chem. 2: 203-215.\n" +
+                        "        solubility of a non-ideal gas.  Mar. Chem. 2: 203-215.\n" +
                         "Weiss, R. F., R. A. Jahnke and C. D. Keeling (1982) Seasonal effects\n" +
-                        "of temperature and salinity on the partial pressure of CO2 in\n" +
-                        "seawater. Nature 300: 511-513.",
+                        "        of temperature and salinity on the partial pressure of CO2 in\n" +
+                        "        seawater. Nature 300: 511-513.",
                 docHandler.getElementText(null, "reference"));
 
         assertEquals("Other Sensor 1: Manufacturer: Setra; Model: 239; Calibration: Factory calibration; " +
@@ -185,7 +185,7 @@ public class OcadsWriterTest {
                         "were interpolated using this offset to determine the SST at the time of the equilibrator " +
                         "measurement.  (2.) A total of 6011 measurements were taken with 5661 flagged as good, 342 " +
                         "flagged as questionable, and 8 flagged as bad.  All measurements flagged as 4 (bad) have " +
-                        "been removed from the final data file.  (3.) There was a 17-1/2 hour dropout of EqT readings at\n" +
+                        "been removed from the final data file.  (3.) There was a 17-1/2 hour dropout of EqT readings at \n" +
                         "the start of the cruise.  New values were determined using a relation between equilibrator " +
                         "temperature and SST.  The equation used was EqT = 0.9734*SST + 0.7735, n = 124, " +
                         "r^2 = 0.9630.  All of these values have been flagged 3.  (4.) On 1/22 at 1730, an emergency " +
@@ -258,8 +258,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+            assertEquals("1", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01\n" +
                             "Frequency: Every 150 seconds",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -286,7 +286,8 @@ public class OcadsWriterTest {
             assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
             assertEquals("Sprayhead above dynamic pool, with thermal jacket",
                     docHandler.getElementText(var, equilibratorType));
-            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L",
+                    docHandler.getElementText(var, equilibratorVolume));
             assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
             assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
             assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
@@ -303,8 +304,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, dryMethod));
             assertEquals("LI-COR", docHandler.getElementText(var, gasDetectorManufacturer));
             assertEquals("LI-6262", docHandler.getElementText(var, gasDetectorModel));
-            assertEquals("0.01 microatmosphere", docHandler.getElementText(var, gasDetectorResolution));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("0.01", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("1", docHandler.getElementText(var, gasDetectorUncertainty));
             assertEquals("The analyzer is calibrated every 3.25 hours with standards from ESRL in Boulder, CO " +
                             "that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
                     docHandler.getElementText(var, standardizationDescription));
@@ -346,11 +347,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -412,11 +413,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -589,9 +590,9 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("deg C", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.025 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.025 deg C", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: In Hydro Lab, inserted into equilibrator ~ 5 cm below water line.\n" +
-                    "Resolution/Precision: 0.01 °C", docHandler.getElementText(var, detailedInfo));
+                    "Resolution/Precision: 0.01 deg C", docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
             assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
@@ -642,9 +643,9 @@ public class OcadsWriterTest {
             assertEquals("Sea surface temperature (degrees Celsius)", docHandler.getElementText(var, fullname));
             assertEquals("deg C", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.01 °C", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.01 deg C", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: Bow thruster room, before sea water pump, ~5 m below water line.\n" +
-                    "Resolution/Precision: 0.001 °C", docHandler.getElementText(var, detailedInfo));
+                    "Resolution/Precision: 0.001 deg C", docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
             assertEquals("Measured in-situ", docHandler.getElementText(var, measured));
@@ -696,9 +697,9 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.005 permil", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.005", docHandler.getElementText(var, uncertainty));
             assertEquals("Sampling location: Attached to underway system at sea water input.\n" +
-                            "Resolution/Precision: 0.0002 permil",
+                            "Resolution/Precision: 0.0002",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
             assertEquals("Measured in-situ", docHandler.getElementText(var, insitu));
@@ -751,8 +752,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("Given in column: WOCE_QC_FLAG", docHandler.getElementText(var, flag));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, uncertainty));
-            assertEquals("Resolution/Precision: 0.01 microatmosphere\n" +
+            assertEquals("1", docHandler.getElementText(var, uncertainty));
+            assertEquals("Resolution/Precision: 0.01\n" +
                             "Frequency: Every 150 seconds",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));
@@ -779,7 +780,8 @@ public class OcadsWriterTest {
             assertEquals("Sampling Depth: 5 meters", docHandler.getElementText(var, depthSeawaterIntake));
             assertEquals("Sprayhead above dynamic pool, with thermal jacket",
                     docHandler.getElementText(var, equilibratorType));
-            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L", docHandler.getElementText(var, equilibratorVolume));
+            assertEquals("0.95 L; Water Volume: 0.4 L; Gas Volume: 0.55 L",
+                    docHandler.getElementText(var, equilibratorVolume));
             assertEquals("Yes", docHandler.getElementText(var, equilibratorVented));
             assertEquals("1.5 - 2.0 L/min", docHandler.getElementText(var, equilibratorWaterFlowRate));
             assertEquals("70 - 150 ml/min", docHandler.getElementText(var, equilibratorGasFlowRate));
@@ -796,8 +798,8 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, dryMethod));
             assertEquals("LI-COR", docHandler.getElementText(var, gasDetectorManufacturer));
             assertEquals("LI-6262", docHandler.getElementText(var, gasDetectorModel));
-            assertEquals("0.01 microatmosphere", docHandler.getElementText(var, gasDetectorResolution));
-            assertEquals("1 microatmospheres", docHandler.getElementText(var, gasDetectorUncertainty));
+            assertEquals("0.01", docHandler.getElementText(var, gasDetectorResolution));
+            assertEquals("1", docHandler.getElementText(var, gasDetectorUncertainty));
             assertEquals("The analyzer is calibrated every 3.25 hours with standards from ESRL in Boulder, CO " +
                             "that are directly traceable to the WMO scale.  The zero gas is 99.9% nitrogen.",
                     docHandler.getElementText(var, standardizationDescription));
@@ -840,11 +842,11 @@ public class OcadsWriterTest {
                     docHandler.getElementText(var, fullname));
             assertEquals("", docHandler.getElementText(var, unit));
             assertEquals("", docHandler.getElementText(var, flag));
-            assertEquals("0.2 ppm", docHandler.getElementText(var, uncertainty));
+            assertEquals("0.2", docHandler.getElementText(var, uncertainty));
             assertEquals("Drying Method: Gas stream passes through a thermoelectric condenser (~5 °C) and " +
                             "then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).\n" +
                             "Sampling location: Bow tower ~10 m above the sea surface.\n" +
-                            "Resolution/Precision: 0.01 ppm\n" +
+                            "Resolution/Precision: 0.01\n" +
                             "Measurement: Yes, 5 readings in a group every 3.25 hours.",
                     docHandler.getElementText(var, detailedInfo));
             assertEquals("Surface Underway", docHandler.getElementText(var, observationType));

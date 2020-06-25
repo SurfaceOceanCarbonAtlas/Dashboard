@@ -6,32 +6,45 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
-import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.socatmetadata.instrument.GasSensor;
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
+import gov.noaa.pmel.socatmetadata.shared.instrument.GasSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.variable.AirPressure;
+import gov.noaa.pmel.socatmetadata.shared.variable.AquGasConc;
+import gov.noaa.pmel.socatmetadata.shared.variable.MethodType;
+import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
+import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.AirPressure;
-import gov.noaa.pmel.socatmetadata.variable.AquGasConc;
-import gov.noaa.pmel.socatmetadata.variable.MethodType;
-import gov.noaa.pmel.socatmetadata.variable.Temperature;
-import gov.noaa.pmel.socatmetadata.variable.Variable;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OmeUtils {
+
+    public static final DateFormat SIMPLE_DATE_FORMAT_UTC;
+
+    static {
+        SIMPLE_DATE_FORMAT_UTC = new SimpleDateFormat("yyyy MM dd HH mm ss");
+        SIMPLE_DATE_FORMAT_UTC.setTimeZone(TimeZone.getTimeZone("UTC"));
+        SIMPLE_DATE_FORMAT_UTC.setLenient(false);
+    }
 
     private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
 
@@ -283,9 +296,12 @@ public class OmeUtils {
             return status;
         }
 
+        String[] pieces = SIMPLE_DATE_FORMAT_UTC.format(new Date()).split(" ");
+        Datestamp today = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], pieces[5]);
+
         // Rough judgement on whether metadata is complete
         boolean acceptable = true;
-        HashSet<String> invalids = sdiMData.invalidFieldNames();
+        HashSet<String> invalids = sdiMData.invalidFieldNames(today);
         if ( invalids.size() > 0 ) {
             comment += "Metadata incomplete: ";
             for (String expl : invalids) {

@@ -11,10 +11,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socatmetadata.MiscInfo;
-import gov.noaa.pmel.socatmetadata.SocatMetadata;
-import gov.noaa.pmel.socatmetadata.platform.Platform;
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.MiscInfo;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -226,7 +226,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // Check if there is a PI-provided OME document
         try {
-            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
             FileReader xmlReader = new FileReader(mdataFile);
             sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
             platformName = sdimdata.getPlatform().getPlatformName();
@@ -236,26 +236,26 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         if ( sdimdata == null ) {
             // Use the OME stub (which should always exist)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
                 sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
-                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+                        "Unexpected failure to read " + DashboardServerUtils.OME_FILENAME + " for " + stdId);
             }
         }
         else if ( platformName.isEmpty() ) {
             // PI-provided OME document given, but does not contain the platform name; try to get it
             // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardUtils.OME_FILENAME);
+                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
                 SocatMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
-                        "Unexpected failure to read " + DashboardUtils.OME_FILENAME + " for " + stdId);
+                        "Unexpected failure to read " + DashboardServerUtils.OME_FILENAME + " for " + stdId);
             }
             if ( !platformName.isEmpty() ) {
                 // Add the platform name to the SDIMetadata object
@@ -273,7 +273,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             for (String datetime : dsetInfo.getArchiveTimestamps()) {
                 // The format of these timestamps are "yyyy-MM-dd HH:mm Z"
                 String[] pieces = datetime.split("[ :/-]");
-                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2]);
+                Datestamp datestamp = new Datestamp(pieces[0], pieces[1], pieces[2], pieces[3], pieces[4], "0");
                 archiveDates.add(datestamp);
             }
             if ( archiveDates.isEmpty() ) {
@@ -283,7 +283,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
                         archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ||
                         archiveStatus.startsWith(DashboardUtils.ARCHIVE_STATUS_SENT_TO_START) )
                     // Add a datestamp of 1900-01-01 to indicate unknown submission date
-                    archiveDates.add(new Datestamp("1900", "1", "1"));
+                    archiveDates.add(new Datestamp(1900, 1, 1, 0, 0, 0));
             }
             if ( !archiveDates.isEmpty() ) {
                 // MiscInfo.getHistory returns a copy, so need to update it in the MiscInfo object
@@ -471,17 +471,17 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // If it exists, include the (dataset)/PI_OME.xml and PI_OME.pdf files
         // (which are not listed as supplemental documents)
-        File piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_FILENAME);
+        File piOme = metadataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
         if ( piOme.exists() )
             metaDocs.add(piOme);
-        piOme = metadataHandler.getMetadataFile(stdId, DashboardUtils.PI_OME_PDF_FILENAME);
+        piOme = metadataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_PDF_FILENAME);
         if ( piOme.exists() )
             metaDocs.add(piOme);
 
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(stdId)) {
             // Exclude the (dataset)/OME.xml stub document
             String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !filename.equals(DashboardServerUtils.OME_FILENAME) ) {
                 metaDocs.add(metadataHandler.getMetadataFile(stdId, filename));
             }
         }

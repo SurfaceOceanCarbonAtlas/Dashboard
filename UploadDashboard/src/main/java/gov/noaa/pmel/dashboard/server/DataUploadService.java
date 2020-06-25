@@ -518,7 +518,7 @@ public class DataUploadService extends HttpServlet {
             }
             // If the platform type is not given, make an educated guess
             if ( platformType == null ) {
-                platformType = DashboardServerUtils.guessPlatformType(datasetId, platformName);
+                platformType = DashboardUtils.guessPlatformType(datasetId, platformName);
             }
 
             // Clear any dataset QC comments as they were for previous data,
@@ -545,7 +545,7 @@ public class DataUploadService extends HttpServlet {
                 omeMData.setPlatformType(platformType);
                 omeMData.setInvestigatorsAndOrganizations(piNames, organizations);
                 DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
-                        DashboardUtils.OME_FILENAME, timestamp, username, dsetData.getVersion());
+                        DashboardServerUtils.OME_FILENAME, timestamp, username, dsetData.getVersion());
                 // This is an known incomplete stub just for SOCAT use, so mark it as okay
                 mdata.setConflicted(false);
                 String msg = "OME metadata created from data file for " + datasetId + " uploaded by " + username;
@@ -564,10 +564,10 @@ public class DataUploadService extends HttpServlet {
             ArrayList<DashboardMetadata> mdataList = configStore.getMetadataFileHandler().getMetadataFiles(datasetId);
             TreeSet<String> addlDocs = new TreeSet<String>();
             for (DashboardMetadata mdata : mdataList) {
-                if ( DashboardUtils.OME_FILENAME.equals(mdata.getFilename()) ) {
+                if ( DashboardServerUtils.OME_FILENAME.equals(mdata.getFilename()) ) {
                     // Ignore the OME XML stub file
                 }
-                else if ( DashboardUtils.PI_OME_FILENAME.equals(mdata.getFilename()) ) {
+                else if ( DashboardServerUtils.PI_OME_FILENAME.equals(mdata.getFilename()) ) {
                     dsetData.setOmeTimestamp(mdata.getUploadTimestamp());
                 }
                 else {

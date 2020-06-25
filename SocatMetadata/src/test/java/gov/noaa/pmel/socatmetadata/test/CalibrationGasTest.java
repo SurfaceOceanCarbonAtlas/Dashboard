@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -151,7 +151,7 @@ public class CalibrationGasTest {
         try {
             gas.isNonZero();
             fail("calling isNonZero on a unassigned CalibrationGas succeeded");
-        } catch ( IllegalStateException ex ) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         gas.setConcentration(new NumericString("0.0", null));
@@ -160,7 +160,7 @@ public class CalibrationGasTest {
         try {
             gas.isNonZero();
             fail("calling isNonZero in a CalibrationGas with only concentration assigned succeeded");
-        } catch ( IllegalStateException ex ) {
+        } catch ( IllegalArgumentException ex ) {
             // Expected result
         }
         gas.setAccuracy(ACCURACY);
@@ -181,9 +181,9 @@ public class CalibrationGasTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         CalibrationGas gas = new CalibrationGas();
-        CalibrationGas dup = gas.clone();
+        CalibrationGas dup = (CalibrationGas) (gas.duplicate(null));
         assertEquals(gas, dup);
         assertNotSame(gas, dup);
 
@@ -195,7 +195,7 @@ public class CalibrationGasTest {
         gas.setAccuracy(ACCURACY);
         assertNotEquals(gas, dup);
 
-        dup = gas.clone();
+        dup = (CalibrationGas) (gas.duplicate(null));
         assertEquals(gas, dup);
         assertNotSame(gas, dup);
     }

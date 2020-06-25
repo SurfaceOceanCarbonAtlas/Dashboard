@@ -1,9 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.Equilibrator;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Equilibrator;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -16,18 +17,16 @@ import static org.junit.Assert.assertTrue;
 public class EquilibratorTest {
 
     private static final String EMPTY_STRING = "";
-    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
 
     private static final String NAME = "Equilibrator";
     private static final String ID = "325";
     private static final String MANUFACTURER = "NOAA";
     private static final String MODEL = "7";
-    private static final String LOCATION = "Bow of ship";
-    private static final String CALIBRATION = "Factory calibration";
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some comment",
-            "Another comment"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some comment\n" +
+                    "Another comment"
+    );
     private static final String EQUILIBRATOR_TYPE = "Sprayhead above dynamic pool, with thermal jacket";
     private static final String CHAMBER_VOLUME = "0.95L";
     private static final String CHAMBER_WATER_VOLUME = "0.4L";
@@ -35,8 +34,6 @@ public class EquilibratorTest {
     private static final String WATER_FLOW_RATE = "1.5 - 2.0 L/min";
     private static final String GAS_FLOW_RATE = "70 - 150 ml/min";
     private static final String VENTING = "Primary equlibrator is vented through a secondary equilibrator";
-    private static final String DRYING = "Gas stream passes through a thermoelectric condenser (~5 &#176;C) " +
-            "and then through a Perma Pure (Nafion) dryer before reaching the analyzer (90% dry).";
 
     @Test
     public void testInvalidFieldNames() {
@@ -47,7 +44,7 @@ public class EquilibratorTest {
         )), sampler.invalidFieldNames());
 
         sampler.setName(NAME);
-        sampler.setInstrumentNames(Arrays.asList("TemperatureSensor", "PressureSensor", "CO2Sensor"));
+        sampler.setInstrumentNames(new MultiNames("TemperatureSensor, PressureSensor, CO2Sensor"));
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         assertEquals(new HashSet<String>(Arrays.asList(
                 "chamberWaterVol", "chamberGasVol", "waterFlowRate", "gasFlowRate", "venting"
@@ -79,7 +76,7 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
         sampler.setEquilibratorType(EQUILIBRATOR_TYPE);
         assertEquals(EQUILIBRATOR_TYPE, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -97,7 +94,7 @@ public class EquilibratorTest {
         sampler.setChamberVol(CHAMBER_VOLUME);
         assertEquals(CHAMBER_VOLUME, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -116,7 +113,7 @@ public class EquilibratorTest {
         assertEquals(CHAMBER_WATER_VOLUME, sampler.getChamberWaterVol());
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -136,7 +133,7 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberWaterVol());
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -157,7 +154,7 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberWaterVol());
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -179,7 +176,7 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberWaterVol());
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -202,7 +199,7 @@ public class EquilibratorTest {
         assertEquals(EMPTY_STRING, sampler.getChamberWaterVol());
         assertEquals(EMPTY_STRING, sampler.getChamberVol());
         assertEquals(EMPTY_STRING, sampler.getEquilibratorType());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
@@ -214,9 +211,9 @@ public class EquilibratorTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Equilibrator sampler = new Equilibrator();
-        Equilibrator dup = sampler.clone();
+        Equilibrator dup = (Equilibrator) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
 
@@ -234,7 +231,7 @@ public class EquilibratorTest {
         sampler.setVenting(VENTING);
         assertNotEquals(sampler, dup);
 
-        dup = sampler.clone();
+        dup = (Equilibrator) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
     }

@@ -40,11 +40,10 @@ public class GenerateCruiseReports {
 
     private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
     private static final String NOT_AVAILABLE_TAG = "N/A";
-    private static final String SOCAT_ENHANCED_DOI_TAG = "SOCATENHANCEDDOI";
-    private static final String SOCAT_ENHANCED_HREF_PREFIX = "https://doi.pangaea.de/";
 
     // SOCAT main DOI, DOI HRef, and publication citation
     private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.905654";
+    private static final String SOCAT_MAIN_URL = "https://doi.pangaea.de/10.1594/PANGAEA.905654";
     private static final String[] SOCAT_MAIN_CITATION = {
             "  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade ",
             "record of high quality fCO2 data in version 3 of the Surface Ocean ",
@@ -64,12 +63,12 @@ public class GenerateCruiseReports {
                     "316N19971005"
             ));
 
-    private DataFileHandler dataHandler;
-    private MetadataFileHandler metadataHandler;
-    private DsgNcFileHandler dsgFileHandler;
-    private KnownDataTypes knownMetadataTypes;
-    private KnownDataTypes knownDataFileTypes;
-    private String dateStamp;
+    private final DataFileHandler dataHandler;
+    private final MetadataFileHandler metadataHandler;
+    private final DsgNcFileHandler dsgFileHandler;
+    private final KnownDataTypes knownMetadataTypes;
+    private final KnownDataTypes knownDataFileTypes;
+    private final String dateStamp;
 
     /**
      * For generating cruise reports from the data provided by the given dashboard configuration.
@@ -134,7 +133,7 @@ public class GenerateCruiseReports {
             // Exclude the (expocode)/OME.xml document at this time;
             // do include the (expocode)/PI_OME.xml
             String filename = mdata.getFilename();
-            if ( !filename.equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !filename.equals(DashboardServerUtils.OME_FILENAME) ) {
                 addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
             }
         }
@@ -202,31 +201,43 @@ public class GenerateCruiseReports {
         String qcFlag = socatMeta.getDatasetQCFlag();
 
         // Get the rest of the metadata info from the OME XML
-        DashboardOmeMetadata omeMeta = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
+        DashboardOmeMetadata omeMeta = metadataHandler.getOmeFromFile(upperExpo, DashboardServerUtils.OME_FILENAME);
 
-        // Get DOIs from data file properties
+        // Get DOIs and URLs from data file properties
         DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-        omeMeta.setDatasetDOI(cruise.getSourceDOI());
-        String socatDOI = cruise.getEnhancedDOI();
-        if ( socatDOI.isEmpty() )
-            socatDOI = SOCAT_ENHANCED_DOI_TAG;
+        String origDoi = cruise.getSourceDOI();
+        if ( DashboardUtils.STRING_MISSING_VALUE.equals(origDoi) )
+            origDoi = NOT_AVAILABLE_TAG;
+        String origUrl = cruise.getSourceURL();
+        if ( DashboardUtils.STRING_MISSING_VALUE.equals(origUrl) )
+            origUrl = NOT_AVAILABLE_TAG;
+        /*
+         * String socatDoi = cruise.getEnhancedDOI();
+         * if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDoi) )
+         *     socatDoi = NOT_AVAILABLE_TAG;
+         * String socatUrl = cruise.getEnhancedURL();
+         * if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatUrl) )
+         *     socatUrl = NOT_AVAILABLE_TAG;
+         */
 
         // Get the list of additional document filenames associated with this cruise.
         // Use what the QC-ers see - the directory listing.
         TreeSet<String> addlDocs = new TreeSet<String>();
         for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo)) {
-            if ( !mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
+            if ( !mdata.getFilename().equals(DashboardServerUtils.OME_FILENAME) ) {
                 addlDocs.add(mdata.getFilename());
             }
         }
 
         // Generate the report
-        PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
+        PrintWriter report = new PrintWriter(reportFile, "UTF-8");
         try {
-            ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion, socatDOI, qcFlag, addlDocs, report);
+            ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion,
+                    origDoi, origUrl, qcFlag, addlDocs, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, false);
-            printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersion, socatDOI, qcFlag, null, false);
+            printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersion,
+                    origDoi, qcFlag, null, false);
         } finally {
             report.close();
         }
@@ -258,7 +269,12 @@ public class GenerateCruiseReports {
         int numDatasets = expocodes.size();
         ArrayList<String> upperExpoList = new ArrayList<String>(numDatasets);
         ArrayList<String> socatVersionList = new ArrayList<String>(numDatasets);
-        ArrayList<String> socatDOIList = new ArrayList<String>(numDatasets);
+        ArrayList<String> origDoiList = new ArrayList<String>(numDatasets);
+        ArrayList<String> origUrlList = new ArrayList<String>(numDatasets);
+        /*
+         * ArrayList<String> socatDoiList = new ArrayList<String>(numDatasets);
+         * ArrayList<String> socatUrlList = new ArrayList<String>(numDatasets);
+         */
         ArrayList<String> qcFlagList = new ArrayList<String>(numDatasets);
         ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
         ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
@@ -315,15 +331,27 @@ public class GenerateCruiseReports {
                 DsgMetadata socatMeta = dsgFile.getMetadata();
                 socatVersionList.add(socatMeta.getVersion());
                 qcFlagList.add(socatMeta.getDatasetQCFlag());
+                // get the DOIs and URLs from the data file properties
                 DashboardDataset cruise = dataHandler.getDatasetFromInfoFile(upperExpo);
-                String socatDOI = cruise.getEnhancedDOI();
-                if ( DashboardUtils.STRING_MISSING_VALUE.equals(socatDOI) )
-                    socatDOI = SOCAT_ENHANCED_DOI_TAG;
-                socatDOIList.add(socatDOI);
-                DashboardOmeMetadata omeMData = metadataHandler.getOmeFromFile(upperExpo, DashboardUtils.OME_FILENAME);
-                // get the original-data DOI from the data file properties (not part of CDIAC OME as such; might be part of citation)
-                omeMData.setDatasetDOI(cruise.getSourceDOI());
-                omeMetaList.add(omeMData);
+                String value = cruise.getSourceDOI();
+                if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                    value = NOT_AVAILABLE_TAG;
+                origDoiList.add(value);
+                value = cruise.getSourceURL();
+                if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                    value = NOT_AVAILABLE_TAG;
+                origUrlList.add(value);
+                /*
+                 * value = cruise.getEnhancedDOI();
+                 * if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                 *     value = NOT_AVAILABLE_TAG;
+                 * socatDoiList.add(value);
+                 * value = cruise.getEnhancedURL();
+                 * if ( DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+                 *     value = NOT_AVAILABLE_TAG;
+                 * socatUrlList.add(value);
+                 */
+                omeMetaList.add(metadataHandler.getOmeFromFile(upperExpo, DashboardServerUtils.OME_FILENAME));
                 upperExpoList.add(upperExpo);
             }
         }
@@ -335,17 +363,17 @@ public class GenerateCruiseReports {
             TreeSet<String> addlDocs = new TreeSet<String>();
             for (DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo)) {
                 // Ignore the OME.xml stub at this time, but include any PI_OME.xml since that is what was uploaded
-                if ( !mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
+                if ( !mdata.getFilename().equals(DashboardServerUtils.OME_FILENAME) ) {
                     addlDocs.add(mdata.getFilename());
                 }
             }
             addlDocsList.add(addlDocs);
         }
 
-        PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
+        PrintWriter report = new PrintWriter(reportFile, "UTF-8");
         try {
-            ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList,
-                    socatVersionList, socatDOIList, qcFlagList, addlDocsList, report);
+            ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList, socatVersionList,
+                    origDoiList, origUrlList, qcFlagList, addlDocsList, report);
             warnMsgs.addAll(msgs);
             printDataTableHeader(report, true);
             // Read and report the data for one dataset at a time
@@ -361,7 +389,7 @@ public class GenerateCruiseReports {
                     warnMsgs.add(msg);
                 }
                 printDataStrings(report, dsgFile.getStdDataArray(), upperExpo, socatVersionList.get(k),
-                        socatDOIList.get(k), qcFlagList.get(k), regionID, true);
+                        origDoiList.get(k), qcFlagList.get(k), regionID, true);
             }
         } finally {
             report.close();
@@ -378,8 +406,10 @@ public class GenerateCruiseReports {
      *         OME XML document with metadata values to report in the preamble
      * @param socatVersion
      *         SOCAT version to report in the preamble
-     * @param socatDOI
-     *         DOI for this SOCAT-enhanced data file
+     * @param origDoi
+     *         DOI for the original data
+     * @param origUrl
+     *         URL for the landing page of the original data
      * @param qcFlag
      *         QC flag to report in the preamble
      * @param addlDocs
@@ -389,8 +419,8 @@ public class GenerateCruiseReports {
      *
      * @return list of warnings about the generated preamble; never null but may be empty
      */
-    private ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta,
-            String socatVersion, String socatDOI, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
+    private ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, String socatVersion,
+            String origDoi, String origUrl, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
         String upperExpo = omeMeta.getDatasetId();
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -400,18 +430,20 @@ public class GenerateCruiseReports {
         report.println("Dataset Name: " + omeMeta.getDatasetName());
         report.println("Platform Name: " + omeMeta.getPlatformName());
         report.println("Principal Investigator(s): " + omeMeta.getPINames());
-        report.println("DOI for the original data: " + omeMeta.getDatasetDOI());
-        report.println("    or see: " + omeMeta.getDatasetLink());
-        report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
-        report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
+        report.println("DOI for the original data: " + origDoi);
+        report.println("    or see: " + origUrl);
+        /*
+         * report.println("DOI of this SOCAT-enhanced data: " + socatDoi);
+         * report.println("    or see: " + socatUrl);
+         */
         report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
-        report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
+        report.println("    or see: " + SOCAT_MAIN_URL);
         report.println();
 
         // Additional references - add expocode suffix for clarity
         report.println("Supplemental documentation reference(s):");
         for (String filename : addlDocs) {
-            report.println("    " + filename);
+            report.println("    " + upperExpo + "/" + filename);
         }
         report.println();
 
@@ -484,10 +516,10 @@ public class GenerateCruiseReports {
             "Dataset Name\t" +
             "Platform Name\t" +
             "PI(s)\t" +
-            "Original Data DOI\t" +
-            "Original Data Reference\t" +
-            "SOCAT DOI\t" +
-            "SOCAT Reference\t" +
+            "Data Source DOI\t" +
+            "Data Source Reference\t" +
+            // "SOCAT DOI\t" +
+            // "SOCAT Reference\t" +
             "Westmost Longitude\t" +
             "Eastmost Longitude\t" +
             "Southmost Latitude\t" +
@@ -507,8 +539,10 @@ public class GenerateCruiseReports {
      *         list of metadata values, one per dataset, to use for information to report
      * @param socatVersionList
      *         list of SOCAT version numbers, one per dataset, to report
-     * @param socatDOIList
-     *         list of DOIs, one per dataset, for the SOCAT-enhanced data files
+     * @param origDoiList
+     *         list of DOIs, one per dataset, for the original data
+     * @param origUrlList
+     *         list of landing page URLs, one per dataset, for the original data
      * @param qcFlagList
      *         list of QC flags, one per dataset, to report
      * @param addlDocsList
@@ -519,18 +553,17 @@ public class GenerateCruiseReports {
      * @return list of warnings about the generated preamble; never null but may be empty
      */
     private ArrayList<String> printMetadataPreamble(String regionName, ArrayList<DashboardOmeMetadata> omeMetaList,
-            ArrayList<String> socatVersionList, ArrayList<String> socatDOIList, ArrayList<String> qcFlagList,
-            ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
+            ArrayList<String> socatVersionList, ArrayList<String> origDoiList, ArrayList<String> origUrlList,
+            ArrayList<String> qcFlagList, ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
         ArrayList<String> warnMsgs = new ArrayList<String>();
 
         report.println("SOCAT data report created: " + dateStamp);
         report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
-        report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
+        report.println("    or see: " + SOCAT_MAIN_URL);
         if ( regionName == null )
             report.println("SOCAT data for the following data sets:");
         else
-            report.println("SOCAT data in SOCAT region \"" +
-                    regionName + "\" for the following data sets:");
+            report.println("SOCAT data in SOCAT region \"" + regionName + "\" for the following data sets:");
         report.println(MULTI_CRUISE_METADATA_REPORT_HEADER);
         boolean needsFakeHoursMsg = false;
         for (int k = 0; k < omeMetaList.size(); k++) {
@@ -555,25 +588,19 @@ public class GenerateCruiseReports {
             report.print(omeMeta.getPINames());
             report.print("\t");
 
-            String origDOI = omeMeta.getDatasetDOI();
-            if ( origDOI.isEmpty() )
-                origDOI = NOT_AVAILABLE_TAG;
-            report.print(origDOI);
+            report.print(origDoiList.get(k));
             report.print("\t");
 
-            String origHRef = omeMeta.getDatasetLink();
-            if ( origHRef.isEmpty() )
-                origHRef = NOT_AVAILABLE_TAG;
-            report.print(origHRef);
+            report.print(origUrlList.get(k));
             report.print("\t");
 
-            String socatDOI = socatDOIList.get(k);
-            report.print(socatDOI);
-            report.print("\t");
-
-            String socatHRef = SOCAT_ENHANCED_HREF_PREFIX + socatDOI;
-            report.print(socatHRef);
-            report.print("\t");
+            /*
+             * report.print(socatDoiList.get(k));
+             * report.print("\t");
+             *
+             * report.print(socatUrlList.get(k));
+             * report.print("\t");
+             */
 
             try {
                 double westLon = omeMeta.getWestmostLongitude();
@@ -656,7 +683,7 @@ public class GenerateCruiseReports {
                     isFirst = false;
                 else
                     report.print("; ");
-                report.print(filename);
+                report.print(upperExpo + "/" + filename);
             }
 
             report.println();
@@ -751,7 +778,8 @@ public class GenerateCruiseReports {
     private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
             "version: version of SOCAT where this enhanced data first appears",
-            "SOCAT_DOI: DOI for this SOCAT-enhanced data",
+            "Source_DOI: DOI for the data source (the original data)",
+            // "SOCAT_DOI: DOI for this SOCAT-enhanced data",
             "QC_Flag: Data set QC flag",
             "yr: 4-digit year of the time (UTC) of the measurement",
             "mon: month of the time (UTC) of the measurement",
@@ -775,7 +803,7 @@ public class GenerateCruiseReports {
             "    Global Relief Data (see: http://www.ngdc.noaa.gov/mgg/global/etopo2.html)",
             "dist_to_land: estimated distance to major land mass in kilometers (up to 1000 km)",
             "GVCO2: atmospheric xCO2 in micromole per mole interpolated from NOAA Greenhouse Gas Reference ",
-            "    1979-01-01 to 2018-01-01 surface CO2 data (see: https://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php)",
+            "    1979-01-01 to 2019-01-01 surface CO2 data (see: https://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php)",
             "xCO2water_equ_dry: measured xCO2 (water) in micromole per mole at equilibrator temperature (dry air)",
             "xCO2water_SST_dry: measured xCO2 (water) in micromole per mole at sea surface temperature (dry air)",
             "pCO2water_equ_wet: measured pCO2 (water) in microatmospheres at equilibrator temperature (wet air)",
@@ -795,7 +823,8 @@ public class GenerateCruiseReports {
      */
     public static final String SINGLE_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
-            "SOCAT_DOI\t" +
+            "Source_DOI\t" +
+            // "SOCAT_DOI\t" +
             "QC_Flag\t" +
             "yr\t" +
             "mon\t" +
@@ -833,7 +862,8 @@ public class GenerateCruiseReports {
     private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
             "Expocode: unique identifier for the data set from which this data was obtained",
             "version: version of SOCAT where this enhanced data first appears",
-            "SOCAT_DOI: DOI for this SOCAT-enhanced data",
+            "Source_DOI: DOI for the data source (the original data)",
+            // "SOCAT_DOI: DOI for this SOCAT-enhanced data",
             "QC_Flag: Data set QC flag",
             "yr: 4-digit year of the time (UTC) of the measurement",
             "mon: month of the time (UTC) of the measurement",
@@ -857,7 +887,13 @@ public class GenerateCruiseReports {
             "    Global Relief Data (see: http://www.ngdc.noaa.gov/mgg/global/etopo2.html)",
             "dist_to_land: estimated distance to major land mass in kilometers (up to 1000 km)",
             "GVCO2: atmospheric xCO2 in micromole per mole interpolated from NOAA Greenhouse Gas Reference ",
-            "    1979-01-01 to 2018-01-01 surface CO2 data (see: https://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php)",
+            "    1979-01-01 to 2019-01-01 surface CO2 data (see: https://www.esrl.noaa.gov/gmd/ccgg/mbl/data.php)",
+            "xCO2water_equ_dry: measured xCO2 (water) in micromole per mole at equilibrator temperature (dry air)",
+            "xCO2water_SST_dry: measured xCO2 (water) in micromole per mole at sea surface temperature (dry air)",
+            "pCO2water_equ_wet: measured pCO2 (water) in microatmospheres at equilibrator temperature (wet air)",
+            "pCO2water_SST_wet: measured pCO2 (water) in microatmospheres at sea surface temperature (wet air)",
+            "fCO2water_equ_wet: measured fCO2 (water) in microatmospheres at equilibrator temperature (wet air)",
+            "fCO2water_SST_wet: measured fCO2 (water) in microatmospheres at sea surface temperature (wet air)",
             "fCO2rec: fCO2 in microatmospheres recomputed from the raw data (see below)",
             "fCO2rec_src: algorithm for generating fCO2rec from the raw data (0:not generated; 1-14, see below)",
             "fCO2rec_flag: WOCE flag for this fCO2rec value (2:good, 3:questionable, 4:bad, 9:not generated; see below)",
@@ -871,7 +907,8 @@ public class GenerateCruiseReports {
      */
     public static final String MULTI_CRUISE_DATA_REPORT_HEADER = "Expocode\t" +
             "version\t" +
-            "SOCAT_DOI\t" +
+            "Source_DOI\t" +
+            // "SOCAT_DOI\t" +
             "QC_Flag\t" +
             "yr\t" +
             "mon\t" +
@@ -892,6 +929,12 @@ public class GenerateCruiseReports {
             "ETOPO2_depth [m]\t" +
             "dist_to_land [km]\t" +
             "GVCO2 [umol/mol]\t" +
+            "xCO2water_equ_dry [umol/mol]\t" +
+            "xCO2water_SST_dry [umol/mol]\t" +
+            "pCO2water_equ_wet [uatm]\t" +
+            "pCO2water_SST_wet [uatm]\t" +
+            "fCO2water_equ_wet [uatm]\t" +
+            "fCO2water_SST_wet [uatm]\t" +
             "fCO2rec [uatm]\t" +
             "fCO2rec_src\t" +
             "fCO2rec_flag";
@@ -905,8 +948,8 @@ public class GenerateCruiseReports {
      *         ID for this dataset
      * @param version
      *         version for this SOCAT-enhanced dataset
-     * @param socatDOI
-     *         DOI for this SOCAT-enhanced dataset
+     * @param origDoi
+     *         DOI for the original dataset
      * @param qcFlag
      *         dataset QC flag value for this dataset
      * @param regionID
@@ -918,7 +961,7 @@ public class GenerateCruiseReports {
      *         if false, print single-cruise data strings
      */
     private void printDataStrings(PrintWriter report, StdDataArray dataVals, String expocode, String version,
-            String socatDOI, String qcFlag, String regionID, boolean multicruise) throws IOException {
+            String origDoi, String qcFlag, String regionID, boolean multicruise) throws IOException {
         // Indices to data columns that will be reported
         // All data columns should exist, although they may not have any valid values
         Integer longitudeIdx = dataVals.getIndexOfType(DashboardServerUtils.LONGITUDE);
@@ -1033,15 +1076,9 @@ public class GenerateCruiseReports {
 
         // For multicruise reports, remove duplicate data points.
         // Region restrictions, if any, only apply to multicruise reports.
-        TreeSet<DataPoint> prevDatPts;
-        Integer sectimeIdx;
-        Integer regionIdx;
-        Integer xco2WaterTEquIdx;
-        Integer xco2WaterSSTIdx;
-        Integer pco2WaterTEquIdx;
-        Integer pco2WaterSSTIdx;
-        Integer fco2WaterTEquIdx;
-        Integer fco2WaterSSTIdx;
+        TreeSet<DataPoint> prevDatPts = null;
+        Integer sectimeIdx = null;
+        Integer regionIdx = null;
         if ( multicruise ) {
             prevDatPts = new TreeSet<DataPoint>();
 
@@ -1060,53 +1097,37 @@ public class GenerateCruiseReports {
             }
             else
                 regionIdx = null;
-
-            // These values are not reported in multicruise reports
-            xco2WaterTEquIdx = null;
-            xco2WaterSSTIdx = null;
-            pco2WaterTEquIdx = null;
-            pco2WaterSSTIdx = null;
-            fco2WaterTEquIdx = null;
-            fco2WaterSSTIdx = null;
         }
-        else {
-            // Duplicates not checked in single-cruise reports
-            prevDatPts = null;
-            sectimeIdx = null;
-            // Single-cruise reports are never region-specific
-            regionIdx = null;
 
-            // These values are reported in single-cruise reports
-            xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
-            if ( xco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName());
+        Integer xco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_TEQU_DRY);
+        if ( xco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName());
 
-            xco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_SST_DRY);
-            if ( xco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.XCO2_WATER_SST_DRY.getVarName());
+        Integer xco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.XCO2_WATER_SST_DRY);
+        if ( xco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.XCO2_WATER_SST_DRY.getVarName());
 
-            pco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_TEQU_WET);
-            if ( pco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.PCO2_WATER_TEQU_WET.getVarName());
+        Integer pco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_TEQU_WET);
+        if ( pco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PCO2_WATER_TEQU_WET.getVarName());
 
-            pco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_SST_WET);
-            if ( pco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.PCO2_WATER_SST_WET.getVarName());
+        Integer pco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.PCO2_WATER_SST_WET);
+        if ( pco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.PCO2_WATER_SST_WET.getVarName());
 
-            fco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_TEQU_WET);
-            if ( fco2WaterTEquIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.FCO2_WATER_TEQU_WET.getVarName());
+        Integer fco2WaterTEquIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_TEQU_WET);
+        if ( fco2WaterTEquIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_WATER_TEQU_WET.getVarName());
 
-            fco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_SST_WET);
-            if ( fco2WaterSSTIdx == null )
-                throw new IOException("The DSG file for " + expocode +
-                        " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
-        }
+        Integer fco2WaterSSTIdx = dataVals.getIndexOfType(SocatTypes.FCO2_WATER_SST_WET);
+        if ( fco2WaterSSTIdx == null )
+            throw new IOException("The DSG file for " + expocode +
+                    " does not contain the variable " + SocatTypes.FCO2_WATER_SST_WET.getVarName());
 
         for (int j = 0; j < dataVals.getNumSamples(); j++) {
             if ( multicruise ) {
@@ -1134,7 +1155,8 @@ public class GenerateCruiseReports {
             Formatter fmtr = new Formatter();
             fmtr.format("%s\t", expocode);
             fmtr.format("%s\t", version);
-            fmtr.format("%s\t", socatDOI);
+            fmtr.format("%s\t", origDoi);
+            // fmtr.format("%s\t", socatDoi);
             fmtr.format("%s\t", qcFlag);
 
             Object value;
@@ -1262,43 +1284,41 @@ public class GenerateCruiseReports {
             else
                 fmtr.format("%#.3f\t", (Double) value);
 
-            if ( !multicruise ) {
-                value = dataVals.getStdVal(j, xco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, xco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, xco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, xco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, pco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, pco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, pco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, pco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, fco2WaterTEquIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
+            value = dataVals.getStdVal(j, fco2WaterTEquIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
-                value = dataVals.getStdVal(j, fco2WaterSSTIdx);
-                if ( value == null )
-                    fmtr.format("NaN\t");
-                else
-                    fmtr.format("%#.3f\t", (Double) value);
-            }
+            value = dataVals.getStdVal(j, fco2WaterSSTIdx);
+            if ( value == null )
+                fmtr.format("NaN\t");
+            else
+                fmtr.format("%#.3f\t", (Double) value);
 
             value = dataVals.getStdVal(j, fco2RecIdx);
             if ( value == null ) {

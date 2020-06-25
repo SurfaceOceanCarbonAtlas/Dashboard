@@ -17,6 +17,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataQCFlag;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -53,7 +54,9 @@ public class DataFileHandler extends VersionedFileHandler {
     private static final String UPLOAD_FILENAME_ID = "uploadfilename";
     private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
     private static final String SOURCE_DOI_ID = "sourcedoi";
+    private static final String SOURCE_URL_ID = "sourceurl";
     private static final String ENHANCED_DOI_ID = "enhanceddoi";
+    private static final String ENHANCED_URL_ID = "enhancedurl";
     private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
     private static final String OME_TIMESTAMP_ID = "ometimestamp";
     private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
@@ -601,6 +604,9 @@ public class DataFileHandler extends VersionedFileHandler {
         // DOIs
         datasetProps.setProperty(SOURCE_DOI_ID, dataset.getSourceDOI());
         datasetProps.setProperty(ENHANCED_DOI_ID, dataset.getEnhancedDOI());
+        // URLs
+        datasetProps.setProperty(SOURCE_URL_ID, dataset.getSourceURL());
+        datasetProps.setProperty(ENHANCED_URL_ID, dataset.getEnhancedURL());
         // Data-check status string
         datasetProps.setProperty(DATA_CHECK_STATUS_ID, dataset.getDataCheckStatus());
         // OME metadata timestamp
@@ -794,12 +800,12 @@ public class DataFileHandler extends VersionedFileHandler {
         }
         else {
             String uploadFilename = addlDoc.getFilename();
-            if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) )
+            if ( DashboardServerUtils.OME_FILENAME.equals(uploadFilename) )
                 throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
-                        DashboardUtils.OME_FILENAME);
-            if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) )
+                        DashboardServerUtils.OME_FILENAME);
+            if ( DashboardServerUtils.PI_OME_FILENAME.equals(uploadFilename) )
                 throw new IllegalArgumentException("Supplemental documents cannot have the upload filename of " +
-                        DashboardUtils.PI_OME_FILENAME);
+                        DashboardServerUtils.PI_OME_FILENAME);
             // Work directly on the additional documents list in the cruise object
             TreeSet<String> addlDocTitles = dataset.getAddlDocs();
             String titleToDelete = null;
@@ -1007,12 +1013,12 @@ public class DataFileHandler extends VersionedFileHandler {
             // Delete the metadata and additional documents associated with this cruise
             MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
             try {
-                metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.OME_FILENAME);
+                metadataHandler.deleteMetadata(username, datasetId, DashboardServerUtils.OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
             }
             try {
-                metadataHandler.deleteMetadata(username, datasetId, DashboardUtils.PI_OME_FILENAME);
+                metadataHandler.deleteMetadata(username, datasetId, DashboardServerUtils.PI_OME_FILENAME);
             } catch ( Exception ex ) {
                 // Ignore - may not exist
             }
@@ -1106,6 +1112,18 @@ public class DataFileHandler extends VersionedFileHandler {
         if ( value != null ) {
             // Missing in earlier SOCAT versions
             dataset.setEnhancedDOI(value);
+        }
+
+        // URLS
+        value = cruiseProps.getProperty(SOURCE_URL_ID);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setSourceURL(value);
+        }
+        value = cruiseProps.getProperty(ENHANCED_URL_ID);
+        if ( value != null ) {
+            // Missing in earlier SOCAT versions
+            dataset.setEnhancedURL(value);
         }
 
         // Data check status
@@ -1333,10 +1351,7 @@ public class DataFileHandler extends VersionedFileHandler {
                 throw new IllegalArgumentException("Invalid value for wocefourrows");
             }
             dataset.setCheckerFlags(qcflags);
-            // No recorded list of PI-provided QC flags
             dataset.setUserFlags(null);
-            // TODO: maybe ? - go through data to record PI-provided data QC flags and update
-            // however, there might not be any in these early versions (especially if from v1 and v2)
             return;
         }
 
@@ -1371,6 +1386,21 @@ public class DataFileHandler extends VersionedFileHandler {
         saveDatasetInfoToFile(dset, "Update dataset dashboard status for " + expocode +
                 "from '" + oldStatus.statusString() + "' to '" + newStatus.statusString() + "'");
         return true;
+    }
+
+    /**
+     * Update the appropriate fields in the given standard metadata from valid data in the
+     * dataset associated with this metadata.
+     *
+     * @param metadata
+     *         standard metadata to check.
+     *
+     * @throws IllegalArgumentException
+     *         if the dataset ID in the metadata is invalid, or
+     *         if there is an error reading the dataset data
+     */
+    public void updateSocatMetadataFromData(SocatMetadata metadata) throws IllegalArgumentException {
+        // TODO: implement
     }
 
     /**

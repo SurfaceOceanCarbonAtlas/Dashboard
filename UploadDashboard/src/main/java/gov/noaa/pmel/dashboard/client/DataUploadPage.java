@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
@@ -405,7 +402,7 @@ public class DataUploadPage extends CompositeWithUsername {
      * Display the cruise upload page in the RootLayoutPanel after clearing as much of the page as possible. The upload
      * filename cannot be cleared. Adds this page to the page history.
      */
-    static void showPage(String username) {
+    public static void showPage(String username) {
         if ( singleton == null )
             singleton = new DataUploadPage();
         singleton.setUsername(username);
@@ -421,7 +418,7 @@ public class DataUploadPage extends CompositeWithUsername {
     /**
      * Redisplays the last version of this page if the username associated with this page matches the given username.
      */
-    static void redisplayPage(String username) {
+    public static void redisplayPage(String username) {
         if ( (username == null) || username.isEmpty() ||
                 (singleton == null) || !singleton.getUsername().equals(username) ) {
             DatasetListPage.showPage();

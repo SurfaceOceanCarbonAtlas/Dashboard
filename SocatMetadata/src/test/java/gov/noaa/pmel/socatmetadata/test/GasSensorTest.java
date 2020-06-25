@@ -1,8 +1,9 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.CalibrationGas;
-import gov.noaa.pmel.socatmetadata.instrument.GasSensor;
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.CalibrationGas;
+import gov.noaa.pmel.socatmetadata.shared.instrument.GasSensor;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import static org.junit.Assert.fail;
 public class GasSensorTest {
 
     private static final String EMPTY_STR = "";
-    private static final ArrayList<String> EMPTY_STRLIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTR = new MultiString();
     private static final ArrayList<CalibrationGas> EMPTY_GASLIST = new ArrayList<CalibrationGas>();
 
     private static final String NAME = "LI-COR 840";
@@ -34,9 +35,9 @@ public class GasSensorTest {
             new CalibrationGas("SM-1000", "CO2", "Scott Marin", "1036.95", "0.01", "every 5.5 h"),
             new CalibrationGas("SM-1500", "CO2", "Scott Marin", "1533.7", "0.1", "every 6.5 h")
     ));
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
+    private static final MultiString ADDN_INFO = new MultiString(
             "Some comment just to have one."
-    ));
+    );
 
     @Test
     public void testGetSetCalibrationGasses() {
@@ -50,7 +51,7 @@ public class GasSensorTest {
             assertNotSame(CALIBRATION_GASES.get(k), gasList.get(k));
         }
         assertNotSame(gasList, sensor.getCalibrationGases());
-        assertEquals(EMPTY_STRLIST, sensor.getAddnInfo());
+        assertEquals(EMPTY_MULTISTR, sensor.getAddnInfo());
         assertEquals(EMPTY_STR, sensor.getCalibration());
         assertEquals(EMPTY_STR, sensor.getModel());
         assertEquals(EMPTY_STR, sensor.getManufacturer());
@@ -69,9 +70,9 @@ public class GasSensorTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         GasSensor sensor = new GasSensor();
-        GasSensor dup = sensor.clone();
+        GasSensor dup = (GasSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -84,7 +85,7 @@ public class GasSensorTest {
         sensor.setCalibrationGases(CALIBRATION_GASES);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.clone();
+        dup = (GasSensor) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
         assertNotSame(sensor.getAddnInfo(), dup.getAddnInfo());

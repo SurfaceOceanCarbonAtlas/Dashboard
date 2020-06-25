@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.util.NumericString;
-import gov.noaa.pmel.socatmetadata.variable.Temperature;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +55,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
+            ((InstData) pressure).setAccuracy(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setAccuracy with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -88,7 +88,7 @@ public class TemperatureTest {
             // Expected result
         }
         try {
-            ((DataVar) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
+            ((InstData) pressure).setPrecision(new NumericString("0.01", KELVIN_UNIT));
             fail("call to casted setPrecision with Kelvin unit succeeded");
         } catch ( IllegalArgumentException ex ) {
             // Expected result
@@ -97,9 +97,9 @@ public class TemperatureTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Temperature pressure = new Temperature();
-        Temperature dup = pressure.clone();
+        Temperature dup = (Temperature) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
 
@@ -109,7 +109,7 @@ public class TemperatureTest {
         pressure.setPrecision(PRECISION);
         assertNotEquals(pressure, dup);
 
-        dup = pressure.clone();
+        dup = (Temperature) (pressure.duplicate(null));
         assertEquals(pressure, dup);
         assertNotSame(pressure, dup);
         assertNotSame(pressure.getAccuracy(), dup.getAccuracy());

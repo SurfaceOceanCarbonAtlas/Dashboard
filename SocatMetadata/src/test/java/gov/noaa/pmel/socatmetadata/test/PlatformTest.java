@@ -1,7 +1,7 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.platform.Platform;
-import gov.noaa.pmel.socatmetadata.platform.PlatformType;
+import gov.noaa.pmel.socatmetadata.shared.platform.Platform;
+import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -105,9 +105,9 @@ public class PlatformTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Platform platform = new Platform();
-        Platform dup = platform.clone();
+        Platform dup = (Platform) (platform.duplicate(null));
         assertEquals(platform, dup);
         assertNotSame(platform, dup);
 
@@ -118,7 +118,7 @@ public class PlatformTest {
         platform.setPlatformCountry(PLATFORM_COUNTRY);
         assertNotEquals(platform, dup);
 
-        dup = platform.clone();
+        dup = (Platform) (platform.duplicate(null));
         assertEquals(platform, dup);
         assertNotSame(platform, dup);
     }

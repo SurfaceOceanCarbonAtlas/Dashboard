@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.datatype.KnownDataTypes;
@@ -14,7 +11,6 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -85,7 +81,7 @@ public class RegenerateDsgs {
             dataVals = fullDataDsg.getStdDataArray();
 
             // Get the metadata in the OME XML file
-            DashboardOmeMetadata omeMData = metaHandler.getOmeFromFile(stdId, DashboardUtils.OME_FILENAME);
+            DashboardOmeMetadata omeMData = metaHandler.getOmeFromFile(stdId, DashboardServerUtils.OME_FILENAME);
             omeMData.setDatasetDOI(fullDataMeta.getSourceDOI());
             updatedMeta = omeMData.createDsgMetadata(knownMetadataTypes);
             // Copy over metadata not contained in the XML file

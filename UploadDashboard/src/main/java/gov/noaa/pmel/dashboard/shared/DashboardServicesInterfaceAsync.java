@@ -1,9 +1,7 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.shared;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -233,6 +231,61 @@ public interface DashboardServicesInterfaceAsync {
      */
     void buildPreviewImages(String username, String datasetId, String timetag, boolean firstCall,
             AsyncCallback<Boolean> callback);
+
+    /**
+     * Client side request for the IDs of datasets which have associated SocatMetadata objects
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param callback
+     *         callback to make with the list of dataset IDs
+     */
+    void getAllDatasetIdsForMetadata(String username, AsyncCallback<ArrayList<String>> callback);
+
+    /**
+     * Client side request to copy the SocatMetadata, with appropriate adjustments, from one dataset to another.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param toId
+     *         copy the SocatMetadata to the dataset with this ID
+     * @param fromId
+     *         copy the SocatMetadata from the dataset with this ID
+     * @param callback
+     *         callback to make on success or failure; the onFailure method of the callback will be called if
+     *         authentication failed, if unable to get the SocatMetadata for the dataset associated with fromId, or
+     *         if unable to write the SocatMetadata for the dataset associated with toId.
+     */
+    void copySocatMetadata(String username, String toId, String fromId, AsyncCallback<Void> callback);
+
+    /**
+     * Client side request to return the SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         return the SocatMetadata for the dataset with this ID
+     * @param callback
+     *         callback to make on success or failure; the onFailure method of the callback will be called if
+     *         authentication fails or if unable to read the SocatMetadata for the dataset.
+     */
+    void getSocatMetadata(String username, String datasetId, AsyncCallback<SocatMetadata> callback);
+
+    /**
+     * Client side request to save the given SocatMetadata for a dataset.
+     *
+     * @param username
+     *         name of the current user - for validation
+     * @param datasetId
+     *         save the given SocatMetadata for the dataset with this ID
+     * @param metadata
+     *         SocatMetadata to save
+     * @param callback
+     *         callback to make on success or failure; the onFailure method of the callback will be called
+     *         if authentication fails, if the SocatMetadata does not correspond to the indicated dataset, or
+     *         if unable to save the SocatMetadata for the dataset.
+     */
+    void saveSocatMetadata(String username, String datasetId, SocatMetadata metadata, AsyncCallback<Void> callback);
 
     /**
      * Client-side interface for submitting datasets for QC.

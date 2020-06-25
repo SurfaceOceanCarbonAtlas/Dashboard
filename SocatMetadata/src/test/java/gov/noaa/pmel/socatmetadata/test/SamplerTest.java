@@ -1,8 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.Analyzer;
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
-import gov.noaa.pmel.socatmetadata.instrument.Sampler;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiNames;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Analyzer;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Sampler;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,59 +21,44 @@ import static org.junit.Assert.fail;
 public class SamplerTest {
 
     private static final String EMPTY_STRING = "";
-    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
-    private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
+    private static final MultiNames EMPTY_NAMESET = new MultiNames();
 
     private static final String NAME = "Equilibrator";
     private static final String ID = "325";
     private static final String MANUFACTURER = "NOAA";
     private static final String MODEL = "7";
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Some comment",
-            "Another comment"
-    ));
-    private static final HashSet<String> INSTRUMENT_NAMES = new HashSet<String>(Arrays.asList(
-            "Equilibrator Pressure Sensor",
-            "Equilibrator Temperature Sensor"
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Some comment\n" +
+                    "Another comment"
+    );
+    private static final MultiNames INSTRUMENT_NAMES =
+            new MultiNames("Equilibrator Pressure Sensor, Equilibrator Temperature Sensor");
 
     @Test
     public void testGetSetInstrumentNames() {
         Sampler sampler = new Sampler();
         assertEquals(EMPTY_NAMESET, sampler.getInstrumentNames());
         sampler.setInstrumentNames(INSTRUMENT_NAMES);
-        HashSet<String> instNames = sampler.getInstrumentNames();
+        MultiNames instNames = sampler.getInstrumentNames();
         assertEquals(INSTRUMENT_NAMES, instNames);
         assertNotSame(INSTRUMENT_NAMES, instNames);
         assertNotSame(instNames, sampler.getInstrumentNames());
-        assertEquals(EMPTY_NAMELIST, sampler.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sampler.getAddnInfo());
         assertEquals(EMPTY_STRING, sampler.getModel());
         assertEquals(EMPTY_STRING, sampler.getManufacturer());
         assertEquals(EMPTY_STRING, sampler.getId());
         assertEquals(EMPTY_STRING, sampler.getName());
         sampler.setInstrumentNames(null);
         assertEquals(EMPTY_NAMESET, sampler.getInstrumentNames());
-        sampler.setInstrumentNames(EMPTY_NAMELIST);
+        sampler.setInstrumentNames(EMPTY_NAMESET);
         assertEquals(EMPTY_NAMESET, sampler.getInstrumentNames());
-        try {
-            sampler.setInstrumentNames(Arrays.asList("Equilibator Pressure Sensor", "\n"));
-            fail("setInstrumentNames called with a list containing a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            sampler.setInstrumentNames(Arrays.asList("Equilibator Pressure Sensor", null));
-            fail("setInstrumentNames called with a list containing null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Sampler sampler = new Sampler();
-        Sampler dup = sampler.clone();
+        Sampler dup = (Sampler) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
 
@@ -83,7 +70,7 @@ public class SamplerTest {
         sampler.setInstrumentNames(INSTRUMENT_NAMES);
         assertNotEquals(sampler, dup);
 
-        dup = sampler.clone();
+        dup = (Sampler) (sampler.duplicate(null));
         assertEquals(sampler, dup);
         assertNotSame(sampler, dup);
         assertNotSame(sampler.getAddnInfo(), dup.getAddnInfo());

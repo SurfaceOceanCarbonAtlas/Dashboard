@@ -1,0 +1,23 @@
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:my="urn:import:gov.noaa.pmel.dashboard.client.metadata">
+
+    <ui:style src="../EditSocatMetadata.css"/>
+
+    <g:ScrollPanel>
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="nameValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="idValue"/>
+            </g:FlowPanel>
+            <my:LabeledListBox addStyleNames="{style.areapanel}" ui:field="instTypeList"/>
+            <g:FlowPanel addStyleNames="{style.rowpanel}">
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="manufacturerValue"/>
+                <my:LabeledTextBox addStyleNames="{style.cellpanel}" ui:field="modelValue"/>
+            </g:FlowPanel>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="calibrationValue"/>
+            <my:LabeledTextArea addStyleNames="{style.areapanel}" ui:field="addnInfoValue"/>
+        </g:FlowPanel>
+    </g:ScrollPanel>
+
+</ui:UiBinder>

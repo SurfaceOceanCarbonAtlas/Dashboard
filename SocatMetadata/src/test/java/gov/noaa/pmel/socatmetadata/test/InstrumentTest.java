@@ -1,9 +1,9 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.instrument.Instrument;
+import gov.noaa.pmel.socatmetadata.shared.core.MultiString;
+import gov.noaa.pmel.socatmetadata.shared.instrument.Instrument;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -12,23 +12,23 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class InstrumentTest {
 
     private static final String EMPTY_STRING = "";
-    private static final ArrayList<String> EMPTY_NAMELIST = new ArrayList<String>();
+    private static final MultiString EMPTY_MULTISTRING = new MultiString();
     private static final HashSet<String> EMPTY_NAMESET = new HashSet<String>();
 
     private static final String NAME = "Equilibrator headspace differential pressure sensor";
     private static final String ID = "Setra-239 #0003245";
     private static final String MANUFACTURER = "Setra";
     private static final String MODEL = "239";
-    private static final ArrayList<String> ADDN_INFO = new ArrayList<String>(Arrays.asList(
-            "Pressure reading from the Setra-270 on the exit of the analyzer was added to the differential pressure " +
-                    "reading from Setra-239 attached to the equilibrator headspace to yield the equlibrator pressure.",
-            "Some other comment just to have a second one."
-    ));
+    private static final MultiString ADDN_INFO = new MultiString(
+            "Pressure reading from the Setra-270 on the exit of the analyzer was added to the " +
+                    "differential pressure reading from Setra-239 attached to the equilibrator headspace " +
+                    "to yield the equlibrator pressure.\n" +
+                    "Some other comment just to have a second one."
+    );
 
     @Test
     public void testGetSetName() {
@@ -87,9 +87,9 @@ public class InstrumentTest {
     @Test
     public void testGetSetAddnInfo() {
         Instrument sensor = new Instrument();
-        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
+        assertEquals(EMPTY_MULTISTRING, sensor.getAddnInfo());
         sensor.setAddnInfo(ADDN_INFO);
-        ArrayList<String> info = sensor.getAddnInfo();
+        MultiString info = sensor.getAddnInfo();
         assertEquals(ADDN_INFO, info);
         assertNotSame(ADDN_INFO, info);
         assertNotSame(info, sensor.getAddnInfo());
@@ -98,21 +98,9 @@ public class InstrumentTest {
         assertEquals(EMPTY_STRING, sensor.getId());
         assertEquals(EMPTY_STRING, sensor.getName());
         sensor.setAddnInfo(null);
-        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
-        sensor.setAddnInfo(EMPTY_NAMESET);
-        assertEquals(EMPTY_NAMELIST, sensor.getAddnInfo());
-        try {
-            sensor.setAddnInfo(Arrays.asList(ADDN_INFO.get(0), "\n"));
-            fail("setAddnInfo called with a list containing a blank string succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
-        try {
-            sensor.setAddnInfo(Arrays.asList(ADDN_INFO.get(0), null));
-            fail("setAddnInfo called with a list containing null succeeded");
-        } catch ( IllegalArgumentException ex ) {
-            // Expected result
-        }
+        assertEquals(EMPTY_MULTISTRING, sensor.getAddnInfo());
+        sensor.setAddnInfo(EMPTY_MULTISTRING);
+        assertEquals(EMPTY_MULTISTRING, sensor.getAddnInfo());
     }
 
     @Test
@@ -124,9 +112,9 @@ public class InstrumentTest {
     }
 
     @Test
-    public void testClone() {
+    public void testDuplicate() {
         Instrument sensor = new Instrument();
-        Instrument dup = sensor.clone();
+        Instrument dup = (Instrument) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
 
@@ -137,7 +125,7 @@ public class InstrumentTest {
         sensor.setAddnInfo(ADDN_INFO);
         assertNotEquals(sensor, dup);
 
-        dup = sensor.clone();
+        dup = (Instrument) (sensor.duplicate(null));
         assertEquals(sensor, dup);
         assertNotSame(sensor, dup);
     }

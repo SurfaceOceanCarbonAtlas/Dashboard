@@ -20,6 +20,9 @@
     <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
     <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
 
+    <!-- Inherit the shared SocatMetadata stuff -->
+    <inherits name='gov.noaa.pmel.socatmetadata.SocatMetadata'/>
+
     <!-- Specify the app entry point class. -->
     <entry-point class='gov.noaa.pmel.dashboard.client.UploadDashboard'/>
 

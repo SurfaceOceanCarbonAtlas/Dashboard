@@ -1,6 +1,3 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.client;
 
 import com.google.gwt.core.client.GWT;
@@ -60,7 +57,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     /**
      * Shows the logout page in the RootLayoutPanel and logs out the user. Adds this page to the page history.
      */
-    static void showPage() {
+    public static void showPage() {
         if ( singleton == null )
             singleton = new DashboardLogoutPage();
         UploadDashboard.updateCurrentPage(singleton);
@@ -86,7 +83,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
     /**
      * Shows the logout page in the RootLayoutPanel. Does not attempt to logout the user.
      */
-    static void redisplayPage() {
+    public static void redisplayPage() {
         // Allow this to succeed even if never called before
         if ( singleton == null )
             singleton = new DashboardLogoutPage();

@@ -1,12 +1,9 @@
-/**
- *
- */
 package gov.noaa.pmel.dashboard.test.actualdatamodified;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -31,13 +28,13 @@ public class OmePdfGeneratorTest {
 
     @Test
     public void testCreatePiOmePdf() throws IOException {
-        System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+        System.setProperty("CATALINA_BASE", System.getenv("HOME") + "/Tomcat");
         System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
         DashboardConfigStore confStore = DashboardConfigStore.get(false);
         MetadataFileHandler metaHandler = confStore.getMetadataFileHandler();
         OmePdfGenerator omePdfGenerator = confStore.getOmePdfGenerator();
         for (String expo : EXPOCODE_ARRAY) {
-            File pdfFile = metaHandler.getMetadataFile(expo, DashboardUtils.PI_OME_PDF_FILENAME);
+            File pdfFile = metaHandler.getMetadataFile(expo, DashboardServerUtils.PI_OME_PDF_FILENAME);
             assertNotNull(pdfFile);
             // Make sure the PDF file does not exist, then generate it
             pdfFile.delete();

@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 /**
  * Updates the cruise dashboard status from the current QC flag in the full-data DSG file.
- * s *
  *
  * @author Karl Smith
  */

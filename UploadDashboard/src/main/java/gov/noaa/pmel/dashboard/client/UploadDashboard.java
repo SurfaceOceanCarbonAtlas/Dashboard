@@ -6,13 +6,18 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
+import gov.noaa.pmel.dashboard.client.metadata.EditSocatMetadataPage;
 
 public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
+
+    private static final String INVALID_HTML_PREFIX = "<span style='color:red; font-weight:bold; font-style:oblique'>";
+    private static final String INVALID_HTML_SUFFIX = "</span>";
 
     public static final DashboardResources resources =
             GWT.create(DashboardResources.class);
@@ -42,9 +47,14 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         SHOW_DATA_MESSAGES,
 
         /**
-         * History tag for OmeManagerPage
+         * History tag for SelectSocatMetadataPage
          */
-        EDIT_METADATA,
+        SELECT_SOCAT_METADATA,
+
+        /**
+         * History tag for EditSocatMetadataPage
+         */
+        EDIT_SOCAT_METADATA,
 
         /**
          * History tag for AddlDocsManagerPage
@@ -64,7 +74,7 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         /**
          * History tag for DashboardLogoutPage
          */
-        LOGOUT
+        LOGOUT;
     }
 
     // Column widths in em's
@@ -110,6 +120,18 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
         // Make sure singleton is assign to this instance since
         // this constructor is probably called from GWT.
         singleton = this;
+    }
+
+    /**
+     * Generates the highlighted version of a label indicating associated content is invalid.
+     *
+     * @param labelHtml
+     *         HTML of the Label with valid associated content
+     *
+     * @return HTML of the label with invalid associated content
+     */
+    public static SafeHtml invalidLabelHtml(SafeHtml labelHtml) {
+        return SafeHtmlUtils.fromTrustedString(INVALID_HTML_PREFIX + labelHtml.asString() + INVALID_HTML_SUFFIX);
     }
 
     /**
@@ -238,9 +260,17 @@ public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
             // Data column specs page from history
             DataColumnSpecsPage.redisplayPage(currentPage.getUsername());
         }
-        else if ( token.equals(PagesEnum.EDIT_METADATA.name()) ) {
-            // OME metadata manager page from history
-            OmeManagerPage.redisplayPage(currentPage.getUsername());
+        else if ( token.equals(PagesEnum.SHOW_DATA_MESSAGES.name()) ) {
+            // Select show data messages page from history
+            DataMessagesPage.redisplayPage(currentPage.getUsername());
+        }
+        else if ( token.equals(PagesEnum.SELECT_SOCAT_METADATA.name()) ) {
+            // Select SOCAT metadata page from history
+            SelectSocatMetadataPage.redisplayPage(currentPage.getUsername());
+        }
+        else if ( token.equals(PagesEnum.EDIT_SOCAT_METADATA.name()) ) {
+            // Edit SOCAT metadata page from history
+            EditSocatMetadataPage.redisplayPage(currentPage.getUsername());
         }
         else if ( token.equals(PagesEnum.MANAGE_DOCUMENTS.name()) ) {
             // Additional data manager page from history

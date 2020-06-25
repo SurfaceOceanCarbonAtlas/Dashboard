@@ -1,0 +1,43 @@
+! Compute the coastal mask  
+
+use dist2land20_burke.nc
+define symbol outfile = coast_mask_quarter.nc
+
+! Define grid as for tracks2grid_monthly_quarterdeg.jnl
+DEFINE AXIS/X=-180:180.0:0.25/EDGES/UNITS=degrees_east/MODULO xlon
+DEFINE AXIS/Y=-90:90:0.25/EDGES/UNITS=degrees_north ylat
+
+! WHY does this make missing every 3rd point of the output grid?
+! gridding from a 1/3 degree grid to a 1/4 degree grid get some
+! cells with not much overlap
+let d2land_quarter = DIST2LAND[gx=xlon@min,gy=ylat@min]
+
+! First regrid the original data to a finer grid with linear interpolation.
+! Then regrid with @MIN to the grid we want.
+DEFINE AXIS/X=-180:180.0:0.1/EDGES/UNITS=degrees_east/MODULO xlon_fine
+DEFINE AXIS/Y=-90:90:0.1/EDGES/UNITS=degrees_north ylat_fine
+let d2land_fine = DIST2LAND[gx=xlon_fine,gy=ylat_fine]
+let d2land_quarter = d2land_fine[gx=xlon@min,gy=ylat@min]
+
+! Write a global attribute to the output file.
+
+let title = "Coastal Mask for quarter-degree grid, dist2land<= 400 km, d2land from dist2land20_burke.nc"
+
+save/clobber/file="($outfile)"/asglobal title
+
+! Write the coastal mask.
+let coast_mask = if d2land_quarter le 400 then 1
+save/append/file="($outfile)" coast_mask
+
+can dat/all
+can var/all
+
+! Check
+
+use "($outfile)"
+use dist2land20_burke.nc"
+set view full
+shade COAST_MASK[d=1]
+def view/x=0:1/y=0:1 full2
+set view full2
+shade/pat=weave/pal=black/x=-180:180 if dist2land lt 400 then 1

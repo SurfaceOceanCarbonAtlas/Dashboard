@@ -21,6 +21,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.dashboard.shared.TypesDatasetDataPair;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,7 @@ import java.util.TreeSet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-    private static final long serialVersionUID = -1849939750979152323L;
+    private static final long serialVersionUID = -6379445797395821598L;
 
     private String username = null;
     private DashboardConfigStore configStore = null;
@@ -249,12 +250,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
         // Get the current metadata documents for the cruise
         MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-        if ( DashboardUtils.OME_FILENAME.equals(deleteFilename) ) {
+        if ( DashboardServerUtils.OME_FILENAME.equals(deleteFilename) ) {
             // Remove the OME XML stub file
             if ( !Boolean.TRUE.equals(dataset.isEditable()) )
                 throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted dataset");
         }
-        else if ( DashboardUtils.PI_OME_FILENAME.equals(deleteFilename) ) {
+        else if ( DashboardServerUtils.PI_OME_FILENAME.equals(deleteFilename) ) {
             // No more PI-provided OME metadata for this cruise
             dataset.setOmeTimestamp(null);
         }
@@ -571,6 +572,43 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
+    public ArrayList<String> getAllDatasetIdsForMetadata(String pageUsername) throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        return configStore.getMetadataFileHandler().getDatasetIdsWithSocatMetadata(pageUsername);
+    }
+
+    @Override
+    public void copySocatMetadata(String pageUsername, String toId, String fromId) throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        configStore.getMetadataFileHandler().copySocatMetadata(pageUsername, toId, fromId);
+    }
+
+    @Override
+    public SocatMetadata getSocatMetadata(String pageUsername, String datasetId) throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        return configStore.getMetadataFileHandler().getSocatMetadata(datasetId);
+    }
+
+    @Override
+    public void saveSocatMetadata(String pageUsername, String datasetId, SocatMetadata metadata)
+            throws IllegalArgumentException {
+        // Get the dashboard data store and current username, and validate that username
+        if ( !validateRequest(pageUsername) )
+            throw new IllegalArgumentException("Invalid user request");
+
+        configStore.getMetadataFileHandler().saveSocatMetadata(pageUsername, datasetId, metadata);
+    }
+
+    @Override
     public void submitDatasetsForQC(String pageUsername, TreeSet<String> idsSet, String archiveStatus,
             String timestamp, boolean repeatSend) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
@@ -596,7 +634,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
         qc.setUsername(username);
         qc.setFlagDate(new Date());
         qc.setVersion(configStore.getQCVersion());
-        qc.setRegionId(DashboardUtils.REGION_ID_GLOBAL);
+        qc.setRegionId(DashboardServerUtils.REGION_ID_GLOBAL);
         qc.setComment(comment);
 
         DataFileHandler dataHandler = configStore.getDataFileHandler();

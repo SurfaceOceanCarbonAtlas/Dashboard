@@ -1,10 +1,10 @@
 package gov.noaa.pmel.socatmetadata.test;
 
-import gov.noaa.pmel.socatmetadata.person.Person;
-import gov.noaa.pmel.socatmetadata.platform.PlatformType;
+import gov.noaa.pmel.socatmetadata.shared.core.Datestamp;
+import gov.noaa.pmel.socatmetadata.shared.core.NumericString;
+import gov.noaa.pmel.socatmetadata.shared.person.Person;
+import gov.noaa.pmel.socatmetadata.shared.platform.PlatformType;
 import gov.noaa.pmel.socatmetadata.translate.DocumentHandler;
-import gov.noaa.pmel.socatmetadata.util.Datestamp;
-import gov.noaa.pmel.socatmetadata.util.NumericString;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import static gov.noaa.pmel.socatmetadata.translate.DocumentHandler.SEP;
@@ -23,9 +22,9 @@ import static org.junit.Assert.assertNull;
 
 public class DocumentHandlerTest {
 
-    private class MyDocHandler extends DocumentHandler {
+    private static final class MyDocHandler extends DocumentHandler {
         MyDocHandler(String xmlString) {
-            Document omeDoc = null;
+            Document omeDoc;
             try {
                 omeDoc = (new SAXBuilder()).build(new StringReader(xmlString));
             } catch ( Exception ex ) {
@@ -111,7 +110,7 @@ public class DocumentHandlerTest {
         final String year = "2010";
         final String month = "3";
         final String day = "24";
-        final Datestamp stamp = new Datestamp(year, month, day);
+        final Datestamp stamp = new Datestamp(year, month, day, "0", "0", "0");
 
         String concat = year + "0" + month + day;
         assertEquals(stamp, DocumentHandler.getDatestamp(concat));
@@ -122,14 +121,8 @@ public class DocumentHandlerTest {
         concat = year + "/" + month + "/" + day;
         assertEquals(stamp, DocumentHandler.getDatestamp(concat));
         assertNull(DocumentHandler.getDatestamp("Mar 24, 2010"));
-        assertNull(DocumentHandler.getDatestamp((String) null));
+        assertNull(DocumentHandler.getDatestamp(null));
         assertNull(DocumentHandler.getDatestamp("\t"));
-
-        Date time = stamp.getEarliestTime();
-        assertEquals(stamp, DocumentHandler.getDatestamp(time));
-        time = new Date(stamp.getEarliestTime().getTime() + 24L * 60L * 60L * 1000L - 1000L);
-        assertEquals(stamp, DocumentHandler.getDatestamp(time));
-        assertNull(DocumentHandler.getDatestamp((Date) null));
     }
 
     @Test
