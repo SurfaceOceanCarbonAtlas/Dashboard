@@ -3,3 +3,5 @@ target/
 .idea/inspectionProfiles
 .idea/uiDesigner.xml
 .idea/workspace.xml
+SocatMetadata/GWTCompilerOutput_socatmetadata/
+UploadDashboard/GWTCompilerOutput_uploaddashboard/

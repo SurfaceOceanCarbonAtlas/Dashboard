@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_uploaddashboard" default="compile.module.uploaddashboard">
+  <dirname property="module.uploaddashboard.basedir" file="${ant.file.module_uploaddashboard}"/>
+  
+  
+  <property name="compiler.args.uploaddashboard" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="uploaddashboard.output.dir" value="${module.uploaddashboard.basedir}/../target/production/UploadDashboard"/>
+  <property name="uploaddashboard.testoutput.dir" value="${module.uploaddashboard.basedir}/../target/test/UploadDashboard"/>
+  
+  <path id="uploaddashboard.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="uploaddashboard.module.production.classpath">
+    <pathelement location="${omemetadata.output.dir}"/>
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+  </path>
+  
+  <path id="uploaddashboard.runtime.production.module.classpath">
+    <pathelement location="${uploaddashboard.output.dir}"/>
+    <path refid="omemetadata.runtime.production.module.classpath"/>
+    <path refid="socatmetadata.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="uploaddashboard.module.classpath">
+    <pathelement location="${uploaddashboard.output.dir}"/>
+    <pathelement location="${omemetadata.testoutput.dir}"/>
+    <pathelement location="${omemetadata.output.dir}"/>
+    <pathelement location="${socatmetadata.testoutput.dir}"/>
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  <path id="uploaddashboard.runtime.module.classpath">
+    <pathelement location="${uploaddashboard.testoutput.dir}"/>
+    <pathelement location="${uploaddashboard.output.dir}"/>
+    <path refid="omemetadata.runtime.module.classpath"/>
+    <path refid="socatmetadata.runtime.module.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.uploaddashboard">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.uploaddashboard">
+    <patternset refid="excluded.from.module.uploaddashboard"/>
+  </patternset>
+  
+  <path id="uploaddashboard.module.sourcepath">
+    <dirset dir="${module.uploaddashboard.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  <path id="uploaddashboard.module.test.sourcepath">
+    <dirset dir="${module.uploaddashboard.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.uploaddashboard" depends="compile.module.uploaddashboard.production,compile.module.uploaddashboard.tests" description="Compile module UploadDashboard"/>
+  
+  <target name="compile.module.uploaddashboard.production" depends="compile.module.omemetadata,compile.module.socatmetadata" description="Compile module UploadDashboard; production classes">
+    <mkdir dir="${uploaddashboard.output.dir}"/>
+    <javac destdir="${uploaddashboard.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.uploaddashboard}"/>
+      <bootclasspath refid="uploaddashboard.module.bootclasspath"/>
+      <classpath refid="uploaddashboard.module.production.classpath"/>
+      <src refid="uploaddashboard.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.uploaddashboard"/>
+    </javac>
+    
+    <copy todir="${uploaddashboard.output.dir}">
+      <fileset dir="${module.uploaddashboard.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.uploaddashboard.tests" depends="compile.module.uploaddashboard.production" description="compile module UploadDashboard; test classes" unless="skip.tests">
+    <mkdir dir="${uploaddashboard.testoutput.dir}"/>
+    <javac destdir="${uploaddashboard.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.uploaddashboard}"/>
+      <bootclasspath refid="uploaddashboard.module.bootclasspath"/>
+      <classpath refid="uploaddashboard.module.classpath"/>
+      <src refid="uploaddashboard.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.uploaddashboard"/>
+    </javac>
+    
+    <copy todir="${uploaddashboard.testoutput.dir}">
+      <fileset dir="${module.uploaddashboard.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.uploaddashboard" description="cleanup module">
+    <delete dir="${uploaddashboard.output.dir}"/>
+    <delete dir="${uploaddashboard.testoutput.dir}"/>
+  </target>
+  
+  <property name="gwt.compiler.output.uploaddashboard" value="${module.uploaddashboard.basedir}/GWTCompilerOutput_uploaddashboard"/>
+  
+  <!-- Run GWT compiler for GWT module ${gwt.module.name} -->
+  <target name="run.gwt.compiler.uploaddashboard" description="Run GWT compiler">
+    <java fork="true" classname="com.google.gwt.dev.Compiler" failonerror="true">
+      <jvmarg line="-Xmx1024m"/>
+      <classpath>
+        <pathelement location="${gwt.sdk.home.uploaddashboard}/gwt-dev.jar"/>
+        <path refid="uploaddashboard.module.sourcepath"/>
+        <path refid="socatmetadata.module.sourcepath"/>
+        <path refid="uploaddashboard.module.classpath"/>
+      </classpath>
+      <arg value="-logLevel"/>
+      <arg value="WARN"/>
+      <arg value="-war"/>
+      <arg value="${gwt.compiler.output.uploaddashboard}"/>
+      <arg value="-style"/>
+      <arg value="OBF"/>
+      <arg value="${gwt.module.name}"/>
+    </java>
+  </target>
+  
+  <target name="compile.gwt.uploaddashboard" depends="compile.module.uploaddashboard" description="Compile all GWT modules in module UploadDashboard">
+    <property name="gwt.sdk.home.uploaddashboard" value="${gwt.sdk.home}"/>
+    <antcall target="run.gwt.compiler.uploaddashboard">
+      <param name="gwt.module.name" value="gov.noaa.pmel.dashboard.SocatUploadDashboard"/>
+    </antcall>
+  </target>
+</project>
