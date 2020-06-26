@@ -4,7 +4,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/OmeMetadata"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SDIMetadata"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SocatMetadata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/UploadDashboard"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gwt-user"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/antlr-runtime-3.4"/>
