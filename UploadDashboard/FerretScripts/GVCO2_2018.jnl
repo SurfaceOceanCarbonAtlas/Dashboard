@@ -22,8 +22,8 @@
 ! The date field is in year fractions -- an ugly unit for Ferret, since years are not all of equal length. 
 
 let nskip = 78
-define symbol infile = co2_GHGreference.1065549360_surface.txt
-define symbol outfile = gvco2_2017.nc
+define symbol infile = co2_GHGreference.170105742_surface.txt
+define symbol outfile = gvco2_2018.nc
 
 file/col=1/format="(1x,F12.6)"/var=date/skip=`nskip` ($infile)
 let ndate = `date[i=@ngd]`
@@ -54,7 +54,7 @@ define grid/y=lats/t=tcarbon gcarbon
 file/skip=`nskip`/format="(13x, 41(F12.4,14x))"/col=41/var=co2_in/grid=gcarbon ($infile)
 
 ! Units and title.
-let/title="NOAA greenhouse gas MBL surface reference 2017"/units="umol/mol" co2 = co2_in
+let/title="NOAA greenhouse gas MBL surface reference 2018"/units="umol/mol" co2 = co2_in
 shade/lev=(325,412,.5) co2
 pause
 
@@ -65,7 +65,7 @@ cancel data/all
 
 file/skip=`nskip`/format="(13x, 41(14x,F12.4))"/col=41/var=unc_in/grid=gcarbon ($infile)
 
-let/title="Uncertainty, NOAA greenhouse gas MBL surface reference 2017"/units="umol/mol" uncertain = unc_in
+let/title="Uncertainty, NOAA greenhouse gas MBL surface reference 2018"/units="umol/mol" uncertain = unc_in
 shade uncertain
 pause
 
@@ -77,57 +77,42 @@ can var/all
 ! Look at dataset differences
 use "($outfile)"
 show grid co2
+use "/home/data/socat/gvco2_2017.nc"
+show grid co2
 use "/home/data/socat/gvco2_2016.nc"
 show grid co2
 use "/home/data/socat/gvco2_2015.nc"
 show grid co2
 use "/home/data/socat/gvco2_2014.nc"
 show grid co2
-use "/home/data/socat/gvco2_2013.nc"
-show grid co2
-use "/home/data/socat/gvco2_2012.nc"
-show grid co2
-use "/home/data/socat/gvco2_2008.nc"
-show grid co2
+
 set data 1
 
-let/title="gvc02 2017" co2_17 = co2[d=1,gt=co2[d=1]]
-let/title="gvc02 2016" co2_16 = co2[d=2,gt=co2[d=1]]
-let/title="gvc02 2015" co2_15 = co2[d=3,gt=co2[d=1]]
-let/title="gvc02 2014" co2_14 = co2[d=4,gt=co2[d=1]]
-let/title="gvc02 2013" co2_13 = co2[d=5,gt=co2[d=1]]
-let/title="gvc02 2012" co2_12 = co2[d=6,gt=co2[d=1]]
-let/title="gvc02 2008" co2_08 = co2[d=7,gt=co2[d=1]]
+let/title="gvc02 2018" co2_18 = co2[d=1,gt=co2[d=1]]
+let/title="gvc02 2017" co2_17 = co2[d=gvco2_2017,gt=co2[d=1]]
+let/title="gvc02 2016" co2_16 = co2[d=gvco2_2016,gt=co2[d=1]]
+let/title="gvc02 2015" co2_15 = co2[d=gvco2_2015,gt=co2[d=1]]
+let/title="gvc02 2014" co2_14 = co2[d=gvco2_2014,gt=co2[d=1]]
+
+! Difference between what we had as gvco2 2018 and 2017
+set win 1
+shade /pal=red_blue_centered /lev=20cv co2_18 - co2_17
+stats co2_18 - co2_17
 
 ! Difference between what we had as gvco2 2017 and 2016
-set win 1
+set win 2
 shade /pal=red_blue_centered /lev=20cv co2_17 - co2_16
 stats co2_17 - co2_16
 
 ! Difference between what we had as gvco2 2016 and 2015
-set win 2
+set win 3
 shade /pal=red_blue_centered /lev=20cv co2_16 - co2_15
 stats co2_16 - co2_15
 
 ! Difference between what we had as gvco2 2015 and 2014
-set win 3
+set win 4
 shade /pal=red_blue_centered /lev=20cv co2_15 - co2_14
 stats co2_15 - co2_14
-
-! Difference between what we had as gvco2 2014 and 2013
-set win 4
-shade /pal=red_blue_centered /lev=20cv co2_14 - co2_13
-stats co2_14 - co2_13
-
-! Difference between what we had as gvco2 2013 and 2012
-set win 5
-shade /pal=red_blue_centered /lev=20cv co2_13 - co2_12
-stats co2_13 - co2_12
-
-! Difference between what we had as gvco2 2012 and 2008
-set win 6
-shade /pal=red_blue_centered /lev=20cv co2_12 - co2_08
-stats co2_12 - co2_08
 
 pause
 
