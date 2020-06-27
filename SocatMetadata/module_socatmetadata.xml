@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_socatmetadata" default="compile.module.socatmetadata">
+  <dirname property="module.socatmetadata.basedir" file="${ant.file.module_socatmetadata}"/>
+  
+  
+  <property name="compiler.args.socatmetadata" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="socatmetadata.output.dir" value="${module.socatmetadata.basedir}/../target/production/SocatMetadata"/>
+  <property name="socatmetadata.testoutput.dir" value="${module.socatmetadata.basedir}/../target/test/SocatMetadata"/>
+  
+  <path id="socatmetadata.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="socatmetadata.module.production.classpath">
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+  </path>
+  
+  <path id="socatmetadata.runtime.production.module.classpath">
+    <pathelement location="${socatmetadata.output.dir}"/>
+  </path>
+  
+  <path id="socatmetadata.module.classpath">
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+  </path>
+  
+  <path id="socatmetadata.runtime.module.classpath">
+    <pathelement location="${socatmetadata.testoutput.dir}"/>
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.socatmetadata">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.socatmetadata">
+    <patternset refid="excluded.from.module.socatmetadata"/>
+  </patternset>
+  
+  <path id="socatmetadata.module.sourcepath">
+    <dirset dir="${module.socatmetadata.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  <path id="socatmetadata.module.test.sourcepath">
+    <dirset dir="${module.socatmetadata.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.socatmetadata" depends="compile.module.socatmetadata.production,compile.module.socatmetadata.tests" description="Compile module SocatMetadata"/>
+  
+  <target name="compile.module.socatmetadata.production" description="Compile module SocatMetadata; production classes">
+    <mkdir dir="${socatmetadata.output.dir}"/>
+    <javac destdir="${socatmetadata.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.socatmetadata}"/>
+      <bootclasspath refid="socatmetadata.module.bootclasspath"/>
+      <classpath refid="socatmetadata.module.production.classpath"/>
+      <src refid="socatmetadata.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.socatmetadata"/>
+    </javac>
+    
+    <copy todir="${socatmetadata.output.dir}">
+      <fileset dir="${module.socatmetadata.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.socatmetadata.tests" depends="compile.module.socatmetadata.production" description="compile module SocatMetadata; test classes" unless="skip.tests">
+    <mkdir dir="${socatmetadata.testoutput.dir}"/>
+    <javac destdir="${socatmetadata.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.socatmetadata}"/>
+      <bootclasspath refid="socatmetadata.module.bootclasspath"/>
+      <classpath refid="socatmetadata.module.classpath"/>
+      <src refid="socatmetadata.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.socatmetadata"/>
+    </javac>
+    
+    <copy todir="${socatmetadata.testoutput.dir}">
+      <fileset dir="${module.socatmetadata.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.socatmetadata" description="cleanup module">
+    <delete dir="${socatmetadata.output.dir}"/>
+    <delete dir="${socatmetadata.testoutput.dir}"/>
+  </target>
+  
+  <property name="gwt.compiler.output.socatmetadata" value="${module.socatmetadata.basedir}/GWTCompilerOutput_socatmetadata"/>
+  
+  <!-- Run GWT compiler for GWT module ${gwt.module.name} -->
+  <target name="run.gwt.compiler.socatmetadata" description="Run GWT compiler">
+    <java fork="true" classname="com.google.gwt.dev.Compiler" failonerror="true">
+      <jvmarg line="-Xmx1024m"/>
+      <classpath>
+        <pathelement location="${gwt.sdk.home.socatmetadata}/gwt-dev.jar"/>
+        <path refid="socatmetadata.module.sourcepath"/>
+        <path refid="socatmetadata.module.classpath"/>
+      </classpath>
+      <arg value="-logLevel"/>
+      <arg value="WARN"/>
+      <arg value="-war"/>
+      <arg value="${gwt.compiler.output.socatmetadata}"/>
+      <arg value="-style"/>
+      <arg value="OBF"/>
+      <arg value="${gwt.module.name}"/>
+    </java>
+  </target>
+  
+  <target name="compile.gwt.socatmetadata" depends="compile.module.socatmetadata" description="Compile all GWT modules in module SocatMetadata">
+    <property name="gwt.sdk.home.socatmetadata" value="${gwt.sdk.home}"/>
+    <antcall target="run.gwt.compiler.socatmetadata">
+      <param name="gwt.module.name" value="gov.noaa.pmel.socatmetadata.SocatMetadata"/>
+    </antcall>
+  </target>
+</project>

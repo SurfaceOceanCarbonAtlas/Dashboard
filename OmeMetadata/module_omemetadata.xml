@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_omemetadata" default="compile.module.omemetadata">
+  <dirname property="module.omemetadata.basedir" file="${ant.file.module_omemetadata}"/>
+  
+  
+  <property name="compiler.args.omemetadata" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="omemetadata.output.dir" value="${module.omemetadata.basedir}/../target/production/OmeMetadata"/>
+  <property name="omemetadata.testoutput.dir" value="${module.omemetadata.basedir}/../target/test/OmeMetadata"/>
+  
+  <path id="omemetadata.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="omemetadata.module.production.classpath">
+    <path refid="library.jdom-2.0.6.classpath"/>
+  </path>
+  
+  <path id="omemetadata.runtime.production.module.classpath">
+    <pathelement location="${omemetadata.output.dir}"/>
+  </path>
+  
+  <path id="omemetadata.module.classpath">
+    <pathelement location="${omemetadata.output.dir}"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  <path id="omemetadata.runtime.module.classpath">
+    <pathelement location="${omemetadata.testoutput.dir}"/>
+    <pathelement location="${omemetadata.output.dir}"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.omemetadata">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.omemetadata">
+    <patternset refid="excluded.from.module.omemetadata"/>
+  </patternset>
+  
+  <path id="omemetadata.module.sourcepath">
+    <dirset dir="${module.omemetadata.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  <path id="omemetadata.module.test.sourcepath">
+    <dirset dir="${module.omemetadata.basedir}">
+      <include name="src/test/java"/>
+      <include name="src/test/resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.omemetadata" depends="compile.module.omemetadata.production,compile.module.omemetadata.tests" description="Compile module OmeMetadata"/>
+  
+  <target name="compile.module.omemetadata.production" description="Compile module OmeMetadata; production classes">
+    <mkdir dir="${omemetadata.output.dir}"/>
+    <javac destdir="${omemetadata.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.omemetadata}"/>
+      <bootclasspath refid="omemetadata.module.bootclasspath"/>
+      <classpath refid="omemetadata.module.production.classpath"/>
+      <src refid="omemetadata.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.omemetadata"/>
+    </javac>
+    
+    <copy todir="${omemetadata.output.dir}">
+      <fileset dir="${module.omemetadata.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.omemetadata.tests" depends="compile.module.omemetadata.production" description="compile module OmeMetadata; test classes" unless="skip.tests">
+    <mkdir dir="${omemetadata.testoutput.dir}"/>
+    <javac destdir="${omemetadata.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.omemetadata}"/>
+      <bootclasspath refid="omemetadata.module.bootclasspath"/>
+      <classpath refid="omemetadata.module.classpath"/>
+      <src refid="omemetadata.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.omemetadata"/>
+    </javac>
+    
+    <copy todir="${omemetadata.testoutput.dir}">
+      <fileset dir="${module.omemetadata.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.omemetadata.basedir}/src/test/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.omemetadata" description="cleanup module">
+    <delete dir="${omemetadata.output.dir}"/>
+    <delete dir="${omemetadata.testoutput.dir}"/>
+  </target>
+</project>

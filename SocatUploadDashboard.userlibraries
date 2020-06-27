@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eclipse-userlibraries>
+  <library name="antlr-runtime-3.4">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/antlr-runtime-3.4.jar" />
+  </library>
+  <library name="avalon-framework-api-4.3.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/avalon-framework-api-4.3.1.jar" />
+  </library>
+  <library name="avalon-framework-impl-4.3.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/avalon-framework-impl-4.3.1.jar" />
+  </library>
+  <library name="bagit-5.1.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/bagit-5.1.1.jar" />
+  </library>
+  <library name="batik-all-1.9">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/batik-all-1.9.jar" />
+  </library>
+  <library name="commons-csv-1.6">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/commons-csv-1.6.jar" />
+  </library>
+  <library name="commons-io-1.3.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/commons-io-1.3.1.jar" />
+  </library>
+  <library name="commons-logging-1.0.4">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/commons-logging-1.0.4.jar" />
+  </library>
+  <library name="fontbox-2.0.4">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/fontbox-2.0.4.jar" />
+  </library>
+  <library name="fop-2.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/fop-2.2.jar" />
+  </library>
+  <library name="gson-2.8.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/gson-2.8.2.jar" />
+  </library>
+  <library name="gwt-user">
+    <archive path="/Users/ksmith/gwt-2.8.2/gwt-user.jar" />
+  </library>
+  <library name="javax.mail-1.6.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/javax.mail-1.6.1.jar" />
+  </library>
+  <library name="jdom-2.0.6">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/jdom-2.0.6.jar" />
+  </library>
+  <library name="joda-time-2.9.9">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/joda-time-2.9.9.jar" />
+  </library>
+  <library name="junit:junit:4.12">
+    <archive path="/Users/ksmith/.m2/repository/junit/junit/4.12/junit-4.12.jar" />
+    <archive path="/Users/ksmith/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" />
+  </library>
+  <library name="log4j-api-2.11.0">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/log4j-api-2.11.0.jar" />
+  </library>
+  <library name="log4j-core-2.11.0">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/log4j-core-2.11.0.jar" />
+  </library>
+  <library name="log4j-slf4j-impl-2.11.0">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/log4j-slf4j-impl-2.11.0.jar" />
+  </library>
+  <library name="log4j-web-2.11.0">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/log4j-web-2.11.0.jar" />
+  </library>
+  <library name="mysql-connector-java-5.1.46">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/mysql-connector-java-5.1.46.jar" />
+  </library>
+  <library name="netcdfAll-4.6.11">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/netcdfAll-4.6.11.jar" />
+  </library>
+  <library name="sequence-library-1.0.3">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/sequence-library-1.0.3.jar" />
+  </library>
+  <library name="serializer-2.7.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/serializer-2.7.2.jar" />
+  </library>
+  <library name="slf4j-api-1.7.25">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/slf4j-api-1.7.25.jar" />
+  </library>
+  <library name="sqljet-1.1.11">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/sqljet-1.1.11.jar" />
+  </library>
+  <library name="svnkit-1.9.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/svnkit-1.9.2.jar" />
+  </library>
+  <library name="svnkit-cli-1.9.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/svnkit-cli-1.9.2.jar" />
+  </library>
+  <library name="svnkit-javahl16-1.9.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/svnkit-javahl16-1.9.2.jar" />
+  </library>
+  <library name="tomcat-coyote-7.0.86">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/tomcat-coyote-7.0.86.jar" />
+  </library>
+  <library name="xalan-2.7.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/xalan-2.7.2.jar" />
+  </library>
+  <library name="xercesImpl-2.9.1">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/xercesImpl-2.9.1.jar" />
+  </library>
+  <library name="xml-apis-1.3.04">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/xml-apis-1.3.04.jar" />
+  </library>
+  <library name="xml-apis-ext-1.3.04">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/xml-apis-ext-1.3.04.jar" />
+  </library>
+  <library name="xmlgraphics-commons-2.2">
+    <archive path="/Users/ksmith/git/SocatDashboard/UploadDashboard/src/main/webapp/WEB-INF/lib/xmlgraphics-commons-2.2.jar" />
+  </library>
+</eclipse-userlibraries>
+

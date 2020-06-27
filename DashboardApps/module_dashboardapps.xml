@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_dashboardapps" default="compile.module.dashboardapps">
+  <dirname property="module.dashboardapps.basedir" file="${ant.file.module_dashboardapps}"/>
+  
+  
+  <property name="compiler.args.dashboardapps" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="dashboardapps.output.dir" value="${module.dashboardapps.basedir}/../target/production/DashboardApps"/>
+  <property name="dashboardapps.testoutput.dir" value="${module.dashboardapps.basedir}/../target/test/DashboardApps"/>
+  
+  <path id="dashboardapps.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="dashboardapps.module.production.classpath">
+    <pathelement location="${omemetadata.output.dir}"/>
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <pathelement location="${uploaddashboard.output.dir}"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+  </path>
+  
+  <path id="dashboardapps.runtime.production.module.classpath">
+    <pathelement location="${dashboardapps.output.dir}"/>
+    <path refid="omemetadata.runtime.production.module.classpath"/>
+    <path refid="socatmetadata.runtime.production.module.classpath"/>
+    <path refid="uploaddashboard.runtime.production.module.classpath"/>
+  </path>
+  
+  <path id="dashboardapps.module.classpath">
+    <pathelement location="${dashboardapps.output.dir}"/>
+    <pathelement location="${omemetadata.testoutput.dir}"/>
+    <pathelement location="${omemetadata.output.dir}"/>
+    <pathelement location="${socatmetadata.testoutput.dir}"/>
+    <pathelement location="${socatmetadata.output.dir}"/>
+    <pathelement location="${uploaddashboard.testoutput.dir}"/>
+    <pathelement location="${uploaddashboard.output.dir}"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  <path id="dashboardapps.runtime.module.classpath">
+    <pathelement location="${dashboardapps.testoutput.dir}"/>
+    <pathelement location="${dashboardapps.output.dir}"/>
+    <path refid="omemetadata.runtime.module.classpath"/>
+    <path refid="socatmetadata.runtime.module.classpath"/>
+    <path refid="uploaddashboard.runtime.module.classpath"/>
+    <path refid="library.gwt-user.classpath"/>
+    <path refid="library.antlr-runtime-3.4.classpath"/>
+    <path refid="library.avalon-framework-api-4.3.1.classpath"/>
+    <path refid="library.avalon-framework-impl-4.3.1.classpath"/>
+    <path refid="library.bagit-5.1.1.classpath"/>
+    <path refid="library.batik-all-1.9.classpath"/>
+    <path refid="library.commons-csv-1.6.classpath"/>
+    <path refid="library.commons-io-1.3.1.classpath"/>
+    <path refid="library.commons-logging-1.0.4.classpath"/>
+    <path refid="library.fontbox-2.0.4.classpath"/>
+    <path refid="library.fop-2.2.classpath"/>
+    <path refid="library.gson-2.8.2.classpath"/>
+    <path refid="library.javax.mail-1.6.1.classpath"/>
+    <path refid="library.jdom-2.0.6.classpath"/>
+    <path refid="library.joda-time-2.9.9.classpath"/>
+    <path refid="library.log4j-api-2.11.0.classpath"/>
+    <path refid="library.log4j-core-2.11.0.classpath"/>
+    <path refid="library.log4j-slf4j-impl-2.11.0.classpath"/>
+    <path refid="library.log4j-web-2.11.0.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.46.classpath"/>
+    <path refid="library.sequence-library-1.0.3.classpath"/>
+    <path refid="library.serializer-2.7.2.classpath"/>
+    <path refid="library.slf4j-api-1.7.25.classpath"/>
+    <path refid="library.sqljet-1.1.11.classpath"/>
+    <path refid="library.svnkit-1.9.2.classpath"/>
+    <path refid="library.svnkit-cli-1.9.2.classpath"/>
+    <path refid="library.svnkit-javahl16-1.9.2.classpath"/>
+    <path refid="library.tomcat-coyote-7.0.86.classpath"/>
+    <path refid="library.xalan-2.7.2.classpath"/>
+    <path refid="library.xercesimpl-2.9.1.classpath"/>
+    <path refid="library.xml-apis-1.3.04.classpath"/>
+    <path refid="library.xml-apis-ext-1.3.04.classpath"/>
+    <path refid="library.xmlgraphics-commons-2.2.classpath"/>
+    <path refid="library.netcdfall-4.6.11.classpath"/>
+    <path refid="library.junit:junit:4.12.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.dashboardapps">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.dashboardapps">
+    <patternset refid="excluded.from.module.dashboardapps"/>
+  </patternset>
+  
+  <path id="dashboardapps.module.sourcepath">
+    <dirset dir="${module.dashboardapps.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  <path id="dashboardapps.module.test.sourcepath">
+    <dirset dir="${module.dashboardapps.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.dashboardapps" depends="compile.module.dashboardapps.production,compile.module.dashboardapps.tests" description="Compile module DashboardApps"/>
+  
+  <target name="compile.module.dashboardapps.production" depends="compile.module.omemetadata,compile.module.socatmetadata,compile.module.uploaddashboard" description="Compile module DashboardApps; production classes">
+    <mkdir dir="${dashboardapps.output.dir}"/>
+    <javac destdir="${dashboardapps.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.dashboardapps}"/>
+      <bootclasspath refid="dashboardapps.module.bootclasspath"/>
+      <classpath refid="dashboardapps.module.production.classpath"/>
+      <src refid="dashboardapps.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.dashboardapps"/>
+    </javac>
+    
+    <copy todir="${dashboardapps.output.dir}">
+      <fileset dir="${module.dashboardapps.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.dashboardapps.tests" depends="compile.module.dashboardapps.production" description="compile module DashboardApps; test classes" unless="skip.tests">
+    <mkdir dir="${dashboardapps.testoutput.dir}"/>
+    <javac destdir="${dashboardapps.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.dashboardapps}"/>
+      <bootclasspath refid="dashboardapps.module.bootclasspath"/>
+      <classpath refid="dashboardapps.module.classpath"/>
+      <src refid="dashboardapps.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.dashboardapps"/>
+    </javac>
+    
+    <copy todir="${dashboardapps.testoutput.dir}">
+      <fileset dir="${module.dashboardapps.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.dashboardapps" description="cleanup module">
+    <delete dir="${dashboardapps.output.dir}"/>
+    <delete dir="${dashboardapps.testoutput.dir}"/>
+  </target>
+</project>
