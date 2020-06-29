@@ -71,6 +71,13 @@ public class CalibrationGasPanel extends Composite {
         this.header = header;
         this.parentPanel = parentPanel;
 
+        typeValue.setText(gas.getType());
+        idValue.setText(gas.getId());
+        frequencyValue.setText(gas.getUseFrequency());
+        supplierValue.setText(gas.getSupplier());
+        concValue.setText(gas.getConcentration().getValueString());
+        accuracyValue.setText(gas.getAccuracy().getValueString());
+
         addButton.setText("Add another");
         addButton.setTitle("Adds a new calibration gas description after the currently displayed one");
         removeButton.setText("Remove current");
@@ -80,28 +87,28 @@ public class CalibrationGasPanel extends Composite {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setType(typeValue.getText());
-                markInvalids();
+                markInvalids(true);
             }
         });
         idValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setId(idValue.getText());
-                markInvalids();
+                markInvalids(true);
             }
         });
         frequencyValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setUseFrequency(frequencyValue.getText());
-                markInvalids();
+                markInvalids(true);
             }
         });
         supplierValue.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setSupplier(supplierValue.getText());
-                markInvalids();
+                markInvalids(true);
             }
         });
         concValue.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -109,7 +116,7 @@ public class CalibrationGasPanel extends Composite {
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setConcentration(
                         new NumericString(concValue.getText(), CalibrationGas.GAS_CONCENTRATION_UNIT));
-                markInvalids();
+                markInvalids(true);
             }
         });
         accuracyValue.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -117,9 +124,11 @@ public class CalibrationGasPanel extends Composite {
             public void onValueChange(ValueChangeEvent<String> event) {
                 calibrationGas.setAccuracy(
                         new NumericString(accuracyValue.getText(), CalibrationGas.GAS_CONCENTRATION_UNIT));
-                markInvalids();
+                markInvalids(true);
             }
         });
+
+        markInvalids(false);
     }
 
     @UiHandler("addButton")
@@ -134,11 +143,15 @@ public class CalibrationGasPanel extends Composite {
 
     /**
      * Indicate which fields contain invalid values and which contain acceptable values.
-     * Also appropriately assigns the tab for this panel and
-     * notifies the parent panel to update its calibration gases.
+     * Also appropriately assigns the tab for this panel and, if notifyParent is true,
+     * will notify the parent panel to update its calibration gases.
+     *
+     * @param notifyParent
+     *         also notify the parent panel to update its calibration gasses?
      */
-    private void markInvalids() {
+    private void markInvalids(boolean notifyParent) {
         HashSet<String> invalids = calibrationGas.invalidFieldNames();
+
         // Set the contents of the tab for this panel
         String refname = calibrationGas.getId();
         if ( refname.isEmpty() )
@@ -159,8 +172,10 @@ public class CalibrationGasPanel extends Composite {
         supplierValue.markInvalid(invalids.contains("supplier"));
         concValue.markInvalid(invalids.contains("concentration"));
         accuracyValue.markInvalid(invalids.contains("accuracy"));
+
         // notify the parent panel to update the calibration gases
-        parentPanel.updateCalibrationGases();
+        if ( notifyParent )
+            parentPanel.updateCalibrationGases();
     }
 
     /**
