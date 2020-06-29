@@ -100,10 +100,10 @@ public class CoveragePanel extends Composite {
         northLatValue.setText(coverage.getNorthernLatitude().getValueString());
         westLonValue.setText(coverage.getWesternLongitude().getValueString());
         eastLonValue.setText(coverage.getEasternLongitude().getValueString());
-        startDateValue.setText(coverage.getStartDatestamp().fullOrPartialString());
-        endDateValue.setText(coverage.getEndDatestamp().fullOrPartialString());
-        earlyDateValue.setText(coverage.getEarliestDataDate().fullOrPartialString());
-        lateDateValue.setText(coverage.getLatestDataDate().fullOrPartialString());
+        startDateValue.setText(coverage.getStartDatestamp().dateString());
+        endDateValue.setText(coverage.getEndDatestamp().dateString());
+        earlyDateValue.setText(coverage.getEarliestDataDate().dateString());
+        lateDateValue.setText(coverage.getLatestDataDate().dateString());
         regionsValue.setText(coverage.getGeographicNames().asOneString());
 
         markInvalids(null);

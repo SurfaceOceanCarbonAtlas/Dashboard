@@ -101,7 +101,7 @@
   </path>
   
   <path id="library.gwt-user.classpath">
-    <pathelement location="${basedir}/../../gwt-2.8.2/gwt-user.jar"/>
+    <pathelement location="${gwt.sdk.home}/gwt-user.jar"/>
   </path>
   
   <path id="library.javax.mail-1.6.1.classpath">
@@ -269,7 +269,7 @@
       <fileset dir="${socatmetadata.output.dir}"/>
     </copy>
     <mkdir dir="${artifact.output.socatuploaddashboard:web_exploded}/WEB-INF/lib"/>
-    <copy file="${basedir}/../../gwt-2.8.2/gwt-servlet.jar" tofile="${artifact.output.socatuploaddashboard:web_exploded}/WEB-INF/lib/gwt-servlet.jar"/>
+    <copy file="${gwt.sdk.home}/gwt-servlet.jar" tofile="${artifact.output.socatuploaddashboard:web_exploded}/WEB-INF/lib/gwt-servlet.jar"/>
     <copy todir="${artifact.output.socatuploaddashboard:web_exploded}">
       <fileset dir="${gwt.compiler.output.uploaddashboard}"/>
     </copy>
