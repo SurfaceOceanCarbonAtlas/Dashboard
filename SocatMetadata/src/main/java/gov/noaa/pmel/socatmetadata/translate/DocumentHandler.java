@@ -223,22 +223,19 @@ public abstract class DocumentHandler {
             for (int k = 0; k < numStr.length(); k++) {
                 char chr = numStr.charAt(k);
                 if ( (chr == '-') || (chr == '+') || (chr == '.') || Character.isDigit(chr) ) {
-                    numStr = numStr.substring(k);
+                    numStr = numStr.substring(k).trim();
                     break;
                 }
             }
             if ( unitStr == null ) {
                 // Check if unit is part of the string in the number element
-                String[] pieces = numStr.split("[ \t\\(\\)\\[\\]\\{\\}]+");
+                String[] pieces = numStr.split("[\\s\\(\\)\\[\\]\\{\\}]+");
                 if ( pieces.length > 1 ) {
                     numStr = pieces[0];
                     unitStr = pieces[1];
                     for (int k = 2; k < pieces.length; k++) {
                         unitStr += " " + pieces[k];
                     }
-                }
-                else {
-                    numStr = pieces[0];
                 }
             }
         }

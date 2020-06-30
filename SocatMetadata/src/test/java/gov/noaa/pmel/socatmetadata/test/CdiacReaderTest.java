@@ -431,8 +431,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("1", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), genData.getPrecision());
             assertEquals(var.toString(), "WOCE_QC_FLAG", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);
@@ -484,8 +484,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genData.getPrecision());
             assertEquals(var.toString(), "", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);
@@ -535,8 +535,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genData.getPrecision());
             assertEquals(var.toString(), "", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);
@@ -721,8 +721,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("0.005 ", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.0002", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("0.005 ", "permil"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.0002", "permil"), genData.getPrecision());
             assertEquals(var.toString(), "", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);
@@ -759,8 +759,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("1", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("1", "microatmospheres"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "microatmosphere"), genData.getPrecision());
             assertEquals(var.toString(), "WOCE_QC_FLAG", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);
@@ -813,8 +813,8 @@ public class CdiacReaderTest {
 
             assertTrue(var instanceof GenData);
             GenData genData = (GenData) var;
-            assertEquals(var.toString(), new NumericString("0.2", ""), genData.getAccuracy());
-            assertEquals(var.toString(), new NumericString("0.01", ""), genData.getPrecision());
+            assertEquals(var.toString(), new NumericString("0.2", "ppm"), genData.getAccuracy());
+            assertEquals(var.toString(), new NumericString("0.01", "ppm"), genData.getPrecision());
             assertEquals(var.toString(), "", genData.getFlagColName());
 
             assertTrue(var instanceof InstData);

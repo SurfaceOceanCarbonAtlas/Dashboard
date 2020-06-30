@@ -262,17 +262,17 @@ public interface DashboardServicesInterface extends RemoteService {
             throws IllegalArgumentException;
 
     /**
-     * Requests the IDs of datasets which have associated SocatMetadata objects
+     * Requests the IDs of datasets which have associated SocatMetadata objects accessible by the current user
      *
      * @param username
-     *         name of the current user - for validation
+     *         name of the current user - used for validation as well as limiting the list of dataset IDs
      *
-     * @return list of dataset IDs
+     * @return set of dataset IDs
      *
      * @throws IllegalArgumentException
      *         if authentication failed
      */
-    ArrayList<String> getAllDatasetIdsForMetadata(String username) throws IllegalArgumentException;
+    TreeSet<String> getAllDatasetIdsForMetadata(String username) throws IllegalArgumentException;
 
     /**
      * Copy the SocatMetadata, with appropriate adjustments, from one dataset to another.

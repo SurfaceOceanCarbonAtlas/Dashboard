@@ -240,7 +240,7 @@ public interface DashboardServicesInterfaceAsync {
      * @param callback
      *         callback to make with the list of dataset IDs
      */
-    void getAllDatasetIdsForMetadata(String username, AsyncCallback<ArrayList<String>> callback);
+    void getAllDatasetIdsForMetadata(String username, AsyncCallback<TreeSet<String>> callback);
 
     /**
      * Client side request to copy the SocatMetadata, with appropriate adjustments, from one dataset to another.

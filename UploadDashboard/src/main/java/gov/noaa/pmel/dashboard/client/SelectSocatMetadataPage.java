@@ -31,6 +31,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeSet;
 
 /**
  * Page for selecting the standard SOCAT metadata to view and edit.
@@ -65,7 +66,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
 
     private static final String NO_FILE_ERROR_MSG = "Please select a metadata XML file to upload";
 
-    private static final String OVERWRITE_WARNING_MSG = "<h3>The SOCAT metadata for this dataset will be overwritten./h3>" +
+    private static final String OVERWRITE_WARNING_MSG = "<h3>The SOCAT metadata for this dataset will be overwritten.</h3>" +
             "<p>Do you wish to proceed?</p>";
     private static final String OVERWRITE_YES_TEXT = "Yes";
     private static final String OVERWRITE_NO_TEXT = "No";
@@ -272,9 +273,9 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
         if ( datasetIdsList == null ) {
             // Make the call to the server to retrieve the complete list of dataset IDs
             UploadDashboard.showWaitCursor();
-            service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<ArrayList<String>>() {
+            service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<TreeSet<String>>() {
                 @Override
-                public void onSuccess(ArrayList<String> result) {
+                public void onSuccess(TreeSet<String> result) {
                     UploadDashboard.showAutoCursor();
                     datasetIdsList = new ArrayList<String>(result);
                     // Now that the list of dataset IDs exists, try to initialize the list box to the last dataset ID

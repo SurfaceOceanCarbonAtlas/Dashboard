@@ -572,7 +572,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
     }
 
     @Override
-    public ArrayList<String> getAllDatasetIdsForMetadata(String pageUsername) throws IllegalArgumentException {
+    public TreeSet<String> getAllDatasetIdsForMetadata(String pageUsername) throws IllegalArgumentException {
         // Get the dashboard data store and current username, and validate that username
         if ( !validateRequest(pageUsername) )
             throw new IllegalArgumentException("Invalid user request");

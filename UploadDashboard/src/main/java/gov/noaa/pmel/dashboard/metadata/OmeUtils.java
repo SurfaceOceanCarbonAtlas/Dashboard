@@ -19,11 +19,11 @@ import gov.noaa.pmel.socatmetadata.shared.variable.Temperature;
 import gov.noaa.pmel.socatmetadata.shared.variable.Variable;
 import gov.noaa.pmel.socatmetadata.translate.CdiacReader;
 import gov.noaa.pmel.socatmetadata.translate.OcadsWriter;
+import org.jdom2.Document;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class OmeUtils {
         SIMPLE_DATE_FORMAT_UTC.setLenient(false);
     }
 
-    private static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
+    public static final HashMap<String,CdiacReader.VarType> DASH_TYPE_TO_CDIAC_TYPE;
 
     static {
         DASH_TYPE_TO_CDIAC_TYPE = new HashMap<String,CdiacReader.VarType>();
@@ -72,33 +72,26 @@ public class OmeUtils {
     }
 
     /**
-     * Using the given data column names and types for a datasets, creates an SDIMetadata object
+     * Using the given data column names and types for a datasets, creates an SocatMetadata object
      * from CDIAC OME metadata XML.
      *
-     * @param xmlReader
+     * @param omeDoc
      *         read CDIAC OME metadata XML from here
      * @param dataColNames
      *         data column names for this dataset
      * @param dataColTypes
      *         data column types for this dataset
      *
-     * @return SDIMetadata object created from the CDIAC OME metadata file contents
+     * @return SocatMetadata object created from the CDIAC OME metadata file contents
      *
-     * @throws IOException
-     *         if an error occurs when reading the CDIAC OME metadata file
      * @throws IllegalArgumentException
      *         if the contents of the CDIAC OME metadata file are invalid
      */
-    public static SocatMetadata createSocatMetadataFromCdiacOme(Reader xmlReader,
+    public static SocatMetadata createSocatMetadataFromCdiacOme(Document omeDoc,
             ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
-            throws IOException, IllegalArgumentException {
+            throws IllegalArgumentException {
         // Read the CDIAC XML into an XML Document in memory
-        CdiacReader reader;
-        try {
-            reader = new CdiacReader(xmlReader);
-        } finally {
-            xmlReader.close();
-        }
+        CdiacReader reader = new CdiacReader(omeDoc);
         // Make sure all data column names used are mapped to the correct CdiacReader.VarType
         for (int k = 0; k < dataColNames.size(); k++) {
             CdiacReader.VarType vtype = DASH_TYPE_TO_CDIAC_TYPE.get(dataColTypes.get(k).getVarName());
@@ -120,7 +113,7 @@ public class OmeUtils {
      * @throws IOException
      *         if there is a problem writing the file
      */
-    public static void createOcadsOmeFromSdiMetadata(File omeFile, SocatMetadata sdiMData) throws IOException {
+    public static void createOcadsOmeFromSocatMetadata(File omeFile, SocatMetadata sdiMData) throws IOException {
         OcadsWriter ocadsWriter = new OcadsWriter(new FileWriter(omeFile));
         try {
             ocadsWriter.writeOcadsXml(sdiMData);

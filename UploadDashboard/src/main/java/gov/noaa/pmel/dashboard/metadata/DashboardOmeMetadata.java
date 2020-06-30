@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = -4098156831084417729L;
+    private static final long serialVersionUID = -3963269526126888701L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -138,6 +139,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         } catch ( Exception ex ) {
             throw new IllegalArgumentException(ex);
         }
+    }
+
+    /**
+     * Generates a SocatMetadata object from the contents of this OME object
+     *
+     * @return the generated SocatMetadata object
+     *
+     * @throws IllegalArgumentException
+     *         if there were problems generating the SocatMetadata object
+     */
+    public SocatMetadata createSocatMetadata() throws IllegalArgumentException {
+        return omeMData.createSocatMetadataFromContents();
     }
 
     /**
@@ -521,7 +534,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
      *         if there are problems with the given Metadata
      */
     public DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
-        return omeMData.suggestedDatasetStatus(this, dataset);
+        return omeMData.suggestedDatasetStatus(dataset);
     }
 
 }

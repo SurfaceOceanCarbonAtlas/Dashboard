@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.test.actualdatapreserved;
 
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.metadata.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.metadata.OmeUtils;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -10,18 +11,13 @@ import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
-import java.util.ArrayList;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class AutoQCTest {
 
     /**
-     * Test of {@link OmeUtils#createSocatMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
+     * Test of {@link DashboardOmeMetadata#createSocatMetadata()} and
      * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
@@ -48,10 +44,8 @@ public class AutoQCTest {
 
         for (String expocode : TEST_EXPOCODES) {
             DashboardDataset dset = dataHandler.getDatasetFromInfoFile(expocode);
-            File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardServerUtils.PI_OME_FILENAME);
-            FileReader cdiacReader = new FileReader(cdiacFile);
-            SocatMetadata mdata = OmeUtils.createSocatMetadataFromCdiacOme(cdiacReader,
-                    dset.getUserColNames(), dset.getDataColTypes());
+            DashboardOmeMetadata omeMData = metaHandler.getOmeFromFile(expocode, DashboardServerUtils.PI_OME_FILENAME);
+            SocatMetadata mdata = omeMData.createSocatMetadata();
             DatasetQCStatus status = OmeUtils.suggestDatasetQCFlag(mdata, dset);
             DatasetQCStatus.Status auto = status.getAutoSuggested();
             String comment = status.getComments().get(0);
@@ -121,8 +115,8 @@ public class AutoQCTest {
             "33RO20180728",
             "33RO20180910",
             "33RO20181008",
-            // "33WA20180425",
-            // "33WA20180430",
+            "33WA20180425",
+            "33WA20180430",
             "MLCE20180106",
             "MLCE20180111",
             "MLCE20180117",

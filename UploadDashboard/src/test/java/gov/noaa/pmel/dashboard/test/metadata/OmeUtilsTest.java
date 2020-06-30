@@ -8,9 +8,10 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
+import org.jdom2.Document;
+import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
-import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +23,7 @@ import static org.junit.Assert.fail;
 public class OmeUtilsTest {
 
     /**
-     * Test of {@link OmeUtils#createSocatMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
+     * Test of {@link OmeUtils#createSocatMetadataFromCdiacOme(Document, ArrayList, ArrayList)} and
      * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
@@ -31,12 +32,12 @@ public class OmeUtilsTest {
         dset.setUserColNames(DATA_COLUMN_NAMES);
         dset.setDataColTypes(DATA_COLUMN_TYPES);
 
-        StringReader reader = new StringReader(AOML_CDIAC_XML_DATA_STRING);
         SocatMetadata mdata = null;
         try {
-            mdata = OmeUtils.createSocatMetadataFromCdiacOme(reader, dset.getUserColNames(), dset.getDataColTypes());
+            Document omeDoc = (new SAXBuilder()).build(new StringReader(AOML_CDIAC_XML_DATA_STRING));
+            mdata = OmeUtils.createSocatMetadataFromCdiacOme(omeDoc, dset.getUserColNames(), dset.getDataColTypes());
         } catch ( Exception ex ) {
-            fail("Unable to create the SDIMetadata object from CDIAC OME XML: " + ex.getMessage());
+            fail("Unable to create the SocatMetadata object from CDIAC OME XML: " + ex.getMessage());
         }
         assertNotNull(mdata);
 

@@ -2,6 +2,7 @@ package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,6 +53,16 @@ public interface OmeMetadataInterface {
      *         adding it as a supplemental document
      */
     void createPdfFromContents() throws IllegalArgumentException;
+
+    /**
+     * Generates a SocatMetadata object from the contents of this OME object
+     *
+     * @return the generated SocatMetadata object
+     *
+     * @throws IllegalArgumentException
+     *         if there were problems generating the SocatMetadata object
+     */
+    SocatMetadata createSocatMetadataFromContents() throws IllegalArgumentException;
 
     /**
      * @return if the current contents this OME object are acceptable; in particular,
@@ -217,9 +228,6 @@ public interface OmeMetadataInterface {
      * The returned dataset QC will have the autoSuggested flag assigned as well as
      * a single comment documenting the reason for this suggested Status.
      *
-     * @param metadata
-     *         OME metadata XML file associated with this metadata.  The XML from this file
-     *         may be read instead of using the contents of this object.
      * @param dataset
      *         information about the dataset associated with this OME document
      *
@@ -228,8 +236,6 @@ public interface OmeMetadataInterface {
      * @throws IllegalArgumentException
      *         if there are problems with the given metadata
      */
-
-    DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
-            throws IllegalArgumentException;
+    DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException;
 
 }

@@ -32,9 +32,11 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 /**
  * Handles storage and retrieval of metadata files.
@@ -1076,7 +1078,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         SocatMetadata metadata;
         try {
             SocatOmeMetadata omeMetadata = new SocatOmeMetadata(datasetId, metadataFile);
-            metadata = omeMetadata.getSocatMetadata();
+            metadata = omeMetadata.createSocatMetadataFromContents();
         } catch ( Exception ex ) {
             metadata = new SocatMetadata();
             setSocatMetadataDatasetId(datasetId, metadata);
@@ -1128,29 +1130,57 @@ public class MetadataFileHandler extends VersionedFileHandler {
     }
 
     /**
-     * Return the list of dataset IDs which have standard metadata which can be modified by the specified user.
+     * Return the set of dataset IDs which have standard metadata which can be modified by the specified user.
      *
      * @param username
      *         name of the user
      *
-     * @return list of dataset IDs; never null but could be empty
+     * @return set of dataset IDs; never null but could be empty
      */
-    public ArrayList<String> getDatasetIdsWithSocatMetadata(String username) {
-        File[] socatMetadataFiles = filesDir.listFiles(new FilenameFilter() {
+    public TreeSet<String> getDatasetIdsWithSocatMetadata(String username) {
+        // Get the list of all MetadataDocs/(NOCD)/(EXPOCODE)/(EXPOCODE)_SocatMetadata.xml Files
+        File[] nodcDirs = filesDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.endsWith(STD_METADATA_SUFFIX);
+                if ( name.length() != 4 )
+                    return false;
+                return (new File(dir, name)).isDirectory();
             }
         });
-        if ( socatMetadataFiles == null )
-            return new ArrayList<String>(0);
-        ArrayList<String> datasetIds = new ArrayList<String>(socatMetadataFiles.length);
-        for (File mdataFile : socatMetadataFiles) {
-            String filename = mdataFile.getName();
-            String id = filename.substring(0, filename.indexOf(STD_METADATA_SUFFIX));
+        if ( nodcDirs == null )
+            throw new IllegalArgumentException("Unexpected failure to find any primary metadata subdirectories");
+        ArrayList<File> expocodeDirs = new ArrayList<File>(30 * nodcDirs.length);
+        for (File nodc : nodcDirs) {
+            File[] expoDirs = nodc.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if ( (name.length() < 12) || (name.length() > 15) )
+                        return false;
+                    return (new File(dir, name)).isDirectory();
+                }
+            });
+            if ( expoDirs != null )
+                expocodeDirs.addAll(Arrays.asList(expoDirs));
+        }
+        if ( expocodeDirs.isEmpty() )
+            throw new IllegalArgumentException("Unexpected failure to find any secondary metadata subdirectories");
+        ArrayList<File> socatMetadataFiles = new ArrayList<File>(expocodeDirs.size());
+        for (File expo : expocodeDirs) {
+            File[] smfiles = expo.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(STD_METADATA_SUFFIX);
+                }
+            });
+            if ( smfiles != null )
+                socatMetadataFiles.addAll(Arrays.asList(smfiles));
+        }
+        TreeSet<String> datasetIds = new TreeSet<String>();
+        for (File smfile : socatMetadataFiles) {
+            String id = smfile.getParentFile().getName();
             // Only return the IDs of the metadata modifiable by the user
             try {
-                verifyOkayToDelete(username, id, filename);
+                verifyOkayToDelete(username, id, smfile.getName());
                 // allowed, so add this entry
                 datasetIds.add(id);
             } catch ( Exception ex ) {

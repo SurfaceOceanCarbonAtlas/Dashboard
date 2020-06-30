@@ -226,9 +226,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
         // Check if there is a PI-provided OME document
         try {
-            File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
-            FileReader xmlReader = new FileReader(mdataFile);
-            sdimdata = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+            sdimdata = mdataHandler.getOmeFromFile(stdId, DashboardServerUtils.PI_OME_FILENAME).createSocatMetadata();
             platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
             // Probably does not exist
@@ -236,9 +234,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         if ( sdimdata == null ) {
             // Use the OME stub (which should always exist)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
-                FileReader xmlReader = new FileReader(mdataFile);
-                sdimdata = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                sdimdata = mdataHandler.getOmeFromFile(stdId, DashboardServerUtils.OME_FILENAME).createSocatMetadata();
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -249,10 +245,10 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // PI-provided OME document given, but does not contain the platform name; try to get it
             // from the OME stub (ie, check if it was given in the metadata preamble of the data file)
             try {
-                File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
-                FileReader xmlReader = new FileReader(mdataFile);
-                SocatMetadata stub = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
-                platformName = stub.getPlatform().getPlatformName();
+                platformName = mdataHandler.getOmeFromFile(stdId, DashboardServerUtils.OME_FILENAME)
+                                           .createSocatMetadata()
+                                           .getPlatform()
+                                           .getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
                         "Unexpected failure to read " + DashboardServerUtils.OME_FILENAME + " for " + stdId);
@@ -515,7 +511,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             // The SDIMetadata object is always present, but may just be a minimal stub with history
             infoMsg += "    " + OCADS_XML_FILENAME + "\n";
             dest = new File(bundleDir, OCADS_XML_FILENAME);
-            OmeUtils.createOcadsOmeFromSdiMetadata(dest, sdimdata);
+            OmeUtils.createOcadsOmeFromSocatMetadata(dest, sdimdata);
         } catch ( Exception ex ) {
             throw new IOException("Problems copying files to bagit bundle directory: " + ex.getMessage(), ex);
         }
