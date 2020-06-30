@@ -57,7 +57,7 @@ public class GenData extends Variable implements Duplicable, Serializable, IsSer
      * @param accuracy
      *         assign as the accuracy (uncertainty) in values of this variable;
      *         if null, an empty NumericString is assigned.
-     *         The unit is ignored and is force to match the variable unit value.
+     *         The unit is ignored and is force to match the variable unit value if already given.
      *
      * @throws IllegalArgumentException
      *         if a numeric string is given but is not a finite positive number
@@ -71,7 +71,8 @@ public class GenData extends Variable implements Duplicable, Serializable, IsSer
         }
         else
             this.accuracy = new NumericString();
-        this.accuracy.setUnitString(getVarUnit());
+        if ( !getVarUnit().isEmpty() )
+            this.accuracy.setUnitString(getVarUnit());
     }
 
     /**
@@ -86,7 +87,7 @@ public class GenData extends Variable implements Duplicable, Serializable, IsSer
      * @param precision
      *         assign as the precision (resolution) in values of this variable;
      *         if null, an empty NumericString is assigned
-     *         The unit is ignored and is force to match the variable unit value.
+     *         The unit is ignored and is force to match the variable unit value if already given.
      *
      * @throws IllegalArgumentException
      *         if a numeric string is given but is not a finite positive number
@@ -100,7 +101,8 @@ public class GenData extends Variable implements Duplicable, Serializable, IsSer
         }
         else
             this.precision = new NumericString();
-        this.precision.setUnitString(getVarUnit());
+        if ( !getVarUnit().isEmpty() )
+            this.precision.setUnitString(getVarUnit());
     }
 
     /**

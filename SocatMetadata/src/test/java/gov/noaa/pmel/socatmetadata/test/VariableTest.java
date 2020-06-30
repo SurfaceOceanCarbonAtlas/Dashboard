@@ -109,7 +109,7 @@ public class VariableTest {
         GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getAccuracy());
         var.setAccuracy(ACCURACY);
-        assertEquals(new NumericString(ACCURACY.getValueString(), ""), var.getAccuracy());
+        assertEquals(new NumericString(ACCURACY.getValueString(), "deg C"), var.getAccuracy());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         var.setVarUnit(VAR_UNIT);
         assertEquals(ACCURACY, var.getAccuracy());
@@ -145,7 +145,7 @@ public class VariableTest {
         GenData var = new GenData();
         assertEquals(EMPTY_NUMSTR, var.getPrecision());
         var.setPrecision(PRECISION);
-        assertEquals(new NumericString(PRECISION.getValueString(), ""), var.getPrecision());
+        assertEquals(new NumericString(PRECISION.getValueString(), "deg C"), var.getPrecision());
         assertEquals(EMPTY_STRING, var.getVarUnit());
         var.setVarUnit(VAR_UNIT);
         assertEquals(PRECISION, var.getPrecision());

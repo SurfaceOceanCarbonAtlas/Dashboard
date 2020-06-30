@@ -233,11 +233,9 @@ public abstract class DocumentHandler {
                 if ( pieces.length > 1 ) {
                     numStr = pieces[0];
                     unitStr = pieces[1];
-                    /* ignore the rest of the pieces
-                     * for (int k = 2; k < pieces.length; k++) {
-                     *     unitStr += " " + pieces[k];
-                     * }
-                     */
+                    for (int k = 2; k < pieces.length; k++) {
+                        unitStr += " " + pieces[k];
+                    }
                 }
             }
         }
