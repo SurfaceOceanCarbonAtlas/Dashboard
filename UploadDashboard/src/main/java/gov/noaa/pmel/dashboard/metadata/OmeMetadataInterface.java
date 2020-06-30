@@ -45,6 +45,15 @@ public interface OmeMetadataInterface {
     void write(File mdataFile) throws IOException;
 
     /**
+     * Creates an appropriately-name PDF supplemental document from the contents of this OME object
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems creating the PDF document or
+     *         adding it as a supplemental document
+     */
+    void createPdfFromContents() throws IllegalArgumentException;
+
+    /**
      * @return if the current contents this OME object are acceptable; in particular,
      *         all required fields have acceptable values and there are no conflicting field values.
      */

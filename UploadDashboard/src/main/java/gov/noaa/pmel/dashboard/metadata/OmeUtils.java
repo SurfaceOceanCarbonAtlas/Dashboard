@@ -89,7 +89,7 @@ public class OmeUtils {
      * @throws IllegalArgumentException
      *         if the contents of the CDIAC OME metadata file are invalid
      */
-    public static SocatMetadata createSdiMetadataFromCdiacOme(Reader xmlReader,
+    public static SocatMetadata createSocatMetadataFromCdiacOme(Reader xmlReader,
             ArrayList<String> dataColNames, ArrayList<DataColumnType> dataColTypes)
             throws IOException, IllegalArgumentException {
         // Read the CDIAC XML into an XML Document in memory
@@ -132,13 +132,17 @@ public class OmeUtils {
     private static final List<String> ALLOWED_UNITS = Arrays.asList(
             "microatmospheres",
             "uatmospheres",
+            SpellingHandler.micro + "atmospheres",
             SpellingHandler.mu + "atmospheres",
             "uatm",
+            SpellingHandler.micro + "atm",
             SpellingHandler.mu + "atm",
             "micromole_per_mole",
             "umol_per_mol",
+            SpellingHandler.micro + "mol_per_mol",
             SpellingHandler.mu + "mol_per_mol",
             "umol/mol",
+            SpellingHandler.micro + "mol/mol",
             SpellingHandler.mu + "mol/mol",
             "ppm"
     );

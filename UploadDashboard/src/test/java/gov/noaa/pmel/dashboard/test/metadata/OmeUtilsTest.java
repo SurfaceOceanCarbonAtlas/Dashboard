@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
 public class OmeUtilsTest {
 
     /**
-     * Test of {@link OmeUtils#createSdiMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
+     * Test of {@link OmeUtils#createSocatMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
      * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
@@ -34,7 +34,7 @@ public class OmeUtilsTest {
         StringReader reader = new StringReader(AOML_CDIAC_XML_DATA_STRING);
         SocatMetadata mdata = null;
         try {
-            mdata = OmeUtils.createSdiMetadataFromCdiacOme(reader, dset.getUserColNames(), dset.getDataColTypes());
+            mdata = OmeUtils.createSocatMetadataFromCdiacOme(reader, dset.getUserColNames(), dset.getDataColTypes());
         } catch ( Exception ex ) {
             fail("Unable to create the SDIMetadata object from CDIAC OME XML: " + ex.getMessage());
         }

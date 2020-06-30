@@ -815,7 +815,29 @@ public class MetadataFileHandler extends VersionedFileHandler {
      */
     public DashboardOmeMetadata getOmeFromFile(DashboardMetadata mdata) throws IllegalArgumentException {
         File mdataFile = getMetadataFile(mdata.getDatasetId(), mdata.getFilename());
-        DashboardOmeMetadata omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
+        DashboardOmeMetadata omeMData = null;
+        IllegalArgumentException socatException = null;
+        IllegalArgumentException cdiacException = null;
+        try {
+            // Try reading it as a SocatMetadata XML
+            omeMData = new DashboardOmeMetadata(SocatOmeMetadata.class, mdata, mdataFile);
+        } catch ( IllegalArgumentException ex ) {
+            socatException = ex;
+        }
+        if ( omeMData == null ) {
+            try {
+                // Try reading it as CDIAC XML
+                omeMData = new DashboardOmeMetadata(CdiacOmeMetadata.class, mdata, mdataFile);
+            } catch ( IllegalArgumentException ex ) {
+                cdiacException = ex;
+            }
+        }
+        // TODO: try reading it as OCADS XML
+        // If nothing can read the file, raise an IllegalArgumentException
+        if ( omeMData == null )
+            throw new IllegalArgumentException("Cannot read uploaded file as SocatMetadata or CDIAC XML: " +
+                    "\n -- " + socatException.getMessage() +
+                    "\n -- " + cdiacException.getMessage());
         return omeMData;
     }
 

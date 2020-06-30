@@ -1,5 +1,6 @@
 package gov.noaa.pmel.dashboard.metadata;
 
+import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -86,6 +87,22 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
             (new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, outStream);
         } finally {
             outStream.close();
+        }
+    }
+
+    @Override
+    public void createPdfFromContents() throws IllegalArgumentException {
+        OmePdfGenerator omePdfGenerator;
+        try {
+            omePdfGenerator = DashboardConfigStore.get(false).getOmePdfGenerator();
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Unexpect failure to get the current dashboard configuration");
+        }
+        try {
+            // This generates the PI_OME.pdf file and adds it as a supplemental document
+            omePdfGenerator.createPiOmePdf(getDatasetId());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
         }
     }
 
@@ -432,7 +449,7 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         SocatMetadata sdiMData;
         try {
             FileReader xmlReader = new FileReader(cdiacOmeFile);
-            sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
+            sdiMData = OmeUtils.createSocatMetadataFromCdiacOme(
                     xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
