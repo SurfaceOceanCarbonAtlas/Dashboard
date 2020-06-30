@@ -65,7 +65,7 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
 
     private static final String NO_FILE_ERROR_MSG = "Please select a metadata XML file to upload";
 
-    private static final String OVERWRITE_WARNING_MSG = "<h3>The SOCAT metadata for this dataset will be overwritten./h3>" +
+    private static final String OVERWRITE_WARNING_MSG = "<h3>The SOCAT metadata for this dataset will be overwritten.</h3>" +
             "<p>Do you wish to proceed?</p>";
     private static final String OVERWRITE_YES_TEXT = "Yes";
     private static final String OVERWRITE_NO_TEXT = "No";

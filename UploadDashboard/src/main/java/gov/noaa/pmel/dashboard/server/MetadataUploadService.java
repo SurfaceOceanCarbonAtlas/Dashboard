@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardDataset;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
+import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.apache.logging.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
@@ -298,6 +299,10 @@ public class MetadataUploadService extends HttpServlet {
         // Generate the PDF from this OME file; this adds the PDF file as a "supplemental document"
         omedata.createPdfFromContents();
 
+        // Generate the standard metadata (SocatMetadata) from this OME file
+        SocatMetadata socatMData = omedata.createSocatMetadata();
+        metadataHandler.saveSocatMetadata(omedata.getOwner(), id, socatMData);
+
         // "Add" this OME metadata file by assigning the OME timestamp, and get the dataset information
         DashboardDataset dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
 
@@ -308,8 +313,7 @@ public class MetadataUploadService extends HttpServlet {
                 status.setAutoSuggested(autoSuggestedQC.getAutoSuggested());
                 status.addComment(autoSuggestedQC.getComments().get(0));
                 dataset.setSubmitStatus(status);
-                dataFileHandler.saveDatasetInfoToFile(dataset,
-                        "Update of automation-suggested dataset QC flag");
+                dataFileHandler.saveDatasetInfoToFile(dataset, "Update of automation-suggested dataset QC flag");
             }
         } catch ( Exception ex ) {
             /*
