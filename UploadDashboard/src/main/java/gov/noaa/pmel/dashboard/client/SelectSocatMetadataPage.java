@@ -214,35 +214,83 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
             existingRadio.setText(EXISTING_RADIO_TEXT_PROLOGUE +
                     EXISTING_LAST_MODIFIED + omeTimestamp + EXISTING_RADIO_TEXT_EPILOGUE);
 
-        // Initialize the list box of dataset IDs for coping metadata, but only if the list of dataset IDs exist.
+        // Clear the hidden tokens just to be safe
+        clearTokens();
+
+        // Initialize the list box of dataset IDs for copying metadata
+        datasetIdsList = null;
+        metadataListBox.clear();
+        updateDatasetIdsList();
+    }
+
+    /**
+     * Calls the server to get the current set of expocodes of all datasets with
+     * standard metadata (SocatMetadata) files that can be accessed by this user.
+     */
+    private void updateDatasetIdsList() {
+        UploadDashboard.showWaitCursor();
+        service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<TreeSet<String>>() {
+            @Override
+            public void onSuccess(TreeSet<String> result) {
+                UploadDashboard.showAutoCursor();
+                datasetIdsList = new ArrayList<String>(result);
+                for (String id : datasetIdsList) {
+                    metadataListBox.addItem(id);
+                }
+                continueUpdateDataset();
+            }
+
+            @Override
+            public void onFailure(Throwable ex) {
+                UploadDashboard.showAutoCursor();
+                UploadDashboard.showFailureMessage(GET_DATASET_IDS_FAILURE_MSG, ex);
+                continueUpdateDataset();
+            }
+        });
+    }
+
+    /**
+     * Continue the initialization of the page following the update of the dataset ID list
+     */
+    private void continueUpdateDataset() {
+        // try to initialize the selected item to the current dataset
         boolean selectionMade = selectCopyMetadataDatasetId(lastDatasetId);
 
         // Use existing metadata unless only have data-derived metadata and a selection was made for copying metadata
+        String omeTimestamp = cruise.getOmeTimestamp();
         if ( selectionMade && omeTimestamp.isEmpty() )
             copyRadio.setValue(true, true);
         else
             existingRadio.setValue(true, true);
-
-        // Clear the hidden tokens just to be safe
-        clearTokens();
     }
 
     /**
      * Select the given dataset ID in the list box of dataset IDs for copying metadata.
-     * If the list of dataset IDs does not yet exist, false is returned; this method
-     * does not trigger retrieval of the list of dataset IDs.
+     * If the list of dataset IDs does not exist, false is returned.
      *
      * @param datasetId
      *         dataset ID to select; cannot be null but can be empty
      *
-     * @return true if the dataset ID was found in the list of dataset IDs; otherwise false
+     * @return true if a selection was made at least partially matching the dataset ID
+     *         (NODC code at minimum) ; otherwise false
      */
     private boolean selectCopyMetadataDatasetId(String datasetId) {
         if ( (datasetIdsList != null) && !datasetId.isEmpty() ) {
-            int idx = datasetIdsList.indexOf(lastDatasetId);
+            // First check if the dataset ID is in the list
+            int idx = datasetIdsList.indexOf(datasetId);
             if ( idx >= 0 ) {
                 metadataListBox.setSelectedIndex(idx);
                 return true;
+            }
+            // If not found, then search for the closest match; at least the NODC code
+            for (int k = datasetId.length() - 1; k > 4; k--) {
+                String partial = datasetId.substring(0, k);
+                for (idx = 0; idx < datasetIdsList.size(); idx++) {
+                    if ( datasetIdsList.get(idx).startsWith(partial) ) {
+                        metadataListBox.setSelectedIndex(idx);
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -266,30 +314,6 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
         timestampToken.setValue(localTimestamp);
         datasetIdsToken.setValue("[ \"" + cruise.getDatasetId() + "\" ]");
         omeToken.setValue("true");
-    }
-
-    @UiHandler("copyRadio")
-    void copyRadioOnClick(ClickEvent event) {
-        if ( datasetIdsList == null ) {
-            // Make the call to the server to retrieve the complete list of dataset IDs
-            UploadDashboard.showWaitCursor();
-            service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<TreeSet<String>>() {
-                @Override
-                public void onSuccess(TreeSet<String> result) {
-                    UploadDashboard.showAutoCursor();
-                    datasetIdsList = new ArrayList<String>(result);
-                    // Now that the list of dataset IDs exists, try to initialize the list box to the last dataset ID
-                    selectCopyMetadataDatasetId(lastDatasetId);
-                }
-
-                @Override
-                public void onFailure(Throwable ex) {
-                    UploadDashboard.showAutoCursor();
-                    UploadDashboard.showFailureMessage(GET_DATASET_IDS_FAILURE_MSG, ex);
-                    existingRadio.setValue(true, true);
-                }
-            });
-        }
     }
 
     @UiHandler("logoutButton")
