@@ -31,6 +31,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TreeSet;
 
 /**
  * Page for selecting the standard SOCAT metadata to view and edit.
@@ -272,9 +273,9 @@ public class SelectSocatMetadataPage extends CompositeWithUsername {
         if ( datasetIdsList == null ) {
             // Make the call to the server to retrieve the complete list of dataset IDs
             UploadDashboard.showWaitCursor();
-            service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<ArrayList<String>>() {
+            service.getAllDatasetIdsForMetadata(getUsername(), new AsyncCallback<TreeSet<String>>() {
                 @Override
-                public void onSuccess(ArrayList<String> result) {
+                public void onSuccess(TreeSet<String> result) {
                     UploadDashboard.showAutoCursor();
                     datasetIdsList = new ArrayList<String>(result);
                     // Now that the list of dataset IDs exists, try to initialize the list box to the last dataset ID
