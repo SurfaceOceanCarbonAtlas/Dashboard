@@ -229,7 +229,7 @@ public abstract class DocumentHandler {
             }
             if ( unitStr == null ) {
                 // Check if unit is part of the string in the number element
-                String[] pieces = numStr.split("[ \t\\(\\)\\[\\]\\{\\}]+");
+                String[] pieces = numStr.split("[\\s\\(\\)\\[\\]\\{\\}]+");
                 if ( pieces.length > 1 ) {
                     numStr = pieces[0];
                     unitStr = pieces[1];
