@@ -2,7 +2,6 @@ package gov.noaa.pmel.dashboard.test.actualdatamodified;
 
 import gov.noaa.pmel.dashboard.actions.DatasetChecker;
 import gov.noaa.pmel.dashboard.actions.DatasetSubmitter;
-import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.datatype.SocatTypes;
 import gov.noaa.pmel.dashboard.dsg.DsgNcFile;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
@@ -56,7 +55,6 @@ public class SubmitProcessTest {
         DataFileHandler datasetHandler = configStore.getDataFileHandler();
         MetadataFileHandler metaFileHandler = configStore.getMetadataFileHandler();
         DatasetChecker dataChecker = configStore.getDashboardDatasetChecker();
-        OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
         String version = configStore.getUploadVersion();
         DatasetSubmitter datasetSubmitter = configStore.getDashboardDatasetSubmitter();
         DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
@@ -147,8 +145,7 @@ public class SubmitProcessTest {
 
         DashboardDataset dataset = null;
         try {
-            dataset = MetadataUploadService.processOmeMetadata(EXPOCODE, metadata,
-                    metaFileHandler, datasetHandler, omePdfGenerator);
+            dataset = MetadataUploadService.processOmeMetadata(EXPOCODE, metadata, metaFileHandler, datasetHandler);
         } catch ( Exception ex ) {
             System.err.println("Problems interpreting the 'PI_OME.xml' for " +
                     EXPOCODE + ": " + ex.getMessage());
