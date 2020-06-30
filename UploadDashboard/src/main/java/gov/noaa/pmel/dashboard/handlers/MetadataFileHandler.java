@@ -1076,7 +1076,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
         SocatMetadata metadata;
         try {
             SocatOmeMetadata omeMetadata = new SocatOmeMetadata(datasetId, metadataFile);
-            metadata = omeMetadata.getSocatMetadata();
+            metadata = omeMetadata.createSocatMetadataFromContents();
         } catch ( Exception ex ) {
             metadata = new SocatMetadata();
             setSocatMetadataDatasetId(datasetId, metadata);

@@ -223,7 +223,7 @@ public abstract class DocumentHandler {
             for (int k = 0; k < numStr.length(); k++) {
                 char chr = numStr.charAt(k);
                 if ( (chr == '-') || (chr == '+') || (chr == '.') || Character.isDigit(chr) ) {
-                    numStr = numStr.substring(k);
+                    numStr = numStr.substring(k).trim();
                     break;
                 }
             }
@@ -233,12 +233,11 @@ public abstract class DocumentHandler {
                 if ( pieces.length > 1 ) {
                     numStr = pieces[0];
                     unitStr = pieces[1];
-                    for (int k = 2; k < pieces.length; k++) {
-                        unitStr += " " + pieces[k];
-                    }
-                }
-                else {
-                    numStr = pieces[0];
+                    /* ignore the rest of the pieces
+                     * for (int k = 2; k < pieces.length; k++) {
+                     *     unitStr += " " + pieces[k];
+                     * }
+                     */
                 }
             }
         }

@@ -1,10 +1,10 @@
 package gov.noaa.pmel.dashboard.metadata;
 
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
-import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardDataset;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DatasetQCStatus;
 import gov.noaa.pmel.socatmetadata.shared.core.SocatMetadata;
 import org.jdom2.Document;
@@ -16,7 +16,6 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -104,6 +103,35 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
         }
+    }
+
+    /**
+     * Generates a SocatMetadata object from the contents of this OME object.
+     * Uses the properties file of the dataset associated with this metadata
+     * to associate data column names with data column types.
+     *
+     * @return the generated SocatMetadata object
+     *
+     * @throws IllegalArgumentException
+     *         if there were problems generating the SocatMetadata object
+     */
+    @Override
+    public SocatMetadata createSocatMetadataFromContents() throws IllegalArgumentException {
+        DashboardDataset dataset;
+        try {
+            dataset = DashboardConfigStore.get(false).getDataFileHandler().getDatasetFromInfoFile(getDatasetId());
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Unable to read the dataset properties file: " + ex.getMessage());
+        }
+        ArrayList<String> dataColNames = dataset.getUserColNames();
+        ArrayList<DataColumnType> dataColTypes = dataset.getDataColTypes();
+        SocatMetadata socatMData;
+        try {
+            socatMData = OmeUtils.createSocatMetadataFromCdiacOme(mdata.createOmeXmlDoc(), dataColNames, dataColTypes);
+        } catch ( Exception ex ) {
+            throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
+        }
+        return socatMData;
     }
 
     @Override
@@ -435,27 +463,16 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
-            throws IllegalArgumentException {
-        // Read the CDIAC XML directly from the file associated with this metadata
-        File cdiacOmeFile;
+    public DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
+        SocatMetadata socatMData;
         try {
-            DashboardConfigStore configStore = DashboardConfigStore.get(false);
-            MetadataFileHandler metaFileHandler = configStore.getMetadataFileHandler();
-            cdiacOmeFile = metaFileHandler.getMetadataFile(metadata.getDatasetId(), metadata.getFilename());
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Problems getting the CDIAC OME XML file: " + ex.getMessage(), ex);
-        }
-        SocatMetadata sdiMData;
-        try {
-            FileReader xmlReader = new FileReader(cdiacOmeFile);
-            sdiMData = OmeUtils.createSocatMetadataFromCdiacOme(
-                    xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
+            socatMData = OmeUtils.createSocatMetadataFromCdiacOme(mdata.createOmeXmlDoc(),
+                    dataset.getUserColNames(), dataset.getDataColTypes());
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);
         }
 
-        return OmeUtils.suggestDatasetQCFlag(sdiMData, dataset);
+        return OmeUtils.suggestDatasetQCFlag(socatMData, dataset);
     }
 
 }

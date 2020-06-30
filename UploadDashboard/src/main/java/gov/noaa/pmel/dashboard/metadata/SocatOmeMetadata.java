@@ -65,10 +65,8 @@ public class SocatOmeMetadata implements OmeMetadataInterface {
         this.read(datasetId, mdataFile);
     }
 
-    /**
-     * @return a copy of the current foundation metadata object in this instance
-     */
-    public SocatMetadata getSocatMetadata() {
+    @Override
+    public SocatMetadata createSocatMetadataFromContents() {
         return (SocatMetadata) mdata.duplicate(null);
     }
 
@@ -376,8 +374,7 @@ public class SocatOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
-    public DatasetQCStatus suggestedDatasetStatus(DashboardOmeMetadata metadata, DashboardDataset dataset)
-            throws IllegalArgumentException {
+    public DatasetQCStatus suggestedDatasetStatus(DashboardDataset dataset) throws IllegalArgumentException {
         return OmeUtils.suggestDatasetQCFlag(mdata, dataset);
     }
 

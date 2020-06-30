@@ -291,6 +291,23 @@ public class CdiacReader extends DocumentHandler {
     }
 
     /**
+     * Create from CDIAC XML content provided in the given document
+     *
+     * @param omeDoc
+     *         read the CDIAC XML from here
+     *
+     * @throws IllegalArgumentException
+     *         if there is a problem interpreting the XML read
+     */
+    public CdiacReader(Document omeDoc) throws IllegalArgumentException {
+        rootElement = omeDoc.getRootElement();
+        if ( rootElement == null )
+            throw new IllegalArgumentException("No root element found");
+
+        this.keyToTypeMap = new HashMap<String,VarType>(DEFAULT_KEY_TO_TYPE_MAP);
+    }
+
+    /**
      * Adds an association of a column name to a variable type.  The name key is generated from
      * the name (remove anything not alphanumeric and convert to lowercase), and the resulting
      * key added to the current map of name keys to variable types.

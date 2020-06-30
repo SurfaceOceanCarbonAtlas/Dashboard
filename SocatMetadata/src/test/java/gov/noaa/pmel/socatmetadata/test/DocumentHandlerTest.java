@@ -128,7 +128,7 @@ public class DocumentHandlerTest {
     @Test
     public void testGetNumericString() {
         final String numVal = "345.0";
-        final String unitVal = "umol / mol";
+        final String unitVal = "umol/mol";
         final NumericString numstr = new NumericString(numVal, unitVal);
         final NumericString invalid = new NumericString();
 
