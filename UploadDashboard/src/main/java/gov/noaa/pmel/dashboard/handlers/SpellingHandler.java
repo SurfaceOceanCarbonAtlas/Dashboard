@@ -65,6 +65,7 @@ public class SpellingHandler {
     public static final Character iUmlaut = '\u00EF';
     public static final Character dBar = '\u00F0';
     public static final Character mu = '\u03BC';
+    public static final Character micro = '\u00B5';
     public static final Character nTilde = '\u00F1';
     public static final Character oGrave = '\u00F2';
     public static final Character oAcute = '\u00F3';
@@ -140,6 +141,7 @@ public class SpellingHandler {
         ANGLICIZE_MAP.put(iHat, "i");
         ANGLICIZE_MAP.put(iUmlaut, "i");
         ANGLICIZE_MAP.put(dBar, "th");
+        ANGLICIZE_MAP.put(micro, "u");
         ANGLICIZE_MAP.put(mu, "u");
         ANGLICIZE_MAP.put(nTilde, "n");
         ANGLICIZE_MAP.put(oGrave, "o");

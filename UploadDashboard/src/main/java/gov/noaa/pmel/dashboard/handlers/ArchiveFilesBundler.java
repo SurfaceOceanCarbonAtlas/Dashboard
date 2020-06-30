@@ -228,7 +228,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
         try {
             File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.PI_OME_FILENAME);
             FileReader xmlReader = new FileReader(mdataFile);
-            sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+            sdimdata = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
             platformName = sdimdata.getPlatform().getPlatformName();
         } catch ( Exception ex ) {
             // Probably does not exist
@@ -238,7 +238,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
-                sdimdata = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                sdimdata = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = sdimdata.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(
@@ -251,7 +251,7 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
             try {
                 File mdataFile = mdataHandler.getMetadataFile(stdId, DashboardServerUtils.OME_FILENAME);
                 FileReader xmlReader = new FileReader(mdataFile);
-                SocatMetadata stub = OmeUtils.createSdiMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
+                SocatMetadata stub = OmeUtils.createSocatMetadataFromCdiacOme(xmlReader, dataColNames, dataColTypes);
                 platformName = stub.getPlatform().getPlatformName();
             } catch ( Exception ex ) {
                 throw new RuntimeException(

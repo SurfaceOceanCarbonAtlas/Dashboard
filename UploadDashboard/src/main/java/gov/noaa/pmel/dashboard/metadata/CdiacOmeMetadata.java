@@ -449,7 +449,7 @@ public class CdiacOmeMetadata implements OmeMetadataInterface {
         SocatMetadata sdiMData;
         try {
             FileReader xmlReader = new FileReader(cdiacOmeFile);
-            sdiMData = OmeUtils.createSdiMetadataFromCdiacOme(
+            sdiMData = OmeUtils.createSocatMetadataFromCdiacOme(
                     xmlReader, dataset.getUserColNames(), dataset.getDataColTypes());
         } catch ( Exception ex ) {
             throw new IllegalArgumentException("Problems interpreting the CDIAC OME XML: " + ex.getMessage(), ex);

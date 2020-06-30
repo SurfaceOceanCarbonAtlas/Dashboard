@@ -21,7 +21,7 @@ import static org.junit.Assert.fail;
 public class AutoQCTest {
 
     /**
-     * Test of {@link OmeUtils#createSdiMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
+     * Test of {@link OmeUtils#createSocatMetadataFromCdiacOme(Reader, ArrayList, ArrayList)} and
      * {@link OmeUtils#suggestDatasetQCFlag(SocatMetadata, DashboardDataset)}
      */
     @Test
@@ -50,7 +50,7 @@ public class AutoQCTest {
             DashboardDataset dset = dataHandler.getDatasetFromInfoFile(expocode);
             File cdiacFile = metaHandler.getMetadataFile(expocode, DashboardServerUtils.PI_OME_FILENAME);
             FileReader cdiacReader = new FileReader(cdiacFile);
-            SocatMetadata mdata = OmeUtils.createSdiMetadataFromCdiacOme(cdiacReader,
+            SocatMetadata mdata = OmeUtils.createSocatMetadataFromCdiacOme(cdiacReader,
                     dset.getUserColNames(), dset.getDataColTypes());
             DatasetQCStatus status = OmeUtils.suggestDatasetQCFlag(mdata, dset);
             DatasetQCStatus.Status auto = status.getAutoSuggested();
