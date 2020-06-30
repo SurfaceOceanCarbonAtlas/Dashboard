@@ -94,6 +94,13 @@ public class SocatOmeMetadata implements OmeMetadataInterface {
     }
 
     @Override
+    public void createPdfFromContents() throws IllegalArgumentException {
+        // TODO: implement, if a PDF of this is needed
+        // Do not throw an exception at this time as there is no decision yet
+        // on displaying the contents of this SocatMetadata object.
+    }
+
+    @Override
     public void write(File mdataFile) throws IOException {
         XMLEncoder xenc = new XMLEncoder(new FileOutputStream(mdataFile));
         xenc.writeObject(mdata);

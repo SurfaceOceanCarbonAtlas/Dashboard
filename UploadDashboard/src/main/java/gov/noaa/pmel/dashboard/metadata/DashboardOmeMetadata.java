@@ -25,7 +25,7 @@ import java.util.TimeZone;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-    private static final long serialVersionUID = -8109401858249468927L;
+    private static final long serialVersionUID = -4098156831084417729L;
 
     /**
      * String separating each PI listed in scienceGroup, each organization listed in organizations, and each additional
@@ -211,6 +211,17 @@ public class DashboardOmeMetadata extends DashboardMetadata {
         scMData.setSourceDOI(omeMData.getDatasetDOI());
 
         return scMData;
+    }
+
+    /**
+     * Creates an appropriately-name PDF supplemental document from the contents of this OME object
+     *
+     * @throws IllegalArgumentException
+     *         if there are problems creating the PDF document or
+     *         adding it as a supplemental document
+     */
+    public void createPdfFromContents() throws IllegalArgumentException {
+        omeMData.createPdfFromContents();
     }
 
     /**

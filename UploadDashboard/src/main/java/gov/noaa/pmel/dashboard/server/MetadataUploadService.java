@@ -1,6 +1,5 @@
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.DataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
@@ -35,9 +34,9 @@ import java.util.TreeSet;
  */
 public class MetadataUploadService extends HttpServlet {
 
-    private static final long serialVersionUID = 3482482593306147686L;
+    private static final long serialVersionUID = -8381450557534906569L;
 
-    private ServletFileUpload metadataUpload;
+    private final ServletFileUpload metadataUpload;
 
     public MetadataUploadService() {
         File servletTmpDir;
@@ -149,7 +148,6 @@ public class MetadataUploadService extends HttpServlet {
 
         MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
         DataFileHandler dataFileHandler = configStore.getDataFileHandler();
-        OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
         DatabaseRequestHandler databaseHandler = configStore.getDatabaseRequestHandler();
         DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
@@ -187,7 +185,7 @@ public class MetadataUploadService extends HttpServlet {
                 DashboardDataset dataset;
                 if ( isOme ) {
                     try {
-                        dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler, omePdfGenerator);
+                        dataset = processOmeMetadata(id, metadata, metadataHandler, dataFileHandler);
                         // TODO: needs to create a file for generating a SocatMetadata object
                     } catch ( IllegalArgumentException ex ) {
                         // Problem with this PI_OME metadata - delete it
@@ -284,31 +282,22 @@ public class MetadataUploadService extends HttpServlet {
      *         metadata file handler to obtain the OME metadata from the metadata information
      * @param dataFileHandler
      *         data file handler to obtain the data file information
-     * @param omePdfGenerator
-     *         handler to generate the PDF from the OME metadata
      *
      * @return the updated dataset information after adding this OME metadata
      *
      * @throws IllegalArgumentException
-     *         if the OME metadata is invalid, or if there is a problem generating the PDF from the OME metadata
+     *         if the OME metadata is invalid, or
+     *         if there is a problem generating the PDF from the OME metadata
      */
     public static DashboardDataset processOmeMetadata(String id, DashboardMetadata metadata,
-            MetadataFileHandler metadataHandler, DataFileHandler dataFileHandler,
-            OmePdfGenerator omePdfGenerator) throws IllegalArgumentException {
+            MetadataFileHandler metadataHandler, DataFileHandler dataFileHandler) throws IllegalArgumentException {
 
-        // Make sure the contents are valid OME XML
-        DashboardOmeMetadata omedata;
-        try {
-            omedata = metadataHandler.getOmeFromFile(metadata);
-        } catch ( IllegalArgumentException ex ) {
-            throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
-        }
-        // Generate the PDF from this PI_OME.xml file; this adds the PDF file as a "supplemental document"
-        try {
-            omePdfGenerator.createPiOmePdf(id);
-        } catch ( Exception ex ) {
-            throw new IllegalArgumentException("Unable to create the PDF from the OME XML: " + ex.getMessage());
-        }
+        // Make sure the contents are valid OME in some format
+        DashboardOmeMetadata omedata = metadataHandler.getOmeFromFile(metadata);
+
+        // Generate the PDF from this OME file; this adds the PDF file as a "supplemental document"
+        omedata.createPdfFromContents();
+
         // "Add" this OME metadata file by assigning the OME timestamp, and get the dataset information
         DashboardDataset dataset = dataFileHandler.addAddlDocTitleToDataset(id, omedata);
 
