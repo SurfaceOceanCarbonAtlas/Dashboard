@@ -124,7 +124,7 @@ public class KnownDataTypes {
     /**
      * Adds the default well-known metadata column types for generating the NetCDF DSG files:
      * <p>
-     * DATASET_ID, DATASET_NAME, ENHANCED_DOI, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
+     * DATASET_ID, DATASET_NAME, SOURCE_DOI, PLATFORM_NAME, PLATFORM_TYPE, ORGANIZATION_NAME, INVESTIGATOR_NAMES,
      * WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE,
      * TIME_COVERAGE_START, TIME_COVERAGE_END, DATASET_QC_FLAG, ALL_REGION_IDS, VERSION
      * <p>
@@ -135,7 +135,7 @@ public class KnownDataTypes {
     public KnownDataTypes addStandardTypesForMetadataFiles() {
         addDataType(DashboardServerUtils.DATASET_ID);
         addDataType(DashboardServerUtils.DATASET_NAME);
-        addDataType(DashboardServerUtils.ENHANCED_DOI);
+        addDataType(DashboardServerUtils.SOURCE_DOI);
         addDataType(DashboardServerUtils.PLATFORM_NAME);
         addDataType(DashboardServerUtils.PLATFORM_TYPE);
         addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);

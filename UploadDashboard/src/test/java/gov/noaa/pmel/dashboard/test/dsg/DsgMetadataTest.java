@@ -343,33 +343,6 @@ public class DsgMetadataTest {
     }
 
     /**
-     * Test method for {@link DsgMetadata#getEnhancedDOI()} and {@link DsgMetadata#setEnhancedDOI(String)}
-     */
-    @Test
-    public void testGetSetEnhancedDOI() {
-        KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-        DsgMetadata mdata = new DsgMetadata(knownTypes);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getEnhancedDOI());
-        mdata.setEnhancedDOI(SOCAT_DOI);
-        assertEquals(SOCAT_DOI, mdata.getEnhancedDOI());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSourceDOI());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getNorthmostLatitude());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getSouthmostLatitude());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEastmostLongitude());
-        assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getWestmostLongitude());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetId());
-        mdata.setEnhancedDOI(null);
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getEnhancedDOI());
-    }
-
-    /**
      * Test method for {@link DsgMetadata#getDatasetQCFlag()} and {@link DsgMetadata#setDatasetQCFlag(String)}
      */
     @Test
@@ -379,7 +352,6 @@ public class DsgMetadataTest {
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetQCFlag());
         mdata.setDatasetQCFlag(QC_FLAG);
         assertEquals(QC_FLAG, mdata.getDatasetQCFlag());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getEnhancedDOI());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSourceDOI());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
@@ -408,7 +380,6 @@ public class DsgMetadataTest {
         mdata.setVersion(SOCAT_VERSION);
         assertEquals(SOCAT_VERSION, mdata.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetQCFlag());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getEnhancedDOI());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSourceDOI());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
@@ -438,7 +409,6 @@ public class DsgMetadataTest {
         assertEquals(ALL_REGION_IDS, mdata.getAllRegionIDs());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetQCFlag());
-        assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getEnhancedDOI());
         assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSourceDOI());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getEndTime());
         assertEquals(DashboardUtils.FP_MISSING_VALUE, mdata.getBeginTime());
@@ -604,13 +574,6 @@ public class DsgMetadataTest {
         assertNotEquals(mdata.hashCode(), other.hashCode());
         assertFalse(mdata.equals(other));
         other.setSourceDOI(OCADS_DOI);
-        assertEquals(mdata.hashCode(), other.hashCode());
-        assertTrue(mdata.equals(other));
-
-        mdata.setEnhancedDOI(SOCAT_DOI);
-        assertNotEquals(mdata.hashCode(), other.hashCode());
-        assertFalse(mdata.equals(other));
-        other.setEnhancedDOI(SOCAT_DOI);
         assertEquals(mdata.hashCode(), other.hashCode());
         assertTrue(mdata.equals(other));
 

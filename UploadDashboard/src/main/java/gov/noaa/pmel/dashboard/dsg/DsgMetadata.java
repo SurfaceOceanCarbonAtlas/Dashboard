@@ -421,31 +421,6 @@ public class DsgMetadata {
     }
 
     /**
-     * @return the DOI for the enhanced dataset;
-     *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
-     */
-    public String getEnhancedDOI() {
-        String value = (String) valuesMap.get(DashboardServerUtils.ENHANCED_DOI);
-        if ( value == null )
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        return value;
-    }
-
-    /**
-     * @param enhancedDOI
-     *         the DOI to set for the enhanced dataset
-     *         if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-     */
-    public void setEnhancedDOI(String enhancedDOI) {
-        String value;
-        if ( enhancedDOI != null )
-            value = enhancedDOI;
-        else
-            value = DashboardUtils.STRING_MISSING_VALUE;
-        valuesMap.put(DashboardServerUtils.ENHANCED_DOI, value);
-    }
-
-    /**
      * @return the dataset QC flag;
      *         never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
      */

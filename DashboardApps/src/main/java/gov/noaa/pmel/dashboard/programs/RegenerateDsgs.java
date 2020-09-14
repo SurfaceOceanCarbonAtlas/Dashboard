@@ -85,7 +85,7 @@ public class RegenerateDsgs {
             omeMData.setDatasetDOI(fullDataMeta.getSourceDOI());
             updatedMeta = omeMData.createDsgMetadata(knownMetadataTypes);
             // Copy over metadata not contained in the XML file
-            updatedMeta.setEnhancedDOI(fullDataMeta.getEnhancedDOI());
+            updatedMeta.setSourceDOI(fullDataMeta.getSourceDOI());
             updatedMeta.setDatasetQCFlag(fullDataMeta.getDatasetQCFlag());
             updatedMeta.setVersion(fullDataMeta.getVersion());
             updatedMeta.setAllRegionIDs(fullDataMeta.getAllRegionIDs());
