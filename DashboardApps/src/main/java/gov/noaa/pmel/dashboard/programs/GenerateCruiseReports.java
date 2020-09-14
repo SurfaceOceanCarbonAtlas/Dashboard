@@ -301,18 +301,17 @@ public class GenerateCruiseReports {
                 }
                 warnMsgs.add(msg);
             }
-            boolean inRegion;
+            dsgFile.readData(knownDataFileTypes);
+            StdDataArray dataVals = dsgFile.getStdDataArray();
+            Integer woceColIdx = dataVals.getIndexOfType(SocatTypes.WOCE_CO2_WATER);
+            if ( woceColIdx == null )
+                throw new IOException(SocatTypes.WOCE_CO2_WATER.getVarName() +
+                        " is not defined in the DSG file for " + upperExpo);
+            boolean inRegion = false;
             if ( regionID != null ) {
-                inRegion = false;
-                dsgFile.readData(knownDataFileTypes);
-                StdDataArray dataVals = dsgFile.getStdDataArray();
                 Integer regionColIdx = dataVals.getIndexOfType(DashboardServerUtils.REGION_ID);
                 if ( regionColIdx == null )
                     throw new IOException(DashboardServerUtils.REGION_ID.getVarName() +
-                            " is not defined in the DSG file for " + upperExpo);
-                Integer woceColIdx = dataVals.getIndexOfType(SocatTypes.WOCE_CO2_WATER);
-                if ( woceColIdx == null )
-                    throw new IOException(SocatTypes.WOCE_CO2_WATER.getVarName() +
                             " is not defined in the DSG file for " + upperExpo);
                 for (int j = 0; j < dataVals.getNumSamples(); j++) {
                     // Ignore WOCE-3 and WOCE-4 as they are not reported
@@ -325,7 +324,13 @@ public class GenerateCruiseReports {
                 }
             }
             else {
-                inRegion = true;
+                // Check that there is some valid data point
+                for (int j = 0; j < dataVals.getNumSamples(); j++) {
+                    if ( DashboardServerUtils.WOCE_ACCEPTABLE.equals(dataVals.getStdVal(j, woceColIdx)) ) {
+                        inRegion = true;
+                        break;
+                    }
+                }
             }
             if ( inRegion ) {
                 DsgMetadata socatMeta = dsgFile.getMetadata();
