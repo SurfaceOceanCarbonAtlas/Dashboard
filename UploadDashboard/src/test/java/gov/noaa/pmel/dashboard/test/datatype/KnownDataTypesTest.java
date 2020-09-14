@@ -129,7 +129,7 @@ public class KnownDataTypesTest {
     private static final TreeSet<DashDataType<?>> STD_METADATA_FILES_TYPES = new TreeSet<DashDataType<?>>(Arrays.asList(
             DashboardServerUtils.DATASET_ID,
             DashboardServerUtils.DATASET_NAME,
-            DashboardServerUtils.ENHANCED_DOI,
+            DashboardServerUtils.SOURCE_DOI,
             DashboardServerUtils.PLATFORM_NAME,
             DashboardServerUtils.PLATFORM_TYPE,
             DashboardServerUtils.ORGANIZATION_NAME,

@@ -263,11 +263,6 @@ public class DashboardServerUtils {
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
             null, null, null, null, USER_ONLY_ROLES);
 
-    public static final StringDashDataType ENHANCED_DOI = new StringDashDataType("socat_doi",
-            121.0, "SOCAT DOI", "DOI of the SOCAT-enhanced dataset", false,
-            DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
-            null, null, null, null, FILE_METADATA_ONLY_ROLES);
-
     public static final StringDashDataType DATASET_QC_FLAG = new StringDashDataType("qc_flag",
             122.0, "Dataset QC Flag", "QC assessment of the dataset", false,
             DashboardUtils.NO_UNITS, null, IDENTIFIER_CATEGORY, null,
